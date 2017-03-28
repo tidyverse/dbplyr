@@ -16,7 +16,7 @@ Depends:
 Imports: 
     assertthat,
     DBI (>= 0.5),
-    dplyr (>= 0.5.0.9000),
+    dplyr (>= 0.5.0.9001),
     glue,
     rlang (>= 0.0.0.9004),
     R6,

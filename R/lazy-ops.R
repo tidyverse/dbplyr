@@ -133,7 +133,7 @@ op_grps.op_summarise <- function(op) {
 
 #' @export
 op_grps.op_rename <- function(op) {
-  names(rename_vars(op_grps(op$x), !!! op$dots))
+  names(rename_vars(op_grps(op$x), !!! op$dots, strict = FALSE))
 }
 
 #' @export
