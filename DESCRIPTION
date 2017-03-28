@@ -37,11 +37,11 @@ VignetteBuilder: knitr
 LazyData: yes
 License: MIT + file LICENSE
 Collate: 
+    'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
     'data-nycflights13.r'
     'data-temp.R'
-    'data.r'
     'db-mysql.r'
     'db-postgres.r'
     'db-sqlite.r'
@@ -50,8 +50,8 @@ Collate:
     'do.r'
     'explain.r'
     'lazy-ops.R'
+    'memdb.R'
     'partial-eval.r'
-    'pull.R'
     'query.r'
     'sql-build.R'
     'sql-escape.r'
@@ -59,7 +59,6 @@ Collate:
     'sql-optimise.R'
     'sql-query.R'
     'sql-render.R'
-    'sql-star.r'
     'src-sql.r'
     'src-test.r'
     'src_dbi.R'
@@ -70,7 +69,6 @@ Collate:
     'translate-sql-window.r'
     'translate-sql-base.r'
     'translate-sql.r'
-    'utils-expr.R'
     'utils-format.r'
     'utils.r'
 RoxygenNote: 6.0.1
