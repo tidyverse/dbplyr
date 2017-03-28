@@ -48,6 +48,11 @@ test_frame <- function(..., srcs = test_srcs$get(), ignore = character()) {
   test_load(df, srcs = srcs, ignore = ignore)
 }
 
+test_frame_windowed <- function(...) {
+  # SQLite and MySQL don't support window functions
+  test_frame(..., ignore = c("sqlite", "mysql"))
+}
+
 # Manage cache of testing srcs
 test_srcs <- local({
   e <- new.env(parent = emptyenv())

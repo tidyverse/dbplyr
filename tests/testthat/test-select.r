@@ -4,51 +4,40 @@ df <- as.data.frame(as.list(setNames(1:26, letters)))
 tbls <- test_load(df)
 
 test_that("two selects equivalent to one", {
-  compare_tbls(tbls, . %>% select(l:s) %>% select(n:o), ref = select(df, n:o))
+  mf <- memdb_frame(a = 1, b = 1, c = 1, d = 2)
+
+  out <- mf %>%
+    select(a:c) %>%
+    select(b:c) %>%
+    collect()
+
+  expect_named(out, c("b", "c"))
 })
 
 test_that("select operates on mutated vars", {
-  test_f <- function(tbl) {
-    res <- tbl %>%
-      mutate(x, z = x + y) %>%
-      select(z) %>%
-      collect()
-    expect_equal(res$z, rep(4, 3))
-  }
+  mf <- memdb_frame(x = c(1, 2, 3), y = c(3, 2, 1))
 
-  test_frame(x = c(1, 2, 3), y = c(3, 2, 1)) %>% lapply(test_f)
+  df1 <- mf %>%
+    mutate(x, z = x + y) %>%
+    select(z) %>%
+    collect()
+
+  df2 <- mf %>%
+    collect() %>%
+    mutate(x, z = x + y) %>%
+    select(z)
+
+  expect_equal_tbl(df1, df2)
 })
 
 test_that("select renames variables (#317)", {
-  skip_if_no_sqlite()
-
-  first <- tbls$sqlite %>% select(A = a)
-  expect_equal(tbl_vars(first), "A")
-  expect_equal(tbl_vars(first %>% select(A)), "A")
-  expect_equal(tbl_vars(first %>% select(B = A)), "B")
+  mf <- memdb_frame(x = 1, y = 2)
+  expect_equal_tbl(mf %>% select(A = x), tibble(A = 1))
 })
 
 test_that("select preserves grouping vars", {
-  skip_if_no_sqlite()
+  mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
+  out <- mf %>% select(a) %>% collect()
 
-  first <- tbls$sqlite %>% group_by(b) %>% select(a)
-  expect_equal(tbl_vars(first), c("b", "a"))
-})
-
-test_that("rename handles grouped data (#640)", {
-  res <- data_frame(a = 1, b = 2) %>% group_by(a) %>% rename(c = b)
-  expect_equal(names(res), c("a", "c"))
-})
-
-test_that("rename does not crash with invalid grouped data frame (#640)", {
-  df <- data_frame(a = 1:3, b = 2:4, d = 3:5) %>% group_by(a, b)
-  df$a <- NULL
-  expect_equal(
-    df %>% rename(e = d) %>% ungroup,
-    data_frame(b = 2:4, e = 3:5)
-  )
-  expect_equal(
-    df %>% rename(e = b) %>% ungroup,
-    data_frame(e = 2:4, d = 3:5)
-  )
+  expect_named(out, c("b", "a"))
 })
