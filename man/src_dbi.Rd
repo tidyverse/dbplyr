@@ -2,20 +2,9 @@
 % Please edit documentation in R/src_dbi.R
 \name{src_dbi}
 \alias{src_dbi}
-\alias{src_mysql}
-\alias{src_postgres}
-\alias{src_sqlite}
 \title{Source for database backends}
 \usage{
 src_dbi(con, auto_disconnect = FALSE)
-
-src_mysql(dbname, host = NULL, port = 0L, username = "root",
-  password = "", ...)
-
-src_postgres(dbname = NULL, host = NULL, port = NULL, user = NULL,
-  password = NULL, ...)
-
-src_sqlite(path, create = FALSE)
 }
 \arguments{
 \item{con}{An object that inherits from \link[DBI:DBIConnection-class]{DBI::DBIConnection},
@@ -29,10 +18,6 @@ clean up themselves.}
 
 \item{host, port}{Host name and port number of database}
 
-\item{...}{for the src, other arguments passed on to the underlying
-database connector, \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. For the tbl, included for
-compatibility with the generic, but otherwise ignored.}
-
 \item{user, username, password}{User name and password.
 
 Generally, you should avoid saving username and password in your
@@ -41,13 +26,9 @@ Instead, retrieve them from environment variables, or use database
 specific credential scores. For example, with MySQL you can set up \code{my.cnf}
 as described in \code{\link[RMySQL:MySQL]{RMySQL::MySQL()}}.}
 
-\item{path}{Path to SQLite database. You can use the special path
-":memory:" to create a temporary in memory database.}
-
-\item{create}{if \code{FALSE}, \code{path} must already exist. If
-\code{TRUE}, will create a new SQlite3 database at \code{path} if
-\code{path} does not exist and connect to the existing database if
-\code{path} does exist.}
+\item{...}{for the src, other arguments passed on to the underlying
+database connector, \code{\link[DBI:dbConnect]{DBI::dbConnect()}}. For the tbl, included for
+compatibility with the generic, but otherwise ignored.}
 }
 \value{
 An S3 object with class \code{src_dbi}, \code{src_sql}, \code{src}.
