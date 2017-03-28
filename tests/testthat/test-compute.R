@@ -1,4 +1,4 @@
-context("Compute")
+context("compute")
 
 test_that("compute doesn't change representation", {
   tbls <- test_frame(x = 5:1, y = 1:5, z = "a")

@@ -1,5 +1,4 @@
-context("Window functions")
-
+context("win_over")
 
 test_that("over() only requires first argument", {
   expect_equal(win_over("X"), sql("'X' OVER ()"))

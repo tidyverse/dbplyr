@@ -1,5 +1,17 @@
 context("tbl_sql")
 
+test_that("can connect directly to con", {
+  skip_if_no_sqlite()
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con))
+  DBI::dbWriteTable(con, "mtcars", mtcars)
+
+  mtcars2 <- tbl(con, "mtcars")
+  expect_s3_class(mtcars2, "tbl_dbi")
+  expect_equal(collect(mtcars2), mtcars)
+})
+
 test_that("can generate sql tbls with raw sql", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
   mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x))

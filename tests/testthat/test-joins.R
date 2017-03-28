@@ -1,4 +1,4 @@
-context("SQL: joins")
+context("joins")
 
 src <- src_sqlite(tempfile(), create = TRUE)
 df1 <- copy_to(src, data.frame(x = 1:5, y = 1:5), "df1")

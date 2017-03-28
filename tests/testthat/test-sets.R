@@ -1,4 +1,4 @@
-context("Set ops")
+context("sets")
 
 test_that("union and union all work for all backends", {
   df <- tibble(x = 1:10, y = x %% 2)
@@ -8,6 +8,17 @@ test_that("union and union all work for all backends", {
 
   compare_tbls2(tbls_full, tbls_filter, dplyr::union)
   compare_tbls2(tbls_full, tbls_filter, dplyr::union_all)
+})
+
+test_that("union on database uses UNION ALL", {
+  skip_if_no_sqlite()
+  db <- src_sqlite(":memory:", TRUE)
+
+  df1 <- copy_to(db, data_frame(x = 1:2), "df1")
+  df2 <- copy_to(db, data_frame(x = 1:2), "df2")
+
+  res <- collect(union_all(df1, df2))
+  expect_equal(res$x, rep(1:2, 2))
 })
 
 test_that("intersect and setdiff work for supported backends", {
