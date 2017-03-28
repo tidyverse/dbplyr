@@ -18,10 +18,8 @@ Imports:
     DBI (>= 0.5),
     dplyr (>= 0.5.0.9000),
     glue,
-    methods,
     rlang (>= 0.0.0.9004),
     R6,
-    tibble (>= 1.2),
     utils
 Suggests: 
     covr,
@@ -41,7 +39,6 @@ Collate:
     'compat-purrr.R'
     'data-lahman.r'
     'data-nycflights13.r'
-    'data-temp.R'
     'db-mysql.r'
     'db-postgres.r'
     'db-sqlite.r'
@@ -64,6 +61,7 @@ Collate:
     'src_dbi.R'
     'tbl-lazy.R'
     'tbl-sql.r'
+    'test-frame.R'
     'testthat.r'
     'translate-sql-helpers.r'
     'translate-sql-window.r'
