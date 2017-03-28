@@ -38,8 +38,10 @@ LazyData: yes
 License: MIT + file LICENSE
 Collate: 
     'bench-compare.r'
+    'compat-purrr.R'
     'data-lahman.r'
     'data-nycflights13.r'
+    'data-temp.R'
     'data.r'
     'db-mysql.r'
     'db-postgres.r'

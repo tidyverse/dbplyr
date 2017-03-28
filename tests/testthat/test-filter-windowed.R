@@ -48,3 +48,4 @@ test_that("cumulative aggregates generate window function", {
   tbls <- test_load(df, ignore = c("sqlite", "mysql"))
   tbls %>% lapply(test_f)
 })
+
