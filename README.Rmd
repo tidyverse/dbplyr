@@ -21,3 +21,5 @@ knitr::opts_chunk$set(
 [![Coverage Status](https://img.shields.io/codecov/c/github/hadley/dbplyr/master.svg)](https://codecov.io/github/hadley/dbplyr?branch=master)
 
 dbplyr is the database backend for dbplyr. 
+
+If you find any bugs, please file in [dplyr](https://github.com/hadley/dplyr).
