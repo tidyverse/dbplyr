@@ -34,7 +34,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   p <- progress_estimated(n * m, min_time = 2)
 
   # Create ungrouped data frame suitable for chunked retrieval
-  query <- query(con, sql_render(ungroup(.data), con), op_vars(.data))
+  query <- Query$new(con, sql_render(ungroup(.data), con), op_vars(.data))
 
   # When retrieving in pages, there's no guarantee we'll get a complete group.
   # So we always assume the last group in the chunk is incomplete, and leave

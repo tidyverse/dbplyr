@@ -1,22 +1,3 @@
-#' Create a mutable query object.
-#'
-#' A query object is mutable wrapper around a [DBI::DBIResult-class] object that caches
-#' expensive operations, and insulates the rest of dplyr from the vagaries of
-#' DBI and the individual database implementation.
-#'
-#' @keywords internal
-#' @param con a [DBI::DBIConnection-class] object
-#' @param sql a string containing an sql query.
-#' @export
-query <- function(con, sql, .vars) UseMethod("query")
-
-#' @export
-query.DBIConnection <- function(con, sql, .vars) {
-  assert_that(is_string(sql))
-
-  Query$new(con, sql(sql), .vars)
-}
-
 Query <- R6::R6Class("Query",
   private = list(
     .nrow = NULL,

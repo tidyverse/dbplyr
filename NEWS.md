@@ -1,5 +1,8 @@
 # dplyr 0.5.0.9000
 
+* `query()` is no longer exported. It hasn't been useful for a while
+  so this shouldn't break any code.
+
 * `win_over()` escapes expression using current database rules.
 
 * You can create a `tbl` directly from a DBI connection (#2576).
