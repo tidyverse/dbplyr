@@ -1,4 +1,4 @@
-context("Group by")
+context("group_by")
 
 df <- data.frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
 

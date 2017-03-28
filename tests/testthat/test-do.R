@@ -1,6 +1,4 @@
-context("Do")
-
-# Grouped data frames ----------------------------------------------------------
+context("do")
 
 df <- data.frame(
   g = c(1, 2, 2, 3, 3, 3),
@@ -10,8 +8,6 @@ df <- data.frame(
 
 tbls <- test_load(df)
 grp <- lapply(tbls, function(x) x %>% group_by(g))
-
-# SQLite -----------------------------------------------------------------------
 
 test_that("ungrouped data collected first", {
   out <- memdb_frame(x = 1:2) %>% do(head(.))

@@ -1,4 +1,4 @@
-context("Arrange")
+context("arrange")
 
 test_that("two arranges equivalent to one", {
   df1 <- tribble(

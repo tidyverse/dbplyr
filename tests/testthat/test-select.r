@@ -1,4 +1,4 @@
-context("Select")
+context("select")
 
 df <- as.data.frame(as.list(setNames(1:26, letters)))
 tbls <- test_load(df)
@@ -7,7 +7,17 @@ test_that("two selects equivalent to one", {
   compare_tbls(tbls, . %>% select(l:s) %>% select(n:o), ref = select(df, n:o))
 })
 
-# Database ---------------------------------------------------------------------
+test_that("select operates on mutated vars", {
+  test_f <- function(tbl) {
+    res <- tbl %>%
+      mutate(x, z = x + y) %>%
+      select(z) %>%
+      collect()
+    expect_equal(res$z, rep(4, 3))
+  }
+
+  test_frame(x = c(1, 2, 3), y = c(3, 2, 1)) %>% lapply(test_f)
+})
 
 test_that("select renames variables (#317)", {
   skip_if_no_sqlite()

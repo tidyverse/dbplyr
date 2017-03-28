@@ -1,4 +1,4 @@
-context("SQL translation")
+context("translate")
 
 test_that("Simple maths is correct", {
   expect_equal(translate_sql(1 + 2), sql("1.0 + 2.0"))
@@ -95,6 +95,10 @@ test_that("n_distinct can take multiple values", {
     translate_sql(n_distinct(x, y), window = FALSE),
     sql('COUNT(DISTINCT "x", "y")')
   )
+})
+
+test_that("is translated to NULL_IF", {
+  expect_equal(translate_sql(na_if(x, 0L)), sql('NULL_IF("x", 0)'))
 })
 
 # Minus -------------------------------------------------------------------

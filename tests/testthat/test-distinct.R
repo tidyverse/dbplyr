@@ -1,4 +1,4 @@
-context("Distinct")
+context("distinct")
 
 df <- tibble(
   x = c(1, 1, 1, 1),
