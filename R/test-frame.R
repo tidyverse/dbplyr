@@ -32,6 +32,13 @@ test_register_src <- function(name, src) {
 
 #' @export
 #' @rdname testing
+test_register_con <- function(name, ...) {
+  test_register_src(name, src_dbi(DBI::dbConnect(...)))
+}
+
+
+#' @export
+#' @rdname testing
 test_load <- function(df, name = random_table_name(), srcs = test_srcs$get(),
                       ignore = character()) {
   stopifnot(is.data.frame(df))
