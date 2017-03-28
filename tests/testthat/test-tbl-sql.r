@@ -1,13 +1,10 @@
 context("tbl_sql")
 
 test_that("can generate sql tbls with raw sql", {
-  df <- data_frame(x = 1:3, y = 3:1)
-  tbls <- test_load(df, ignore = "df")
+  mf1 <- memdb_frame(x = 1:3, y = 3:1)
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x))
 
-  test_f <- function(tbl) {
-    clone <- tbl(x$src, build_sql("SELECT * FROM ", x$from))
-    expect_equal(collect(tbl), collect(clone))
-  }
+  expect_equal(collect(mf1), collect(mf2))
 })
 
 test_that("NAs in character fields handled by db sources (#2256)", {
@@ -40,7 +37,7 @@ test_that("head/print respects n" ,{
 
   out <- df2 %>% head(n = Inf) %>% collect()
   expect_equal(nrow(out), 5)
-  expect_error(print(df2, n = Inf), NA)
+  expect_output(print(df2, n = Inf))
 
   out <- df2 %>% head(n = 1) %>% collect()
   expect_equal(nrow(out), 1)

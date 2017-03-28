@@ -1,18 +1,27 @@
-compare_tbls <- function(tbls, op, ref = NULL, compare = equal_data_frame, ...) {
-  results <- eval_tbls(tbls, op)
-  expect_equal_tbls(results, compare = compare, ...)
+all_equal <- function(x, y) {
+  out <- dplyr::all_equal(collect(x), collect(y))
+
+  if (isTRUE(out)) {
+    TRUE
+  } else {
+    structure(FALSE, comment = out)
+  }
 }
 
-compare_tbls2 <- function(tbls_x, tbls_y, op, ref = NULL, compare = equal_data_frame, ...) {
-  results <- eval_tbls2(tbls_x, tbls_y, op)
-  expect_equal_tbls(results, compare = compare, ...)
+compare_tbls <- function(tbls, op = force, ref = NULL, compare = all_equal, ...) {
+  results <- lapply(tbls, op)
+  expect_equal_tbls(results, ref = ref, compare = compare, ...)
 }
 
-expect_equal_tbls <- function(results, ref = NULL, compare = equal_data_frame, ...) {
+compare_tbls2 <- function(tbls_x, tbls_y, op, ref = NULL, compare = all_equal, ...) {
+  results <- Map(op, tbls_x, tbls_y)
+  expect_equal_tbls(results, ref = ref, compare = compare, ...)
+}
+
+expect_equal_tbls <- function(results, ref = NULL, compare = all_equal, ...) {
   if (length(results) < 2 && is.null(ref)) {
     testthat::skip("Need at least two srcs to compare")
   }
-
 
   if (is.null(ref)) {
     ref <- results[[1]]
@@ -25,12 +34,12 @@ expect_equal_tbls <- function(results, ref = NULL, compare = equal_data_frame, .
 
   for (i in seq_along(rest)) {
     ok <- compare(ref, rest[[i]], ...)
-    # if (!ok) browser()
+
     msg <- paste0(
       names(rest)[[i]], " not equal to ", ref_name, "\n",
-      attr(ok, "comment")
+      paste(attr(ok, "comment"), collapse = "\n")
     )
-    testthat::expect_true(ok, info = msg)
+    testthat::expect_true(isTRUE(ok), info = msg)
   }
 
   invisible(TRUE)
@@ -41,5 +50,5 @@ eval_tbls <- function(tbls, op) {
 }
 
 eval_tbls2 <- function(tbls_x, tbls_y, op) {
-  Map(function(x, y) dplyr(op(x, y)), tbls_x, tbls_y)
+  Map(function(x, y) as.data.frame(op(x, y)), tbls_x, tbls_y)
 }

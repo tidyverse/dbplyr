@@ -67,3 +67,19 @@ test_that("suffix modifies duplicated variable names", {
   expect_named(j1, c("id", "parent1", "parent2"))
   expect_named(j2, c("id", "parent1", "parent2"))
 })
+
+
+test_that("join functions error on column not found for SQL sources #1928", {
+  expect_error(
+    left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "x"),
+    "column not found in rhs"
+  )
+  expect_error(
+    left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "y"),
+    "column not found in lhs"
+  )
+  expect_error(
+    left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5)),
+    "No common variables"
+  )
+})

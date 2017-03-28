@@ -1,14 +1,3 @@
-#' @import DBI
-NULL
-
-
-#' Source generics.
-#'
-#' These generics retrieve metadata for a given src.
-#'
-#' @keywords internal
-#' @name backend_src
-NULL
 
 #' @name backend_src
 #' @export

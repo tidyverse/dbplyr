@@ -195,3 +195,22 @@ print.set_op_query <- function(x, ...) {
   cat(named_rule("Y"), "\n", sep = "")
   print(x$y$ops)
 }
+
+check_suffix <- function(x) {
+  if (!is.character(x) || length(x) != 2) {
+    stop("`suffix` must be a character vector of length 2.", call. = FALSE)
+  }
+
+  list(x = x[1], y = x[2])
+}
+
+common_by_from_vector <- function(by) {
+  by <- by[!duplicated(by)]
+  by_x <- names(by) %||% by
+  by_y <- unname(by)
+
+  # If x partially named, assume unnamed are the same in both tables
+  by_x[by_x == ""] <- by_y[by_x == ""]
+
+  list(x = by_x, y = by_y)
+}

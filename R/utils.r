@@ -107,7 +107,3 @@ inc_seq <- function(from, to) {
     seq.int(from, to)
   }
 }
-
-compact <- function(.x) {
-  Filter(length, .x)
-}

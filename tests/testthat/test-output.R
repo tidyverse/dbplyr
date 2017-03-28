@@ -12,7 +12,7 @@ test_that("ungrouped output", {
     arrange(Sepal.Length)
 
   withr::with_options(list(digits = 4, width = 80), with_mock(
-    `dplyr::sqlite_version` = function() "x.y.z",
+    `dbplyr::sqlite_version` = function() "x.y.z",
     {
       expect_output_file_rel(
         print(mtcars_mem, n = 8L, width = 30L),
