@@ -14,11 +14,11 @@
 #' @export
 #' @keywords internal
 #' @examples
-#' win_over("avg(x)")
-#' win_over("avg(x)", "y")
-#' win_over("avg(x)", order = "y")
-#' win_over("avg(x)", order = c("x", "y"))
-#' win_over("avg(x)", frame = c(-Inf, 0), order = "y")
+#' win_over(sql("avg(x)"))
+#' win_over(sql("avg(x)"), "y")
+#' win_over(sql("avg(x)"), order = "y")
+#' win_over(sql("avg(x)"), order = c("x", "y"))
+#' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y")
 win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
   if (length(partition) > 0) {
     if (!is.sql(partition)) {
@@ -63,7 +63,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
   }
 
   over <- sql_vector(compact(list(partition, order, frame)), parens = TRUE)
-  sql <- build_sql(expr, " OVER ", over)
+  sql <- build_sql(expr, " OVER ", over, con = win_current_con())
 
   sql
 }

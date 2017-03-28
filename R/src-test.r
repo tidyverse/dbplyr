@@ -4,7 +4,9 @@
 #' @param x Object to transform
 #' @param sql A string containing an sql query.
 #' @param ... Other arguments passed on to the individual methods
-NULL
+DBITest <- function() {
+  structure(list(), class = "DBITestConnection")
+}
 
 #' @export
 #' @rdname src-test
