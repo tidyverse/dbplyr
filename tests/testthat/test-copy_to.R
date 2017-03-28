@@ -12,4 +12,13 @@ test_that("src_sql allows you to overwrite", {
   expect_equal(collect(tbl(src_memdb(), name)), df2)
 })
 
+test_that("NAs in character fields handled by db sources (#2256)", {
+  df <- test_frame(
+    x = c("a", "aa", NA),
+    y = c(NA, "b", "bb"),
+    z = c("cc", NA, "c")
+  )
+  expect_equal_tbls(df)
+})
+
 

@@ -1,14 +1,10 @@
 context("arrange")
 
 test_that("two arranges equivalent to one", {
-  df1 <- tribble(
-    ~x,  ~y,
-    2,  1,
-    2,  -1,
-    1,  1
-  )
-  tbls <- test_load(df1)
+  mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
-  single <- df1 %>% arrange(x, y)
-  compare_tbls(tbls, function(x) x %>% arrange(y) %>% arrange(x), ref = single)
+  mf1 <- mf %>% arrange(x, y)
+  mf2 <- mf %>% arrange(y) %>% arrange(x)
+
+  expect_equal_tbl(mf1, mf2)
 })

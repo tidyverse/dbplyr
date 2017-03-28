@@ -1,85 +1,68 @@
 context("filter")
 
-df <- expand.grid(a = 1:10, b = letters[1:10],
-  KEEP.OUT.ATTRS = FALSE,
-  stringsAsFactors = FALSE)
-
-tbls <- test_load(df)
-
-test_that("filter results independent of data tbl (simple)", {
-  skip_if_no_sqlite()
-
-  expected <- df[df$a > 6, , drop = FALSE]
-  compare_tbls(tbls[c("df", "sqlite")], function(x) {
-    filter(x, a > 6)
-  }, expected)
-})
-
 test_that("filter captures local variables", {
-  sel <- c("d", "g", "a")
-  expected <- df[df$b %in% sel, , drop = FALSE]
+  mf <- memdb_frame(x = 1:5, y = 5:1)
 
-  compare_tbls(tbls, function(x) x %>% filter(b %in% sel), ref = expected)
+  z <- 3
+  df1 <- mf %>% filter(x > z) %>% collect()
+  df2 <- mf %>% collect() %>% filter(x > z)
+
+  expect_equal_tbl(df1, df2)
 })
 
 test_that("two filters equivalent to one", {
-  expected <- filter(df, a > 4 & b == "a")
+  mf <- memdb_frame(x = 1:5, y = 5:1)
 
-  compare_tbls(tbls, function(x) x %>% filter(a > 4) %>% filter(b == "a"),
-    ref = expected)
+  df1 <- mf %>% filter(x > 3) %>% filter(y < 3)
+  df2 <- mf %>% filter(x > 3, y < 3)
+  expect_equal_tbl(df1, df2)
 })
 
+# SQL generation --------------------------------------------------------
 
-# Window functions --------------------------------------------------------
+test_that("basic filter works across all backends", {
+  dfs <- test_frame(x = 1:5, y = 5:1)
 
+  dfs %>%
+    map(. %>% filter(x > 3)) %>%
+    expect_equal_tbls()
+})
 
 test_that("filter calls windowed versions of sql functions", {
-  test_f <- function(tbl) {
-    res <- tbl %>%
-      group_by(g) %>%
-      filter(row_number(x) < 3) %>%
-      collect()
-    expect_equal(res$x, c(1, 2, 6, 7))
-    expect_equal(res$g, c(1, 1, 2, 2))
-  }
+  dfs <- test_frame_windowed(
+    x = 1:10,
+    g = rep(c(1, 2), each = 5)
+  )
 
-  df <- data_frame(x = 1:10, g = rep(c(1, 2), each = 5))
-  # SQLite and MySQL don't support window functions
-  tbls <- test_load(df, ignore = c("sqlite", "mysql"))
-  tbls %>% lapply(test_f)
+  dfs %>%
+    map(. %>% group_by(g) %>% filter(row_number(x) < 3)) %>%
+    expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(1L, 2L, 6L, 7L)))
 })
 
 test_that("recycled aggregates generate window function", {
-  test_f <- function(tbl) {
-    res <- tbl %>%
-      group_by(g) %>%
-      filter(x > mean(x)) %>%
-      collect()
-    expect_equal(res$x, c(4, 5, 9, 10))
-    expect_equal(res$g, c(1, 1, 2, 2))
-  }
+  dfs <- test_frame_windowed(
+    x = 1:10,
+    g = rep(c(1, 2), each = 5)
+  )
 
-  df <- data_frame(x = 1:10, g = rep(c(1, 2), each = 5))
-  # SQLite and MySQL don't support window functions
-  tbls <- test_load(df, ignore = c("sqlite", "mysql"))
-  tbls %>% lapply(test_f)
+  dfs %>%
+    map(. %>% group_by(g) %>% filter(x > mean(x))) %>%
+    expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(4L, 5L, 9L, 10L)))
 })
 
 test_that("cumulative aggregates generate window function", {
-  test_f <- function(tbl) {
-    res <- tbl %>%
+  dfs <- test_frame_windowed(
+    x = c(1:3, 2:4),
+    g = rep(c(1, 2), each = 3)
+  )
+
+  dfs %>%
+    map(. %>%
       group_by(g) %>%
       arrange(x) %>%
-      filter(cumsum(x) > 3) %>%
-      collect()
-    expect_equal(res$x, c(3, 3, 4))
-    expect_equal(res$g, c(1, 2, 2))
-  }
-
-  df <- data_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
-  # SQLite and MySQL don't support window functions
-  tbls <- test_load(df, ignore = c("sqlite", "mysql"))
-  tbls %>% lapply(test_f)
+      filter(cumsum(x) > 3)
+    ) %>%
+    expect_equal_tbls(tibble(g = c(1, 2, 2), x = c(3L, 3L, 4L)))
 })
 
 

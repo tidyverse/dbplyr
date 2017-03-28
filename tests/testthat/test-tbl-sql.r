@@ -1,8 +1,6 @@
 context("tbl_sql")
 
 test_that("can connect directly to con", {
-  skip_if_no_sqlite()
-
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con))
   DBI::dbWriteTable(con, "mtcars", mtcars)
@@ -19,19 +17,6 @@ test_that("can generate sql tbls with raw sql", {
   expect_equal(collect(mf1), collect(mf2))
 })
 
-test_that("NAs in character fields handled by db sources (#2256)", {
-  df <- data.frame(
-    x = c("a", "aa", NA),
-    y = c(NA, "b", "bb"),
-    z = c("cc", NA, "c"),
-    stringsAsFactors = FALSE
-  )
-  tbls <- test_load(df, ignore = "df")
-  for (tbl in tbls) {
-    expect_equal(collect(tbl), as.tbl(df))
-  }
-})
-
 test_that("tbl_sql() works with string argument", {
   name <- unclass(random_table_name())
   df <- memdb_frame(a = 1, .name = name)
@@ -42,7 +27,6 @@ test_that("tbl_sql() works with string argument", {
 test_that("memdb_frame() returns visible output", {
   expect_true(withVisible(memdb_frame(a = 1))$visible)
 })
-
 
 test_that("head/print respects n" ,{
   df2 <- memdb_frame(x = 1:5)

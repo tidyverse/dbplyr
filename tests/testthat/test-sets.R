@@ -1,24 +1,36 @@
 context("sets")
 
+test_that("column order is matched", {
+  df1 <- memdb_frame(x = 1, y = 2)
+  df2 <- memdb_frame(y = 1, x = 2)
+
+  out <- collect(dplyr::union(df1, df2))
+  expect_equal(out, tibble(x = c(1, 2), y = c(2, 1)))
+})
+
+test_that("missing columns filled with NULL", {
+  df1 <- memdb_frame(x = 1)
+  df2 <- memdb_frame(y = 1)
+
+  out <- collect(dplyr::union(df1, df2))
+  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 1)))
+})
+
+# SQL generation ----------------------------------------------------------
+
 test_that("union and union all work for all backends", {
   df <- tibble(x = 1:10, y = x %% 2)
 
   tbls_full <- test_load(df)
   tbls_filter <- test_load(filter(df, y == 0))
 
-  compare_tbls2(tbls_full, tbls_filter, dplyr::union)
-  compare_tbls2(tbls_full, tbls_filter, dplyr::union_all)
-})
+  tbls_full %>%
+    map2(tbls_filter, union) %>%
+    expect_equal_tbls()
 
-test_that("union on database uses UNION ALL", {
-  skip_if_no_sqlite()
-  db <- src_sqlite(":memory:", TRUE)
-
-  df1 <- copy_to(db, data_frame(x = 1:2), "df1")
-  df2 <- copy_to(db, data_frame(x = 1:2), "df2")
-
-  res <- collect(union_all(df1, df2))
-  expect_equal(res$x, rep(1:2, 2))
+  tbls_full %>%
+    map2(tbls_filter, union_all) %>%
+    expect_equal_tbls()
 })
 
 test_that("intersect and setdiff work for supported backends", {
@@ -28,8 +40,13 @@ test_that("intersect and setdiff work for supported backends", {
   tbls_full <- test_load(df, ignore = "mysql")
   tbls_filter <- test_load(filter(df, y == 0), ignore = "mysql")
 
-  compare_tbls2(tbls_full, tbls_filter, dplyr::union)
-  compare_tbls2(tbls_full, tbls_filter, dplyr::union_all)
+  tbls_full %>%
+    map2(tbls_filter, intersect) %>%
+    expect_equal_tbls()
+
+  tbls_full %>%
+    map2(tbls_filter, setdiff) %>%
+    expect_equal_tbls()
 })
 
 test_that("SQLite warns if set op attempted when tbl has LIMIT", {
@@ -47,26 +64,10 @@ test_that("other backends can combine with a limit", {
   tbls_full <- test_load(df, ignore = "sqlite")
   tbls_head <- lapply(test_load(df, ignore = "sqlite"), head, n = 1)
 
-  compare_tbls2(tbls_full, tbls_head, dplyr::union)
-  compare_tbls2(tbls_full, tbls_head, dplyr::union_all)
-})
-
-test_that("column order is matched", {
-  skip_if_no_sqlite()
-
-  df1 <- memdb_frame(x = 1, y = 2)
-  df2 <- memdb_frame(y = 1, x = 2)
-
-  out <- collect(dplyr::union(df1, df2))
-  expect_equal(out, tibble(x = c(1, 2), y = c(2, 1)))
-})
-
-test_that("missing columns filled with NULL", {
-  skip_if_no_sqlite()
-
-  df1 <- memdb_frame(x = 1)
-  df2 <- memdb_frame(y = 1)
-
-  out <- collect(dplyr::union(df1, df2))
-  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 1)))
+  tbls_full %>%
+    map2(tbls_head, union) %>%
+    expect_equal_tbls()
+  tbls_full %>%
+    map2(tbls_head, union_all) %>%
+    expect_equal_tbls()
 })
