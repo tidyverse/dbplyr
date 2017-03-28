@@ -1,2 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
+^inst/db$
+^LICENSE\.md$
+^README\.Rmd$
+^codecov\.yml$
