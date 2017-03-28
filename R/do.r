@@ -1,106 +1,103 @@
-#' Do arbitrary operations on a tbl.
+#' Perform arbitrary computation on remote backend
 #'
-#' This is a general purpose complement to the specialised manipulation
-#' functions [filter()], [select()], [mutate()],
-#' [summarise()] and [arrange()]. You can use `do()`
-#' to perform arbitrary computation, returning either a data frame or
-#' arbitrary objects which will be stored in a list. This is particularly
-#' useful when working with models: you can fit models per group with
-#' `do()` and then flexibly extract components with either another
-#' `do()` or `summarise()`.
-#'
-#' For an empty data frame, the expressions will be evaluated once, even in the
-#' presence of a grouping.  This makes sure that the format of the resulting
-#' data frame is the same for both empty and non-empty input.
-#'
-#' @section Connection to plyr:
-#'
-#' If you're familiar with plyr, `do()` with named arguments is basically
-#' equivalent to [plyr::dlply()], and `do()` with a single unnamed argument
-#' is basically equivalent to [plyr::ldply()]. However, instead of storing
-#' labels in a separate attribute, the result is always a data frame. This
-#' means that `summarise()` applied to the result of `do()` can
-#' act like `ldply()`.
-#'
-#' @inheritParams filter
-#' @param .data a tbl
-#' @param ... Expressions to apply to each group. If named, results will be
-#'   stored in a new column. If unnamed, should return a data frame. You can
-#'   use `.` to refer to the current group. You can not mix named and
-#'   unnamed arguments.
-#' @return
-#' `do()` always returns a data frame. The first columns in the data frame
-#' will be the labels, the others will be computed from `...`. Named
-#' arguments become list-columns, with one element for each group; unnamed
-#' elements must be data frames and labels will be duplicated accordingly.
-#'
-#' Groups are preserved for a single unnamed input. This is different to
-#' [summarise()] because `do()` generally does not reduce the
-#' complexity of the data, it just expresses it in a special way. For
-#' multiple named inputs, the output is grouped by row with
-#' [rowwise()]. This allows other verbs to work in an intuitive
-#' way.
+#' @inheritParams dplyr::do
+#' @param .chunk_size The size of each chunk to pull into R. If this number is
+#'   too big, the process will be slow because R has to allocate and free a lot
+#'   of memory. If it's too small, it will be slow, because of the overhead of
+#'   talking to the database.
 #' @export
-#' @examples
-#' by_cyl <- group_by(mtcars, cyl)
-#' do(by_cyl, head(., 2))
-#'
-#' models <- by_cyl %>% do(mod = lm(mpg ~ disp, data = .))
-#' models
-#'
-#' summarise(models, rsq = summary(mod)$r.squared)
-#' models %>% do(data.frame(coef = coef(.$mod)))
-#' models %>% do(data.frame(
-#'   var = names(coef(.$mod)),
-#'   coef(summary(.$mod)))
-#' )
-#'
-#' models <- by_cyl %>% do(
-#'   mod_linear = lm(mpg ~ disp, data = .),
-#'   mod_quad = lm(mpg ~ poly(disp, 2), data = .)
-#' )
-#' models
-#' compare <- models %>% do(aov = anova(.$mod_linear, .$mod_quad))
-#' # compare %>% summarise(p.value = aov$`Pr(>F)`)
-#'
-#' if (require("nycflights13")) {
-#' # You can use it to do any arbitrary computation, like fitting a linear
-#' # model. Let's explore how carrier departure delays vary over the time
-#' carriers <- group_by(flights, carrier)
-#' group_size(carriers)
-#'
-#' mods <- do(carriers, mod = lm(arr_delay ~ dep_time, data = .))
-#' mods %>% do(as.data.frame(coef(.$mod)))
-#' mods %>% summarise(rsq = summary(mod)$r.squared)
-#'
-#' \dontrun{
-#' # This longer example shows the progress bar in action
-#' by_dest <- flights %>% group_by(dest) %>% filter(n() > 100)
-#' library(mgcv)
-#' by_dest %>% do(smooth = gam(arr_delay ~ s(dep_time) + month, data = .))
-#' }
-#' }
-do <- function(.data, ...) {
-  UseMethod("do")
-}
-#' @export
-do.default <- function(.data, ...) {
-  do_(.data, .dots = compat_as_lazy_dots(...))
-}
-#' @export
-#' @rdname se-deprecated
-do_ <- function(.data, ..., .dots = list()) {
-  UseMethod("do_")
+do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
+  groups_sym <- groups(.data)
+
+  if (length(groups_sym) == 0) {
+    .data <- collect(.data)
+    return(do(.data, ...))
+  }
+
+  args <- quos(...)
+  named <- named_args(args)
+
+  # Create data frame of labels
+  labels <- .data %>%
+    select(!!! groups_sym) %>%
+    summarise() %>%
+    collect()
+
+  con <- con_acquire(.data$src)
+  on.exit(con_release(.data$src, con), add = TRUE)
+
+  n <- nrow(labels)
+  m <- length(args)
+
+  out <- replicate(m, vector("list", n), simplify = FALSE)
+  names(out) <- names(args)
+  p <- progress_estimated(n * m, min_time = 2)
+
+  # Create ungrouped data frame suitable for chunked retrieval
+  query <- query(con, sql_render(ungroup(.data), con), op_vars(.data))
+
+  # When retrieving in pages, there's no guarantee we'll get a complete group.
+  # So we always assume the last group in the chunk is incomplete, and leave
+  # it for the next. If the group size is large than chunk size, it may
+  # take a couple of iterations to get the entire group, but that should
+  # be an unusual situation.
+  last_group <- NULL
+  i <- 0
+
+  # Assumes `chunk` to be ordered with group columns first
+  gvars <- seq_along(groups_sym)
+
+  # Create the dynamic scope for tidy evaluation
+  env <- child_env(NULL)
+  overscope <- new_overscope(env)
+  on.exit(overscope_clean(overscope))
+
+  query$fetch_paged(.chunk_size, function(chunk) {
+    if (!is_null(last_group)) {
+      chunk <- rbind(last_group, chunk)
+    }
+
+    # Create an id for each group
+    grouped <- chunk %>% group_by(!!! syms(names(chunk)[gvars]))
+    index <- attr(grouped, "indices") # zero indexed
+    n <- length(index)
+
+    last_group <<- chunk[index[[length(index)]] + 1L, , drop = FALSE]
+
+    for (j in seq_len(n - 1)) {
+      cur_chunk <- chunk[index[[j]] + 1L, , drop = FALSE]
+      # Update pronouns within the overscope
+      env$. <- env$.data <- cur_chunk
+      for (k in seq_len(m)) {
+        out[[k]][i + j] <<- list(overscope_eval_next(overscope, args[[k]]))
+        p$tick()$print()
+      }
+    }
+    i <<- i + (n - 1)
+  })
+
+  # Process last group
+  if (!is_null(last_group)) {
+    env$. <- env$.data <- last_group
+    for (k in seq_len(m)) {
+      out[[k]][i + 1] <- list(overscope_eval_next(overscope, args[[k]]))
+      p$tick()$print()
+    }
+  }
+
+  if (!named) {
+    label_output_dataframe(labels, out, groups(.data))
+  } else {
+    label_output_list(labels, out, groups(.data))
+  }
 }
 
 #' @export
-do.NULL <- function(.data, ...) {
-  NULL
+do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
+  do(.data, !!! dots, .chunk_size = .chunk_size)
 }
-#' @export
-do_.NULL <- function(.data, ..., .dots = list()) {
-  NULL
-}
+
 
 # Helper functions -------------------------------------------------------------
 

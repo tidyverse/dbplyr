@@ -9,16 +9,6 @@
   unique_indexes = NULL, indexes = NULL, analyze = TRUE, ...)
 }
 \arguments{
-\item{dest}{remote data source}
-
-\item{df}{local data frame}
-
-\item{name}{name for new remote table.}
-
-\item{overwrite}{If \code{TRUE}, will overwrite an existing table with
-name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
-exists.}
-
 \item{types}{a character vector giving variable types to use for the columns.
 See \url{http://www.sqlite.org/datatype3.html} for available types.}
 
@@ -35,8 +25,6 @@ will create a new index.}
 
 \item{analyze}{if \code{TRUE} (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.}
-
-\item{...}{other parameters passed to methods.}
 }
 \value{
 A \code{\link[=tbl]{tbl()}} object (invisibly).
