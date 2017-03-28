@@ -113,7 +113,7 @@ tail.tbl_sql <- function(x, n = 6L, ...) {
 #' can only create semi joins where the `x` and `y` columns are
 #' compared with `=` not with more general operators.
 #'
-#' @inheritParams join
+#' @inheritParams dplyr::join
 #' @param copy If `x` and `y` are not from the same data source,
 #'   and `copy` is `TRUE`, then `y` will be copied into a
 #'   temporary table in same database as `x`. `*_join()` will automatically
@@ -128,7 +128,8 @@ tail.tbl_sql <- function(x, n = 6L, ...) {
 #'   there are matching indexes in `x`.
 #' @examples
 #' \dontrun{
-#' if (require("RSQLite") && has_lahman("sqlite")) {
+#' library(dplyr)
+#' if (has_lahman("sqlite")) {
 #'
 #' # Left joins ----------------------------------------------------------------
 #' lahman_s <- lahman_sqlite()
@@ -320,10 +321,10 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #'   will create a new index.
 #' @param analyze if `TRUE` (the default), will automatically ANALYZE the
 #'   new table so that the query optimiser has useful information.
-#' @inheritParams copy_to
+#' @inheritParams dplyr::copy_to
 #' @return A [tbl()] object (invisibly).
 #' @examples
-#' if (requireNamespace("RSQLite")) {
+#' library(dplyr)
 #' set.seed(1014)
 #'
 #' mtcars$model <- rownames(mtcars)
@@ -335,7 +336,6 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' # in the join functions
 #' df <- tibble(cyl = c(6, 8))
 #' mtcars2 %>% semi_join(df, copy = TRUE)
-#' }
 copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,

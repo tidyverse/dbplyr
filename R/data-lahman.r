@@ -60,12 +60,6 @@ lahman_df <- function() {
   src_df("Lahman")
 }
 
-#' @export
-#' @rdname lahman
-lahman_dt <- function() {
-  dtplyr::src_dt("Lahman")
-}
-
 #' @rdname lahman
 #' @export
 copy_lahman <- function(src, ...) {

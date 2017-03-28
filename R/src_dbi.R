@@ -43,7 +43,7 @@
 #' @export
 #' @examples
 #' # Basic connection using DBI -------------------------------------------
-#' if (requireNamespace("RSQLite", quietly = TRUE)) {
+#' library(dplyr)
 #'
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 #' src <- src_dbi(con)
@@ -64,7 +64,6 @@
 #'
 #' # If you just want a temporary in-memory database, use src_memdb()
 #' src3 <- src_memdb()
-#' }
 #'
 #' # To show off the full features of dplyr's database integration,
 #' # we'll use the Lahman database. lahman_sqlite() takes care of
