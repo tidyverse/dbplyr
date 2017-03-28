@@ -1,4 +1,4 @@
 library(testthat)
-library(dplyr)
+library(dbplyr)
 
-test_check("dplyr")
+test_check("dbplyr")
