@@ -1,5 +1,6 @@
 #' A set of DBI methods to ease unit testing dplyr with DBI
 #' @name src-test
+#' @export
 #' @param con A database connection.
 #' @param x Object to transform
 #' @param sql A string containing an sql query.
