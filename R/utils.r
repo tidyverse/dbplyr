@@ -1,7 +1,3 @@
-#' @importFrom magrittr %>%
-#' @export
-magrittr::`%>%`
-
 dots <- function(...) {
   eval_bare(substitute(alist(...)))
 }
@@ -110,4 +106,8 @@ inc_seq <- function(from, to) {
   } else {
     seq.int(from, to)
   }
+}
+
+compact <- function(.x) {
+  Filter(length, .x)
 }
