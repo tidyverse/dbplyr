@@ -31,8 +31,7 @@ diagnosing performance problems.
 }
 
 \examples{
-\donttest{
-if (require("RSQLite") && has_lahman("sqlite")) {
+library(dplyr)
 
 lahman_s <- lahman_sqlite()
 batting <- tbl(lahman_s, "Batting")
@@ -49,6 +48,4 @@ batting \%>\% filter(lgID == "NL" | yearID == 2000) \%>\% explain()
 # Joins will use indexes in both tables
 teams <- tbl(lahman_s, "Teams")
 batting \%>\% left_join(teams, c("yearID", "teamID")) \%>\% explain()
-}
-}
 }

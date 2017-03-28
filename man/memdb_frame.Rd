@@ -18,10 +18,8 @@ unlikely to conflict with an existing table.}
 data frame in R, it creates a table in \code{\link[=src_memdb]{src_memdb()}}.
 }
 \examples{
-if (require("RSQLite")) {
+library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
 df \%>\% arrange(x)
 df \%>\% arrange(x) \%>\% show_query()
-}
-
 }

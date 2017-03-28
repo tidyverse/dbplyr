@@ -43,10 +43,10 @@ provide helpers for constructing common types of window functions.
 the grouping and order context set up by \code{\link[=group_by]{group_by()}} and \code{\link[=arrange]{arrange()}}.
 }
 \examples{
-win_over("avg(x)")
-win_over("avg(x)", "y")
-win_over("avg(x)", order = "y")
-win_over("avg(x)", order = c("x", "y"))
-win_over("avg(x)", frame = c(-Inf, 0), order = "y")
+win_over(sql("avg(x)"))
+win_over(sql("avg(x)"), "y")
+win_over(sql("avg(x)"), order = "y")
+win_over(sql("avg(x)"), order = c("x", "y"))
+win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y")
 }
 \keyword{internal}

@@ -9,6 +9,16 @@
   unique_indexes = NULL, indexes = NULL, analyze = TRUE, ...)
 }
 \arguments{
+\item{dest}{remote data source}
+
+\item{df}{local data frame}
+
+\item{name}{name for new remote table.}
+
+\item{overwrite}{If \code{TRUE}, will overwrite an existing table with
+name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
+exists.}
+
 \item{types}{a character vector giving variable types to use for the columns.
 See \url{http://www.sqlite.org/datatype3.html} for available types.}
 
@@ -25,6 +35,8 @@ will create a new index.}
 
 \item{analyze}{if \code{TRUE} (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.}
+
+\item{...}{other parameters passed to methods.}
 }
 \value{
 A \code{\link[=tbl]{tbl()}} object (invisibly).
@@ -36,7 +48,7 @@ and joins. By default, it creates temporary tables which are typically
 only visible to the current connection to the database.
 }
 \examples{
-if (requireNamespace("RSQLite")) {
+library(dplyr)
 set.seed(1014)
 
 mtcars$model <- rownames(mtcars)
@@ -48,5 +60,4 @@ mtcars2 \%>\% filter(model == "Hornet 4 Drive")
 # in the join functions
 df <- tibble(cyl = c(6, 8))
 mtcars2 \%>\% semi_join(df, copy = TRUE)
-}
 }

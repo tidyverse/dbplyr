@@ -2,11 +2,14 @@
 % Please edit documentation in R/src-test.r
 \name{src-test}
 \alias{src-test}
+\alias{DBITest}
 \alias{db_query_fields.DBITestConnection}
 \alias{sql_escape_ident.DBITestConnection}
 \alias{sql_translate_env.DBITestConnection}
 \title{A set of DBI methods to ease unit testing dplyr with DBI}
 \usage{
+DBITest()
+
 \method{db_query_fields}{DBITestConnection}(con, sql, ...)
 
 \method{sql_escape_ident}{DBITestConnection}(con, x)

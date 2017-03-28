@@ -6,7 +6,6 @@
 \alias{lahman_postgres}
 \alias{lahman_mysql}
 \alias{lahman_df}
-\alias{lahman_dt}
 \alias{copy_lahman}
 \alias{has_lahman}
 \alias{lahman_srcs}
@@ -19,8 +18,6 @@ lahman_postgres(dbname = "lahman", host = "localhost", ...)
 lahman_mysql(dbname = "lahman", ...)
 
 lahman_df()
-
-lahman_dt()
 
 copy_lahman(src, ...)
 

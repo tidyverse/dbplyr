@@ -15,8 +15,7 @@
 #' @param ... Other parameters possibly used by generic
 #' @return The first argument, invisibly.
 #' @examples
-#' \donttest{
-#' if (require("RSQLite") && has_lahman("sqlite")) {
+#' library(dplyr)
 #'
 #' lahman_s <- lahman_sqlite()
 #' batting <- tbl(lahman_s, "Batting")
@@ -33,8 +32,6 @@
 #' # Joins will use indexes in both tables
 #' teams <- tbl(lahman_s, "Teams")
 #' batting %>% left_join(teams, c("yearID", "teamID")) %>% explain()
-#' }
-#' }
 explain <- function(x, ...) {
   UseMethod("explain")
 }

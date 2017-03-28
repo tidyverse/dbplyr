@@ -29,6 +29,20 @@
   auto_index = FALSE, ...)
 }
 \arguments{
+\item{x}{tbls to join}
+
+\item{y}{tbls to join}
+
+\item{by}{a character vector of variables to join by.  If \code{NULL}, the
+default, \code{*_join()} will do a natural join, using all variables with
+common names across the two tables. A message lists the variables so
+that you can check they're right (to suppress the message, simply
+explicitly list the variables that you want to join).
+
+To join by different variables on x and y use a named vector.
+For example, \code{by = c("a" = "b")} will match \code{x.a} to
+\code{y.b}.}
+
 \item{copy}{If \code{x} and \code{y} are not from the same data source,
 and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
 temporary table in same database as \code{x}. \code{*_join()} will automatically
@@ -39,9 +53,15 @@ planner.
 This allows you to join tables across srcs, but it's potentially expensive
 operation so you must opt into it.}
 
+\item{suffix}{If there are non-joined duplicate variables in \code{x} and
+\code{y}, these suffixes will be added to the output to diambiguate them.
+Should be a character vector of length 2.}
+
 \item{auto_index}{if \code{copy} is \code{TRUE}, automatically create
 indices for the variables in \code{by}. This may speed up the join if
 there are matching indexes in \code{x}.}
+
+\item{...}{other parameters passed onto methods}
 }
 \description{
 See \link{join} for a description of the general purpose of the
@@ -58,7 +78,8 @@ compared with \code{=} not with more general operators.
 
 \examples{
 \dontrun{
-if (require("RSQLite") && has_lahman("sqlite")) {
+library(dplyr)
+if (has_lahman("sqlite")) {
 
 # Left joins ----------------------------------------------------------------
 lahman_s <- lahman_sqlite()
