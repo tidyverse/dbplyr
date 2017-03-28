@@ -23,7 +23,6 @@ Imports:
     pkgconfig,
     rlang (>= 0.0.0.9004),
     R6,
-    Rcpp (>= 0.12.6),
     tibble (>= 1.2),
     utils
 Suggests: 
@@ -43,10 +42,6 @@ Suggests:
     bit64,
     hms
 VignetteBuilder: knitr
-LinkingTo: Rcpp (>= 0.12.0),
-    BH (>= 1.58.0-1),
-    bindrcpp,
-    plogr
 LazyData: yes
 License: MIT + file LICENSE
 Collate: 
