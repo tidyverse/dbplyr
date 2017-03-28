@@ -1,5 +1,7 @@
 # dplyr 0.5.0.9000
 
+* `win_over()` escapes expression using current database rules.
+
 * You can create a `tbl` directly from a DBI connection (#2576).
 
 * `mutate.tbl_sql()` will now generate as many subqueries as necessary so 
