@@ -5,7 +5,6 @@
 \alias{src_mysql}
 \alias{src_postgres}
 \alias{src_sqlite}
-\alias{src_memdb}
 \title{Source for database backends}
 \usage{
 src_dbi(con, auto_disconnect = FALSE)
@@ -17,8 +16,6 @@ src_postgres(dbname = NULL, host = NULL, port = NULL, user = NULL,
   password = NULL, ...)
 
 src_sqlite(path, create = FALSE)
-
-src_memdb()
 }
 \arguments{
 \item{con}{An object that inherits from \link[DBI:DBIConnection-class]{DBI::DBIConnection},
