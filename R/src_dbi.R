@@ -1,15 +1,12 @@
-#' Source for database backends
+#' dplyr backend for any DBI-compatible database
 #'
 #' @description
 #' `src_dbi()` is a general dplyr backend that connects to any
-#' DBI driver. There are three helpers for popular open-source databases:
-#'
-#' * `src_mysql()` connects to a MySQL or MariaDB database using [RMySQL::MySQL()].
-#' * `src_postgres()` connects to PostgreSQL using [RPostgreSQL::PostgreSQL()]
-#' * `src_sqlite()` to connect to a SQLite database using [RSQLite::SQLite()].
-#'
-#' Additionally, `src_memdb()` connects to a temporary in-memory SQLite
+#' DBI driver. `src_memdb()` connects to a temporary in-memory SQLite
 #' database, that's useful for testing and experimenting.
+#'
+#' You can generate a `tbl()` directly from the DBI connection, or
+#' go via `src_dbi()`.
 #'
 #' @details
 #' All data manipulation on SQL tbls are lazy: they will not actually
@@ -109,6 +106,11 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 # Methods -----------------------------------------------------------------
 
 #' @export
+#' @aliases tbl_dbi
+#' @rdname src_dbi
+#' @param src Either a `src_dbi` or `DBIConnection`
+#' @param from Either a string (giving a table name) or literal [sql()].
+#' @param ... Needed for compatibility with generic; currently ignored.
 tbl.src_dbi <- function(src, from, ...) {
   # If not literal sql, must be a table identifier
   if (!is.sql(from)) {
@@ -123,6 +125,7 @@ tbl.src_dbi <- function(src, from, ...) {
 }
 
 #' @export
+#' @rdname src_dbi
 tbl.DBIConnection <- function(src, from, ...) {
   tbl(src_dbi(src), from = from, ...)
 }

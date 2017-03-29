@@ -3,11 +3,15 @@
 \name{backend_src}
 \alias{backend_src}
 \alias{backend_src}
+\alias{src_desc}
+\alias{backend_src}
 \alias{sql_translate_env}
 \alias{backend_src}
 \alias{sql_translate_env.NULL}
 \title{Source generics.}
 \usage{
+src_desc(x)
+
 sql_translate_env(con)
 
 \method{sql_translate_env}{NULL}(con)

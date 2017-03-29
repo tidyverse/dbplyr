@@ -54,6 +54,15 @@ test_that("if and ifelse use correctly named arguments",{
   expect_equal(translate_sql(if_else(condition = x, true = 1, false = 2)), exp)
 })
 
+
+test_that("all forms of if translated to case statement", {
+  expected <- sql('CASE WHEN ("x") THEN (1) ELSE (2) END')
+
+  expect_equal(translate_sql(if (x) 1L else 2L), expected)
+  expect_equal(translate_sql(ifelse(x, 1L, 2L)), expected)
+  expect_equal(translate_sql(if_else(x, 1L, 2L)), expected)
+})
+
 test_that("pmin and pmax become min and max", {
   expect_equal(translate_sql(pmin(x, y)), sql('MIN("x", "y")'))
   expect_equal(translate_sql(pmax(x, y)), sql('MAX("x", "y")'))

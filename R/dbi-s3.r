@@ -8,6 +8,10 @@ NULL
 
 #' @name backend_src
 #' @export
+src_desc <- function(x) UseMethod("src_desc")
+
+#' @name backend_src
+#' @export
 sql_translate_env <- function(con) UseMethod("sql_translate_env")
 
 #' @name backend_src
