@@ -116,7 +116,7 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
     new_vars <- names(dots)[cur_idx]
 
     if (any(used_vars[[i]] %in% new_vars)) {
-      .data <- dplyr::add_op_single("mutate", .data, dots = dots[cur_idx])
+      .data <- add_op_single("mutate", .data, dots = dots[cur_idx])
       init <- i
     }
   }

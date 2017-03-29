@@ -18,6 +18,20 @@ test_that("two filters equivalent to one", {
   expect_equal_tbl(df1, df2)
 })
 
+
+test_that("each argument gets implicit parens", {
+  mf <- memdb_frame(
+    v1 = c("a", "b", "a", "b"),
+    v2 = c("b", "a", "a", "b"),
+    v3 = c("a", "b", "c", "d")
+  )
+
+  mf1 <- mf %>% filter((v1 == "a" | v2 == "a") & v3 == "a")
+  mf2 <- mf %>% filter(v1 == "a" | v2 == "a", v3 == "a")
+  expect_equal_tbl(mf1, mf2)
+})
+
+
 # SQL generation --------------------------------------------------------
 
 test_that("basic filter works across all backends", {
