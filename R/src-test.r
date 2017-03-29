@@ -24,9 +24,9 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
 #' @export
 #' @rdname src-test
 sql_translate_env.DBITestConnection <- function(con) {
-  dplyr::sql_variant(
-    scalar = dplyr::sql_translator(.parent = dplyr::base_scalar),
-    aggregate = dplyr::sql_translator(.parent = dplyr::base_agg),
-    window = dplyr::sql_translator(.parent = dplyr::base_win)
+  sql_variant(
+    scalar = sql_translator(.parent = base_scalar),
+    aggregate = sql_translator(.parent = base_agg),
+    window = sql_translator(.parent = base_win)
   )
 }
