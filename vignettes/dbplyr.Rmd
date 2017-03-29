@@ -1,9 +1,8 @@
 ---
-title: "Databases"
-date: "`r Sys.Date()`"
+title: "Introduction to dbplyr"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Databases}
+  %\VignetteIndexEntry{Introduction to dbplyr}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -68,7 +67,7 @@ mutate(flights_sqlite, speed = air_time / distance)
 summarise(flights_sqlite, delay = mean(dep_time))
 ```
 
-The most important difference is that the expressions in `select()`, `filter()`, `arrange()`, `mutate()`, and `summarise()` are translated into SQL so they can be run on the database. While the translations for the most common operations are almost perfect there are some limitations, which you'll learn about later.
+The most important difference is that the expressions in `select()`, `filter()`, `arrange()`, `mutate()`, and `summarise()` are translated into SQL so they can be run on the database. The details of the translation are described in `vignette("sql-translation")`.
 
 ## Laziness
 
@@ -136,55 +135,6 @@ dplyr tries to prevent you from accidentally performing expensive query operatio
 
 * Because you can't find the last few rows without executing the whole query, you can't use `tail()`.
 
-## SQL translation
-
-When performing the simple mathematical operations used when filtering, mutating or summarising, translating R code to SQL (or indeed to any programming language) is relatively straightforward.
-
-To experiment with this, use `translate_sql()`. The following examples work through some of the basic differences between R and SQL.
-
-```{r}
-# In SQLite variable names are escaped by double quotes:
-translate_sql(x)
-# And strings are escaped by single quotes
-translate_sql("x")
-
-# Many functions have slightly different names
-translate_sql(x == 1 && (y < 2 || z > 3))
-translate_sql(x ^ 2 < 10)
-translate_sql(x %% 2 == 10)
-
-# R and SQL have different defaults for integers and reals.
-# In R, 1 is a real, and 1L is an integer
-# In SQL, 1 is an integer, and 1.0 is a real
-translate_sql(1)
-translate_sql(1L)
-```
-
-dplyr knows how to convert the following R functions to SQL:
-
-* basic math operators: `+`, `-`, `*`, `/`, `%%`, `^`
-* math functions: `abs`, `acos`, `acosh`, `asin`, `asinh`, `atan`, `atan2`,
-  `atanh`, `ceiling`, `cos`, `cosh`, `cot`, `coth`, `exp`, `floor`,
-  `log`, `log10`, `round`, `sign`, `sin`, `sinh`, `sqrt`, `tan`, `tanh`
-* logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
-* boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor`
-* basic aggregations: `mean`, `sum`, `min`, `max`, `sd`, `var`
-
-The basic techniques that underlie the implementation of `translate_sql()` are described in the [Advanced R book](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
-
-Perfect translation is not possible because databases don't have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean rather than what is done. In fact, even for functions that exist both in databases and R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. This means the essence of simple calls like `mean(x)` will be translated accurately, but more complicated calls like `mean(x, trim = 0.5, na.rm = TRUE)` will raise an error:
-
-```{r, eval = FALSE}
-translate_sql(mean(x, trim = 0.1))
-# Error: Invalid number of args to SQL AVG. Expecting 1
-```
-
-Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](http://www.sqlite.org/lang_corefunc.html):
-
-```{r}
-translate_sql(glob(x, y))
-translate_sql(x %like% "ab%")
-```
 
 ## Grouping
 
