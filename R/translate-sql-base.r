@@ -226,8 +226,8 @@ base_win <- sql_translator(
   },
 
   order_by = function(order_by, expr) {
-    old <- set_partition(win_current_group(), order_by)
-    on.exit(set_partition(old))
+    old <- set_win_current_order(order_by)
+    on.exit(set_win_current_order(old))
 
     expr
   }
