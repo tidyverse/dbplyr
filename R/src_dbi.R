@@ -124,11 +124,6 @@ tbl.src_dbi <- function(src, from, ...) {
   )
 }
 
-#' @export
-#' @rdname src_dbi
-tbl.DBIConnection <- function(src, from, ...) {
-  tbl(src_dbi(src), from = from, ...)
-}
 
 db_vars <- function(src, from) {
   vars <- attr(from, "vars")
