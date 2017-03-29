@@ -147,20 +147,20 @@ You'll notice that window functions in SQL are more verbose than in R. This is b
 
 ### Translating dplyr to SQL
 
-To see how individual window functions are translated to SQL, we can use `translate_sql()` with the argument `window = TRUE`.
+To see how individual window functions are translated to SQL, we can again use `translate_sql()`:
 
 ```{r}
-translate_sql(mean(G), window = TRUE)
-translate_sql(rank(G), window = TRUE)
-translate_sql(ntile(G, 2), window = TRUE)
-translate_sql(lag(G), window = TRUE)
+translate_sql(mean(G))
+translate_sql(rank(G))
+translate_sql(ntile(G, 2))
+translate_sql(lag(G))
 ```
 
 If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the "partition by" and "order by" clauses. For interactive exploration, you can achieve the same effect by setting the `vars_group` and `vars_order` arguments to `translate_sql()`
 
 ```{r}
-translate_sql(cummean(G), vars_order = "year", window = TRUE)
-translate_sql(rank(), vars_group = "ID", window = TRUE)
+translate_sql(cummean(G), vars_order = "year")
+translate_sql(rank(), vars_group = "ID")
 ```
 
 There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you're using:
