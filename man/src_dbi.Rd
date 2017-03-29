@@ -4,14 +4,11 @@
 \alias{src_dbi}
 \alias{tbl.src_dbi}
 \alias{tbl_dbi}
-\alias{tbl.DBIConnection}
 \title{dplyr backend for any DBI-compatible database}
 \usage{
 src_dbi(con, auto_disconnect = FALSE)
 
 \method{tbl}{src_dbi}(src, from, ...)
-
-\method{tbl}{DBIConnection}(src, from, ...)
 }
 \arguments{
 \item{con}{An object that inherits from \link[DBI:DBIConnection-class]{DBI::DBIConnection},
