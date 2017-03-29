@@ -7,6 +7,24 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+```
+
+There are two components to dplyr's SQL translation system:
+
+* translation of vector expressions like `x * y + 10`
+
+* translation of whole verbs like `mutate()` or `summarise()`
+
+To explore them, you'll need to load both dbplyr and dplyr
+
+```{r, message = FALSE}
+library(dbplyr)
+library(dplyr)
+```
+
 ## Vectors
 
 ### Basics
@@ -26,6 +44,10 @@ translate_sql(x == 1 && (y < 2 || z > 3))
 translate_sql(x ^ 2 < 10)
 translate_sql(x %% 2 == 10)
 
+# Some arrange the arguments differently:
+translate_sql(substr(x, 5, 10))
+translate_sql(log(x, 10))
+
 # R and SQL have different defaults for integers and reals.
 # In R, 1 is a real, and 1L is an integer
 # In SQL, 1 is an integer, and 1.0 is a real
@@ -43,13 +65,12 @@ dplyr knows how to convert the following R functions to SQL:
 * boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor`
 * basic aggregations: `mean`, `sum`, `min`, `max`, `sd`, `var`
 
-The basic techniques that underlie the implementation of `translate_sql()` are described in the [Advanced R book](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
+The basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
 
 Perfect translation is not possible because databases don't have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean rather than what is done. In fact, even for functions that exist both in databases and R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. This means the essence of simple calls like `mean(x)` will be translated accurately, but more complicated calls like `mean(x, trim = 0.5, na.rm = TRUE)` will raise an error:
 
-```{r, eval = FALSE}
+```{r, error = TRUE}
 translate_sql(mean(x, trim = 0.1))
-# Error: Invalid number of args to SQL AVG. Expecting 1
 ```
 
 Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](http://www.sqlite.org/lang_corefunc.html):
@@ -60,8 +81,6 @@ translate_sql(x %like% "ab%")
 ```
 
 ### Window functions
-
-Window functions have a slightly different flavour in SQL. The syntax is a little different, and the cumulative, rolling and recycled aggregate functions are all based on the simple aggregate function. The goal in this section is not to tell you everything you need to know about window functions in SQL, but to remind you of the basics and show you how dplyr translates your R expressions in to SQL. 
 
 In SQL, window functions have the form `[expression] OVER ([partition clause] [order clause] [frame_clause])`:
 
@@ -130,27 +149,18 @@ You'll notice that window functions in SQL are more verbose than in R. This is b
 
 To see how individual window functions are translated to SQL, we can use `translate_sql()` with the argument `window = TRUE`.
 
-```{r, message = FALSE}
-if (has_lahman("postgres")) {
-  players_db <- group_by(tbl(lahman_postgres(), "Batting"), playerID)
-  
-  print(translate_sql(mean(G), tbl = players_db, window = TRUE))
-  print(translate_sql(cummean(G), tbl = players_db, window = TRUE))
-  print(translate_sql(rank(G), tbl = players_db, window = TRUE))
-  print(translate_sql(ntile(G, 2), tbl = players_db, window = TRUE))
-  print(translate_sql(lag(G), tbl = players_db, window = TRUE))
-}
+```{r}
+translate_sql(mean(G), window = TRUE)
+translate_sql(rank(G), window = TRUE)
+translate_sql(ntile(G, 2), window = TRUE)
+translate_sql(lag(G), window = TRUE)
 ```
 
-If the tbl has been arranged previously, then that ordering will be used for the order clause:
+If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the "partition by" and "order by" clauses. For interactive exploration, you can achieve the same effect by setting the `vars_group` and `vars_order` arguments to `translate_sql()`
 
-```{r, message = FALSE}
-if (has_lahman("postgres")) {
-  players_by_year <- arrange(players_db, yearID)
-  print(translate_sql(cummean(G), tbl = players_by_year, window = TRUE))
-  print(translate_sql(rank(), tbl = players_by_year, window = TRUE))
-  print(translate_sql(lag(G), tbl = players_by_year, window = TRUE))
-}
+```{r}
+translate_sql(cummean(G), vars_order = "year", window = TRUE)
+translate_sql(rank(), vars_group = "ID", window = TRUE)
 ```
 
 There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you're using:
@@ -172,7 +182,7 @@ The three options are illustrated in the snippet below:
 mutate(players,
   min_rank(yearID),
   order_by(yearID, cumsum(G)),
-  lead(order_by = yearID, G)
+  lead(G, order_by = yearID)
 )
 ```
 
@@ -219,15 +229,68 @@ WHERE rank = 1;
 
 And even that query is a slightly simplification because it will also add a rank column to the original columns. dplyr takes care of generating the full, verbose, query, so you can focus on your data analysis challenges.
 
+### Behind the scenes
 
-## Single table verbs
+`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translate_env()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL.
 
-## Dual table verbs
+## Whole tables
+
+All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
+
+```{r}
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+flights <- copy_to(con, nycflights13::flights)
+airports <- copy_to(con, nycflights13::airports)
+```
+
+### Single table verbs
+
+*  `select()` and `mutate()` modify the `SELECT` clause:
+
+    ```{r}
+    flights %>%
+      select(contains("delay")) %>%
+      show_query()
+    
+    flights %>%
+      select(distance, air_time) %>%  
+      mutate(speed = distance / (air_time / 60)) %>%
+      show_query()
+    ```
+    (As you can see here, the generated SQL isn't always as minimal as you
+    might generate by hand.)
+    
+*  `filter()` generates a `WHERE` clause:
+    
+    ```{r}
+    flights %>% 
+      filter(month == 1, day == 1) %>%
+      show_query()
+    ```
+
+*  `arrange()` generates an `ORDER BY` clause:
+
+    ```{r}
+    flights %>% 
+      arrange(carrier, desc(arr_delay)) %>%
+      show_query()
+    ```
+
+*  `summarise()` and `group_by()` work together to generate a `GROUP BY` clause:
+
+    ```{r}
+    flights %>%
+      group_by(month, day) %>%
+      summarise(delay = mean(dep_delay)) %>%
+      show_query()
+    ```
+
+### Dual table verbs
 
 Each two-table verb has a straightforward SQL equivalent:
 
 | R                | SQL
-|------------------|--------
+|------------------|------------------------------------------------------------
 | `inner_join()`   | `SELECT * FROM x JOIN y ON x.a = y.a`
 | `left_join()`    | `SELECT * FROM x LEFT JOIN y ON x.a = y.a`
 | `right_join()`   | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`
@@ -241,3 +304,21 @@ Each two-table verb has a straightforward SQL equivalent:
 `x` and `y` don't have to be tables in the same database. If you specify `copy = TRUE`, dplyr will copy the `y` table into the same location as the `x` variable. This is useful if you've downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use `semi_join(x, y, copy = TRUE)` to upload the indices of interest to a temporary table in the same database as `x`, and then perform a efficient semi join in the database. 
 
 If you're working with large data, it maybe also be helpful to set `auto_index = TRUE`. That will automatically add an index on the join variables to the temporary table.
+
+### Behind the scenes
+
+The verb level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in three steps:
+
+* `sql_build()` recurses over the lazy op data structure building up query 
+  objects (`select_query()`, `join_query()`, `set_op_query()` etc) 
+  that represent the different subtypes of `SELECT` queries that we might
+  generate.
+
+* `sql_optimise()` takes a pass over these SQL objects, looking for potential
+  optimisations. Currently this only involves removing subqueries where
+  possible.
+
+* `sql_render()` calls an SQL generation function (`sql_select()`, `sql_join()`, 
+  `sql_subquery()`, `sql_semijoin()` etc) to produce the actual SQL.
+  Each of these functions is a generic, taking the connection as an argument,
+  so that the details can be customised for different databases.
