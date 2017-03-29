@@ -98,35 +98,6 @@ test_that("connection affects quoting character", {
   expect_match(sql_render(out), "^SELECT `field1` AS `field1`\nFROM `table1`$")
 })
 
-# Window functions --------------------------------------------------------
-
-test_that("window functions without group have empty over", {
-  expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(translate_sql(sum(x)), sql('sum("x") OVER ()'))
-})
-
-test_that("aggregating window functions ignore order_by", {
-  expect_equal(
-    translate_sql(n(), vars_order = "x"),
-    sql("COUNT(*) OVER ()")
-  )
-  expect_equal(
-    translate_sql(sum(x), vars_order = "x"),
-    sql('sum("x") OVER ()')
-  )
-})
-
-test_that("cumulative windows warn if no order", {
-  expect_warning(translate_sql(cumsum(x)), "does not have explicit order")
-  expect_warning(translate_sql(cumsum(x), vars_order = "x"), NA)
-})
-
-test_that("ntile always casts to integer", {
-  expect_equal(
-    translate_sql(ntile(x, 10.5)),
-    sql('NTILE(10) OVER (ORDER BY "x")')
-  )
-})
 
 
 # string functions --------------------------------------------------------

@@ -164,20 +164,6 @@ set_win_current_order <- function(vars) {
   invisible(old)
 }
 
-set_partition <- function(group_by, order_by, con = NULL) {
-  old <- list(partition$group_by, partition$order_by)
-  if (is.list(group_by)) {
-    order_by <- group_by[[2]]
-    group_by <- group_by[[1]]
-  }
-
-  partition$group_by <- group_by
-  partition$order_by <- order_by
-  partition$con <- con
-
-  invisible(old)
-}
-
 #' @export
 #' @rdname win_over
 win_current_group <- function() partition$group_by

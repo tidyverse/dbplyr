@@ -1,0 +1,36 @@
+context("translate-window")
+
+test_that("window functions without group have empty over", {
+  expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
+  expect_equal(translate_sql(sum(x)), sql('sum("x") OVER ()'))
+})
+
+test_that("aggregating window functions ignore order_by", {
+  expect_equal(
+    translate_sql(n(), vars_order = "x"),
+    sql("COUNT(*) OVER ()")
+  )
+  expect_equal(
+    translate_sql(sum(x), vars_order = "x"),
+    sql('sum("x") OVER ()')
+  )
+})
+
+test_that("order_by overrides default ordering", {
+  expect_equal(
+    translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
+    sql('sum("x") OVER (ORDER BY "y" ROWS UNBOUNDED PRECEDING)')
+  )
+})
+
+test_that("cumulative windows warn if no order", {
+  expect_warning(translate_sql(cumsum(x)), "does not have explicit order")
+  expect_warning(translate_sql(cumsum(x), vars_order = "x"), NA)
+})
+
+test_that("ntile always casts to integer", {
+  expect_equal(
+    translate_sql(ntile(x, 10.5)),
+    sql('NTILE(10) OVER (ORDER BY "x")')
+  )
+})
