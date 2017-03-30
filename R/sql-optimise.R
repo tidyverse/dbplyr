@@ -42,10 +42,7 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
 
 #' @export
 sql_optimise.tbl_sql <- function(x, con = NULL, ...) {
-  if (is.null(con)) {
-    con <- con_acquire(x$src)
-    on.exit(con_release(x$src, con), add = TRUE)
-  }
+  con <- con %||% x$src$con
   sql_optimise(sql_build(x$ops, con, ...), con = con, ...)
 }
 

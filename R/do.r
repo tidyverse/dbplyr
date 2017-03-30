@@ -23,8 +23,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     summarise() %>%
     collect()
 
-  con <- con_acquire(.data$src)
-  on.exit(con_release(.data$src, con), add = TRUE)
+  con <- .data$src$con
 
   n <- nrow(labels)
   m <- length(args)

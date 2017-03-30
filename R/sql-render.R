@@ -11,11 +11,7 @@ sql_render.op <- function(query, con = NULL, ...) {
 
 #' @export
 sql_render.tbl_sql <- function(query, con = NULL, ...) {
-  if (is.null(con)) {
-    con <- con_acquire(query$src)
-    on.exit(con_release(query$src, con), add = TRUE)
-  }
-
+  con <- con %||% query$src$con
   sql_render.tbl_lazy(query, con, ...)
 }
 
