@@ -91,7 +91,11 @@ rows <- function(from = -Inf, to = 0) {
 win_rank <- function(f) {
   force(f)
   function(order = NULL) {
-    win_over(build_sql(sql(f), list()), win_current_group(), order %||% win_current_order())
+    win_over(
+      build_sql(sql(f), list()),
+      partition = win_current_group(),
+      order = order %||% win_current_order()
+    )
   }
 }
 
@@ -100,7 +104,10 @@ win_rank <- function(f) {
 win_recycled <- function(f) {
   force(f)
   function(x) {
-    win_over(build_sql(sql(f), list(x)), win_current_group())
+    win_over(
+      build_sql(sql(f), list(x)),
+      partition = win_current_group()
+    )
   }
 }
 
@@ -111,8 +118,8 @@ win_cumulative <- function(f) {
   function(x) {
     win_over(
       build_sql(sql(f), list(x)),
-      win_current_group(),
-      win_current_order(),
+      partition = win_current_group(),
+      order = win_current_order(),
       frame = c(-Inf, 0)
     )
   }
