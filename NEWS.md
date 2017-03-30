@@ -98,6 +98,8 @@
   SQLite does not support the 2-argument log function so it is translated
   to `log(x) / log(b)`.
 
+* `nth(x, i)` is now correctly translated to `nth_value(x, i)`.
+
 * `n_distinct()` now accepts multiple variables (#2148).
 
 * [API] `substr()` is now translated to SQL, correcting for the difference

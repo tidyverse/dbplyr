@@ -181,33 +181,27 @@ base_win <- sql_translator(
     )
   },
 
-  # Recycled aggregate fuctions take single argument, don't need order and
-  # include entire partition in frame.
-  mean  = win_recycled("avg"),
-  sum   = win_recycled("sum"),
-  min   = win_recycled("min"),
-  max   = win_recycled("max"),
-  n     = function() {
-    win_over(sql("COUNT(*)"), win_current_group())
-  },
-
-  # Cumulative function are like recycled aggregates except that R names
-  # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
-  cummean = win_cumulative("mean"),
-  cumsum  = win_cumulative("sum"),
-  cummin  = win_cumulative("min"),
-  cummax  = win_cumulative("max"),
-
-  # Finally there are a few miscellaenous functions that don't follow any
-  # particular pattern
-  nth = function(x, order = NULL) {
-    win_over(build_sql("NTH_VALUE", list(x)), win_current_group(), order %||% win_current_order())
-  },
+  # Variants that take more arguments
   first = function(x, order = NULL) {
-    win_over(build_sql("FIRST_VALUE", list(x)), win_current_group(), order %||% win_current_order())
+    win_over(
+      build_sql("first_value", list(x)),
+      win_current_group(),
+      order %||% win_current_order()
+    )
   },
   last = function(x, order = NULL) {
-    win_over(build_sql("LAST_VALUE", list(x)), win_current_group(), order %||% win_current_order())
+    win_over(
+      build_sql("last_value", list(x)),
+      win_current_group(),
+      order %||% win_current_order()
+    )
+  },
+  nth = function(x, n, order = NULL) {
+    win_over(
+      build_sql("nth_value", list(x, as.integer(n))),
+      win_current_group(),
+      order %||% win_current_order()
+    )
   },
 
   lead = function(x, n = 1L, default = NA, order = NULL) {
@@ -225,6 +219,24 @@ base_win <- sql_translator(
     )
   },
 
+  # Recycled aggregate fuctions take single argument, don't need order and
+  # include entire partition in frame.
+  mean  = win_recycled("avg"),
+  sum   = win_recycled("sum"),
+  min   = win_recycled("min"),
+  max   = win_recycled("max"),
+  n     = function() {
+    win_over(sql("COUNT(*)"), win_current_group())
+  },
+
+  # Cumulative function are like recycled aggregates except that R names
+  # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
+  cummean = win_cumulative("mean"),
+  cumsum  = win_cumulative("sum"),
+  cummin  = win_cumulative("min"),
+  cummax  = win_cumulative("max"),
+
+  # Manually override other parameters --------------------------------------
   order_by = function(order_by, expr) {
     old <- set_win_current_order(order_by)
     on.exit(set_win_current_order(old))
