@@ -175,6 +175,11 @@ db_insert_into <- function(con, table, values, ...) {
   UseMethod("db_insert_into")
 }
 
+#' @export
+db_insert_into.DBIConnection <- function(con, table, values, ...) {
+  dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
+}
+
 #' @name backend_db
 #' @export
 db_create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {

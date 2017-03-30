@@ -49,11 +49,3 @@ sql_subquery.SQLiteConnection <- function(con, from, name = unique_name(), ...) 
     }
   }
 }
-
-
-# DBI methods ------------------------------------------------------------------
-
-#' @export
-db_insert_into.SQLiteConnection <- function(con, table, values, ...) {
-  DBI::dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
-}
