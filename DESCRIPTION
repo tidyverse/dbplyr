@@ -39,6 +39,7 @@ Collate:
     'compat-purrr.R'
     'data-lahman.r'
     'data-nycflights13.r'
+    'db-compute.R'
     'db-mysql.r'
     'db-postgres.r'
     'db-sqlite.r'

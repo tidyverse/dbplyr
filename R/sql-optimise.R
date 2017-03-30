@@ -36,17 +36,3 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
     x
   }
 }
-
-
-# Helpers for testing -----------------------------------------------------
-
-#' @export
-sql_optimise.tbl_sql <- function(x, con = NULL, ...) {
-  con <- con %||% x$src$con
-  sql_optimise(sql_build(x$ops, con, ...), con = con, ...)
-}
-
-#' @export
-sql_optimise.tbl_lazy <- function(x, con = NULL, ...) {
-  sql_optimise(sql_build(x$ops, con = NULL, ...), con = NULL, ...)
-}

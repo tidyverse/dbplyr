@@ -120,6 +120,15 @@
 * `copy_to()` now uses `db_write_table()` instead of `db_create_table()` and 
   `db_insert_into()`. `db_write_table.DBIConnection()` uses `dbWriteTable()`.
 
+* New `db_copy_to()`, `db_compute()` and `db_collect()` allow backends to 
+  override the entire database process behind `copy_to()`, `compute()` and 
+  `collect()`. `db_sql_render()` allow additional control over the SQL
+  rendering process.
+
+* All generics whose behaviour can vary from database to database now 
+  provide a DBIConnection method. That means that you can easily scan
+  the NAMESPACE to see the extension points.
+
 * `src_desc()` has been replaced by `db_desc()` and  now dispatches on the 
   connection, eliminating the last method that required dispatch on the class 
   of the src.
