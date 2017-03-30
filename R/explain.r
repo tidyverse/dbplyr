@@ -1,14 +1,5 @@
-#' Show query
-#'
-#' @param x A [tbl_dbi]
 #' @export
-#' @examples
-#' library(dplyr)
-#'
-#' lahman_s <- lahman_sqlite()
-#' batting <- tbl(lahman_s, "Batting")
-#' batting %>% show_query()
-show_query <- function(x) {
+show_query.tbl_sql <- function(x, ...) {
   con <- con_acquire(x$src)
   on.exit(con_release(x$src, con), add = TRUE)
 

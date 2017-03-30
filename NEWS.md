@@ -120,8 +120,9 @@
 * `copy_to()` now uses `db_write_table()` instead of `db_create_table()` and 
   `db_insert_into()`. `db_write_table.DBIConnection()` uses `dbWriteTable()`.
 
-* `src_desc.src_dbi()` now dispatches on the connection, eliminating the
-  last method that required dispatch on the class of the src.
+* `src_desc()` has been replaced by `db_desc()` and  now dispatches on the 
+  connection, eliminating the last method that required dispatch on the class 
+  of the src.
 
 * `win_over()`, `win_rank()`, `win_recycled()`, `win_cumulative()`,
   `win_current_group()` and `win_current_order()` are now exported. This
@@ -168,7 +169,7 @@
 * `print(df, n = Inf)` and `head(df, n = Inf)` now work with remote tables 
   (#2580).
 
-* `src_desc()` and `sql_translate_env()` get defaults for DBIConnection.
+* `db_desc()` and `sql_translate_env()` get defaults for DBIConnection.
 
 ## Lazy ops
 

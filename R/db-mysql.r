@@ -1,5 +1,5 @@
 #' @export
-src_desc.MySQLConnection <- function(x) {
+db_desc.MySQLConnection <- function(x) {
   info <- dbGetInfo(x)
 
   paste0(
@@ -119,7 +119,17 @@ db_analyze.MySQLConnection <- function(con, table, ...) {
   dbExecute(con, sql)
 }
 
+# SQL methods -------------------------------------------------------------
+
 #' @export
 sql_escape_ident.MySQLConnection <- function(con, x) {
   sql_quote(x, "`")
+}
+
+#' @export
+sql_join.MySQLConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+  if (identical(type, "full")) {
+    stop("MySQL does not support full joins", call. = FALSE)
+  }
+  NextMethod()
 }

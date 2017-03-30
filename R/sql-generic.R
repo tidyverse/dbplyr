@@ -1,22 +1,3 @@
-#' SQL generation.
-#'
-#' These generics are used to run build various SQL queries. A default method
-#' generates ANSI 92 compliant SQL, but variations in SQL across databases means
-#' that it's likely that a backend will require at least a few methods.
-#'
-#' @return An SQL string.
-#' @name backend_sql
-#' @param con A database connection.
-#' @keywords internal
-NULL
-
-#' @rdname backend_sql
-#' @export
-sql_select <- function(con, select, from, where = NULL, group_by = NULL,
-                       having = NULL, order_by = NULL, limit = NULL,
-                       distinct = FALSE, ...) {
-  UseMethod("sql_select")
-}
 #' @export
 sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                group_by = NULL, having = NULL,
@@ -81,11 +62,6 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
 }
 
 #' @export
-#' @rdname backend_sql
-sql_subquery <- function(con, from, name = random_table_name(), ...) {
-  UseMethod("sql_subquery")
-}
-#' @export
 sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
@@ -94,11 +70,6 @@ sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
   }
 }
 
-#' @rdname backend_sql
-#' @export
-sql_join <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
-  UseMethod("sql_join")
-}
 #' @export
 sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   JOIN <- switch(
@@ -158,19 +129,6 @@ sql_table_prefix <- function(con, var, table = NULL) {
 }
 
 #' @export
-sql_join.MySQLConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
-  if (identical(type, "full")) {
-    stop("MySQL does not support full joins", call. = FALSE)
-  }
-  NextMethod()
-}
-
-#' @rdname backend_sql
-#' @export
-sql_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  UseMethod("sql_semi_join")
-}
-#' @export
 sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
   # X and Y are subqueries named TBL_LEFT and TBL_RIGHT
   left <- escape(ident("TBL_LEFT"), con = con)
@@ -195,11 +153,6 @@ sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...)
   )
 }
 
-#' @rdname backend_sql
-#' @export
-sql_set_op <- function(con, x, y, method) {
-  UseMethod("sql_set_op")
-}
 #' @export
 sql_set_op.default <- function(con, x, y, method) {
   build_sql(
@@ -219,11 +172,6 @@ sql_set_op.SQLiteConnection <- function(con, x, y, method) {
   )
 }
 
-
-#' @rdname backend_sql
-#' @export
-sql_escape_string <- function(con, x) UseMethod("sql_escape_string")
-
 #' @export
 sql_escape_string.DBIConnection <- function(con, x) {
   dbQuoteString(con, x)
@@ -234,10 +182,6 @@ sql_escape_string.NULL <- function(con, x) {
   sql_quote(x, "'")
 }
 
-#' @rdname backend_sql
-#' @export
-sql_escape_ident <- function(con, x) UseMethod("sql_escape_ident")
-
 #' @export
 sql_escape_ident.DBIConnection <- function(con, x) {
   dbQuoteIdentifier(con, x)
@@ -247,3 +191,22 @@ sql_escape_ident.DBIConnection <- function(con, x) {
 sql_escape_ident.NULL <- function(con, x) {
   sql_quote(x, '"')
 }
+
+#' @export
+sql_translate_env.NULL <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+

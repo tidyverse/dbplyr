@@ -27,11 +27,10 @@ This document is still a work in progress, but it will hopefully get you started
 
 ## First steps
 
-For interactive exploation, attach dplyr, dbplyr and DBI. If you're creating a package, you'll need to import these packages.
+For interactive exploation, attach dplyr and DBI. If you're creating a package, you'll need to import dplyr and DBI.
 
 ```{r setup, message = FALSE}
 library(dplyr)
-library(dbplyr)
 library(DBI)
 ```
 
@@ -46,11 +45,11 @@ tbl(con, "mtcars")
 
 If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/rstats-db/DBItest) to narrow down the problem.
 
-Now is a good time to implement a method for `src_desc()`. This should briefly describe the connection, typically formatting the information returned form `dbGetInfo()`. This is what dbplyr does for Postgres connections:
+Now is a good time to implement a method for `db_desc()`. This should briefly describe the connection, typically formatting the information returned form `dbGetInfo()`. This is what dbplyr does for Postgres connections:
 
 ```{r}
 #' @export
-src_desc.PostgreSQLConnection <- function(x) {
+db_desc.PostgreSQLConnection <- function(x) {
   info <- dbGetInfo(x)
   host <- if (info$host == "") "localhost" else info$host
 

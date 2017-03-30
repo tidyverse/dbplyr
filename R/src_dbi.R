@@ -136,12 +136,6 @@ db_vars <- function(src, from) {
   db_query_fields(con, from)
 }
 
-
-#' @export
-src_desc.src_dbi <- function(x) {
-  src_desc(x$con)
-}
-
 # Creates an environment that disconnects the database when it's GC'd
 db_disconnector <- function(con, quiet = FALSE) {
   reg.finalizer(environment(), function(...) {
