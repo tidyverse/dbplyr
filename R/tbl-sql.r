@@ -361,8 +361,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
         db_drop_table(con, name, force = TRUE)
       }
 
-      db_create_table(con, name, types, temporary = temporary)
-      db_insert_into(con, name, df)
+      db_write_table(con, name, types, df, temporary = temporary)
       db_create_indexes(con, name, unique_indexes, unique = TRUE)
       db_create_indexes(con, name, indexes, unique = FALSE)
       if (analyze) db_analyze(con, name)

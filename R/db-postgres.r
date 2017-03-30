@@ -64,7 +64,10 @@ db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
 }
 
 #' @export
-db_insert_into.PostgreSQLConnection <- function(con, table, values, ...) {
+db_write_table.PostgreSQLConnection <- function(con, table, types, values,
+                                                temporary = TRUE, ...) {
+
+  db_create_table(con, table, types, temporary = temporary)
 
   if (nrow(values) == 0)
     return(NULL)

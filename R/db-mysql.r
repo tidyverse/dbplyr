@@ -74,7 +74,9 @@ db_rollback.MySQLConnection <- function(con, ...) {
 }
 
 #' @export
-db_insert_into.MySQLConnection <- function(con, table, values, ...) {
+db_write_table.MySQLConnection <- function(con, table, types, values,
+                                           temporary = TRUE, ...) {
+  db_create_table(con, table, types, temporary = temporary)
 
   # Convert factors to strings
   is_factor <- vapply(values, is.factor, logical(1))

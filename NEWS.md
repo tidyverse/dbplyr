@@ -113,6 +113,11 @@
   Export `win_current_group()` and `win_current_order()` (#2051, #2126).
   `win_over()` escapes expression using current database rules.
 
+## Backends
+
+* `copy_to()` now uses `db_write_table()` instead of `db_create_table()` and 
+  `db_insert_into()`. `db_write_table.DBIConnection()` uses `dbWriteTable()`.
+
 ## Minor bug fixes and improvements
 
 * `collect()` once again defaults to return all rows in the data (#1968).
