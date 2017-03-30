@@ -41,37 +41,35 @@ sql_translate_env.DBIConnection <- function(con) {
 #'
 #' These generics execute actions on the database. Most generics have a method
 #' for [DBI::DBIConnection-class] which typically just call the standard DBI S4
-#' method.
+#' method. Do not rely on them in other packages: over time they will be
+#' condensed into DBI.
 #'
 #' Note, a few backend methods do not call the standard DBI S4 methods including
-#' \itemize{
-#' \item `db_data_type()`: Calls [DBI::dbDataType()] for every field
-#' (e.g. data frame column) and returns a vector of corresponding SQL data
-#' types
-#' \item `db_save_query()`: Builds and executes a
-#' `CREATE [TEMPORARY] TABLE <table> ...` SQL command.
-#' \item `db_create_table()`: Builds and executes a
-#' `CREATE [TEMPORARY] TABLE <table> ...` SQL command.
-#' \item `db_create_index()`: Builds and executes a
-#' `CREATE INDEX <name> ON <table>` SQL command.
-#' \item `db_drop_table()`: Builds and executes a
-#' `DROP TABLE [IF EXISTS]  <table>` SQL command.
-#' \item `db_analyze()`: Builds and executes an
-#' `ANALYZE <table>` SQL command.
-#' \item `db_insert_into()` and `db_explain()`: do not have methods
-#' calling corresponding DBI methods. The latter because no underlying DBI S4
-#' method exists and the former because calls to the corresponding DBI S4
-#' method ([DBI::dbWriteTable()]) need to be able to specify an appropriate
-#' combination of values for non-standard `append` and `overwrite`
-#' arguments.
-#' }
+#'
+#' * `db_data_type()`: Calls [DBI::dbDataType()] for every field
+#'   (e.g. data frame column) and returns a vector of corresponding SQL data
+#'   types
+#'
+#' * `db_save_query()`: Builds and executes a
+#'   `CREATE [TEMPORARY] TABLE <table> ...` SQL command.
+#'
+#' * `db_create_index()`: Builds and executes a
+#'   `CREATE INDEX <name> ON <table>` SQL command.
+#'
+#' * `db_drop_table()`: Builds and executes a
+#'   `DROP TABLE [IF EXISTS]  <table>` SQL command.
+#'
+#' * `db_analyze()`: Builds and executes an
+#'   `ANALYZE <table>` SQL command.
 #'
 #' Currently, [copy_to()] is the only user of `db_begin()`, `db_commit()`,
-#' `db_rollback()`, `db_create_table()`, `db_insert_into()`,
-#' `db_create_indexes()`, `db_drop_table()` and
+#' `db_rollback()`, `db_write_table()`, `db_create_indexes()`, `db_drop_table()` and
 #' `db_analyze()`. If you find yourself overriding many of these
 #' functions it may suggest that you should just override `copy_to()`
 #' instead.
+#'
+#' `db_create_table()` and `db_insert_into()` have been deprecated
+#' in favour of `db_write_table()`.
 #'
 #' @return Usually a logical value indicating success. Most failures should generate
 #'  an error. However, `db_has_table()` should return `NA` if
@@ -142,6 +140,24 @@ db_commit.DBIConnection <- function(con, ...) dbCommit(con)
 db_rollback <- function(con, ...) UseMethod("db_rollback")
 #' @export
 db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
+
+#' @name backend_db
+#' @export
+db_write_table <- function(con, table, types, values, temporary = FALSE, ...) {
+  UseMethod("db_write_table")
+}
+
+#' @export
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = FALSE, ...) {
+  dbWriteTable(
+    con,
+    name = table,
+    value = values,
+    field.types = types,
+    temporary = temporary,
+    row.names = FALSE
+  )
+}
 
 #' @name backend_db
 #' @export

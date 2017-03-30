@@ -17,6 +17,8 @@
 \alias{backend_db}
 \alias{db_rollback}
 \alias{backend_db}
+\alias{db_write_table}
+\alias{backend_db}
 \alias{db_create_table}
 \alias{backend_db}
 \alias{db_insert_into}
@@ -46,6 +48,8 @@ db_begin(con, ...)
 db_commit(con, ...)
 
 db_rollback(con, ...)
+
+db_write_table(con, table, types, values, temporary = FALSE, ...)
 
 db_create_table(con, table, types, temporary = FALSE, ...)
 
@@ -82,7 +86,8 @@ backend to throw an error if a table exists when it shouldn't.
 \description{
 These generics execute actions on the database. Most generics have a method
 for \link[DBI:DBIConnection-class]{DBI::DBIConnection} which typically just call the standard DBI S4
-method.
+method. Do not rely on them in other packages: over time they will be
+condensed into DBI.
 }
 \details{
 Note, a few backend methods do not call the standard DBI S4 methods including
@@ -92,27 +97,21 @@ Note, a few backend methods do not call the standard DBI S4 methods including
 types
 \item \code{db_save_query()}: Builds and executes a
 \code{CREATE [TEMPORARY] TABLE <table> ...} SQL command.
-\item \code{db_create_table()}: Builds and executes a
-\code{CREATE [TEMPORARY] TABLE <table> ...} SQL command.
 \item \code{db_create_index()}: Builds and executes a
 \code{CREATE INDEX <name> ON <table>} SQL command.
 \item \code{db_drop_table()}: Builds and executes a
 \code{DROP TABLE [IF EXISTS] <table>} SQL command.
 \item \code{db_analyze()}: Builds and executes an
 \code{ANALYZE <table>} SQL command.
-\item \code{db_insert_into()} and \code{db_explain()}: do not have methods
-calling corresponding DBI methods. The latter because no underlying DBI S4
-method exists and the former because calls to the corresponding DBI S4
-method (\code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}) need to be able to specify an appropriate
-combination of values for non-standard \code{append} and \code{overwrite}
-arguments.
 }
 
 Currently, \code{\link[=copy_to]{copy_to()}} is the only user of \code{db_begin()}, \code{db_commit()},
-\code{db_rollback()}, \code{db_create_table()}, \code{db_insert_into()},
-\code{db_create_indexes()}, \code{db_drop_table()} and
+\code{db_rollback()}, \code{db_write_table()}, \code{db_create_indexes()}, \code{db_drop_table()} and
 \code{db_analyze()}. If you find yourself overriding many of these
 functions it may suggest that you should just override \code{copy_to()}
 instead.
+
+\code{db_create_table()} and \code{db_insert_into()} have been deprecated
+in favour of \code{db_write_table()}.
 }
 \keyword{internal}
