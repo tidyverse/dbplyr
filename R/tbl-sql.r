@@ -1,7 +1,7 @@
 #' Create an SQL tbl (abstract)
 #'
-#' Deprecated: you should no longer need to provide a custom `tbl()`
-#' method. Instead, you can rely on the default `tbl_dbi` method.
+#' Generally, you should no longer need to provide a custom `tbl()`
+#' method you you can default `tbl.DBIConnect` method.
 #'
 #' @keywords internal
 #' @export
@@ -18,12 +18,9 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   }
 
   vars <- db_query_fields(src$con, from)
+  ops <- op_base_remote(from, vars)
 
-  make_tbl(
-    c(subclass, "sql", "lazy"),
-    src = src,
-    ops = op_base_remote(from, vars)
-  )
+  make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
 }
 
 #' @export

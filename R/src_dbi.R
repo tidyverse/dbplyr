@@ -112,16 +112,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 #' @param from Either a string (giving a table name) or literal [sql()].
 #' @param ... Needed for compatibility with generic; currently ignored.
 tbl.src_dbi <- function(src, from, ...) {
-  # If not literal sql, must be a table identifier
-  if (!is.sql(from)) {
-    from <- ident(from)
-  }
-
-  make_tbl(
-    c("dbi", "sql", "lazy"),
-    src = src,
-    ops = op_base_remote(from, vars = db_query_fields(src$con, from))
-  )
+  tbl_sql("dbi", src = src, from = from)
 }
 
 # Creates an environment that disconnects the database when it's GC'd
