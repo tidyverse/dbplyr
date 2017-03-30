@@ -45,6 +45,7 @@ Collate:
     'dbi-s3.r'
     'dbplyr.R'
     'do.r'
+    'dplyr-generics.R'
     'explain.r'
     'lazy-ops.R'
     'memdb.R'
