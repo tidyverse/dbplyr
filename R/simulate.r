@@ -10,7 +10,15 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
-# PostgreSQL --------------------------------------------------------------
+# DBI connections --------------------------------------------------------------
+
+simulate_dbi <- function() {
+  structure(
+    list(),
+    class = "DBIConnection"
+  )
+}
+
 
 simulate_postgres <- function() {
   structure(
@@ -18,3 +26,4 @@ simulate_postgres <- function() {
     class = c("PostgreSQLConnection", "DBIConnection")
   )
 }
+

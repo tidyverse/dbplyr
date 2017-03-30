@@ -5,20 +5,22 @@ sql_render <- function(query, con = NULL, ...) {
 }
 
 #' @export
+sql_render.tbl_lazy <- function(query, con = NULL, ...) {
+  # only used for testing
+  qry <- sql_build(query$ops, con = con, ...)
+  sql_render(qry, con = con, ...)
+}
+
+#' @export
+sql_render.tbl_sql <- function(query, con = query$src$con, ...) {
+  # only used for testing
+  qry <- sql_build(query$ops, con = con, ...)
+  sql_render(qry, con = con, ...)
+}
+
+#' @export
 sql_render.op <- function(query, con = NULL, ...) {
   sql_render(sql_build(query, ...), con = con, ...)
-}
-
-#' @export
-sql_render.tbl_sql <- function(query, con = NULL, ...) {
-  con <- con %||% query$src$con
-  sql_render.tbl_lazy(query, con, ...)
-}
-
-#' @export
-sql_render.tbl_lazy <- function(query, con = NULL, ...) {
-  qry <- sql_build(query, con = con, ...)
-  sql_render(qry, con = con, ...)
 }
 
 #' @export

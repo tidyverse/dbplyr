@@ -12,7 +12,7 @@
 #'   dplyr. However, you should usually be able to leave this blank and it
 #'   will be determined from the context.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
-  # If not literal sql, must be a table identifier
+  # If not literal ql, must be a table identifier
   if (!is.sql(from)) {
     from <- ident(from)
   }
@@ -347,32 +347,22 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   assert_that(is.data.frame(df), is_string(name), is.flag(temporary))
   class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
 
-  types <- types %||% db_data_type(dest$con, df)
-  names(types) <- names(df)
-
-  db_begin(dest$con)
-  tryCatch({
-    if (overwrite) {
-      db_drop_table(dest$con, name, force = TRUE)
-    }
-
-    db_write_table(dest$con, name, types, df, temporary = temporary)
-    db_create_indexes(dest$con, name, unique_indexes, unique = TRUE)
-    db_create_indexes(dest$con, name, indexes, unique = FALSE)
-    if (analyze) db_analyze(dest$con, name)
-
-    db_commit(dest$con)
-  }, error = function(err) {
-    db_rollback(dest$con)
-    stop(err)
-  })
+  name <- db_copy_to(dest$con, name, df,
+    overwrite = overwrite,
+    types = types,
+    temporary = temporary,
+    unique_indexes = unique_indexes,
+    indexes = indexes,
+    analyze = analyze,
+    ...
+  )
 
   invisible(tbl(dest, name))
 }
 
 #' @export
 collapse.tbl_sql <- function(x, vars = NULL, ...) {
-  sql <- sql_render(x)
+  sql <- db_sql_render(x$src$con, x)
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%
@@ -383,21 +373,20 @@ collapse.tbl_sql <- function(x, vars = NULL, ...) {
 compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
                             unique_indexes = list(), indexes = list(),
                             ...) {
-  if (!is.list(indexes)) {
-    indexes <- as.list(indexes)
-  }
-  if (!is.list(unique_indexes)) {
-    unique_indexes <- as.list(unique_indexes)
-  }
 
-  con <- x$src$con
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
   assert_that(all(unlist(unique_indexes) %in% vars))
+
   x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
-  db_save_query(con, sql_render(x_aliased, con), name = name, temporary = temporary)
-  db_create_indexes(con, name, unique_indexes, unique = TRUE)
-  db_create_indexes(con, name, indexes, unique = FALSE)
+  sql <- db_sql_render(x$src$con, x_aliased)
+
+  name <- db_compute(x$src$con, name, sql,
+    temporary = temporary,
+    unique_indexes = unique_indexes,
+    indexes = indexes,
+    ...
+  )
 
   tbl(x$src, name) %>%
     group_by(!!! syms(op_grps(x))) %>%
@@ -415,17 +404,9 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
     x <- head(x, n)
   }
 
-  sql <- sql_render(x, x$src$con)
-  res <- dbSendQuery(x$src$con, sql)
-  tryCatch({
-    out <- dbFetch(res, n)
-    if (warn_incomplete) {
-      res_warn_incomplete(res, "n = Inf")
-    }
-  }, finally = {
-    dbClearResult(res)
-  })
-
+  sql <- db_sql_render(x$src$con, x)
+  out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete)
   grouped_df(out, intersect(op_grps(x), names(out)))
 }
+
 

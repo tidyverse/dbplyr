@@ -1,7 +1,6 @@
 #' @export
 show_query.tbl_sql <- function(x, ...) {
-  message("<SQL>\n", sql_render(x, con = x$src$con))
-
+  message("<SQL>\n", db_sql_render(x$src$con, x))
   invisible(x)
 }
 
@@ -11,7 +10,7 @@ explain.tbl_sql <- function(x, ...) {
   show_query(x)
 
   message("\n")
-  message("<PLAN>\n", db_explain(con, sql_render(x, con = x$src$con)))
+  message("<PLAN>\n", db_explain(x$con, db_sql_render(x$con, x$ops)))
 
   invisible(x)
 }
