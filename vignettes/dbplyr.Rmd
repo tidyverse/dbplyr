@@ -112,10 +112,10 @@ To pull down all the results use `collect()`, which returns a `tbl_df()`:
 collect(c4)
 ```
 
-You can see the query dplyr will generate to pull down results by using the `show_query()` function from dbplyr:
+You can see the query dplyr will generate to pull down results by using `show_query()`
 
 ```{r}
-c4 %>% dbplyr::show_query()
+c4 %>% show_query()
 ```
 
 You can also ask the database how it plans to execute the query with `explain()`. The output for SQLite is described in more detail on the [SQLite website](http://www.sqlite.org/eqp.html). It's helpful if you're trying to figure out which indexes are being used.
@@ -136,7 +136,7 @@ nrow(flights_db)
 
 tail(flights_db)
 
-flights_db %>% head(6) %>% dbplyr::show_query()
+flights_db %>% head(6) %>% show_query()
 ```
 
 ## Grouping
@@ -179,13 +179,13 @@ daily <- flights_postgres %>% group_by(year, month, day)
 bestworst <- daily %>% 
   select(flight, arr_delay) %>% 
   filter(arr_delay == min(arr_delay) || arr_delay == max(arr_delay))
-bestworst %>% dbplyr::show_query()
+bestworst %>% show_query()
 
 # Rank each flight within a daily
 ranked <- daily %>% 
   select(arr_delay) %>% 
   mutate(rank = rank(desc(arr_delay)))
-ranked %>% dbplyr::show_query()
+ranked %>% show_query()
 ```
 
 ### MySQL and MariaDB

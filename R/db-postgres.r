@@ -1,5 +1,5 @@
 #' @export
-src_desc.PostgreSQLConnection <- function(x) {
+db_desc.PostgreSQLConnection <- function(x) {
   info <- dbGetInfo(x)
   host <- if (info$host == "") "localhost" else info$host
 

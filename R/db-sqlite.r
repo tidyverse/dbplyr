@@ -1,5 +1,5 @@
 #' @export
-src_desc.SQLiteConnection <- function(x) {
+db_desc.SQLiteConnection <- function(x) {
   paste0("sqlite ", sqlite_version(), " [", x@dbname, "]")
 }
 
