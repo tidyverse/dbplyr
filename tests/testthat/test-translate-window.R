@@ -34,3 +34,9 @@ test_that("ntile always casts to integer", {
     sql('NTILE(10) OVER (ORDER BY "x")')
   )
 })
+
+test_that("first, last, and nth translated to _value", {
+  expect_equal(translate_sql(first(x)), sql('first_value("x") OVER ()'))
+  expect_equal(translate_sql(last(x)), sql('last_value("x") OVER ()'))
+  expect_equal(translate_sql(nth(x, 1)), sql('nth_value("x", 1) OVER ()'))
+})
