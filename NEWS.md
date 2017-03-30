@@ -84,6 +84,9 @@
     * Better test for whether or not a double is similar to an integer and 
       hence needs a trailing 0.0 added (#2004).
 
+    * Quoting defaults to `DBI::dbEscapeString()` and `DBI::dbQuoteIdentifier()`
+      respectively.
+
 * `::` and `:::` are handled correctly (#2321)
 
 * `x %in% 1` is now correctly translated to `x IN (1)` (#511).
