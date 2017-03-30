@@ -143,7 +143,7 @@ translate_sql_ <- function(dots,
 }
 
 sql_overscope <- function(expr, variant, con, window = FALSE,
-                          strict = getOption("dplyr.strict_sql")) {
+                          strict = getOption("dplyr.strict_sql", FALSE)) {
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
