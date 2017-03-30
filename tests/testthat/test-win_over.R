@@ -16,7 +16,7 @@ test_that("multiple group by or order values don't have parens", {
 })
 
 test_that("connection affects quoting window function fields", {
-  old <- set_win_current_con(DBITest())
+  old <- set_win_current_con(simulate_test())
   on.exit(set_win_current_con(old))
 
   expect_equal(win_over(ident("x")), sql("`x` OVER ()"))

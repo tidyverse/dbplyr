@@ -90,8 +90,7 @@ test_that("na_if is translated to NULL_IF", {
 })
 
 test_that("connection affects quoting character", {
-  dbiTest <- structure(list(), class = "DBITestConnection")
-  dbTest <- src_sql("test", con = dbiTest)
+  dbTest <- src_sql("test", con = simulate_test())
   testTable <- tbl_sql("test", src = dbTest, from = ident("table1"))
 
   out <- select(testTable, field1)
