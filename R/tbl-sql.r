@@ -17,7 +17,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
     from <- ident(from)
   }
 
-  vars <- db_vars(src, from)
+  vars <- db_query_fields(src$con, from)
 
   make_tbl(
     c(subclass, "sql", "lazy"),
@@ -350,29 +350,24 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   assert_that(is.data.frame(df), is_string(name), is.flag(temporary))
   class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
 
-  con <- con_acquire(dest)
+  types <- types %||% db_data_type(dest$con, df)
+  names(types) <- names(df)
+
+  db_begin(dest$con)
   tryCatch({
-    types <- types %||% db_data_type(con, df)
-    names(types) <- names(df)
+    if (overwrite) {
+      db_drop_table(dest$con, name, force = TRUE)
+    }
 
-    db_begin(con)
-    tryCatch({
-      if (overwrite) {
-        db_drop_table(con, name, force = TRUE)
-      }
+    db_write_table(dest$con, name, types, df, temporary = temporary)
+    db_create_indexes(dest$con, name, unique_indexes, unique = TRUE)
+    db_create_indexes(dest$con, name, indexes, unique = FALSE)
+    if (analyze) db_analyze(dest$con, name)
 
-      db_write_table(con, name, types, df, temporary = temporary)
-      db_create_indexes(con, name, unique_indexes, unique = TRUE)
-      db_create_indexes(con, name, indexes, unique = FALSE)
-      if (analyze) db_analyze(con, name)
-
-      db_commit(con)
-    }, error = function(err) {
-      db_rollback(con)
-      stop(err)
-    })
-  }, finally = {
-    con_release(dest, con)
+    db_commit(dest$con)
+  }, error = function(err) {
+    db_rollback(dest$con)
+    stop(err)
   })
 
   invisible(tbl(dest, name))
@@ -380,12 +375,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
 
 #' @export
 collapse.tbl_sql <- function(x, vars = NULL, ...) {
-  con <- con_acquire(x$src)
-  tryCatch({
-    sql <- sql_render(x, con)
-  }, finally = {
-    con_release(x$src, con)
-  })
+  sql <- sql_render(x)
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%
@@ -403,18 +393,14 @@ compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
     unique_indexes <- as.list(unique_indexes)
   }
 
-  con <- con_acquire(x$src)
-  tryCatch({
-    vars <- op_vars(x)
-    assert_that(all(unlist(indexes) %in% vars))
-    assert_that(all(unlist(unique_indexes) %in% vars))
-    x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
-    db_save_query(con, sql_render(x_aliased, con), name = name, temporary = temporary)
-    db_create_indexes(con, name, unique_indexes, unique = TRUE)
-    db_create_indexes(con, name, indexes, unique = FALSE)
-  }, finally = {
-    con_release(x$src, con)
-  })
+  con <- x$src$con
+  vars <- op_vars(x)
+  assert_that(all(unlist(indexes) %in% vars))
+  assert_that(all(unlist(unique_indexes) %in% vars))
+  x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
+  db_save_query(con, sql_render(x_aliased, con), name = name, temporary = temporary)
+  db_create_indexes(con, name, unique_indexes, unique = TRUE)
+  db_create_indexes(con, name, indexes, unique = FALSE)
 
   tbl(x$src, name) %>%
     group_by(!!! syms(op_grps(x))) %>%
@@ -432,11 +418,8 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
     x <- head(x, n)
   }
 
-  con <- con_acquire(x$src)
-  on.exit(con_release(x$src, con), add = TRUE)
-
-  sql <- sql_render(x, con)
-  res <- dbSendQuery(con, sql)
+  sql <- sql_render(x, x$src$con)
+  res <- dbSendQuery(x$src$con, sql)
   tryCatch({
     out <- dbFetch(res, n)
     if (warn_incomplete) {
@@ -445,7 +428,6 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   }, finally = {
     dbClearResult(res)
   })
-
 
   grouped_df(out, intersect(op_grps(x), names(out)))
 }

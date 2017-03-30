@@ -120,20 +120,8 @@ tbl.src_dbi <- function(src, from, ...) {
   make_tbl(
     c("dbi", "sql", "lazy"),
     src = src,
-    ops = op_base_remote(from, vars = db_vars(src, from))
+    ops = op_base_remote(from, vars = db_query_fields(src$con, from))
   )
-}
-
-
-db_vars <- function(src, from) {
-  vars <- attr(from, "vars")
-  if (!is.null(vars))
-    return(vars)
-
-  con <- con_acquire(src)
-  on.exit(con_release(src, con), add = TRUE)
-
-  db_query_fields(con, from)
 }
 
 # Creates an environment that disconnects the database when it's GC'd
