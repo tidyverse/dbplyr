@@ -10,13 +10,26 @@ NULL
 #' @export
 src_desc <- function(x) UseMethod("src_desc")
 
+#' @export
+src_desc.DBIConnection <- function(x) {
+  class(x)[[1]]
+}
+
 #' @name backend_src
 #' @export
 sql_translate_env <- function(con) UseMethod("sql_translate_env")
 
-#' @name backend_src
 #' @export
 sql_translate_env.NULL <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
   sql_variant(
     base_scalar,
     base_agg,
