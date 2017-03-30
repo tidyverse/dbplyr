@@ -17,7 +17,7 @@ dplyr. However, you should usually be able to leave this blank and it
 will be determined from the context.}
 }
 \description{
-Deprecated: you should no longer need to provide a custom \code{tbl()}
-method. Instead, you can rely on the default \code{tbl_dbi} method.
+Generally, you should no longer need to provide a custom \code{tbl()}
+method you you can default \code{tbl.DBIConnect} method.
 }
 \keyword{internal}
