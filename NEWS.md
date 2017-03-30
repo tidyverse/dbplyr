@@ -2,14 +2,18 @@
 
 ## New features
 
-* New `src_dbi()` is the new offiicial way to construct dplyr sources with
-  a remote backend. `src_dbi()` is very similar to the existing `src_sql()`
-  (which remains for backward compatibility), but it recognises that dplyr
-  only works with database backends that support the DBI protocol (#2423).
-  `src_desc.src_dbi()` dispatches on the connection, eliminating the
-  last method that required a dispatch on the class of the src, rather
-  than the underlying connection. You can create a `tbl` directly from a 
-  DBI connection (#2576).
+* `tbl()` and `copy_to()` now work directly with DBI connections (#2423, #2576), 
+  so there is no longer a need to generate a dplyr src. 
+  
+    ```R
+    library(dplyr)
+
+    con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+    copy_to(con, mtcars)
+    
+    mtcars2 <- tbl(con, "mtcars")
+    mtcars2
+    ```
 
 * dplyr has gained a basic SQL optimiser, which collapses certain nested
   SELECT queries into a single query (#1979). This will improve query
@@ -109,14 +113,20 @@
   in the third argument. In R, it's the position of the last character,
   in SQL it's the length of the string (#2536).
 
-* Export `win_over()`, `win_rank()`, `win_recycled()`, and `win_cumulative()`.
-  Export `win_current_group()` and `win_current_order()` (#2051, #2126).
-  `win_over()` escapes expression using current database rules.
+* `win_over()` escapes expression using current database rules.
 
 ## Backends
 
 * `copy_to()` now uses `db_write_table()` instead of `db_create_table()` and 
   `db_insert_into()`. `db_write_table.DBIConnection()` uses `dbWriteTable()`.
+
+* `src_desc.src_dbi()` now dispatches on the connection, eliminating the
+  last method that required dispatch on the class of the src.
+
+* `win_over()`, `win_rank()`, `win_recycled()`, `win_cumulative()`,
+  `win_current_group()` and `win_current_order()` are now exported. This
+  should make it easier to provide customised SQL for window functions
+  (#2051, #2126).
 
 ## Minor bug fixes and improvements
 
