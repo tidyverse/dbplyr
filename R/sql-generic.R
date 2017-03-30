@@ -18,7 +18,7 @@ sql_select <- function(con, select, from, where = NULL, group_by = NULL,
   UseMethod("sql_select")
 }
 #' @export
-sql_select.default <- function(con, select, from, where = NULL,
+sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                group_by = NULL, having = NULL,
                                order_by = NULL,
                                limit = NULL,
@@ -86,7 +86,7 @@ sql_subquery <- function(con, from, name = random_table_name(), ...) {
   UseMethod("sql_subquery")
 }
 #' @export
-sql_subquery.default <- function(con, from, name = unique_name(), ...) {
+sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
@@ -100,7 +100,7 @@ sql_join <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   UseMethod("sql_join")
 }
 #' @export
-sql_join.default <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -171,7 +171,7 @@ sql_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
   UseMethod("sql_semi_join")
 }
 #' @export
-sql_semi_join.default <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
   # X and Y are subqueries named TBL_LEFT and TBL_RIGHT
   left <- escape(ident("TBL_LEFT"), con = con)
   right <- escape(ident("TBL_RIGHT"), con = con)
