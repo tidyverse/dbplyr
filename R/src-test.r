@@ -30,3 +30,12 @@ sql_translate_env.DBITestConnection <- function(con) {
     window = sql_translator(.parent = base_win)
   )
 }
+
+
+
+simulate_postgres <- function() {
+  structure(
+    list(),
+    class = c("PostgreSQLConnection", "DBIConnection")
+  )
+}

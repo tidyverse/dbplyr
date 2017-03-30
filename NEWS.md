@@ -153,6 +153,8 @@
 * `print(df, n = Inf)` and `head(df, n = Inf)` now work with remote tables 
   (#2580).
 
+* `src_desc()` and `sql_translate_env()` get defaults for DBIConnection.
+
 ## Lazy ops
 
 * [API] The signature of `op_base` has changed to `op_base(x, vars, class)`

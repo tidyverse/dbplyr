@@ -225,7 +225,7 @@ sql_set_op.SQLiteConnection <- function(con, x, y, method) {
 sql_escape_string <- function(con, x) UseMethod("sql_escape_string")
 
 #' @export
-sql_escape_string.default <- function(con, x) {
+sql_escape_string.DBIConnection <- function(con, x) {
   dbQuoteString(con, x)
 }
 
@@ -239,7 +239,7 @@ sql_escape_string.NULL <- function(con, x) {
 sql_escape_ident <- function(con, x) UseMethod("sql_escape_ident")
 
 #' @export
-sql_escape_ident.default <- function(con, x) {
+sql_escape_ident.DBIConnection <- function(con, x) {
   dbQuoteIdentifier(con, x)
 }
 
