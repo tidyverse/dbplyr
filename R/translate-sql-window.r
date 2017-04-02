@@ -226,7 +226,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
         window_where(as_symbol(name), set_names(list(expr), name))
       } else {
         args <- map(expr[-1], translate_window_where, window_funs = window_funs)
-        expr <- new_language(node_car(expr), .args = map(args, "[[", "expr"))
+        expr <- new_language(node_car(expr), splice(map(args, "[[", "expr")))
 
         window_where(
           expr = expr,
