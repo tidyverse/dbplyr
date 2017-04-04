@@ -72,3 +72,13 @@ test_that("join functions error on column not found for SQL sources #1928", {
     "No common variables"
   )
 })
+
+# All sources -------------------------------------------------------------
+
+test_that("sql generated correctly for all sources", {
+  x <- test_frame(a = letters[1:7], c = 2:8)
+  y <- test_frame(a = letters[1:4], b = c(1, 2, 3, NA))
+  xy <- map2(x, y, left_join)
+
+  expect_equal_tbls(xy)
+})

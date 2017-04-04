@@ -98,7 +98,7 @@ escape <- function(x, parens = NA, collapse = " ", con = NULL) {
 #' @export
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, con), parens, collapse)
+  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse)
 }
 
 #' @export
@@ -179,8 +179,7 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql(x)
 }
 
-names_to_as <- function(x, con = NULL) {
-  names <- names2(x)
+names_to_as <- function(x, names = names2(x), con = NULL) {
   as <- ifelse(names == "", "", paste0(" AS ", sql_escape_ident(con, names)))
 
   paste0(x, as)
