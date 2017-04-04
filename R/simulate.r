@@ -19,6 +19,12 @@ simulate_dbi <- function() {
   )
 }
 
+simulate_sqlite <- function() {
+  structure(
+    list(),
+    class = c("SQLiteConnection", "DBIConnection")
+  )
+}
 
 simulate_postgres <- function() {
   structure(
@@ -26,4 +32,3 @@ simulate_postgres <- function() {
     class = c("PostgreSQLConnection", "DBIConnection")
   )
 }
-

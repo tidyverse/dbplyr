@@ -80,8 +80,9 @@
 
 * Translation of inline scalars:
 
-    * Logical values are now translated to 0 and 1 rather than TRUE and FALSE
-      this should work on a wider range of backends (#2052).
+    * Logical values are now translated differently depending on the backend.
+      The default is to use "true" and "false" which is the SQL-99 standard,
+      but not widely support. SQLite translates to "0" and "1" (#2052).
 
     * `Inf` and `-Inf` are correctly escaped
 
@@ -128,6 +129,9 @@
 * All generics whose behaviour can vary from database to database now 
   provide a DBIConnection method. That means that you can easily scan
   the NAMESPACE to see the extension points.
+
+* `sql_escape_logical()` allows you to control the translation of
+  literal logicals (#2614).
 
 * `src_desc()` has been replaced by `db_desc()` and  now dispatches on the 
   connection, eliminating the last method that required dispatch on the class 

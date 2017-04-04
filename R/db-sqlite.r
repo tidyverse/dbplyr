@@ -38,6 +38,13 @@ sql_escape_ident.SQLiteConnection <- function(con, x) {
 }
 
 #' @export
+sql_escape_logical.SQLiteConnection <- function(con, x){
+  y <- as.character(as.integer(x))
+  y[is.na(x)] <- "NULL"
+  y
+}
+
+#' @export
 sql_subquery.SQLiteConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)

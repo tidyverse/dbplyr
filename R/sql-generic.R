@@ -193,6 +193,18 @@ sql_escape_ident.NULL <- function(con, x) {
 }
 
 #' @export
+sql_escape_logical.DBIConnection <- function(con, x) {
+  y <- as.character(x)
+  y[is.na(x)] <- "NULL"
+
+  y
+}
+
+#' @export
+sql_escape_logical.NULL <- sql_escape_logical.DBIConnection
+
+
+#' @export
 sql_translate_env.NULL <- function(con) {
   sql_variant(
     base_scalar,

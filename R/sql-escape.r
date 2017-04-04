@@ -103,9 +103,7 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 
 #' @export
 escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x <- as.character(as.integer(x))
-  x[is.na(x)] <- "NULL"
-  sql_vector(x, parens, collapse)
+  sql_vector(sql_escape_logical(con, x), parens, collapse, con = con)
 }
 
 #' @export
@@ -211,7 +209,7 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' # http://xkcd.com/327/
 #' name <- "Robert'); DROP TABLE Students;--"
 #' build_sql("INSERT INTO Students (Name) VALUES (", name, ")")
-build_sql <- function(..., .env = parent.frame(), con = NULL) {
+build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   escape_expr <- function(x) {
     # If it's a string, leave it as is
     if (is.character(x)) return(x)

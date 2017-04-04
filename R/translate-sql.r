@@ -117,10 +117,10 @@ translate_sql_ <- function(dots,
     names(dots) <- NULL
   }
 
-  if (window) {
-    old_con <- set_win_current_con(con)
-    on.exit(set_win_current_con(old_con), add = TRUE)
+  old_con <- set_current_con(con)
+  on.exit(set_current_con(old_con), add = TRUE)
 
+  if (window) {
     old_group <- set_win_current_group(vars_group)
     on.exit(set_win_current_group(old_group), add = TRUE)
 

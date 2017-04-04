@@ -28,7 +28,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     partition <- build_sql(
       "PARTITION BY ",
       sql_vector(
-        escape(partition, con = win_current_con()),
+        escape(partition, con = sql_current_con()),
         collapse = ", ",
         parens = FALSE
       )
@@ -43,7 +43,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     order <- build_sql(
       "ORDER BY ",
       sql_vector(
-        escape(order, con = win_current_con()),
+        escape(order, con = sql_current_con()),
         collapse = ", ",
         parens = FALSE
       )
@@ -63,7 +63,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
   }
 
   over <- sql_vector(compact(list(partition, order, frame)), parens = TRUE)
-  sql <- build_sql(expr, " OVER ", over, con = win_current_con())
+  sql <- build_sql(expr, " OVER ", over)
 
   sql
 }
@@ -144,43 +144,43 @@ win_absent <- function(f) {
 # Use a global variable to communicate state of partitioning between
 # tbl and sql translator. This isn't the most amazing design, but it keeps
 # things loosely coupled and is easy to understand.
-partition <- new.env(parent = emptyenv())
-partition$group_by <- NULL
-partition$order_by <- NULL
-partition$con <- NULL
+sql_context <- new.env(parent = emptyenv())
+sql_context$group_by <- NULL
+sql_context$order_by <- NULL
+sql_context$con <- NULL
 
-set_win_current_con <- function(con) {
-  old <- partition$con
-  partition$con <- con
+set_current_con <- function(con) {
+  old <- sql_context$con
+  sql_context$con <- con
   invisible(old)
 }
 
 set_win_current_group <- function(vars) {
   stopifnot(is.null(vars) || is.character(vars))
 
-  old <- partition$group_by
-  partition$group_by <- vars
+  old <- sql_context$group_by
+  sql_context$group_by <- vars
   invisible(old)
 }
 
 set_win_current_order <- function(vars) {
   stopifnot(is.null(vars) || is.character(vars))
 
-  old <- partition$order_by
-  partition$order_by <- vars
+  old <- sql_context$order_by
+  sql_context$order_by <- vars
   invisible(old)
 }
 
 #' @export
 #' @rdname win_over
-win_current_group <- function() partition$group_by
+win_current_group <- function() sql_context$group_by
 
 #' @export
 #' @rdname win_over
-win_current_order <- function() partition$order_by
+win_current_order <- function() sql_context$order_by
 
 # Not exported, because you shouldn't need it
-win_current_con <- function() partition$con
+sql_current_con <- function() sql_context$con
 
 
 # Where translation -------------------------------------------------------
