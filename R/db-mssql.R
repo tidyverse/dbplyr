@@ -1,10 +1,15 @@
 #' @export
 `db_desc.Microsoft SQL Server` <- function(x) {
   info <- DBI::dbGetInfo(x)
-  host <- if (info$host == "") "localhost" else info$host
 
-  paste0("Microsoft SQL Server ", info$serverVersion, " [", info$user, "@",
-         host, ":", info$port, "/", info$dbname, "]")
+  host <- if (info$servername == "") "localhost" else info$servername
+  port <- if (info$port == "") "" else paste0(":", port)
+
+  paste0(
+    info$dbms.name, " ", info$db.version,
+    "[", info$username, "@", host, port,
+    "/", info$dbname , "]")
+
 }
 
 #' @export
@@ -22,14 +27,20 @@
   out$select <- build_sql(
     "SELECT ",
 
+    if (distinct) sql("DISTINCT "),
+    escape(select, collapse = ", ", con = con),
+
+    # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
+    # TOP is expected after DISTINCT and not at the end of the query
+    # e.g: SELECT TOP 100 * FROM my_table
+
     if (!is.null(limit) && !identical(limit, Inf)) {
       assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
       sql("TOP ")
       sql(format(trunc(limit), scientific = FALSE))
-      sql(" ")},
+      sql(" ")}
 
-    if (distinct) sql("DISTINCT "),
-    escape(select, collapse = ", ", con = con)
+
   )
 
   assert_that(is.character(from), length(from) == 1L)
@@ -69,38 +80,25 @@
 }
 
 
-#' @export
-`sql_subquery.Microsoft SQL Server` <- function(con, from, name = dbplyr:::unique_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% dbplyr:::random_table_name()), con = con)
-  }
-}
-
 
 #' @export
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
   dbplyr::sql_variant(
     scalar = dbplyr::sql_translator(
+      # MSSQL supports CONCAT_WS in the CTP version of 2016
       .parent = dbplyr::base_scalar,
       as.numeric = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
       as.double  = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
       as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS VARCHAR(MAX))"),
-      as.date  = function(x) build_sql("CAST(", x, " AS DATE)"),
       as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      paste = function(..., sep = " ") build_sql("CONCAT_WS", list(sep, ...)),
       paste0 = function(...) build_sql("CONCAT", list(...)),
-      xor = function(x, y) build_sql(x, " ^ ", y),
       or = function(x, y) build_sql(x, " or ", y),
-      and = function(x, y) build_sql(x, " and ", y),
-      pmin = function(...) build_sql_if_compare(..., con = con, compare = "<="),
-      pmax = function(...) build_sql_if_compare(..., con = con, compare = ">=")
+      and = function(x, y) build_sql(x, " and ", y)
     ) ,
     aggregate = dbplyr::sql_translator(
-      # T-SQL does not have function for: cor and cov
+      # MSSQL does not have function for: cor and cov
       .parent = dbplyr::base_agg,
       n = function() dbplyr::sql("COUNT(*)"),
       count = function() dbplyr::sql("COUNT(*)"),
@@ -109,44 +107,5 @@
       var = function(...) dbplyr::build_sql("VAR(", list(...), ")")
     )
   )}
-
-
-
-#' @export
-`sql_join.Microsoft SQL Server` <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
-  JOIN <- switch(
-    type,
-    left = sql("LEFT JOIN"),
-    inner = sql("INNER JOIN"),
-    right = sql("RIGHT JOIN"),
-    full = sql("FULL JOIN"),
-    stop("Unknown join type:", type, call. = FALSE)
-  )
-
-  select <- sql_vector(c(
-    dbplyr:::sql_as(con, names(vars$x), vars$x, table = "TBL_LEFT"),
-    dbplyr:::sql_as(con, names(vars$y), vars$y, table = "TBL_RIGHT")
-  ), collapse = ", ", parens = FALSE)
-
-  on <- sql_vector(
-    paste0(
-      dbplyr:::sql_table_prefix(con, by$x, "TBL_LEFT"),
-      " = ",
-      dbplyr:::sql_table_prefix(con, by$y, "TBL_RIGHT")
-    ),
-    collapse = " AND ",
-    parens = TRUE
-  )
-
-  # Wrap with SELECT since callers assume a valid query is returned
-  build_sql(
-    "SELECT ", select, "\n",
-    "  FROM ", x, "\n",
-    "  ", JOIN, " ", y, "\n",
-    "  ON ", on, "\n",
-    con = con
-  )
-}
-
 
 
