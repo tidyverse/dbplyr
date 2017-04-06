@@ -141,7 +141,7 @@
   # Wrap with SELECT since callers assume a valid query is returned
   build_sql(
     "SELECT ", select, "\n",
-    "  FROM ", x, " TBL_LEFT", "\n",
+    "  FROM ", x, "\n",
     "  ", JOIN, " ", y, "\n",
     "  ON ", on, "\n",
     con = con
