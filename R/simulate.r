@@ -33,25 +33,18 @@ simulate_postgres <- function() {
   )
 }
 
-# odbc connections --------------------------------------------------------
+simulate_mssql <- function() {
 
-setClass(
-  "OdbcConnection",
-  contains = "DBIConnection",
-  slots = list(
-    ptr = "externalptr",
-    quote = "character",
-    info = "ANY"
-  )
-)
+  class_mssql <- new.env(parent = emptyenv())
 
-class_cache <- new.env(parent = emptyenv())
+  setClass(
+    "OdbcConnection",
+    contains = "DBIConnection",
+    slots = list(quote = "character"),
+    where = class_mssql)
 
-simulate_odbc <- function(dbms.name = NULL) {
-  class <- getClassDef(dbms.name, where = class_cache, inherits = FALSE)
-  if (is.null(class)) {
-    setClass(dbms.name,
-             contains = "OdbcConnection", where = class_cache)
-  }
+  dbms.name <- "Microsoft SQL Server"
+
+  setClass(dbms.name, contains = "OdbcConnection", where = class_mssql)
   new(dbms.name, quote = "\"")
 }

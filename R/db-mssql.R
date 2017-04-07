@@ -93,9 +93,7 @@
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS VARCHAR(MAX))"),
       as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      paste0 = function(...) build_sql("CONCAT", list(...)),
-      or = function(x, y) build_sql(x, " or ", y),
-      and = function(x, y) build_sql(x, " and ", y)
+      paste0 = function(...) build_sql("CONCAT", list(...))
     ) ,
     aggregate = dbplyr::sql_translator(
       # MSSQL does not have function for: cor and cov
