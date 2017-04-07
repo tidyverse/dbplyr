@@ -1,25 +1,8 @@
 context("MSSQL translation")
 
-# DB simulator -----------------------------------------------------------
-
-# Generic function to simulate any connection
-# coming from 'odbc' by passing it the dbms.name
-
-class_cache <- new.env(parent = emptyenv())
-
-simulate_db <- function(dbms.name = NULL) {
-  class <- getClassDef(dbms.name, where = class_cache, inherits = FALSE)
-  if (is.null(class)) {
-    setClass(dbms.name,
-             contains = "OdbcConnection", where = class_cache)
-  }
-  new(dbms.name, quote = "\"")
-}
-
 # Initialize simulated DB connection -------------------------------------
 
-mssql_connection <- simulate_db("Microsoft SQL Server")
-
+mssql_connection <- dbplyr:::simulate_odbc("Microsoft SQL Server")
 
 # MSSQL base_scalar conversions -----------------------------------------
 
