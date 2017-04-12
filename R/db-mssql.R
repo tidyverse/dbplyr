@@ -28,21 +28,16 @@
     "SELECT ",
 
     if (distinct) sql("DISTINCT "),
-    escape(select, collapse = ", ", con = con),
 
     # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
     # TOP is expected after DISTINCT and not at the end of the query
     # e.g: SELECT TOP 100 * FROM my_table
-
     if (!is.null(limit) && !identical(limit, Inf)) {
       assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-      sql("TOP ")
-      sql(format(trunc(limit), scientific = FALSE))
-      sql(" ")}
+      build_sql(" TOP ", as.integer(limit), " ")},
 
-
+    escape(select, collapse = ", ", con = con)
   )
-
   assert_that(is.character(from), length(from) == 1L)
   out$from <- build_sql("FROM ", from, con = con)
 
