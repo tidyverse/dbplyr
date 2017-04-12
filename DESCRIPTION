@@ -48,6 +48,7 @@ Collate:
     'do.r'
     'dplyr-generics.R'
     'explain.r'
+    'ident.R'
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.r'

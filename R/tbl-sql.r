@@ -12,10 +12,8 @@
 #'   dplyr. However, you should usually be able to leave this blank and it
 #'   will be determined from the context.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
-  # If not literal ql, must be a table identifier
-  if (!is.sql(from)) {
-    from <- ident(from)
-  }
+  # If not literal sql, must be a table identifier
+  from <- as.ident(from)
 
   vars <- db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)

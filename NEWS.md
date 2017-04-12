@@ -99,6 +99,10 @@
 * `ifelse()` and `if_else()` use correct argument names in SQL translation 
   (#2225).
 
+* `ident()` now returns an object with class `c("ident", "character")`. It
+   no longer contains "sql" to indicate that this is not already escaped.
+   New `as.ident()` safely coerces an input to an identifier.
+
 * `is.na()` and `is.null()` gain extra parens in SQL translation to preserve
   correct precedence (#2302).
 

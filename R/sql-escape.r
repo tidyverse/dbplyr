@@ -5,8 +5,7 @@
 #' all it's inputs and return an sql object.
 #'
 #' @param ... Character vectors that will be combined into a single SQL
-#'   expression. `ident` flags its input as a identifier, to ensure that
-#'   it gets the correct quoting.
+#'   expression.
 #' @param x An object to escape. Existing sql vectors will be left as is,
 #'   character vectors are escaped with single quotes, numeric vectors have
 #'   trailing `.0` added if they're whole numbers, identifiers are
@@ -45,16 +44,6 @@ sql <- function(...) {
 }
 
 #' @export
-#' @rdname sql
-ident <- function(...) {
-  x <- c(...)
-  if (length(x) == 0) return(sql())
-  stopifnot(is.character(x))
-
-  structure(x, class = c("ident", "sql", "character"))
-}
-
-#' @export
 c.sql <- function(..., drop_null = FALSE, con = NULL) {
   input <- list(...)
   if (drop_null) input <- compact(input)
@@ -63,31 +52,23 @@ c.sql <- function(..., drop_null = FALSE, con = NULL) {
   sql(out)
 }
 
-
 #' @export
 unique.sql <- function(x, ...) {
   sql(NextMethod())
 }
 
-
 setOldClass(c("sql", "character"))
-setOldClass(c("ident", "sql", "character"))
 
 #' @rdname sql
 #' @export
 is.sql <- function(x) inherits(x, "sql")
 
-#' @rdname sql
-#' @export
-is.ident <- function(x) inherits(x, "ident")
-
-
 #' @export
 print.sql <- function(x, ...) cat(format(x, ...), sep = "\n")
 #' @export
 format.sql <- function(x, ...) paste0("<SQL> ", x)
-#' @export
-format.ident <- function(x, ...) paste0("<VAR> ", escape(x))
+
+# escape() ----------------------------------------------------------------
 
 #' @rdname sql
 #' @export

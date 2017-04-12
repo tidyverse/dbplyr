@@ -2,20 +2,14 @@
 % Please edit documentation in R/sql-escape.r
 \name{sql}
 \alias{sql}
-\alias{ident}
 \alias{is.sql}
-\alias{is.ident}
 \alias{escape}
 \alias{sql_vector}
 \title{SQL escaping.}
 \usage{
 sql(...)
 
-ident(...)
-
 is.sql(x)
-
-is.ident(x)
 
 escape(x, parens = NA, collapse = " ", con = NULL)
 
@@ -23,8 +17,7 @@ sql_vector(x, parens = NA, collapse = " ", con = NULL)
 }
 \arguments{
 \item{...}{Character vectors that will be combined into a single SQL
-expression. \code{ident} flags its input as a identifier, to ensure that
-it gets the correct quoting.}
+expression.}
 
 \item{x}{An object to escape. Existing sql vectors will be left as is,
 character vectors are escaped with single quotes, numeric vectors have
