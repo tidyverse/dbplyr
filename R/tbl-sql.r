@@ -85,7 +85,8 @@ glimpse.tbl_sql <- function(.data, width = NULL, n = 25, ...) {
 
 #' @export
 pull.tbl_sql <- function(.data, var = -1) {
-  var <- dplyr:::find_var(var, tbl_vars(.data))
+  expr <- enexpr(var)
+  var <- dplyr:::find_var(expr, tbl_vars(.data))
 
   .data <- select(.data, !! sym(var))
   .data <- collect(.data)
