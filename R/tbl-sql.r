@@ -78,6 +78,12 @@ print.tbl_sql <- function(x, ..., n = NULL, width = NULL) {
 }
 
 #' @export
+glimpse.tbl_sql <- function(.data, width = NULL, n = 25, ...) {
+  .data <- collect(head(.data, n = n))
+  glimpse(.data, width = width, ...)
+}
+
+#' @export
 pull.tbl_sql <- function(.data, var = -1) {
   var <- dplyr:::find_var(var, tbl_vars(.data))
 

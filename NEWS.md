@@ -15,6 +15,8 @@
     mtcars2
     ```
 
+* `glimpse()` now works with remote tables (#2665)
+
 * dplyr has gained a basic SQL optimiser, which collapses certain nested
   SELECT queries into a single query (#1979). This will improve query
   execution performance for databases with less sophisticated query optimisers,
