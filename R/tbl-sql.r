@@ -85,7 +85,7 @@ glimpse.tbl_sql <- function(.data, width = NULL, n = 25, ...) {
 
 #' @export
 pull.tbl_sql <- function(.data, var = -1) {
-  expr <- enexpr(var)
+  expr <- enquo(var)
   var <- dplyr:::find_var(expr, tbl_vars(.data))
 
   .data <- select(.data, !! sym(var))
