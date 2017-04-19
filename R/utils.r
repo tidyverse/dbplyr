@@ -91,15 +91,6 @@ succeeds <- function(x, quiet = FALSE) {
   )
 }
 
-is_1d <- function(x) {
-  # dimension check is for matrices and data.frames
-  (is_atomic(x) || is.list(x)) && length(dim(x)) <= 1
-}
-
-is_negated <- function(x) {
-  is_lang(x, "-", n = 1)
-}
-
 inc_seq <- function(from, to) {
   if (from > to) {
     integer()
