@@ -78,6 +78,9 @@
 
 *   `rename()` and `group_by()` now combine correctly (#1962)
 
+*   `tbl_lazy()` and `lazy_tbl()` have been exported. These help you test
+    generated SQL with out an active database connection.
+
 ## Vector-level SQL generation
 
 * Translation of inline scalars:

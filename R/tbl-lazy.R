@@ -1,9 +1,24 @@
-tbl_lazy <- function(df) {
-  make_tbl("lazy", ops = op_base_local(df))
+#' Create a local lazy tibble
+#'
+#' These functions are useful for testing SQL generation without having to
+#' have an active database connection.
+#'
+#' @keywords internal
+#' @export
+#' @examples
+#' library(dplyr)
+#' df <- data.frame(x = 1, y = 2)
+#'
+#' df_sqlite <- tbl_lazy(df, src = simulate_sqlite())
+#' df_sqlite %>% summarise(x = sd(x)) %>% show_query()
+tbl_lazy <- function(df, src = NULL) {
+  make_tbl("lazy", ops = op_base_local(df), src = src)
 }
 
-lazy_frame <- function(...) {
-  tbl_lazy(data_frame(...))
+#' @export
+#' @rdname tbl_lazy
+lazy_frame <- function(..., src = NULL) {
+  tbl_lazy(tibble(...), src = src)
 }
 
 #' @export

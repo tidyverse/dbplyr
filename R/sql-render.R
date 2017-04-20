@@ -5,7 +5,7 @@ sql_render <- function(query, con = NULL, ...) {
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = NULL, ...) {
+sql_render.tbl_lazy <- function(query, con = query$con, ...) {
   # only used for testing
   qry <- sql_build(query$ops, con = con, ...)
   sql_render(qry, con = con, ...)
