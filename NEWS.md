@@ -15,6 +15,8 @@
     mtcars2
     ```
 
+* `glimpse()` now works with remote tables (#2665)
+
 * dplyr has gained a basic SQL optimiser, which collapses certain nested
   SELECT queries into a single query (#1979). This will improve query
   execution performance for databases with less sophisticated query optimisers,
@@ -76,6 +78,9 @@
 
 *   `rename()` and `group_by()` now combine correctly (#1962)
 
+*   `tbl_lazy()` and `lazy_tbl()` have been exported. These help you test
+    generated SQL with out an active database connection.
+
 ## Vector-level SQL generation
 
 * Translation of inline scalars:
@@ -98,6 +103,10 @@
 
 * `ifelse()` and `if_else()` use correct argument names in SQL translation 
   (#2225).
+
+* `ident()` now returns an object with class `c("ident", "character")`. It
+   no longer contains "sql" to indicate that this is not already escaped.
+   New `as.ident()` safely coerces an input to an identifier.
 
 * `is.na()` and `is.null()` gain extra parens in SQL translation to preserve
   correct precedence (#2302).

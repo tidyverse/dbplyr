@@ -31,7 +31,7 @@ op_base <- function(x, vars, class = character()) {
 }
 
 op_base_remote <- function(x, vars) {
-  stopifnot(is.sql(x))
+  stopifnot(is.sql(x) || is.ident(x))
   op_base(x, vars, class = "remote")
 }
 

@@ -64,6 +64,8 @@ dplyr knows how to convert the following R functions to SQL:
 * logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
 * boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor`
 * basic aggregations: `mean`, `sum`, `min`, `max`, `sd`, `var`
+* string functions: `tolower`, `toupper`, `trimws`, `nchar`, `substr`
+* coerce types: `as.numeric`, `as.integer`, `as.character`
 
 The basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
 

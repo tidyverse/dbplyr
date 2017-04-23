@@ -12,10 +12,8 @@
 #'   dplyr. However, you should usually be able to leave this blank and it
 #'   will be determined from the context.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
-  # If not literal ql, must be a table identifier
-  if (!is.sql(from)) {
-    from <- ident(from)
-  }
+  # If not literal sql, must be a table identifier
+  from <- as.ident(from)
 
   vars <- db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
@@ -80,8 +78,15 @@ print.tbl_sql <- function(x, ..., n = NULL, width = NULL) {
 }
 
 #' @export
+glimpse.tbl_sql <- function(.data, width = NULL, n = 25, ...) {
+  .data <- collect(head(.data, n = n))
+  glimpse(.data, width = width, ...)
+}
+
+#' @export
 pull.tbl_sql <- function(.data, var = -1) {
-  var <- dplyr:::find_var(var, tbl_vars(.data))
+  expr <- enquo(var)
+  var <- dplyr:::find_var(expr, tbl_vars(.data))
 
   .data <- select(.data, !! sym(var))
   .data <- collect(.data)

@@ -12,6 +12,8 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
 
 # DBI connections --------------------------------------------------------------
 
+#' @export
+#' @rdname tbl_lazy
 simulate_dbi <- function() {
   structure(
     list(),
@@ -19,6 +21,8 @@ simulate_dbi <- function() {
   )
 }
 
+#' @export
+#' @rdname tbl_lazy
 simulate_sqlite <- function() {
   structure(
     list(),
@@ -26,6 +30,8 @@ simulate_sqlite <- function() {
   )
 }
 
+#' @export
+#' @rdname tbl_lazy
 simulate_postgres <- function() {
   structure(
     list(),

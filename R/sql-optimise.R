@@ -11,6 +11,11 @@ sql_optimise.sql <- function(x, con = NULL, ...) {
 }
 
 #' @export
+sql_optimise.ident <- function(x, con = NULL, ...) {
+  x
+}
+
+#' @export
 sql_optimise.query <- function(x, con = NULL, ...) {
   # Default to no optimisation
   x

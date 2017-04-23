@@ -1,6 +1,6 @@
 Package: dbplyr
 Type: Package
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Title: A 'dplyr' Backend for Databases
 Description: A dplyr backend for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Works with
@@ -16,9 +16,9 @@ Depends:
 Imports: 
     assertthat,
     DBI (>= 0.5),
-    dplyr (>= 0.5.0.9001),
+    dplyr (>= 0.5.0.9004),
     glue,
-    rlang (>= 0.0.0.9005),
+    rlang (>= 0.0.0.9018),
     R6,
     utils
 Suggests: 
@@ -49,6 +49,7 @@ Collate:
     'do.r'
     'dplyr-generics.R'
     'explain.r'
+    'ident.R'
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.r'
