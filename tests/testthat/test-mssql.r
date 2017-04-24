@@ -91,6 +91,14 @@ test_that("var aggregate functions translate to MSSQL VAR ", {
 })
 
 
+test_that("query uses TOP instead of LIMIT ", {
+  df <- data.frame(x = 1, y = 2)
+  df_mssql <- tbl_lazy(df, src = simulate_mssql())
+  expect_equivalent(show_query(head(df_mssql)),
+                    sql("SELECT  TOP 6 *
+FROM `df`"))
+})
+
 
 
 

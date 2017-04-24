@@ -10,6 +10,15 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
+#' @export
+sql_subquery.DBITestConnection <- function(con, from, name = unique_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+  }
+}
+
 # DBI connections --------------------------------------------------------------
 
 #' @export
@@ -44,8 +53,10 @@ simulate_postgres <- function() {
 simulate_mssql <- function() {
   structure(
     list(),
-    class = c("Microsoft SQL Server", "DBIConnection")
+    class = c("Microsoft SQL Server", "DBITestConnection")
   )
 
 }
+
+
 

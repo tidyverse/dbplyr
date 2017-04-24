@@ -102,21 +102,4 @@
   )}
 
 
-#' @export
-sql_subquery.OdbcConnection <- function(con, from, name = unique_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
-  }
-}
-
-setMethod("dbQuoteIdentifier", c("OdbcConnection", "character"), function(conn, x, ...) {
-  if (regexpr("`", x)[[1]] >= 0)
-    stop("Can't scape back tick from string")
-
-  y <- paste("`", x, "`", sep = "")
-
-  SQL(y)
-})
 
