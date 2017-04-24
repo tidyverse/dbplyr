@@ -45,7 +45,7 @@ simulate_mssql <- function() {
 
   class_mssql <- new.env(parent = emptyenv())
 
-  setClass(
+  methods::setClass(
     "OdbcConnection",
     contains = "DBIConnection",
     slots = list(quote = "character"),
@@ -54,5 +54,5 @@ simulate_mssql <- function() {
   dbms.name <- "Microsoft SQL Server"
 
   setClass(dbms.name, contains = "OdbcConnection", where = class_mssql)
-  new(dbms.name, quote = "\"")
+  methods::new(dbms.name, quote = "\"")
 }
