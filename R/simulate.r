@@ -7,7 +7,7 @@ db_query_fields.DBITestConnection <- function(con, sql, ...) {
 }
 
 sql_escape_ident.DBITestConnection <- function(con, x) {
-  sql_quote(x, "`")
+  sql_quote(x, "\"")
 }
 
 #' @export

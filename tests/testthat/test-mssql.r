@@ -96,7 +96,7 @@ test_that("query uses TOP instead of LIMIT ", {
   df_mssql <- tbl_lazy(df, src = simulate_mssql())
   expect_equivalent(show_query(head(df_mssql)),
                     sql("SELECT  TOP 6 *
-FROM `df`"))
+FROM \"df\""))
 })
 
 
