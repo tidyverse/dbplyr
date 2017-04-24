@@ -42,17 +42,10 @@ simulate_postgres <- function() {
 #' @export
 #' @rdname tbl_lazy
 simulate_mssql <- function() {
+  structure(
+    list(),
+    class = c("Microsoft SQL Server", "DBIConnection")
+  )
 
-  class_mssql <- new.env(parent = emptyenv())
-
-  methods::setClass(
-    "OdbcConnection",
-    contains = "DBIConnection",
-    slots = list(quote = "character"),
-    where = class_mssql)
-
-  dbms.name <- "Microsoft SQL Server"
-
-  setClass(dbms.name, contains = "OdbcConnection", where = class_mssql)
-  methods::new(dbms.name, quote = "\"")
 }
+
