@@ -39,6 +39,8 @@ simulate_postgres <- function() {
   )
 }
 
+#' @export
+#' @rdname tbl_lazy
 simulate_mssql <- function() {
 
   class_mssql <- new.env(parent = emptyenv())
