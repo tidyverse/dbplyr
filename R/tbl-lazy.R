@@ -76,7 +76,7 @@ arrange.tbl_lazy <- function(.data, ...) {
 }
 #' @export
 arrange_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(dots, caller_env(), ...)
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   arrange(.data, !!! dots)
 }
 
