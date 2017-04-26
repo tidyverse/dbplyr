@@ -151,7 +151,7 @@
   should make it easier to provide customised SQL for window functions
   (#2051, #2126).
   
-*  SQL translation for Microsoft SQL Server
+*  SQL translation for Microsoft SQL Server (@edgararuiz)
 
 ## Minor bug fixes and improvements
 
