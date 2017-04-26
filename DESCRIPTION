@@ -40,6 +40,7 @@ Collate:
     'data-lahman.r'
     'data-nycflights13.r'
     'db-compute.R'
+    'db-mssql.R'
     'db-mysql.r'
     'db-postgres.r'
     'db-sqlite.r'
