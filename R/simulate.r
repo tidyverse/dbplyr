@@ -58,5 +58,24 @@ simulate_mssql <- function() {
 
 }
 
+#' @export
+#' @rdname tbl_lazy
+simulate_hive <- function() {
+  structure(
+    list(),
+    class = c("Hive", "DBIConnection")
+  )
+
+}
+
+#' @export
+#' @rdname tbl_lazy
+simulate_impala <- function() {
+  structure(
+    list(),
+    class = c("Impala", "DBIConnection")
+  )
+
+}
 
 

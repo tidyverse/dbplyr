@@ -5,6 +5,8 @@
 \alias{simulate_sqlite}
 \alias{simulate_postgres}
 \alias{simulate_mssql}
+\alias{simulate_hive}
+\alias{simulate_impala}
 \alias{tbl_lazy}
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
@@ -16,6 +18,10 @@ simulate_sqlite()
 simulate_postgres()
 
 simulate_mssql()
+
+simulate_hive()
+
+simulate_impala()
 
 tbl_lazy(df, src = NULL)
 
