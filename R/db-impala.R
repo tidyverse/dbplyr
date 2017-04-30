@@ -12,7 +12,6 @@ db_desc.Impala <- function(x) {
 
 }
 
-
 #' @export
 sql_translate_env.Impala <- function(con) {
 
@@ -25,6 +24,7 @@ sql_translate_env.Impala <- function(con) {
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
       as.Date  = function(x) build_sql("CAST(", x, " AS )"),
+      round = function(x, digits = 0L) build_sql("ROUND(", x, ", ", as.integer(digits),")"),
       paste0 = function(...) build_sql("CONCAT", list(...))
     ) ,
     sql_translator(
@@ -39,7 +39,6 @@ sql_translate_env.Impala <- function(con) {
     )
   )
   }
-
 
 #' @export
 sql_escape_ident.Impala <- function(con, x) {
