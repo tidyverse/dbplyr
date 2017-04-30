@@ -25,8 +25,10 @@ sql_translate_env.Hive <- function(con) {
       as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS STRING)"),
       as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      round = function(x, digits = 0L) build_sql("ROUND(", x, ",", digits,")"),
-      paste0 = function(...) build_sql("CONCAT", list(...))
+      round = function(x, digits = 0L) build_sql("ROUND(", x, ", INT(", digits,"))"),
+      paste0 = function(...) build_sql("CONCAT", list(...)),
+      if_else = function(condition, true, false) build_sql("if(", condition, ", ", true, ", ", false, ")"),
+      if_else = function(test, yes, no) build_sql("if(", test, ", ", yes, ", ", no, ")")
     ) ,
     sql_translator(
       .parent = base_agg,
