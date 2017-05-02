@@ -15,7 +15,7 @@ require SQL translation to be provided by the package author.
 Useful links:
 \itemize{
   \item \url{https://github.com/tidyverse/dbplyr}
-  \item Report bugs at \url{https://github.com/tidyverse/dbplyr/issues}
+  \item Report bugs at \url{https://github.com/tidyverse/dplyr/issues}
 }
 
 }
