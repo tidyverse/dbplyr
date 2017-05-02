@@ -30,6 +30,9 @@
 * `copy_to()` gains an `overwrite` argument which allows you to overwrite
   an existing table. Use with care! (#2296)
 
+* New `in_schema()` function makes it easy to refer to tables in schema:
+  `in_schema("my_schema_name", "my_table_name")`.
+
 ## Deprecated and defunct
 
 * `query()` is no longer exported. It hasn't been useful for a while
@@ -81,7 +84,14 @@
 *   `tbl_lazy()` and `lazy_tbl()` have been exported. These help you test
     generated SQL with out an active database connection.
 
+*   `ungroup()` correctly resets grouping variables (#2704).
+
 ## Vector-level SQL generation
+
+* New `as.sql()` safely coerces an input to SQL.
+
+* New `ident_q()` makes it possible to specifier identifiers that do not
+  need to be quoted.
 
 * Translation of inline scalars:
 
@@ -106,8 +116,7 @@
 
 * `ident()` now returns an object with class `c("ident", "character")`. It
    no longer contains "sql" to indicate that this is not already escaped.
-   New `as.ident()` safely coerces an input to an identifier.
-
+   
 * `is.na()` and `is.null()` gain extra parens in SQL translation to preserve
   correct precedence (#2302).
 

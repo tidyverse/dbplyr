@@ -53,7 +53,7 @@ print.tbl_lazy <- function(x, ...) {
 
 # Single table methods ----------------------------------------------------
 
-#' @export
+# registered onLoad
 filter.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
   dots <- partial_eval(dots, vars = op_vars(.data))
@@ -106,7 +106,7 @@ rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
 
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
-  dots <- quos(...)
+  dots <- quos(..., .named = TRUE)
   add_op_single("summarise", .data, dots = dots)
 }
 #' @export

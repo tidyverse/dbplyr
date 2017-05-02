@@ -1,11 +1,5 @@
-#' SQL escaping.
+#' Escape/quote a string.
 #'
-#' These functions are critical when writing functions that translate R
-#' functions to sql functions. Typically a conversion function should escape
-#' all it's inputs and return an sql object.
-#'
-#' @param ... Character vectors that will be combined into a single SQL
-#'   expression.
 #' @param x An object to escape. Existing sql vectors will be left as is,
 #'   character vectors are escaped with single quotes, numeric vectors have
 #'   trailing `.0` added if they're whole numbers, identifiers are
@@ -17,7 +11,8 @@
 #'   Default behaviour: lists are always wrapped in parens and separated by
 #'   commas, identifiers are separated by commas and never wrapped,
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
-#' @keywords internal
+#' @param con Database connection. If not specified, uses SQL 92 conventions.
+#' @rdname escape
 #' @export
 #' @examples
 #' # Doubles vs. integers
@@ -33,45 +28,6 @@
 #' escape("X")
 #' escape(escape("X"))
 #' escape(escape(escape("X")))
-sql <- function(...) {
-  x <- c(...)
-  if (length(x) == 0) {
-    structure(character(), class = c("sql", "character"))
-  } else {
-    stopifnot(is.character(x))
-    structure(x, class = c("sql", "character"))
-  }
-}
-
-#' @export
-c.sql <- function(..., drop_null = FALSE, con = NULL) {
-  input <- list(...)
-  if (drop_null) input <- compact(input)
-
-  out <- unlist(lapply(input, escape, collapse = NULL, con = con))
-  sql(out)
-}
-
-#' @export
-unique.sql <- function(x, ...) {
-  sql(NextMethod())
-}
-
-setOldClass(c("sql", "character"))
-
-#' @rdname sql
-#' @export
-is.sql <- function(x) inherits(x, "sql")
-
-#' @export
-print.sql <- function(x, ...) cat(format(x, ...), sep = "\n")
-#' @export
-format.sql <- function(x, ...) paste0("<SQL> ", x)
-
-# escape() ----------------------------------------------------------------
-
-#' @rdname sql
-#' @export
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   UseMethod("escape")
 }
@@ -80,6 +36,11 @@ escape <- function(x, parens = NA, collapse = " ", con = NULL) {
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   y <- sql_escape_ident(con, x)
   sql_vector(names_to_as(y, names2(x), con = con), parens, collapse)
+}
+
+#' @export
+escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse)
 }
 
 #' @export
@@ -146,7 +107,7 @@ escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 }
 
 #' @export
-#' @rdname sql
+#' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.na(parens)) {
     parens <- length(x) > 1L

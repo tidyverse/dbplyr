@@ -1,0 +1,26 @@
+template:
+  package: tidytemplate
+  default_assets: false
+
+home:
+  strip_header: true
+
+navbar:
+  title: ~
+  type: default
+  left:
+  - text: Reference
+    href: reference/index.html
+  - text: Intro
+    href: articles/dbplyr.html
+  - text: Articles
+    menu:
+    - text: SQL translation
+      href: articles/sql-translation.html
+    - text: Creating new backends
+      href: articles/new-backend.html
+  - text: News
+    href: news/index.html
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/tidyverse/dbplyr

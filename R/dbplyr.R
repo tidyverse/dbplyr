@@ -3,7 +3,9 @@
 #' @importFrom stats setNames update
 #' @importFrom utils head tail
 #' @importFrom glue glue
+#' @importFrom methods setOldClass
 #' @import dplyr
 #' @import rlang
 #' @import DBI
-NULL
+#' @keywords internal
+"_PACKAGE"

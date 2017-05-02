@@ -13,7 +13,7 @@
 #'   will be determined from the context.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
-  from <- as.ident(from)
+  from <- as.sql(from)
 
   vars <- db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
@@ -286,11 +286,11 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 # Set operations ---------------------------------------------------------------
 
-#' @export
+# registered onLoad
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "INTERSECT", copy = copy, ...)
 }
-#' @export
+# registered onLoad
 union.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "UNION", copy = copy, ...)
 }
@@ -298,7 +298,7 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "UNION ALL", copy = copy, ...)
 }
-#' @export
+# registered onLoad
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "EXCEPT", copy = copy, ...)
 }

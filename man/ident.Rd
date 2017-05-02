@@ -2,15 +2,15 @@
 % Please edit documentation in R/ident.R
 \name{ident}
 \alias{ident}
+\alias{ident_q}
 \alias{is.ident}
-\alias{as.ident}
 \title{Flag a character vector as SQL identifiers}
 \usage{
 ident(...)
 
-is.ident(x)
+ident_q(...)
 
-as.ident(x)
+is.ident(x)
 }
 \arguments{
 \item{...}{A character vector, or name-value pairs}
@@ -18,14 +18,21 @@ as.ident(x)
 \item{x}{An object}
 }
 \description{
-This ensures that during SQL generation, the values will be quoted as
-identifiers, not as strings. \code{as.ident()} coerces to an identifier,
-assuming that escaped SQL already represents an identifier.
+\code{ident()} takes unquoted strings and quotes them for you; \code{ident_q()}
+assumes its input has already been quoted.
+}
+\details{
+These two \code{ident} clsases are used during SQL generation to make sure
+the values will be quoted as, not as strings.
 }
 \examples{
 # SQL92 quotes strings with '
 escape("x")
 
 # And identifiers with "
-escape(ident("x"))
+ident("x")
+
+# You can supply multiple inputs
+ident(a = "x", b = "y")
+ident_q(a = "x", b = "y")
 }

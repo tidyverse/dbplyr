@@ -3,14 +3,15 @@ Type: Package
 Version: 0.0.0.9001
 Title: A 'dplyr' Backend for Databases
 Description: A dplyr backend for databases that allows you to work with 
-    remote database tables as if they are in-memory data frames. Works with
-    an database that has DBI backend.
+    remote database tables as if they are in-memory data frames. Basic features
+    works with any database that has a DBI backend; more advanced features 
+    require SQL translation to be provided by the package author.
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
-    person("RStudio", role = "cph")
+    person("RStudio", role = c("cph", "fnd"))
     )
-URL: https://github.com/hadley/dbplyr
-BugReports: https://github.com/hadley/dbplyr/issues
+URL: https://github.com/tidyverse/dbplyr
+BugReports: https://github.com/tidyverse/dplyr/issues
 Depends: 
     R (>= 3.1.2)
 Imports: 
@@ -18,6 +19,7 @@ Imports:
     DBI (>= 0.5),
     dplyr (>= 0.5.0.9004),
     glue,
+    methods,
     rlang (>= 0.0.0.9018),
     R6,
     utils
@@ -49,13 +51,13 @@ Collate:
     'dbi-s3.r'
     'dbplyr.R'
     'do.r'
-    'dplyr-generics.R'
     'explain.r'
     'ident.R'
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.r'
     'query.r'
+    'schema.R'
     'simulate.r'
     'sql-build.R'
     'sql-escape.r'
@@ -76,8 +78,9 @@ Collate:
     'translate-sql.r'
     'utils-format.r'
     'utils.r'
+    'zzz.R'
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 Remotes:
     tidyverse/glue,
-    hadley/dplyr
+    tidyverse/dplyr
