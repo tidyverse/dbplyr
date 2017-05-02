@@ -78,26 +78,24 @@
 
 #' @export
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
-  dbplyr::sql_variant(
-    scalar = dbplyr::sql_translator(
-      # MSSQL supports CONCAT_WS in the CTP version of 2016
-      .parent = dbplyr::base_scalar,
-      as.numeric = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
-      as.double  = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
-      as.integer  = function(x) build_sql("CAST(", x, " AS INT)"),
-      as.logical = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
+  sql_variant(
+    scalar = sql_translator(.parent = base_scalar,
+      as.numeric    = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
+      as.double     = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
+      as.integer    = function(x) build_sql("CAST(", x, " AS INT)"),
+      as.logical    = function(x) build_sql("CAST(", x, " AS BOOLEAN)"),
       as.character  = function(x) build_sql("CAST(", x, " AS VARCHAR(MAX))"),
-      as.Date  = function(x) build_sql("CAST(", x, " AS DATE)"),
-      paste0 = function(...) build_sql("CONCAT", list(...))
-    ) ,
-    aggregate = dbplyr::sql_translator(
+      as.Date       = function(x) build_sql("CAST(", x, " AS DATE)"),
+      # MSSQL supports CONCAT_WS in the CTP version of 2016
+      paste0        = sql_prefix("CONCAT")
+    ),
+    aggregate = sql_translator(.parent = base_agg,
       # MSSQL does not have function for: cor and cov
-      .parent = dbplyr::base_agg,
-      n = function() dbplyr::sql("COUNT(*)"),
-      count = function() dbplyr::sql("COUNT(*)"),
-      n_distinct = function(...) dbplyr::build_sql("COUNT(DISTINCT", list(...), ")"),
-      sd =  function(...) dbplyr::build_sql("STDEV(", list(...), ")"),
-      var = function(...) dbplyr::build_sql("VAR(", list(...), ")")
+      n =          function() sql("COUNT(*)"),
+      count =      function() sql("COUNT(*)"),
+      n_distinct = function(x) build_sql("COUNT(DISTINCT ", x, ")"),
+      sd =         sql_prefix("STDEV"),
+      var =        sql_prefix("VAR")
     )
   )}
 

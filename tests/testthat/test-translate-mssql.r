@@ -58,21 +58,21 @@ test_that("n() translated to COUNT(*) ", {
 test_that("n_distinct() translated to COUNT(DISTINCT) ", {
   expect_equivalent(
     translate_sql(n_distinct(field_name), window = FALSE, con = simulate_mssql()),
-    sql("COUNT(DISTINCT(`field_name`))")
+    sql("COUNT(DISTINCT `field_name`)")
   )
 })
 
 test_that("sd aggregate functions translate to STDEV ", {
   expect_equivalent(
     translate_sql(sd(field_name), window = FALSE, con = simulate_mssql()),
-    sql("STDEV((`field_name`))")
+    sql("STDEV(`field_name`)")
   )
 })
 
 test_that("var aggregate functions translate to VAR ", {
   expect_equivalent(
     translate_sql(var(field_name), window = FALSE, con = simulate_mssql()),
-    sql("VAR((`field_name`))")
+    sql("VAR(`field_name`)")
   )
 })
 
