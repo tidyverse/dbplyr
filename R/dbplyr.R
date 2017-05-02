@@ -7,4 +7,5 @@
 #' @import dplyr
 #' @import rlang
 #' @import DBI
-NULL
+#' @keywords internal
+"_PACKAGE"

@@ -3,8 +3,9 @@ Type: Package
 Version: 0.0.0.9001
 Title: A 'dplyr' Backend for Databases
 Description: A dplyr backend for databases that allows you to work with 
-    remote database tables as if they are in-memory data frames. Works with
-    an database that has DBI backend.
+    remote database tables as if they are in-memory data frames. Basic features
+    works with any database that has a DBI backend; more advanced features 
+    require SQL translation to be provided by the package author.
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("RStudio", role = c("cph", "fnd"))

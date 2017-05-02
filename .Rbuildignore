@@ -5,3 +5,4 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^codecov\.yml$
+^_pkgdown\.yml$
