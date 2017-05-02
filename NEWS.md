@@ -81,6 +81,8 @@
 *   `tbl_lazy()` and `lazy_tbl()` have been exported. These help you test
     generated SQL with out an active database connection.
 
+*   `ungroup()` correctly resets grouping variables (#2704).
+
 ## Vector-level SQL generation
 
 * Translation of inline scalars:

@@ -99,11 +99,17 @@ test_that("summarise drops one grouping level", {
 })
 
 test_that("ungroup drops all groups", {
-  out <- lazy_frame(g1 = 1, g2 = 2) %>%
+  out1 <- lazy_frame(g1 = 1, g2 = 2) %>%
     group_by(g1, g2) %>%
     ungroup()
 
-  expect_equal(op_grps(out), NULL)
+  out2 <- lazy_frame(g1 = 1, g2 = 2) %>%
+    group_by(g1, g2) %>%
+    ungroup() %>%
+    rename(g3 = g1)
+
+  expect_equal(op_grps(out1), character())
+  expect_equal(op_grps(out2), character())
 })
 
 # op_sort -----------------------------------------------------------------

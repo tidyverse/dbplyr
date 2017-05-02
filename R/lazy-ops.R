@@ -119,7 +119,7 @@ op_grps.op_group_by <- function(op) {
 }
 #' @export
 op_grps.op_ungroup <- function(op) {
-  NULL
+  character()
 }
 #' @export
 op_grps.op_summarise <- function(op) {
