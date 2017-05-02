@@ -30,6 +30,9 @@
 * `copy_to()` gains an `overwrite` argument which allows you to overwrite
   an existing table. Use with care! (#2296)
 
+* New `in_schema()` function makes it easy to refer to tables in schema:
+  `in_schema("my_schema_name", "my_table_name")`.
+
 ## Deprecated and defunct
 
 * `query()` is no longer exported. It hasn't been useful for a while

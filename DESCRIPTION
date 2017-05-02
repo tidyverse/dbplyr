@@ -55,6 +55,7 @@ Collate:
     'memdb.R'
     'partial-eval.r'
     'query.r'
+    'schema.R'
     'simulate.r'
     'sql-build.R'
     'sql-escape.r'
