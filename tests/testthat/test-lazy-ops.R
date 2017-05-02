@@ -22,6 +22,16 @@ test_that("summarise replaces existing", {
   expect_equal(op_vars(out), "z")
 })
 
+test_that("summarised and mutated vars are always named", {
+  mf <- dbplyr::memdb_frame(a = 1)
+
+  out1 <- mf %>% summarise(1) %>% op_vars()
+  expect_equal(out1, "1")
+
+  out2 <- mf %>% mutate(1) %>% op_vars()
+  expect_equal(out2, c("a", "1"))
+})
+
 test_that("distinct has complicated rules", {
   out <- lazy_frame(x = 1, y = 2) %>% distinct()
   expect_equal(op_vars(out), c("x", "y"))

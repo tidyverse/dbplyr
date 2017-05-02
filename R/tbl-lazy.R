@@ -106,7 +106,7 @@ rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
 
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
-  dots <- quos(...)
+  dots <- quos(..., .named = TRUE)
   add_op_single("summarise", .data, dots = dots)
 }
 #' @export
