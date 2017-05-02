@@ -41,11 +41,3 @@ sql_translate_env.Hive <- function(con) {
   )
   }
 
-
-#' @export
-sql_escape_ident.Hive <- function(con, x) {
-    sql_quote(x, " ")
-}
-
-
-

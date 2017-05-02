@@ -10,6 +10,28 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
+sql_select.DBITestConnection <- function(con, select, from, where = NULL,
+                                     group_by = NULL, having = NULL,
+                                     order_by = NULL,
+                                     limit = NULL,
+                                     distinct = FALSE,
+                                     ...) {
+
+  sql_select.DBIConnection(con = con,
+                           select = select,
+                           from = from,
+                           where = where,
+                           group_by = group_by,
+                           having = having,
+                           order_by = order_by,
+                           limit = limit,
+                           distinct = distinct,
+                           ...)
+
+
+}
+
+
 #' @export
 sql_subquery.DBITestConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
@@ -63,7 +85,7 @@ simulate_mssql <- function() {
 simulate_hive <- function() {
   structure(
     list(),
-    class = c("Hive", "DBIConnection")
+    class = c("Hive", "DBITestConnection")
   )
 
 }
@@ -73,7 +95,7 @@ simulate_hive <- function() {
 simulate_impala <- function() {
   structure(
     list(),
-    class = c("Impala", "DBIConnection")
+    class = c("Impala", "DBITestConnection")
   )
 
 }
