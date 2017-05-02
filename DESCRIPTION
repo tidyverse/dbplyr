@@ -49,7 +49,6 @@ Collate:
     'dbi-s3.r'
     'dbplyr.R'
     'do.r'
-    'dplyr-generics.R'
     'explain.r'
     'ident.R'
     'lazy-ops.R'
@@ -77,6 +76,7 @@ Collate:
     'translate-sql.r'
     'utils-format.r'
     'utils.r'
+    'zzz.R'
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 Remotes:
