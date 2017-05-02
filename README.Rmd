@@ -38,7 +38,7 @@ devtools::install_github("tidyverse/dplyr")
 ## Usage
 
 ```{r}
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 copy_to(con, mtcars)
