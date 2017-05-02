@@ -18,6 +18,7 @@ Imports:
     DBI (>= 0.5),
     dplyr (>= 0.5.0.9004),
     glue,
+    methods,
     rlang (>= 0.0.0.9018),
     R6,
     utils

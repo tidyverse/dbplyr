@@ -85,6 +85,11 @@
 
 ## Vector-level SQL generation
 
+* New `as.sql()` safely coerces an input to SQL.
+
+* New `ident_q()` makes it possible to specifier identifiers that do not
+  need to be quoted.
+
 * Translation of inline scalars:
 
     * Logical values are now translated differently depending on the backend.
@@ -108,8 +113,7 @@
 
 * `ident()` now returns an object with class `c("ident", "character")`. It
    no longer contains "sql" to indicate that this is not already escaped.
-   New `as.ident()` safely coerces an input to an identifier.
-
+   
 * `is.na()` and `is.null()` gain extra parens in SQL translation to preserve
   correct precedence (#2302).
 

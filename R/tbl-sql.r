@@ -13,7 +13,7 @@
 #'   will be determined from the context.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
-  from <- as.ident(from)
+  from <- as.sql(from)
 
   vars <- db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
