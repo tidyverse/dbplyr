@@ -11,6 +11,9 @@
 \alias{base_agg}
 \alias{base_win}
 \alias{base_no_win}
+\alias{base_odbc_scalar}
+\alias{base_odbc_agg}
+\alias{base_odbc_win}
 \title{Create an sql translator}
 \usage{
 sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
@@ -31,6 +34,12 @@ base_agg
 base_win
 
 base_no_win
+
+base_odbc_scalar
+
+base_odbc_agg
+
+base_odbc_win
 }
 \arguments{
 \item{scalar, aggregate, window}{The three families of functions than an

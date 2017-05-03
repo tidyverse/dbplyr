@@ -46,6 +46,7 @@ Collate:
     'db-impala.R'
     'db-mssql.R'
     'db-mysql.r'
+    'db-odbc.R'
     'db-postgres.r'
     'db-sqlite.r'
     'dbi-s3.r'
