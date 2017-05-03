@@ -154,6 +154,7 @@ sql_not_supported <- function(f) {
   }
 }
 
+#' @rdname sql_variant
 #' @export
 sql_cast <- function(type) {
   function(x) {
