@@ -7,6 +7,7 @@
 \alias{sql_infix}
 \alias{sql_prefix}
 \alias{sql_not_supported}
+\alias{sql_cast}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -26,6 +27,8 @@ sql_infix(f)
 sql_prefix(f, n = NULL)
 
 sql_not_supported(f)
+
+sql_cast(type)
 
 base_scalar
 
