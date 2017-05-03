@@ -6,6 +6,9 @@ db_query_fields.DBITestConnection <- function(con, sql, ...) {
   c("field1")
 }
 
+sql_escape_ident.DBITestConnection <- function(con, x) {
+  sql_quote(x, "`")
+}
 
 #' @export
 sql_subquery.DBITestConnection <- function(con, from, name = unique_name(), ...) {
