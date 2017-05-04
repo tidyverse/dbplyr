@@ -5,32 +5,33 @@ context("translate-MSSQL")
 test_that("as.numeric() translated to NUMERIC ", {
   expect_equivalent(
     translate_sql(as.numeric(field_name), con = simulate_mssql()),
-    sql("CAST(field_name AS NUMERIC)")
+    sql("CAST(`field_name` AS NUMERIC)")
   )
 })
+
 test_that("as.double() translated to NUMERIC ", {
   expect_equivalent(
     translate_sql(as.double(field_name), con = simulate_mssql()),
-    sql("CAST(field_name AS NUMERIC)")
+    sql("CAST(`field_name` AS NUMERIC)")
   )
 })
 
 test_that("as.character() translate to VARCHAR(MAX) ", {
   expect_equivalent(
-    translate_sql(as.character(field_name), con = simulate_mssql()),
-    sql("CAST(field_name AS VARCHAR(MAX))")
+  translate_sql(as.character(field_name), con = simulate_mssql()),
+    sql("CAST(`field_name` AS VARCHAR(MAX))")
   )
 })
 test_that("log() translates to LOG ", {
   expect_equivalent(
     translate_sql(log(field_name), con = simulate_mssql()),
-    sql("LOG(field_name)")
+    sql("LOG(`field_name`)")
   )
 })
 test_that("ceiling() translates to CEILING ", {
   expect_equivalent(
     translate_sql(ceiling(field_name), con = simulate_mssql()),
-    sql("CEILING(field_name)")
+    sql("CEILING(`field_name`)")
   )
 })
 
@@ -50,7 +51,7 @@ test_that("sd() translates to STDEV ", {
     translate_sql(sd(field_name),
                   window = FALSE,
                   con = simulate_mssql()),
-    sql("STDEV(field_name)")
+    sql("STDEV(`field_name`)")
   )
 })
 
@@ -59,7 +60,7 @@ test_that("var() translates to VAR ", {
     translate_sql(var(field_name),
                   window = FALSE,
                   con = simulate_mssql()),
-    sql("VAR(field_name)")
+    sql("VAR(`field_name`)")
   )
 })
 
@@ -90,5 +91,6 @@ test_that("query uses TOP instead of LIMIT ", {
 
   expect_equivalent(
     show_query(head(df_mssql)),
-    sql("SELECT  TOP 6 *\nFROM df"))
+    sql("SELECT  TOP 6 *\nFROM `df`"))
 })
+

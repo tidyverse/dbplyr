@@ -158,6 +158,6 @@ sql_not_supported <- function(f) {
 #' @export
 sql_cast <- function(type) {
   function(x) {
-    build_sql("CAST(", x, " AS ", ident_q(type), ")")
+    build_sql("CAST(", x, " AS ", sql(type), ")")
   }
 }

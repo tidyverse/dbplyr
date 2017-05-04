@@ -7,11 +7,5 @@ test_that("as.Date()translates to VARCHAR(10) ", {
     translate_sql(
       as.Date(field_name),
       con = simulate_impala()),
-    sql("CAST(field_name AS VARCHAR(10))"))
+    sql("CAST(`field_name` AS VARCHAR(10))"))
 })
-
-
-
-
-
-
