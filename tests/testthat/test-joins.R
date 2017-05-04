@@ -61,11 +61,11 @@ test_that("suffix modifies duplicated variable names", {
 test_that("join functions error on column not found for SQL sources #1928", {
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "x"),
-    "not found in rhs"
+    "`by` can't contain join column `x` which is missing from RHS"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "y"),
-    "not found in lhs"
+    "`by` can't contain join column `y` which is missing from LHS"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5)),
