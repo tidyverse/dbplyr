@@ -122,23 +122,19 @@ unlikely to conflict with an existing table.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>dplyr</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>))
-<span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; Source:     table&lt;guhwhzptvt&gt; [?? x 2]
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>))</div><div class='output co'>#&gt; <span class='message'>Auto-disconnecting PostgreSQLConnection</span></div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; Source:     table&lt;guhwhzptvt&gt; [?? x 2]
 #&gt; Database:   sqlite 3.11.1 [:memory:]
 #&gt; Ordered by: x
 #&gt; 
-#&gt;             x           y
-#&gt;         &lt;dbl&gt;       &lt;dbl&gt;
-#&gt; 1  0.02006522 0.750603328
-#&gt; 2  0.02795603 0.383370670
-#&gt; 3  0.02806097 0.004496308
-#&gt; 4  0.03123033 0.164569248
-#&gt; 5  0.03424133 0.011479538
-#&gt; 6  0.05144628 0.402881212
-#&gt; 7  0.05861411 0.163623198
-#&gt; 8  0.06366146 0.774913022
-#&gt; 9  0.06521611 0.464013567
-#&gt; 10 0.09602416 0.909440965
+#&gt; # S3: tbl_dbi
+#&gt;            x           y
+#&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+#&gt; 1 0.02006522 0.750603328
+#&gt; 2 0.02795603 0.383370670
+#&gt; 3 0.02806097 0.004496308
+#&gt; 4 0.03123033 0.164569248
+#&gt; 5 0.03424133 0.011479538
+#&gt; 6 0.05144628 0.402881212
 #&gt; # ... with more rows</div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'>show_query</span>()</div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
 #&gt; <span class='message'>SELECT *</span>
 #&gt; <span class='message'>FROM `guhwhzptvt`</span>

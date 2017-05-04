@@ -102,6 +102,7 @@ DBI::<span class="kw">dbWriteTable</span>(con, <span class="st">"mtcars"</span>,
 <span class="co">#&gt; Source:     table&lt;mtcars&gt; [?? x 11]</span>
 <span class="co">#&gt; Database:   sqlite 3.11.1 []</span>
 <span class="co">#&gt; </span>
+<span class="co">#&gt; # S3: tbl_dbi</span>
 <span class="co">#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4</span>
@@ -140,7 +141,7 @@ db_desc.PostgreSQLConnection &lt;-<span class="st"> </span>function(x) {
 <p>Check that SQL translation for the key verbs work:</p>
 <ul>
 <li>
-<code>summarise()</code>, <code>mutate()</code>, <code><a href="../reference/reexports.html">filter()</a></code> etc: powered by <code>sql_select()</code>
+<code>summarise()</code>, <code>mutate()</code>, <code>filter()</code> etc: powered by <code>sql_select()</code>
 </li>
 <li>
 <code>left_join()</code>, <code>inner_join()</code>: powered by <code>sql_join()</code>
@@ -149,7 +150,7 @@ db_desc.PostgreSQLConnection &lt;-<span class="st"> </span>function(x) {
 <code>semi_join()</code>, <code>anti_join()</code>: powered by <code>sql_semi_join()</code>
 </li>
 <li>
-<code><a href="../reference/reexports.html">union()</a></code>, <code><a href="../reference/reexports.html">intersect()</a></code>, <code><a href="../reference/reexports.html">setdiff()</a></code>: powered by <code>sql_set_op()</code>
+<code>union()</code>, <code>intersect()</code>, <code>setdiff()</code>: powered by <code>sql_set_op()</code>
 </li>
 </ul>
 </div>

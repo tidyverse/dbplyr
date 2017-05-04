@@ -222,7 +222,7 @@
 <h3 class="hasAnchor">
 <a href="#translating-filters-based-on-window-functions" class="anchor"></a>Translating filters based on window functions</h3>
 <p>There are some restrictions on window functions in SQL that make their use with <code>WHERE</code> somewhat challenging. Take this simple example, where we want to find the year each player played the most games:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/reexports.html">filter</a></span>(players, <span class="kw">rank</span>(G) ==<span class="st"> </span><span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">filter</span>(players, <span class="kw">rank</span>(G) ==<span class="st"> </span><span class="dv">1</span>)</code></pre></div>
 <p>The following straightforward translation does not work because window functions are only allowed in <code>SELECT</code> and <code>ORDER_BY</code>.</p>
 <pre><code>SELECT *
 FROM Batting
@@ -281,9 +281,9 @@ flights %&gt;%
 <p>(As you can see here, the generated SQL isn’t always as minimal as you might generate by hand.)</p>
 </li>
 <li>
-<p><code><a href="../reference/reexports.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
+<p><code>filter()</code> generates a <code>WHERE</code> clause:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw"><a href="../reference/reexports.html">filter</a></span>(month ==<span class="st"> </span><span class="dv">1</span>, day ==<span class="st"> </span><span class="dv">1</span>) %&gt;%
+<span class="st">  </span><span class="kw">filter</span>(month ==<span class="st"> </span><span class="dv">1</span>, day ==<span class="st"> </span><span class="dv">1</span>) %&gt;%
 <span class="st">  </span><span class="kw">show_query</span>()
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT *</span>
@@ -352,15 +352,15 @@ flights %&gt;%
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="../reference/reexports.html">intersect(x, y)</a></code></td>
+<td><code>intersect(x, y)</code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="../reference/reexports.html">union(x, y)</a></code></td>
+<td><code>union(x, y)</code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="../reference/reexports.html">setdiff(x, y)</a></code></td>
+<td><code>setdiff(x, y)</code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
