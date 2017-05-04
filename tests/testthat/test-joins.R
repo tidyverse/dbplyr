@@ -59,13 +59,14 @@ test_that("suffix modifies duplicated variable names", {
 })
 
 test_that("join functions error on column not found for SQL sources #1928", {
+  # Rely on dplyr to test precise code
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "x"),
-    "`by` can't contain join column `x` which is missing from RHS"
+    "missing|(not found)"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "y"),
-    "`by` can't contain join column `y` which is missing from LHS"
+    "missing|(not found)"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5)),
