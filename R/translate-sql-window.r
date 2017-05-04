@@ -21,9 +21,7 @@
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y")
 win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
   if (length(partition) > 0) {
-    if (!is.sql(partition)) {
-      partition <- ident(partition)
-    }
+    partition <- as.sql(partition)
 
     partition <- build_sql(
       "PARTITION BY ",
@@ -36,9 +34,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
   }
 
   if (length(order) > 0) {
-    if (!is.sql(order)) {
-      order <- ident(order)
-    }
+    order <- as.sql(order)
 
     order <- build_sql(
       "ORDER BY ",
@@ -212,7 +208,7 @@ common_window_funs <- function() {
 #' translate_window_where(quote(rank() > cumsum(AB)))
 translate_window_where <- function(expr, window_funs = common_window_funs()) {
   switch_type(expr,
-    quosure = translate_window_where(f_rhs(expr), window_funs),
+    formula = translate_window_where(f_rhs(expr), window_funs),
     logical = ,
     integer = ,
     double = ,
@@ -221,9 +217,9 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
     string = ,
     symbol = window_where(expr, list()),
     language = {
-      if (as_name(expr) %in% window_funs) {
+      if (lang_name(expr) %in% window_funs) {
         name <- unique_name()
-        window_where(as_symbol(name), set_names(list(expr), name))
+        window_where(sym(name), set_names(list(expr), name))
       } else {
         args <- map(expr[-1], translate_window_where, window_funs = window_funs)
         expr <- new_language(node_car(expr), splice(map(args, "[[", "expr")))

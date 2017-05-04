@@ -88,6 +88,7 @@ base_scalar <- sql_translator(
   sinh    = sql_prefix("sinh", 1),
   sqrt    = sql_prefix("sqrt", 1),
   tan     = sql_prefix("tan", 1),
+  tanh     = sql_prefix("tanh", 1),
 
   tolower = sql_prefix("lower", 1),
   toupper = sql_prefix("upper", 1),

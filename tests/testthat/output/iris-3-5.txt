@@ -3,6 +3,8 @@ Database:   sqlite x.y.z [:memory:]
 Grouped by: Species
 Ordered by: Sepal.Length
 
+# S3:
+#   tbl_dbi
   Sepal.Length
          <dbl>
 1          4.3

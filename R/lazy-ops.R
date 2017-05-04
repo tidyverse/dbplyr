@@ -31,7 +31,7 @@ op_base <- function(x, vars, class = character()) {
 }
 
 op_base_remote <- function(x, vars) {
-  stopifnot(is.sql(x))
+  stopifnot(is.sql(x) || is.ident(x))
   op_base(x, vars, class = "remote")
 }
 
@@ -119,7 +119,7 @@ op_grps.op_group_by <- function(op) {
 }
 #' @export
 op_grps.op_ungroup <- function(op) {
-  NULL
+  character()
 }
 #' @export
 op_grps.op_summarise <- function(op) {

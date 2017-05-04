@@ -57,7 +57,7 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
     complex = ,
     string = ,
     character = call,
-    quosure = set_expr(call, partial_eval(f_rhs(call), vars, f_env(call))),
+    formula = set_expr(call, partial_eval(f_rhs(call), vars, f_env(call))),
     list = {
       if (inherits(call, "lazy_dots")) {
         call <- dplyr:::compat_lazy_dots(call, env)
@@ -68,14 +68,14 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
   )
 }
 
-sym_partial_eval <- function(call, vars, env) {
-  name <- as_name(call)
+sym_partial_eval <- function(sym, vars, env) {
+  name <- as_string(sym)
   if (name %in% vars) {
-    call
+    sym
   } else if (env_has(env, name, inherit = TRUE)) {
-    eval_bare(call, env)
+    eval_bare(sym, env)
   } else {
-    call
+    sym
   }
 }
 
@@ -88,7 +88,7 @@ lang_partial_eval <- function(call, vars, env) {
     named = {
       # Process call arguments recursively, unless user has manually called
       # remote/local
-      name <- as_name(node_car(call))
+      name <- as_string(node_car(call))
       if (name == "local") {
         eval_bare(call[[2]], env)
       } else if (name %in% c("$", "[[", "[")) {

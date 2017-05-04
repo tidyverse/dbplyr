@@ -15,6 +15,8 @@
     mtcars2
     ```
 
+* `glimpse()` now works with remote tables (#2665)
+
 * dplyr has gained a basic SQL optimiser, which collapses certain nested
   SELECT queries into a single query (#1979). This will improve query
   execution performance for databases with less sophisticated query optimisers,
@@ -27,6 +29,9 @@
 
 * `copy_to()` gains an `overwrite` argument which allows you to overwrite
   an existing table. Use with care! (#2296)
+
+* New `in_schema()` function makes it easy to refer to tables in schema:
+  `in_schema("my_schema_name", "my_table_name")`.
 
 ## Deprecated and defunct
 
@@ -82,7 +87,17 @@
 
 *   `rename()` and `group_by()` now combine correctly (#1962)
 
+*   `tbl_lazy()` and `lazy_tbl()` have been exported. These help you test
+    generated SQL with out an active database connection.
+
+*   `ungroup()` correctly resets grouping variables (#2704).
+
 ## Vector-level SQL generation
+
+* New `as.sql()` safely coerces an input to SQL.
+
+* New `ident_q()` makes it possible to specifier identifiers that do not
+  need to be quoted.
 
 * Translation of inline scalars:
 
@@ -105,6 +120,9 @@
 * `ifelse()` and `if_else()` use correct argument names in SQL translation 
   (#2225).
 
+* `ident()` now returns an object with class `c("ident", "character")`. It
+   no longer contains "sql" to indicate that this is not already escaped.
+   
 * `is.na()` and `is.null()` gain extra parens in SQL translation to preserve
   correct precedence (#2302).
 
@@ -147,6 +165,8 @@
   `win_current_group()` and `win_current_order()` are now exported. This
   should make it easier to provide customised SQL for window functions
   (#2051, #2126).
+  
+*  SQL translation for Microsoft SQL Server (@edgararuiz)
 
 ## Minor bug fixes and improvements
 

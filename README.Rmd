@@ -1,7 +1,5 @@
 ---
-output:
-  md_document:
-    variant: markdown_github
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -14,12 +12,37 @@ knitr::opts_chunk$set(
 )
 ```
 
-# dbplyr
+# dbplyr <img src="man/figures/logo.png" align="right" />
 
-[![Build Status](https://travis-ci.org/hadley/dbplyr.svg?branch=master)](https://travis-ci.org/hadley/dbplyr)
+[![Build Status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/dplyr)](http://cran.r-project.org/package=dbplyr)
-[![Coverage Status](https://img.shields.io/codecov/c/github/hadley/dbplyr/master.svg)](https://codecov.io/github/hadley/dbplyr?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tidyverse/dbplyr/master.svg)](https://codecov.io/github/tidyverse/dbplyr?branch=master)
 
-dbplyr is the database backend for dbplyr. 
+## Overview
 
-If you find any bugs, please file in [dplyr](https://github.com/hadley/dplyr).
+dbplyr is the database backend for dplyr. If you are using dplyr to connect to databases, you generally will not need to use any functions from dbplyr, but you will need to make sure it's installed. 
+
+If you find any bugs, please file in [dplyr](https://github.com/tidyverse/dplyr).
+
+## Installation
+
+```{r, eval = FALSE}
+# You can install the released version from CRAN
+install.packages("dbplyr")
+
+# Or the the development version from GitHub:
+# install.packages("devtools")
+devtools::install_github("tidyverse/dplyr")
+```
+
+## Usage
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+copy_to(con, mtcars)
+
+mtcars2 <- tbl(con, "mtcars")
+mtcars2
+```

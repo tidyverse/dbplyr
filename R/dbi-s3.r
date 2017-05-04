@@ -19,7 +19,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
                                         ...) {
   tt_sql <- build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", ident(name), " AS ", sql,
+    "TABLE ", as.sql(name), " AS ", sql,
     con = con
   )
   dbGetQuery(con, tt_sql)
@@ -41,7 +41,7 @@ db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = FALSE, ...) {
   dbWriteTable(
     con,
-    name = table,
+    name = dbi_quote(table, con),
     value = values,
     field.types = types,
     temporary = temporary,
@@ -63,7 +63,7 @@ db_create_table.DBIConnection <- function(con, table, types,
   )
   sql <- build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", ident(table), " ", fields,
+    "TABLE ", as.sql(table), " ", fields,
     con = con
   )
 
@@ -94,8 +94,8 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
   name <- name %||% paste0(c(table, columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   sql <- build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", ident(name),
-    " ON ", ident(table), " ", fields,
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
+    " ON ", as.sql(table), " ", fields,
     con = con)
 
   dbExecute(con, sql)
@@ -104,7 +104,7 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
 #' @export
 db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
   sql <- build_sql(
-    "DROP TABLE ", if (force) sql("IF EXISTS "), ident(table),
+    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
     con = con
   )
   dbExecute(con, sql)
@@ -112,7 +112,7 @@ db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
 
 #' @export
 db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE ", ident(table), con = con)
+  sql <- build_sql("ANALYZE ", as.sql(table), con = con)
   dbExecute(con, sql)
 }
 
@@ -171,3 +171,10 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
   warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
     call. = FALSE)
 }
+
+
+dbi_quote <- function(x, con) UseMethod("dbi_quote")
+dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
+dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
+dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
+dbi_quote.sql <- function(x, con) DBI::SQL(x)
