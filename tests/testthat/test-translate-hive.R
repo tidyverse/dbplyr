@@ -134,13 +134,13 @@ df_hive <- tbl_lazy(df, src = simulate_hive())
 
 test_that("query uses COUNT(*) instead of COUNT() ", {
   expect_equivalent(
-    dplyr::show_query(dplyr::tally(df_hive)),
+    show_query(tally(df_hive)),
     sql("SELECT COUNT(*) AS n\nFROM df"))
 })
 
 test_that("query uses COUNT(*) instead of COUNT() ", {
   expect_equivalent(
-    dplyr::show_query(dplyr::summarise(df_hive, count = n())),
+    show_query(summarise(df_hive, count = n())),
     sql("SELECT COUNT(*) AS count\nFROM df"))
 })
 

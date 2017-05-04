@@ -22,5 +22,3 @@ sql_escape_string.OdbcConnection <- function(con, x) {
   sql_quote(x, "'")
 }
 
-
-
