@@ -7,7 +7,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(tibble.print_min = 6L, tibble.print_max = 6L)
 ```
@@ -16,7 +16,7 @@ As well as working with local in-memory data stored in data frames, dplyr also w
 
 * Your data is already in a database.
   
-* You have so much data that it does not all fit into memory simultaneously  
+* You have so much data that it does not all fit into memory simultaneously
   and you need to use some external storage engine.
   
 (If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating).
@@ -31,13 +31,17 @@ To use databases with dplyr you need to first install dbplyr:
 install.packages("dbplyr")
 ```
 
-You'll also need to install a DBI backend package. A backend package takes care of communicating between R and the database in a standardised way that dplyr builds on top of. Here are four commonly used backends:
+You'll also need to install a DBI backend package. The DBI package provides a common interface that allows dplyr to work with many different databases using the same code. DBI is automatically installed with dbplyr, but you need to install a specific backend for the database that you want to connect to.
+
+Five commonly used backends are:
 
 *   [RMySQL](https://github.com/rstats-db/RMySQL#readme) 
     connects to MySQL and MariaDB
 
 *   [RPostgreSQL](https://cran.r-project.org/web/packages/RPostgreSQL) 
     connects to Postgres and Redshift.
+
+*   [RSQLite](https://github.com/rstats-db/RSQLite) embeds a SQLite database.
 
 *   [odbc](https://github.com/rstats-db/odbc#odbc) connects to many commercial
     databases via the open database connectivity protocol.
@@ -47,18 +51,18 @@ You'll also need to install a DBI backend package. A backend package takes care 
 
 If the database you need to connect to is not listed here, you'll need to do some investigation (i.e. googling) yourself.
 
-In this vignette, we're going to use the RSQLite backend which is automatically installed when you install dbplyr. SQLite is a great way to get started with databases because it's completely embedded inside an R package. Unlike most other systems, you don't need to setup a separate database server. SQLite is create for demos, but is surprisingly powerful, and with a little knowledge can easily allow to work with many gigabytes of data.
+In this vignette, we're going to use the RSQLite backend which is automatically installed when you install dbplyr. SQLite is a great way to get started with databases because it's completely embedded inside an R package. Unlike most other systems, you don't need to setup a separate database server. SQLite is great for demos, but is surprisingly powerful, and with a little practice you can use it to easily work with many gigabytes of data.
 
 ## Connecting to the database
 
-To work with a database in dplyr, you must first make a connection to that database using `DBI::dbConnect()` (DBI is also automatically installed when you install dbplyr). We're not going to go into the details of the DBI package here, but it's the foundation upon which dplyr is built. You'll need to learn more about if you need to do things to the database that are beyond the scope of dplyr.
+To work with a database in dplyr, you must first connect to it, using `DBI::dbConnect()`. We're not going to go into the details of the DBI package here, but it's the foundation upon which dbplyr is built. You'll need to learn more about if you need to do things to the database that are beyond the scope of dplyr.
 
-```{r, message = FALSE}
+```{r setup, message = FALSE}
 library(dplyr)
 con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
 ```
 
-The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMySQL::MySQL()` for RMySQL, `RPostgreSQL::PostgreSQL()` for RPostgreSQL, `odbc::odbc()` for odbc, and `bigrquery::bigquery()`. SQLite only needs one other argument: the path to the database. Here we use the special string ":memory:" which causes SQLite to make a temporary in-memory database.
+The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMySQL::MySQL()` for RMySQL, `RPostgreSQL::PostgreSQL()` for RPostgreSQL, `odbc::odbc()` for odbc, and `bigrquery::bigquery()` for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string ":memory:" which causes SQLite to make a temporary in-memory database.
 
 Most existing databases don't live in a file, but instead live on another server. That means in real-life that your code will look more like this:
 
@@ -70,9 +74,9 @@ con <- DBI::dbConnect(RMySQL::MySQL(),
 )
 ```
 
-(If you're not using RStudio, you'll need some other way to securely store your password. You should never record it in your analysis scripts or type it into the console.)
+(If you're not using RStudio, you'll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console.)
 
-Our temporary database has no data in it, so we'll start by copying over `nycflights13::flights` using the convenient `copy_to()` function. This is a quick and dirty way of getting data into a database and is useful primarily for demos, and other small jobs. 
+Our temporary database has no data in it, so we'll start by copying over `nycflights13::flights` using the convenient `copy_to()` function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.
 
 ```{r}
 copy_to(con, nycflights13::flights, "flights",
@@ -86,7 +90,7 @@ copy_to(con, nycflights13::flights, "flights",
 )
 ```
 
-As you can see, the `copy_to()` operation has an additional argument that allows you to supply indexes for the table. Here we set up indexes that will allow us to quickly process the data by day, by carrier and by plane.
+As you can see, the `copy_to()` operation has an additional argument that allows you to supply indexes for the table. Here we set up indexes that will allow us to quickly process the data by day, by carrier, by plane, and destination. Creating the write indices is key to good database performance, but is unfortunately beyond the scope of this article.
 
 Now that we've copied the data, we can use `tbl()` to take a reference to it:
 
@@ -104,11 +108,9 @@ The main difference is that you can see that it's a remote source in a SQLite da
 
 ## Generating queries
 
-To interact with a database you usually use SQL, Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you. But SQL is a very large language so dbplyr doesn't do everything: instead it focusses on `SELECT` statements, the SQL you write most often as an analyst.
+To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you're not forced to use it. However, SQL is a very large language and dbplyr doesn't do everything. It focusses on `SELECT` statements, the SQL you write most often as an analyst.
 
-For basic dplyr usage, you don't need to know anything about SQL, but in the long-run I highly recomend you at least learn the basics. If you have some familiarity with SQL and you'd like to learn more, I found [how indexes work in SQLite](http://www.sqlite.org/queryplanner.html) and [10 easy steps to a complete understanding of SQL](http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql) to be particularly helpful.
-
-While dplyr is generating SQL behind the scenes, you generally don't need to know anything about it, and can continue to use the dplyr verbs you're already familiar with:
+Most of the time you don't need to know anything about SQL, and you can continue to use the dplyr verbs that you're already familiar with:
 
 ```{r}
 flights_db %>% select(year:day, dep_delay, arr_delay)
@@ -120,7 +122,9 @@ flights_db %>%
   summarise(delay = mean(dep_time))
 ```
 
-The most important difference is that your R code is translated into SQL and executed in the database, not in R. When working with databases, dplyr tries to be as lazy as possible:
+However, in the long-run, I highly recommend you at least learn the basics of SQL. It's a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr's automatic translation. If you're completely new to SQL you might start with this [codeacademy tutorial](https://www.codecademy.com/learn/learn-sql). If you have some familiarity with SQL and you'd like to learn more, I found [how indexes work in SQLite](http://www.sqlite.org/queryplanner.html) and [10 easy steps to a complete understanding of SQL](http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql) to be particularly helpful.
+
+The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database, not in R. When working with databases, dplyr tries to be as lazy as possible:
 
 * It never pulls data into R unless you explicitly ask for it.
 
@@ -152,9 +156,7 @@ Behind the scenes, dplyr is translating your R code into SQL. You can see the SQ
 tailnum_delay_db %>% show_query()
 ```
 
-You can learn more about the SQL translation in `vignette("sql-translation")`.
-
-This probably isn't exactly what you'd write by hand, but it does the job.
+If you're familiar with SQL, this probably isn't exactly what you'd write by hand, but it does the job. You can learn more about the SQL translation in `vignette("sql-translation")`.
 
 Typically, you'll iterate a few times before you figure out what data you need from the database. Once you've figured it out, use `collect()` to pull all the data down into a local tibble:
 
@@ -177,7 +179,7 @@ nrow(tailnum_delay_db)
 tail(tailnum_delay_db)
 ```
 
-You can also ask the database how it plans to execute the query with `explain()`. The output is often fairly esoteric, but learning a bit about it can be very useful because it helps you understand if the database is using it's indexes efficiently.
+You can also ask the database how it plans to execute the query with `explain()`. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute query efficiently, or if you need to create new indices.
 
 ## Creating your own database
 
