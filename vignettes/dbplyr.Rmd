@@ -70,7 +70,7 @@ Most existing databases don't live in a file, but instead live on another server
 con <- DBI::dbConnect(RMySQL::MySQL(), 
   host = "database.rstudio.com",
   user = "hadley",
-  password = rstudioapi::askForPassword()
+  password = rstudioapi::askForPassword("Database password")
 )
 ```
 

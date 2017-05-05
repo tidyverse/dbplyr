@@ -116,7 +116,7 @@ con &lt;-<span class="st"> </span>DBI::<span class="kw">dbConnect</span>(RSQLite
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">con &lt;-<span class="st"> </span>DBI::<span class="kw">dbConnect</span>(RMySQL::<span class="kw">MySQL</span>(), 
   <span class="dt">host =</span> <span class="st">"database.rstudio.com"</span>,
   <span class="dt">user =</span> <span class="st">"hadley"</span>,
-  <span class="dt">password =</span> rstudioapi::<span class="kw">askForPassword</span>()
+  <span class="dt">password =</span> rstudioapi::<span class="kw">askForPassword</span>(<span class="st">"Database password"</span>)
 )</code></pre></div>
 <p>(If you’re not using RStudio, you’ll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console.)</p>
 <p>Our temporary database has no data in it, so we’ll start by copying over <code>nycflights13::flights</code> using the convenient <code>copy_to()</code> function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.</p>
