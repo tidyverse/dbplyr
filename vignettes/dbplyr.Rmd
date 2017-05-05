@@ -9,7 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(tibble.print_min = 6L, tibble.print_max = 6L)
+options(tibble.print_min = 6L, tibble.print_max = 6L, digits = 3)
 ```
 
 As well as working with local in-memory data stored in data frames, dplyr also works with remote on-disk data stored in databases. This is particularly useful in two scenarios:
