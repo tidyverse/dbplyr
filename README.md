@@ -3,7 +3,7 @@
 dbplyr <img src="man/figures/logo.png" align="right" />
 =======================================================
 
-[![Build Status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/dplyr)](http://cran.r-project.org/package=dbplyr) [![Coverage Status](https://img.shields.io/codecov/c/github/tidyverse/dbplyr/master.svg)](https://codecov.io/github/tidyverse/dbplyr?branch=master)
+[![Build Status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/dbplyr)](http://cran.r-project.org/package=dbplyr) [![Coverage Status](https://img.shields.io/codecov/c/github/tidyverse/dbplyr/master.svg)](https://codecov.io/github/tidyverse/dbplyr?branch=master)
 
 Overview
 --------
@@ -21,7 +21,7 @@ install.packages("dbplyr")
 
 # Or the the development version from GitHub:
 # install.packages("devtools")
-devtools::install_github("tidyverse/dplyr")
+devtools::install_github("tidyverse/dbplyr")
 ```
 
 Usage
