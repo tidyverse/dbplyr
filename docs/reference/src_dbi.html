@@ -169,35 +169,29 @@ into R.</p>
 <span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'>tbl</span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; Source:     table&lt;mtcars&gt; [?? x 11]
 #&gt; Database:   sqlite 3.11.1 [:memory:]
 #&gt; 
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1   21.0     6 160.0   110  3.90 2.620 16.46     0     1     4     4
-#&gt; 2   21.0     6 160.0   110  3.90 2.875 17.02     0     1     4     4
-#&gt; 3   22.8     4 108.0    93  3.85 2.320 18.61     1     1     4     1
-#&gt; 4   21.4     6 258.0   110  3.08 3.215 19.44     1     0     3     1
-#&gt; 5   18.7     8 360.0   175  3.15 3.440 17.02     0     0     3     2
-#&gt; 6   18.1     6 225.0   105  2.76 3.460 20.22     1     0     3     1
-#&gt; 7   14.3     8 360.0   245  3.21 3.570 15.84     0     0     3     4
-#&gt; 8   24.4     4 146.7    62  3.69 3.190 20.00     1     0     4     2
-#&gt; 9   22.8     4 140.8    95  3.92 3.150 22.90     1     0     4     2
-#&gt; 10  19.2     6 167.6   123  3.92 3.440 18.30     1     0     4     4
+#&gt; # S3: tbl_dbi
+#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4
+#&gt; 2  21.0     6   160   110  3.90 2.875 17.02     0     1     4     4
+#&gt; 3  22.8     4   108    93  3.85 2.320 18.61     1     1     4     1
+#&gt; 4  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
+#&gt; 5  18.7     8   360   175  3.15 3.440 17.02     0     0     3     2
+#&gt; 6  18.1     6   225   105  2.76 3.460 20.22     1     0     3     1
 #&gt; # ... with more rows</div><div class='input'>
 <span class='co'># You can also use pass raw SQL if you want a more sophisticated query</span>
 <span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'>tbl</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl == 8"</span>))</div><div class='output co'>#&gt; Source:     SQL [?? x 11]
 #&gt; Database:   sqlite 3.11.1 [:memory:]
 #&gt; 
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1   18.7     8 360.0   175  3.15 3.440 17.02     0     0     3     2
-#&gt; 2   14.3     8 360.0   245  3.21 3.570 15.84     0     0     3     4
-#&gt; 3   16.4     8 275.8   180  3.07 4.070 17.40     0     0     3     3
-#&gt; 4   17.3     8 275.8   180  3.07 3.730 17.60     0     0     3     3
-#&gt; 5   15.2     8 275.8   180  3.07 3.780 18.00     0     0     3     3
-#&gt; 6   10.4     8 472.0   205  2.93 5.250 17.98     0     0     3     4
-#&gt; 7   10.4     8 460.0   215  3.00 5.424 17.82     0     0     3     4
-#&gt; 8   14.7     8 440.0   230  3.23 5.345 17.42     0     0     3     4
-#&gt; 9   15.5     8 318.0   150  2.76 3.520 16.87     0     0     3     2
-#&gt; 10  15.2     8 304.0   150  3.15 3.435 17.30     0     0     3     2
+#&gt; # S3: tbl_dbi
+#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1  18.7     8 360.0   175  3.15  3.44 17.02     0     0     3     2
+#&gt; 2  14.3     8 360.0   245  3.21  3.57 15.84     0     0     3     4
+#&gt; 3  16.4     8 275.8   180  3.07  4.07 17.40     0     0     3     3
+#&gt; 4  17.3     8 275.8   180  3.07  3.73 17.60     0     0     3     3
+#&gt; 5  15.2     8 275.8   180  3.07  3.78 18.00     0     0     3     3
+#&gt; 6  10.4     8 472.0   205  2.93  5.25 17.98     0     0     3     4
 #&gt; # ... with more rows</div><div class='input'>
 <span class='co'># Alternatively, you can use the `src_sqlite()` helper</span>
 <span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'>src_sqlite</span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
@@ -215,7 +209,7 @@ into R.</p>
 <span class='no'>batting</span>
 
 <span class='co'># Basic data manipulation verbs work in the same way as with a tibble</span>
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='reexports.html'>filter</a></span>(<span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2005</span>, <span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>130</span>)
+<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'>filter</span>(<span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2005</span>, <span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>130</span>)
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'>select</span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>)
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>playerID</span>, <span class='fu'>desc</span>(<span class='no'>yearID</span>))
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'>summarise</span>(<span class='kw'>G</span> <span class='kw'>=</span> <span class='fu'>mean</span>(<span class='no'>G</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'>n</span>())
@@ -232,16 +226,16 @@ into R.</p>
 <span class='co'># All operations are lazy: they don't do anything until you request the</span>
 <span class='co'># data, either by `print()`ing it (which shows the first ten rows),</span>
 <span class='co'># or by `collect()`ing the results locally.</span>
-<span class='fu'>system.time</span>(<span class='no'>recent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='reexports.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2010</span>))
+<span class='fu'>system.time</span>(<span class='no'>recent</span> <span class='kw'>&lt;-</span> <span class='fu'>filter</span>(<span class='no'>batting</span>, <span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2010</span>))
 <span class='fu'>system.time</span>(<span class='fu'>collect</span>(<span class='no'>recent</span>))
 
 <span class='co'># You can see the query that dplyr creates with show_query()</span>
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='reexports.html'>filter</a></span>(<span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'>filter</span>(<span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>group_by</span>(<span class='no'>playerID</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>summarise</span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'>n</span>()) <span class='kw'>%&gt;%</span>
   <span class='fu'>show_query</span>()
-}</div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
+}</div><div class='output co'>#&gt; <span class='message'>Auto-disconnecting PostgreSQLConnection</span></div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
 #&gt; <span class='message'>SELECT `playerID`, COUNT() AS `n`</span>
 #&gt; <span class='message'>FROM `Batting`</span>
 #&gt; <span class='message'>WHERE (`G` &gt; 0.0)</span>
