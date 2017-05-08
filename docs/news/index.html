@@ -133,7 +133,7 @@ mtcars2</code></pre></div>
 <h2 class="hasAnchor">
 <a href="#verb-level-sql-generation" class="anchor"></a>Verb-level SQL generation</h2>
 <ul>
-<li><p>Partial evaluation occurs immediately when you execute a verb (like <code>filter()</code> or <code>mutate()</code>) rather than happening when the query is executed (#2370).</p></li>
+<li><p>Partial evaluation occurs immediately when you execute a verb (like <code><a href="../reference/reexports.html">filter()</a></code> or <code>mutate()</code>) rather than happening when the query is executed (#2370).</p></li>
 <li><p><code>mutate.tbl_sql()</code> will now generate as many subqueries as necessary so that you can refer to variables that you just created (like in mutate with regular dataframes) (#2481, #2483).</p></li>
 <li>
 <p>SQL joins have been improved:</p>
@@ -146,7 +146,7 @@ mtcars2</code></pre></div>
 </li>
 <li><p><code>group_by()</code> can now perform an inline mutate for database backends (#2422).</p></li>
 <li>
-<p>The SQL generation set operations (<code>intersect()</code>, <code>setdiff()</code>, <code>union()</code>, and <code>union_all()</code>) have been considerably improved.</p>
+<p>The SQL generation set operations (<code><a href="../reference/reexports.html">intersect()</a></code>, <code><a href="../reference/reexports.html">setdiff()</a></code>, <code><a href="../reference/reexports.html">union()</a></code>, and <code>union_all()</code>) have been considerably improved.</p>
 <p>By default, the component SELECT are surrounded with parentheses, except on SQLite. The SQLite backend will now throw an error if you attempt a set operation on a query that contains a LIMIT, as that is not supported in SQLite (#2270).</p>
 <p>All set operations match column names across inputs, filling in non-matching variables with NULL (#2556).</p>
 </li>

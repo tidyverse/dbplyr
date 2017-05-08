@@ -147,25 +147,30 @@ connect.</p></td>
   <span class='fu'>lahman_sqlite</span>()
   <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl</span>(<span class='fu'>lahman_sqlite</span>(), <span class='st'>"Batting"</span>)
   <span class='no'>batting</span>
-}</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; Source:     table&lt;Batting&gt; [?? x 22]
+}</div><div class='output co'>#&gt; Source:     table&lt;Batting&gt; [?? x 22]
 #&gt; Database:   sqlite 3.11.1 [/Users/hadley/R/dplyr/db/lahman.sqlite]
 #&gt; 
-#&gt; # S3: tbl_dbi
-#&gt;    playerID yearID stint teamID  lgID     G    AB     R     H   X2B   X3B    HR
-#&gt;       &lt;chr&gt;  &lt;int&gt; &lt;int&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-#&gt; 1 abercda01   1871     1    TRO    NA     1     4     0     0     0     0     0
-#&gt; 2  addybo01   1871     1    RC1    NA    25   118    30    32     6     0     0
-#&gt; 3 allisar01   1871     1    CL1    NA    29   137    28    40     4     5     0
-#&gt; 4 allisdo01   1871     1    WS3    NA    27   133    28    44    10     2     2
-#&gt; 5 ansonca01   1871     1    RC1    NA    25   120    29    39    11     3     0
-#&gt; 6 armstbo01   1871     1    FW1    NA    12    49     9    11     2     1     0
-#&gt; # ... with more rows, and 10 more variables: RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,
-#&gt; #   BB &lt;int&gt;, SO &lt;int&gt;, IBB &lt;int&gt;, HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, GIDP &lt;int&gt;</div><div class='input'>
+#&gt;     playerID yearID stint teamID  lgID     G    AB     R     H   X2B   X3B
+#&gt;        &lt;chr&gt;  &lt;int&gt; &lt;int&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt; 1  abercda01   1871     1    TRO    NA     1     4     0     0     0     0
+#&gt; 2   addybo01   1871     1    RC1    NA    25   118    30    32     6     0
+#&gt; 3  allisar01   1871     1    CL1    NA    29   137    28    40     4     5
+#&gt; 4  allisdo01   1871     1    WS3    NA    27   133    28    44    10     2
+#&gt; 5  ansonca01   1871     1    RC1    NA    25   120    29    39    11     3
+#&gt; 6  armstbo01   1871     1    FW1    NA    12    49     9    11     2     1
+#&gt; 7  barkeal01   1871     1    RC1    NA     1     4     0     1     0     0
+#&gt; 8  barnero01   1871     1    BS1    NA    31   157    66    63    10     9
+#&gt; 9  barrebi01   1871     1    FW1    NA     1     5     1     1     1     0
+#&gt; 10 barrofr01   1871     1    BS1    NA    18    86    13    13     2     1
+#&gt; # ... with more rows, and 11 more variables: HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;,
+#&gt; #   CS &lt;int&gt;, BB &lt;int&gt;, SO &lt;int&gt;, IBB &lt;int&gt;, HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;,
+#&gt; #   GIDP &lt;int&gt;</div><div class='input'>
 <span class='co'># Connect to a local postgres database with lahman database, if available</span>
 <span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"postgres"</span>)) {
   <span class='fu'>lahman_postgres</span>()
   <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl</span>(<span class='fu'>lahman_postgres</span>(), <span class='st'>"Batting"</span>)
-}</div></pre>
+}</div><div class='output co'>#&gt; <span class='message'>Error: RS-DBI driver: ((ü¾™–ˆ¼_ü¾™¦˜¼cannot allocate a new connection -- maximum of 16 connections already opened)</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

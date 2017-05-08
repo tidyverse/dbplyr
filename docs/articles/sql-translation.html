@@ -86,56 +86,45 @@
 <li><p>translation of vector expressions like <code>x * y + 10</code></p></li>
 <li><p>translation of whole verbs like <code>mutate()</code> or <code>summarise()</code></p></li>
 </ul>
-<p>To explore them, you’ll need to load both dbplyr and dplyr:</p>
+<p>To explore them, you’ll need to load both dbplyr and dplyr</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dbplyr)
 <span class="kw">library</span>(dplyr)</code></pre></div>
 <div id="vectors" class="section level2">
 <h2 class="hasAnchor">
 <a href="#vectors" class="anchor"></a>Vectors</h2>
-<p>Most filtering, mutating or summarising operations only perform simple mathematical operations. These operations are very similar between R and SQL, so they’re easy to translate. To see what’s happening yourself, you can use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. The basic techniques that underlie the implementation of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> are described in <a href="http://adv-r.had.co.nz/dsl.html">“Advanced R”</a>. <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is built on top of R’s parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you’re connecting to.</p>
-<p>The following examples work through some of the basic differences between R and SQL.</p>
-<ul>
-<li>
-<p><code>"</code> and <code>'</code> mean different things</p>
+<div id="basics" class="section level3">
+<h3 class="hasAnchor">
+<a href="#basics" class="anchor"></a>Basics</h3>
+<p>When performing the simple mathematical operations used when filtering, mutating or summarising, translating R code to SQL (or indeed to any programming language) is relatively straightforward.</p>
+<p>To experiment with this, use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. The following examples work through some of the basic differences between R and SQL.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># In SQLite variable names are escaped by double quotes:</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x)
 <span class="co">#&gt; &lt;SQL&gt; "x"</span>
 <span class="co"># And strings are escaped by single quotes</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="st">"x"</span>)
-<span class="co">#&gt; &lt;SQL&gt; 'x'</span></code></pre></div>
-</li>
-<li>
-<p>Many functions have slightly different names</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x ==<span class="st"> </span><span class="dv">1</span> &amp;&amp;<span class="st"> </span>(y &lt;<span class="st"> </span><span class="dv">2</span> ||<span class="st"> </span>z &gt;<span class="st"> </span><span class="dv">3</span>))
+<span class="co">#&gt; &lt;SQL&gt; 'x'</span>
+
+<span class="co"># Many functions have slightly different names</span>
+<span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x ==<span class="st"> </span><span class="dv">1</span> &amp;&amp;<span class="st"> </span>(y &lt;<span class="st"> </span><span class="dv">2</span> ||<span class="st"> </span>z &gt;<span class="st"> </span><span class="dv">3</span>))
 <span class="co">#&gt; &lt;SQL&gt; "x" = 1.0 AND ("y" &lt; 2.0 OR "z" &gt; 3.0)</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x ^<span class="st"> </span><span class="dv">2</span> &lt;<span class="st"> </span><span class="dv">10</span>)
 <span class="co">#&gt; &lt;SQL&gt; POWER("x", 2.0) &lt; 10.0</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x %%<span class="st"> </span><span class="dv">2</span> ==<span class="st"> </span><span class="dv">10</span>)
-<span class="co">#&gt; &lt;SQL&gt; "x" % 2.0 = 10.0</span></code></pre></div>
-</li>
-<li>
-<p>And some functions have different argument orders:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">substr</span>(x, <span class="dv">5</span>, <span class="dv">10</span>))
+<span class="co">#&gt; &lt;SQL&gt; "x" % 2.0 = 10.0</span>
+
+<span class="co"># Some arrange the arguments differently:</span>
+<span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">substr</span>(x, <span class="dv">5</span>, <span class="dv">10</span>))
 <span class="co">#&gt; &lt;SQL&gt; substr("x", 5, 6)</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">log</span>(x, <span class="dv">10</span>))
-<span class="co">#&gt; &lt;SQL&gt; log(10.0, "x")</span></code></pre></div>
-</li>
-<li>
-<p>R and SQL have different defaults for integers and reals. In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="dv">1</span>)
+<span class="co">#&gt; &lt;SQL&gt; log(10.0, "x")</span>
+
+<span class="co"># R and SQL have different defaults for integers and reals.</span>
+<span class="co"># In R, 1 is a real, and 1L is an integer</span>
+<span class="co"># In SQL, 1 is an integer, and 1.0 is a real</span>
+<span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="dv">1</span>)
 <span class="co">#&gt; &lt;SQL&gt; 1.0</span>
 <span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(1L)
 <span class="co">#&gt; &lt;SQL&gt; 1</span></code></pre></div>
-</li>
-<li>
-<p>If statements are translated into a case statement:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(if (x &gt;<span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> else <span class="st">"small"</span>)
-<span class="co">#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') ELSE ('small') END</span></code></pre></div>
-</li>
-</ul>
-<div id="known-functions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#known-functions" class="anchor"></a>Known functions</h3>
 <p>dplyr knows how to convert the following R functions to SQL:</p>
 <ul>
 <li>basic math operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%%</code>, <code>^</code>
@@ -153,16 +142,10 @@
 <li>coerce types: <code>as.numeric</code>, <code>as.integer</code>, <code>as.character</code>
 </li>
 </ul>
+<p>The basic techniques that underlie the implementation of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> are described in <a href="http://adv-r.had.co.nz/dsl.html">“Advanced R”</a>. <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is built on top of R’s parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you’re connecting to.</p>
 <p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean rather than what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code>mean()</code> loops through the data twice. R’s <code>mean()</code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. This means the essence of simple calls like <code>mean(x)</code> will be translated accurately, but more complicated calls like <code>mean(x, trim = 0.5, na.rm = TRUE)</code> will raise an error:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
-<span class="co">#&gt; Error in mean(x, na.rm = TRUE): unused argument (na.rm = TRUE)</span>
-<span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">mean</span>(x, <span class="dt">trim =</span> <span class="fl">0.1</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">mean</span>(x, <span class="dt">trim =</span> <span class="fl">0.1</span>))
 <span class="co">#&gt; Error in mean(x, trim = 0.1): unused argument (trim = 0.1)</span></code></pre></div>
-<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code>sql_translate_env()</code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details.</p>
-</div>
-<div id="unknown-functions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#unknown-functions" class="anchor"></a>Unknown functions</h3>
 <p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="http://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">glob</span>(x, y))
 <span class="co">#&gt; &lt;SQL&gt; GLOB("x", "y")</span>
@@ -172,15 +155,16 @@
 <div id="window-functions" class="section level3">
 <h3 class="hasAnchor">
 <a href="#window-functions" class="anchor"></a>Window functions</h3>
-<p>Things get a little trickier with window functions, because SQL’s window functions are considerably more expressive than the specific variants provided by base R or dplyr. They have the form <code>[expression] OVER ([partition clause] [order clause] [frame_clause])</code>:</p>
+<p>In SQL, window functions have the form <code>[expression] OVER ([partition clause] [order clause] [frame_clause])</code>:</p>
 <ul>
-<li><p>The <strong>expression</strong> is a combination of variable names and window functions. Support for window functions varies from database to database, but most support the ranking functions, <code>lead</code>, <code>lag</code>, <code>nth</code>, <code>first</code>, <code>last</code>, <code>count</code>, <code>min</code>, <code>max</code>, <code>sum</code>, <code>avg</code> and <code>stddev</code>.</p></li>
+<li><p>The <strong>expression</strong> is a combination of variable names and window functions. Support for window functions varies from database to database, but most support the ranking functions, <code>lead</code>, <code>lag</code>, <code>nth</code>, <code>first</code>, <code>last</code>, <code>count</code>, <code>min</code>, <code>max</code>, <code>sum</code>, <code>avg</code> and <code>stddev</code>. dplyr generates this from the R expression in your <code>mutate</code> or <code>filter</code> call.</p></li>
 <li><p>The <strong>partition clause</strong> specifies how the window function is broken down over groups. It plays an analogous role to <code>GROUP BY</code> for aggregate functions, and <code>group_by()</code> in dplyr. It is possible for different window functions to be partitioned into different groups, but not all databases support it, and neither does dplyr.</p></li>
-<li><p>The <strong>order clause</strong> controls the ordering (when it makes a difference). This is important for the ranking functions since it specifies which variables to rank by, but it’s also needed for cumulative functions and lead. Whenever you’re thinking about before and after in SQL, you must always tell it which variable defines the order. If the order clause is missing when needed, some databases fail with an error message while others return non-deterministic results.</p></li>
+<li><p>The <strong>order clause</strong> controls the ordering (when it makes a difference). This is important for the ranking functions since it specifies which variables to rank by, but it’s also needed for cumulative functions and lead. Whenever you’re thinking about before and after in SQL, you must always tell it which variable defines the order. In dplyr you do this with <code>arrange()</code>. If the order clause is missing when needed, some databases fail with an error message while others return non-deterministic results.</p></li>
 <li>
 <p>The <strong>frame clause</strong> defines which rows, or <strong>frame</strong>, that are passed to the window function, describing which rows (relative to the current row) should be included. The frame clause provides two offsets which determine the start and end of frame. There are three special values: -Inf means to include all preceeding rows (in SQL, “unbounded preceding”), 0 means the current row (“current row”), and Inf means all following rows (“unbounded following)”. The complete set of options is comprehensive, but fairly confusing, and is summarised visually below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">include_graphics</span>(<span class="st">"windows.png"</span>, <span class="dt">dpi =</span> <span class="dv">200</span>)</code></pre></div>
-<p><img src="windows.png"><!-- --></p>
+<div class="figure">
+<img src="windows.png" alt="A visual summary of frame options"><p class="caption">A visual summary of frame options</p>
+</div>
 <p>Of the many possible specifications, there are only three that commonly used. They select between aggregation variants:</p>
 <ul>
 <li><p>Recycled: <code>BETWEEN UNBOUND PRECEEDING AND UNBOUND FOLLOWING</code></p></li>
@@ -190,6 +174,22 @@
 <p>dplyr generates the frame clause based on whether your using a recycled aggregate or a cumulative aggregate.</p>
 </li>
 </ul>
+<p>It’s easiest to understand these specifications by looking at a few examples. Simple examples just need the partition and order clauses:</p>
+<ul>
+<li><p>Rank each year within a player by number of home runs: <code>RANK() OVER (PARTITION BY playerID ORDER BY desc(H))</code></p></li>
+<li><p>Compute change in number of games from one year to the next: <code>G - LAG(G) OVER (PARTITION G playerID ORDER BY yearID)</code></p></li>
+</ul>
+<p>Aggregate variants are more verbose because we also need to supply the frame clause:</p>
+<ul>
+<li><p>Running sum of G for each player: <code>SUM(G) OVER (PARTITION BY playerID ORDER BY yearID BETWEEN UNBOUND PRECEEDING AND CURRENT ROW)</code></p></li>
+<li><p>Compute the career year: <code>YearID - min(YearID) OVER (PARTITION BY playerID BETWEEN UNBOUND PRECEEDING AND UNBOUND FOLLOWING) + 1</code></p></li>
+<li><p>Compute a rolling average of games player: <code>MEAN(G) OVER (PARTITION BY playerID ORDER BY yearID BETWEEN 2 PRECEEDING AND 2 FOLLOWING)</code></p></li>
+</ul>
+<p>You’ll notice that window functions in SQL are more verbose than in R. This is because different window functions can have different partitions, and the frame specification is more general than the two aggregate variants (recycled and cumulative) provided by dplyr. dplyr makes a tradeoff: you can’t access rarely used window function capabilities (unless you write raw SQL), but in return, common operations are much more succinct.</p>
+</div>
+<div id="translating-dplyr-to-sql" class="section level3">
+<h3 class="hasAnchor">
+<a href="#translating-dplyr-to-sql" class="anchor"></a>Translating dplyr to SQL</h3>
 <p>To see how individual window functions are translated to SQL, we can again use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">mean</span>(G))
 <span class="co">#&gt; &lt;SQL&gt; avg("G") OVER ()</span>
@@ -217,6 +217,37 @@
   <span class="kw">lead</span>(G, <span class="dt">order_by =</span> yearID)
 )</code></pre></div>
 <p>Currently there is no way to order by multiple variables, except by setting the default ordering with <code>arrange()</code>. This will be added in a future release.</p>
+</div>
+<div id="translating-filters-based-on-window-functions" class="section level3">
+<h3 class="hasAnchor">
+<a href="#translating-filters-based-on-window-functions" class="anchor"></a>Translating filters based on window functions</h3>
+<p>There are some restrictions on window functions in SQL that make their use with <code>WHERE</code> somewhat challenging. Take this simple example, where we want to find the year each player played the most games:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/reexports.html">filter</a></span>(players, <span class="kw">rank</span>(G) ==<span class="st"> </span><span class="dv">1</span>)</code></pre></div>
+<p>The following straightforward translation does not work because window functions are only allowed in <code>SELECT</code> and <code>ORDER_BY</code>.</p>
+<pre><code>SELECT *
+FROM Batting
+WHERE rank() OVER (PARTITION BY "playerID" ORDER BY "G") = 1;</code></pre>
+<p>Computing the window function in <code>SELECT</code> and referring to it in <code>WHERE</code> or <code>HAVING</code> doesn’t work either, because <code>WHERE</code> and <code>HAVING</code> are computed before windowing functions.</p>
+<pre><code>SELECT *, rank() OVER (PARTITION BY "playerID" ORDER BY "G") as rank
+FROM Batting
+WHERE rank = 1;
+
+SELECT *, rank() OVER (PARTITION BY "playerID" ORDER BY "G") as rank
+FROM Batting
+HAVING rank = 1;</code></pre>
+<p>Instead, we must use a subquery:</p>
+<pre><code>SELECT *
+FROM (
+  SELECT *, rank() OVER (PARTITION BY "playerID" ORDER BY "G") as rank
+  FROM Batting
+) tmp
+WHERE rank = 1;</code></pre>
+<p>And even that query is a slightly simplification because it will also add a rank column to the original columns. dplyr takes care of generating the full, verbose, query, so you can focus on your data analysis challenges.</p>
+</div>
+<div id="behind-the-scenes" class="section level3">
+<h3 class="hasAnchor">
+<a href="#behind-the-scenes" class="anchor"></a>Behind the scenes</h3>
+<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code>sql_translate_env()</code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL.</p>
 </div>
 </div>
 <div id="whole-tables" class="section level2">
@@ -250,9 +281,9 @@ flights %&gt;%
 <p>(As you can see here, the generated SQL isn’t always as minimal as you might generate by hand.)</p>
 </li>
 <li>
-<p><code>filter()</code> generates a <code>WHERE</code> clause:</p>
+<p><code><a href="../reference/reexports.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">flights %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">filter</span>(month ==<span class="st"> </span><span class="dv">1</span>, day ==<span class="st"> </span><span class="dv">1</span>) %&gt;%
+<span class="st">  </span><span class="kw"><a href="../reference/reexports.html">filter</a></span>(month ==<span class="st"> </span><span class="dv">1</span>, day ==<span class="st"> </span><span class="dv">1</span>) %&gt;%
 <span class="st">  </span><span class="kw">show_query</span>()
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT *</span>
@@ -285,6 +316,7 @@ flights %&gt;%
 <div id="dual-table-verbs" class="section level3">
 <h3 class="hasAnchor">
 <a href="#dual-table-verbs" class="anchor"></a>Dual table verbs</h3>
+<p>Each two-table verb has a straightforward SQL equivalent:</p>
 <table class="table">
 <colgroup>
 <col width="23%">
@@ -320,15 +352,15 @@ flights %&gt;%
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code>intersect(x, y)</code></td>
+<td><code><a href="../reference/reexports.html">intersect(x, y)</a></code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code>union(x, y)</code></td>
+<td><code><a href="../reference/reexports.html">union(x, y)</a></code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code>setdiff(x, y)</code></td>
+<td><code><a href="../reference/reexports.html">setdiff(x, y)</a></code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
@@ -336,9 +368,9 @@ flights %&gt;%
 <p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code>semi_join(x, y, copy = TRUE)</code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set <code>auto_index = TRUE</code>. That will automatically add an index on the join variables to the temporary table.</p>
 </div>
-<div id="behind-the-scenes" class="section level3">
+<div id="behind-the-scenes-1" class="section level3">
 <h3 class="hasAnchor">
-<a href="#behind-the-scenes" class="anchor"></a>Behind the scenes</h3>
+<a href="#behind-the-scenes-1" class="anchor"></a>Behind the scenes</h3>
 <p>The verb level SQL translation is implemented on top of <code>tbl_lazy</code>, which basically tracks the operations you perform in a pipeline (see <code>lazy-ops.R</code>). Turning that into a SQL query takes place in three steps:</p>
 <ul>
 <li><p><code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy op data structure building up query objects (<code><a href="../reference/sql_build.html">select_query()</a></code>, <code><a href="../reference/sql_build.html">join_query()</a></code>, <code><a href="../reference/sql_build.html">set_op_query()</a></code> etc) that represent the different subtypes of <code>SELECT</code> queries that we might generate.</p></li>
