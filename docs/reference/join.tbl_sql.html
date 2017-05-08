@@ -195,7 +195,7 @@ compared with <code>=</code> not with more general operators.</p>
   <span class='no'>team_info</span> <span class='kw'>&lt;-</span> <span class='fu'>select</span>(<span class='fu'>tbl</span>(<span class='no'>lahman_s</span>, <span class='st'>"Teams"</span>), <span class='no'>yearID</span>, <span class='no'>lgID</span>, <span class='no'>teamID</span>, <span class='no'>G</span>, <span class='no'>R</span>:<span class='no'>H</span>)
 
   <span class='co'># Combine player and whole team statistics</span>
-  <span class='no'>first_stint</span> <span class='kw'>&lt;-</span> <span class='fu'>select</span>(<span class='fu'><a href='reexports.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>stint</span> <span class='kw'>==</span> <span class='fl'>1</span>), <span class='no'>playerID</span>:<span class='no'>H</span>)
+  <span class='no'>first_stint</span> <span class='kw'>&lt;-</span> <span class='fu'>select</span>(<span class='fu'>filter</span>(<span class='no'>batting</span>, <span class='no'>stint</span> <span class='kw'>==</span> <span class='fl'>1</span>), <span class='no'>playerID</span>:<span class='no'>H</span>)
   <span class='no'>both</span> <span class='kw'>&lt;-</span> <span class='fu'>left_join</span>(<span class='no'>first_stint</span>, <span class='no'>team_info</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"yearID"</span>, <span class='st'>"teamID"</span>, <span class='st'>"lgID"</span>))
   <span class='fu'>head</span>(<span class='no'>both</span>)
   <span class='fu'>explain</span>(<span class='no'>both</span>)

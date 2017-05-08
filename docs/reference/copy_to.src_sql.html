@@ -173,9 +173,10 @@ new table so that the query optimiser has useful information.</p></td>
 <span class='no'>mtcars</span>$<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>rownames</span>(<span class='no'>mtcars</span>)
 <span class='no'>mtcars2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>() <span class='kw'>%&gt;%</span>
   <span class='fu'>copy_to</span>(<span class='no'>mtcars</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='st'>"model"</span>), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='reexports.html'>filter</a></span>(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"Hornet 4 Drive"</span>)</div><div class='output co'>#&gt; Source:     lazy query [?? x 12]
+<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'>filter</span>(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"Hornet 4 Drive"</span>)</div><div class='output co'>#&gt; Source:     lazy query [?? x 12]
 #&gt; Database:   sqlite 3.11.1 [:memory:]
 #&gt; 
+#&gt; # S3: tbl_dbi
 #&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt; 1  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
@@ -186,18 +187,15 @@ new table so that the query optimiser has useful information.</p></td>
 <span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'>semi_join</span>(<span class='no'>df</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='message'>Joining, by = "cyl"</span></div><div class='output co'>#&gt; Source:     lazy query [?? x 12]
 #&gt; Database:   sqlite 3.11.1 [:memory:]
 #&gt; 
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1   21.0     6 160.0   110  3.90 2.620 16.46     0     1     4     4
-#&gt; 2   21.0     6 160.0   110  3.90 2.875 17.02     0     1     4     4
-#&gt; 3   21.4     6 258.0   110  3.08 3.215 19.44     1     0     3     1
-#&gt; 4   18.7     8 360.0   175  3.15 3.440 17.02     0     0     3     2
-#&gt; 5   18.1     6 225.0   105  2.76 3.460 20.22     1     0     3     1
-#&gt; 6   14.3     8 360.0   245  3.21 3.570 15.84     0     0     3     4
-#&gt; 7   19.2     6 167.6   123  3.92 3.440 18.30     1     0     4     4
-#&gt; 8   17.8     6 167.6   123  3.92 3.440 18.90     1     0     4     4
-#&gt; 9   16.4     8 275.8   180  3.07 4.070 17.40     0     0     3     3
-#&gt; 10  17.3     8 275.8   180  3.07 3.730 17.60     0     0     3     3
+#&gt; # S3: tbl_dbi
+#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4
+#&gt; 2  21.0     6   160   110  3.90 2.875 17.02     0     1     4     4
+#&gt; 3  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
+#&gt; 4  18.7     8   360   175  3.15 3.440 17.02     0     0     3     2
+#&gt; 5  18.1     6   225   105  2.76 3.460 20.22     1     0     3     1
+#&gt; 6  14.3     8   360   245  3.21 3.570 15.84     0     0     3     4
 #&gt; # ... with more rows, and 1 more variables: model &lt;chr&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
