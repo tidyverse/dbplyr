@@ -168,6 +168,10 @@
   
 *  SQL translation for Microsoft SQL Server (@edgararuiz)
 
+*  SQL translation for Apache Hive (@edgararuiz)
+
+*  SQL translation for Apache Impala (@edgararuiz)
+
 ## Minor bug fixes and improvements
 
 * `collect()` once again defaults to return all rows in the data (#1968).

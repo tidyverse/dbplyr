@@ -105,7 +105,7 @@ test_that("summarise drops one grouping level", {
   out2 <- out1 %>% summarise(y = 2)
 
   expect_equal(op_grps(out1), "g1")
-  expect_equal(op_grps(out2), NULL)
+  expect_equal(op_grps(out2), character())
 })
 
 test_that("ungroup drops all groups", {

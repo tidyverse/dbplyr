@@ -10,6 +10,10 @@ sql_escape_ident.DBITestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
+sql_escape_string.DBITestConnection <- function(con, x) {
+  sql_quote(x, "'")
+}
+
 #' @export
 sql_subquery.DBITestConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
@@ -50,13 +54,18 @@ simulate_postgres <- function() {
 
 #' @export
 #' @rdname tbl_lazy
-simulate_mssql <- function() {
+simulate_odbc <- function(type = NULL) {
   structure(
     list(),
-    class = c("Microsoft SQL Server", "DBITestConnection")
+    class = c(type, "DBITestConnection", "DBIConnection")
   )
-
 }
 
+#' @export
+#' @rdname tbl_lazy
+simulate_impala <- function() simulate_odbc("Impala")
 
+#' @export
+#' @rdname tbl_lazy
+simulate_mssql <- function() simulate_odbc("Microsoft SQL Server")
 
