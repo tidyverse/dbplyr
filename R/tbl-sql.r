@@ -351,7 +351,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             analyze = TRUE, ...) {
   assert_that(is.data.frame(df), is_string(name), is.flag(temporary))
   class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
-
+  class(name) <- "ident"
   name <- db_copy_to(dest$con, name, df,
     overwrite = overwrite,
     types = types,
