@@ -6,5 +6,5 @@ test_that("summarise peels off a single layer of grouping", {
   expect_equal(group_vars(mf2), "x")
 
   mf3 <- mf2 %>% summarise(n = n())
-  expect_null(group_vars(mf3))
+  expect_equal(group_vars(mf3), character())
 })
