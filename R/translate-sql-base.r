@@ -124,9 +124,10 @@ base_scalar <- sql_translator(
   },
   na_if = sql_prefix("NULL_IF", 2),
 
-  as.numeric = function(x) build_sql("CAST(", x, " AS NUMERIC)"),
-  as.integer = function(x) build_sql("CAST(", x, " AS INTEGER)"),
-  as.character = function(x) build_sql("CAST(", x, " AS TEXT)"),
+  as.numeric = sql_cast("NUMERIC"),
+  as.double = sql_cast("NUMERIC"),
+  as.integer = sql_cast("INTEGER"),
+  as.character = sql_cast("TEXT"),
 
   c = function(...) escape(c(...)),
   `:` = function(from, to) escape(from:to),
