@@ -20,7 +20,7 @@ Imports:
     dplyr (>= 0.5.0.9004),
     glue,
     methods,
-    rlang (>= 0.0.0.9018),
+    rlang (>= 0.1.0),
     R6,
     utils
 Suggests: 
@@ -83,5 +83,4 @@ Collate:
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 Remotes:
-    tidyverse/glue,
     tidyverse/dplyr
