@@ -4,6 +4,8 @@
 \alias{simulate_dbi}
 \alias{simulate_sqlite}
 \alias{simulate_postgres}
+\alias{simulate_odbc}
+\alias{simulate_impala}
 \alias{simulate_mssql}
 \alias{tbl_lazy}
 \alias{lazy_frame}
@@ -14,6 +16,10 @@ simulate_dbi()
 simulate_sqlite()
 
 simulate_postgres()
+
+simulate_odbc(type = NULL)
+
+simulate_impala()
 
 simulate_mssql()
 

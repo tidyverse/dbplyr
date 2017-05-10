@@ -153,3 +153,11 @@ sql_not_supported <- function(f) {
     stop(f, " is not available in this SQL variant", call. = FALSE)
   }
 }
+
+#' @rdname sql_variant
+#' @export
+sql_cast <- function(type) {
+  function(x) {
+    build_sql("CAST(", x, " AS ", sql(type), ")")
+  }
+}
