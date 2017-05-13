@@ -1,7 +1,9 @@
-Source:     table<mtcars-output-test> [?? x 11]
-Database:   sqlite x.y.z [:memory:]
-
-# S3: tbl_dbi
+# A tibble: ?? x 11
+# Source:
+#   table<mtcars-output-test>
+#   [?? x 11]
+# Database: sqlite x.y.z
+#   [:memory:]
     mpg   cyl  disp    hp
   <dbl> <dbl> <dbl> <dbl>
 1  21.0     6 160.0   110

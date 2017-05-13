@@ -58,23 +58,16 @@ as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
 }
 
 #' @export
-print.tbl_sql <- function(x, ..., n = NULL, width = NULL) {
-  cat("Source:     ", tbl_desc(x), "\n", sep = "")
-  cat("Database:   ", db_desc(x$src$con), "\n", sep = "")
-
+tbl_sum.tbl_sql <- function(x) {
   grps <- op_grps(x$ops)
-  if (length(grps) > 0) {
-    cat("Grouped by: ", commas(grps), "\n", sep = "")
-  }
   sort <- op_sort(x$ops)
-  if (length(sort) > 0) {
-    cat("Ordered by: ", commas(deparse_all(sort)), "\n", sep = "")
-  }
-
-  cat("\n")
-
-  print(trunc_mat(x, n = n, width = width))
-  invisible(x)
+  c(
+    NextMethod(),
+    paste0("Source: ", tbl_desc(x)),
+    paste0("Database: ", db_desc(x$src$con)),
+    if (length(grps) > 0) paste0("Groups: ", commas(grps)),
+    if (length(sort) > 0) paste0("Ordered by: ", commas(deparse_all(sort)))
+  )
 }
 
 #' @export
