@@ -1,10 +1,10 @@
-# A tibble: ?? x 5
-# Source:
+# A tibble  : ?? x 5
+# Source    :
 #   table<iris-output-test>
 #   [?? x 5]
-# Database: sqlite x.y.z
+# Database  : sqlite x.y.z
 #   [:memory:]
-# Groups: Species
+# Groups    : Species
 # Ordered by: Sepal.Length
   Sepal.Length Sepal.Width
          <dbl>       <dbl>

@@ -1,18 +1,18 @@
 # A
-#   tibble:
+#   tibble  :
 #   ??
 #   x
 #   5
-# Source:
+# Source    :
 #   table<iris-output-test>
 #   [??
 #   x
 #   5]
-# Database:
+# Database  :
 #   sqlite
 #   x.y.z
 #   [:memory:]
-# Groups:
+# Groups    :
 #   Species
 # Ordered
 #   by:
