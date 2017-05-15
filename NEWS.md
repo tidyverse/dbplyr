@@ -70,8 +70,8 @@
     * `right_join()` and `full_join()` now return results consistent with
       local data frame sources when there are records in the right table with
       no match in the left table. `right_join()` returns values of `by` columns
-      from the right table. `full_join()` returns coalesced values of `by` columns
-      from the left and right tables (#2578)
+      from the right table. `full_join()` returns coalesced values of `by` 
+      columns from the left and right tables (#2578, @ianmcook)
 
 *   `group_by()` can now perform an inline mutate for database backends (#2422).
 
