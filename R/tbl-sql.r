@@ -62,7 +62,6 @@ tbl_sum.tbl_sql <- function(x) {
   grps <- op_grps(x$ops)
   sort <- op_sort(x$ops)
   c(
-    NextMethod(),
     "Source" = tbl_desc(x),
     "Database" = db_desc(x$src$con),
     if (length(grps) > 0) c("Groups" = commas(grps)),

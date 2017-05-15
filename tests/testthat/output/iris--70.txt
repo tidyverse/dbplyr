@@ -1,7 +1,6 @@
-# A tibble  : ?? x 5
-# Source    : table<iris-output-test> [?? x 5]
-# Database  : sqlite x.y.z [:memory:]
-# Groups    : Species
+# Source:     table<iris-output-test> [?? x 5]
+# Database:   sqlite x.y.z [:memory:]
+# Groups:     Species
 # Ordered by: Sepal.Length
    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
           <dbl>       <dbl>        <dbl>       <dbl>   <chr>

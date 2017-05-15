@@ -1,5 +1,4 @@
-# A tibble: ?? x 11
-# Source  :
+# Source:  
 #   table<mtcars-output-test>
 #   [?? x 11]
 # Database: sqlite x.y.z
