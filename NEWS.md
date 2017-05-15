@@ -96,6 +96,9 @@
 
 * New `as.sql()` safely coerces an input to SQL.
 
+* More tranlators for `as.character()`, `as.integer()` and `as.double()` 
+  (#2775).
+
 * New `ident_q()` makes it possible to specifier identifiers that do not
   need to be quoted.
 
@@ -213,6 +216,8 @@
   (#2580).
 
 * `db_desc()` and `sql_translate_env()` get defaults for DBIConnection.
+
+* Formatting now works by overriding the `tbl_sum()` generic instead of `print()`. This means that the output is more consistent with tibble, and that `format()` is now supported also for SQL sources (tidyverse/dbplyr#14).
 
 ## Lazy ops
 

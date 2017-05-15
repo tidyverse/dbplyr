@@ -12,7 +12,9 @@ db_desc.MySQLConnection <- function(x) {
 #' @export
 sql_translate_env.MySQLConnection <- function(con) {
   sql_variant(
-    base_scalar,
+    sql_translator(.parent = base_scalar,
+      as.character = sql_cast("CHAR")
+    ),
     sql_translator(.parent = base_agg,
       n = function() sql("count(*)"),
       sd =  sql_prefix("stddev_samp"),

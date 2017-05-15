@@ -41,8 +41,7 @@ group_vars.tbl_lazy <- function(x) {
   op_grps(x$ops)
 }
 
-#' @export
-print.tbl_lazy <- function(x, ...) {
+render_lazy <- function(x, ...) {
   cat("Source: lazy\n")
   cat("Vars  : ", commas(op_vars(x$ops)), "\n", sep = "")
   cat("Groups: ", commas(op_grps(x$ops)), "\n", sep = "")

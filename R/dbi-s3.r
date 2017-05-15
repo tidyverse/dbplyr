@@ -41,7 +41,7 @@ db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = FALSE, ...) {
   dbWriteTable(
     con,
-    name = dbi_quote(table, con),
+    name = dbi_quote(as.sql(table), con),
     value = values,
     field.types = types,
     temporary = temporary,

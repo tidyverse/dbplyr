@@ -54,6 +54,15 @@ simulate_postgres <- function() {
 
 #' @export
 #' @rdname tbl_lazy
+simulate_mysql <- function() {
+  structure(
+    list(),
+    class = c("MySQLConnection", "DBIConnection")
+  )
+}
+
+#' @export
+#' @rdname tbl_lazy
 simulate_odbc <- function(type = NULL) {
   structure(
     list(),
