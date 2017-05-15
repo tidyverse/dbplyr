@@ -1,9 +1,7 @@
-Source:     lazy query [?? x 5]
-Database:   sqlite x.y.z [:memory:]
-Grouped by: Species
-Ordered by: Sepal.Length
-
-# S3: tbl_dbi
+# Source:     lazy query [?? x 5]
+# Database:   sqlite x.y.z [:memory:]
+# Groups:     Species
+# Ordered by: Sepal.Length
   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
          <dbl>       <dbl>        <dbl>       <dbl>   <chr>
 1          4.3         3.0          1.1         0.1  setosa

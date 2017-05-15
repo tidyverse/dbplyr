@@ -211,6 +211,8 @@
 
 * `db_desc()` and `sql_translate_env()` get defaults for DBIConnection.
 
+* Formatting now works by overriding the `tbl_sum()` generic instead of `print()`. This means that the output is more consistent with tibble, and that `format()` is now supported also for SQL sources (tidyverse/dbplyr#14).
+
 ## Lazy ops
 
 * [API] The signature of `op_base` has changed to `op_base(x, vars, class)`
