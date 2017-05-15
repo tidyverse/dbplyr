@@ -90,6 +90,9 @@
 
 * New `as.sql()` safely coerces an input to SQL.
 
+* More tranlators for `as.character()`, `as.integer()` and `as.double()` 
+  (#2775).
+
 * New `ident_q()` makes it possible to specifier identifiers that do not
   need to be quoted.
 
