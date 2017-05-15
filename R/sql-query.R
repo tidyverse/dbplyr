@@ -87,7 +87,7 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 
 
 # Returns NULL if variables don't need to be renamed
-join_vars <- function(x_names, y_names, by, suffix = c(".x", ".y")) {
+join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
@@ -103,7 +103,22 @@ join_vars <- function(x_names, y_names, by, suffix = c(".x", ".y")) {
   y_new <- y_names
   y_new[y_match] <- paste0(y_names[y_match], suffix$y)
 
-  list(x = setNames(x_new, x_names), y = setNames(y_new, y_names))
+  # In left and inner joins, return key values only from x
+  # In right joins, return key values only from y
+  # In full joins, return key values by coalescing values from x and y
+  x_x <- x_names
+  x_y <- by$y[match(x_names, by$x)]
+  x_y[type == "left" | type == "inner"] <- NA
+  x_x[type == "right" & !is.na(x_y)] <- NA
+  y_x <- rep_len(NA, length(y_names))
+  y_y <- y_names
+
+  # Return a list with 3 parallel vectors
+  # At each position, values in the 3 vectors represent
+  #  alias - name of column in join result
+  #  x - name of column from left table or NA if only from right table
+  #  y - name of column from right table or NA if only from left table
+  list(alias = c(x_new, y_new), x = c(x_x, y_x), y = c(x_y, y_y))
 }
 
 semi_join_vars <- function(x_names, y_names) {

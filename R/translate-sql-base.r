@@ -123,6 +123,7 @@ base_scalar <- sql_translator(
     build_sql("((", x, ") IS NULL)")
   },
   na_if = sql_prefix("NULL_IF", 2),
+  coalesce = sql_prefix("coalesce"),
 
   as.numeric = sql_cast("NUMERIC"),
   as.double = sql_cast("NUMERIC"),
