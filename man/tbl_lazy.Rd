@@ -4,6 +4,7 @@
 \alias{simulate_dbi}
 \alias{simulate_sqlite}
 \alias{simulate_postgres}
+\alias{simulate_mysql}
 \alias{simulate_odbc}
 \alias{simulate_impala}
 \alias{simulate_mssql}
@@ -16,6 +17,8 @@ simulate_dbi()
 simulate_sqlite()
 
 simulate_postgres()
+
+simulate_mysql()
 
 simulate_odbc(type = NULL)
 
