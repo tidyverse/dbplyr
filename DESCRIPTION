@@ -1,11 +1,11 @@
 Package: dbplyr
 Type: Package
 Version: 1.0.0
-Title: A 'dplyr' Backend for Databases
-Description: A dplyr backend for databases that allows you to work with 
+Title: A 'dplyr' Back End for Databases
+Description: A 'dplyr' back end for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Basic features
-    works with any database that has a DBI backend; more advanced features 
-    require SQL translation to be provided by the package author.
+    works with any database that has a 'DBI' back end; more advanced features 
+    require 'SQL' translation to be provided by the package author.
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("RStudio", role = c("cph", "fnd"))

@@ -38,7 +38,7 @@ Five commonly used backends are:
 *   [RMySQL](https://github.com/rstats-db/RMySQL#readme) 
     connects to MySQL and MariaDB
 
-*   [RPostgreSQL](https://cran.r-project.org/web/packages/RPostgreSQL) 
+*   [RPostgreSQL](https://CRAN.R-project.org/package=RPostgreSQL) 
     connects to Postgres and Redshift.
 
 *   [RSQLite](https://github.com/rstats-db/RSQLite) embeds a SQLite database.
