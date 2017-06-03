@@ -69,8 +69,10 @@
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
       nchar         = sql_prefix("LEN"),
+      atan2         = sql_prefix("ATN2"),
       substr        = sql_prefix("SUBSTRING"),
       is.null       = sql_prefix("ISNULL"),
+      ceil          = sql_prefix("CEILING"),
       # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()")
     ),

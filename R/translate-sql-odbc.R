@@ -9,8 +9,6 @@ base_odbc_scalar <- sql_translator(
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
-  ceil          = sql_prefix("CEILING"),
-  ceiling       = sql_prefix("CEILING"),
   round         = function(x, digits = 0L)
                     build_sql(
                       "ROUND(", x, ", ", as.integer(digits),")"
