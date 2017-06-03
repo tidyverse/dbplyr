@@ -47,6 +47,7 @@ Collate:
     'db-odbc-hive.R'
     'db-odbc-impala.R'
     'db-odbc-mssql.R'
+    'db-odbc-oracle.R'
     'db-postgres.r'
     'db-sqlite.r'
     'dbi-s3.r'
@@ -81,7 +82,7 @@ Collate:
     'utils-format.r'
     'utils.r'
     'zzz.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 Remotes:
     tidyverse/dplyr

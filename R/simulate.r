@@ -78,3 +78,8 @@ simulate_impala <- function() simulate_odbc("Impala")
 #' @rdname tbl_lazy
 simulate_mssql <- function() simulate_odbc("Microsoft SQL Server")
 
+#' @export
+#' @rdname tbl_lazy
+simulate_oracle <- function() simulate_odbc("Oracle")
+
+
