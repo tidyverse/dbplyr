@@ -26,7 +26,14 @@ base_odbc_scalar <- sql_translator(
 base_odbc_agg <- sql_translator(
   .parent = base_agg,
   n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)")
+  count         = function() sql("COUNT(*)"),
+  first         = function(x, order = NULL) {
+    win_over(
+      build_sql("first_value", list(x)),
+      win_current_group(),
+      order %||% win_current_order() %||% win_current_group() %||% list(x)
+    )
+  }
 )
 
 #' @export
@@ -35,7 +42,14 @@ base_odbc_agg <- sql_translator(
 base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)")
+  count         = function() sql("COUNT(*)"),
+  first         = function(x, order = NULL) {
+    win_over(
+      build_sql("first_value", list(x)),
+      win_current_group(),
+      order %||% win_current_order() %||% win_current_group() %||% list(x)
+    )
+    }
 )
 
 #' @export
