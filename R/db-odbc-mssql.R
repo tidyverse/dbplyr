@@ -71,8 +71,16 @@
       nchar         = sql_prefix("LEN"),
       atan2         = sql_prefix("ATN2"),
       substr        = sql_prefix("SUBSTRING"),
-      is.null       = sql_prefix("ISNULL"),
       ceil          = sql_prefix("CEILING"),
+      ceiling       = sql_prefix("CEILING"),
+      is.null       = function(x)
+        build_sql(
+          "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
+        ),
+      is.na         = function(x)
+        build_sql(
+          "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
+        ),
       # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()")
     ),

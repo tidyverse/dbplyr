@@ -3,7 +3,7 @@ sql_translate_env.Impala <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
       as.Date       = sql_cast("VARCHAR(10)"),
-      ceiling          = sql_prefix("CEIL")
+      ceiling       = sql_prefix("CEIL")
     ) ,
     base_odbc_agg,
     base_odbc_win
