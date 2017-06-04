@@ -91,7 +91,8 @@
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()")
 
-    )
+    ),
+    base_odbc_win
   )}
 
 #' @export
