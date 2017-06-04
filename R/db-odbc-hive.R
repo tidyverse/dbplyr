@@ -8,3 +8,15 @@ sql_translate_env.Hive <- function(con) {
     base_odbc_win
   )
 }
+
+#' @export
+db_analyze.Hive <- function(con, table, ...) {
+  # Using ANALYZE TABLE instead of ANALYZE as recommended in this article
+  # https://cwiki.apache.org/confluence/display/Hive/StatsDev
+  sql <- dbplyr::build_sql(
+    "ANALYZE TABLE ",
+    dbplyr::ident(table),
+    " COMPUTE STATISTICS"
+    , con = con)
+  DBI::dbExecute(con, sql)
+}

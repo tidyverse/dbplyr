@@ -62,3 +62,30 @@ sql_translate_env.OdbcConnection <- function(con) {
 }
 
 
+#' @export
+db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
+  sql <- dbplyr::build_sql(
+    "DROP TABLE ", if (force) dbplyr::sql("IF EXISTS "), dbplyr::sql(table),
+    con = con
+  )
+  DBI::dbExecute(con, sql)
+}
+
+
+#' @export
+db_copy_to.OdbcConnection <- function(con, table, values,
+                                      overwrite = FALSE, types = NULL, temporary = FALSE,
+                                      unique_indexes = NULL, indexes = NULL,
+                                      analyze = TRUE, ...) {
+
+  if (overwrite) {
+    db_drop_table(con, table, force = TRUE)
+  }
+
+  dbWriteTable(con, table, values, temporary = temporary)
+
+  if (analyze) db_analyze(con, table)
+
+  table
+}
+

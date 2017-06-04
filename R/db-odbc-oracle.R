@@ -98,3 +98,13 @@ sql_subquery.Oracle <- function(con, from, name = dbplyr:::unique_name(), ...) {
   }
 }
 
+#' @export
+db_analyze.Oracle <- function(con, table, ...) {
+  sql <- dbplyr::build_sql(
+    "ANALYZE TABLE ",
+    dbplyr::ident(table)
+    , con = con)
+  DBI::dbExecute(con, sql)
+}
+
+

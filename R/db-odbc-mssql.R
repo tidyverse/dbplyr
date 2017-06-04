@@ -94,5 +94,15 @@
     )
   )}
 
-
+#' @export
+`db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+  # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
+  # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
+  sql <- dbplyr::build_sql(
+    "UPDATE STATISTICS ",
+    dbplyr::ident(table)
+    , con = con
+  )
+  DBI::dbExecute(con, sql)
+}
 
