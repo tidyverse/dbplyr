@@ -73,6 +73,18 @@
       substr        = sql_prefix("SUBSTRING"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
+      cosh = function(x){
+        build_sql("(EXP(", x, ") + EXP(-", x,")) / 2")
+      },
+      sinh = function(x){
+        build_sql("(EXP(", x, ") - EXP(-", x,")) / 2")
+      },
+      tanh = function(x){
+        build_sql("((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)")
+      },
+      coth = function(x){
+        build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
+      },
       is.null = function(x){
         build_sql(
           "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"

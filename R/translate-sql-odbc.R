@@ -18,8 +18,10 @@ base_odbc_scalar <- sql_translator(
     build_sql(
       "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
     )
+  },
+  coth = function(x){
+    build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
   }
-
 )
 
 #' @export
