@@ -97,8 +97,10 @@ db_copy_to.OdbcConnection <- function(con, table, values,
 }
 
 win_order_by <- function(x, order = NULL){
-  x
-  if(!is.null(win_current_group())) win_current_group()
-  if(!is.null(win_current_group())) win_current_order()
-  if(!is.null(order)) order
+
+  if(!is.null(order)) order else
+    if(!is.null(win_current_order())) win_current_order() else
+      if(!is.null(win_current_group())) win_current_group() else
+        x
+
 }
