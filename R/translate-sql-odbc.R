@@ -51,6 +51,7 @@ base_odbc_win <- sql_translator(
     )
   },
   lead = function(x, n = 1L, order = NULL) {
+    n <- as.integer(n)
     win_over(
       build_sql("LEAD (", x, ", ", n, ")"),
       win_current_group(),
@@ -58,13 +59,42 @@ base_odbc_win <- sql_translator(
     )
   },
   lag = function(x, n = 1L, order = NULL) {
+    n <- as.integer(n)
     win_over(
       build_sql("LAG (", x, ", ", n, ")"),
       win_current_group(),
       order %||% x
       )
+  },
+  dense_rank = function(x) {
+    win_over(
+      build_sql("DENSE_RANK () "),
+      win_current_group(),
+      x
+    )
+  },
+  ntile = function(x, n = 1L) {
+    n <- as.integer(n)
+    win_over(
+      build_sql("NTILE (", n, ") "),
+      win_current_group(),
+      x
+    )
+  },
+  min_rank = function(x) {
+    win_over(
+      build_sql("RANK() "),
+      win_current_group(),
+      x
+    )
+  },
+  row_number = function(x) {
+    win_over(
+      build_sql("ROW_NUMBER () "),
+      win_current_group(),
+      x
+    )
   }
-
 )
 
 #' @export
