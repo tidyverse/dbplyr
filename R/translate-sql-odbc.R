@@ -50,14 +50,14 @@ base_odbc_win <- sql_translator(
       win_current_group(),
       order %||% x
     )
-  }
+  },
   lead = function(x, n = 1L, default = NA, order = NULL) {
     win_over(
       build_sql("LEAD", list(x), n , default),
       win_current_group(),
       order %||% x
     )
-  }
+  },
   lag = function(x, n = 1L, default = NA, order = NULL) {
     win_over(
       build_sql("LAG", list(x), n , default),
