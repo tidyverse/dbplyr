@@ -40,10 +40,7 @@ base_odbc_win <- sql_translator(
     win_over(
       build_sql("first_value", list(x)),
       win_current_group(),
-      order %||%
-        if(win_current_order() != "") win_current_order() else NULL %||%
-        if(win_current_group() != "") win_current_group() else NULL %||%
-        x
+      win_order_by(x, order = order)
     )
     }
 )
@@ -99,3 +96,9 @@ db_copy_to.OdbcConnection <- function(con, table, values,
   table
 }
 
+win_order_by <- function(x, order = NULL){
+  x
+  if(win_current_group() != "") win_current_group()
+  if(win_current_order() != "") win_current_order()
+  if(!is.null(order)) order
+}
