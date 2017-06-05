@@ -41,8 +41,8 @@ base_odbc_win <- sql_translator(
       build_sql("first_value", list(x)),
       win_current_group(),
       order %||%
-        if(win_current_order() != "")win_current_order() %||%
-        if(win_current_group() != "")win_current_group() %||%
+        if(win_current_order() != "") win_current_order() else NULL %||%
+        if(win_current_group() != "") win_current_group() else NULL %||%
         x
     )
     }
