@@ -9,15 +9,17 @@ base_odbc_scalar <- sql_translator(
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
-  round         = function(x, digits = 0L)
-                    build_sql(
-                      "ROUND(", x, ", ", as.integer(digits),")"
-                      ),
   paste0        = sql_prefix("CONCAT"),
-  paste         = function(..., sep = " ")
-                    build_sql(
-                      "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-                      )
+  round = function(x, digits = 0L){
+    build_sql(
+      "ROUND(", x, ", ", as.integer(digits),")"
+  )},
+  paste = function(..., sep = " "){
+    build_sql(
+      "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+    )
+  }
+
 )
 
 #' @export
@@ -90,7 +92,14 @@ base_odbc_win <- sql_translator(
   },
   row_number = function(x) {
     win_over(
-      build_sql("ROW_NUMBER () "),
+      build_sql("ROW_NUMBER() "),
+      win_current_group(),
+      x
+    )
+  },
+  percent_rank = function(x) {
+    win_over(
+      build_sql("PERCENT_RANK() "),
       win_current_group(),
       x
     )
