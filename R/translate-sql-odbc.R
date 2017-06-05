@@ -36,13 +36,36 @@ base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
   count         = function() sql("COUNT(*)"),
-  first         = function(x, order = NULL) {
+
+  first = function(x, order = NULL) {
     win_over(
-      build_sql("first_value", list(x)),
+      build_sql("FIRST_VALUE", list(x)),
       win_current_group(),
       order %||% x
     )
-    }
+  },
+  last = function(x, order = NULL) {
+    win_over(
+      build_sql("LAST_VALUE", list(x)),
+      win_current_group(),
+      order %||% x
+    )
+  }
+  lead = function(x, n = 1L, default = NA, order = NULL) {
+    win_over(
+      build_sql("LEAD", list(x), n , default),
+      win_current_group(),
+      order %||% x
+    )
+  }
+  lag = function(x, n = 1L, default = NA, order = NULL) {
+    win_over(
+      build_sql("LAG", list(x), n , default),
+      win_current_group(),
+      order %||% x
+    )
+  }
+
 )
 
 #' @export
