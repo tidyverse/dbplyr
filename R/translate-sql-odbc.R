@@ -10,6 +10,15 @@ base_odbc_scalar <- sql_translator(
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
   paste0        = sql_prefix("CONCAT"),
+  cosh = function(x){
+    build_sql("(EXP(", x, ") + EXP(-", x,")) / 2")
+  },
+  sinh = function(x){
+    build_sql("(EXP(", x, ") - EXP(-", x,")) / 2")
+  },
+  tanh = function(x){
+    build_sql("((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)")
+  },
   round = function(x, digits = 0L){
     build_sql(
       "ROUND(", x, ", ", as.integer(digits),")"
