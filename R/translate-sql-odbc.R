@@ -36,7 +36,6 @@ base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
   count         = function() sql("COUNT(*)"),
-
   first = function(x, order = NULL) {
     win_over(
       build_sql("FIRST_VALUE", list(x)),
@@ -46,9 +45,9 @@ base_odbc_win <- sql_translator(
   },
   last = function(x, order = NULL) {
     win_over(
-      build_sql("LAST_VALUE", list(x)),
+      build_sql("FIRST_VALUE", list(x)),
       win_current_group(),
-      order %||% x
+      build_sql(order %||% x, " DESC")
     )
   },
   lead = function(x, n = 1L, order = NULL) {
