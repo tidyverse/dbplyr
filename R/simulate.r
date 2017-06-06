@@ -82,4 +82,8 @@ simulate_mssql <- function() simulate_odbc("Microsoft SQL Server")
 #' @rdname tbl_lazy
 simulate_oracle <- function() simulate_odbc("Oracle")
 
+#' @export
+#' @rdname tbl_lazy
+simulate_hive <- function() simulate_odbc("Hive")
+
 

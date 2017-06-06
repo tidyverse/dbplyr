@@ -9,6 +9,7 @@
 \alias{simulate_impala}
 \alias{simulate_mssql}
 \alias{simulate_oracle}
+\alias{simulate_hive}
 \alias{tbl_lazy}
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
@@ -28,6 +29,8 @@ simulate_impala()
 simulate_mssql()
 
 simulate_oracle()
+
+simulate_hive()
 
 tbl_lazy(df, src = NULL)
 
