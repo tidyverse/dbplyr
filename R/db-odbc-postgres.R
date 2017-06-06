@@ -22,7 +22,7 @@ sql_translate_env.PostgreSQL <- function(con) {
       },
       coth = function(x){
         build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
-      }
+      },
       log = function(x, base = exp(1)) {
         if (isTRUE(all.equal(base, exp(1)))) {
           build_sql("ln(", x, ")")
