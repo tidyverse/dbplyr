@@ -31,7 +31,21 @@ sql_translate_env.PostgreSQL <- function(con) {
           # two-argument "log(base, x)" for floating point x.
           build_sql("log(", x, ") / log(", base, ")")
         }
+      },
+      is.null = function(x){
+        build_sql(
+          "UPPER(CAST(((", x  ,") IS NULL)  AS TEXT))"
+        )},
+      is.na = function(x){
+        build_sql(
+          "UPPER(CAST(((", x  ,") IS NULL)  AS TEXT))"
+        )},
+      paste = function(..., sep = " "){
+        build_sql(
+          "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+        )
       }
+
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("count(*)"),
