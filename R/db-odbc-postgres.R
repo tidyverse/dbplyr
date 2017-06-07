@@ -15,11 +15,6 @@ sql_translate_env.PostgreSQL <- function(con) {
         build_sql(
           "ROUND(", x, ", ", as.integer(digits),")"
         )},
-      paste = function(..., sep = " "){
-        build_sql(
-          "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-        )
-      },
       coth = function(x){
         build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
       },
@@ -32,14 +27,6 @@ sql_translate_env.PostgreSQL <- function(con) {
           build_sql("log(", x, ") / log(", base, ")")
         }
       },
-      is.null = function(x){
-        build_sql(
-          "UPPER(CAST(((", x  ,") IS NULL)  AS TEXT))"
-        )},
-      is.na = function(x){
-        build_sql(
-          "UPPER(CAST(((", x  ,") IS NULL)  AS TEXT))"
-        )},
       paste = function(..., sep = " "){
         build_sql(
           "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
