@@ -148,18 +148,14 @@ db_copy_to.Oracle <- function(con, table, values,
       # Oracle does not like quote marks for table and field names
       # conn@quote will be set to a single quote in the section
       # where we insert the records
-      con@quote <- ""
       sql <- sqlCreateTable(con, table, values, row.names = FALSE, temporary = FALSE)
       dbExecute(con, sql)
     }
 
 
     if (nrow(values) > 0) {
-
-      con@quote <- "'"
       fields <- paste0(colnames(values), ", ", collapse = "")
       fields <- substr(fields, 1, nchar(fields) - 2)
-
       lapply(1:nrow(values),
              function(x){
                row_values <- paste0(
@@ -186,6 +182,7 @@ db_copy_to.Oracle <- function(con, table, values,
 }
 
 #' @export
+# Temporary db_list_tables() for Oracle until odbc is patched
 db_list_tables.Oracle <- function(con)  {
   table_names <- dbGetQuery(con, "select table_name from dba_tables")
   table_names$upper <- toupper(table_names$TABLE_NAME)
@@ -194,11 +191,13 @@ db_list_tables.Oracle <- function(con)  {
 }
 
 #' @export
+# Temporary db_has_table for Oracle until odbc is patched
 db_has_table.Oracle <- function(con, table){
   stopifnot(length(table) == 1)
   toupper(table) %in% db_list_tables(con)
 }
 
+# Temporary sqlCreateTable for Oracle until odbc is patched
 setMethod("sqlCreateTable", "Oracle",
           function(con, table, fields, row.names = NA, temporary = FALSE, ...) {
             table <- dbQuoteIdentifier(con, table)
@@ -218,4 +217,9 @@ setMethod("sqlCreateTable", "Oracle",
             ))
           }
 )
+
+
+#' @export
+# Temporary setClass() for Oracle until odbc is patched
+setClass("Oracle", contains = c("DBIConnection", "VIRTUAL"))
 
