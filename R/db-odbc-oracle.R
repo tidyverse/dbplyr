@@ -107,92 +107,129 @@ db_analyze.Oracle <- function(con, table, ...) {
   DBI::dbExecute(con, sql)
 }
 
+
 #' @export
-db_copy_to.Oracle <- function(con, table, values,
-                              overwrite = FALSE, types = NULL, temporary = FALSE,
-                              unique_indexes = NULL, indexes = NULL,
-                              analyze = TRUE, ...) {
-
-
-  # Oracle requires case matching for the table in INSERT
-  # operation, easier to upper case name in the beginning
-
-  table <- toupper(table)
-
-  found <- db_has_table(con, table)
-  if (found && !overwrite && !append) {
-    stop("Table ", table, " exists in database, and both overwrite and",
-         " append are FALSE", call. = FALSE)
-  }
-
-  tryCatch({
-
-    # Using transactions to both create and insert into the table, like in a
-    # a Store Procedure. This enables us to execute multiple smaller INSERT INTO
-    # commands instead of one large string with all of the values that may
-    # overflow a string buffer and to prevent leaving an empty table behind
-    # if the INSERT INTO fails. As of 5/28/17, the full ROLLBACK does not work
-    # we may need support for END and SAVEPOINT (
-    # https://stackoverflow.com/questions/11966020/begin-end-block-atomic-transactions-in-pl-sql
-    # )
-
-    dbBegin(con)
-
-    if (found && overwrite) {
-      db_drop_table(con, table)
-    }
-
-    values <- sqlData(con, row.names = TRUE, values[, , drop = FALSE])
-
-    if (!found || overwrite) {
-      # Oracle does not like quote marks for table and field names
-      # conn@quote will be set to a single quote in the section
-      # where we insert the records
-      sql <- sqlCreateTable(con, table, values, row.names = FALSE, temporary = FALSE)
-      dbExecute(con, sql)
-    }
-
-
-    if (nrow(values) > 0) {
-      fields <- paste0(colnames(values), ", ", collapse = "")
-      fields <- substr(fields, 1, nchar(fields) - 2)
-      lapply(1:nrow(values),
-             function(x){
-               row_values <- paste0(
-                 dbQuoteIdentifier(con, as.character(values[x, ])),
-                 ", ",
-                 collapse = ""
-               )
-               row_values <- substr(row_values, 1, nchar(row_values) - 2)
-               insert_sql <- paste0("INSERT INTO ", toupper(table), " (", fields, ") VALUES (", row_values, ")")
-               dbExecute(con, insert_sql)
-             }
-      )
-
-    }
-
-
-    dbCommit(con)
-  }  ,  error = function(err) {
-    dbRollback(con)
-    stop(err)
+setMethod(
+  "dbListTables", "Oracle",
+  function(conn, ...) {
+    table_names <- dbGetQuery(con, "select table_name from dba_tables")
+    table_names$upper <- toupper(table_names$TABLE_NAME)
+    table_names <- table_names[table_names$TABLE_NAME == table_names$upper , 1]
+    as.character(table_names)
   })
 
-  table
-}
+#' @export
+setMethod(
+  "dbExistsTable", c("Oracle", "character"),
+  function(conn, name, ...) {
+    stopifnot(length(name) == 1)
+    name <- toupper(name)
+    dbUnQuoteIdentifier(conn, name) %in% dbListTables(conn)
+  })
+
+
 
 #' @export
-# Temporary db_list_tables() for Oracle until odbc is patched
-db_list_tables.Oracle <- function(con)  {
-  table_names <- dbGetQuery(con, "select table_name from dba_tables")
-  table_names$upper <- toupper(table_names$TABLE_NAME)
-  table_names <- table_names[table_names$TABLE_NAME == table_names$upper , 1]
-  as.character(table_names)
-}
+setMethod(
+  "dbWriteTable", c("Oracle", "character", "data.frame"),
+  function(conn, name, value, overwrite=FALSE, append=FALSE, temporary = FALSE,
+           row.names = NA, ...) {
+
+    # Oracle requires case matching for the table in INSERT
+    # operation, easier to upper case name in the beginning
+
+    name <- toupper(name)
+
+    if (overwrite && append)
+      stop("overwrite and append cannot both be TRUE", call. = FALSE)
+
+    found <- dbExistsTable(conn, name)
+    if (found && !overwrite && !append) {
+      stop("Table ", name, " exists in database, and both overwrite and",
+           " append are FALSE", call. = FALSE)
+    }
+
+    tryCatch({
+
+      # Using transactions to both create and insert into the table, like in a
+      # a Store Procedure. This enables us to execute multiple smaller INSERT INTO
+      # commands instead of one large string with all of the values that may
+      # overflow a string buffer and to prevent leaving an empty table behind
+      # if the INSERT INTO fails. As of 5/28/17, the full ROLLBACK does not work
+      # we may need support for END and SAVEPOINT (
+      # https://stackoverflow.com/questions/11966020/begin-end-block-atomic-transactions-in-pl-sql
+      # )
+
+      dbBegin(conn)
+
+      if (found && overwrite) {
+        dbRemoveTable(conn, name)
+      }
+
+      values <- sqlData(conn, row.names = row.names, value[, , drop = FALSE])
+
+      if (!found || overwrite) {
+        # Oracle does not like quote marks for table and field names
+        # conn@quote will be set to a single quote in the section
+        # where we insert the records
+        conn@quote <- ""
+        sql <- sqlCreateTable(conn, name, values, row.names = FALSE, temporary = temporary)
+        dbExecute(conn, sql)
+      }
+
+
+      if (nrow(value) > 0) {
+
+        conn@quote <- "'"
+        fields <- paste0(colnames(values), ", ", collapse = "")
+        fields <- substr(fields, 1, nchar(fields) - 2)
+
+        lapply(1:nrow(values),
+               function(x){
+                 row_values <- paste0(
+                   dbQuoteIdentifier(conn, as.character(values[x, ])),
+                   ", ",
+                   collapse = ""
+                 )
+                 row_values <- substr(row_values, 1, nchar(row_values) - 2)
+                 insert_sql <- paste0("INSERT INTO ", toupper(name), " (", fields, ") VALUES (", row_values, ")")
+                 dbExecute(conn, insert_sql)
+               }
+        )
+
+      }
+
+
+      dbCommit(conn)
+    }  ,  error = function(err) {
+      dbRollback(conn)
+      stop(err)
+    })
+    invisible(TRUE)
+  })
 
 #' @export
-# Temporary db_has_table for Oracle until odbc is patched
-db_has_table.Oracle <- function(con, table){
-  stopifnot(length(table) == 1)
-  toupper(table) %in% db_list_tables(con)
-}
+setMethod("sqlCreateTable", "Oracle",
+          function(con, table, fields, row.names = NA, temporary = FALSE, ...) {
+            table <- dbQuoteIdentifier(con, table)
+
+            if (is.data.frame(fields)) {
+              fields <- sqlRownamesToColumn(fields, row.names)
+              fields <- vapply(fields, function(x) DBI::dbDataType(con, x), character(1))
+            }
+
+            field_names <- dbQuoteIdentifier(con, names(fields))
+            field_types <- unname(fields)
+            fields <- paste0(field_names, " ", field_types)
+
+            SQL(paste0(
+              "CREATE ", if (temporary) " GLOBAL TEMPORARY ", "TABLE ", table, " (\n",
+              "  ", paste(fields, collapse = ",\n  "), "\n)\n", if (temporary) " ON COMMIT DELETE ROWS"
+            ))
+          }
+)
+
+
+
+
+
