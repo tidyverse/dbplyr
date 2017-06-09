@@ -197,5 +197,5 @@ db_list_tables.Oracle <- function(con)  {
 db_has_table.Oracle <- function(con, table){
   stopifnot(length(table) == 1)
   table <- toupper(table)
-  dbUnQuoteIdentifier(con, table) %in% dbListTables(con)
+  odbc::dbUnQuoteIdentifier(con, table) %in% dbListTables(con)
 }
