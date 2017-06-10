@@ -15,18 +15,3 @@ test_that("as.numeric() translated to NUMBER ", {
     sql("CAST(`field_name` AS NUMBER)")
   )
 })
-
-# Oracle query tests  ------------------------------------------------
-
-df <- data.frame(x = 1, y = 2)
-df_oracle <- tbl_lazy(df, src = simulate_oracle())
-test_that("query uses FETCH FIRST instead of LIMIT ", {
-  expect_equivalent(
-    show_query(head(df_oracle)),
-    sql("SELECT *\nFROM (df) \nFETCH FIRST 6 ROWS ONLY "))
-})
-
-
-
-
-
