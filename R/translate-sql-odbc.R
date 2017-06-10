@@ -10,6 +10,8 @@ base_odbc_scalar <- sql_translator(
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
   paste0        = sql_prefix("CONCAT"),
+  # cosh, sinh, coth and tanh calculations are based on this article
+  # https://en.wikipedia.org/wiki/Hyperbolic_function
   cosh = function(x){
     build_sql("(EXP(", x, ") + EXP(-", x,")) / 2")
   },
@@ -23,13 +25,13 @@ base_odbc_scalar <- sql_translator(
     build_sql(
       "ROUND(", x, ", ", as.integer(digits),")"
   )},
+  coth = function(x){
+    build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
+  },
   paste = function(..., sep = " "){
     build_sql(
       "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
     )
-  },
-  coth = function(x){
-    build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
   }
 )
 
@@ -49,6 +51,12 @@ base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
   count         = function() sql("COUNT(*)"),
+
+  # Window functions in this variant use field that its being
+  # 'windowed' as the secondary ORDER BY instead of the field
+  # from win_current_order().  In the tests, having an ORDER BY
+  # outside of the window statement breaks the SQL query.
+
   first = function(x, order = NULL) {
     win_over(
       build_sql("FIRST_VALUE", list(x)),
@@ -156,6 +164,9 @@ db_copy_to.OdbcConnection <- function(con, table, values,
                                       overwrite = FALSE, types = NULL, temporary = FALSE,
                                       unique_indexes = NULL, indexes = NULL,
                                       analyze = TRUE, ...) {
+
+  # A simplified version of db_copy_to.DBIConnection has worked on all
+  # ODBCConnection variances so far
 
   if (overwrite) {
     db_drop_table(con, table, force = TRUE)

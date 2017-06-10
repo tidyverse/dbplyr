@@ -69,9 +69,11 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
 sql_translate_env.Oracle <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
+                            # Data type conversions are mostly based on this article
+                            # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
                             as.character  = sql_cast("VARCHAR(255)"),
-                            as.numeric = sql_cast("NUMERIC"),
-                            as.double = sql_cast("NUMERIC"),
+                            as.numeric = sql_cast("NUMBER"),
+                            as.double = sql_cast("NUMBER"),
                             is.null = function(x){
                               build_sql(
                                 "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
@@ -109,6 +111,8 @@ sql_subquery.Oracle <- function(con, from, name = dbplyr:::unique_name(), ...) {
 #' @export
 db_analyze.Oracle <- function(con, table, ...) {
   sql <- dbplyr::build_sql(
+    # Using ANALYZE TABLE instead of ANALYZE
+    # https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11526
     "ANALYZE TABLE ",
     dbplyr::ident(table)
     , con = con)
@@ -117,6 +121,8 @@ db_analyze.Oracle <- function(con, table, ...) {
 
 #' @export
 db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
+  # Oracle does not support the IF EXISTS argument passed by force = TRUE
+  # this is why we are not using the db_drop_table.OdbcConnection
   sql <- dbplyr::build_sql(
     "DROP TABLE ", dbplyr::sql(table),
     con = con
@@ -124,9 +130,11 @@ db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
   DBI::dbExecute(con, sql)
 }
 
-
 #' @export
 db_list_tables.Oracle <- function(con)  {
+  # This function allows copy_to() to work.  This variance may
+  # be removed when the odbc package is able to handle a straight
+  # dbListTables
   table_names <- dbGetQuery(con, "select table_name from dba_tables")
   table_names$upper <- toupper(table_names$TABLE_NAME)
   table_names <- table_names[table_names$TABLE_NAME == table_names$upper , 1]
@@ -135,6 +143,9 @@ db_list_tables.Oracle <- function(con)  {
 
 #' @export
 db_has_table.Oracle <- function(con, table){
+  # This function allows copy_to() to work.  This variance may
+  # be removed when the odbc package is able to handle a straight
+  # dbListTables
   stopifnot(length(table) == 1)
   toupper(table) %in% dbListTables(con)
 }
@@ -146,9 +157,13 @@ db_copy_to.Oracle <- function(con, table, values,
                               analyze = TRUE, ...) {
 
 
+  # This function allows copy_to() to work.  Unlike db_list_tables()
+  # and db_has_table, I'd recommend to keep this variance because
+  # I believe it handles the INSERT INTO phase as a transaction and
+  # not as a long string that may overload a string buffer.
+
   # Oracle requires case matching for the table in INSERT
   # operation, easier to upper case name in the beginning
-
   table <- toupper(table)
 
   found <- db_has_table(con, table)

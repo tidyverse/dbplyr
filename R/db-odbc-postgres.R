@@ -1,7 +1,19 @@
 #' @export
 sql_translate_env.PostgreSQL <- function(con) {
-  sql_variant(
+
+    # Started with a copy of the existing PostgreSQL translation
+    # and included additional variances that did not pass the
+    # tests from dbtest.  To leverage the rest of the translations,
+    # the bases are set to base_scalar, base_agg and base_win,
+    # instead of base_odbc_...
+
+    sql_variant(
     sql_translator(.parent = base_scalar,
+       # cot, cosh, sinh, coth and tanh calculations are based on this article
+       # https://en.wikipedia.org/wiki/Hyperbolic_function
+       cot = function(x){
+         build_sql("1 / TAN(", x, ")")
+       },
       cosh = function(x){
         build_sql("(EXP(", x, ") + EXP(-", x,")) / 2")
       },
@@ -11,13 +23,13 @@ sql_translate_env.PostgreSQL <- function(con) {
       tanh = function(x){
         build_sql("((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)")
       },
+      coth = function(x){
+        build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
+      },
       round = function(x, digits = 0L){
         build_sql(
           "ROUND(", x, ", ", as.integer(digits),")"
         )},
-      coth = function(x){
-        build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
-      },
       log = function(x, base = exp(1)) {
         if (isTRUE(all.equal(base, exp(1)))) {
           build_sql("ln(", x, ")")

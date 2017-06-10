@@ -175,6 +175,9 @@
 
 *  SQL translation for Apache Impala (@edgararuiz)
 
+*  SQL translation for Oracle  (@edgararuiz)
+
+
 ## Minor bug fixes and improvements
 
 * `collect()` once again defaults to return all rows in the data (#1968).

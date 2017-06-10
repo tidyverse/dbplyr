@@ -2,7 +2,9 @@
 sql_translate_env.Hive <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
-      var       = sql_prefix("VAR_POP"),
+      var       = sql_prefix("VARIANCE"),
+      # cot calculation is based on this article
+      # https://en.wikipedia.org/wiki/Hyperbolic_function
       cot = function(x){
         build_sql("1 / TAN(", x, ")")
       }
