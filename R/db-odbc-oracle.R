@@ -61,7 +61,7 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
     )
   }
 
-  escape(unname(plyr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 
