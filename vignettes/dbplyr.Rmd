@@ -179,7 +179,7 @@ nrow(tailnum_delay_db)
 tail(tailnum_delay_db)
 ```
 
-You can also ask the database how it plans to execute the query with `explain()`. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute query efficiently, or if you need to create new indices.
+You can also ask the database how it plans to execute the query with `explain()`. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute the query efficiently, or if you need to create new indices.
 
 ## Creating your own database
 
