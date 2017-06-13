@@ -1,4 +1,4 @@
-# dbplyr 0.5.0.9000
+# dbplyr 1.0.0
 
 ## New features
 
