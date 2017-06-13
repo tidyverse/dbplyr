@@ -19,7 +19,7 @@ As well as working with local in-memory data stored in data frames, dplyr also w
 * You have so much data that it does not all fit into memory simultaneously
   and you need to use some external storage engine.
   
-(If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating).
+(If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating.)
 
 This vignette focusses on the first scenario because it's the most common. If you're using R to do data analysis inside a company, most of the data you need probably already lives in a database (it's just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr's database tools. At  the end, I'll also give you a few pointers if you do need to set up your own database.
 
