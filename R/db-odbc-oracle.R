@@ -9,50 +9,15 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
                   "limit")
 
-  assertthat::assert_that(is.character(select), length(select) > 0L)
-  out$select <- build_sql(
-    "SELECT ",
-    if (distinct) sql("DISTINCT "),
-    escape(toupper(select), collapse = ", ", con = con)
-  )
-
-  assertthat::assert_that(is.character(from), length(from) == 1L)
-  out$from <- build_sql("FROM ", from, con = con)
-
-  if (length(where) > 0L) {
-    assertthat::assert_that(is.character(where))
-
-    where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
-  }
-
-  if (length(group_by) > 0L) {
-    assertthat::assert_that(is.character(group_by))
-    out$group_by <- build_sql(
-      "GROUP BY ",
-      escape(group_by, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(having) > 0L) {
-    assertthat::assert_that(is.character(having))
-    out$having <- build_sql(
-      "HAVING ",
-      escape(having, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(order_by) > 0L) {
-    assertthat::assert_that(is.character(order_by))
-    out$order_by <- build_sql(
-      "ORDER BY ",
-      escape(order_by, collapse = ", ", con = con)
-    )
-  }
+  out$select    <- sql_clause_select(select, con, distinct)
+  out$from      <- sql_clause_from(from, con)
+  out$where     <- sql_clause_where(where, con)
+  out$group_by  <- sql_clause_group_by(group_by, con)
+  out$having    <- sql_clause_having(having, con)
+  out$order_by  <- sql_clause_order_by(order_by, con)
 
   # Using Oracle's FETCH FIRST SQL command instead of LIMIT
   # https://oracle-base.com/articles/12c/row-limiting-clause-for-top-n-queries-12cr1
-
   if (!is.null(limit) && !identical(limit, Inf)) {
     assertthat::assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
     out$limit <- build_sql(
@@ -69,167 +34,39 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
 sql_translate_env.Oracle <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
-                            # Data type conversions are mostly based on this article
-                            # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
-                            as.character  = sql_cast("VARCHAR(255)"),
-                            as.numeric = sql_cast("NUMBER"),
-                            as.double = sql_cast("NUMBER"),
-                            is.null = function(x){
-                              build_sql(
-                                "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                              )},
-                            is.na = function(x){
-                              build_sql(
-                                "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                              )}
-    ) ,
+      # Data type conversions are mostly based on this article
+      # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
+      as.character  = sql_cast("VARCHAR(255)"),
+      as.numeric    = sql_cast("NUMBER"),
+      as.double     = sql_cast("NUMBER"),
+      is.null       = function(x){
+                        build_sql(
+                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
+                        )},
+      is.na         = function(x){
+                        build_sql(
+                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
+                        )}
+    ),
     base_odbc_agg,
     base_odbc_win
   )
 }
 
-
-#' @export
-sql_subquery.Oracle <- function(con, from, name = dbplyr:::unique_name(), ...) {
-  # Query fails if a quoted table is used.  Using sql() to remove quotes from an
-  # already 'idented' argument.
-  if (is.ident(from)) {
-    if (is.null(name)) {
-      build_sql("(", sql(from), ") ", con = con)
-    } else {
-      build_sql("(", sql(from), ") ", ident(name), con = con)
-    }
-  } else {
-    if (is.null(name)) {
-      build_sql("(", from, ")", con = con)
-    } else {
-      build_sql("(", from, ") ", ident(name), con = con)
-    }
-  }
-}
-
 #' @export
 db_analyze.Oracle <- function(con, table, ...) {
   sql <- dbplyr::build_sql(
-    # Using ANALYZE TABLE instead of ANALYZE
-    # https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11526
+    # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11524
     "ANALYZE TABLE ",
-    dbplyr::ident(table)
+    ident(table)
     , con = con)
   DBI::dbExecute(con, sql)
 }
 
 #' @export
-db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
-  # Oracle does not support the IF EXISTS argument passed by force = TRUE
-  # this is why we are not using the db_drop_table.OdbcConnection
-  sql <- dbplyr::build_sql(
-    "DROP TABLE ", dbplyr::sql(table),
-    con = con
-  )
-  DBI::dbExecute(con, sql)
+sql_escape_ident.Oracle <- function(con, x) {
+  sql_quote(x, '"')
 }
 
-#' @export
-db_list_tables.Oracle <- function(con)  {
-  # This function allows copy_to() to work.  This variance may
-  # be removed when the odbc package is able to handle a straight
-  # dbListTables
-  table_names <- dbGetQuery(con, "select table_name from dba_tables")
-  table_names$upper <- toupper(table_names$TABLE_NAME)
-  table_names <- table_names[table_names$TABLE_NAME == table_names$upper , 1]
-  as.character(table_names)
-}
-
-#' @export
-db_has_table.Oracle <- function(con, table){
-  # This function allows copy_to() to work.  This variance may
-  # be removed when the odbc package is able to handle a straight
-  # dbListTables
-  stopifnot(length(table) == 1)
-  toupper(table) %in% dbListTables(con)
-}
-
-#' @export
-db_copy_to.Oracle <- function(con, table, values,
-                              overwrite = FALSE, types = NULL, temporary = FALSE,
-                              unique_indexes = NULL, indexes = NULL,
-                              analyze = TRUE, ...) {
-
-
-  # This function allows copy_to() to work.  Unlike db_list_tables()
-  # and db_has_table, I'd recommend to keep this variance because
-  # I believe it handles the INSERT INTO phase as a transaction and
-  # not as a long string that may overload a string buffer.
-
-  # Oracle requires case matching for the table in INSERT
-  # operation, easier to upper case name in the beginning
-  table <- toupper(table)
-
-  found <- db_has_table(con, table)
-  if (found && !overwrite && !append) {
-    stop("Table ", table, " exists in database, and both overwrite and",
-         " append are FALSE", call. = FALSE)
-  }
-
-  tryCatch({
-
-    # Using transactions to both create and insert into the table, like in a
-    # a Store Procedure. This enables us to execute multiple smaller INSERT INTO
-    # commands instead of one large string with all of the values that may
-    # overflow a string buffer and to prevent leaving an empty table behind
-    # if the INSERT INTO fails. As of 5/28/17, the full ROLLBACK does not work
-    # we may need support for END and SAVEPOINT (
-    # https://stackoverflow.com/questions/11966020/begin-end-block-atomic-transactions-in-pl-sql
-    # )
-
-    dbBegin(con)
-
-    if (found && overwrite) {
-      db_drop_table(con, table)
-    }
-
-    values <- sqlData(con, row.names = TRUE, values[, , drop = FALSE])
-
-    if (!found || overwrite) {
-      # Oracle does not like quote marks for table and field names
-      # conn@quote will be set to a single quote in the section
-      # where we insert the records
-      con@quote <- ""
-      sql <- sqlCreateTable(con, table, values, row.names = FALSE, temporary = FALSE)
-      dbExecute(con, sql)
-    }
-
-
-    if (nrow(values) > 0) {
-
-      con@quote <- "'"
-      fields <- paste0(colnames(values), ", ", collapse = "")
-      fields <- substr(fields, 1, nchar(fields) - 2)
-
-      lapply(1:nrow(values),
-             function(x){
-               row_values <- paste0(
-                 dbQuoteIdentifier(con, as.character(values[x, ])),
-                 ", ",
-                 collapse = ""
-               )
-               row_values <- substr(row_values, 1, nchar(row_values) - 2)
-               insert_sql <- paste0("INSERT INTO ", toupper(table), " (", fields, ") VALUES (", row_values, ")")
-               dbExecute(con, insert_sql)
-             }
-      )
-
-    }
-
-
-    dbCommit(con)
-  }  ,  error = function(err) {
-    dbRollback(con)
-    stop(err)
-  })
-
-  table
-}
 
 

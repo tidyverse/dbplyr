@@ -1,6 +1,6 @@
 Package: dbplyr
 Type: Package
-Version: 0.0.0.9001
+Version: 1.0.0.9000
 Title: A 'dplyr' Backend for Databases
 Description: A dplyr backend for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Basic features
@@ -83,7 +83,7 @@ Collate:
     'utils-format.r'
     'utils.r'
     'zzz.R'
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 Remotes:
     tidyverse/dplyr

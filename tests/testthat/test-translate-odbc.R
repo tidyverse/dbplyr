@@ -87,28 +87,28 @@ test_that("cosh() translates to the correct formula ", {
     translate_sql(
       cosh(field1),
       con = simulate_odbc("OdbcConnection")),
-    sql("(EXP(`field1`) + EXP(-`field1`)) / 2"))
+    sql("(EXP(`field1`) + EXP(-(`field1`))) / 2"))
 })
 test_that("sinh() translates to the correct formula ", {
   expect_equivalent(
     translate_sql(
       sinh(field1),
       con = simulate_odbc("OdbcConnection")),
-    sql("(EXP(`field1`) - EXP(-`field1`)) / 2"))
+    sql("(EXP(`field1`) - EXP(-(`field1`))) / 2"))
 })
 test_that("tanh() translates to the correct formula ", {
   expect_equivalent(
     translate_sql(
       tanh(field1),
       con = simulate_odbc("OdbcConnection")),
-    sql("((EXP(`field1`) - EXP(-`field1`)) / 2) / ((EXP(`field1`) + EXP(-`field1`)) / 2)"))
+    sql("((EXP(`field1`) - EXP(-(`field1`))) / 2) / ((EXP(`field1`) + EXP(-(`field1`))) / 2)"))
 })
 test_that("coth() translates to the correct formula ", {
   expect_equivalent(
     translate_sql(
       coth(field1),
       con = simulate_odbc("OdbcConnection")),
-    sql("((EXP(`field1`) + EXP(-`field1`)) / 2) / ((EXP(`field1`) - EXP(-`field1`)) / 2)"))
+    sql("((EXP(`field1`) + EXP(-(`field1`))) / 2) / ((EXP(`field1`) - EXP(-(`field1`))) / 2)"))
 })
 
 # odbc base_agg conversions -----------------------------------------
@@ -153,75 +153,7 @@ test_that("var() translates to VARIANCE ", {
     sql("VARIANCE(`field_name`)"))
 })
 
-# odbc base_win conversions -----------------------------------------
 
-test_that("first() uses field_name as for the ORDER BY  ", {
-  expect_equivalent(
-    translate_sql(first(field_name),
-                  con = simulate_odbc("OdbcConnection")),
-    sql("FIRST_VALUE(`field_name`) OVER (ORDER BY `field_name`)"))
-})
-
-test_that("last(x) uses x as for the ORDER BY  ", {
-  expect_equivalent(
-    translate_sql(last(field_name),
-                  con = simulate_odbc("OdbcConnection")),
-    sql("FIRST_VALUE(`field_name`) OVER (ORDER BY `field_name` DESC)"))
-})
-test_that("lead(x) uses x as for the ORDER BY  and defaults to 1L offset ", {
-  expect_equivalent(
-    translate_sql(lead(field_name),
-                  con = simulate_odbc("OdbcConnection")),
-    sql("LEAD(`field_name`, 1) OVER (ORDER BY `field_name`)"))
-})
-test_that("lag(x) uses x as for the ORDER BY  and defaults to 1L offset ", {
-  expect_equivalent(
-    translate_sql(lag(field_name),
-                  con = simulate_odbc("OdbcConnection")),
-    sql("LAG(`field_name`, 1) OVER (ORDER BY `field_name`)"))
-})
-test_that("dense_rank() translates to DENSE_RANK ", {
-  expect_equivalent(
-    translate_sql(
-      dense_rank(field1),
-      con = simulate_odbc("OdbcConnection")),
-    sql("DENSE_RANK()  OVER (ORDER BY `field1`)"))
-})
-test_that("ntile() translates to NTILE and uses 1L as default groups ", {
-  expect_equivalent(
-    translate_sql(
-      ntile(field1),
-      con = simulate_odbc("OdbcConnection")),
-    sql("NTILE(1)  OVER (ORDER BY `field1`)"))
-})
-test_that("ntile() translates to NTILE and uses the passed number of groups ", {
-  expect_equivalent(
-    translate_sql(
-      ntile(field1, 4),
-      con = simulate_odbc("OdbcConnection")),
-    sql("NTILE(4)  OVER (ORDER BY `field1`)"))
-})
-test_that("min_rank() translates to RANK ", {
-  expect_equivalent(
-    translate_sql(
-      min_rank(field1),
-      con = simulate_odbc("OdbcConnection")),
-    sql("RANK()  OVER (ORDER BY `field1`)"))
-})
-test_that("row_number() translates to ROW_NUMBER ", {
-  expect_equivalent(
-    translate_sql(
-      row_number(field1),
-      con = simulate_odbc("OdbcConnection")),
-    sql("ROW_NUMBER()  OVER (ORDER BY `field1`)"))
-})
-test_that("percent_rank() translates to PERCENT_RANK ", {
-  expect_equivalent(
-    translate_sql(
-      percent_rank(field1),
-      con = simulate_odbc("OdbcConnection")),
-    sql("PERCENT_RANK()  OVER (ORDER BY `field1`)"))
-})
 # odbc query tests  ------------------------------------------------
 
 df <- data.frame(x = 1, y = 2)

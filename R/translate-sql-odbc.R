@@ -10,29 +10,26 @@ base_odbc_scalar <- sql_translator(
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
   paste0        = sql_prefix("CONCAT"),
-  # cosh, sinh, coth and tanh calculations are based on this article
-  # https://en.wikipedia.org/wiki/Hyperbolic_function
-  cosh = function(x){
-    build_sql("(EXP(", x, ") + EXP(-", x,")) / 2")
-  },
-  sinh = function(x){
-    build_sql("(EXP(", x, ") - EXP(-", x,")) / 2")
-  },
-  tanh = function(x){
-    build_sql("((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)")
-  },
-  round = function(x, digits = 0L){
-    build_sql(
-      "ROUND(", x, ", ", as.integer(digits),")"
-  )},
-  coth = function(x){
-    build_sql("((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)")
-  },
-  paste = function(..., sep = " "){
-    build_sql(
-      "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-    )
-  }
+                  # cosh, sinh, coth and tanh calculations are based on this article
+                  # https://en.wikipedia.org/wiki/Hyperbolic_function
+  cosh          = function(x) build_sql("(EXP(", x, ") + EXP(-(", x,"))) / 2"),
+  sinh          = function(x) build_sql("(EXP(", x, ") - EXP(-(", x,"))) / 2"),
+  tanh          = function(x){
+                    build_sql(
+                      "((EXP(", x, ") - EXP(-(", x,"))) / 2) / ((EXP(", x, ") + EXP(-(", x,"))) / 2)"
+                    )},
+  round         = function(x, digits = 0L){
+                    build_sql(
+                      "ROUND(", x, ", ", as.integer(digits),")"
+                    )},
+  coth          = function(x){
+                    build_sql(
+                      "((EXP(", x, ") + EXP(-(", x,"))) / 2) / ((EXP(", x, ") - EXP(-(", x,"))) / 2)"
+                    )},
+  paste         = function(..., sep = " "){
+                    build_sql(
+                      "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+                    )}
 )
 
 #' @export
@@ -50,79 +47,7 @@ base_odbc_agg <- sql_translator(
 base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)"),
-
-  # Window functions in this variant use field that its being
-  # 'windowed' as the secondary ORDER BY instead of the field
-  # from win_current_order().  In the tests, having an ORDER BY
-  # outside of the window statement breaks the SQL query.
-
-  first = function(x, order = NULL) {
-    win_over(
-      build_sql("FIRST_VALUE", list(x)),
-      win_current_group(),
-      order %||% x
-    )
-  },
-  last = function(x, order = NULL) {
-    win_over(
-      build_sql("FIRST_VALUE", list(x)),
-      win_current_group(),
-      build_sql(order %||% x, " DESC")
-    )
-  },
-  lead = function(x, n = 1L, order = NULL) {
-    n <- as.integer(n)
-    win_over(
-      build_sql("LEAD(", x, ", ", n, ")"),
-      win_current_group(),
-      order %||% x
-    )
-  },
-  lag = function(x, n = 1L, order = NULL) {
-    n <- as.integer(n)
-    win_over(
-      build_sql("LAG(", x, ", ", n, ")"),
-      win_current_group(),
-      order %||% x
-      )
-  },
-  dense_rank = function(x) {
-    win_over(
-      build_sql("DENSE_RANK() "),
-      win_current_group(),
-      x
-    )
-  },
-  ntile = function(x, n = 1L) {
-    n <- as.integer(n)
-    win_over(
-      build_sql("NTILE(", n, ") "),
-      win_current_group(),
-      x
-    )
-  },
-  min_rank = function(x) {
-    win_over(
-      build_sql("RANK() "),
-      win_current_group(),
-      x
-    )
-  },
-  row_number = function(x) {
-    win_over(
-      build_sql("ROW_NUMBER() "),
-      win_current_group(),
-      x
-    )
-  },
-  percent_rank = function(x) {
-    win_over(
-      build_sql("PERCENT_RANK() "),
-      win_current_group(),
-      x
-    )
-  }
+  count         = function() sql("COUNT(*)")
 )
 
 #' @export
@@ -151,8 +76,8 @@ sql_translate_env.OdbcConnection <- function(con) {
 
 #' @export
 db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
-  sql <- dbplyr::build_sql(
-    "DROP TABLE ", if (force) dbplyr::sql("IF EXISTS "), dbplyr::sql(table),
+  sql <- build_sql(
+    "DROP TABLE ", if (force) sql("IF EXISTS "), sql(table),
     con = con
   )
   DBI::dbExecute(con, sql)

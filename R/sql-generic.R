@@ -23,54 +23,13 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
     "limit")
 
-  assert_that(is.character(select), length(select) > 0L)
-  out$select <- build_sql(
-    "SELECT ",
-    if (distinct) sql("DISTINCT "),
-    escape(select, collapse = ", ", con = con)
-  )
-
-  assert_that(is.character(from), length(from) == 1L)
-  out$from <- build_sql("FROM ", from, con = con)
-
-  if (length(where) > 0L) {
-    assert_that(is.character(where))
-
-    where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
-  }
-
-  if (length(group_by) > 0L) {
-    assert_that(is.character(group_by))
-    out$group_by <- build_sql(
-      "GROUP BY ",
-      escape(group_by, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(having) > 0L) {
-    assert_that(is.character(having))
-    out$having <- build_sql(
-      "HAVING ",
-      escape(having, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(order_by) > 0L) {
-    assert_that(is.character(order_by))
-    out$order_by <- build_sql(
-      "ORDER BY ",
-      escape(order_by, collapse = ", ", con = con)
-    )
-  }
-
-  if (!is.null(limit) && !identical(limit, Inf)) {
-    assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-    out$limit <- build_sql(
-      "LIMIT ", sql(format(trunc(limit), scientific = FALSE)),
-      con = con
-    )
-  }
+  out$select    <- sql_clause_select(select, con, distinct)
+  out$from      <- sql_clause_from(from, con)
+  out$where     <- sql_clause_where(where, con)
+  out$group_by  <- sql_clause_group_by(group_by, con)
+  out$having    <- sql_clause_having(having, con)
+  out$order_by  <- sql_clause_order_by(order_by, con)
+  out$limit     <- sql_clause_limit(limit, con)
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }

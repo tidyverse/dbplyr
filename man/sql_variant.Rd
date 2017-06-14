@@ -9,6 +9,14 @@
 \alias{sql_prefix}
 \alias{sql_not_supported}
 \alias{sql_cast}
+\alias{sql_clause_generic}
+\alias{sql_clause_select}
+\alias{sql_clause_where}
+\alias{sql_clause_limit}
+\alias{sql_clause_from}
+\alias{sql_clause_group_by}
+\alias{sql_clause_having}
+\alias{sql_clause_order_by}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -30,6 +38,22 @@ sql_prefix(f, n = NULL)
 sql_not_supported(f)
 
 sql_cast(type)
+
+sql_clause_generic(clause, fields, con)
+
+sql_clause_select(select, con, distinct = FALSE)
+
+sql_clause_where(where, con)
+
+sql_clause_limit(limit, con)
+
+sql_clause_from(from, con)
+
+sql_clause_group_by(group_by, con)
+
+sql_clause_having(having, con)
+
+sql_clause_order_by(order_by, con)
 
 base_scalar
 
