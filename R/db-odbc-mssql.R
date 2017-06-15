@@ -80,80 +80,7 @@
       cov           = sql_not_supported("cov()")
 
     ),
-    sql_translator(.parent = base_odbc_win,
-      # Window functions in this variant use field that its being
-      # 'windowed' as the secondary ORDER BY instead of the field
-      # from win_current_order().  In the tests, having an ORDER BY
-      # outside of the window statement breaks the SQL query.
-
-      first = function(x, order = NULL) {
-        win_over(
-          build_sql("FIRST_VALUE", list(x)),
-          win_current_group(),
-          order %||% x
-        )
-      },
-      last = function(x, order = NULL) {
-        win_over(
-          build_sql("FIRST_VALUE", list(x)),
-          win_current_group(),
-          build_sql(order %||% x, " DESC")
-        )
-      },
-      lead = function(x, n = 1L, order = NULL) {
-        n <- as.integer(n)
-        win_over(
-          build_sql("LEAD(", x, ", ", n, ")"),
-          win_current_group(),
-          order %||% x
-        )
-      },
-      lag = function(x, n = 1L, order = NULL) {
-        n <- as.integer(n)
-        win_over(
-          build_sql("LAG(", x, ", ", n, ")"),
-          win_current_group(),
-          order %||% x
-        )
-      },
-      dense_rank = function(x) {
-        win_over(
-          build_sql("DENSE_RANK() "),
-          win_current_group(),
-          x
-        )
-      },
-      ntile = function(x, n = 1L) {
-        n <- as.integer(n)
-        win_over(
-          build_sql("NTILE(", n, ") "),
-          win_current_group(),
-          x
-        )
-      },
-      min_rank = function(x) {
-        win_over(
-          build_sql("RANK() "),
-          win_current_group(),
-          x
-        )
-      },
-      row_number = function(x) {
-        win_over(
-          build_sql("ROW_NUMBER() "),
-          win_current_group(),
-          x
-        )
-      },
-      percent_rank = function(x) {
-        win_over(
-          build_sql("PERCENT_RANK() "),
-          win_current_group(),
-          x
-        )
-      }
-      )
-
+    base_odbc_win
   )}
 
 #' @export
@@ -167,7 +94,4 @@
   )
   DBI::dbExecute(con, sql)
 }
-
-
-# test -------------
 

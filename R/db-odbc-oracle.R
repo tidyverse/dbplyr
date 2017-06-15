@@ -63,10 +63,3 @@ db_analyze.Oracle <- function(con, table, ...) {
   DBI::dbExecute(con, sql)
 }
 
-#' @export
-sql_escape_ident.Oracle <- function(con, x) {
-  sql_quote(x, '"')
-}
-
-
-
