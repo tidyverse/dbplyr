@@ -9,6 +9,7 @@
 * Added custom db_analyze_table() for MS SQL, Oracle, Hive and Impala (@edgararuiz)
 
 # dbplyr 0.5.0.9000
+# dbplyr 1.0.0
 
 ## New features
 
