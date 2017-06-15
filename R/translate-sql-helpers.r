@@ -218,10 +218,10 @@ sql_clause_group_by <- function(group_by, con) sql_clause_generic("GROUP BY", gr
 
 #' @rdname sql_variant
 #' @export
-sql_clause_having <- function(having, con) sql_clause_generic("HAVING ", having, con)
+sql_clause_having <- function(having, con) sql_clause_generic("HAVING", having, con)
 
 #' @rdname sql_variant
 #' @export
-sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY ", order_by, con)
+sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY", order_by, con)
 
 
