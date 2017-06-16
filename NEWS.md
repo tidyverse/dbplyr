@@ -1,14 +1,9 @@
 # dbplyr 1.0.0.9000
 
-## Backends
+* SQL translation for Oracle  (@edgararuiz)
 
-*  SQL translation for Oracle  (@edgararuiz)
+* Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
 
-## Minor bug fixes and improvements
-
-* Added custom db_analyze_table() for MS SQL, Oracle, Hive and Impala (@edgararuiz)
-
-# dbplyr 0.5.0.9000
 # dbplyr 1.0.0
 
 ## New features
