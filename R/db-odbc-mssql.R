@@ -10,7 +10,7 @@
                   "having", "order_by","limit")
 
   assert_that(is.character(select), length(select) > 0L)
-  out$select <- build_sql(
+  out$select    <- build_sql(
     "SELECT ",
 
     if (distinct) sql("DISTINCT "),
@@ -24,38 +24,13 @@
 
     escape(select, collapse = ", ", con = con)
   )
-  assert_that(is.character(from), length(from) == 1L)
-  out$from <- build_sql("FROM ", from, con = con)
 
-  if (length(where) > 0L) {
-    assert_that(is.character(where))
-    where_paren <- escape(where, parens = TRUE, con = con)
-    out$where <- build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
-  }
+  out$from      <- sql_clause_from(from, con)
+  out$where     <- sql_clause_where(where, con)
+  out$group_by  <- sql_clause_group_by(group_by, con)
+  out$having    <- sql_clause_having(having, con)
+  out$order_by  <- sql_clause_order_by(order_by, con)
 
-  if (length(group_by) > 0L) {
-    assert_that(is.character(group_by))
-    out$group_by <- build_sql(
-      "GROUP BY ",
-      escape(group_by, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(having) > 0L) {
-    assert_that(is.character(having))
-    out$having <- build_sql(
-      "HAVING ",
-      escape(having, collapse = ", ", con = con)
-    )
-  }
-
-  if (length(order_by) > 0L) {
-    assert_that(is.character(order_by))
-    out$order_by <- build_sql(
-      "ORDER BY ",
-      escape(order_by, collapse = ", ", con = con)
-    )
-  }
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
@@ -68,19 +43,55 @@
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
+      nchar         = sql_prefix("LEN"),
+      atan2         = sql_prefix("ATN2"),
+      ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
-      # MSSQL supports CONCAT_WS in the CTP version of 2016
+      substr        = function(x, start, stop){
+                        len <- stop - start + 1
+                        build_sql(
+                          "SUBSTRING(", x, ", ", start, ", ", len, ")"
+                        )},
+                      # Casting as BIT converts the Integer result into an actual logical
+                      # values TRUE and FALSE
+      is.null       = function(x){
+                        build_sql(
+                          "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
+                        )},
+      is.na         = function(x){
+                          build_sql(
+                            "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
+                        )},
+                      # TRIM is not supported on MS SQL versions under 2017
+                      # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
+                      # Best solution was to nest a left and right trims.
+      trimws        = function(x){
+                          build_sql(
+                            "LTRIM(RTRIM(", x ,"))"
+                          )},
+                      # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()")
     ),
     aggregate = sql_translator(.parent = base_odbc_agg,
       sd            = sql_prefix("STDEV"),
       var           = sql_prefix("VAR"),
-      # MSSQL does not have function for: cor and cov
+                      # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()")
 
-    )
+    ),
+    base_odbc_win
   )}
 
-
+#' @export
+`db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+  # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
+  # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
+  sql <- build_sql(
+    "UPDATE STATISTICS ",
+    ident(table)
+    , con = con
+  )
+  DBI::dbExecute(con, sql)
+}
 

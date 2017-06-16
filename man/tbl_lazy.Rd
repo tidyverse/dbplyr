@@ -8,6 +8,9 @@
 \alias{simulate_odbc}
 \alias{simulate_impala}
 \alias{simulate_mssql}
+\alias{simulate_oracle}
+\alias{simulate_hive}
+\alias{simulate_odbc_postgresql}
 \alias{tbl_lazy}
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
@@ -25,6 +28,12 @@ simulate_odbc(type = NULL)
 simulate_impala()
 
 simulate_mssql()
+
+simulate_oracle()
+
+simulate_hive()
+
+simulate_odbc_postgresql()
 
 tbl_lazy(df, src = NULL)
 

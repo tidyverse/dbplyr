@@ -82,15 +82,65 @@ test_that("cov() returns error message", {
   )
 })
 
+#nchar, atan2, substr, ceil, is.null, is.na, trimws
+
+test_that("nchar() translates to LEN ", {
+  expect_equivalent(
+    translate_sql(nchar(field_name),
+                  con = simulate_mssql()),
+    sql("LEN(`field_name`)")
+  )
+})
+test_that("atan2() translates to ATN2 ", {
+  expect_equivalent(
+    translate_sql(atan2(field_name),
+                  con = simulate_mssql()),
+    sql("ATN2(`field_name`)")
+  )
+})
+test_that("substr() translates to SUBSTRING ", {
+  expect_equivalent(
+    translate_sql(substr(field_name, 1, 2),
+                  con = simulate_mssql()),
+    sql("SUBSTRING(`field_name`, 1.0, 2.0)")
+  )
+})
+test_that("ceil() translates to CEILING ", {
+  expect_equivalent(
+    translate_sql(ceil(field_name),
+                  con = simulate_mssql()),
+    sql("CEILING(`field_name`)")
+  )
+})
+test_that("is.null() translates to CASE-WHEN statement ", {
+  expect_equivalent(
+    translate_sql(is.null(field_name),
+                  con = simulate_mssql()),
+    sql("CASE WHEN `field_name` IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END")
+  )
+})
+test_that("is.na() translates to CASE-WHEN statement ", {
+  expect_equivalent(
+    translate_sql(is.na(field_name),
+                  con = simulate_mssql()),
+    sql("CASE WHEN `field_name` IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END")
+  )
+})
+test_that("trimws() translates to LTRIM-RTRIM ", {
+  expect_equivalent(
+    translate_sql(trimws(field_name),
+                  con = simulate_mssql()),
+    sql("LTRIM(RTRIM(`field_name`))")
+  )
+})
+
 
 # MSSQL query tests  ------------------------------------------------
 
+df <- data.frame(x = 1, y = 2)
+df_mssql <- tbl_lazy(df, src = simulate_mssql())
 test_that("query uses TOP instead of LIMIT ", {
-  df <- data.frame(x = 1, y = 2)
-  df_mssql <- tbl_lazy(df, src = simulate_mssql())
-
   expect_equivalent(
     show_query(head(df_mssql)),
     sql("SELECT  TOP 6 *\nFROM `df`"))
 })
-

@@ -47,6 +47,8 @@ Collate:
     'db-odbc-hive.R'
     'db-odbc-impala.R'
     'db-odbc-mssql.R'
+    'db-odbc-oracle.R'
+    'db-odbc-postgres.R'
     'db-postgres.r'
     'db-sqlite.r'
     'dbi-s3.r'

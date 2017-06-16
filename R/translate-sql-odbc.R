@@ -9,15 +9,27 @@ base_odbc_scalar <- sql_translator(
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
-  round         = function(x, digits = 0L)
+  paste0        = sql_prefix("CONCAT"),
+                  # cosh, sinh, coth and tanh calculations are based on this article
+                  # https://en.wikipedia.org/wiki/Hyperbolic_function
+  cosh          = function(x) build_sql("(EXP(", x, ") + EXP(-(", x,"))) / 2"),
+  sinh          = function(x) build_sql("(EXP(", x, ") - EXP(-(", x,"))) / 2"),
+  tanh          = function(x){
+                    build_sql(
+                      "((EXP(", x, ") - EXP(-(", x,"))) / 2) / ((EXP(", x, ") + EXP(-(", x,"))) / 2)"
+                    )},
+  round         = function(x, digits = 0L){
                     build_sql(
                       "ROUND(", x, ", ", as.integer(digits),")"
-                      ),
-  paste0        = sql_prefix("CONCAT"),
-  paste         = function(..., sep = " ")
+                    )},
+  coth          = function(x){
+                    build_sql(
+                      "((EXP(", x, ") + EXP(-(", x,"))) / 2) / ((EXP(", x, ") - EXP(-(", x,"))) / 2)"
+                    )},
+  paste         = function(..., sep = " "){
                     build_sql(
                       "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-                      )
+                    )}
 )
 
 #' @export
@@ -62,3 +74,32 @@ sql_translate_env.OdbcConnection <- function(con) {
 }
 
 
+#' @export
+db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
+  sql <- build_sql(
+    "DROP TABLE ", if (force) sql("IF EXISTS "), sql(table),
+    con = con
+  )
+  DBI::dbExecute(con, sql)
+}
+
+
+#' @export
+db_copy_to.OdbcConnection <- function(con, table, values,
+                                      overwrite = FALSE, types = NULL, temporary = FALSE,
+                                      unique_indexes = NULL, indexes = NULL,
+                                      analyze = TRUE, ...) {
+
+  # A simplified version of db_copy_to.DBIConnection has worked on all
+  # ODBCConnection variances so far
+
+  if (overwrite) {
+    db_drop_table(con, table, force = TRUE)
+  }
+
+  dbWriteTable(con, table, values, temporary = temporary)
+
+  if (analyze) db_analyze(con, table)
+
+  table
+}

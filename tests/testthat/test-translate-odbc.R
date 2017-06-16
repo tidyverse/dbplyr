@@ -82,6 +82,34 @@ test_that("the sep argument in paste() is passed to CONCAT_WS ", {
       con = simulate_odbc("OdbcConnection")),
     sql("CONCAT_WS(',', `field1`,`field2`)"))
 })
+test_that("cosh() translates to the correct formula ", {
+  expect_equivalent(
+    translate_sql(
+      cosh(field1),
+      con = simulate_odbc("OdbcConnection")),
+    sql("(EXP(`field1`) + EXP(-(`field1`))) / 2"))
+})
+test_that("sinh() translates to the correct formula ", {
+  expect_equivalent(
+    translate_sql(
+      sinh(field1),
+      con = simulate_odbc("OdbcConnection")),
+    sql("(EXP(`field1`) - EXP(-(`field1`))) / 2"))
+})
+test_that("tanh() translates to the correct formula ", {
+  expect_equivalent(
+    translate_sql(
+      tanh(field1),
+      con = simulate_odbc("OdbcConnection")),
+    sql("((EXP(`field1`) - EXP(-(`field1`))) / 2) / ((EXP(`field1`) + EXP(-(`field1`))) / 2)"))
+})
+test_that("coth() translates to the correct formula ", {
+  expect_equivalent(
+    translate_sql(
+      coth(field1),
+      con = simulate_odbc("OdbcConnection")),
+    sql("((EXP(`field1`) + EXP(-(`field1`))) / 2) / ((EXP(`field1`) - EXP(-(`field1`))) / 2)"))
+})
 
 # odbc base_agg conversions -----------------------------------------
 
@@ -125,6 +153,7 @@ test_that("var() translates to VARIANCE ", {
     sql("VARIANCE(`field_name`)"))
 })
 
+
 # odbc query tests  ------------------------------------------------
 
 df <- data.frame(x = 1, y = 2)
@@ -141,8 +170,5 @@ test_that("query uses COUNT(*) instead of COUNT() ", {
     show_query(summarise(df_odbc, count = n())),
     sql("SELECT COUNT(*) AS `count`\nFROM `df`"))
 })
-
-
-
 
 
