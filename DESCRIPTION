@@ -37,7 +37,7 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: yes
 License: MIT + file LICENSE
-Collate:
+Collate: 
     'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
@@ -78,6 +78,7 @@ Collate:
     'translate-sql-helpers.r'
     'translate-sql-window.r'
     'translate-sql-base.r'
+    'translate-sql-clause.r'
     'translate-sql-odbc.R'
     'translate-sql.r'
     'utils-format.r'
