@@ -149,21 +149,6 @@ random_table_name <- function(n = 10) {
   paste0(sample(letters, n, replace = TRUE), collapse = "")
 }
 
-# Creates an environment that disconnects the database when it's
-# garbage collected
-db_disconnector <- function(con, name, quiet = FALSE) {
-  reg.finalizer(environment(), function(...) {
-    if (!quiet) {
-      message(
-        "Auto-disconnecting ", name, " connection ",
-        "(", paste(con@Id, collapse = ", "), ")"
-      )
-    }
-    dbDisconnect(con)
-  })
-  environment()
-}
-
 res_warn_incomplete <- function(res, hint = "n = -1") {
   if (dbHasCompleted(res)) return()
 
