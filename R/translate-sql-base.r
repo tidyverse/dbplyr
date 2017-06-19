@@ -185,40 +185,40 @@ base_win <- sql_translator(
   },
 
   # Variants that take more arguments
-  first = function(x, order = NULL) {
+  first = function(x, order_by = NULL) {
     win_over(
       build_sql("first_value", list(x)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  last = function(x, order = NULL) {
+  last = function(x, order_by = NULL) {
     win_over(
       build_sql("last_value", list(x)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  nth = function(x, n, order = NULL) {
+  nth = function(x, n, order_by = NULL) {
     win_over(
       build_sql("nth_value", list(x, as.integer(n))),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
 
-  lead = function(x, n = 1L, default = NA, order = NULL) {
+  lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       build_sql("LEAD", list(x, n, default)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  lag = function(x, n = 1L, default = NA, order = NULL) {
+  lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       build_sql("LAG", list(x, as.integer(n), default)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
 
