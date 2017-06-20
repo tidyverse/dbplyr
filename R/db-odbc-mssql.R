@@ -47,6 +47,7 @@
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
+      sd            = sql_prefix("STDEV"),
       substr        = function(x, start, stop){
                         len <- stop - start + 1
                         build_sql(
@@ -80,7 +81,10 @@
       cov           = sql_not_supported("cov()")
 
     ),
-    base_odbc_win
+    sql_variant(
+      scalar = sql_translator(.parent = base_odbc_win,
+        sd          = win_recycled("STDEV")
+      ))
   )}
 
 #' @export

@@ -9,6 +9,7 @@ base_odbc_scalar <- sql_translator(
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
+  sd            = sql_cast("STDDEV_SAMP"),
   paste0        = sql_prefix("CONCAT"),
                   # cosh, sinh, coth and tanh calculations are based on this article
                   # https://en.wikipedia.org/wiki/Hyperbolic_function
@@ -47,7 +48,8 @@ base_odbc_agg <- sql_translator(
 base_odbc_win <- sql_translator(
   .parent = base_win,
   n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)")
+  count         = function() sql("COUNT(*)"),
+  sd            = win_recycled("STDDEV_SAMP")
 )
 
 #' @export
