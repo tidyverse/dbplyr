@@ -92,10 +92,11 @@
 #' }
 src_dbi <- function(con, auto_disconnect = TRUE) {
   # stopifnot(is(con, "DBIConnection"))
-  if (is_false(auto_disconnect))
+  if (is_false(auto_disconnect)) {
     disco <- NULL
-  else
+  } else {
     disco <- db_disconnector(con, quiet = is_true(auto_disconnect))
+  }
 
   structure(
     list(
