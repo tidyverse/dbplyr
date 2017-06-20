@@ -4,6 +4,8 @@
 
 * Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
 
+* Added support for `sd()` for scalar, aggregate and window functions (#2887) (@edgararuiz) 
+
 # dbplyr 1.0.0
 
 ## New features
