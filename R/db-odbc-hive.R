@@ -1,7 +1,7 @@
 #' @export
 sql_translate_env.Hive <- function(con) {
   sql_variant(
-    scalar = sql_translator(.parent = base_odbc_scalar,
+    sql_translator(.parent = base_odbc_scalar,
       var       = sql_prefix("VARIANCE"),
       cot       = function(x){
                     build_sql("1 / TAN(", x, ")")

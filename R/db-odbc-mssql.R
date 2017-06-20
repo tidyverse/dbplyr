@@ -38,7 +38,7 @@
 #' @export
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
   sql_variant(
-    scalar = sql_translator(.parent = base_odbc_scalar,
+    sql_translator(.parent = base_odbc_scalar,
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -73,7 +73,7 @@
                       # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()")
     ),
-    aggregate = sql_translator(.parent = base_odbc_agg,
+    sql_translator(.parent = base_odbc_agg,
       sd            = sql_prefix("STDEV"),
       var           = sql_prefix("VAR"),
                       # MSSQL does not have function for: cor and cov
@@ -81,10 +81,9 @@
       cov           = sql_not_supported("cov()")
 
     ),
-    sql_variant(
-      scalar = sql_translator(.parent = base_odbc_win,
-        sd          = win_recycled("STDEV")
-      ))
+    sql_translator(.parent = base_odbc_win,
+      sd            = win_recycled("STDEV")
+    )
   )}
 
 #' @export

@@ -1,15 +1,14 @@
 #' @export
 #' @rdname sql_variant
 #' @format NULL
-base_odbc_scalar <- sql_translator(
-  .parent = base_scalar,
+base_odbc_scalar <- sql_translator(.parent = base_scalar,
   as.numeric    = sql_cast("DOUBLE"),
   as.double     = sql_cast("DOUBLE"),
   as.integer    = sql_cast("INT"),
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
-  sd            = sql_cast("STDDEV_SAMP"),
+  sd            = sql_prefix("STDDEV_SAMP"),
   paste0        = sql_prefix("CONCAT"),
                   # cosh, sinh, coth and tanh calculations are based on this article
                   # https://en.wikipedia.org/wiki/Hyperbolic_function
