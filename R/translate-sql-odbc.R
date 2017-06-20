@@ -38,14 +38,14 @@ base_odbc_scalar <- sql_translator(.parent = base_scalar,
 base_odbc_agg <- sql_translator(
   .parent = base_agg,
   n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)")
+  count         = function() sql("COUNT(*)"),
+  sd            = sql_prefix("STDDEV_SAMP")
 )
 
 #' @export
 #' @rdname sql_variant
 #' @format NULL
-base_odbc_win <- sql_translator(
-  .parent = base_win,
+base_odbc_win <- sql_translator(.parent = base_win,
   n             = function() sql("COUNT(*)"),
   count         = function() sql("COUNT(*)"),
   sd            = win_recycled("STDDEV_SAMP")
