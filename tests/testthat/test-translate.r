@@ -91,6 +91,9 @@ test_that("connection affects quoting character", {
   expect_match(sql_render(out), "^SELECT `field1` AS `field1`\nFROM `table1`$")
 })
 
+test_that("magrittr pipe is translated", {
+  expect_identical(translate_sql(1 %>% is.na()), translate_sql(is.na(1)))
+})
 
 
 # string functions --------------------------------------------------------
