@@ -138,7 +138,9 @@ base_scalar <- sql_translator(
   },
 
   pmin = sql_prefix("min"),
-  pmax = sql_prefix("max")
+  pmax = sql_prefix("max"),
+
+  `%>%` = `%>%`
 )
 
 base_symbols <- sql_translator(
