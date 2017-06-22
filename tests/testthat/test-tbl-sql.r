@@ -28,9 +28,12 @@ test_that("head/print respects n" ,{
   out <- df2 %>% head(n = 1) %>% collect()
   expect_equal(nrow(out), 1)
 
+  out <- df2 %>% head(n = 0) %>% collect()
+  expect_equal(nrow(out), 0)
+
   expect_error(
     df2 %>% head(n = -1) %>% collect(),
-    "not greater than 0"
+    "not greater than or equal to 0"
   )
 })
 

@@ -10,7 +10,11 @@ sql_clause_generic <- function(clause, fields, con){
 }
 
 sql_clause_select <- function(select, con, distinct = FALSE){
-  assert_that(is.character(select), length(select) > 0L)
+  assert_that(is.character(select))
+  if (is_empty(select)) {
+    abort("Query contains no columns")
+  }
+
   build_sql(
     "SELECT ",
     if (distinct) sql("DISTINCT "),
@@ -28,7 +32,7 @@ sql_clause_where <- function(where, con){
 
 sql_clause_limit <- function(limit, con){
   if (!is.null(limit) && !identical(limit, Inf)) {
-    assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
+    assert_that(is.numeric(limit), length(limit) == 1L, limit >= 0)
     build_sql(
       "LIMIT ", sql(format(trunc(limit), scientific = FALSE)),
       con = con

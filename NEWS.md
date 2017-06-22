@@ -1,5 +1,9 @@
 # dbplyr 1.0.0.9000
 
+* `head(tbl, 0)` is now supported (#2863). 
+
+* Selecting zero columns gives a more information error message (#2863).
+
 * PostgreSQL gains a better translation for `round()` (#60).
 
 * SQL translation for Oracle  (@edgararuiz)
