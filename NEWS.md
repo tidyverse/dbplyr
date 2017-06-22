@@ -1,5 +1,7 @@
 # dbplyr 1.0.0.9000
 
+* `case_when()` now translates to SQL "CASE WHEN" (#2894)
+
 * `head(tbl, 0)` is now supported (#2863). 
 
 * Selecting zero columns gives a more information error message (#2863).
@@ -13,7 +15,6 @@
 * Added support for `sd()` for scalar, aggregate and window functions (#2887) (@edgararuiz) 
 * You can now use the magrittr pipe within expressions,
   e.g. `mutate(mtcars, cyl %>% as.character())`.
-
 
 * If a translation was supplied for a summarise function, but not for the
   equivalent windowed variant, the expression would be translated to `NULL`

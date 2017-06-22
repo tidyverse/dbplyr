@@ -105,6 +105,8 @@ base_scalar <- sql_translator(
   if_else = function(condition, true, false) sql_if(condition, true, false),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
 
+  case_when = function(...) sql_case_when(...),
+
   sql = function(...) sql(...),
   `(` = function(x) {
     build_sql("(", x, ")")
@@ -282,3 +284,37 @@ base_no_win <- sql_translator(
   lag          = win_absent("lag"),
   order_by     = win_absent("order_by")
 )
+
+
+
+# case_when ---------------------------------------------------------------
+
+sql_case_when <- function(...) {
+  # TODO: switch to dplyr::case_when_prepare when available
+
+  formulas <- dots_list(...)
+  n <- length(formulas)
+
+  if (n == 0) {
+    abort("No cases provided")
+  }
+
+  query <- vector("list", n)
+  value <- vector("list", n)
+
+  for (i in seq_len(n)) {
+    f <- formulas[[i]]
+
+    env <- environment(f)
+    query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
+    value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
+  }
+
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  sql(paste0(
+    "CASE\n",
+    paste0(clauses, collapse = "\n"),
+    "\nEND"
+  ))
+}
+
