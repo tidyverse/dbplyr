@@ -34,7 +34,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         )},
       round  = function(x, digits = 0L){
         build_sql(
-          "ROUND(", x, ", ", as.integer(digits),")"
+          "ROUND((", x, ")::numeric, ", as.integer(digits),")"
         )},
       paste  = function(..., sep = " "){
         build_sql(

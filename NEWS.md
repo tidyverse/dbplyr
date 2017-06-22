@@ -1,5 +1,7 @@
 # dbplyr 1.0.0.9000
 
+* PostgreSQL gains a better translation for `round()` (#60).
+
 * SQL translation for Oracle  (@edgararuiz)
 
 * Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
