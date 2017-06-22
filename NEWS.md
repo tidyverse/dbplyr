@@ -1,5 +1,8 @@
 # dbplyr 1.0.0.9000
 
+* New `window_order()` and `window_frame()` give you finer control over 
+  the window functions that dplyr creates (#2874, #2593).
+
 * Variables created in a join are now disambiguated against other variables
   in the same table, not just variables in the other table (#2823).
 

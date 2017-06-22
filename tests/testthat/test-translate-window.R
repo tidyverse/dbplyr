@@ -40,3 +40,12 @@ test_that("first, last, and nth translated to _value", {
   expect_equal(translate_sql(last(x)), sql('last_value("x") OVER ()'))
   expect_equal(translate_sql(nth(x, 1)), sql('nth_value("x", 1) OVER ()'))
 })
+
+
+test_that("can override frame of recycled functions", {
+  expect_equal(
+    translate_sql(sum(x), vars_frame = c(-1, 0), vars_order = "y"),
+    sql('sum("x") OVER (ORDER BY "y" ROWS 1 PRECEDING)')
+  )
+
+})

@@ -49,7 +49,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     if (length(order) == 0) {
       warning(
         "Windowed expression '", expr, "' does not have explicit order.\n",
-        "Please use arrange() to make determinstic.",
+        "Please use arrange() or window_order() to make determinstic.",
         call. = FALSE
       )
     }
@@ -90,7 +90,8 @@ win_rank <- function(f) {
     win_over(
       build_sql(sql(f), list()),
       partition = win_current_group(),
-      order = order %||% win_current_order()
+      order = order %||% win_current_order(),
+      frame = win_current_frame()
     )
   }
 }
@@ -100,9 +101,13 @@ win_rank <- function(f) {
 win_recycled <- function(f) {
   force(f)
   function(x) {
+    frame <- win_current_frame()
+
     win_over(
       build_sql(sql(f), list(x)),
-      partition = win_current_group()
+      partition = win_current_group(),
+      order = if (!is.null(frame)) win_current_order(),
+      frame = frame
     )
   }
 }
@@ -167,6 +172,13 @@ set_win_current_order <- function(vars) {
   invisible(old)
 }
 
+set_win_current_frame <- function(frame) {
+  stopifnot(is.null(frame) || is.numeric(frame))
+
+  old <- sql_context$frame
+  sql_context$frame <- frame
+  invisible(old)
+}
 #' @export
 #' @rdname win_over
 win_current_group <- function() sql_context$group_by
@@ -174,6 +186,10 @@ win_current_group <- function() sql_context$group_by
 #' @export
 #' @rdname win_over
 win_current_order <- function() sql_context$order_by
+
+#' @export
+#' @rdname win_over
+win_current_frame <- function() sql_context$frame
 
 # Not exported, because you shouldn't need it
 sql_current_con <- function() sql_context$con

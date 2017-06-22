@@ -20,6 +20,7 @@ Imports:
     dplyr (>= 0.5.0.9004),
     glue,
     methods,
+    purrr,
     rlang (>= 0.1.0),
     tibble (>= 1.3.0.9007),
     R6,
@@ -83,6 +84,7 @@ Collate:
     'translate-sql.r'
     'utils-format.r'
     'utils.r'
+    'window.R'
     'zzz.R'
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))

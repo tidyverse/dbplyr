@@ -8,6 +8,7 @@
 \alias{win_absent}
 \alias{win_current_group}
 \alias{win_current_order}
+\alias{win_current_frame}
 \title{Generate SQL expression for window functions}
 \usage{
 win_over(expr, partition = NULL, order = NULL, frame = NULL)
@@ -23,6 +24,8 @@ win_absent(f)
 win_current_group()
 
 win_current_order()
+
+win_current_frame()
 }
 \arguments{
 \item{expr}{The window expression}
