@@ -47,7 +47,6 @@
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
-      sd            = sql_prefix("STDEV"),
       substr        = function(x, start, stop){
                         len <- stop - start + 1
                         build_sql(

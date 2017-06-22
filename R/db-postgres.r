@@ -11,7 +11,6 @@ db_desc.PostgreSQLConnection <- function(x) {
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      sd = sql_prefix("stddev_samp"),
       log = function(x, base = exp(1)) {
         if (isTRUE(all.equal(base, exp(1)))) {
           build_sql("ln(", x, ")")

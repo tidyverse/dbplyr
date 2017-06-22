@@ -8,7 +8,6 @@ base_odbc_scalar <- sql_translator(.parent = base_scalar,
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
-  sd            = sql_prefix("STDDEV_SAMP"),
   paste0        = sql_prefix("CONCAT"),
                   # cosh, sinh, coth and tanh calculations are based on this article
                   # https://en.wikipedia.org/wiki/Hyperbolic_function
