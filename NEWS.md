@@ -4,6 +4,7 @@
 
 * Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
 
+* Added support for `sd()` for scalar, aggregate and window functions (#2887) (@edgararuiz) 
 * You can now use the magrittr pipe within expressions,
   e.g. `mutate(mtcars, cyl %>% as.character())`.
 

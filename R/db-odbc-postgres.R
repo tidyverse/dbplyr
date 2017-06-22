@@ -39,12 +39,15 @@ sql_translate_env.PostgreSQL <- function(con) {
       n      = function() sql("count(*)"),
       cor    = sql_prefix("corr"),
       cov    = sql_prefix("covar_samp"),
-      sd     =  sql_prefix("stddev_samp"),
+      sd     = sql_prefix("stddev_samp"),
       var    = sql_prefix("var_samp"),
       all    = sql_prefix("bool_and"),
       any    = sql_prefix("bool_or"),
       paste  = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
     ),
-    base_win
+    sql_translator(.parent = base_win,
+      sd     = win_recycled("stddev_samp")
+    )
+
   )
 }
