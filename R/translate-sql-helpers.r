@@ -56,6 +56,15 @@ sql_variant <- function(scalar = sql_translator(),
   stopifnot(is.environment(aggregate))
   stopifnot(is.environment(window))
 
+  # Need to check that every function in aggregate also occurs in window
+  missing <- setdiff(ls(aggregate), ls(window))
+  if (length(missing) > 1) {
+    warn(paste0(
+      "Translator is missing window functions:\n",
+      paste0(missing, collapse = ", ")
+    ))
+  }
+
   structure(
     list(scalar = scalar, aggregate = aggregate, window = window),
     class = "sql_variant"

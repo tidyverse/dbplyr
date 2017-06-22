@@ -9,6 +9,12 @@
   e.g. `mutate(mtcars, cyl %>% as.character())`.
 
 
+* If a translation was supplied for a summarise function, but not for the
+  equivalent windowed variant, the expression would be translated to `NULL`
+  with a warning. Now `sql_variant()` checks that all aggregate functions 
+  have matching window functions so that correct translations or clean errors
+  will be generated (#2887)
+
 # dbplyr 1.0.0
 
 ## New features

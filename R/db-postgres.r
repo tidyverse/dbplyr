@@ -19,7 +19,27 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           # two-argument "log(base, x)" for floating point x.
           build_sql("log(", x, ") / log(", base, ")")
         }
-      }
+      },
+      log10  = function(x) build_sql("log(", x, ")"),
+      cot    = function(x) build_sql("1 / TAN(", x, ")"),
+      cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
+      sinh   = function(x) build_sql("(EXP(", x, ") - EXP(-", x,")) / 2"),
+      tanh   = function(x) {
+        build_sql(
+          "((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)"
+        )},
+      coth   = function(x){
+        build_sql(
+          "((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)"
+        )},
+      round  = function(x, digits = 0L){
+        build_sql(
+          "ROUND(", x, ", ", as.integer(digits),")"
+        )},
+      paste  = function(..., sep = " "){
+        build_sql(
+          "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+        )}
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("count(*)"),
@@ -32,7 +52,22 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       paste = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
     ),
     sql_translator(.parent = base_win,
-      sd = win_recycled("stddev_samp")
+      n = function() {
+        win_over(sql("count(*)"), partition = win_current_group())
+      },
+      cor = win_recycled("corr"),
+      cov = win_recycled("covar_samp"),
+      sd =  win_recycled("stddev_samp"),
+      var = win_recycled("var_samp"),
+      all = win_recycled("bool_and"),
+      any = win_recycled("bool_or"),
+      paste = function(x, collapse) {
+        win_over(
+          build_sql("string_agg(", x, ", ", collapse, ")"),
+          partition = win_current_group(),
+          order = win_current_order()
+        )
+      }
     )
   )
 }

@@ -227,12 +227,14 @@ base_win <- sql_translator(
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_recycled("avg"),
+  var   = win_recycled("variance"),
   sum   = win_recycled("sum"),
   min   = win_recycled("min"),
   max   = win_recycled("max"),
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
+
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
@@ -262,10 +264,13 @@ base_no_win <- sql_translator(
   cume_dist    = win_absent("cume_dist"),
   ntile        = win_absent("ntile"),
   mean         = win_absent("avg"),
+  sd           = win_absent("sd"),
+  var          = win_absent("var"),
   sum          = win_absent("sum"),
   min          = win_absent("min"),
   max          = win_absent("max"),
   n            = win_absent("n"),
+  n_distinct   = win_absent("n_distinct"),
   cummean      = win_absent("mean"),
   cumsum       = win_absent("sum"),
   cummin       = win_absent("min"),

@@ -78,11 +78,15 @@
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()")
-
     ),
     sql_translator(.parent = base_odbc_win,
-      sd            = win_recycled("STDEV")
+      sd            = win_recycled("STDEV"),
+      var           = win_recycled("VAR"),
+      # MSSQL does not have function for: cor and cov
+      cor           = win_absent("cor"),
+      cov           = win_absent("cov")
     )
+
   )}
 
 #' @export
