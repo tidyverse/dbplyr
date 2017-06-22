@@ -58,6 +58,15 @@ test_that("suffix modifies duplicated variable names", {
   expect_named(j2, c("id", "parent1", "parent2"))
 })
 
+test_that("join variables always disambiguated (#2823)", {
+  # Even if the new variable conflicts with an existing variable
+  df1 <- dbplyr::memdb_frame(a = 1, b.x = 1, b = 1)
+  df2 <- dbplyr::memdb_frame(a = 1, b = 1)
+
+  both <- collect(dplyr::left_join(df1, df2, by = "a"))
+  expect_named(both, c("a", "b.x", "b.x.x", "b.y"))
+})
+
 test_that("join functions error on column not found for SQL sources #1928", {
   # Rely on dplyr to test precise code
   expect_error(

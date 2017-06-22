@@ -1,5 +1,8 @@
 # dbplyr 1.0.0.9000
 
+* Variables created in a join are now disambiguated against other variables
+  in the same table, not just variables in the other table (#2823).
+
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
 
 * `head(tbl, 0)` is now supported (#2863). 
