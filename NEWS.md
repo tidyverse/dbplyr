@@ -1,26 +1,31 @@
 # dbplyr 1.0.0.9000
 
-* `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
+## New features
+
+* `case_when()` now translates to SQL "CASE WHEN" (#2894)
 
 * New `window_order()` and `window_frame()` give you finer control over 
   the window functions that dplyr creates (#2874, #2593).
 
-* Variables created in a join are now disambiguated against other variables
-  in the same table, not just variables in the other table (#2823).
+* Added SQL translations for Oracle (@edgararuiz).
 
-* `case_when()` now translates to SQL "CASE WHEN" (#2894)
+## Minor improvements and bug fixes
+
+* `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
 
 * `head(tbl, 0)` is now supported (#2863). 
 
-* Selecting zero columns gives a more information error message (#2863).
+* `select()`ing zero columns gives a more information error message (#2863).
+
+* Variables created in a join are now disambiguated against other variables
+  in the same table, not just variables in the other table (#2823).
 
 * PostgreSQL gains a better translation for `round()` (#60).
 
-* SQL translation for Oracle  (@edgararuiz)
-
 * Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
 
-* Added support for `sd()` for scalar, aggregate and window functions (#2887) (@edgararuiz) 
+* Added support for `sd()` for aggregate and window functions (#2887) (@edgararuiz) 
+
 * You can now use the magrittr pipe within expressions,
   e.g. `mutate(mtcars, cyl %>% as.character())`.
 
