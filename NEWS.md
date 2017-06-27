@@ -3,6 +3,9 @@
 ## New features
 
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
+* SQL translation for Redshift (@edgararuiz)
+
+* `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
 
 * New `window_order()` and `window_frame()` give you finer control over 
   the window functions that dplyr creates (#2874, #2593).
