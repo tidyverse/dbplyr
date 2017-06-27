@@ -1,11 +1,12 @@
 # dbplyr 1.1.0.9000
 
+* SQL translation for Redshift (@edgararuiz)
+
 # dbplyr 1.1.0
 
 ## New features
 
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
-* SQL translation for Redshift (@edgararuiz)
 
 * `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
 
