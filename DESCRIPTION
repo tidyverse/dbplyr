@@ -1,6 +1,6 @@
 Package: dbplyr
 Type: Package
-Version: 1.1.0
+Version: 1.1.0.9000
 Title: A 'dplyr' Back End for Databases
 Description: A 'dplyr' back end for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Basic features
@@ -38,7 +38,7 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: yes
 License: MIT + file LICENSE
-Collate: 
+Collate:
     'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
