@@ -201,7 +201,14 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
 add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
-  by <- common_by(by, x, y)
+  by_intersect <- intersect(tbl_vars(x), tbl_vars(y))
+  by <- if (length(by_intersect) > 0 || !identical(type, "full")) {
+    common_by(by, x, y)
+  } else {
+    type <- "cross"
+    NULL
+  }
+
   y <- auto_copy(
     x, y, copy,
     indexes = if (auto_index) list(by$y)

@@ -51,12 +51,13 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
     inner = sql("INNER JOIN"),
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
+    cross = sql("CROSS JOIN"),
     stop("Unknown join type:", type, call. = FALSE)
   )
 
   select <- sql_join_vars(con, vars)
 
-  on <- sql_vector(
+  on <- if (is.null(by)) NULL else sql_vector(
     paste0(
       sql_table_prefix(con, by$x, "TBL_LEFT"),
       " = ",
@@ -71,7 +72,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
     "SELECT ", select, "\n",
     "  FROM ", x, "\n",
     "  ", JOIN, " ", y, "\n",
-    "  ON ", on, "\n",
+    if (!is.null(on)) build_sql("  ON ", on, "\n") else NULL,
     con = con
   )
 }
