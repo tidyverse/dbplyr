@@ -6,7 +6,7 @@
 
 ## New features
 
-* `full_join()` with no variables overlap is promoted to `CROSS JOIN`.
+* `full_join()` over non-overlapping columns translated to `CROSS JOIN` (#2924).
 
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
 
