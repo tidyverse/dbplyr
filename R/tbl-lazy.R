@@ -206,7 +206,7 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
     common_by(by, x, y)
   } else {
     type <- "cross"
-    NULL
+    list(x = character(0), y = character(0))
   }
 
   y <- auto_copy(

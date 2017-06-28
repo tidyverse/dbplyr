@@ -57,7 +57,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
 
   select <- sql_join_vars(con, vars)
 
-  on <- if (is.null(by)) NULL else sql_vector(
+  on <- if (length(by$x) + length(by$y) <= 0) NULL else sql_vector(
     paste0(
       sql_table_prefix(con, by$x, "TBL_LEFT"),
       " = ",
