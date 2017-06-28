@@ -6,6 +6,8 @@
 
 ## New features
 
+* `full_join()` with no variables overlap is promoted to `CROSS JOIN`.
+
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
 
 * `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
