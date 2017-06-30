@@ -112,20 +112,14 @@
                 ...) {
 
 
-
-  # The user will have to pass the pound sign, or signs, to setup the
-  # temp table. Two pound signs indicate a global temporary table, a
-  # single pound sign indicates a local temporary table
-
   if (substr(table, 1, 1) != "#") {
-    stop("MS SQL temporary tables names must be prefixed with a single or double pound sign, e.g.: ##temp", call. = FALSE)
+    table <- paste0("##", table)
+    message("MS SQL temp tables names require a single or double pound sign prefix. Renaming table to: ", table)
     }
 
   current_query <- dbplyr::sql(sql)
   current_query <- sql_select(con, sql("*"), sql_subquery(con, current_query))
-  qry <- dbSendQuery(con, current_query)
-  on.exit(dbClearResult(qry))
-  res <- dbFetch(qry)
+  res <- dbGetQuery(con, current_query)
   values <- sqlData(con, res[, , drop = FALSE])
 
   new_table <- sqlCreateTable(con, table, values, row.names = NULL, temporary = FALSE)
@@ -134,8 +128,8 @@
 
   new_data <- dbplyr::build_sql(con = con, "INSERT INTO ", dbplyr::ident(table), " ", dbplyr::sql(sql))
 
-  dbSendQuery(con, new_table)
-  dbSendQuery(con, new_data)
+  dbExecute(con, new_table)
+  dbExecute(con, new_data)
 
   table
 }
