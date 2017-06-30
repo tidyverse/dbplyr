@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Custom `compute()` function for MS SQL connections (@edgararuiz)
+
 * SQL translation for Redshift (@edgararuiz)
 
 # dbplyr 1.1.0
