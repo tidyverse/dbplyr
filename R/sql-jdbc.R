@@ -3,7 +3,7 @@ sql_translate_env.JDBCConnection <- function(x, ...) {
   class <- x@jc
 
   if (grepl("oracle.jdbc.driver", class)) {
-    sql_translate_env.OracleConnection(x, ...)
+    sql_translate_env.Oracle(x, ...)
   } else {
     sql_translate_env.DBIConnection(x, ...)
   }
