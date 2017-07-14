@@ -1,5 +1,6 @@
 # dbplyr 1.1.0.9000
 
+* `names_to_as()` now prevents select from adding names when not necessary (#2968) (@DavisVaughan)
 * SQL translation for Redshift (@edgararuiz)
 
 # dbplyr 1.1.0
