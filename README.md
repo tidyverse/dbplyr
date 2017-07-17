@@ -18,6 +18,8 @@ Installation
 ``` r
 # You can install the released version from CRAN
 install.packages("dbplyr")
+# Only needed to run the usage example below
+install.packages("RSQLite")
 
 # Or the the development version from GitHub:
 # install.packages("devtools")
