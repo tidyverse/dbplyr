@@ -101,36 +101,4 @@
   DBI::dbExecute(con, sql)
 }
 
-#' @export
-`db_compute.Microsoft SQL Server` <- function(
-                con,
-                table,
-                sql,
-                temporary = TRUE,
-                unique_indexes = list(),
-                indexes = list(),
-                ...) {
-
-
-  if (substr(table, 1, 1) != "#") {
-    table <- paste0("##", table)
-    message("MS SQL temp tables names require a single or double pound sign prefix. Renaming table to: ", table)
-    }
-
-  current_query <- dbplyr::sql(sql)
-  current_query <- sql_select(con, sql("*"), sql_subquery(con, current_query))
-  res <- dbGetQuery(con, current_query)
-  values <- sqlData(con, res[, , drop = FALSE])
-
-  new_table <- sqlCreateTable(con, table, values, row.names = NULL, temporary = FALSE)
-
-
-
-  new_data <- dbplyr::build_sql(con = con, "INSERT INTO ", dbplyr::ident(table), " ", dbplyr::sql(sql))
-
-  dbExecute(con, new_table)
-  dbExecute(con, new_data)
-
-  table
-}
 
