@@ -1,6 +1,12 @@
 # dbplyr 1.1.0.9000
 
+## New features
+
 * SQL translation for Redshift (@edgararuiz)
+
+## Minor improvements and bug fixes
+
+* Fix `na_if` translation for SQLite (@cwarden)
 
 # dbplyr 1.1.0
 
