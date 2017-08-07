@@ -23,7 +23,8 @@ sql_translate_env.SQLiteConnection <- function(con) {
         } else {
           build_sql("log(", x, ")")
         }
-      }
+      },
+      na_if = sql_prefix("NULLIF", 2)
     ),
     sql_translator(.parent = base_agg,
       sd = sql_prefix("stdev")
