@@ -50,19 +50,19 @@ sql_build.op_base_local <- function(op, con, ...) {
 #' @export
 sql_build.op_select <- function(op, con, ...) {
   vars <- select_vars(op_vars(op$x), !!! op$dots, include = op_grps(op$x))
-  select_query(sql_build(op$x, con), ident(vars))
+  select_query(sql_build(op$x, con), as.sql(vars))
 }
 
 #' @export
 sql_build.op_rename <- function(op, con, ...) {
   vars <- rename_vars(op_vars(op$x), !!! op$dots)
-  select_query(sql_build(op$x, con), ident(vars))
+  select_query(sql_build(op$x, con), as.sql(vars))
 }
 
 #' @export
 sql_build.op_arrange <- function(op, con, ...) {
   order_vars <- translate_sql_(op$dots, con)
-  group_vars <- c.sql(ident(op_grps(op$x)), con = con)
+  group_vars <- c.sql(as.sql(op_grps(op$x)), con = con)
 
   select_query(sql_build(op$x, con), order_by = order_vars)
 }
@@ -70,7 +70,7 @@ sql_build.op_arrange <- function(op, con, ...) {
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
   select_vars <- translate_sql_(op$dots, con, window = FALSE)
-  group_vars <- c.sql(ident(op_grps(op$x)), con = con)
+  group_vars <- c.sql(as.sql(op_grps(op$x)), con = con)
 
   select_query(
     sql_build(op$x, con),
@@ -89,7 +89,7 @@ sql_build.op_mutate <- function(op, con, ...) {
     vars_order = translate_sql_(op_sort(op), con),
     vars_frame = op_frame(op)
   )
-  old_vars <- ident(setdiff(vars, names(new_vars)))
+  old_vars <- as.sql(setdiff(vars, names(new_vars)))
 
   select_query(
     sql_build(op$x, con),
@@ -132,7 +132,7 @@ sql_build.op_filter <- function(op, con, ...) {
     mutated <- sql_build(op_single("mutate", op$x, dots = where$comp), con)
     where_sql <- translate_sql_(where$expr, con = con)
 
-    select_query(mutated, select = ident(vars), where = where_sql)
+    select_query(mutated, select = as.sql(vars), where = where_sql)
   }
 }
 
@@ -151,7 +151,7 @@ sql_build.op_distinct <- function(op, con, ...) {
       )
     }
 
-    group_vars <- c.sql(ident(op_vars(op)), con = con)
+    group_vars <- c.sql(as.sql(op_vars(op)), con = con)
     select_query(
       sql_build(op$x, con),
       select = group_vars,
@@ -188,8 +188,8 @@ sql_build.op_set_op <- function(op, con, ...) {
   if (!identical(x_vars, y_vars)) {
     vars <- semi_join_vars(x_vars, y_vars)
 
-    x <- select_query(sql_build(op$x, con), ident(vars$x))
-    y <- select_query(sql_build(op$y, con), ident(vars$y))
+    x <- select_query(sql_build(op$x, con), as.sql(vars$x))
+    y <- select_query(sql_build(op$y, con), as.sql(vars$y))
   } else {
     x <- op$x
     y <- op$y

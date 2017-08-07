@@ -58,7 +58,7 @@ db_analyze.Oracle <- function(con, table, ...) {
   sql <- dbplyr::build_sql(
     # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11524
     "ANALYZE TABLE ",
-    ident(table)
+    as.sql(table)
     , con = con)
   DBI::dbExecute(con, sql)
 }
@@ -67,8 +67,8 @@ db_analyze.Oracle <- function(con, table, ...) {
 sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
-    build_sql("(", from, ") ", if(!is.null(name))ident(name) , con = con)
+    build_sql("(", from, ") ", if(!is.null(name))as.sql(name) , con = con)
   } else {
-    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+    build_sql("(", from, ") ", as.sql(name %||% random_table_name()), con = con)
   }
 }
