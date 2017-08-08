@@ -39,7 +39,7 @@
 |package                              |version |error |warning |note |
 |:------------------------------------|:-------|:-----|:-------|:----|
 |[grasp2db](problems.md#grasp2db)     |1.0.0   |1     |3       |4    |
-|[RSQLServer](problems.md#RSQLServer) |0.3.0   |1     |        |     |
+|[RSQLServer](problems.md#rsqlserver) |0.3.0   |1     |        |     |
 
 ## All (23)
 
@@ -61,7 +61,7 @@
 |Organism.dplyr                       |1.2.1   |      |        |1    |
 |pleiades                             |0.2.0   |      |        |     |
 |RPresto                              |1.3.0   |      |        |     |
-|[RSQLServer](problems.md#RSQLServer) |0.3.0   |1     |        |     |
+|[RSQLServer](problems.md#rsqlserver) |0.3.0   |1     |        |     |
 |sergeant                             |0.5.2   |1     |        |     |
 |sparklyr                             |0.6.1   |      |        |     |
 |sqlscore                             |0.1.2   |      |        |     |
