@@ -43,29 +43,29 @@
 
 ## All (23)
 
-|package                              |version |error |warning |note |
-|:------------------------------------|:-------|:-----|:-------|:----|
-|bigrquery                            |0.4.1   |1     |        |     |
-|bikedata                             |0.0.3   |-1    |        |     |
-|BiocFileCache                        |1.0.1   |      |        |     |
-|chunked                              |0.4     |      |        |     |
-|dexter                               |0.4.2   |      |2       |1    |
-|dplyr                                |0.7.2   |      |        |1    |
-|etl                                  |0.3.6   |      |        |     |
-|[grasp2db](problems.md#grasp2db)     |1.0.0   |1     |3       |4    |
-|implyr                               |0.2.1   |1     |        |     |
-|infuser                              |0.2.7   |      |        |     |
-|mdsr                                 |0.1.4   |      |        |3    |
-|metagenomeFeatures                   |1.8.1   |      |        |2    |
-|MonetDBLite                          |0.4.1   |      |        |1    |
-|Organism.dplyr                       |1.2.1   |      |        |1    |
-|pleiades                             |0.2.0   |      |        |     |
-|RPresto                              |1.3.0   |      |        |     |
-|[RSQLServer](problems.md#rsqlserver) |0.3.0   |1     |        |     |
-|sergeant                             |0.5.2   |1     |        |     |
-|sparklyr                             |0.6.1   |      |        |     |
-|sqlscore                             |0.1.2   |      |        |     |
-|srvyr                                |0.2.2   |      |        |     |
-|taxizedb                             |0.1.4   |1     |        |     |
-|valr                                 |0.3.1   |      |        |     |
+|package                                              |version |error |warning |note |
+|:----------------------------------------------------|:-------|:-----|:-------|:----|
+|[bigrquery](problems.md#bigrquery)                   |0.4.1   |1     |        |     |
+|bikedata                                             |0.0.3   |-1    |        |     |
+|BiocFileCache                                        |1.0.1   |      |        |     |
+|chunked                                              |0.4     |      |        |     |
+|[dexter](problems.md#dexter)                         |0.4.2   |      |2       |1    |
+|[dplyr](problems.md#dplyr)                           |0.7.2   |      |        |1    |
+|etl                                                  |0.3.6   |      |        |     |
+|[grasp2db](problems.md#grasp2db)                     |1.0.0   |1     |3       |4    |
+|[implyr](problems.md#implyr)                         |0.2.1   |1     |        |     |
+|infuser                                              |0.2.7   |      |        |     |
+|[mdsr](problems.md#mdsr)                             |0.1.4   |      |        |3    |
+|[metagenomeFeatures](problems.md#metagenomefeatures) |1.8.1   |      |        |2    |
+|[MonetDBLite](problems.md#monetdblite)               |0.4.1   |      |        |1    |
+|[Organism.dplyr](problems.md#organism.dplyr)         |1.2.1   |      |        |1    |
+|pleiades                                             |0.2.0   |      |        |     |
+|RPresto                                              |1.3.0   |      |        |     |
+|[RSQLServer](problems.md#rsqlserver)                 |0.3.0   |1     |        |     |
+|[sergeant](problems.md#sergeant)                     |0.5.2   |1     |        |     |
+|sparklyr                                             |0.6.1   |      |        |     |
+|sqlscore                                             |0.1.2   |      |        |     |
+|srvyr                                                |0.2.2   |      |        |     |
+|[taxizedb](problems.md#taxizedb)                     |0.1.4   |1     |        |     |
+|valr                                                 |0.3.1   |      |        |     |
 
