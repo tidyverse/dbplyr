@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
+
 * SQL translation for Redshift (@edgararuiz)
 
 * Fix `na_if` translation for SQLite (@cwarden)
