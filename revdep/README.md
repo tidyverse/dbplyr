@@ -1,139 +1,71 @@
-# Setup
+# Platform
 
-## Platform
+|field    |value                        |
+|:--------|:----------------------------|
+|version  |R version 3.4.1 (2017-06-30) |
+|os       |macOS Sierra 10.12.6         |
+|system   |x86_64, darwin15.6.0         |
+|ui       |RStudio                      |
+|language |(EN)                         |
+|collate  |en_US.UTF-8                  |
+|tz       |America/Chicago              |
+|date     |2017-08-08                   |
 
-|setting  |value                                       |
-|:--------|:-------------------------------------------|
-|version  |R version 3.4.0 Patched (2017-06-13 r72789) |
-|system   |x86_64, darwin15.6.0                        |
-|ui       |RStudio (1.1.271)                           |
-|language |(EN)                                        |
-|collate  |en_US.UTF-8                                 |
-|tz       |America/Chicago                             |
-|date     |2017-06-26                                  |
+# Dependencies
 
-## Packages
+|package    |old      |new        |Δ  |
+|:----------|:--------|:----------|:--|
+|dbplyr     |1.1.0    |1.1.0.9000 |*  |
+|assertthat |0.2.0    |0.2.0      |   |
+|BH         |1.62.0-1 |1.62.0-1   |   |
+|bindr      |0.1      |0.1        |   |
+|bindrcpp   |0.2      |0.2        |   |
+|DBI        |0.7      |0.7        |   |
+|dplyr      |0.7.2    |0.7.2      |   |
+|glue       |1.1.1    |1.1.1      |   |
+|magrittr   |1.5      |1.5        |   |
+|pkgconfig  |2.0.1    |2.0.1      |   |
+|plogr      |0.1-1    |0.1-1      |   |
+|purrr      |0.2.3    |0.2.3      |   |
+|R6         |2.2.2    |2.2.2      |   |
+|Rcpp       |0.12.12  |0.12.12    |   |
+|rlang      |0.1.1    |0.1.1      |   |
+|tibble     |1.3.3    |1.3.3      |   |
 
-|package      |*  |version    |date       |source                           |
-|:------------|:--|:----------|:----------|:--------------------------------|
-|covr         |   |2.2.2      |2017-01-05 |cran (@2.2.2)                    |
-|DBI          |*  |0.7        |2017-06-18 |cran (@0.7)                      |
-|dbplyr       |   |1.1.0      |2017-06-26 |local (tidyverse/dbplyr@NA)      |
-|knitr        |   |1.16       |2017-05-18 |cran (@1.16)                     |
-|Lahman       |   |5.0-0      |2016-08-27 |cran (@5.0-0)                    |
-|nycflights13 |   |0.2.2      |2017-01-27 |cran (@0.2.2)                    |
-|purrr        |   |0.2.2.9000 |2017-06-26 |Github (tidyverse/purrr@6dda577) |
-|R6           |   |2.2.2      |2017-06-17 |cran (@2.2.2)                    |
-|rmarkdown    |   |1.6        |2017-06-15 |cran (@1.6)                      |
-|RMySQL       |   |0.10.11    |2017-03-29 |cran (@0.10.11)                  |
-|RPostgreSQL  |   |0.6-2      |2017-06-24 |CRAN (R 3.4.0)                   |
-|RSQLite      |   |1.1-2      |2017-01-08 |cran (@1.1-2)                    |
-|testthat     |   |1.0.2      |2016-04-23 |cran (@1.0.2)                    |
+# Revdeps
 
-# Check results
-9 packages
+## Couldn't check (2)
 
-## bigrquery (0.4.0)
-Maintainer: Hadley Wickham <hadley@rstudio.com>  
-Bug reports: https://github.com/rstats-db/bigrquery/issues
+|package                              |version |error |warning |note |
+|:------------------------------------|:-------|:-----|:-------|:----|
+|[grasp2db](problems.md#grasp2db)     |1.0.0   |1     |3       |4    |
+|[RSQLServer](problems.md#rsqlserver) |0.3.0   |1     |        |     |
 
-0 errors | 0 warnings | 0 notes
+## All (23)
 
-## dplyr (0.7.1)
-Maintainer: Hadley Wickham <hadley@rstudio.com>  
-Bug reports: https://github.com/tidyverse/dplyr/issues
-
-1 error  | 0 warnings | 0 notes
-
-```
-checking tests ... ERROR
-  Running ‘testthat.R’ [11s/11s]
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  4: bit64::as.integer64
-  5: getExportedValue(pkg, name)
-  6: asNamespace(ns)
-  7: getNamespace(ns)
-  8: tryCatch(loadNamespace(name), error = function(e) stop(e))
-  9: tryCatchList(expr, classes, parentenv, handlers)
-  10: tryCatchOne(expr, names, parentenv, handlers[[1L]])
-  11: value[[3L]](cond)
-  
-  testthat results ================================================================
-  OK: 2658 SKIPPED: 7 FAILED: 1
-  1. Error: combine works with integer64 (#1092) (@test-combine.R#174) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-```
-
-## implyr (0.2.0)
-Maintainer: Ian Cook <ian@cloudera.com>  
-Bug reports: https://github.com/ianmcook/implyr/issues
-
-1 error  | 0 warnings | 0 notes
-
-```
-checking tests ... ERROR
-  Running ‘testthat.R’
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  
-      intersect, setdiff, setequal, union
-  
-  > library(RJDBC)
-  Loading required package: DBI
-  Loading required package: rJava
-  Error: package or namespace load failed for 'rJava':
-   .onLoad failed in loadNamespace() for 'rJava', details:
-    call: dyn.load(file, DLLpath = DLLpath, ...)
-    error: unable to load shared object '/Users/hadley/R-revdep/rJava/libs/rJava.so':
-    dlopen(/Users/hadley/R-revdep/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
-    Referenced from: /Users/hadley/R-revdep/rJava/libs/rJava.so
-    Reason: image not found
-  Error: package 'rJava' could not be loaded
-  Execution halted
-```
-
-## pleiades (0.2.0)
-Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>  
-Bug reports: https://github.com/ropensci/pleiades/issues
-
-0 errors | 0 warnings | 0 notes
-
-## RSQLServer (0.3.0)
-Maintainer: Imanuel Costigan <i.costigan@me.com>  
-Bug reports: https://github.com/imanuelcostigan/RSQLServer/issues
-
-1 error  | 0 warnings | 0 notes
-
-```
-checking whether package ‘RSQLServer’ can be installed ... ERROR
-Installation failed.
-See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks/RSQLServer.Rcheck/00install.out’ for details.
-```
-
-## sparklyr (0.5.6)
-Maintainer: Javier Luraschi <javier@rstudio.com>  
-Bug reports: https://github.com/rstudio/sparklyr/issues
-
-0 errors | 0 warnings | 0 notes
-
-## sqlscore (0.1.2)
-Maintainer: William Brannon <wwbrannon@email.wm.edu>  
-Bug reports: https://github.com/wwbrannon/sqlscore/issues
-
-0 errors | 0 warnings | 0 notes
-
-## srvyr (0.2.2)
-Maintainer: Greg Freedman Ellis <greg.freedman@gmail.com>  
-Bug reports: https://github.com/gergness/srvyr/issues
-
-0 errors | 0 warnings | 0 notes
-
-## taxizedb (0.1.4)
-Maintainer: Scott Chamberlain <myrmecocystus+r@gmail.com>  
-Bug reports: https://github.com/ropensci/taxizedb/issues
-
-0 errors | 0 warnings | 0 notes
+|package                                              |version |error |warning |note |
+|:----------------------------------------------------|:-------|:-----|:-------|:----|
+|[bigrquery](problems.md#bigrquery)                   |0.4.1   |1     |        |     |
+|bikedata                                             |0.0.3   |-1    |        |     |
+|BiocFileCache                                        |1.0.1   |      |        |     |
+|chunked                                              |0.4     |      |        |     |
+|[dexter](problems.md#dexter)                         |0.4.2   |      |2       |1    |
+|[dplyr](problems.md#dplyr)                           |0.7.2   |      |        |1    |
+|etl                                                  |0.3.6   |      |        |     |
+|[grasp2db](problems.md#grasp2db)                     |1.0.0   |1     |3       |4    |
+|[implyr](problems.md#implyr)                         |0.2.1   |1     |        |     |
+|infuser                                              |0.2.7   |      |        |     |
+|[mdsr](problems.md#mdsr)                             |0.1.4   |      |        |3    |
+|[metagenomeFeatures](problems.md#metagenomefeatures) |1.8.1   |      |        |2    |
+|[MonetDBLite](problems.md#monetdblite)               |0.4.1   |      |        |1    |
+|[Organism.dplyr](problems.md#organism.dplyr)         |1.2.1   |      |        |1    |
+|pleiades                                             |0.2.0   |      |        |     |
+|RPresto                                              |1.3.0   |      |        |     |
+|[RSQLServer](problems.md#rsqlserver)                 |0.3.0   |1     |        |     |
+|[sergeant](problems.md#sergeant)                     |0.5.2   |1     |        |     |
+|sparklyr                                             |0.6.1   |      |        |     |
+|sqlscore                                             |0.1.2   |      |        |     |
+|srvyr                                                |0.2.2   |      |        |     |
+|[taxizedb](problems.md#taxizedb)                     |0.1.4   |1     |        |     |
+|valr                                                 |0.3.1   |      |        |     |
 

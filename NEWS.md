@@ -4,7 +4,11 @@
 
 * Replaced Top N approach for Oracle for backwards compatability (#2928)
 
+* Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
+
 * SQL translation for Redshift (@edgararuiz)
+
+* Fix `na_if` translation for SQLite (@cwarden)
 
 # dbplyr 1.1.0
 
