@@ -119,6 +119,7 @@ sql_translate_env.ACCESS <- function(con) {
 
                    sd            = win_absent("sd"),
                    n             = win_absent("n"),
+                   count         = win_absent("count"),
                    cor           = win_absent("cor"),
                    cov           = win_absent("cov")
     )
