@@ -108,7 +108,8 @@ translate_sql_ <- function(dots,
                            vars_group = NULL,
                            vars_order = NULL,
                            vars_frame = NULL,
-                           window = TRUE) {
+                           window = TRUE,
+                           sql_context = NULL) {
 
   if (length(dots) == 0) {
     return(sql())
@@ -122,6 +123,11 @@ translate_sql_ <- function(dots,
 
   old_con <- set_current_con(con)
   on.exit(set_current_con(old_con), add = TRUE)
+
+  if ( !is.null(sql_context) ) {
+    old_context <- set_current_context(sql_context)
+    on.exit(set_current_con(sql_context), add = TRUE)
+  }
 
   if (window) {
     old_group <- set_win_current_group(vars_group)

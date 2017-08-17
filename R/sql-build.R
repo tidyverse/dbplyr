@@ -86,8 +86,9 @@ sql_build.op_mutate <- function(op, con, ...) {
   new_vars <- translate_sql_(
     op$dots, con,
     vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con),
-    vars_frame = op_frame(op)
+    vars_order = translate_sql_(op_sort(op), con, sql_context = list(mutate = TRUE)),
+    vars_frame = op_frame(op),
+    sql_context = list(mutate = TRUE)
   )
   old_vars <- ident(setdiff(vars, names(new_vars)))
 
@@ -117,7 +118,7 @@ sql_build.op_filter <- function(op, con, ...) {
   vars <- op_vars(op$x)
 
   if (!uses_window_fun(op$dots, con)) {
-    where_sql <- translate_sql_(op$dots, con)
+    where_sql <- translate_sql_(op$dots, con, sql_context = list(filter = TRUE))
 
     select_query(
       sql_build(op$x, con),

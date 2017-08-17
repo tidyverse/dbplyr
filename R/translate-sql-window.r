@@ -149,6 +149,9 @@ sql_context <- new.env(parent = emptyenv())
 sql_context$group_by <- NULL
 sql_context$order_by <- NULL
 sql_context$con <- NULL
+# Used to carry additional information needed for special cases
+sql_context$context <- NULL
+
 
 set_current_con <- function(con) {
   old <- sql_context$con
@@ -194,6 +197,14 @@ win_current_frame <- function() sql_context$frame
 # Not exported, because you shouldn't need it
 sql_current_con <- function() sql_context$con
 
+# Functions to manage information for special cases
+set_current_context <- function(context) {
+  old <- sql_context$context
+  sql_context$context <- context
+  invisible(old)
+}
+
+sql_current_context <- function() sql_context$context
 
 # Where translation -------------------------------------------------------
 

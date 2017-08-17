@@ -55,13 +55,23 @@
                       # Casting as BIT converts the Integer result into an actual logical
                       # values TRUE and FALSE
       is.null       = function(x){
-                        build_sql(
-                          "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
-                        )},
-      is.na         = function(x){
-                          build_sql(
-                            "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
-                        )},
+                          if ( !is.null(sql_current_context()$mutate) ) {
+                            build_sql(
+                              "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
+                          )} else {
+                            build_sql(
+                              "((", x, ") IS NULL)"
+                              )
+                          }},
+      is.na       = function(x){
+                          if ( !is.null(sql_current_context()$mutate) ) {
+                            build_sql(
+                              "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
+                            )} else {
+                              build_sql(
+                                "((", x, ") IS NULL)"
+                              )
+                            }},
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
                       # Best solution was to nest a left and right trims.
