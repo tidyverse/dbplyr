@@ -36,6 +36,7 @@
 #' @param window Use `FALSE` to suppress generation of the `OVER`
 #'   statement used for window functions. This is necessary when generating
 #'   SQL for a grouped summary.
+#' @param sql_context Use to carry information for special translation cases.  Expects a list.
 #' @export
 #' @examples
 #' # Regular maths is translated in a very straightforward way
@@ -126,7 +127,7 @@ translate_sql_ <- function(dots,
 
   if ( !is.null(sql_context) ) {
     old_context <- set_current_context(sql_context)
-    on.exit(set_current_con(sql_context), add = TRUE)
+    on.exit(set_current_context(sql_context), add = TRUE)
   }
 
   if (window) {

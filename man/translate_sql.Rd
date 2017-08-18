@@ -27,6 +27,8 @@ expression of windowed functions.}
 \item{window}{Use \code{FALSE} to suppress generation of the \code{OVER}
 statement used for window functions. This is necessary when generating
 SQL for a grouped summary.}
+
+\item{sql_context}{Use to carry information for special translation cases.  Expects a list.}
 }
 \description{
 Translate an expression to sql.
