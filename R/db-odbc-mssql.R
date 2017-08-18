@@ -95,13 +95,21 @@
   DBI::dbExecute(con, sql)
 }
 
-mssql_is_null <- function(x, sql_context){
-  if ( !is.null(sql_context$mutate) | !is.null(sql_context$arrange) ) {
+# `IS NULL` returns a boolean expression, so you can't use it in a result set
+# the approach using casting return a bit, so you can use in a result set, but not in where.
+# Microsoft documentation:  The result of a comparison operator has the Boolean data type.
+# This has three values: TRUE, FALSE, and UNKNOWN. Expressions that return a Boolean data type are
+# known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
+# be specified as the data type of  a table column or variable, and cannot be returned in a result set.
+# https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+mssql_is_null <- function(x, context) {
+  if (context$clause %in% c("SELECT", "ORDER")) {
     build_sql(
-      "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
-    )} else {
+      "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))")
+    } else {
       build_sql(
         "((", x, ") IS NULL)"
       )
-}}
+    }
+}
 

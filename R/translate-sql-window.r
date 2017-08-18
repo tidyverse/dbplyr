@@ -150,7 +150,7 @@ sql_context$group_by <- NULL
 sql_context$order_by <- NULL
 sql_context$con <- NULL
 # Used to carry additional information needed for special cases
-sql_context$context <- NULL
+sql_context$context <- ""
 
 
 set_current_con <- function(con) {
@@ -204,6 +204,10 @@ set_current_context <- function(context) {
   invisible(old)
 }
 
+#' Function that retrieves a list of arguments to handle special cases.
+#' @examples
+#' sql_current_context()clause
+#' @export
 sql_current_context <- function() sql_context$context
 
 # Where translation -------------------------------------------------------

@@ -45,7 +45,10 @@ base_odbc_agg <- sql_translator(
 #' @rdname sql_variant
 #' @format NULL
 base_odbc_win <- sql_translator(.parent = base_win,
-  sd            = win_recycled("STDDEV_SAMP")
+  sd            = win_recycled("STDDEV_SAMP"),
+  count     = function() {
+                  win_over(sql("COUNT(*)"), win_current_group())
+                  }
 )
 
 #' @export

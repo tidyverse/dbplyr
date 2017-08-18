@@ -9,7 +9,7 @@ translate_sql(..., con = NULL, vars = character(), vars_group = NULL,
   vars_order = NULL, vars_frame = NULL, window = TRUE)
 
 translate_sql_(dots, con = NULL, vars_group = NULL, vars_order = NULL,
-  vars_frame = NULL, window = TRUE, sql_context = NULL)
+  vars_frame = NULL, window = TRUE, context = NULL)
 }
 \arguments{
 \item{..., dots}{Expressions to translate. \code{translate_sql()}
@@ -28,7 +28,7 @@ expression of windowed functions.}
 statement used for window functions. This is necessary when generating
 SQL for a grouped summary.}
 
-\item{sql_context}{Use to carry information for special translation cases.  Expects a list.}
+\item{context}{Use to carry information for special translation cases.  Expects a list.}
 }
 \description{
 Translate an expression to sql.

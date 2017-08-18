@@ -155,8 +155,3 @@ test_that("Arrange uses CONVERT-BIT for is.na ", {
     show_query(arrange(df_mssql, !is.na(x))),
     sql("SELECT *\nFROM `df`\nORDER BY NOT(CONVERT(BIT, IIF(`x` IS NULL, 1, 0)))"))
 })
-
-
-
-
-
