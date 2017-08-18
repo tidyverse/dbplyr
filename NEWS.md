@@ -2,7 +2,11 @@
 
 * Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
 
+* Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
+
 * SQL translation for Redshift (@edgararuiz)
+
+* Fix `na_if` translation for SQLite (@cwarden)
 
 # dbplyr 1.1.0
 

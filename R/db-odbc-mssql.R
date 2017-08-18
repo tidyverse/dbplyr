@@ -104,3 +104,4 @@ mssql_is_null <- function(x, sql_context){
         "((", x, ") IS NULL)"
       )
 }}
+
