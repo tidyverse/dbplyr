@@ -61,7 +61,7 @@ sql_build.op_rename <- function(op, con, ...) {
 
 #' @export
 sql_build.op_arrange <- function(op, con, ...) {
-  order_vars <- translate_sql_(op$dots, con)
+  order_vars <- translate_sql_(op$dots, con, sql_context = list(arrange = TRUE))
   group_vars <- c.sql(ident(op_grps(op$x)), con = con)
 
   select_query(sql_build(op$x, con), order_by = order_vars)
@@ -69,7 +69,7 @@ sql_build.op_arrange <- function(op, con, ...) {
 
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
-  select_vars <- translate_sql_(op$dots, con, window = FALSE)
+  select_vars <- translate_sql_(op$dots, con, window = FALSE, sql_context = list(summarise = TRUE))
   group_vars <- c.sql(ident(op_grps(op$x)), con = con)
 
   select_query(
@@ -118,7 +118,7 @@ sql_build.op_filter <- function(op, con, ...) {
   vars <- op_vars(op$x)
 
   if (!uses_window_fun(op$dots, con)) {
-    where_sql <- translate_sql_(op$dots, con, sql_context = list(filter = TRUE))
+    where_sql <- translate_sql_(op$dots, con, sql_context = list(where = TRUE))
 
     select_query(
       sql_build(op$x, con),
@@ -131,7 +131,7 @@ sql_build.op_filter <- function(op, con, ...) {
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
     mutated <- sql_build(op_single("mutate", op$x, dots = where$comp), con)
-    where_sql <- translate_sql_(where$expr, con = con)
+    where_sql <- translate_sql_(where$expr, con = con, sql_context = list(where = TRUE))
 
     select_query(mutated, select = ident(vars), where = where_sql)
   }

@@ -54,24 +54,8 @@
                         )},
                       # Casting as BIT converts the Integer result into an actual logical
                       # values TRUE and FALSE
-      is.null       = function(x){
-                          if ( !is.null(sql_current_context()$mutate) ) {
-                            build_sql(
-                              "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
-                          )} else {
-                            build_sql(
-                              "((", x, ") IS NULL)"
-                              )
-                          }},
-      is.na       = function(x){
-                          if ( !is.null(sql_current_context()$mutate) ) {
-                            build_sql(
-                              "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
-                            )} else {
-                              build_sql(
-                                "((", x, ") IS NULL)"
-                              )
-                            }},
+      is.null       = function(x) mssql_is_null(x, sql_current_context()),
+      is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
                       # Best solution was to nest a left and right trims.
@@ -111,4 +95,12 @@
   DBI::dbExecute(con, sql)
 }
 
-
+mssql_is_null <- function(x, sql_context){
+  if ( !is.null(sql_context$mutate) | !is.null(sql_context$arrange) ) {
+    build_sql(
+      "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))"
+    )} else {
+      build_sql(
+        "((", x, ") IS NULL)"
+      )
+}}

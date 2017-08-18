@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
+
 * SQL translation for Redshift (@edgararuiz)
 
 # dbplyr 1.1.0
