@@ -205,8 +205,6 @@ set_current_context <- function(context) {
 }
 
 #' Function that retrieves a list of arguments to handle special cases.
-#' @examples
-#' sql_current_context()clause
 #' @export
 sql_current_context <- function() sql_context$context
 

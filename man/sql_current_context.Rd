@@ -9,6 +9,3 @@ sql_current_context()
 \description{
 Function that retrieves a list of arguments to handle special cases.
 }
-\examples{
-sql_current_context()clause
-}
