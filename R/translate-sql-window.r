@@ -204,8 +204,6 @@ set_current_context <- function(context) {
   invisible(old)
 }
 
-#' Function that retrieves a list of arguments to handle special cases.
-#' @export
 sql_current_context <- function() sql_context$context
 
 # Where translation -------------------------------------------------------
