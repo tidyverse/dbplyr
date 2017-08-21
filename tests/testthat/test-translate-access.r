@@ -7,42 +7,42 @@ context("translate-ACCESS")
 test_that("as.numeric() translated to CDbl ", {
   expect_equivalent(
     translate_sql(as.numeric(field_name), con = simulate_odbc_access()),
-    sql("CDbl(`field_name`)")
+    sql("CDBL(`field_name`)")
   )
 })
 
 test_that("as.double() translated to CDbl ", {
   expect_equivalent(
     translate_sql(as.double(field_name), con = simulate_odbc_access()),
-    sql("CDbl(`field_name`)")
+    sql("CDBL(`field_name`)")
   )
 })
 
 test_that("as.integer() translated to Int ", {
   expect_equivalent(
     translate_sql(as.integer(field_name), con = simulate_odbc_access()),
-    sql("Int(`field_name`)")
+    sql("INT(`field_name`)")
   )
 })
 
 test_that("as.logical() translated to CBool ", {
   expect_equivalent(
     translate_sql(as.logical(field_name), con = simulate_odbc_access()),
-    sql("CBool(`field_name`)")
+    sql("CBOOL(`field_name`)")
   )
 })
 
 test_that("as.character() translated to CStr ", {
   expect_equivalent(
     translate_sql(as.character(field_name), con = simulate_odbc_access()),
-    sql("CStr(`field_name`)")
+    sql("CSTR(`field_name`)")
   )
 })
 
 test_that("as.Date() translated to CDate ", {
   expect_equivalent(
     translate_sql(as.Date(field_name), con = simulate_odbc_access()),
-    sql("CDate(`field_name`)")
+    sql("CDATE(`field_name`)")
   )
 })
 

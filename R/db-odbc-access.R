@@ -1,10 +1,10 @@
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_select.ACCESS<- function(con, select, from,
-                             where = NULL,  group_by = NULL,
-                             having = NULL, order_by = NULL,
-                             limit = NULL,  distinct = FALSE, ...) {
+sql_select.ACCESS <- function(con, select, from,
+                              where = NULL,  group_by = NULL,
+                              having = NULL, order_by = NULL,
+                              limit = NULL,  distinct = FALSE, ...) {
 
   out <- vector("list", 7)
   names(out) <- c("select",  "from",   "where",
@@ -48,12 +48,13 @@ sql_translate_env.ACCESS <- function(con) {
                    # Much of this translation comes from: https://www.techonthenet.com/access/functions/
 
                    # Conversion
-                   as.numeric    = sql_cast_access("CDbl"),
-                   as.double     = sql_cast_access("CDbl"),
-                   as.integer    = sql_cast_access("Int"),
-                   as.logical    = sql_cast_access("CBool"),
-                   as.character  = sql_cast_access("CStr"),
-                   as.Date       = sql_cast_access("CDate"),
+                   as.numeric    = sql_prefix("CDBL"),
+                   as.double     = sql_prefix("CDBL"),
+                   # as.integer() always rounds down. CInt does not, but Int does
+                   as.integer    = sql_prefix("INT"),
+                   as.logical    = sql_prefix("CBOOL"),
+                   as.character  = sql_prefix("CSTR"),
+                   as.Date       = sql_prefix("CDATE"),
 
                    # Math
                    exp           = sql_prefix("EXP"),
@@ -64,15 +65,14 @@ sql_translate_env.ACCESS <- function(con) {
                    sqrt          = sql_prefix("SQR"),
                    sign          = sql_prefix("SGN"),
                    floor         = sql_prefix("INT"),
-                   # If x was a whole number, this keeps it from rounding up
-                   # All other decimals are correctly ceiling-ed
+                   # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
                    ceiling       = function(x) {
                      build_sql("INT(", x, " + .9999999999)")
                    },
                    ceil          = function(x) {
                      build_sql("INT(", x, " + .9999999999)")
                    },
-                   # There is no POWER function in Access. It takes ^ instead
+                   # There is no POWER function in Access. It uses ^ instead
                    `^`           = function(x, y) {
                      build_sql(x, " ^ ", y)
                    },
@@ -80,12 +80,13 @@ sql_translate_env.ACCESS <- function(con) {
 
                    # Trig
                    # Most implementations come from: https://en.wikibooks.org/wiki/Visual_Basic/Simple_Arithmetic#Trigonometrical_Functions
-                   atan          = sql_prefix("ATN"),
+                   # atan / sin / cos are the only native trig functions with access. Use trig properties to generate others.
+
                    # Catch divide by zero when x = -1 or 1 and return 0 or Pi
                    acos          = function(x) {
                      build_sql("IIF(ABS(", x, ") = 1, ",                                     # If x is 1 or -1
                                x, "* -2 * ATN(1) + 2 * ATN(1), ",                            # Return 0 (if 1) or Pi (if -1) using trig manipulation
-                               "ATN(-", x, "/ SQR(-", x, "*", x, " + 1)) + 2 * ATN(1))")    # Otherwise return ACOS(x) using trig manipulation of ATAN
+                               "ATN(-", x, "/ SQR(-", x, "*", x, " + 1)) + 2 * ATN(1))")     # Otherwise return ACOS(x) using trig manipulation of ATAN
                    },
                    # Inverse hyperbolic cosine for the domain x > 1 satisfies log(x + sqrt(x^2 - 1)). x <= 1 returns complex results
                    acosh         = function(x) {
@@ -95,12 +96,13 @@ sql_translate_env.ACCESS <- function(con) {
                    asin          = function(x) {
                      build_sql("IIF(ABS(", x, ") = 1, ",                                     # If x is 1 or -1
                                x, "* 2 * ATN(1), ",                                          # Return pi/2 (if 1) or -pi/2 (if -1) using trig manipulation
-                               "ATN(", x, "/ SQR(-", x, "*", x, " + 1)))")                  # Otherwise return ASIN(x) using trig manipulation of ATAN
+                               "ATN(", x, "/ SQR(-", x, "*", x, " + 1)))")                   # Otherwise return ASIN(x) using trig manipulation of ATAN
                    },
-                   # Inverse hyperbolic sin for the domain x > 1 satisfies log(x + sqrt(x^2 + 1)). x <= 1 returns complex results
+                   # Inverse hyperbolic sine for the domain x > 1 satisfies log(x + sqrt(x^2 + 1)). x <= 1 returns complex results
                    asinh         = function(x) {
                      build_sql("LOG(", x, " + SQR(", x, "^2 + 1))")
                    },
+                   atan          = sql_prefix("ATN"),
                    # Note that R takes y then x as arguments
                    atan2         = function(y, x) {
                      build_sql("IIF(", y, " > 0, ",
@@ -139,12 +141,13 @@ sql_translate_env.ACCESS <- function(con) {
                        "RIGHT(LEFT(", x, ", ", left, "), ", right, ")")
                    },
                    trimws        = sql_prefix("TRIM"),
-                   # No support for CONCAT in Access. Maybe use &?
+                   # No support for CONCAT in Access
                    paste         = sql_not_supported("paste()"),
                    paste0        = sql_not_supported("paste0()"),
 
                    # Logic
                    # ISNULL() returns -1 for True and 0 for False
+                   # Override this by returning 1 for True and 0 for False
                    is.null       = function(x){
                      build_sql("IIF(ISNULL(", x ,"), 1, 0)")
                    },
@@ -157,13 +160,13 @@ sql_translate_env.ACCESS <- function(con) {
                    },
 
                    # Coalesce doesn't exist in Access.
-                   # NZ() only works in Access, not with the Access driver
+                   # NZ() only works while in Access, not with the Access driver
                    # IIF(ISNULL()) is the best way to construct this
                    coalesce      = function(x, y) {
                      build_sql("IIF(ISNULL(", x, "),", y, ",", x, ")")
                    },
 
-                   # pmin for 2 columns
+                   # pmin/pmax for 2 columns
                    pmin          = function(x, y) {
                      build_sql("IIF(", x, " <= ", y, ",", x, ",", y, ")")
                    },
@@ -184,13 +187,14 @@ sql_translate_env.ACCESS <- function(con) {
                    var           = sql_prefix("VAR"),
                    max           = sql_prefix("MAX"),
                    min           = sql_prefix("MIN"),
-                   # Access does not have function for: cor and cov
+                   # Access does not have functions for cor and cov
                    cor           = sql_not_supported("cor()"),
                    cov           = sql_not_supported("cov()"),
 
                    # Count
                    # Count(Distinct *) does not work in Access
-                   # SELECT Count(*) FROM (SELECT DISTINCT * FROM table_name) AS T <- this would work but we don't know the table name
+                   # This would work but we don't know the table name when translating:
+                   # SELECT Count(*) FROM (SELECT DISTINCT * FROM table_name) AS T
                    n_distinct    = sql_not_supported("n_distinct")
     ),
 
@@ -224,7 +228,6 @@ sql_translate_env.ACCESS <- function(con) {
                    cumsum        = win_absent("cumsum"),
                    cummin        = win_absent("cummin"),
                    cummax        = win_absent("cummax")
-
     )
 
   )}
@@ -234,14 +237,4 @@ sql_translate_env.ACCESS <- function(con) {
 #' @export
 db_analyze.ACCESS <- function(con, table, ...) {
   # Do nothing. Access doesn't support an analyze / update statistics function
-}
-
-# Helpers ----------------------------------------
-
-# CAST() does not exist in Access.
-# Each type has a C*() function e.g. CDbl(), CBool(), etc.
-sql_cast_access <- function(type) {
-  function(x) {
-    build_sql(sql(type), "(", x, ")")
-  }
 }
