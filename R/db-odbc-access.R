@@ -83,8 +83,8 @@ sql_translate_env.ACCESS <- function(con) {
                    atan          = sql_prefix("ATN"),
                    # Catch divide by zero when x = -1 or 1 and return 0 or Pi
                    acos          = function(x) {
-                     build_sql("IIF(ABS(", x, ") = 1,",                                     # If x is 1 or -1
-                               x, "* -2 * ATN(1) + 2 * ATN(1),",                            # Return 0 (if 1) or Pi (if -1) using trig manipulation
+                     build_sql("IIF(ABS(", x, ") = 1, ",                                     # If x is 1 or -1
+                               x, "* -2 * ATN(1) + 2 * ATN(1), ",                            # Return 0 (if 1) or Pi (if -1) using trig manipulation
                                "ATN(-", x, "/ SQR(-", x, "*", x, " + 1)) + 2 * ATN(1))")    # Otherwise return ACOS(x) using trig manipulation of ATAN
                    },
                    # Inverse hyperbolic cosine for the domain x > 1 satisfies log(x + sqrt(x^2 - 1)). x <= 1 returns complex results
@@ -93,8 +93,8 @@ sql_translate_env.ACCESS <- function(con) {
                    },
                    # Catch divide by zero when x = -1 or 1 and return pi/2 or -pi/2
                    asin          = function(x) {
-                     build_sql("IIF(ABS(", x, ") = 1,",                                     # If x is 1 or -1
-                               x, "* 2 * ATN(1),",                                          # Return pi/2 (if 1) or -pi/2 (if -1) using trig manipulation
+                     build_sql("IIF(ABS(", x, ") = 1, ",                                     # If x is 1 or -1
+                               x, "* 2 * ATN(1), ",                                          # Return pi/2 (if 1) or -pi/2 (if -1) using trig manipulation
                                "ATN(", x, "/ SQR(-", x, "*", x, " + 1)))")                  # Otherwise return ASIN(x) using trig manipulation of ATAN
                    },
                    # Inverse hyperbolic sin for the domain x > 1 satisfies log(x + sqrt(x^2 + 1)). x <= 1 returns complex results
@@ -103,7 +103,7 @@ sql_translate_env.ACCESS <- function(con) {
                    },
                    # Note that R takes y then x as arguments
                    atan2         = function(y, x) {
-                     build_sql("IIF(", y, " > 0,",
+                     build_sql("IIF(", y, " > 0, ",
                                     "IIF(", x, " >= ", y, ", ",
                                          "ATN(", y, " / ", x, "), ",
                                          "IIF(", x, " <= -", y, ", ",
@@ -123,7 +123,7 @@ sql_translate_env.ACCESS <- function(con) {
                      build_sql("1 / TAN(", x, ")")
                    },
                    coth          = function(x) {
-                     build_sql("(EXP(", x, ") + Exp(-", x, ")) / (Exp(", x, ") - Exp(-", x, "))")
+                     build_sql("(EXP(", x, ") + EXP(-", x, ")) / (EXP(", x, ") - EXP(-", x, "))")
                    },
 
 
