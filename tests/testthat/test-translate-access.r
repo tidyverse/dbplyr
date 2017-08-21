@@ -18,10 +18,10 @@ test_that("as.double() translated to CDbl ", {
   )
 })
 
-test_that("as.integer() translated to CInt ", {
+test_that("as.integer() translated to Int ", {
   expect_equivalent(
     translate_sql(as.integer(field_name), con = simulate_odbc_access()),
-    sql("CInt(`field_name`)")
+    sql("Int(`field_name`)")
   )
 })
 
@@ -62,6 +62,13 @@ test_that("log() translates to LOG ", {
   )
 })
 
+test_that("log10() translates to LOG(x) / LOG(10) ", {
+  expect_equivalent(
+    translate_sql(log10(field_name), con = simulate_odbc_access()),
+    sql("LOG(`field_name`) / LOG(10)")
+  )
+})
+
 test_that("sqrt() translates to SQR ", {
   expect_equivalent(
     translate_sql(sqrt(field_name), con = simulate_odbc_access()),
@@ -69,10 +76,10 @@ test_that("sqrt() translates to SQR ", {
   )
 })
 
-test_that("atan() translates to ATN ", {
+test_that("sign() translates to SGN ", {
   expect_equivalent(
-    translate_sql(atan(field_name), con = simulate_odbc_access()),
-    sql("ATN(`field_name`)")
+    translate_sql(sign(field_name), con = simulate_odbc_access()),
+    sql("SGN(`field_name`)")
   )
 })
 
@@ -90,10 +97,82 @@ test_that("ceiling() translates to INT plus nearly 1 ", {
   )
 })
 
+test_that("ceil() translates to INT plus nearly 1 ", {
+  expect_equivalent(
+    translate_sql(ceil(field_name), con = simulate_odbc_access()),
+    sql("INT(`field_name` + .9999999999)")
+  )
+})
+
 test_that("^ translates to ^ ", {
   expect_equivalent(
     translate_sql(field_name ^ 2, con = simulate_odbc_access()),
     sql("`field_name` ^ 2.0")
+  )
+})
+
+# Trig
+
+test_that("atan() translates correctly ", {
+  expect_equivalent(
+    translate_sql(atan(field_name), con = simulate_odbc_access()),
+    sql("ATN(`field_name`)")
+  )
+})
+
+test_that("acos() translates to ATN ", {
+  expect_equivalent(
+    translate_sql(acos(field_name), con = simulate_odbc_access()),
+    sql("IIF(ABS(`field_name`) = 1, `field_name`* -2 * ATN(1) + 2 * ATN(1), ATN(-`field_name`/ SQR(-`field_name`*`field_name` + 1)) + 2 * ATN(1))")
+  )
+})
+
+test_that("acosh() translates correctly ", {
+  expect_equivalent(
+    translate_sql(acosh(field_name), con = simulate_odbc_access()),
+    sql("LOG(`field_name` + SQR(`field_name`^2 - 1))")
+  )
+})
+
+test_that("asin() translates correctly ", {
+  expect_equivalent(
+    translate_sql(asin(field_name), con = simulate_odbc_access()),
+    sql("IIF(ABS(`field_name`) = 1, `field_name`* 2 * ATN(1), ATN(`field_name`/ SQR(-`field_name`*`field_name` + 1)))")
+  )
+})
+
+test_that("asinh() translates correctly ", {
+  expect_equivalent(
+    translate_sql(asinh(field_name), con = simulate_odbc_access()),
+    sql("LOG(`field_name` + SQR(`field_name`^2 + 1))")
+  )
+})
+
+test_that("atan2() translates correctly ", {
+  expect_equivalent(
+    translate_sql(atan2(field_name_y, field_name_x), con = simulate_odbc_access()),
+    sql("IIF(`field_name_y` > 0, IIF(`field_name_x` >= `field_name_y`, ATN(`field_name_y` / `field_name_x`), IIF(`field_name_x` <= -`field_name_y`, ATN(`field_name_y` / `field_name_x`+ ATN(1) * 4), ATN(1) * 2 - ATN(`field_name_x` / `field_name_y`))), IIF(`field_name_x`>= -`field_name_y`, ATN(`field_name_y`/`field_name_x`), IIF(`field_name_x`<=`field_name_y`, ATN(`field_name_y`/`field_name_x`- ATN(1)*4), -ATN(1)*2 - ATN(`field_name_x`/`field_name_y`))))")
+  )
+})
+
+test_that("atanh() translates correctly ", {
+  expect_equivalent(
+    translate_sql(atanh(field_name), con = simulate_odbc_access()),
+    sql("LOG((1 + `field_name`) / (1 - `field_name`)) / 2")
+  )
+})
+
+test_that("cot() translates correctly ", {
+  expect_equivalent(
+    translate_sql(cot(field_name), con = simulate_odbc_access()),
+    sql("1 / TAN(`field_name`)")
+  )
+})
+
+test_that("coth() translates correctly ", {
+  expect_equivalent(
+    translate_sql(coth(field_name), con = simulate_odbc_access()),
+    sql("(EXP(`field_name`) + EXP(-`field_name`)) / (EXP(`field_name`) - EXP(-`field_name`))")
   )
 })
 
@@ -103,6 +182,20 @@ test_that("nchar() translates to LEN ", {
   expect_equivalent(
     translate_sql(nchar(field_name), con = simulate_odbc_access()),
     sql("LEN(`field_name`)")
+  )
+})
+
+test_that("tolower() translates to LCASE ", {
+  expect_equivalent(
+    translate_sql(tolower(field_name), con = simulate_odbc_access()),
+    sql("LCASE(`field_name`)")
+  )
+})
+
+test_that("toupper() translates to UCASE ", {
+  expect_equivalent(
+    translate_sql(toupper(field_name), con = simulate_odbc_access()),
+    sql("UCASE(`field_name`)")
   )
 })
 
@@ -158,6 +251,27 @@ test_that("ifelse() translates to IIF ", {
   expect_equivalent(
     translate_sql(ifelse(field_name, yes, no), con = simulate_odbc_access()),
     sql("IIF(`field_name`, `yes`, `no`)")
+  )
+})
+
+test_that("coalesce() translates to IIF with ISNULL for two objects ", {
+  expect_equivalent(
+    translate_sql(coalesce(field_name_x, field_name_y), con = simulate_odbc_access()),
+    sql("IIF(ISNULL(`field_name_x`),`field_name_y`,`field_name_x`)")
+  )
+})
+
+test_that("pmin() translates to IIF for two objects ", {
+  expect_equivalent(
+    translate_sql(pmin(field_name_x, field_name_y), con = simulate_odbc_access()),
+    sql("IIF(`field_name_x` <= `field_name_y`,`field_name_x`,`field_name_y`)")
+  )
+})
+
+test_that("pmax() translates to IIF for two objects ", {
+  expect_equivalent(
+    translate_sql(pmax(field_name_x, field_name_y), con = simulate_odbc_access()),
+    sql("IIF(`field_name_x` <= `field_name_y`,`field_name_y`,`field_name_x`)")
   )
 })
 
