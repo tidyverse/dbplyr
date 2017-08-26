@@ -70,7 +70,19 @@
                             "LTRIM(RTRIM(", x ,"))"
                           )},
                       # MSSQL supports CONCAT_WS in the CTP version of 2016
-      paste         = sql_not_supported("paste()")
+      paste         = sql_not_supported("paste()"),
+
+      # stringr functions
+
+      str_length      = sql_prefix("LEN"),
+      str_locate      = function(string, pattern){
+                            build_sql(
+                              "CHARINDEX(", pattern, ", ", string, ")"
+                            )},
+      str_detect      = function(string, pattern){
+                            build_sql(
+                              "CHARINDEX(", pattern, ", ", string, ") > 0"
+                            )}
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_prefix("STDEV"),
