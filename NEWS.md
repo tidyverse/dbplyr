@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* Adding support for stringr functions: `str_length()`, `str_to_upper()`, `str_to_lower()`,
+  `str_locate()`, `str_replace_all()`, `str_detect()`, `str_trim()`, `str_replace_na()`
+
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
 * SQL translation for Redshift (@edgararuiz)
