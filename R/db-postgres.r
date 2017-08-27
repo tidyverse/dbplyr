@@ -44,6 +44,10 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_locate  = function(string, pattern){
         build_sql(
           "STRPOS(", string, ", ", pattern, ")"
+        )},
+      str_detect  = function(string, pattern){
+        build_sql(
+          "STRPOS(", string, ", ", pattern, ") > 0"
         )}
     ),
     sql_translator(.parent = base_agg,
