@@ -149,28 +149,28 @@ base_scalar <- sql_translator(
   str_to_upper    = sql_prefix("UPPER"),
   str_to_lower    = sql_prefix("LOWER"),
   str_locate      = function(string, pattern){
-    build_sql(
-      "INSTR(", pattern, ", ", string, ")"
-    )},
+                      build_sql(
+                        "INSTR(", pattern, ", ", string, ")"
+                      )},
   str_replace_all = function(string, pattern, replacement){
-    build_sql(
-      "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
-    )},
+                      build_sql(
+                        "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
+                      )},
   str_detect      = function(string, pattern){
-    build_sql(
-      "INSTR(", pattern, ", ", string, ") > 0"
-    )},
+                      build_sql(
+                        "INSTR(", pattern, ", ", string, ") > 0"
+                      )},
   str_trim        = function(string, side = "both"){
-    build_sql(
-      sql(ifelse(side == "both" | side == "left", "LTRIM(", "(")),
-      sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
-      string
-      ,"))"
-    )},
+                      build_sql(
+                        sql(ifelse(side == "both" | side == "left", "LTRIM(", "(")),
+                        sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
+                        string
+                        ,"))"
+                      )},
   str_replace_na  = function(string, replacement = "NA"){
-    build_sql(
-      "CASE WHEN ", string ," IS NULL THEN ", replacement ," ELSE ", string ," END"
-    )}
+                      build_sql(
+                        "CASE WHEN ", string ," IS NULL THEN ", replacement ," ELSE ", string ," END"
+                      )}
 )
 
 base_symbols <- sql_translator(

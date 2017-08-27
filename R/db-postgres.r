@@ -39,6 +39,11 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       paste  = function(..., sep = " "){
         build_sql(
           "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+        )},
+      # stringr functions
+      str_locate  = function(string, pattern){
+        build_sql(
+          "STRPOS(", string, ", ", pattern, ")"
         )}
     ),
     sql_translator(.parent = base_agg,
