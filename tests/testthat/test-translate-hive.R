@@ -17,5 +17,5 @@ test_that("str_replace_all() translates correctly ", {
     translate_sql(
       str_replace_all(field_name, "old", "new"),
       con = simulate_hive()),
-    sql("REPLACE(`field_name`, 'old', 'new')"))
+      sql("regexp_replace(`field_name`, 'old', 'new')"))
 })
