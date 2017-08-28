@@ -1,7 +1,5 @@
 # dbplyr 1.1.0.9000
 
-* Custom `compute()` function for MS SQL connections (@edgararuiz)
-
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
 * SQL translation for Redshift (@edgararuiz)
