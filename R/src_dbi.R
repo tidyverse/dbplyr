@@ -1,3 +1,5 @@
+setOldClass(c("src_dbi", "src_sql", "src"))
+
 #' dplyr backend for any DBI-compatible database
 #'
 #' @description
