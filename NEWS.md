@@ -1,6 +1,6 @@
 # dbplyr 1.1.0.9000
 
-* Custom `compute()` function for MS SQL connections (@edgararuiz)
+* Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
 
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 

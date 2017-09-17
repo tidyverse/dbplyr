@@ -102,34 +102,46 @@
 }
 
 #' @export
-`db_compute.Microsoft SQL Server` <- function(
-                con,
-                table,
-                sql,
-                temporary = TRUE,
-                unique_indexes = list(),
-                indexes = list(),
-                ...) {
-
-
-  if (substr(table, 1, 1) != "#") {
+`db_compute.Microsoft SQL Server` <- function(con,
+                                              table,
+                                              sql,
+                                              temporary = TRUE,
+                                              unique_indexes = list(),
+                                              indexes = list(),
+                                              ...)
+{
+  # check that name has prefixed '##' if temporary
+  if(temporary && substr(table, 1, 1) != "#"){
     table <- paste0("##", table)
     message("MS SQL temp tables names require a single or double pound sign prefix. Renaming table to: ", table)
-    }
-
-  current_query <- dbplyr::sql(sql)
-  current_query <- sql_select(con, sql("*"), sql_subquery(con, current_query))
-  res <- dbGetQuery(con, current_query)
-  values <- sqlData(con, res[, , drop = FALSE])
-
-  new_table <- sqlCreateTable(con, table, values, row.names = NULL, temporary = FALSE)
+  }
 
 
+  if(!is.list(indexes))
+    indexes <- as.list(indexes)
 
-  new_data <- dbplyr::build_sql(con = con, "INSERT INTO ", dbplyr::ident(table), " ", dbplyr::sql(sql))
+  if(!is.list(unique_indexes))
+    unique_indexes <- as.list(unique_indexes)
 
-  dbExecute(con, new_table)
-  dbExecute(con, new_data)
-
+  db_save_query(con, sql, table, temporary=temporary)
+  db_create_indexes(con, table, unique_indexes, unique=TRUE)
+  db_create_indexes(con, table, indexes, unique=FALSE)
   table
+}
+
+
+#' @export
+`db_save_query.Microsoft SQL Server` <- function(con,
+                                                 sql,
+                                                 name,
+                                                 temporary = TRUE, ...)
+{
+  # check that name has prefixed '##' if temporary
+  if(temporary && substr(name, 1, 1) != "#")
+    name <- paste0("##", name)
+
+  tt_sql <- build_sql("select * into ", ident_q(name), " from (", sql, ") ", ident_q(name), con=con)
+
+  dbExecute(con, tt_sql)
+  name
 }
