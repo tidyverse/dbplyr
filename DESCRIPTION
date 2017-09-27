@@ -1,6 +1,6 @@
 Package: dbplyr
 Type: Package
-Version: 1.1.0.9000
+Version: 1.1.0.9001
 Title: A 'dplyr' Back End for Databases
 Description: A 'dplyr' back end for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Basic features

@@ -90,9 +90,9 @@
 #'   summarise(n = n()) %>%
 #'   show_query()
 #' }
-src_dbi <- function(con, auto_disconnect = FALSE) {
+src_dbi <- function(con, auto_disconnect = FALSE, quiet = FALSE) {
   # stopifnot(is(con, "DBIConnection"))
-  disco <- if (isTRUE(auto_disconnect)) db_disconnector(con)
+  disco <- if (isTRUE(auto_disconnect)) db_disconnector(con, quiet = quiet)
 
   structure(
     list(
