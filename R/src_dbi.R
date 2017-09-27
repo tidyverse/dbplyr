@@ -27,6 +27,7 @@
 #' @param auto_disconnect Should the connection be automatically closed when
 #'   the src is deleted. This is useful for older DBI backends that don't
 #'   clean up themselves.
+#' @param quiet When `FALSE`, report auto-disconnect to user.
 #' @return An S3 object with class `src_dbi`, `src_sql`, `src`.
 #' @export
 #' @examples
