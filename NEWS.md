@@ -1,6 +1,6 @@
 # dbplyr 1.1.0.9000
 
-* Fixed `db_write_table()` to allow `append=TRUE`.  Closes tidyverse/dplyr#3120 (@drf5n).
+* Fixed `db_write_table()` to allow `append=TRUE` (@drf5n, #3120).
 
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
