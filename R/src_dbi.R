@@ -27,6 +27,7 @@
 #' @param auto_disconnect Should the connection be automatically closed when
 #'   the src is deleted. This is useful for older DBI backends that don't
 #'   clean up themselves.
+#' @param quiet When `FALSE`, report auto-disconnect to user.
 #' @return An S3 object with class `src_dbi`, `src_sql`, `src`.
 #' @export
 #' @examples
@@ -90,9 +91,9 @@
 #'   summarise(n = n()) %>%
 #'   show_query()
 #' }
-src_dbi <- function(con, auto_disconnect = FALSE) {
+src_dbi <- function(con, auto_disconnect = FALSE, quiet = FALSE) {
   # stopifnot(is(con, "DBIConnection"))
-  disco <- if (isTRUE(auto_disconnect)) db_disconnector(con)
+  disco <- if (isTRUE(auto_disconnect)) db_disconnector(con, quiet = quiet)
 
   structure(
     list(
