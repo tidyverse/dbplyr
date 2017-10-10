@@ -45,7 +45,8 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
     value = values,
     field.types = types,
     temporary = temporary,
-    row.names = FALSE
+    row.names = FALSE,
+    ...
   )
 }
 
