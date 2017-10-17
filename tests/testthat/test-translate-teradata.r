@@ -22,12 +22,21 @@ test_that("as.character() translate to VARCHAR(MAX) ", {
     sql("CAST(`field_name` AS VARCHAR(MAX))")
   )
 })
-test_that("log() translates to LOG ", {
+test_that("log10() translates to LOG ", {
   expect_equivalent(
-    translate_sql(log(field_name), con = simulate_teradata()),
+    translate_sql(log10(field_name), con = simulate_teradata()),
     sql("LOG(`field_name`)")
   )
 })
+
+test_that("log() translates to LOG ", {
+  expect_equivalent(
+    translate_sql(log(field_name), con = simulate_teradata()),
+    sql("ln(`field_name`)")
+  )
+})
+
+
 test_that("ceiling() translates to CEILING ", {
   expect_equivalent(
     translate_sql(ceiling(field_name), con = simulate_teradata()),
@@ -98,6 +107,7 @@ test_that("atan2() translates to ATN2 ", {
     sql("ATN2(`field_name`)")
   )
 })
+
 test_that("substr() translates to SUBSTRING ", {
   expect_equivalent(
     translate_sql(substr(field_name, 1, 2),
@@ -105,6 +115,7 @@ test_that("substr() translates to SUBSTRING ", {
     sql("SUBSTR(`field_name`, 1.0, 2.0)")
   )
 })
+
 test_that("ceil() translates to CEILING ", {
   expect_equivalent(
     translate_sql(ceil(field_name),
