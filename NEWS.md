@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Added translation for Teradata (@edgararuiz)
+
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
 * SQL translation for Redshift (@edgararuiz)

@@ -43,14 +43,14 @@ sql_translate_env.Teradata <- function(con) {
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
-      nchar         = sql_prefix("LEN"),
+      nchar         = sql_prefix("CHARACTER_LENGTH"),
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
       substr        = function(x, start, stop){
                         len <- stop - start + 1
                         build_sql(
-                          "SUBSTRING(", x, ", ", start, ", ", len, ")"
+                          "SUBSTR(", x, ", ", start, ", ", len, ")"
                         )},
                       # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()")
