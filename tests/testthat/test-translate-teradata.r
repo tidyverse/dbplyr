@@ -60,7 +60,7 @@ test_that("sd() translates to STDEV ", {
     translate_sql(sd(field_name),
                   window = FALSE,
                   con = simulate_teradata()),
-    sql("STDEV(`field_name`)")
+    sql("STDDEV_SAMP(`field_name`)")
   )
 })
 
@@ -69,7 +69,7 @@ test_that("var() translates to VAR ", {
     translate_sql(var(field_name),
                   window = FALSE,
                   con = simulate_teradata()),
-    sql("VAR(`field_name`)")
+    sql("VAR_SAMP(`field_name`)")
   )
 })
 
@@ -102,9 +102,9 @@ test_that("nchar() translates to LEN ", {
 })
 test_that("atan2() translates to ATN2 ", {
   expect_equivalent(
-    translate_sql(atan2(field_name),
+    translate_sql(atan2(field1, field2),
                   con = simulate_teradata()),
-    sql("ATN2(`field_name`)")
+    sql("ATAN2(`field2`,`field1`)")
   )
 })
 
