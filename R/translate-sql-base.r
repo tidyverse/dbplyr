@@ -236,7 +236,10 @@ base_win <- sql_translator(
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
-
+  n_distinct = function(...) {
+    vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
+    win_over(build_sql("COUNT(DISTINCT ", vars, ")"), win_current_group())
+  },
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
@@ -282,7 +285,8 @@ base_no_win <- sql_translator(
   last         = win_absent("last_value"),
   lead         = win_absent("lead"),
   lag          = win_absent("lag"),
-  order_by     = win_absent("order_by")
+  order_by     = win_absent("order_by"),
+  paste        = win_absent("paste")
 )
 
 
