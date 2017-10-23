@@ -55,3 +55,17 @@ test_that("db_write_table calls dbQuoteIdentifier on table name" ,{
   db_write_table(dummy_con, "somecrazytablename", NA, NA)
   expect_true("somecrazytablename" %in% idents)
 })
+
+test_that("same_src distinguishes srcs", {
+  src1 <- src_sqlite(":memory:", create = TRUE)
+  src2 <- src_sqlite(":memory:", create = TRUE)
+  expect_true(same_src(src1, src1))
+  expect_false(same_src(src1, src2))
+
+  db1 <- copy_to(src1, iris, 'data1', temporary = FALSE)
+  db2 <- copy_to(src2, iris, 'data2', temporary = FALSE)
+  expect_true(same_src(db1, db1))
+  expect_false(same_src(db1, db2))
+
+  expect_false(same_src(db1, mtcars))
+})
