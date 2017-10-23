@@ -147,36 +147,7 @@ sql_translate_env.ACCESS <- function(con) {
     ),
 
     # Window functions not supported in Access
-    sql_translator(.parent = base_odbc_win,
-
-                   sd            = win_absent("sd"),
-                   n             = win_absent("n"),
-                   n_distinct    = win_absent("n_distinct"),
-                   count         = win_absent("count"),
-                   cor           = win_absent("cor"),
-                   cov           = win_absent("cov"),
-                   row_number    = win_absent("row_number"),
-                   min_rank      = win_absent("min_rank"),
-                   rank          = win_absent("rank"),
-                   dense_rank    = win_absent("dense_rank"),
-                   percent_rank  = win_absent("percent_rank"),
-                   cume_dist     = win_absent("cume_dist"),
-                   ntile         = win_absent("ntile"),
-                   first         = win_absent("first"),
-                   last          = win_absent("last"),
-                   nth           = win_absent("nth"),
-                   lead          = win_absent("lead"),
-                   lag           = win_absent("lag"),
-                   mean          = win_absent("mean"),
-                   var           = win_absent("var"),
-                   sum           = win_absent("sum"),
-                   min           = win_absent("min"),
-                   max           = win_absent("max"),
-                   cummean       = win_absent("cummean"),
-                   cumsum        = win_absent("cumsum"),
-                   cummin        = win_absent("cummin"),
-                   cummax        = win_absent("cummax")
-    )
+    sql_translator(.parent = base_no_win)
 
   )}
 

@@ -285,44 +285,6 @@ test_that("cov() returns error message", {
   )
 })
 
-# Access base_win conversions -----------------------------------------
-
-test_that("sd() returns error message", {
-  expect_error(
-    translate_sql(sd(field_name),
-                  window = TRUE,
-                  con = simulate_odbc_access()),
-    "Window function `sd\\(\\)` is not supported by this database"
-  )
-})
-
-test_that("n() returns error message", {
-  expect_error(
-    translate_sql(n(field_name),
-                  window = TRUE,
-                  con = simulate_odbc_access()),
-    "Window function `n\\(\\)` is not supported by this database"
-  )
-})
-
-test_that("cor() returns error message", {
-  expect_error(
-    translate_sql(cor(field_name),
-                  window = TRUE,
-                  con = simulate_odbc_access()),
-    "Window function `cor\\(\\)` is not supported by this database"
-  )
-})
-
-test_that("cov() returns error message", {
-  expect_error(
-    translate_sql(cov(field_name),
-                  window = TRUE,
-                  con = simulate_odbc_access()),
-    "Window function `cov\\(\\)` is not supported by this database"
-  )
-})
-
 # Access query tests  ------------------------------------------------
 
 df <- data.frame(x = 1, y = 2)
