@@ -204,9 +204,11 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
 add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
+
   by <- common_by(by, x, y)
   y <- auto_copy(
-    x, y, copy,
+    x, y,
+    copy = copy,
     indexes = if (auto_index) list(by$y)
   )
 
