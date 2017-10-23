@@ -1,3 +1,5 @@
+setOldClass(c("tbl_lazy", "tbl"))
+
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
