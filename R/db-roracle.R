@@ -14,22 +14,23 @@ sql_select.OraConnection <- function(con, select, from, where = NULL,
                                group_by = group_by, having = having,
                                order_by = order_by,
                                limit = limit,
-                               distinct = distinct)
+                               distinct = distinct,
+                               ...)
 }
 
 #' @export
 db_analyze.OraConnection <- function(con, table, ...) {
-  db_analyze.Oracle(con = con, table = table)
+  db_analyze.Oracle(con = con, table = table, ...)
 }
 
 #' @export
 sql_subquery.OraConnection <- function(con, from, name = unique_name(), ...) {
-  sql_subquery.Oracle(con = con, from = from, name = name)
+  sql_subquery.Oracle(con = con, from = from, name = name, ...)
 }
 
 #' @export
 db_drop_table.OraConnection <- function(con, table, force = FALSE, ...) {
-  db_drop_table.OdbcConnection(con = con, table = table, force = force)
+  db_drop_table.OdbcConnection(con = con, table = table, force = force, ...)
 }
 
 
@@ -47,7 +48,8 @@ db_copy_to.OraConnection <- function(con, table, values,
                             temporary = temporary,
                             unique_indexes = unique_indexes,
                             indexes = indexes,
-                            analyze = analyze)
+                            analyze = analyze,
+                            ...)
 }
 
 
