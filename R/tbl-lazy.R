@@ -108,6 +108,7 @@ rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
+  dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("summarise", .data, dots = dots)
 }
 #' @export

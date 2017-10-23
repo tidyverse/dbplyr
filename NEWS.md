@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* `summarise()` once again performs partial evaluation before database 
+  submission (#3148).
+
 * `if`, `ifelse()`, and `if_else()` now correctly scope the false condition
   so that it only applies to non-NULL conditions (#3157)
 
