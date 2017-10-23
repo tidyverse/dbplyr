@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* `if`, `ifelse()`, and `if_else()` now correctly scope the false condition
+  so that it only applies to non-NULL conditions (#3157)
+
 * New `sql_aggregate()` and `win_aggregate()` for generating SQL and windowed
   SQL functions for aggregates. These take one argument, `x`, and warn if 
   `na.rm` is not `TRUE` (#3155). `win_recycled()` is equivalent to 

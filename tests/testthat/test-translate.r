@@ -33,7 +33,7 @@ test_that("if translation adds parens", {
   )
   expect_equal(
     translate_sql(if (x) y else z),
-    sql('CASE WHEN ("x") THEN ("y") ELSE ("z") END')
+    sql('CASE WHEN ("x") THEN ("y") WHEN NOT("x") THEN ("z") END')
   )
 })
 
@@ -46,7 +46,7 @@ test_that("if and ifelse use correctly named arguments",{
 
 
 test_that("all forms of if translated to case statement", {
-  expected <- sql('CASE WHEN ("x") THEN (1) ELSE (2) END')
+  expected <- sql('CASE WHEN ("x") THEN (1) WHEN NOT("x") THEN (2) END')
 
   expect_equal(translate_sql(if (x) 1L else 2L), expected)
   expect_equal(translate_sql(ifelse(x, 1L, 2L)), expected)

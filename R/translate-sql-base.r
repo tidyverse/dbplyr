@@ -6,9 +6,9 @@ NULL
 
 sql_if <- function(cond, if_true, if_false = NULL) {
   build_sql(
-    "CASE WHEN (", cond, ")",
-    " THEN (", if_true, ")",
-    if (!is.null(if_false)) build_sql(" ELSE (", if_false, ")"),
+    "CASE WHEN (", cond, ")", " THEN (", if_true, ")",
+    if (!is.null(if_false))
+      build_sql(" WHEN NOT(", cond, ") THEN (", if_false, ")"),
     " END"
   )
 }
