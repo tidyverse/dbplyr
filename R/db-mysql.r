@@ -17,8 +17,8 @@ sql_translate_env.MySQLConnection <- function(con) {
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("count(*)"),
-      sd =  sql_prefix("stddev_samp"),
-      var = sql_prefix("var_samp"),
+      sd =  sql_aggregate("stddev_samp"),
+      var = sql_aggregate("var_samp"),
       paste = function(x, collapse) build_sql("group_concat(", x, collapse, ")")
     ),
     base_no_win

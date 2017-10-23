@@ -9,11 +9,7 @@ test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
 })
 
 test_that("Wrong number of arguments raises error", {
-  expect_error(translate_sql(mean(1, 2), window = FALSE), "Invalid number of args")
-})
-
-test_that("Named arguments generates warning", {
-  expect_warning(translate_sql(mean(x = 1), window = FALSE), "Named arguments ignored")
+  expect_error(translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE), "unused argument")
 })
 
 test_that("between translated to special form (#503)", {
