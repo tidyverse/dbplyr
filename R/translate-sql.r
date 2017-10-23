@@ -31,8 +31,8 @@
 #' @param con An optional database connection to control the details of
 #'   the translation. The default, `NULL`, generates ANSI SQL.
 #' @param vars Deprecated. Now call [partial_eval()] directly.
-#' @param vars_group,vars_order Grouping and ordering variables used for
-#'   windowed functions.
+#' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
+#'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`
 #'   statement used for window functions. This is necessary when generating
 #'   SQL for a grouped summary.
@@ -85,6 +85,7 @@ translate_sql <- function(...,
                           vars = character(),
                           vars_group = NULL,
                           vars_order = NULL,
+                          vars_frame = NULL,
                           window = TRUE) {
   if (!missing(vars)) {
     abort("`vars` is deprecated. Please use partial_eval() directly.")
@@ -95,6 +96,7 @@ translate_sql <- function(...,
     con = con,
     vars_group = vars_group,
     vars_order = vars_order,
+    vars_frame = vars_frame,
     window = window
   )
 }
@@ -105,6 +107,7 @@ translate_sql_ <- function(dots,
                            con = NULL,
                            vars_group = NULL,
                            vars_order = NULL,
+                           vars_frame = NULL,
                            window = TRUE) {
 
   if (length(dots) == 0) {
@@ -126,6 +129,9 @@ translate_sql_ <- function(dots,
 
     old_order <- set_win_current_order(vars_order)
     on.exit(set_win_current_order(old_order), add = TRUE)
+
+    old_frame <- set_win_current_frame(vars_frame)
+    on.exit(set_win_current_frame(old_frame), add = TRUE)
   }
 
   variant <- sql_translate_env(con)

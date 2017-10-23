@@ -20,7 +20,8 @@ sql_translate_env.MySQLConnection <- function(con) {
       sd =  sql_prefix("stddev_samp"),
       var = sql_prefix("var_samp"),
       paste = function(x, collapse) build_sql("group_concat(", x, collapse, ")")
-    )
+    ),
+    base_no_win
   )
 }
 

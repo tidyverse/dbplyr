@@ -93,15 +93,8 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
 
   # Add suffix where needed
   suffix <- check_suffix(suffix)
-  common <- intersect(x_names, y_names)
-
-  x_match <- match(common, x_names)
-  x_new <- x_names
-  x_new[x_match] <- paste0(x_names[x_match], suffix$x)
-
-  y_match <- match(common, y_names)
-  y_new <- y_names
-  y_new[y_match] <- paste0(y_names[y_match], suffix$y)
+  x_new <- add_suffixes(x_names, y_names, suffix$x)
+  y_new <- add_suffixes(y_names, x_names, suffix$y)
 
   # In left and inner joins, return key values only from x
   # In right joins, return key values only from y
@@ -119,6 +112,19 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   #  x - name of column from left table or NA if only from right table
   #  y - name of column from right table or NA if only from left table
   list(alias = c(x_new, y_new), x = c(x_x, y_x), y = c(x_y, y_y))
+}
+
+add_suffixes <- function(x, y, suffix) {
+  out <- chr_along(x)
+  for (i in seq_along(x)) {
+    nm <- x[[i]]
+    while (nm %in% y || nm %in% out) {
+      nm <- paste0(nm, suffix)
+    }
+
+    out[[i]] <- nm
+  }
+  out
 }
 
 semi_join_vars <- function(x_names, y_names) {

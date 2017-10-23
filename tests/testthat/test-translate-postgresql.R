@@ -1,6 +1,13 @@
 context("translate-postgresql")
 
 # odbc base_scalar conversions -----------------------------------------
+test_that("round() coreces first arg to numeric and second to integer", {
+  expect_equivalent(
+    translate_sql(round(x, digits = 1.1), con = simulate_odbc_postgresql()),
+    sql("ROUND((`x`)::numeric, 1)")
+  )
+})
+
 test_that("cosh() translates to the correct formula ", {
   expect_equivalent(
     translate_sql(

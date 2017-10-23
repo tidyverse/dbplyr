@@ -6,10 +6,10 @@
 \title{Translate an expression to sql.}
 \usage{
 translate_sql(..., con = NULL, vars = character(), vars_group = NULL,
-  vars_order = NULL, window = TRUE)
+  vars_order = NULL, vars_frame = NULL, window = TRUE)
 
 translate_sql_(dots, con = NULL, vars_group = NULL, vars_order = NULL,
-  window = TRUE)
+  vars_frame = NULL, window = TRUE)
 }
 \arguments{
 \item{..., dots}{Expressions to translate. \code{translate_sql()}
@@ -21,8 +21,8 @@ the translation. The default, \code{NULL}, generates ANSI SQL.}
 
 \item{vars}{Deprecated. Now call \code{\link[=partial_eval]{partial_eval()}} directly.}
 
-\item{vars_group, vars_order}{Grouping and ordering variables used for
-windowed functions.}
+\item{vars_group, vars_order, vars_frame}{Parameters used in the \code{OVER}
+expression of windowed functions.}
 
 \item{window}{Use \code{FALSE} to suppress generation of the \code{OVER}
 statement used for window functions. This is necessary when generating

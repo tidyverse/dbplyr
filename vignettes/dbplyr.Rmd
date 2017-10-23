@@ -74,7 +74,7 @@ con <- DBI::dbConnect(RMySQL::MySQL(),
 )
 ```
 
-(If you're not using RStudio, you'll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console.)
+(If you're not using RStudio, you'll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console. [Securing Credentials](https://db.rstudio.com/best-practices/managing-credentials) provides some best practices.)
 
 Our temporary database has no data in it, so we'll start by copying over `nycflights13::flights` using the convenient `copy_to()` function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.
 
@@ -195,9 +195,9 @@ In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. I
 
 PostgreSQL is a considerably more powerful database than SQLite. It has:
 
-* a much wider range of [built-in functions](http://www.postgresql.org/docs/9.3/static/functions.html), and
+* a much wider range of [built-in functions](http://www.postgresql.org/docs/current/static/functions.html), and
 
-* support for [window functions](http://www.postgresql.org/docs/9.3/static/tutorial-window.html), which allow grouped subset and mutates to work.
+* support for [window functions](http://www.postgresql.org/docs/current/static/tutorial-window.html), which allow grouped subset and mutates to work.
 
 ### BigQuery
 

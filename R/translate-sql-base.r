@@ -105,6 +105,8 @@ base_scalar <- sql_translator(
   if_else = function(condition, true, false) sql_if(condition, true, false),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
 
+  case_when = function(...) sql_case_when(...),
+
   sql = function(...) sql(...),
   `(` = function(x) {
     build_sql("(", x, ")")
@@ -130,15 +132,17 @@ base_scalar <- sql_translator(
   as.integer = sql_cast("INTEGER"),
   as.character = sql_cast("TEXT"),
 
-  c = function(...) escape(c(...)),
-  `:` = function(from, to) escape(from:to),
+  c = function(...) c(...),
+  `:` = function(from, to) from:to,
 
   between = function(x, left, right) {
     build_sql(x, " BETWEEN ", left, " AND ", right)
   },
 
   pmin = sql_prefix("min"),
-  pmax = sql_prefix("max")
+  pmax = sql_prefix("max"),
+
+  `%>%` = `%>%`
 )
 
 base_symbols <- sql_translator(
@@ -185,52 +189,54 @@ base_win <- sql_translator(
   },
 
   # Variants that take more arguments
-  first = function(x, order = NULL) {
+  first = function(x, order_by = NULL) {
     win_over(
       build_sql("first_value", list(x)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  last = function(x, order = NULL) {
+  last = function(x, order_by = NULL) {
     win_over(
       build_sql("last_value", list(x)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  nth = function(x, n, order = NULL) {
+  nth = function(x, n, order_by = NULL) {
     win_over(
       build_sql("nth_value", list(x, as.integer(n))),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
 
-  lead = function(x, n = 1L, default = NA, order = NULL) {
+  lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       build_sql("LEAD", list(x, n, default)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
-  lag = function(x, n = 1L, default = NA, order = NULL) {
+  lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       build_sql("LAG", list(x, as.integer(n), default)),
       win_current_group(),
-      order %||% win_current_order()
+      order_by %||% win_current_order()
     )
   },
 
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_recycled("avg"),
+  var   = win_recycled("variance"),
   sum   = win_recycled("sum"),
   min   = win_recycled("min"),
   max   = win_recycled("max"),
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
+
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
@@ -260,10 +266,13 @@ base_no_win <- sql_translator(
   cume_dist    = win_absent("cume_dist"),
   ntile        = win_absent("ntile"),
   mean         = win_absent("avg"),
+  sd           = win_absent("sd"),
+  var          = win_absent("var"),
   sum          = win_absent("sum"),
   min          = win_absent("min"),
   max          = win_absent("max"),
   n            = win_absent("n"),
+  n_distinct   = win_absent("n_distinct"),
   cummean      = win_absent("mean"),
   cumsum       = win_absent("sum"),
   cummin       = win_absent("min"),
@@ -275,3 +284,37 @@ base_no_win <- sql_translator(
   lag          = win_absent("lag"),
   order_by     = win_absent("order_by")
 )
+
+
+
+# case_when ---------------------------------------------------------------
+
+sql_case_when <- function(...) {
+  # TODO: switch to dplyr::case_when_prepare when available
+
+  formulas <- dots_list(...)
+  n <- length(formulas)
+
+  if (n == 0) {
+    abort("No cases provided")
+  }
+
+  query <- vector("list", n)
+  value <- vector("list", n)
+
+  for (i in seq_len(n)) {
+    f <- formulas[[i]]
+
+    env <- environment(f)
+    query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
+    value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
+  }
+
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  sql(paste0(
+    "CASE\n",
+    paste0(clauses, collapse = "\n"),
+    "\nEND"
+  ))
+}
+

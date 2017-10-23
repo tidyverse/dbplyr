@@ -22,7 +22,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
     "TABLE ", as.sql(name), " AS ", sql,
     con = con
   )
-  dbGetQuery(con, tt_sql)
+  dbExecute(con, tt_sql)
   name
 }
 

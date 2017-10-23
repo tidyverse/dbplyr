@@ -33,7 +33,7 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
 #' @export
 sql_translate_env.Oracle <- function(con) {
   sql_variant(
-    scalar = sql_translator(.parent = base_odbc_scalar,
+    sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
       as.character  = sql_cast("VARCHAR(255)"),

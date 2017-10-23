@@ -1,6 +1,6 @@
 Package: dbplyr
 Type: Package
-Version: 1.0.0.9000
+Version: 1.1.0.9000
 Title: A 'dplyr' Back End for Databases
 Description: A 'dplyr' back end for databases that allows you to work with 
     remote database tables as if they are in-memory data frames. Basic features
@@ -20,6 +20,7 @@ Imports:
     dplyr (>= 0.5.0.9004),
     glue,
     methods,
+    purrr,
     rlang (>= 0.1.0),
     tibble (>= 1.3.0.9007),
     R6,
@@ -37,7 +38,7 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: yes
 License: MIT + file LICENSE
-Collate: 
+Collate:
     'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
@@ -49,6 +50,7 @@ Collate:
     'db-odbc-mssql.R'
     'db-odbc-oracle.R'
     'db-odbc-postgres.R'
+    'db-odbc-redshift.R'
     'db-postgres.r'
     'db-sqlite.r'
     'dbi-s3.r'
@@ -83,6 +85,7 @@ Collate:
     'translate-sql.r'
     'utils-format.r'
     'utils.r'
+    'window.R'
     'zzz.R'
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))

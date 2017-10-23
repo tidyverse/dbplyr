@@ -142,7 +142,7 @@ test_that("sd() translates to STDEV ", {
     translate_sql(sd(field_name),
                   window = FALSE,
                   con = simulate_odbc("OdbcConnection")),
-    sql("SD(`field_name`)"))
+    sql("STDDEV_SAMP(`field_name`)"))
 })
 
 test_that("var() translates to VARIANCE ", {

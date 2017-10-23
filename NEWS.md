@@ -1,4 +1,4 @@
-# dbplyr 1.0.0.9000
+# dbplyr 1.1.0.9000
 
 * The `auto_disconnect` argument to `src_dbi()` now defaults to `TRUE`, this is
   expected by the DBI specification. A value of `NA` will issue a message every
@@ -6,7 +6,50 @@
 
 * SQL translation for Oracle  (@edgararuiz)
 
+* Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
+
+* SQL translation for Redshift (@edgararuiz)
+
+* Fix `na_if` translation for SQLite (@cwarden)
+
+# dbplyr 1.1.0
+
+## New features
+
+* `case_when()` now translates to SQL "CASE WHEN" (#2894)
+
+* `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
+
+* New `window_order()` and `window_frame()` give you finer control over 
+  the window functions that dplyr creates (#2874, #2593).
+
+* Added SQL translations for Oracle (@edgararuiz).
+
+## Minor improvements and bug fixes
+
+* `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).
+
+* `head(tbl, 0)` is now supported (#2863). 
+
+* `select()`ing zero columns gives a more information error message (#2863).
+
+* Variables created in a join are now disambiguated against other variables
+  in the same table, not just variables in the other table (#2823).
+
+* PostgreSQL gains a better translation for `round()` (#60).
+
 * Added custom `db_analyze_table()` for MS SQL, Oracle, Hive and Impala (@edgararuiz)
+
+* Added support for `sd()` for aggregate and window functions (#2887) (@edgararuiz) 
+
+* You can now use the magrittr pipe within expressions,
+  e.g. `mutate(mtcars, cyl %>% as.character())`.
+
+* If a translation was supplied for a summarise function, but not for the
+  equivalent windowed variant, the expression would be translated to `NULL`
+  with a warning. Now `sql_variant()` checks that all aggregate functions 
+  have matching window functions so that correct translations or clean errors
+  will be generated (#2887)
 
 # dbplyr 1.0.0
 

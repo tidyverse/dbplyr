@@ -49,6 +49,7 @@
 #' partial_eval(quote(x ^ y))
 partial_eval <- function(call, vars = character(), env = caller_env()) {
   switch_type(call,
+    "NULL" = NULL,
     symbol = sym_partial_eval(call, vars, env),
     language = lang_partial_eval(call, vars, env),
     logical = ,
@@ -57,7 +58,15 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
     complex = ,
     string = ,
     character = call,
-    formula = set_expr(call, partial_eval(f_rhs(call), vars, f_env(call))),
+    formula = {
+      # This approach may be ill-founded: might be better to have a separate
+      # function for partially evaluating a list of quos/lazy_dots
+      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call))
+      if (length(call) == 3) {
+        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call))
+      }
+      call
+    },
     list = {
       if (inherits(call, "lazy_dots")) {
         call <- dplyr:::compat_lazy_dots(call, env)
