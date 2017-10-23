@@ -110,7 +110,7 @@ translate_sql_ <- function(dots,
                            vars_order = NULL,
                            vars_frame = NULL,
                            window = TRUE,
-                           context = NULL) {
+                           context = list()) {
 
   if (length(dots) == 0) {
     return(sql())
