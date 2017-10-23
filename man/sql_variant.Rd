@@ -9,6 +9,7 @@
 \alias{sql_prefix}
 \alias{sql_not_supported}
 \alias{sql_cast}
+\alias{sql_formula_log}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -30,6 +31,8 @@ sql_prefix(f, n = NULL)
 sql_not_supported(f)
 
 sql_cast(type)
+
+sql_formula_log(x, base = exp(1))
 
 base_scalar
 

@@ -9,7 +9,6 @@ base_odbc_scalar <- sql_translator(.parent = base_scalar,
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),
   paste0        = sql_prefix("CONCAT"),
-  sd            = sql_prefix("STDDEV_SAMP"),
                   # cosh, sinh, coth and tanh calculations are based on this article
                   # https://en.wikipedia.org/wiki/Hyperbolic_function
   cosh          = function(x) build_sql("(EXP(", x, ") + EXP(-(", x,"))) / 2"),

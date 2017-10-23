@@ -44,15 +44,7 @@ sql_translate_env.Teradata <- function(con) {
       as.character  = sql_cast("VARCHAR(MAX)"),
       var           = sql_prefix("VAR_SAMP"),
       log10         = sql_prefix("LOG"),
-      log           = function(x, base = exp(1)) {
-                        if (isTRUE(all.equal(base, exp(1)))) {
-                          build_sql("ln(", x, ")")
-                        } else {
-                          # Use log change-of-base because postgres doesn't support the
-                          # two-argument "log(base, x)" for floating point x.
-                          build_sql("log(", x, ") / log(", base, ")")
-                        }
-                      },
+      log           = sql_formula_log(x, base = exp(1)),
       nchar         = sql_prefix("CHARACTER_LENGTH"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
