@@ -42,7 +42,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         )}
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("count(*)"),
+      n = function() sql("COUNT(*)"),
       cor = sql_prefix("corr"),
       cov = sql_prefix("covar_samp"),
       sd = sql_aggregate("stddev_samp"),
@@ -53,7 +53,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
     ),
     sql_translator(.parent = base_win,
       n = function() {
-        win_over(sql("count(*)"), partition = win_current_group())
+        win_over(sql("COUNT(*)"), partition = win_current_group())
       },
       cor = win_aggregate("corr"),
       cov = win_aggregate("covar_samp"),

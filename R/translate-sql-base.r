@@ -157,7 +157,7 @@ base_symbols <- sql_translator(
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = sql_prefix("count"),
+  n          = function() sql("COUNT()"),
   mean       = sql_aggregate("avg"),
   var        = sql_aggregate("variance"),
   sum        = sql_aggregate("sum"),
