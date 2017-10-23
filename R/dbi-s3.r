@@ -38,7 +38,7 @@ db_commit.DBIConnection <- function(con, ...) dbCommit(con)
 db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 
 #' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = FALSE, ...) {
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
   dbWriteTable(
     con,
     name = dbi_quote(as.sql(table), con),
@@ -51,7 +51,7 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
 
 #' @export
 db_create_table.DBIConnection <- function(con, table, types,
-                                          temporary = FALSE, ...) {
+                                          temporary = TRUE, ...) {
   assert_that(is_string(table), is.character(types))
 
   field_names <- escape(ident(names(types)), collapse = NULL, con = con)

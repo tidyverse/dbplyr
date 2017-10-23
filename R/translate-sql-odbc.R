@@ -87,7 +87,7 @@ db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
 
 #' @export
 db_copy_to.OdbcConnection <- function(con, table, values,
-                                      overwrite = FALSE, types = NULL, temporary = FALSE,
+                                      overwrite = FALSE, types = NULL, temporary = TRUE,
                                       unique_indexes = NULL, indexes = NULL,
                                       analyze = TRUE, ...) {
 
