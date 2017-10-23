@@ -28,7 +28,7 @@ expression of windowed functions.}
 statement used for window functions. This is necessary when generating
 SQL for a grouped summary.}
 
-\item{context}{Use to carry information for special translation cases.  Expects a list.}
+\item{context}{Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.}
 }
 \description{
 Translate an expression to sql.
