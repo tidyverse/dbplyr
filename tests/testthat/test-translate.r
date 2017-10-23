@@ -89,7 +89,7 @@ test_that("connection affects quoting character", {
   testTable <- tbl_sql("test", src = dbTest, from = ident("table1"))
 
   out <- select(testTable, field1)
-  expect_match(sql_render(out), "^SELECT `field1` AS `field1`\nFROM `table1`$")
+  expect_match(sql_render(out), "^SELECT `field1`\nFROM `table1`$")
 })
 
 test_that("magrittr pipe is translated", {
