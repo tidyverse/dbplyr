@@ -53,7 +53,7 @@ db_desc.OdbcConnection <- function(x) {
   info <- DBI::dbGetInfo(x)
 
   host <- if (info$servername == "") "localhost" else info$servername
-  port <- if (info$port == "") "" else paste0(":", port)
+  port <- if (info$port == "") "" else paste0(":", info$port)
 
   paste0(
     info$dbms.name, " ", info$db.version,
