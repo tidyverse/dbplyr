@@ -1,5 +1,11 @@
 # dbplyr 1.1.0.9000
 
+* The `auto_disconnect` argument to `src_dbi()` now defaults to `TRUE`, this is
+  expected by the DBI specification. A value of `NA` will issue a message every
+  time a connection is disconnected (#18).
+
+* SQL translation for Oracle  (@edgararuiz)
+
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
 * SQL translation for Redshift (@edgararuiz)
