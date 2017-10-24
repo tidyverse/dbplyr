@@ -173,19 +173,23 @@ sql_cast <- function(type) {
 
 #' @rdname sql_variant
 #' @export
-sql_formula_log <- function(f, base = exp(1)) {
-
-  if (isTRUE(all.equal(base, exp(1)))) {
-    build_sql("ln(", f, ")")
-  } else {
-    build_sql("log(", f, ") / log(", base, ")")
+sql_log <- function(base) {
+  function(x){
+    if (isTRUE(all.equal(base, exp(1)))) {
+      build_sql("ln(", x, ")")
+    } else {
+      build_sql("log(", x, ") / log(", base, ")")
+    }
   }
 }
 
+
 #' @rdname sql_variant
 #' @export
-sql_formula_cot <- function(f){
-  build_sql("1 / TAN(", f, ")")
+sql_cot <- function(){
+  function(x){
+    build_sql("1 / TAN(", x, ")")
+  }
 }
 
 

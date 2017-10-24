@@ -44,11 +44,11 @@ sql_translate_env.Teradata <- function(con) {
       as.character  = sql_cast("VARCHAR(MAX)"),
       var           = sql_prefix("VAR_SAMP"),
       log10         = sql_prefix("LOG"),
-      log           = function(x, base = exp(1)) sql_formula_log(x, base = base),
+      log           = function(x, base = exp(1)) sql_log(base),
+      cot           = sql_cot(),
       nchar         = sql_prefix("CHARACTER_LENGTH"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
-      cot           = function(x) sql_formula_cot(x),
       atan2         = function(x, y){
                           build_sql(
                             "ATAN2(", y, ",", x, ")"

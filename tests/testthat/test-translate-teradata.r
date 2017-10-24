@@ -38,7 +38,7 @@ test_that("log() translates to ln ", {
 
 test_that("log() with a different base translates to formula ", {
   expect_equivalent(
-    translate_sql(log(field_name, 2) , con = simulate_teradata()),
+    translate_sql(log(field_name, base = 2) , con = simulate_teradata()),
     sql("log(`field_name`) / log(2.0)")
   )
 })
