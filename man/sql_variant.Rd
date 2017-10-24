@@ -10,6 +10,7 @@
 \alias{sql_not_supported}
 \alias{sql_cast}
 \alias{sql_formula_log}
+\alias{sql_formula_cot}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -32,7 +33,9 @@ sql_not_supported(f)
 
 sql_cast(type)
 
-sql_formula_log(x, base = exp(1))
+sql_formula_log(f, base = exp(1))
+
+sql_formula_cot(f)
 
 base_scalar
 

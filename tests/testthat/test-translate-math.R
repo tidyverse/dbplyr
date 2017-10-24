@@ -52,7 +52,7 @@ test_that("postgres mimics two argument log", {
     translate_sql(..., con = simulate_postgres())
   }
 
-  expect_equal(translate_postgres(log(x)), sql('ln("x")'))
-  expect_equal(translate_postgres(log(x, 10)), sql('log("x") / log(10.0)'))
-  expect_equal(translate_postgres(log(x, 10L)), sql('log("x") / log(10)'))
+  expect_equal(translate_postgres(log(x)), sql('ln(`x`)'))
+  expect_equal(translate_postgres(log(x, 10)), sql('log(`x`) / log(10.0)'))
+  expect_equal(translate_postgres(log(x, 10L)), sql('log(`x`) / log(10)'))
 })

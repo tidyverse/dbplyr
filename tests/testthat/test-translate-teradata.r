@@ -29,10 +29,17 @@ test_that("log10() translates to LOG ", {
   )
 })
 
-test_that("log() translates to LOG ", {
+test_that("log() translates to ln ", {
   expect_equivalent(
     translate_sql(log(field_name), con = simulate_teradata()),
     sql("ln(`field_name`)")
+  )
+})
+
+test_that("log() with a different base translates to formula ", {
+  expect_equivalent(
+    translate_sql(log(field_name, 2) , con = simulate_teradata()),
+    sql("log(`field_name`) / log(2.0)")
   )
 })
 
@@ -49,7 +56,7 @@ test_that("paste() returns error message", {
     translate_sql(paste(field_name),
                   window = FALSE,
                   con = simulate_teradata()),
-    "PASTE\\(\\) is not available in this SQL variant"
+    "PASTE\\(\\) is not supported in this SQL variant, try PASTE0\\(\\) instead"
   )
 })
 
