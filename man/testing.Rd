@@ -4,7 +4,7 @@
 \alias{testing}
 \alias{test_register_src}
 \alias{test_register_con}
-\alias{test_src}
+\alias{src_test}
 \alias{test_load}
 \alias{test_frame}
 \title{Infrastructure for testing dplyr}
@@ -13,7 +13,7 @@ test_register_src(name, src)
 
 test_register_con(name, ...)
 
-test_src(name)
+src_test(name)
 
 test_load(df, name = random_table_name(), srcs = test_srcs$get(),
   ignore = character())
