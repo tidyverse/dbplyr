@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+
+* Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
+
 * Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
 
 * `copy_to()` can now "copy" tbl_sql in the same src, providing another

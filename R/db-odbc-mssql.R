@@ -95,6 +95,25 @@
   DBI::dbExecute(con, sql)
 }
 
+#' @export
+`db_save_query.Microsoft SQL Server` <- function(con,
+                                                 sql,
+                                                 name,
+                                                 temporary = TRUE,
+                                                 ...)
+{
+  # check that name has prefixed '##' if temporary
+  if(temporary && substr(name, 1, 1) != "#") {
+    name <- paste0("##", name)
+    message("Created temporary table named: ", name)
+  }
+
+  tt_sql <- build_sql("select * into ", as.sql(name), " from (", sql, ") ", as.sql(name), con = con)
+
+  dbExecute(con, tt_sql)
+  name
+}
+
 # `IS NULL` returns a boolean expression, so you can't use it in a result set
 # the approach using casting return a bit, so you can use in a result set, but not in where.
 # Microsoft documentation:  The result of a comparison operator has the Boolean data type.
@@ -112,4 +131,3 @@ mssql_is_null <- function(x, context) {
       )
     }
 }
-
