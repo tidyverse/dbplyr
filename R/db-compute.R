@@ -49,6 +49,7 @@ db_compute <- function(con,
                       temporary = TRUE,
                       unique_indexes = list(),
                       indexes = list(),
+                      analyze = TRUE,
                       ...) {
   UseMethod("db_compute")
 }
@@ -60,6 +61,7 @@ db_compute.DBIConnection <- function(con,
                                      temporary = TRUE,
                                      unique_indexes = list(),
                                      indexes = list(),
+                                     analyze = TRUE,
                                      ...) {
   if (!is.list(indexes)) {
     indexes <- as.list(indexes)
@@ -68,9 +70,10 @@ db_compute.DBIConnection <- function(con,
     unique_indexes <- as.list(unique_indexes)
   }
 
-  db_save_query(con, sql, table, temporary = temporary)
+  table <- db_save_query(con, sql, table, temporary = temporary)
   db_create_indexes(con, table, unique_indexes, unique = TRUE)
   db_create_indexes(con, table, indexes, unique = FALSE)
+  if (analyze) db_analyze(con, table)
 
   table
 }
