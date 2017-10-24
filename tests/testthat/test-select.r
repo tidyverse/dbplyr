@@ -41,6 +41,14 @@ test_that("rename renames variables", {
 })
 
 
+test_that("can rename multiple vars", {
+  mf <- memdb_frame(a = 1, b = 2)
+  exp <- tibble(c = 1, d = 2)
+
+  expect_equal_tbl(mf %>% rename(c = a, d = b), exp)
+  expect_equal_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp)
+})
+
 test_that("select preserves grouping vars", {
   mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
   out <- mf %>% select(a) %>% collect()

@@ -11,7 +11,7 @@ test_that("logicals converted to integer correctly", {
   skip_if_no_db("mysql")
 
   df1 <- data.frame(x = c(TRUE, FALSE, NA))
-  df2 <- test_src("mysql") %>% copy_to(df1, random_table_name()) %>% collect()
+  df2 <- src_test("mysql") %>% copy_to(df1, random_table_name()) %>% collect()
 
   expect_identical(df2$x, c(1L, 0L, NA))
 })

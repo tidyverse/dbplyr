@@ -7,7 +7,7 @@
 #'
 #' # Example using schemas with SQLite
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-#' src <- src_dbi(con)
+#' src <- src_dbi(con, auto_disconnect = TRUE)
 #'
 #' # Add auxilary schema
 #' tmp <- tempfile()
