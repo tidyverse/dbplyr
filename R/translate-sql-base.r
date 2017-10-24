@@ -6,9 +6,9 @@ NULL
 
 sql_if <- function(cond, if_true, if_false = NULL) {
   build_sql(
-    "CASE WHEN (", cond, ")",
-    " THEN (", if_true, ")",
-    if (!is.null(if_false)) build_sql(" ELSE (", if_false, ")"),
+    "CASE WHEN (", cond, ")", " THEN (", if_true, ")",
+    if (!is.null(if_false))
+      build_sql(" WHEN NOT(", cond, ") THEN (", if_false, ")"),
     " END"
   )
 }
@@ -157,12 +157,12 @@ base_symbols <- sql_translator(
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = sql_prefix("count"),
-  mean       = sql_prefix("avg", 1),
-  var        = sql_prefix("variance", 1),
-  sum        = sql_prefix("sum", 1),
-  min        = sql_prefix("min", 1),
-  max        = sql_prefix("max", 1),
+  n          = function() sql("COUNT()"),
+  mean       = sql_aggregate("avg"),
+  var        = sql_aggregate("variance"),
+  sum        = sql_aggregate("sum"),
+  min        = sql_aggregate("min"),
+  max        = sql_aggregate("max"),
   n_distinct = function(...) {
     vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
     build_sql("COUNT(DISTINCT ", vars, ")")
@@ -228,15 +228,18 @@ base_win <- sql_translator(
 
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
-  mean  = win_recycled("avg"),
-  var   = win_recycled("variance"),
-  sum   = win_recycled("sum"),
-  min   = win_recycled("min"),
-  max   = win_recycled("max"),
+  mean  = win_aggregate("avg"),
+  var   = win_aggregate("variance"),
+  sum   = win_aggregate("sum"),
+  min   = win_aggregate("min"),
+  max   = win_aggregate("max"),
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
-
+  n_distinct = function(...) {
+    vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
+    win_over(build_sql("COUNT(DISTINCT ", vars, ")"), win_current_group())
+  },
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
@@ -284,7 +287,8 @@ base_no_win <- sql_translator(
   last         = win_absent("last_value"),
   lead         = win_absent("lead"),
   lag          = win_absent("lag"),
-  order_by     = win_absent("order_by")
+  order_by     = win_absent("order_by"),
+  paste        = win_absent("paste")
 )
 
 

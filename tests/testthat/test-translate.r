@@ -9,11 +9,7 @@ test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
 })
 
 test_that("Wrong number of arguments raises error", {
-  expect_error(translate_sql(mean(1, 2), window = FALSE), "Invalid number of args")
-})
-
-test_that("Named arguments generates warning", {
-  expect_warning(translate_sql(mean(x = 1), window = FALSE), "Named arguments ignored")
+  expect_error(translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE), "unused argument")
 })
 
 test_that("between translated to special form (#503)", {
@@ -37,7 +33,7 @@ test_that("if translation adds parens", {
   )
   expect_equal(
     translate_sql(if (x) y else z),
-    sql('CASE WHEN ("x") THEN ("y") ELSE ("z") END')
+    sql('CASE WHEN ("x") THEN ("y") WHEN NOT("x") THEN ("z") END')
   )
 })
 
@@ -50,7 +46,7 @@ test_that("if and ifelse use correctly named arguments",{
 
 
 test_that("all forms of if translated to case statement", {
-  expected <- sql('CASE WHEN ("x") THEN (1) ELSE (2) END')
+  expected <- sql('CASE WHEN ("x") THEN (1) WHEN NOT("x") THEN (2) END')
 
   expect_equal(translate_sql(if (x) 1L else 2L), expected)
   expect_equal(translate_sql(ifelse(x, 1L, 2L)), expected)

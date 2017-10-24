@@ -147,7 +147,7 @@ test_that("sd() translates to STDEV ", {
 
 test_that("var() translates to VARIANCE ", {
   expect_equivalent(
-    translate_sql(var(field_name),
+    translate_sql(var(field_name, na.rm = TRUE),
                   window = FALSE,
                   con = simulate_odbc("OdbcConnection")),
     sql("VARIANCE(`field_name`)"))

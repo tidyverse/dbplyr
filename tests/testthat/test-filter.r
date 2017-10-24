@@ -60,7 +60,7 @@ test_that("recycled aggregates generate window function", {
   )
 
   dfs %>%
-    map(. %>% group_by(g) %>% filter(x > mean(x))) %>%
+    map(. %>% group_by(g) %>% filter(x > mean(x, na.rm = TRUE))) %>%
     expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(4L, 5L, 9L, 10L)))
 })
 

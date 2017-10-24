@@ -17,7 +17,7 @@ src_sql <- function(subclass, con, ...) {
 #' @export
 same_src.src_sql <- function(x, y) {
   if (!inherits(y, "src_sql")) return(FALSE)
-  identical(x$obj, y$obj)
+  identical(x$con, y$con)
 }
 
 #' @export

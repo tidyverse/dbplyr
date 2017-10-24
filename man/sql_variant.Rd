@@ -7,6 +7,7 @@
 \alias{sql_translator}
 \alias{sql_infix}
 \alias{sql_prefix}
+\alias{sql_aggregate}
 \alias{sql_not_supported}
 \alias{sql_cast}
 \alias{base_scalar}
@@ -26,6 +27,8 @@ sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
 sql_infix(f)
 
 sql_prefix(f, n = NULL)
+
+sql_aggregate(f)
 
 sql_not_supported(f)
 
