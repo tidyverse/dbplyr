@@ -102,25 +102,6 @@
 }
 
 #' @export
-`db_compute.Microsoft SQL Server` <- function(con, table, sql, temporary=TRUE, unique_indexes=list(), indexes=list(), ...)
-{
-  # check that name has prefixed '##' if temporary
-  if(temporary && substr(table, 1, 1) != "#")
-    table <- paste0("##", table)
-
-  if(!is.list(indexes))
-    indexes <- as.list(indexes)
-
-  if(!is.list(unique_indexes))
-    unique_indexes <- as.list(unique_indexes)
-
-  db_save_query(con, sql, table, temporary=temporary)
-  db_create_indexes(con, table, unique_indexes, unique=TRUE)
-  db_create_indexes(con, table, indexes, unique=FALSE)
-  table
-}
-
-#' @export
 `db_save_query.Microsoft SQL Server` <- function(con,
                                                  sql,
                                                  name,
@@ -130,7 +111,7 @@
   # check that name has prefixed '##' if temporary
   if(temporary && substr(name, 1, 1) != "#") {
     name <- paste0("##", name)
-    message("MS SQL temporary tables names require a single or double pound sign prefix.\nRenaming table to: ", name)
+    message("Created temporary table named: ", name)
   }
 
   tt_sql <- build_sql("select * into ", as.sql(name), " from (", sql, ") ", as.sql(name), con = con)
