@@ -16,9 +16,9 @@ sql_translate_env.MySQLConnection <- function(con) {
       as.character = sql_cast("CHAR")
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("count(*)"),
-      sd =  sql_prefix("stddev_samp"),
-      var = sql_prefix("var_samp"),
+      n = function() sql("COUNT(*)"),
+      sd =  sql_aggregate("stddev_samp"),
+      var = sql_aggregate("var_samp"),
       paste = function(x, collapse) build_sql("group_concat(", x, collapse, ")")
     ),
     base_no_win
@@ -81,13 +81,9 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
                                            temporary = TRUE, ...) {
   db_create_table(con, table, types, temporary = temporary)
 
-  # Convert factors to strings
-  is_factor <- vapply(values, is.factor, logical(1))
-  values[is_factor] <- lapply(values[is_factor], as.character)
-
-  # Encode special characters in strings
-  is_char <- vapply(values, is.character, logical(1))
-  values[is_char] <- lapply(values[is_char], encodeString, na.encode = FALSE)
+  values <- purrr::modify_if(values, is.logical, as.integer)
+  values <- purrr::modify_if(values, is.factor, as.character)
+  values <- purrr::modify_if(values, is.character, encodeString, na.encode = FALSE)
 
   tmp <- tempfile(fileext = ".csv")
   utils::write.table(values, tmp, sep = "\t", quote = FALSE, qmethod = "escape",

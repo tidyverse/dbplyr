@@ -41,7 +41,7 @@ test_that("summarise drops zero-length groups", {
   for (tbl in tbls) {
     res <- tbl %>%
       group_by(x) %>%
-      summarise(n = n(), mn = mean(y)) %>%
+      summarise(n = n(), mn = mean(y, na.rm = TRUE)) %>%
       collect
     expect_equal(nrow(res), 3, info = class(tbl)[1])
     expect_equal(tail(res$n, n = 1), 10, info = class(tbl)[1])

@@ -73,15 +73,15 @@
       paste         = sql_not_supported("paste()")
     ),
     sql_translator(.parent = base_odbc_agg,
-      sd            = sql_prefix("STDEV"),
-      var           = sql_prefix("VAR"),
+      sd            = sql_aggregate("STDEV"),
+      var           = sql_aggregate("VAR"),
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()")
     ),
     sql_translator(.parent = base_odbc_win,
-      sd            = win_recycled("STDEV"),
-      var           = win_recycled("VAR"),
+      sd            = win_aggregate("STDEV"),
+      var           = win_aggregate("VAR"),
       # MSSQL does not have function for: cor and cov
       cor           = win_absent("cor"),
       cov           = win_absent("cov")

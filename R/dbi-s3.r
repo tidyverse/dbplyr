@@ -38,7 +38,7 @@ db_commit.DBIConnection <- function(con, ...) dbCommit(con)
 db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 
 #' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = FALSE, ...) {
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
   dbWriteTable(
     con,
     name = dbi_quote(as.sql(table), con),
@@ -51,7 +51,7 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
 
 #' @export
 db_create_table.DBIConnection <- function(con, table, types,
-                                          temporary = FALSE, ...) {
+                                          temporary = TRUE, ...) {
   assert_that(is_string(table), is.character(types))
 
   field_names <- escape(ident(names(types)), collapse = NULL, con = con)
@@ -147,21 +147,6 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 
 random_table_name <- function(n = 10) {
   paste0(sample(letters, n, replace = TRUE), collapse = "")
-}
-
-# Creates an environment that disconnects the database when it's
-# garbage collected
-db_disconnector <- function(con, name, quiet = FALSE) {
-  reg.finalizer(environment(), function(...) {
-    if (!quiet) {
-      message(
-        "Auto-disconnecting ", name, " connection ",
-        "(", paste(con@Id, collapse = ", "), ")"
-      )
-    }
-    dbDisconnect(con)
-  })
-  environment()
 }
 
 res_warn_incomplete <- function(res, hint = "n = -1") {
