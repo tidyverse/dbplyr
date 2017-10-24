@@ -310,6 +310,10 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' only visible to the current connection to the database.
 #'
 #' @export
+#' @param df A local data frame, a `tbl_sql` from same source, or a `tbl_sql`
+#'   from another source. If from another source, all data must transition
+#'   through R in one pass, so it is only suitable for transferring small
+#'   amounts of data.
 #' @param types a character vector giving variable types to use for the columns.
 #'    See \url{http://www.sqlite.org/datatype3.html} for available types.
 #' @param temporary if `TRUE`, will create a temporary table that is
@@ -333,6 +337,9 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #'   copy_to(mtcars, indexes = list("model"), overwrite = TRUE)
 #' mtcars2 %>% filter(model == "Hornet 4 Drive")
 #'
+#' cyl8 <- mtcars2 %>% filter(cyl == 8)
+#' cyl8_cached <- copy_to(src_memdb(), cyl8)
+#'
 #' # copy_to is called automatically if you set copy = TRUE
 #' # in the join functions
 #' df <- tibble(cyl = c(6, 8))
@@ -341,20 +348,39 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
                             analyze = TRUE, ...) {
-  assert_that(is.data.frame(df), is_string(name), is.flag(temporary))
-  class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
+  assert_that(is_string(name), is.flag(temporary))
 
-  name <- db_copy_to(dest$con, name, df,
-    overwrite = overwrite,
-    types = types,
-    temporary = temporary,
-    unique_indexes = unique_indexes,
-    indexes = indexes,
-    analyze = analyze,
-    ...
-  )
+  if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
+    stop("`df` must be a local dataframe or a remote tbl_sql", call. = FALSE)
+  }
 
-  invisible(tbl(dest, name))
+  if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
+    out <- compute(df,
+      name = name,
+      temporary = temporary,
+      unique_indexes = unique_indexes,
+      indexes = indexes,
+      analyze = analyze,
+      ...
+    )
+  } else {
+    df <- collect(df)
+    class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
+
+    name <- db_copy_to(dest$con, name, df,
+      overwrite = overwrite,
+      types = types,
+      temporary = temporary,
+      unique_indexes = unique_indexes,
+      indexes = indexes,
+      analyze = analyze,
+      ...
+    )
+
+    out <- tbl(dest, name)
+  }
+
+  invisible(out)
 }
 
 #' @export

@@ -1,5 +1,10 @@
 # dbplyr 1.1.0.9000
 
+* `copy_to()` can now "copy" tbl_sql in the same src, providing another
+  way to cache a query into a temporary table (#3064). You can also 
+  `copy_to` tbl_sqls from another source, and `copy_to()` will automatically
+  collect then copy.
+
 * [API] `db_compute()` gains an `analyze` argument to match `db_copy_to()`.
 
 * `copy_to()` (via `db_write_table()`) correctly translates logical variables

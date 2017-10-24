@@ -11,7 +11,10 @@
 \arguments{
 \item{dest}{remote data source}
 
-\item{df}{local data frame}
+\item{df}{A local data frame, a \code{tbl_sql} from same source, or a \code{tbl_sql}
+from another source. If from another source, all data must transition
+through R in one pass, so it is only suitable for transferring small
+amounts of data.}
 
 \item{name}{name for new remote table.}
 
@@ -55,6 +58,9 @@ mtcars$model <- rownames(mtcars)
 mtcars2 <- src_memdb() \%>\%
   copy_to(mtcars, indexes = list("model"), overwrite = TRUE)
 mtcars2 \%>\% filter(model == "Hornet 4 Drive")
+
+cyl8 <- mtcars2 \%>\% filter(cyl == 8)
+cyl8_cached <- copy_to(src_memdb(), cyl8)
 
 # copy_to is called automatically if you set copy = TRUE
 # in the join functions
