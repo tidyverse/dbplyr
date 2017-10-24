@@ -73,16 +73,6 @@ test_that("String special cases", {
 
 test_that("Logic special cases", {
 
-  # is.null() and is.na() return the same values
-  expect_equivalent(
-    translate_sql(is.null(field_name), con = simulate_odbc_access()),
-    sql("IIF(ISNULL(`field_name`), 1, 0)")
-  )
-  expect_equivalent(
-    translate_sql(is.na(field_name), con = simulate_odbc_access()),
-    sql("IIF(ISNULL(`field_name`), 1, 0)")
-  )
-
   # ifelse = IIF in Access
   expect_equivalent(
     translate_sql(ifelse(field_name, yes, no), con = simulate_odbc_access()),
@@ -103,6 +93,12 @@ test_that("Logic special cases", {
   expect_equivalent(
     translate_sql(pmax(field_name_x, field_name_y), con = simulate_odbc_access()),
     sql("IIF(`field_name_x` <= `field_name_y`,`field_name_y`,`field_name_x`)")
+  )
+
+  # Access always returns -1 for True values, 0 for False
+  expect_equivalent(
+    translate_sql(TRUE, con = simulate_odbc_access()),
+    sql("-1")
   )
 
 })

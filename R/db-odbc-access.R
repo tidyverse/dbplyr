@@ -94,14 +94,9 @@ sql_translate_env.ACCESS <- function(con) {
                    paste0        = sql_paste0_access,
 
                    # Logic
-                   # ISNULL() returns -1 for True and 0 for False
-                   # Override this by returning 1 for True and 0 for False
-                   is.null       = function(x){
-                     build_sql("IIF(ISNULL(", x ,"), 1, 0)")
-                   },
-                   is.na         = function(x){
-                     build_sql("IIF(ISNULL(", x ,"), 1, 0)")
-                   },
+                   # Access always returns -1 for True and 0 for False
+                   is.null       = sql_prefix("ISNULL"),
+                   is.na         = sql_prefix("ISNULL"),
                    # IIF() is like ifelse()
                    ifelse        = function(test, yes, no){
                      build_sql("IIF(", test, ", ", yes, ", ", no, ")")
@@ -184,4 +179,10 @@ sql_paste_access <- function(..., sep = " ", collapse = NULL) {
 
 sql_paste0_access <- function(..., collapse = NULL) {
   sql_paste_access(..., sep = "", collapse = collapse)
+}
+
+sql_escape_logical.ACCESS <- function(con, x) {
+  y <- ifelse(x, -1, 0)
+  y[is.na(x)] <- "NULL"
+  y
 }
