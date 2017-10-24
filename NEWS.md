@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* `copy_to()` (via `db_write_table()`) correctly translates logical variables
+  to integers for MySQL (#3151).
+
 * Add `test_src()` to make it easier to access a single test source.
 
 * SQL translation for Microsoft Access (#2946) (@DavisVaughan)
