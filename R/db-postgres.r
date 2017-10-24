@@ -12,7 +12,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       log10  = function(x) build_sql("log(", x, ")"),
-      log    = sql_log(base = base),
+      log    = sql_log(),
       cot    = sql_cot(),
       cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
       sinh   = function(x) build_sql("(EXP(", x, ") - EXP(-", x,")) / 2"),

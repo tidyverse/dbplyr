@@ -33,7 +33,7 @@ sql_not_supported(f)
 
 sql_cast(type)
 
-sql_log(...)
+sql_log()
 
 sql_cot()
 

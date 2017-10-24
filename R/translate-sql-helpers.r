@@ -173,8 +173,8 @@ sql_cast <- function(type) {
 
 #' @rdname sql_variant
 #' @export
-sql_log <- function(base) {
-  function(x){
+sql_log <- function() {
+  function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
       build_sql("ln(", x, ")")
     } else {
@@ -191,5 +191,6 @@ sql_cot <- function(){
     build_sql("1 / TAN(", x, ")")
   }
 }
+
 
 
