@@ -22,27 +22,13 @@ test_that("as.character() translate to VARCHAR(MAX) ", {
     sql("CAST(`field_name` AS VARCHAR(MAX))")
   )
 })
+
 test_that("log10() translates to LOG ", {
   expect_equivalent(
     translate_sql(log10(field_name), con = simulate_teradata()),
     sql("LOG(`field_name`)")
   )
 })
-
-test_that("log() translates to ln ", {
-  expect_equivalent(
-    translate_sql(log(field_name), con = simulate_teradata()),
-    sql("ln(`field_name`)")
-  )
-})
-
-test_that("log() with a different base translates to formula ", {
-  expect_equivalent(
-    translate_sql(log(field_name, base = 2) , con = simulate_teradata()),
-    sql("log(`field_name`) / log(2.0)")
-  )
-})
-
 
 test_that("ceiling() translates to CEILING ", {
   expect_equivalent(
@@ -61,15 +47,6 @@ test_that("paste() returns error message", {
 })
 
 # Teradata base_agg conversions -----------------------------------------
-
-test_that("sd() translates to STDEV ", {
-  expect_equivalent(
-    translate_sql(sd(field_name),
-                  window = FALSE,
-                  con = simulate_teradata()),
-    sql("STDDEV_SAMP(`field_name`)")
-  )
-})
 
 test_that("var() translates to VAR ", {
   expect_equivalent(
