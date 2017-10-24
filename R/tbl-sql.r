@@ -369,7 +369,7 @@ collapse.tbl_sql <- function(x, vars = NULL, ...) {
 #' @export
 compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
                             unique_indexes = list(), indexes = list(),
-                            ...) {
+                            analyze = TRUE, ...) {
 
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
@@ -382,6 +382,7 @@ compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
     temporary = temporary,
     unique_indexes = unique_indexes,
     indexes = indexes,
+    analyze = analyze,
     ...
   )
 

@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* [API] `db_compute()` gains an `analyze` argument to match `db_copy_to()`.
+
 * `copy_to()` (via `db_write_table()`) correctly translates logical variables
   to integers for MySQL (#3151).
 
