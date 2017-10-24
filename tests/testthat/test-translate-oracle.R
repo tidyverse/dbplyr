@@ -22,9 +22,9 @@ df <- data.frame(x = 1, y = 2)
 df_oracle <- tbl_lazy(df, src = simulate_oracle())
 
 test_that("query uses FETCH FIRST x ROWS instead of LIMIT ", {
-  expect_equivalent(
-    show_query(head(df_oracle)),
-    sql("SELECT *\nFROM (`df`) \nFETCH FIRST 6 ROWS ONLY "))
+  expect_match(
+    sql_render(df_oracle %>% head, simulate_oracle()),
+    sql("^SELECT [*] FROM [(]SELECT [*]\nFROM [(]`df`[)] [)] `[^`]*` WHERE ROWNUM [<][=] 6"))
 })
 
 test_that(" alias is produced without AS ", {

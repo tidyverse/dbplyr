@@ -36,6 +36,7 @@
 #' @param window Use `FALSE` to suppress generation of the `OVER`
 #'   statement used for window functions. This is necessary when generating
 #'   SQL for a grouped summary.
+#' @param context Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.
 #' @export
 #' @examples
 #' # Regular maths is translated in a very straightforward way
@@ -108,7 +109,8 @@ translate_sql_ <- function(dots,
                            vars_group = NULL,
                            vars_order = NULL,
                            vars_frame = NULL,
-                           window = TRUE) {
+                           window = TRUE,
+                           context = list()) {
 
   if (length(dots) == 0) {
     return(sql())
@@ -122,6 +124,11 @@ translate_sql_ <- function(dots,
 
   old_con <- set_current_con(con)
   on.exit(set_current_con(old_con), add = TRUE)
+
+  if (length(context) > 0) {
+    old_context <- set_current_context(context)
+    on.exit(set_current_context(context), add = TRUE)
+  }
 
   if (window) {
     old_group <- set_win_current_group(vars_group)

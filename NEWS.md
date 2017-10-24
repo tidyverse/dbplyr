@@ -2,6 +2,14 @@
 
 * Added translation for Teradata (@edgararuiz)
 
+* Added support for ROracle (#2928, #2732)
+
+* Replaced Top N approach for Oracle for backwards compatability (#2928)
+
+* Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
+
+* Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
+
 * `copy_to()` can now "copy" tbl_sql in the same src, providing another
   way to cache a query into a temporary table (#3064). You can also 
   `copy_to` tbl_sqls from another source, and `copy_to()` will automatically
