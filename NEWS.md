@@ -13,7 +13,6 @@
 
 * Fixed `n()` and `count()` for window function via `odbc` connections (@edgararuiz)
 
-* `names_to_as()` now prevents select from adding names when not necessary (#2968) (@DavisVaughan)
 * SQL translation for Redshift (@edgararuiz)
 
 * Fix `na_if` translation for SQLite (@cwarden)
