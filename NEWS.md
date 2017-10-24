@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* `mutate()` has better logic for splitting a single mutate into multiple
+  subqueries (#3095).
+
 * Added support for ROracle (#2928, #2732)
 
 * Replaced Top N approach for Oracle for backwards compatability (#2928)

@@ -125,16 +125,18 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
 
   # For each expression, check if it uses any newly created variables.
   # If so, nest the mutate()
-  used_vars <- lapply(dots, function(x) all_names(get_expr(x)))
-
+  new_vars <- character()
   init <- 0L
   for (i in seq_along(dots)) {
-    cur_idx <- inc_seq(init + 1L, i - 1L)
-    new_vars <- names(dots)[cur_idx]
+    cur_var <- names(dots)[[i]]
+    used_vars <- all_names(get_expr(dots[[i]]))
 
-    if (any(used_vars[[i]] %in% new_vars)) {
-      .data <- add_op_single("mutate", .data, dots = dots[cur_idx])
+    if (any(used_vars %in% new_vars)) {
+      .data <- add_op_single("mutate", .data, dots = dots[new_vars])
+      new_vars <- cur_var
       init <- i
+    } else {
+      new_vars <- c(new_vars, cur_var)
     }
   }
 

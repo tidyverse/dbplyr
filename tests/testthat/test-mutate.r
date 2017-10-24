@@ -19,15 +19,15 @@ test_that("two mutates equivalent to one", {
 })
 
 test_that("can refer to fresly created values", {
-  out1 <- memdb_frame(x = 1) %>%
-    mutate(y = x + 1, z = y + 1) %>%
+  out1 <- memdb_frame(x1 = 1) %>%
+    mutate(x2 = x1 + 1, x3 = x2 + 1, x4 = x3 + 1) %>%
     collect()
-  expect_equal(out1, tibble(x = 1, y = 2, z = 3))
+  expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
 
   out2 <- memdb_frame(x = 1) %>%
-    mutate(x = x + 1, x = x + 1) %>%
+    mutate(x = x + 1, x = x + 1, x = x + 1) %>%
     collect()
-  expect_equal(out2, tibble(x = 3))
+  expect_equal(out2, tibble(x = 4))
 })
 
 test_that("queries are not nested unnecessarily", {
