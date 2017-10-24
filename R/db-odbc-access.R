@@ -90,8 +90,8 @@ sql_translate_env.ACCESS <- function(con) {
                    },
                    trimws        = sql_prefix("TRIM"),
                    # No support for CONCAT in Access
-                   paste         = sql_not_supported("paste()"),
-                   paste0        = sql_not_supported("paste0()"),
+                   paste         = sql_paste_access,
+                   paste0        = sql_paste0_access,
 
                    # Logic
                    # ISNULL() returns -1 for True and 0 for False
@@ -156,4 +156,32 @@ sql_translate_env.ACCESS <- function(con) {
 #' @export
 db_analyze.ACCESS <- function(con, table, ...) {
   # Do nothing. Access doesn't support an analyze / update statistics function
+}
+
+# Util -------------------------------------------
+
+sql_paste_access <- function(..., sep = " ", collapse = NULL) {
+
+  if (!is.null(collapse)) {
+    stop("`collapse` isn't supported in SQL translation", call. = FALSE)
+  }
+
+  # Access concatenates strings as `"ex1" & "ex2" & "ex3"`
+  binary_build <- function(x, y) {
+    build_sql(x, " & ", sep, " & ", y)
+  }
+
+  .dots <- list(...)
+  n <- length(.dots)
+
+  if(n == 1) {
+    build_sql("CStr(", .dots[[1]], ")")
+  } else {
+    reduce(.dots, binary_build)
+  }
+
+}
+
+sql_paste0_access <- function(..., collapse = NULL) {
+  sql_paste_access(..., sep = "", collapse = collapse)
 }
