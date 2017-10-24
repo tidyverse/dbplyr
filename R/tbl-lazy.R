@@ -1,3 +1,5 @@
+setOldClass(c("tbl_lazy", "tbl"))
+
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
@@ -106,6 +108,7 @@ rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
+  dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("summarise", .data, dots = dots)
 }
 #' @export
@@ -201,9 +204,11 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
 add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
+
   by <- common_by(by, x, y)
   y <- auto_copy(
-    x, y, copy,
+    x, y,
+    copy = copy,
     indexes = if (auto_index) list(by$y)
   )
 

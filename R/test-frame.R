@@ -36,6 +36,15 @@ test_register_con <- function(name, ...) {
   test_register_src(name, src_dbi(DBI::dbConnect(...)))
 }
 
+#' @export
+#' @rdname testing
+test_src <- function(name) {
+  srcs <- test_srcs$get()
+  if (!name %in% names(srcs)) {
+    stop("Couldn't find test src ", name, call. = FALSE)
+  }
+  srcs[[name]]
+}
 
 #' @export
 #' @rdname testing

@@ -48,7 +48,7 @@ test_that("paste() returns error message", {
 
 test_that("sd() translates to STDEV ", {
   expect_equivalent(
-    translate_sql(sd(field_name),
+    translate_sql(sd(field_name, na.rm = TRUE),
                   window = FALSE,
                   con = simulate_mssql()),
     sql("STDEV(`field_name`)")
@@ -57,7 +57,7 @@ test_that("sd() translates to STDEV ", {
 
 test_that("var() translates to VAR ", {
   expect_equivalent(
-    translate_sql(var(field_name),
+    translate_sql(var(field_name, na.rm = TRUE),
                   window = FALSE,
                   con = simulate_mssql()),
     sql("VAR(`field_name`)")

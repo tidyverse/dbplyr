@@ -51,25 +51,25 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         )}
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("count(*)"),
+      n = function() sql("COUNT(*)"),
       cor = sql_prefix("corr"),
       cov = sql_prefix("covar_samp"),
-      sd = sql_prefix("stddev_samp"),
-      var = sql_prefix("var_samp"),
-      all = sql_prefix("bool_and"),
-      any = sql_prefix("bool_or"),
+      sd = sql_aggregate("stddev_samp"),
+      var = sql_aggregate("var_samp"),
+      all = sql_aggregate("bool_and"),
+      any = sql_aggregate("bool_or"),
       paste = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
     ),
     sql_translator(.parent = base_win,
       n = function() {
-        win_over(sql("count(*)"), partition = win_current_group())
+        win_over(sql("COUNT(*)"), partition = win_current_group())
       },
-      cor = win_recycled("corr"),
-      cov = win_recycled("covar_samp"),
-      sd =  win_recycled("stddev_samp"),
-      var = win_recycled("var_samp"),
-      all = win_recycled("bool_and"),
-      any = win_recycled("bool_or"),
+      cor = win_aggregate("corr"),
+      cov = win_aggregate("covar_samp"),
+      sd =  win_aggregate("stddev_samp"),
+      var = win_aggregate("var_samp"),
+      all = win_aggregate("bool_and"),
+      any = win_aggregate("bool_or"),
       paste = function(x, collapse) {
         win_over(
           build_sql("string_agg(", x, ", ", collapse, ")"),
