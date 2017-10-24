@@ -4,7 +4,7 @@ test_that("mutate computed before summarise", {
   mf <- memdb_frame(x = c(1, 2, 3), y = c(9, 8, 7))
 
   out <- mutate(mf, z = x + y) %>%
-    summarise(sum_z = sum(z)) %>%
+    summarise(sum_z = sum(z, na.rm = TRUE)) %>%
     collect()
 
   expect_equal(out$sum_z, 30)
@@ -52,7 +52,7 @@ test_that("mutate calls windowed versions of sql functions", {
 
 test_that("recycled aggregates generate window function", {
   dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- map(dfs, . %>% group_by(g) %>% mutate(r = x > mean(x)))
+  out <- map(dfs, . %>% group_by(g) %>% mutate(r = x > mean(x, na.rm = TRUE)))
 
   expect_equal(out$df$r, c(FALSE, TRUE, FALSE, TRUE))
   expect_equal_tbls(out)

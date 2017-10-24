@@ -13,7 +13,7 @@ test_that("optimisation is turned on by default", {
 test_that("group by then limit is collapsed", {
   lf <- memdb_frame(x = 1:10, y = 2) %>%
     group_by(x) %>%
-    summarise(y = sum(y)) %>%
+    summarise(y = sum(y, na.rm = TRUE)) %>%
     head(1)
 
   qry <- lf %>% sql_build()

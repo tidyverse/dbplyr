@@ -27,7 +27,7 @@ sql_translate_env.SQLiteConnection <- function(con) {
       na_if = sql_prefix("NULLIF", 2)
     ),
     sql_translator(.parent = base_agg,
-      sd = sql_prefix("stdev")
+      sd = sql_aggregate("stdev")
     ),
     base_no_win
   )
