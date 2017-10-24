@@ -38,7 +38,7 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: yes
 License: MIT + file LICENSE
-Collate:
+Collate: 
     'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
@@ -53,6 +53,7 @@ Collate:
     'db-odbc-postgres.R'
     'db-odbc-redshift.R'
     'db-postgres.r'
+    'db-roracle.R'
     'db-sqlite.r'
     'dbi-s3.r'
     'dbplyr.R'

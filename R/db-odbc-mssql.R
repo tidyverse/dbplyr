@@ -54,14 +54,8 @@
                         )},
                       # Casting as BIT converts the Integer result into an actual logical
                       # values TRUE and FALSE
-      is.null       = function(x){
-                        build_sql(
-                          "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
-                        )},
-      is.na         = function(x){
-                          build_sql(
-                            "CASE WHEN ", x ," IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END"
-                        )},
+      is.null       = function(x) mssql_is_null(x, sql_current_context()),
+      is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
                       # Best solution was to nest a left and right trims.
@@ -111,4 +105,41 @@
     , con = con
   )
   DBI::dbExecute(con, sql)
+}
+
+#' @export
+`db_save_query.Microsoft SQL Server` <- function(con,
+                                                 sql,
+                                                 name,
+                                                 temporary = TRUE,
+                                                 ...)
+{
+  # check that name has prefixed '##' if temporary
+  if(temporary && substr(name, 1, 1) != "#") {
+    name <- paste0("##", name)
+    message("Created temporary table named: ", name)
+  }
+
+  tt_sql <- build_sql("select * into ", as.sql(name), " from (", sql, ") ", as.sql(name), con = con)
+
+  dbExecute(con, tt_sql)
+  name
+}
+
+# `IS NULL` returns a boolean expression, so you can't use it in a result set
+# the approach using casting return a bit, so you can use in a result set, but not in where.
+# Microsoft documentation:  The result of a comparison operator has the Boolean data type.
+# This has three values: TRUE, FALSE, and UNKNOWN. Expressions that return a Boolean data type are
+# known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
+# be specified as the data type of  a table column or variable, and cannot be returned in a result set.
+# https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+mssql_is_null <- function(x, context) {
+  if (context$clause %in% c("SELECT", "ORDER")) {
+    build_sql(
+      "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))")
+    } else {
+      build_sql(
+        "((", x, ") IS NULL)"
+      )
+    }
 }

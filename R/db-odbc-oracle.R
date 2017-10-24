@@ -16,17 +16,17 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
 
-  # Using Oracle's FETCH FIRST SQL command instead of LIMIT
-  # https://oracle-base.com/articles/12c/row-limiting-clause-for-top-n-queries-12cr1
+  # Processing limit via ROWNUM in a WHERE clause, thie method
+  # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
   if (!is.null(limit) && !identical(limit, Inf)) {
+    out <- escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
     assertthat::assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-    out$limit <- build_sql(
-      "FETCH FIRST ", sql(format(trunc(limit), scientific = FALSE)), " ROWS ONLY ",
-      con = con
-    )
+    out <- build_sql(
+      "SELECT * FROM ", sql_subquery(con, out), " WHERE ROWNUM <= ", limit,
+      con = con)
+  }else{
+    escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
   }
-
-  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 

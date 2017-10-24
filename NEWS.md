@@ -2,6 +2,24 @@
 
 * Adding support for stringr functions: `str_length()`, `str_to_upper()`, `str_to_lower()`,
   `str_locate()`, `str_replace_all()`, `str_detect()`, `str_trim()`, `str_replace_na()`
+  
+* Added support for ROracle (#2928, #2732)
+
+* Replaced Top N approach for Oracle for backwards compatability (#2928)
+
+* Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
+
+* Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
+
+* Multiple `head()` calls in a row now collapse to a single call. This avoids 
+  a printing problem with MS SQL (#3084).
+
+* `copy_to()` can now "copy" tbl_sql in the same src, providing another
+  way to cache a query into a temporary table (#3064). You can also 
+  `copy_to` tbl_sqls from another source, and `copy_to()` will automatically
+  collect then copy.
+
+* [API] `db_compute()` gains an `analyze` argument to match `db_copy_to()`.
 
 * `copy_to()` (via `db_write_table()`) correctly translates logical variables
   to integers for MySQL (#3151).

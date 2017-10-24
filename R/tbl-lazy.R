@@ -178,7 +178,12 @@ group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
 
 #' @export
 head.tbl_lazy <- function(x, n = 6L, ...) {
-  add_op_single("head", x, args = list(n = n))
+  if (inherits(x$ops, "op_head")) {
+    x$ops$args$n <- min(x$ops$args$n, n)
+  } else {
+    x$ops <- op_single("head", x = x$ops, dots = dots, args = list(n = n))
+  }
+  x
 }
 
 #' @export
