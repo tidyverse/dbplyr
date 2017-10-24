@@ -48,7 +48,7 @@ simulate_sqlite <- function() {
 simulate_postgres <- function() {
   structure(
     list(),
-    class = c("PostgreSQLConnection", "DBITestConnection", "DBIConnection")
+    class = c("PostgreSQLConnection", "DBIConnection")
   )
 }
 
