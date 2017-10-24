@@ -3,6 +3,7 @@
 \name{win_over}
 \alias{win_over}
 \alias{win_rank}
+\alias{win_aggregate}
 \alias{win_recycled}
 \alias{win_cumulative}
 \alias{win_absent}
@@ -15,7 +16,7 @@ win_over(expr, partition = NULL, order = NULL, frame = NULL)
 
 win_rank(f)
 
-win_recycled(f)
+win_aggregate(f)
 
 win_cumulative(f)
 
@@ -40,7 +41,7 @@ win_current_frame()
 }
 \description{
 \code{win_over()} makes it easy to generate the window function specification.
-\code{win_absent()}, \code{win_rank()}, \code{win_recycled()}, and \code{win_cumulative()}
+\code{win_absent()}, \code{win_rank()}, \code{win_aggregate()}, and \code{win_cumulative()}
 provide helpers for constructing common types of window functions.
 \code{win_current_group()} and \code{win_current_order()} allow you to access
 the grouping and order context set up by \code{\link[=group_by]{group_by()}} and \code{\link[=arrange]{arrange()}}.

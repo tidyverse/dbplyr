@@ -1,7 +1,7 @@
 #' Generate SQL expression for window functions
 #'
 #' `win_over()` makes it easy to generate the window function specification.
-#' `win_absent()`, `win_rank()`, `win_recycled()`, and `win_cumulative()`
+#' `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
 #' provide helpers for constructing common types of window functions.
 #' `win_current_group()` and `win_current_order()` allow you to access
 #' the grouping and order context set up by [group_by()] and [arrange()].
@@ -98,9 +98,10 @@ win_rank <- function(f) {
 
 #' @rdname win_over
 #' @export
-win_recycled <- function(f) {
+win_aggregate <- function(f) {
   force(f)
-  function(x) {
+  function(x, na.rm = FALSE) {
+    check_na_rm(f, na.rm)
     frame <- win_current_frame()
 
     win_over(
@@ -111,6 +112,12 @@ win_recycled <- function(f) {
     )
   }
 }
+
+#' @rdname win_over
+#' @usage NULL
+#' @export
+win_recycled <- win_aggregate
+
 
 #' @rdname win_over
 #' @export

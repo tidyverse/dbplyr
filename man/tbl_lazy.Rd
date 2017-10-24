@@ -12,6 +12,7 @@
 \alias{simulate_hive}
 \alias{simulate_odbc_postgresql}
 \alias{simulate_teradata}
+\alias{simulate_odbc_access}
 \alias{tbl_lazy}
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
@@ -37,6 +38,8 @@ simulate_hive()
 simulate_odbc_postgresql()
 
 simulate_teradata()
+
+simulate_odbc_access()
 
 tbl_lazy(df, src = NULL)
 

@@ -45,6 +45,7 @@ Collate:
     'data-nycflights13.r'
     'db-compute.R'
     'db-mysql.r'
+    'db-odbc-access.R'
     'db-odbc-hive.R'
     'db-odbc-impala.R'
     'db-odbc-mssql.R'
