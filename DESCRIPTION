@@ -23,6 +23,7 @@ Imports:
     purrr,
     rlang (>= 0.1.0),
     tibble (>= 1.3.0.9007),
+    tidyselect,
     R6,
     utils
 Suggests:

@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* dbplyr now uses tidyselect to power `rename()` and `select()` (#2943).
+
 * `mutate()` has better logic for splitting a single mutate into multiple
   subqueries (#3095).
 
