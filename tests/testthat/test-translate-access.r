@@ -37,34 +37,36 @@ test_that("Math special cases", {
 # Strings
 
 test_that("String special cases", {
+  translate_access <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_odbc_access(), window = FALSE)
+  }
 
   expect_equivalent(
-    translate_sql(substr(field_name, 1, 2), con = simulate_odbc_access()),
-    sql("RIGHT(LEFT(`field_name`, 2.0), 2.0)")
+    translate_access(substr(x, 1, 2)), sql("RIGHT(LEFT(`x`, 2.0), 2.0)")
   )
 
   # paste() - 1 argument uses CStr
   expect_equivalent(
-    translate_sql(paste(field_name), con = simulate_odbc_access()),
+    translate_access(paste(field_name)),
     sql("CStr(`field_name`)")
   )
 
   # paste() - Multiple arguments use `&` with separator
   expect_equivalent(
-    translate_sql(paste(field_name1, field_name2, sep = "+"), con = simulate_odbc_access()),
+    translate_access(paste(field_name1, field_name2, sep = "+")),
     sql("`field_name1` & '+' & `field_name2`")
   )
 
   # paste() - Collapse is not allowed. Would take scalar function -> agg function
   expect_error(
-    translate_sql(paste(field_name1, collapse = "-"), con = simulate_odbc_access()),
+    translate_access(paste(field_name1, collapse = "-")),
     "`collapse` isn't supported in SQL translation"
   )
 
   # paste0() is paste(sep = "")
   expect_equivalent(
-    translate_sql(paste0(field_name1, field_name2), con = simulate_odbc_access()),
-    translate_sql(paste(field_name1, field_name2, sep = ""), con = simulate_odbc_access())
+    translate_access(paste0(field_name1, field_name2)),
+    translate_access(paste(field_name1, field_name2, sep = ""))
   )
 
 })
