@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* SQL translation for Microsoft Access (#2946) (@DavisVaughan)
+
 * `same_src.tbl_sql()` now performs correct comparison instead of always 
   returning `TRUE`. This means that `copy = TRUE` once again allows you to
   perform cross-database joins (#3002).
