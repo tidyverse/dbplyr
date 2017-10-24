@@ -95,7 +95,7 @@
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   sql <- build_sql(
     "UPDATE STATISTICS ",
-    ident(table)
+    as.sql(table)
     , con = con
   )
   DBI::dbExecute(con, sql)

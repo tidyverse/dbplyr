@@ -54,7 +54,7 @@ db_create_table.DBIConnection <- function(con, table, types,
                                           temporary = TRUE, ...) {
   assert_that(is_string(table), is.character(types))
 
-  field_names <- escape(ident(names(types)), collapse = NULL, con = con)
+  field_names <- escape(as.sql(names(types)), collapse = NULL, con = con)
   fields <- sql_vector(
     paste0(field_names, " ", types),
     parens = TRUE,
@@ -92,7 +92,7 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
   assert_that(is_string(table), is.character(columns))
 
   name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
+  fields <- escape(as.sql(columns), parens = TRUE, con = con)
   sql <- build_sql(
     "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
     " ON ", as.sql(table), " ", fields,

@@ -90,7 +90,7 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
     na = "\\N", row.names = FALSE, col.names = FALSE)
 
   sql <- build_sql("LOAD DATA LOCAL INFILE ", encodeString(tmp), " INTO TABLE ",
-    ident(table), con = con)
+    as.sql(table), con = con)
   dbExecute(con, sql)
 
   invisible()
@@ -100,21 +100,21 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
 db_create_index.MySQLConnection <- function(con, table, columns, name = NULL,
                                             unique = FALSE, ...) {
   name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
+  fields <- escape(as.sql(columns), parens = TRUE, con = con)
   index <- build_sql(
     "ADD ",
     if (unique) sql("UNIQUE "),
-    "INDEX ", ident(name), " ", fields,
+    "INDEX ", as.sql(name), " ", fields,
     con = con
   )
 
-  sql <- build_sql("ALTER TABLE ", ident(table), "\n", index, con = con)
+  sql <- build_sql("ALTER TABLE ", as.sql(table), "\n", index, con = con)
   dbExecute(con, sql)
 }
 
 #' @export
 db_analyze.MySQLConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE TABLE", ident(table), con = con)
+  sql <- build_sql("ANALYZE TABLE", as.sql(table), con = con)
   dbExecute(con, sql)
 }
 

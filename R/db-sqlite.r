@@ -53,7 +53,7 @@ sql_subquery.SQLiteConnection <- function(con, from, name = unique_name(), ...) 
     if (is.null(name)) {
       build_sql("(", from, ")", con = con)
     } else {
-      build_sql("(", from, ") AS ", ident(name), con = con)
+      build_sql("(", from, ") AS ", as.sql(name), con = con)
     }
   }
 }

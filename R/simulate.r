@@ -19,7 +19,7 @@ sql_subquery.DBITestConnection <- function(con, from, name = unique_name(), ...)
   if (is.ident(from)) {
     setNames(from, name)
   } else {
-    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+    build_sql("(", from, ") ", as.sql(name %||% random_table_name()), con = con)
   }
 }
 
