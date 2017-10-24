@@ -11,7 +11,7 @@ db_desc.PostgreSQLConnection <- function(x) {
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      log           = function(x, base = exp(1)) sql_formula_log(x, base = base),
+      log    = function(x, base = exp(1)) sql_formula_log(x, base = base),
       log10  = function(x) build_sql("log(", x, ")"),
       cot    = function(x) sql_formula_cot(x),
       cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
