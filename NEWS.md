@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Add `test_src()` to make it easier to access a single test source.
+
 * SQL translation for Microsoft Access (#2946) (@DavisVaughan)
 
 * `same_src.tbl_sql()` now performs correct comparison instead of always 
