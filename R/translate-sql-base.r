@@ -268,6 +268,8 @@ base_no_win <- sql_translator(
   mean         = win_absent("avg"),
   sd           = win_absent("sd"),
   var          = win_absent("var"),
+  cov          = win_absent("cov"),
+  cor          = win_absent("cor"),
   sum          = win_absent("sum"),
   min          = win_absent("min"),
   max          = win_absent("max"),
