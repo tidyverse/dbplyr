@@ -8,6 +8,9 @@
 
 * Fixed `is.na()` & `is.null()` translations for MSSQL (@edgararuiz)
 
+* Multiple `head()` calls in a row now collapse to a single call. This avoids 
+  a printing problem with MS SQL (#3084).
+
 * `copy_to()` can now "copy" tbl_sql in the same src, providing another
   way to cache a query into a temporary table (#3064). You can also 
   `copy_to` tbl_sqls from another source, and `copy_to()` will automatically

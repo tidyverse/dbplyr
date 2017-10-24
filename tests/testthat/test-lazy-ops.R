@@ -151,3 +151,10 @@ test_that("preserved across compute and collapse", {
   df3 <- collapse(df1)
   expect_equal(op_sort(df3), list(~x))
 })
+
+# head --------------------------------------------------------------------
+
+test_that("two heads are equivalent to one", {
+  out <- lazy_frame(x = 1:10) %>% head(3) %>% head(5)
+  expect_equal(out$ops$args$n, 3)
+})
