@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* Added support for ROracle (#2928, #2732)
+
+* Replaced Top N approach for Oracle for backwards compatability (#2928)
 
 * Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
 
