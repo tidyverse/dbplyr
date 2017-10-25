@@ -1,9 +1,11 @@
 # dbplyr 1.1.0.9000
 
+* Fixed `is.na()` & `is.null()` translations for Oracle (@edgararuiz)
+
 * Adding support for stringr functions: `str_length()`, `str_to_upper()`, `str_to_lower()`,
   str_replace_all()`, `str_detect()`, `str_trim()`. Regular expression support varies 
   from database to database, but most simple regular expressions should be ok (@edgararuiz)
-  
+
 * Added translation for Teradata (@edgararuiz)
 
 * dbplyr now uses tidyselect to power `rename()` and `select()` 

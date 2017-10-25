@@ -38,3 +38,18 @@ test_that(" alias is produced without AS ", {
       simulate_oracle()),
     sql("^SELECT COUNT[(][*][)] AS `nn`\nFROM [(]SELECT `x`, COUNT[(][*][)] AS `n`\nFROM [(]`df`[)] \nGROUP BY `x`[)] `[^`]*`$"))
 })
+
+test_that("query uses IS NULL to filter is.na() ", {
+  expect_match(
+    sql_render(df_oracle %>% filter(is.na(x)), simulate_oracle()),
+    sql("^SELECT [*]\nFROM [(]`df`[)] \nWHERE [(][(][(]`x`[)] IS NULL[)][)]"))
+})
+
+test_that("query uses CASE WHEN to mutate is.na() ", {
+  expect_match(
+    sql_render(df_oracle %>% mutate(is.na(x)), simulate_oracle()),
+    sql("SELECT `x`, `y`, CASE WHEN`x` IS NULL THEN 1 ELSE 0 END  AS `is.na[(]x[)]`\nFROM [(]`df`[)] "))
+})
+
+
+
