@@ -39,14 +39,8 @@ sql_translate_env.Oracle <- function(con) {
       as.character  = sql_cast("VARCHAR(255)"),
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER"),
-      is.null       = function(x){
-                        build_sql(
-                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                        )},
-      is.na         = function(x){
-                        build_sql(
-                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                        )}
+      is.null       = function(x) oracle_is_null(x, sql_current_context()),
+      is.na         = function(x) oracle_is_null(x, sql_current_context())
     ),
     base_odbc_agg,
     base_odbc_win
@@ -70,5 +64,17 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
     build_sql("(", from, ") ", if(!is.null(name))ident(name) , con = con)
   } else {
     build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+  }
+}
+
+
+oracle_is_null <- function(x, context) {
+  if (context$clause %in% c("SELECT", "ORDER")) {
+    build_sql(
+      "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END ")
+  } else {
+    build_sql(
+      "((", x, ") IS NULL)"
+    )
   }
 }
