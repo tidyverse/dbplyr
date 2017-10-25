@@ -212,11 +212,12 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
   by_intersect <- intersect(tbl_vars(x), tbl_vars(y))
-  by <- if (length(by_intersect) > 0 || !identical(type, "full") || !is.null(by)) {
-    common_by(by, x, y)
-  } else {
+
+  if (length(by_intersect) == 0 && identical(type, "full") && is.character(by)) {
     type <- "cross"
-    list(x = character(0), y = character(0))
+    by <- list(x = character(0), y = character(0))
+  } else {
+    by <- common_by(by, x, y)
   }
 
   y <- auto_copy(

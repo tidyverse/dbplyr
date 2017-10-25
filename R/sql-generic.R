@@ -56,16 +56,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
   )
 
   select <- sql_join_vars(con, vars)
-
-  on <- if (length(by$x) + length(by$y) <= 0) NULL else sql_vector(
-    paste0(
-      sql_table_prefix(con, by$x, "TBL_LEFT"),
-      " = ",
-      sql_table_prefix(con, by$y, "TBL_RIGHT")
-    ),
-    collapse = " AND ",
-    parens = TRUE
-  )
+  on <- sql_join_tbls(con, by)
 
   # Wrap with SELECT since callers assume a valid query is returned
   build_sql(
@@ -107,6 +98,23 @@ sql_join_var <- function(con, alias, x, y) {
   } else {
     stop("No source for join column ", alias, call. = FALSE)
   }
+}
+
+sql_join_tbls <- function(con, by) {
+  on <- NULL
+  if (length(by$x) + length(by$y) > 0) {
+    on <- sql_vector(
+      paste0(
+        sql_table_prefix(con, by$x, "TBL_LEFT"),
+        " = ",
+        sql_table_prefix(con, by$y, "TBL_RIGHT")
+      ),
+      collapse = " AND ",
+      parens = TRUE
+    )
+  }
+
+  on
 }
 
 sql_coalesce <- function(...) {
