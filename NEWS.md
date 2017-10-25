@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Added translation for Teradata (@edgararuiz)
+
 * dbplyr now uses tidyselect to power `rename()` and `select()` 
   This fixes a few renaming bugs (#3132, #2943, #2860).
 

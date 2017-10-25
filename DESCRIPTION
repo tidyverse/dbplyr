@@ -55,6 +55,7 @@ Collate:
     'db-odbc-oracle.R'
     'db-odbc-postgres.R'
     'db-odbc-redshift.R'
+    'db-odbc-teradata.R'
     'db-postgres.r'
     'db-roracle.R'
     'db-sqlite.r'

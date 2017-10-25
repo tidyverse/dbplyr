@@ -11,17 +11,9 @@ db_desc.PostgreSQLConnection <- function(x) {
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      log = function(x, base = exp(1)) {
-        if (isTRUE(all.equal(base, exp(1)))) {
-          build_sql("ln(", x, ")")
-        } else {
-          # Use log change-of-base because postgres doesn't support the
-          # two-argument "log(base, x)" for floating point x.
-          build_sql("log(", x, ") / log(", base, ")")
-        }
-      },
       log10  = function(x) build_sql("log(", x, ")"),
-      cot    = function(x) build_sql("1 / TAN(", x, ")"),
+      log    = sql_log(),
+      cot    = sql_cot(),
       cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
       sinh   = function(x) build_sql("(EXP(", x, ") - EXP(-", x,")) / 2"),
       tanh   = function(x) {
