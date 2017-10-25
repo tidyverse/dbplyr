@@ -36,3 +36,17 @@ test_that("coth() translates to the correct formula ", {
       con = simulate_odbc_postgresql()),
     sql("((EXP(`field1`) + EXP(-`field1`)) / 2) / ((EXP(`field1`) - EXP(-`field1`)) / 2)"))
 })
+
+test_that("log() translates to ln ", {
+  expect_equivalent(
+    translate_sql(log(field_name), con = simulate_odbc_postgresql()),
+    sql("ln(`field_name`)")
+  )
+})
+
+test_that("log() with a different base translates to formula ", {
+  expect_equivalent(
+    translate_sql(log(field_name, 2) , con = simulate_odbc_postgresql()),
+    sql("log(`field_name`) / log(2.0)")
+  )
+})

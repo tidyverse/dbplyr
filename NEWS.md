@@ -4,6 +4,8 @@
   str_replace_all()`, `str_detect()`, `str_trim()`. Regular expression support varies 
   from database to database, but most simple regular expressions should be ok (@edgararuiz)
   
+* Added translation for Teradata (@edgararuiz)
+
 * dbplyr now uses tidyselect to power `rename()` and `select()` 
   This fixes a few renaming bugs (#3132, #2943, #2860).
 

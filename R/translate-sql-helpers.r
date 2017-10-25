@@ -190,3 +190,27 @@ sql_cast <- function(type) {
     build_sql("CAST(", x, " AS ", sql(type), ")")
   }
 }
+
+#' @rdname sql_variant
+#' @export
+sql_log <- function() {
+  function(x, base = exp(1)){
+    if (isTRUE(all.equal(base, exp(1)))) {
+      build_sql("ln(", x, ")")
+    } else {
+      build_sql("log(", x, ") / log(", base, ")")
+    }
+  }
+}
+
+
+#' @rdname sql_variant
+#' @export
+sql_cot <- function(){
+  function(x){
+    build_sql("1 / TAN(", x, ")")
+  }
+}
+
+
+
