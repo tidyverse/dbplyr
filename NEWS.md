@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Fixed `is.na()` & `is.null()` translations for Oracle (@edgararuiz)
+
 * Added translation for Teradata (@edgararuiz)
 
 * dbplyr now uses tidyselect to power `rename()` and `select()` 
