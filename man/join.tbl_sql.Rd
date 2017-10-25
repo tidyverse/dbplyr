@@ -54,7 +54,7 @@ This allows you to join tables across srcs, but it's potentially expensive
 operation so you must opt into it.}
 
 \item{suffix}{If there are non-joined duplicate variables in \code{x} and
-\code{y}, these suffixes will be added to the output to diambiguate them.
+\code{y}, these suffixes will be added to the output to disambiguate them.
 Should be a character vector of length 2.}
 
 \item{auto_index}{if \code{copy} is \code{TRUE}, automatically create

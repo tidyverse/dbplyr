@@ -2,7 +2,7 @@ context("translate-window")
 
 test_that("window functions without group have empty over", {
   expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(translate_sql(sum(x)), sql('sum("x") OVER ()'))
+  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql('sum("x") OVER ()'))
 })
 
 test_that("aggregating window functions ignore order_by", {
@@ -11,7 +11,7 @@ test_that("aggregating window functions ignore order_by", {
     sql("COUNT(*) OVER ()")
   )
   expect_equal(
-    translate_sql(sum(x), vars_order = "x"),
+    translate_sql(sum(x, na.rm = TRUE), vars_order = "x"),
     sql('sum("x") OVER ()')
   )
 })
@@ -44,7 +44,7 @@ test_that("first, last, and nth translated to _value", {
 
 test_that("can override frame of recycled functions", {
   expect_equal(
-    translate_sql(sum(x), vars_frame = c(-1, 0), vars_order = "y"),
+    translate_sql(sum(x, na.rm = TRUE), vars_frame = c(-1, 0), vars_order = "y"),
     sql('sum("x") OVER (ORDER BY "y" ROWS 1 PRECEDING)')
   )
 

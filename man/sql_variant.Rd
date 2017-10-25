@@ -7,8 +7,11 @@
 \alias{sql_translator}
 \alias{sql_infix}
 \alias{sql_prefix}
+\alias{sql_aggregate}
 \alias{sql_not_supported}
 \alias{sql_cast}
+\alias{sql_log}
+\alias{sql_cot}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -27,9 +30,15 @@ sql_infix(f)
 
 sql_prefix(f, n = NULL)
 
+sql_aggregate(f)
+
 sql_not_supported(f)
 
 sql_cast(type)
+
+sql_log()
+
+sql_cot()
 
 base_scalar
 

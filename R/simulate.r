@@ -90,3 +90,10 @@ simulate_hive <- function() simulate_odbc("Hive")
 #' @rdname tbl_lazy
 simulate_odbc_postgresql <- function() simulate_odbc("PostgreSQL")
 
+#' @export
+#' @rdname tbl_lazy
+simulate_teradata <- function() simulate_odbc("Teradata")
+
+#' @export
+#' @rdname tbl_lazy
+simulate_odbc_access <- function() simulate_odbc("ACCESS")

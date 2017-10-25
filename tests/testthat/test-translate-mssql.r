@@ -48,7 +48,7 @@ test_that("paste() returns error message", {
 
 test_that("sd() translates to STDEV ", {
   expect_equivalent(
-    translate_sql(sd(field_name),
+    translate_sql(sd(field_name, na.rm = TRUE),
                   window = FALSE,
                   con = simulate_mssql()),
     sql("STDEV(`field_name`)")
@@ -57,7 +57,7 @@ test_that("sd() translates to STDEV ", {
 
 test_that("var() translates to VAR ", {
   expect_equivalent(
-    translate_sql(var(field_name),
+    translate_sql(var(field_name, na.rm = TRUE),
                   window = FALSE,
                   con = simulate_mssql()),
     sql("VAR(`field_name`)")
@@ -112,20 +112,6 @@ test_that("ceil() translates to CEILING ", {
     sql("CEILING(`field_name`)")
   )
 })
-test_that("is.null() translates to CASE-WHEN statement ", {
-  expect_equivalent(
-    translate_sql(is.null(field_name),
-                  con = simulate_mssql()),
-    sql("CASE WHEN `field_name` IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END")
-  )
-})
-test_that("is.na() translates to CASE-WHEN statement ", {
-  expect_equivalent(
-    translate_sql(is.na(field_name),
-                  con = simulate_mssql()),
-    sql("CASE WHEN `field_name` IS NULL THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END")
-  )
-})
 test_that("trimws() translates to LTRIM-RTRIM ", {
   expect_equivalent(
     translate_sql(trimws(field_name),
@@ -134,13 +120,64 @@ test_that("trimws() translates to LTRIM-RTRIM ", {
   )
 })
 
+# stringr -------------------------------------------
+
+test_that("str_length() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_length(field_name),
+      con = simulate_mssql()),
+    sql("LEN(`field_name`)"))
+})
+
+test_that("str_locate() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_locate(field_name, "find"),
+      con = simulate_mssql()),
+    sql("CHARINDEX('find', `field_name`)"))
+})
+
+test_that("str_detect() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_detect(field_name, "find"),
+      con = simulate_mssql()),
+    sql("CHARINDEX('find', `field_name`) > 0"))
+})
+
 
 # MSSQL query tests  ------------------------------------------------
 
 df <- data.frame(x = 1, y = 2)
 df_mssql <- tbl_lazy(df, src = simulate_mssql())
+
 test_that("query uses TOP instead of LIMIT ", {
   expect_equivalent(
     show_query(head(df_mssql)),
     sql("SELECT  TOP 6 *\nFROM `df`"))
+})
+
+test_that("Mutate uses CONVERT-BIT for is.na ", {
+  expect_equivalent(
+    show_query(mutate(df_mssql, z = is.na(x))),
+    sql("SELECT `x`, `y`, CONVERT(BIT, IIF(`x` IS NULL, 1, 0)) AS `z`\nFROM `df`"))
+})
+
+test_that("Filter uses IS NULL for is.na ", {
+  expect_equivalent(
+    show_query(filter(df_mssql, is.na(x))),
+    sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))"))
+})
+
+test_that("Filter uses NOT IS NULL for !is.na ", {
+  expect_equivalent(
+    show_query(filter(df_mssql, !is.na(x))),
+    sql("SELECT *\nFROM `df`\nWHERE (NOT(((`x`) IS NULL)))"))
+})
+
+test_that("Arrange uses CONVERT-BIT for is.na ", {
+  expect_equivalent(
+    show_query(arrange(df_mssql, !is.na(x))),
+    sql("SELECT *\nFROM `df`\nORDER BY NOT(CONVERT(BIT, IIF(`x` IS NULL, 1, 0)))"))
 })

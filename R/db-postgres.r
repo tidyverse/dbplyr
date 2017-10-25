@@ -11,17 +11,9 @@ db_desc.PostgreSQLConnection <- function(x) {
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      log = function(x, base = exp(1)) {
-        if (isTRUE(all.equal(base, exp(1)))) {
-          build_sql("ln(", x, ")")
-        } else {
-          # Use log change-of-base because postgres doesn't support the
-          # two-argument "log(base, x)" for floating point x.
-          build_sql("log(", x, ") / log(", base, ")")
-        }
-      },
       log10  = function(x) build_sql("log(", x, ")"),
-      cot    = function(x) build_sql("1 / TAN(", x, ")"),
+      log    = sql_log(),
+      cot    = sql_cot(),
       cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
       sinh   = function(x) build_sql("(EXP(", x, ") - EXP(-", x,")) / 2"),
       tanh   = function(x) {
@@ -39,28 +31,37 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       paste  = function(..., sep = " "){
         build_sql(
           "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
+        )},
+      # stringr functions
+      str_locate  = function(string, pattern){
+        build_sql(
+          "STRPOS(", string, ", ", pattern, ")"
+        )},
+      str_detect  = function(string, pattern){
+        build_sql(
+          "STRPOS(", string, ", ", pattern, ") > 0"
         )}
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("count(*)"),
+      n = function() sql("COUNT(*)"),
       cor = sql_prefix("corr"),
       cov = sql_prefix("covar_samp"),
-      sd = sql_prefix("stddev_samp"),
-      var = sql_prefix("var_samp"),
-      all = sql_prefix("bool_and"),
-      any = sql_prefix("bool_or"),
+      sd = sql_aggregate("stddev_samp"),
+      var = sql_aggregate("var_samp"),
+      all = sql_aggregate("bool_and"),
+      any = sql_aggregate("bool_or"),
       paste = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
     ),
     sql_translator(.parent = base_win,
       n = function() {
-        win_over(sql("count(*)"), partition = win_current_group())
+        win_over(sql("COUNT(*)"), partition = win_current_group())
       },
-      cor = win_recycled("corr"),
-      cov = win_recycled("covar_samp"),
-      sd =  win_recycled("stddev_samp"),
-      var = win_recycled("var_samp"),
-      all = win_recycled("bool_and"),
-      any = win_recycled("bool_or"),
+      cor = win_aggregate("corr"),
+      cov = win_aggregate("covar_samp"),
+      sd =  win_aggregate("stddev_samp"),
+      var = win_aggregate("var_samp"),
+      all = win_aggregate("bool_and"),
+      any = win_aggregate("bool_or"),
       paste = function(x, collapse) {
         win_over(
           build_sql("string_agg(", x, ", ", collapse, ")"),

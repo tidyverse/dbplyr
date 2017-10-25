@@ -10,7 +10,10 @@ Overview
 
 dbplyr is the database backend for dplyr. If you are using dplyr to connect to databases, you generally will not need to use any functions from dbplyr, but you will need to make sure it's installed.
 
-If you find any bugs, please file in [dplyr](https://github.com/tidyverse/dplyr).
+Issues
+------
+
+If you find any bugs, please file in [dplyr](https://github.com/tidyverse/dplyr/issues).
 
 Installation
 ------------
@@ -35,10 +38,8 @@ copy_to(con, mtcars)
 
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
-#> Source:     table<mtcars> [?? x 11]
-#> Database:   sqlite 3.11.1 [:memory:]
-#> 
-#> # S3: tbl_dbi
+#> # Source:   table<mtcars> [?? x 11]
+#> # Database: sqlite 3.19.3 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21.0     6 160.0   110  3.90 2.620 16.46     0     1     4     4

@@ -12,7 +12,7 @@ test_that("connection affects SQL generation", {
   out2 <- lf %>% sql_build(con = simulate_postgres())
 
   expect_equal(out1$select, sql('COUNT() AS "n"'))
-  expect_equal(out2$select, sql('count(*) AS "n"'))
+  expect_equal(out2$select, sql('COUNT(*) AS \"n\"'))
 })
 
 # select and rename -------------------------------------------------------

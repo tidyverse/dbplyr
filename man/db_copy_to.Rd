@@ -12,7 +12,7 @@ db_copy_to(con, table, values, overwrite = FALSE, types = NULL,
   analyze = TRUE, ...)
 
 db_compute(con, table, sql, temporary = TRUE, unique_indexes = list(),
-  indexes = list(), ...)
+  indexes = list(), analyze = TRUE, ...)
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 

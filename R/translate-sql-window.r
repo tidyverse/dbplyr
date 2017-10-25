@@ -1,7 +1,7 @@
 #' Generate SQL expression for window functions
 #'
 #' `win_over()` makes it easy to generate the window function specification.
-#' `win_absent()`, `win_rank()`, `win_recycled()`, and `win_cumulative()`
+#' `win_absent()`, `win_rank()`, `win_aggregate()`, and `win_cumulative()`
 #' provide helpers for constructing common types of window functions.
 #' `win_current_group()` and `win_current_order()` allow you to access
 #' the grouping and order context set up by [group_by()] and [arrange()].
@@ -98,9 +98,10 @@ win_rank <- function(f) {
 
 #' @rdname win_over
 #' @export
-win_recycled <- function(f) {
+win_aggregate <- function(f) {
   force(f)
-  function(x) {
+  function(x, na.rm = FALSE) {
+    check_na_rm(f, na.rm)
     frame <- win_current_frame()
 
     win_over(
@@ -111,6 +112,12 @@ win_recycled <- function(f) {
     )
   }
 }
+
+#' @rdname win_over
+#' @usage NULL
+#' @export
+win_recycled <- win_aggregate
+
 
 #' @rdname win_over
 #' @export
@@ -149,6 +156,9 @@ sql_context <- new.env(parent = emptyenv())
 sql_context$group_by <- NULL
 sql_context$order_by <- NULL
 sql_context$con <- NULL
+# Used to carry additional information needed for special cases
+sql_context$context <- ""
+
 
 set_current_con <- function(con) {
   old <- sql_context$con
@@ -194,6 +204,14 @@ win_current_frame <- function() sql_context$frame
 # Not exported, because you shouldn't need it
 sql_current_con <- function() sql_context$con
 
+# Functions to manage information for special cases
+set_current_context <- function(context) {
+  old <- sql_context$context
+  sql_context$context <- context
+  invisible(old)
+}
+
+sql_current_context <- function() sql_context$context
 
 # Where translation -------------------------------------------------------
 

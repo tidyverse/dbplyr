@@ -21,7 +21,7 @@ test_that("unary minus flips sign of number", {
 
 test_that("unary minus wraps non-numeric expressions", {
   expect_equal(translate_sql(-(1L + 2L)), sql("-(1 + 2)"))
-  expect_equal(translate_sql(-mean(x), window = FALSE), sql('-AVG("x")'))
+  expect_equal(translate_sql(-mean(x, na.rm = TRUE), window = FALSE), sql('-AVG("x")'))
 })
 
 test_that("binary minus subtracts", {
@@ -52,7 +52,7 @@ test_that("postgres mimics two argument log", {
     translate_sql(..., con = simulate_postgres())
   }
 
-  expect_equal(translate_postgres(log(x)), sql('ln("x")'))
-  expect_equal(translate_postgres(log(x, 10)), sql('log("x") / log(10.0)'))
-  expect_equal(translate_postgres(log(x, 10L)), sql('log("x") / log(10)'))
+  expect_equal(translate_postgres(log(x)), sql('ln(\"x\")'))
+  expect_equal(translate_postgres(log(x, 10)), sql('log(\"x\") / log(10.0)'))
+  expect_equal(translate_postgres(log(x, 10L)), sql('log(\"x\") / log(10)'))
 })

@@ -1,3 +1,5 @@
+setOldClass(c("tbl_lazy", "tbl"))
+
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
@@ -106,6 +108,7 @@ rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
+  dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("summarise", .data, dots = dots)
 }
 #' @export
@@ -122,16 +125,18 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
 
   # For each expression, check if it uses any newly created variables.
   # If so, nest the mutate()
-  used_vars <- lapply(dots, function(x) all_names(get_expr(x)))
-
+  new_vars <- character()
   init <- 0L
   for (i in seq_along(dots)) {
-    cur_idx <- inc_seq(init + 1L, i - 1L)
-    new_vars <- names(dots)[cur_idx]
+    cur_var <- names(dots)[[i]]
+    used_vars <- all_names(get_expr(dots[[i]]))
 
-    if (any(used_vars[[i]] %in% new_vars)) {
-      .data <- add_op_single("mutate", .data, dots = dots[cur_idx])
+    if (any(used_vars %in% new_vars)) {
+      .data <- add_op_single("mutate", .data, dots = dots[new_vars])
+      new_vars <- cur_var
       init <- i
+    } else {
+      new_vars <- c(new_vars, cur_var)
     }
   }
 
@@ -175,7 +180,12 @@ group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
 
 #' @export
 head.tbl_lazy <- function(x, n = 6L, ...) {
-  add_op_single("head", x, args = list(n = n))
+  if (inherits(x$ops, "op_head")) {
+    x$ops$args$n <- min(x$ops$args$n, n)
+  } else {
+    x$ops <- op_single("head", x = x$ops, dots = dots, args = list(n = n))
+  }
+  x
 }
 
 #' @export
@@ -210,7 +220,8 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
   }
 
   y <- auto_copy(
-    x, y, copy,
+    x, y,
+    copy = copy,
     indexes = if (auto_index) list(by$y)
   )
 

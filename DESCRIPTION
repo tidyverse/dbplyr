@@ -1,57 +1,63 @@
-Package: dbplyr
 Type: Package
-Version: 1.1.0.9000
+Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Description: A 'dplyr' back end for databases that allows you to work with 
-    remote database tables as if they are in-memory data frames. Basic features
-    works with any database that has a 'DBI' back end; more advanced features 
-    require 'SQL' translation to be provided by the package author.
+Version: 1.1.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("RStudio", role = c("cph", "fnd"))
     )
+Description: A 'dplyr' back end for databases that allows you to work with 
+    remote database tables as if they are in-memory data frames. Basic features
+    works with any database that has a 'DBI' back end; more advanced features 
+    require 'SQL' translation to be provided by the package author.
+License: MIT + file LICENSE
 URL: https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dplyr/issues
-Depends:
-    R (>= 3.1.2)
-Imports:
+Depends: 
+    R (>= 3.1)
+Imports: 
     assertthat,
     DBI (>= 0.5),
     dplyr (>= 0.5.0.9004),
     glue,
     methods,
     purrr,
+    R6,
     rlang (>= 0.1.0),
     tibble (>= 1.3.0.9007),
-    R6,
+    tidyselect,
     utils
-Suggests:
+Suggests: 
     covr,
     knitr,
     Lahman (>= 3.0-1),
     nycflights13,
     rmarkdown,
-    RSQLite (>= 1.0.0),
     RMySQL,
     RPostgreSQL,
+    RSQLite (>= 1.0.0),
     testthat
 VignetteBuilder: knitr
 LazyData: yes
-License: MIT + file LICENSE
-Collate:
+Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
+RoxygenNote: 6.0.1
+Collate: 
     'cache.r'
     'compat-purrr.R'
     'data-lahman.r'
     'data-nycflights13.r'
     'db-compute.R'
     'db-mysql.r'
+    'db-odbc-access.R'
     'db-odbc-hive.R'
     'db-odbc-impala.R'
     'db-odbc-mssql.R'
     'db-odbc-oracle.R'
     'db-odbc-postgres.R'
     'db-odbc-redshift.R'
+    'db-odbc-teradata.R'
     'db-postgres.r'
+    'db-roracle.R'
     'db-sqlite.r'
     'dbi-s3.r'
     'dbplyr.R'
@@ -87,5 +93,3 @@ Collate:
     'utils.r'
     'window.R'
     'zzz.R'
-RoxygenNote: 6.0.1
-Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))

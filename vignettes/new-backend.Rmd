@@ -22,11 +22,11 @@ This document describes how to add a new SQL backend to dbplyr. To begin:
   [familiar with the basics](http://adv-r.had.co.nz/OO-essentials.html#s3) 
   before you start.
  
-This document is still a work in progress, but it will hopefully get you started. I'd also strongly recommending the bundled source code for [SQLite](https://github.com/tidyverse/dbplyr/blob/master/R/db-sqlite.r), [MySQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-mysql.r), and [PostgreSQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-postgres.r).
+This document is still a work in progress, but it will hopefully get you started. I'd also strongly recommend reading the bundled source code for [SQLite](https://github.com/tidyverse/dbplyr/blob/master/R/db-sqlite.r), [MySQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-mysql.r), and [PostgreSQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-postgres.r).
 
 ## First steps
 
-For interactive exploation, attach dplyr and DBI. If you're creating a package, you'll need to import dplyr and DBI.
+For interactive exploitation, attach dplyr and DBI. If you're creating a package, you'll need to import dplyr and DBI.
 
 ```{r setup, message = FALSE}
 library(dplyr)
@@ -44,7 +44,7 @@ tbl(con, "mtcars")
 
 If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/rstats-db/DBItest) to narrow down the problem.
 
-Now is a good time to implement a method for `db_desc()`. This should briefly describe the connection, typically formatting the information returned form `dbGetInfo()`. This is what dbplyr does for Postgres connections:
+Now is a good time to implement a method for `db_desc()`. This should briefly describe the connection, typically formatting the information returned from `dbGetInfo()`. This is what dbplyr does for Postgres connections:
 
 ```{r}
 #' @export
@@ -57,7 +57,7 @@ db_desc.PostgreSQLConnection <- function(x) {
 }
 ```
 
-## Coping, computing, collecting and collapsing
+## Copying, computing, collecting and collapsing
 
 Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work.
 
@@ -85,5 +85,5 @@ Check that SQL translation for the key verbs work:
 
 ### Vectors
 
-Finially, you may way to provide custom R -> SQL translation at the vector level by providing a method for `src_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
+Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `src_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
 

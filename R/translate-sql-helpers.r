@@ -58,10 +58,10 @@ sql_variant <- function(scalar = sql_translator(),
 
   # Need to check that every function in aggregate also occurs in window
   missing <- setdiff(ls(aggregate), ls(window))
-  if (length(missing) > 1) {
+  if (length(missing) > 0) {
     warn(paste0(
-      "Translator is missing window functions:\n",
-      paste0(missing, collapse = ", ")
+      "Translator is missing window variants of the following aggregate functions:\n",
+      paste0("* ", missing, "\n", collapse = "")
     ))
   }
 
@@ -133,11 +133,7 @@ sql_prefix <- function(f, n = NULL) {
   assert_that(is_string(f))
 
   f <- toupper(f)
-  function(..., na.rm) {
-    if (!missing(na.rm)) {
-      message("na.rm not needed in SQL: NULL are always dropped", call. = FALSE)
-    }
-
+  function(...) {
     args <- list(...)
     if (!is.null(n) && length(args) != n) {
       stop(
@@ -150,6 +146,30 @@ sql_prefix <- function(f, n = NULL) {
     }
     build_sql(sql(f), args)
   }
+}
+
+#' @rdname sql_variant
+#' @export
+sql_aggregate <- function(f) {
+  assert_that(is_string(f))
+  f <- toupper(f)
+
+  function(x, na.rm = FALSE) {
+    check_na_rm(f, na.rm)
+    build_sql(sql(f), list(x))
+  }
+}
+
+check_na_rm <- function(f, na.rm) {
+  if (identical(na.rm, TRUE)) {
+    return()
+  }
+
+  warning(
+    "Missing values are always removed in SQL.\n",
+    "Use `", f, "(x, na.rm = TRUE)` to silence this warning",
+    call. = FALSE
+  )
 }
 
 #' @rdname sql_variant
@@ -170,3 +190,27 @@ sql_cast <- function(type) {
     build_sql("CAST(", x, " AS ", sql(type), ")")
   }
 }
+
+#' @rdname sql_variant
+#' @export
+sql_log <- function() {
+  function(x, base = exp(1)){
+    if (isTRUE(all.equal(base, exp(1)))) {
+      build_sql("ln(", x, ")")
+    } else {
+      build_sql("log(", x, ") / log(", base, ")")
+    }
+  }
+}
+
+
+#' @rdname sql_variant
+#' @export
+sql_cot <- function(){
+  function(x){
+    build_sql("1 / TAN(", x, ")")
+  }
+}
+
+
+

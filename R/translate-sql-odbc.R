@@ -45,9 +45,10 @@ base_odbc_agg <- sql_translator(
 #' @rdname sql_variant
 #' @format NULL
 base_odbc_win <- sql_translator(.parent = base_win,
-  n             = function() sql("COUNT(*)"),
-  count         = function() sql("COUNT(*)"),
-  sd            = win_recycled("STDDEV_SAMP")
+  sd            = win_aggregate("STDDEV_SAMP"),
+  count         = function() {
+                    win_over(sql("COUNT(*)"), win_current_group())
+                    }
 )
 
 #' @export
@@ -55,7 +56,7 @@ db_desc.OdbcConnection <- function(x) {
   info <- DBI::dbGetInfo(x)
 
   host <- if (info$servername == "") "localhost" else info$servername
-  port <- if (info$port == "") "" else paste0(":", port)
+  port <- if (info$port == "") "" else paste0(":", info$port)
 
   paste0(
     info$dbms.name, " ", info$db.version,
@@ -86,7 +87,7 @@ db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
 
 #' @export
 db_copy_to.OdbcConnection <- function(con, table, values,
-                                      overwrite = FALSE, types = NULL, temporary = FALSE,
+                                      overwrite = FALSE, types = NULL, temporary = TRUE,
                                       unique_indexes = NULL, indexes = NULL,
                                       analyze = TRUE, ...) {
 
