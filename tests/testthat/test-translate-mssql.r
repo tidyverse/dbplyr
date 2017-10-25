@@ -120,6 +120,32 @@ test_that("trimws() translates to LTRIM-RTRIM ", {
   )
 })
 
+# stringr -------------------------------------------
+
+test_that("str_length() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_length(field_name),
+      con = simulate_mssql()),
+    sql("LEN(`field_name`)"))
+})
+
+test_that("str_locate() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_locate(field_name, "find"),
+      con = simulate_mssql()),
+    sql("CHARINDEX('find', `field_name`)"))
+})
+
+test_that("str_detect() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_detect(field_name, "find"),
+      con = simulate_mssql()),
+    sql("CHARINDEX('find', `field_name`) > 0"))
+})
+
 
 # MSSQL query tests  ------------------------------------------------
 

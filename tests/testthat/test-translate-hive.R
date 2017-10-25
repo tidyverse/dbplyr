@@ -9,3 +9,13 @@ test_that("cot() translates the appropiate formula ", {
       con = simulate_hive()),
     sql("1 / TAN(`field_name`)"))
 })
+
+# stringr -------------------------------------------
+
+test_that("str_replace_all() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_replace_all(field_name, "old", "new"),
+      con = simulate_hive()),
+      sql("regexp_replace(`field_name`, 'old', 'new')"))
+})

@@ -1,5 +1,9 @@
 # dbplyr 1.1.0.9000
 
+* Adding support for stringr functions: `str_length()`, `str_to_upper()`, `str_to_lower()`,
+  str_replace_all()`, `str_detect()`, `str_trim()`. Regular expression support varies 
+  from database to database, but most simple regular expressions should be ok (@edgararuiz)
+  
 * Added translation for Teradata (@edgararuiz)
 
 * dbplyr now uses tidyselect to power `rename()` and `select()` 
@@ -8,9 +12,9 @@
 * `mutate()` has better logic for splitting a single mutate into multiple
   subqueries (#3095).
 
-* Added support for ROracle (#2928, #2732)
+* Added support for ROracle (#2928, #2732) (@edgararuiz)
 
-* Replaced Top N approach for Oracle for backwards compatability (#2928)
+* Replaced Top N approach for Oracle for backwards compatability (#2928) (@edgararuiz)
 
 * Custom `compute()` and `db_save_query()` functions for MS SQL connections (@Hong-Revo)
 
