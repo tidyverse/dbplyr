@@ -37,6 +37,13 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
   if (length(outer) == 0 || length(inner) == 0)
     return(x)
 
+  if (as.character(inner[length(inner)]) == "order_by" && !("group_by" %in% as.character(inner)) &&
+      (as.character(outer) == "select" || as.character(outer) == "where")
+      ) {
+    from[as.character(outer)] <- x[as.character(outer)]
+    return(from)
+  }
+
   if (min(outer) > max(inner)) {
     from[as.character(outer)] <- x[as.character(outer)]
     from
