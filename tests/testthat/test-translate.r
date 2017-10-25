@@ -125,13 +125,6 @@ test_that("str_to_lower() translates correctly ", {
       sql("LOWER(\"field_name\")"))
 })
 
-test_that("str_locate() translates correctly ", {
-  expect_equivalent(
-    translate_sql(
-      str_locate(field_name, "pattern")),
-      sql("INSTR('pattern', \"field_name\")"))
-})
-
 test_that("str_replace_all() translates correctly ", {
   expect_equivalent(
     translate_sql(
@@ -151,13 +144,6 @@ test_that("str_trim() translates correctly ", {
     translate_sql(
       str_trim(field_name, "both")),
       sql("LTRIM(RTRIM(\"field_name\"))"))
-})
-
-test_that("str_replace_na() translates correctly ", {
-  expect_equivalent(
-    translate_sql(
-      str_replace_na(field_name)),
-      sql("CASE WHEN \"field_name\" IS NULL THEN 'NA' ELSE \"field_name\" END"))
 })
 
 
