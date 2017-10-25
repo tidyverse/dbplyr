@@ -133,7 +133,7 @@ op_grps.op_summarise <- function(op) {
 
 #' @export
 op_grps.op_rename <- function(op) {
-  names(rename_vars(op_grps(op$x), !!! op$dots, strict = FALSE))
+  names(tidyselect::vars_rename(op_grps(op$x), !!! op$dots, .strict = FALSE))
 }
 
 #' @export
@@ -162,7 +162,7 @@ op_vars.op_base <- function(op) {
 }
 #' @export
 op_vars.op_select <- function(op) {
-  names(select_vars(op_vars(op$x), !!! op$dots, include = op_grps(op$x)))
+  names(tidyselect::vars_select(op_vars(op$x), !!! op$dots, .include = op_grps(op$x)))
 }
 #' @export
 op_vars.op_rename <- function(op) {
