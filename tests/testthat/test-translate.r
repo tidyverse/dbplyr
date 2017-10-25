@@ -102,3 +102,50 @@ test_that("different arguments of substr are corrected", {
   expect_equal(translate_sql(substr(x, 3, 1)), sql('substr("x", 3, 0)'))
 })
 
+# stringr -------------------------------------------
+
+test_that("str_length() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_length(field_name)),
+      sql("LENGTH(\"field_name\")"))
+})
+
+test_that("str_to_upper() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_to_upper(field_name)),
+      sql("UPPER(\"field_name\")"))
+})
+
+test_that("str_to_lower() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_to_lower(field_name)),
+      sql("LOWER(\"field_name\")"))
+})
+
+test_that("str_replace_all() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_replace_all(field_name, "pattern", "replacement")),
+      sql("REPLACE(\"field_name\", 'pattern', 'replacement')"))
+})
+
+test_that("str_detect() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_detect(field_name, "pattern")),
+      sql("INSTR('pattern', \"field_name\") > 0"))
+})
+
+test_that("str_trim() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      str_trim(field_name, "both")),
+      sql("LTRIM(RTRIM(\"field_name\"))"))
+})
+
+
+
+

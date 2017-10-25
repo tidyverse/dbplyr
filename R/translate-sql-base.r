@@ -142,7 +142,35 @@ base_scalar <- sql_translator(
   pmin = sql_prefix("min"),
   pmax = sql_prefix("max"),
 
-  `%>%` = `%>%`
+  `%>%` = `%>%`,
+
+  # stringr functions
+
+  # SQL Syntax reference links:
+  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
+  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
+  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
+  #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
+  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
+  #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
+  str_length      = sql_prefix("LENGTH"),
+  str_to_upper    = sql_prefix("UPPER"),
+  str_to_lower    = sql_prefix("LOWER"),
+  str_replace_all = function(string, pattern, replacement){
+                      build_sql(
+                        "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
+                      )},
+  str_detect      = function(string, pattern){
+                      build_sql(
+                        "INSTR(", pattern, ", ", string, ") > 0"
+                      )},
+  str_trim        = function(string, side = "both"){
+                      build_sql(
+                        sql(ifelse(side == "both" | side == "left", "LTRIM(", "(")),
+                        sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
+                        string
+                        ,"))"
+                      )}
 )
 
 base_symbols <- sql_translator(
