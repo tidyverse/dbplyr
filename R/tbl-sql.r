@@ -21,6 +21,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
 }
 
+
 #' @export
 same_src.tbl_sql <- function(x, y) {
   if (!inherits(y, "tbl_sql")) return(FALSE)

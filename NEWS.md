@@ -1,5 +1,9 @@
 # dbplyr 1.1.0.9000
 
+* New `remote_name()`, `remote_con()`, `remote_src()`, `remote_query()` and 
+  `remote_query_plan()` provide a standard API for get metadata about a 
+  remote tbl (#3130, #2923, #2824).
+
 * Adding support for stringr functions: `str_length()`, `str_to_upper()`, `str_to_lower()`,
   str_replace_all()`, `str_detect()`, `str_trim()`. Regular expression support varies 
   from database to database, but most simple regular expressions should be ok (@edgararuiz)
