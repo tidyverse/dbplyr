@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Added support for RMariaDB package (#3154)
+
 * Added support for RPostgres package (currently available only on GitHub) (#3154)
 
 * New `remote_name()`, `remote_con()`, `remote_src()`, `remote_query()` and 

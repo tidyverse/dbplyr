@@ -52,8 +52,8 @@ test_that("consistent result of full join on key column with same name in both t
   tbl_right <- tibble(x = c(1L:3L, 5L), z = 1L:4L)
 
   # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql"))
+  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
+  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
   compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_x)
 })
@@ -110,8 +110,8 @@ test_that("consistent result of full join on key column with different names", {
   tbl_right <- tibble(xr = c(1L:3L, 5L), z = 1L:4L)
 
   # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql"))
+  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
+  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
   compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_xl_xr)
 })
@@ -168,8 +168,8 @@ test_that("consistent result of full natural join", {
   tbl_right <- data_frame(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
 
   # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql"))
+  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
+  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
   compare_tbls2(tbls_left, tbls_right, op = test_f_j)
 })

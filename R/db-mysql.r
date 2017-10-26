@@ -10,6 +10,9 @@ db_desc.MySQLConnection <- function(x) {
 }
 
 #' @export
+db_desc.MariaDBConnection <- db_desc.MySQLConnection
+
+#' @export
 sql_translate_env.MySQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
@@ -25,6 +28,9 @@ sql_translate_env.MySQLConnection <- function(con) {
   )
 }
 
+#' @export
+sql_translate_env.MariaDBConnection <- sql_translate_env.MySQLConnection
+
 # DBI methods ------------------------------------------------------------------
 
 #' @export
@@ -33,6 +39,9 @@ db_has_table.MySQLConnection <- function(con, table, ...) {
   # skip any local checks and rely on the database to throw informative errors
   NA
 }
+
+#' @export
+db_has_table.MariaDBConnection <- db_has_table.MySQLConnection
 
 #' @export
 db_data_type.MySQLConnection <- function(con, fields, ...) {
@@ -113,10 +122,16 @@ db_create_index.MySQLConnection <- function(con, table, columns, name = NULL,
 }
 
 #' @export
+db_create_index.MariaDBConnection <- db_create_index.MySQLConnection
+
+#' @export
 db_analyze.MySQLConnection <- function(con, table, ...) {
   sql <- build_sql("ANALYZE TABLE", as.sql(table), con = con)
   dbExecute(con, sql)
 }
+
+#' @export
+db_analyze.MariaDBConnection <- db_analyze.MySQLConnection
 
 # SQL methods -------------------------------------------------------------
 

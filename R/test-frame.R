@@ -66,7 +66,7 @@ test_frame <- function(..., srcs = test_srcs$get(), ignore = character()) {
 
 test_frame_windowed <- function(...) {
   # SQLite and MySQL don't support window functions
-  test_frame(..., ignore = c("sqlite", "mysql"))
+  test_frame(..., ignore = c("sqlite", "mysql", "MariaDB"))
 }
 
 # Manage cache of testing srcs

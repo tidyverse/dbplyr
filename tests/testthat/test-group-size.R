@@ -2,7 +2,8 @@ context("Group sizes")
 
 # Data for the first three test_that groups below
 df <- data.frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
-tbls <- test_load(df)
+# MariaDB returns bit64 instead of int, which makes testing hard
+tbls <- test_load(df, ignore = "MariaDB")
 
 test_that("ungrouped data has 1 group, with group size = nrow()", {
   for (tbl in tbls) {
@@ -28,7 +29,7 @@ test_that("group_size correct for grouped data", {
 
 # For following tests, add an extra level that's not present in data
 df$x = factor(df$x, levels = 1:4)
-tbls <- test_load(df)
+tbls <- test_load(df, ignore = "MariaDB")
 
 test_that("n_groups drops zero-length groups", {
   for (tbl in tbls) {

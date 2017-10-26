@@ -37,8 +37,8 @@ test_that("intersect and setdiff work for supported backends", {
   df <- tibble(x = 1:10, y = x %% 2)
 
   # MySQL doesn't support EXCEPT or INTERSECT
-  tbls_full <- test_load(df, ignore = "mysql")
-  tbls_filter <- test_load(filter(df, y == 0), ignore = "mysql")
+  tbls_full <- test_load(df, ignore = c("mysql", "MariaDB"))
+  tbls_filter <- test_load(filter(df, y == 0), ignore = c("mysql", "MariaDB"))
 
   tbls_full %>%
     map2(tbls_filter, intersect) %>%

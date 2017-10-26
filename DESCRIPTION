@@ -33,6 +33,7 @@ Suggests:
     Lahman (>= 3.0-1),
     nycflights13,
     rmarkdown,
+    RMariaDB,
     RMySQL,
     RPostgreSQL,
     RSQLite (>= 1.0.0),

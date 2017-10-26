@@ -10,7 +10,7 @@ test_that("compute doesn't change representation", {
 })
 
 test_that("compute can create indexes", {
-  mfs <- test_frame(x = 5:1, y = 1:5, z = "a")
+  mfs <- test_frame(x = 5:1, y = 1:5, z = 10)
 
   mfs %>%
     map(. %>% compute(indexes = c("x", "y"))) %>%

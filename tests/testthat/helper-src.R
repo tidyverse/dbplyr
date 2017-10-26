@@ -7,6 +7,11 @@ if (test_srcs$length() == 0) {
     host = "localhost",
     user = Sys.getenv("USER")
   )
+  test_register_con("MariaDB", RMariaDB::MariaDB(),
+    dbname = "test",
+    host = "localhost",
+    user = Sys.getenv("USER")
+  )
 
   if (identical(Sys.getenv("TRAVIS"), "true")) {
     test_register_con("postgres", RPostgreSQL::PostgreSQL(),
