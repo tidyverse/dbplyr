@@ -189,14 +189,20 @@ sql_overscope <- function(expr, variant, con, window = FALSE,
   new_overscope(symbol_env, top_env)
 }
 
+is_infix_base <- function(x) {
+  x %in% c("::", "$", "@", "^", "*", "/", "+", "-", ">", ">=", "<", "<=",
+    "==", "!=", "!", "&", "&&", "|", "||", "~", "<-", "<<-")
+}
+is_infix_user <- function(x) {
+  grepl("^%.*%$", x)
+}
+
 default_op <- function(x) {
   assert_that(is_string(x))
-  infix <- c("::", "$", "@", "^", "*", "/", "+", "-", ">", ">=", "<", "<=",
-    "==", "!=", "!", "&", "&&", "|", "||", "~", "<-", "<<-")
 
-  if (x %in% infix) {
+  if (is_infix_base(x)) {
     sql_infix(x)
-  } else if (grepl("^%.*%$", x)) {
+  } else if (is_infix_user(x)) {
     x <- substr(x, 2, nchar(x) - 1)
     sql_infix(x)
   } else {

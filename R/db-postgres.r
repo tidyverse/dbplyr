@@ -14,34 +14,22 @@ db_desc.PQConnection <- db_desc.PostgreSQLConnection
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      log10  = function(x) build_sql("log(", x, ")"),
+      log10  = function(x) sql_expr(log(!!x)),
       log    = sql_log(),
       cot    = sql_cot(),
-      cosh   = function(x) build_sql("(EXP(", x, ") + EXP(-", x,")) / 2"),
-      sinh   = function(x) build_sql("(EXP(", x, ") - EXP(-", x,")) / 2"),
-      tanh   = function(x) {
-        build_sql(
-          "((EXP(", x, ") - EXP(-", x,")) / 2) / ((EXP(", x, ") + EXP(-", x,")) / 2)"
-        )},
-      coth   = function(x){
-        build_sql(
-          "((EXP(", x, ") + EXP(-", x,")) / 2) / ((EXP(", x, ") - EXP(-", x,")) / 2)"
-        )},
-      round  = function(x, digits = 0L){
-        build_sql(
-          "ROUND((", x, ")::numeric, ", as.integer(digits),")"
-        )},
+      round  = function(x, digits = 0L) {
+        digits <- as.integer(digits)
+        sql_expr(round((!!x) %::% numeric, !!digits))
+      },
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
       # stringr functions
-      str_locate  = function(string, pattern){
-        build_sql(
-          "STRPOS(", string, ", ", pattern, ")"
-        )},
+      str_locate  = function(string, pattern) {
+        sql_expr(strpos(!!string, !!pattern))
+      },
       str_detect  = function(string, pattern){
-        build_sql(
-          "STRPOS(", string, ", ", pattern, ") > 0"
-        )}
+        sql_expr(strpos(!!string, !!pattern) > 0L)
+      }
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
@@ -51,7 +39,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       var = sql_aggregate("var_samp"),
       all = sql_aggregate("bool_and"),
       any = sql_aggregate("bool_or"),
-      str_collapse = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
+      str_collapse = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
     ),
     sql_translator(.parent = base_win,
       n = function() {
@@ -65,7 +53,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       any = win_aggregate("bool_or"),
       str_collapse = function(x, collapse) {
         win_over(
-          build_sql("string_agg(", x, ", ", collapse, ")"),
+          sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
           order = win_current_order()
         )

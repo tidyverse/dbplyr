@@ -135,11 +135,8 @@
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    build_sql(
-      "CONVERT(BIT, IIF(", x ," IS NULL, 1, 0))")
-    } else {
-      build_sql(
-        "((", x, ") IS NULL)"
-      )
-    }
+    sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
+  } else {
+    sql_expr( ((!!x) %is% NULL) )
+  }
 }

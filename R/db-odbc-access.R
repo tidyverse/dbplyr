@@ -60,21 +60,21 @@ sql_translate_env.ACCESS <- function(con) {
                    exp           = sql_prefix("EXP"),
                    log           = sql_prefix("LOG"),
                    log10         = function(x) {
-                     build_sql("LOG(", x, ") / LOG(10)")
+                     sql_expr(log(!!x) / log(10L))
                    },
                    sqrt          = sql_prefix("SQR"),
                    sign          = sql_prefix("SGN"),
                    floor         = sql_prefix("INT"),
                    # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
                    ceiling       = function(x) {
-                     build_sql("INT(", x, " + .9999999999)")
+                     sql_expr(int(UQ(x) + .9999999999))
                    },
                    ceil          = function(x) {
-                     build_sql("INT(", x, " + .9999999999)")
+                     sql_expr(int(UQ(x) + .9999999999))
                    },
                    # There is no POWER function in Access. It uses ^ instead
                    `^`           = function(x, y) {
-                     build_sql(x, " ^ ", y)
+                     sql_expr(UQ(x) ^ UQ(y))
                    },
 
                    # Strings
@@ -85,8 +85,7 @@ sql_translate_env.ACCESS <- function(con) {
                    substr        = function(x, start, stop){
                      right  <- stop - start + 1
                      left   <- stop
-                     build_sql(
-                       "RIGHT(LEFT(", x, ", ", left, "), ", right, ")")
+                     sql_expr(right(left(!!x, !!left), !!right))
                    },
                    trimws        = sql_prefix("TRIM"),
                    # No support for CONCAT in Access
@@ -99,23 +98,23 @@ sql_translate_env.ACCESS <- function(con) {
                    is.na         = sql_prefix("ISNULL"),
                    # IIF() is like ifelse()
                    ifelse        = function(test, yes, no){
-                     build_sql("IIF(", test, ", ", yes, ", ", no, ")")
+                     sql_expr(iif(!!test, !!yes, !!no))
                    },
 
                    # Coalesce doesn't exist in Access.
                    # NZ() only works while in Access, not with the Access driver
                    # IIF(ISNULL()) is the best way to construct this
                    coalesce      = function(x, y) {
-                     build_sql("IIF(ISNULL(", x, "),", y, ",", x, ")")
+                     sql_expr(iif(isnull(!!x), !!y, !!x))
                    },
 
                    # pmin/pmax for 2 columns
                    pmin          = function(x, y) {
-                     build_sql("IIF(", x, " <= ", y, ",", x, ",", y, ")")
+                     sql_expr(iif(UQ(x) <= UQ(y), !!x, !!y))
                    },
 
                    pmax          = function(x, y) {
-                     build_sql("IIF(", x, " <= ", y, ",", y, ",", x, ")")
+                     sql_expr(iif(UQ(x) <= UQ(y), !!y, !!x))
                    },
 
                    # Dates
@@ -163,14 +162,14 @@ sql_paste_access <- function(..., sep = " ", collapse = NULL) {
 
   # Access concatenates strings as `"ex1" & "ex2" & "ex3"`
   binary_build <- function(x, y) {
-    build_sql(x, " & ", sep, " & ", y)
+    sql_expr(!!x & !!sep & !!y)
   }
 
   .dots <- list(...)
   n <- length(.dots)
 
-  if(n == 1) {
-    build_sql("CStr(", .dots[[1]], ")")
+  if (n == 1) {
+    sql_expr(CStr(!!.dots[[1]]))
   } else {
     reduce(.dots, binary_build)
   }

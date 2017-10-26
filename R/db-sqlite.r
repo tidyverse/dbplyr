@@ -19,9 +19,9 @@ sql_translate_env.SQLiteConnection <- function(con) {
     sql_translator(.parent = base_scalar,
       log     = function(x, base = exp(1)) {
         if (base != exp(1)) {
-          build_sql("log(", x, ") / log(", base, ")")
+          sql_expr(log(!!x) / log(!!base))
         } else {
-          build_sql("log(", x, ")")
+          sql_expr(log(!!x))
         }
       },
       na_if = sql_prefix("NULLIF", 2)

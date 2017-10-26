@@ -7,7 +7,7 @@ test_that("cot() translates the appropiate formula ", {
     translate_sql(
       cot(field_name),
       con = simulate_hive()),
-    sql("1 / TAN(`field_name`)"))
+    sql("1.0 / TAN(`field_name`)"))
 })
 
 # stringr -------------------------------------------
@@ -17,5 +17,5 @@ test_that("str_replace_all() translates correctly ", {
     translate_sql(
       str_replace_all(field_name, "old", "new"),
       con = simulate_hive()),
-      sql("regexp_replace(`field_name`, 'old', 'new')"))
+      sql("REGEXP_REPLACE(`field_name`, 'old', 'new')"))
 })

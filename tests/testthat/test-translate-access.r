@@ -19,11 +19,11 @@ test_that("Math special cases", {
   )
   expect_equivalent(
     translate_sql(ceiling(field_name), con = simulate_odbc_access()),
-    sql("INT(`field_name` + .9999999999)")
+    sql("INT(`field_name` + 0.9999999999)")
   )
   expect_equivalent(
     translate_sql(ceil(field_name), con = simulate_odbc_access()),
-    sql("INT(`field_name` + .9999999999)")
+    sql("INT(`field_name` + 0.9999999999)")
   )
 
   # POW = ^ in Access
@@ -48,7 +48,7 @@ test_that("String special cases", {
   # paste() - 1 argument uses CStr
   expect_equivalent(
     translate_access(paste(field_name)),
-    sql("CStr(`field_name`)")
+    sql("CSTR(`field_name`)")
   )
 
   # paste() - Multiple arguments use `&` with separator
@@ -84,17 +84,17 @@ test_that("Logic special cases", {
   # coalesce() for only 2 objects
   expect_equivalent(
     translate_sql(coalesce(field_name_x, field_name_y), con = simulate_odbc_access()),
-    sql("IIF(ISNULL(`field_name_x`),`field_name_y`,`field_name_x`)")
+    sql("IIF(ISNULL(`field_name_x`), `field_name_y`, `field_name_x`)")
   )
 
   # pmin() and pmax() for only 2 objects
   expect_equivalent(
     translate_sql(pmin(field_name_x, field_name_y), con = simulate_odbc_access()),
-    sql("IIF(`field_name_x` <= `field_name_y`,`field_name_x`,`field_name_y`)")
+    sql("IIF(`field_name_x` <= `field_name_y`, `field_name_x`, `field_name_y`)")
   )
   expect_equivalent(
     translate_sql(pmax(field_name_x, field_name_y), con = simulate_odbc_access()),
-    sql("IIF(`field_name_x` <= `field_name_y`,`field_name_y`,`field_name_x`)")
+    sql("IIF(`field_name_x` <= `field_name_y`, `field_name_y`, `field_name_x`)")
   )
 
   # Access always returns -1 for True values, 0 for False

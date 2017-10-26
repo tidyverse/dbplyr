@@ -6,9 +6,7 @@ sql_paste <- function(default_sep, f = "CONCAT_WS") {
   function(..., sep = default_sep, collapse = NULL){
     check_collapse(collapse)
 
-    build_sql(
-      sql(f), "(", sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-    )
+    sql_expr(UQ(f)(!!sep, !!!list(...)))
   }
 }
 

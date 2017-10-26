@@ -216,9 +216,9 @@ sql_cast <- function(type) {
 sql_log <- function() {
   function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
-      build_sql("ln(", x, ")")
+      sql_expr(ln(!!x))
     } else {
-      build_sql("log(", x, ") / log(", base, ")")
+      sql_expr(log(!!x) / log(!!base))
     }
   }
 }

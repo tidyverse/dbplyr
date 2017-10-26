@@ -73,6 +73,7 @@ Collate:
     'simulate.r'
     'sql-build.R'
     'sql-escape.r'
+    'sql-expr.R'
     'sql-generic.R'
     'sql-optimise.R'
     'sql-query.R'

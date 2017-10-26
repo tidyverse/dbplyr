@@ -25,7 +25,7 @@ sql_translate_env.MySQLConnection <- function(con) {
       sd =  sql_aggregate("stddev_samp"),
       var = sql_aggregate("var_samp"),
       str_collapse = function(x, collapse) {
-        build_sql("group_concat(", x, " SEPARATOR ", collapse, ")")
+        sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),
     base_no_win

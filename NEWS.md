@@ -1,5 +1,8 @@
 # dbplyr 1.1.0.9000
 
+* New `sql_expr()` is a more convenient building block for low-level SQL
+  translation (#3169).
+
 * Improved `paste()` and `paste0()` support in MySQL & PostgreSQL (#3168).
   Both databases also gain support for `str_collapse()` function which behaves
   like `paste(x, collapse = "-")` (but for technical reasons can't be 

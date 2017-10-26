@@ -2,15 +2,14 @@
 sql_translate_env.Hive <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
-      var             = sql_prefix("VARIANCE"),
-      cot             = function(x){
-                          build_sql("1 / TAN(", x, ")")
-                        },
-      str_replace_all = function(string, pattern, replacement){
-                          build_sql(
-                            "regexp_replace(", string, ", ", pattern, ", ", replacement, ")"
-                          )}
-    ) ,
+      var = sql_prefix("VARIANCE"),
+      cot = function(x){
+        sql_expr(1 / tan(!!x))
+      },
+      str_replace_all = function(string, pattern, replacement) {
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+      }
+    ),
     base_odbc_agg,
     base_odbc_win
   )
