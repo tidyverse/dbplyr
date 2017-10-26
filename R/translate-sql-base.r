@@ -316,7 +316,7 @@ base_no_win <- sql_translator(
   lead         = win_absent("lead"),
   lag          = win_absent("lag"),
   order_by     = win_absent("order_by"),
-  paste        = win_absent("paste"),
+  str_collapse = win_absent("str_collapse"),
   count        = win_absent("count")
 )
 

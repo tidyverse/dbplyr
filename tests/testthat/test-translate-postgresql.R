@@ -60,3 +60,13 @@ test_that("two variable aggregates are translated correctly", {
   expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
   expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
 })
+
+test_that("pasting translated correctly", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_odbc_postgresql())
+  }
+
+  expect_equal(trans(paste(x, y)),  sql("CONCAT_WS(' ', `x`,`y`)"))
+  expect_equal(trans(paste0(x, y)), sql("CONCAT_WS('', `x`,`y`)"))
+  expect_error(trans(paste0(x, collapse = "")), "`collapse` not supported")
+})

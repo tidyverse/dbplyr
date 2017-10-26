@@ -1,5 +1,10 @@
 # dbplyr 1.1.0.9000
 
+* Improved `paste()` and `paste0()` support in MySQL & PostgreSQL (#3168).
+  Both databases also gain support for `str_collapse()` function which behaves
+  like `paste(x, collapse = "-")` (but for technical reasons can't be 
+  implemented as a straightforward translation of `paste()`).
+
 * Added support for RMariaDB package (#3154)
 
 * Added support for RPostgres package (currently available only on GitHub) (#3154)

@@ -31,10 +31,8 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         build_sql(
           "ROUND((", x, ")::numeric, ", as.integer(digits),")"
         )},
-      paste  = function(..., sep = " "){
-        build_sql(
-          "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-        )},
+      paste  = sql_paste(" "),
+      paste0 = sql_paste(""),
       # stringr functions
       str_locate  = function(string, pattern){
         build_sql(
@@ -53,7 +51,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       var = sql_aggregate("var_samp"),
       all = sql_aggregate("bool_and"),
       any = sql_aggregate("bool_or"),
-      paste = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
+      str_collapse = function(x, collapse) build_sql("string_agg(", x, ", ", collapse, ")")
     ),
     sql_translator(.parent = base_win,
       n = function() {
@@ -65,7 +63,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       var = win_aggregate("var_samp"),
       all = win_aggregate("bool_and"),
       any = win_aggregate("bool_or"),
-      paste = function(x, collapse) {
+      str_collapse = function(x, collapse) {
         win_over(
           build_sql("string_agg(", x, ", ", collapse, ")"),
           partition = win_current_group(),

@@ -16,13 +16,17 @@ db_desc.MariaDBConnection <- db_desc.MySQLConnection
 sql_translate_env.MySQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      as.character = sql_cast("CHAR")
+      as.character = sql_cast("CHAR"),
+      paste = sql_paste(" "),
+      paste0 = sql_paste("")
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
       sd =  sql_aggregate("stddev_samp"),
       var = sql_aggregate("var_samp"),
-      paste = function(x, collapse) build_sql("group_concat(", x, collapse, ")")
+      str_collapse = function(x, collapse) {
+        build_sql("group_concat(", x, " SEPARATOR ", collapse, ")")
+      }
     ),
     base_no_win
   )

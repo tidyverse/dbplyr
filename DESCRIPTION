@@ -89,6 +89,7 @@ Collate:
     'translate-sql-base.r'
     'translate-sql-clause.r'
     'translate-sql-odbc.R'
+    'translate-sql-paste.R'
     'translate-sql.r'
     'utils-format.r'
     'utils.r'
