@@ -8,6 +8,9 @@ db_desc.PostgreSQLConnection <- function(x) {
 }
 
 #' @export
+db_desc.PQConnection <- db_desc.PostgreSQLConnection
+
+#' @export
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
@@ -73,6 +76,12 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
   )
 }
 
+#' @export
+sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
+
+#' @export
+sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
+
 # DBI methods ------------------------------------------------------------------
 
 # Doesn't return TRUE for temporary tables
@@ -84,21 +93,6 @@ db_has_table.PostgreSQLConnection <- function(con, table, ...) {
 #' @export
 db_begin.PostgreSQLConnection <- function(con, ...) {
   dbExecute(con, "BEGIN TRANSACTION")
-}
-
-# http://www.postgresql.org/docs/9.3/static/sql-explain.html
-#' @export
-db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
-  format <- match.arg(format, c("text", "json", "yaml", "xml"))
-
-  exsql <- build_sql(
-    "EXPLAIN ",
-    if (!is.null(format)) build_sql("(FORMAT ", sql(format), ") "),
-    sql
-  )
-  expl <- dbGetQuery(con, exsql)
-
-  paste(expl[[1]], collapse = "\n")
 }
 
 #' @export
@@ -132,3 +126,24 @@ db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
 
   dbGetInfo(qry)$fieldDescription[[1]]$name
 }
+
+# http://www.postgresql.org/docs/9.3/static/sql-explain.html
+#' @export
+db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
+  format <- match.arg(format, c("text", "json", "yaml", "xml"))
+
+  exsql <- build_sql(
+    "EXPLAIN ",
+    if (!is.null(format)) build_sql("(FORMAT ", sql(format), ") "),
+    sql
+  )
+  expl <- dbGetQuery(con, exsql)
+
+  paste(expl[[1]], collapse = "\n")
+}
+
+#' @export
+db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
+
+#' @export
+db_explain.PqConnection <- db_explain.PostgreSQLConnection

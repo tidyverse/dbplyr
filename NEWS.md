@@ -1,5 +1,7 @@
 # dbplyr 1.1.0.9000
 
+* Added support for RPostgres package (currently available only on GitHub) (#3154)
+
 * New `remote_name()`, `remote_con()`, `remote_src()`, `remote_query()` and 
   `remote_query_plan()` provide a standard API for get metadata about a 
   remote tbl (#3130, #2923, #2824).
