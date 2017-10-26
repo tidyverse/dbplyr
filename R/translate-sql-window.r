@@ -114,6 +114,23 @@ win_aggregate <- function(f) {
 }
 
 #' @rdname win_over
+#' @export
+win_aggregate_2 <- function(f) {
+  f <- toupper(f)
+
+  function(x, y) {
+    frame <- win_current_frame()
+
+    win_over(
+      build_sql(sql(f), list(x, y)),
+      partition = win_current_group(),
+      order = if (!is.null(frame)) win_current_order(),
+      frame = frame
+    )
+  }
+}
+
+#' @rdname win_over
 #' @usage NULL
 #' @export
 win_recycled <- win_aggregate

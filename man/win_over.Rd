@@ -4,6 +4,7 @@
 \alias{win_over}
 \alias{win_rank}
 \alias{win_aggregate}
+\alias{win_aggregate_2}
 \alias{win_recycled}
 \alias{win_cumulative}
 \alias{win_absent}
@@ -17,6 +18,8 @@ win_over(expr, partition = NULL, order = NULL, frame = NULL)
 win_rank(f)
 
 win_aggregate(f)
+
+win_aggregate_2(f)
 
 win_cumulative(f)
 

@@ -50,3 +50,13 @@ test_that("log() with a different base translates to formula ", {
     sql("log(`field_name`) / log(2.0)")
   )
 })
+
+
+test_that("two variable aggregates are translated correctly", {
+  trans <- function(x, window) {
+    translate_sql(!!enquo(x), window = window, con = simulate_odbc_postgresql())
+  }
+
+  expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
+  expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
+})

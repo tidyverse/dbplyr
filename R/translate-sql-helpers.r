@@ -33,22 +33,30 @@
 #' # postgresql provides: http://bit.ly/K5EdTn
 #'
 #' postgres_agg <- sql_translator(.parent = base_agg,
-#'   cor = sql_prefix("corr"),
-#'   cov = sql_prefix("covar_samp"),
-#'   sd =  sql_prefix("stddev_samp"),
-#'   var = sql_prefix("var_samp")
+#'   cor = sql_aggregate_2("corr"),
+#'   cov = sql_aggregate_2("covar_samp"),
+#'   sd =  sql_aggregate("stddev_samp"),
+#'   var = sql_aggregate("var_samp")
 #' )
 #' postgres_var <- sql_variant(
 #'   base_scalar,
-#'   postgres_agg
+#'   postgres_agg,
+#'   base_no_win
 #' )
 #'
-#' translate_sql(cor(x, y), variant = postgres_var)
-#' translate_sql(sd(income / years), variant = postgres_var)
+#' # Next we have to simulate a connection that uses this variant
+#' con <- structure(
+#'   list(),
+#'   class = c("TestCon", "DBITestConnection", "DBIConnection")
+#' )
+#' sql_translate_env.TestCon <- function(x) postgres_var
+#'
+#' translate_sql(cor(x, y), con = con, window = FALSE)
+#' translate_sql(sd(income / years), con = con, window = FALSE)
 #'
 #' # Any functions not explicitly listed in the converter will be translated
 #' # to sql as is, so you don't need to convert all functions.
-#' translate_sql(regr_intercept(y, x), variant = postgres_var)
+#' translate_sql(regr_intercept(y, x), con = con)
 sql_variant <- function(scalar = sql_translator(),
                         aggregate = sql_translator(),
                         window = sql_translator()) {
@@ -159,6 +167,18 @@ sql_aggregate <- function(f) {
     build_sql(sql(f), list(x))
   }
 }
+
+#' @rdname sql_variant
+#' @export
+sql_aggregate_2 <- function(f) {
+  assert_that(is_string(f))
+  f <- toupper(f)
+
+  function(x, y) {
+    build_sql(sql(f), list(x, y))
+  }
+}
+
 
 check_na_rm <- function(f, na.rm) {
   if (identical(na.rm, TRUE)) {
