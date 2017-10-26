@@ -213,7 +213,8 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         auto_index = FALSE, ...) {
   by_intersect <- intersect(tbl_vars(x), tbl_vars(y))
 
-  if (length(by_intersect) == 0 && identical(type, "full") && is.character(by)) {
+  if (length(by_intersect) == 0 && length(by) == 0 &&
+      identical(type, "full") && is.character(by)) {
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
