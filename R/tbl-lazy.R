@@ -211,10 +211,8 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
 add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
-  by_intersect <- intersect(tbl_vars(x), tbl_vars(y))
 
-  if (length(by_intersect) == 0 && length(by) == 0 &&
-      identical(type, "full") && is.character(by)) {
+  if (identical(type, "full") && identical(by, character())) {
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
