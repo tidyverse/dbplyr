@@ -74,6 +74,9 @@
 
 ## New features
 
+* `full_join()` over non-overlapping columns `by = character()` translated to
+  `CROSS JOIN` (#2924).
+
 * `case_when()` now translates to SQL "CASE WHEN" (#2894)
 
 * `x %in% c(1)` now generates the same SQL as `x %in% 1` (#2898).

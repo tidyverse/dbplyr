@@ -92,3 +92,8 @@ test_that("sql generated correctly for all sources", {
 
   expect_equal_tbls(xy)
 })
+
+test_that("full join is promoted to cross join for no overlapping variables", {
+  result <- df1 %>% full_join(df2, by = character()) %>% collect()
+  expect_equal(nrow(result), 25)
+})
