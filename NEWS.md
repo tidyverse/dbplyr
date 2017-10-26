@@ -6,6 +6,9 @@
   
 * Added translation for Teradata (@edgararuiz)
 
+* `in_schema()` should now work in more places, particularly in `copy_to()` 
+   (#3013, @baileych)
+
 * dbplyr now uses tidyselect to power `rename()` and `select()` 
   This fixes a few renaming bugs (#3132, #2943, #2860).
 

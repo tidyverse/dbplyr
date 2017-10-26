@@ -21,7 +21,7 @@ db_analyze.Hive <- function(con, table, ...) {
   # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://cwiki.apache.org/confluence/display/Hive/StatsDev
   sql <- build_sql(
     "ANALYZE TABLE ",
-    ident(table),
+    as.sql(table),
     " COMPUTE STATISTICS"
     , con = con)
   DBI::dbExecute(con, sql)

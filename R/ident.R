@@ -1,10 +1,9 @@
 #' Flag a character vector as SQL identifiers
 #'
-#' `ident()` takes unquoted strings and quotes them for you; `ident_q()`
-#' assumes its input has already been quoted.
-#'
-#' These two `ident` clsases are used during SQL generation to make sure
-#' the values will be quoted as, not as strings.
+#' `ident()` takes unquoted strings and flags them as identifiers.
+#' `ident_q()` assumes its input has already been quoted, and ensures
+#' it does not get quoted again. This is currently used only for
+#' for `schema.table`.
 #'
 #' @param ... A character vector, or name-value pairs
 #' @param x An object
@@ -15,6 +14,7 @@
 #'
 #' # And identifiers with "
 #' ident("x")
+#' escape(ident("x"))
 #'
 #' # You can supply multiple inputs
 #' ident(a = "x", b = "y")

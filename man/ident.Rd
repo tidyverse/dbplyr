@@ -18,12 +18,10 @@ is.ident(x)
 \item{x}{An object}
 }
 \description{
-\code{ident()} takes unquoted strings and quotes them for you; \code{ident_q()}
-assumes its input has already been quoted.
-}
-\details{
-These two \code{ident} clsases are used during SQL generation to make sure
-the values will be quoted as, not as strings.
+\code{ident()} takes unquoted strings and flags them as identifiers.
+\code{ident_q()} assumes its input has already been quoted, and ensures
+it does not get quoted again. This is currently used only for
+for \code{schema.table}.
 }
 \examples{
 # SQL92 quotes strings with '
@@ -31,6 +29,7 @@ escape("x")
 
 # And identifiers with "
 ident("x")
+escape(ident("x"))
 
 # You can supply multiple inputs
 ident(a = "x", b = "y")
