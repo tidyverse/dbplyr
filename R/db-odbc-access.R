@@ -186,3 +186,5 @@ sql_escape_logical.ACCESS <- function(con, x) {
   y[is.na(x)] <- "NULL"
   y
 }
+
+globalVariables(c("CStr", "iif", "isnull"))

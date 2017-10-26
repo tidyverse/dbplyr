@@ -206,8 +206,9 @@ sql_not_supported <- function(f) {
 #' @rdname sql_variant
 #' @export
 sql_cast <- function(type) {
+  type <- sql(type)
   function(x) {
-    build_sql("CAST(", x, " AS ", sql(type), ")")
+    sql_expr(cast(UQ(x) %as% UQ(type)))
   }
 }
 
@@ -228,9 +229,8 @@ sql_log <- function() {
 #' @export
 sql_cot <- function(){
   function(x){
-    build_sql("1 / TAN(", x, ")")
+    sql_expr(1L / tan(!!x))
   }
 }
 
-
-
+globalVariables(c("%as%", "ln", "cast"))

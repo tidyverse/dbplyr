@@ -140,3 +140,5 @@ mssql_is_null <- function(x, context) {
     sql_expr( ((!!x) %is% NULL) )
   }
 }
+
+globalVariables(c("BIT", "%is%", "convert"))

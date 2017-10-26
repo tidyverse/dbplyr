@@ -25,3 +25,5 @@ db_analyze.Hive <- function(con, table, ...) {
     , con = con)
   DBI::dbExecute(con, sql)
 }
+
+globalVariables("regexp_replace")

@@ -133,3 +133,5 @@ db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
 
 #' @export
 db_explain.PqConnection <- db_explain.PostgreSQLConnection
+
+globalVariables(c("strpos", "%::%", "string_agg"))

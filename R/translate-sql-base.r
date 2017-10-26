@@ -76,9 +76,9 @@ base_scalar <- sql_translator(
   floor   = sql_prefix("floor", 1),
   log     = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
-      build_sql(sql("ln"), list(x))
+      sql_expr(ln(!!x))
     } else {
-      build_sql(sql("log"), list(base, x))
+      sql_expr(log(!!base, !!x))
     }
   },
   log10   = sql_prefix("log10", 1),

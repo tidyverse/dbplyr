@@ -151,3 +151,5 @@ sql_join.MySQLConnection <- function(con, x, y, vars, type = "inner", by = NULL,
   }
   NextMethod()
 }
+
+globalVariables(c("%separator%", "group_concat"))
