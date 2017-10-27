@@ -40,8 +40,7 @@
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
 
-
-      `!`     = mssql_not_sql_prefix("not"),
+      `!`           = mssql_not_sql_prefix("not"),
 
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
