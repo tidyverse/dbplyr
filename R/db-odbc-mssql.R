@@ -158,10 +158,15 @@ mssql_not_sql_prefix <- function(f) {
     args_c <- as.character(args)
     if(substr(args_c, 1, 17) == "CONVERT(BIT, IIF(" &&
        substr(args_c, nchar(args_c) - 5, nchar(args_c)) ==  "1, 0))"){
-        return(build_sql(sql(substr(args_c, 1, nchar(args_c) - 6)), "0, 1))"))
+
+        build_sql(sql(substr(args_c, 1, nchar(args_c) - 6)), "0, 1))")
+
+      } else {
+
+        build_sql(sql(f), args)
+
       }
-    build_sql(sql(f), args)
-  }
+    }
 }
 
 globalVariables(c("BIT", "%is%", "convert"))
