@@ -4,6 +4,7 @@ Title: A 'dplyr' Back End for Databases
 Version: 1.1.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
+    person("Edgar", "Ruiz", role = "aut"),
     person("RStudio", role = c("cph", "fnd"))
     )
 Description: A 'dplyr' back end for databases that allows you to work with 
