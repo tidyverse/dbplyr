@@ -16,7 +16,7 @@ check_collapse <- function(collapse) {
 
   stop(
     "`collapse` not supported in DB translation of `paste()`.\n",
-    "Please use str_collapse() instead",
+    "Please use str_flatten() instead",
     call. = FALSE
   )
 }

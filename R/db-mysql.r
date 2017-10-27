@@ -24,7 +24,7 @@ sql_translate_env.MySQLConnection <- function(con) {
       n = function() sql("COUNT(*)"),
       sd =  sql_aggregate("stddev_samp"),
       var = sql_aggregate("var_samp"),
-      str_collapse = function(x, collapse) {
+      str_flatten = function(x, collapse) {
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),

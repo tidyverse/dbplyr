@@ -39,7 +39,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       var = sql_aggregate("var_samp"),
       all = sql_aggregate("bool_and"),
       any = sql_aggregate("bool_or"),
-      str_collapse = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
     ),
     sql_translator(.parent = base_win,
       n = function() {
@@ -51,7 +51,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       var = win_aggregate("var_samp"),
       all = win_aggregate("bool_and"),
       any = win_aggregate("bool_or"),
-      str_collapse = function(x, collapse) {
+      str_flatten = function(x, collapse) {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
