@@ -39,6 +39,10 @@
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
+
+
+      `!`     = mssql_not_sql_prefix("not"),
+
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -138,6 +142,26 @@ mssql_is_null <- function(x, context) {
     sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
   } else {
     sql_expr( ((!!x) %is% NULL) )
+  }
+}
+
+mssql_not_sql_prefix <- function(f) {
+  assert_that(is_string(f))
+
+  f <- toupper(f)
+  function(...) {
+    args <- list(...)
+    if (any(names2(args) != "")) {
+      warning("Named arguments ignored for SQL ", f, call. = FALSE)
+    }
+
+    # Special case for !is.na() on WHERE clause
+    args_c <- as.character(args)
+    if(substr(args_c, 1, 17) == "CONVERT(BIT, IIF(" &&
+       substr(args_c, nchar(args_c) - 5, nchar(args_c)) ==  "1, 0))"){
+        return(build_sql(sql(substr(args_c, 1, nchar(args_c) - 6)), "0, 1))"))
+      }
+    build_sql(sql(f), args)
   }
 }
 
