@@ -77,9 +77,5 @@ test_that("filter and mutate translate is.na correctly", {
     sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))")
   )
 
-  expect_equal(
-    mf %>% arrange(!is.na(x)) %>% show_query(),
-    sql("SELECT *\nFROM `df`\nORDER BY NOT(CONVERT(BIT, IIF(`x` IS NULL, 1, 0)))")
-  )
 })
 
