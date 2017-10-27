@@ -1,6 +1,5 @@
 context("translate-MSSQL")
 
-# MSSQL scalar conversions -----------------------------------------
 test_that("custom scalar translated correctly", {
 
   trans <- function(x) {
@@ -22,7 +21,6 @@ test_that("custom scalar translated correctly", {
 
 })
 
-# MSSQL stringr conversions -----------------------------------------
 test_that("custom stringr functions translated correctly", {
 
   trans <- function(x) {
@@ -35,7 +33,6 @@ test_that("custom stringr functions translated correctly", {
 
 })
 
-# MSSQL aggregate conversions -----------------------------------------
 test_that("custom aggregators translated correctly", {
 
   trans <- function(x) {
@@ -49,8 +46,7 @@ test_that("custom aggregators translated correctly", {
   expect_error(trans(cov(x)), "not available")
 })
 
-# MSSQL window conversions -----------------------------------------
-test_that("custom aggregators translated correctly", {
+test_that("custom window functions translated correctly", {
 
   trans <- function(x) {
     translate_sql(!!enquo(x), window = TRUE, con = simulate_mssql())
@@ -63,7 +59,6 @@ test_that("custom aggregators translated correctly", {
   expect_error(trans(cov(x)), "not supported")
 })
 
-# MSSQL query tests  ------------------------------------------------
 test_that("filter and mutate translate is.na correctly", {
   mf <- lazy_frame(x = 1, src = simulate_mssql())
 
@@ -80,11 +75,6 @@ test_that("filter and mutate translate is.na correctly", {
   expect_equal(
     mf %>% filter(is.na(x)) %>% show_query(),
     sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))")
-  )
-
-  expect_equal(
-    mf %>% filter(!is.na(x)) %>% show_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (NOT(((`x`) IS NULL)))")
   )
 
   expect_equal(
