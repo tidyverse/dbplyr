@@ -6,18 +6,18 @@ test_that("custom scalar translated correctly", {
     translate_sql(!!enquo(x), con = simulate_mssql())
   }
 
-  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
-  expect_equal(trans(log(x)),          sql("LOG(`x`)"))
-  expect_equal(trans(nchar(x)),        sql("LEN(`x`)"))
-  expect_equal(trans(atan2(x)),        sql("ATN2(`x`)"))
-  expect_equal(trans(ceiling(x)),      sql("CEILING(`x`)"))
-  expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
-  expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1.0, 2.0)"))
-  expect_equal(trans(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
+  expect_equal(trans( as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans( as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans( as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
+  expect_equal(trans( log(x)),          sql("LOG(`x`)"))
+  expect_equal(trans( nchar(x)),        sql("LEN(`x`)"))
+  expect_equal(trans( atan2(x)),        sql("ATN2(`x`)"))
+  expect_equal(trans( ceiling(x)),      sql("CEILING(`x`)"))
+  expect_equal(trans( ceil(x)),         sql("CEILING(`x`)"))
+  expect_equal(trans( substr(x, 1, 2)), sql("SUBSTRING(`x`, 1.0, 2.0)"))
+  expect_equal(trans( trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
 
-  expect_error(trans(paste(x)),        sql("not available"))
+  expect_error(trans( paste(x)),        sql("not available"))
 
 })
 
@@ -27,9 +27,9 @@ test_that("custom stringr functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_mssql())
   }
 
-  expect_equal(trans(str_length(x)),         sql("LEN(`x`)"))
-  expect_equal(trans(str_locate(x, "find")), sql("CHARINDEX('find', `x`)"))
-  expect_equal(trans(str_detect(x, "find")), sql("CHARINDEX('find', `x`) > 0"))
+  expect_equal(trans( str_length(x)),         sql("LEN(`x`)"))
+  expect_equal(trans( str_locate(x, "find")), sql("CHARINDEX('find', `x`)"))
+  expect_equal(trans( str_detect(x, "find")), sql("CHARINDEX('find', `x`) > 0"))
 
 })
 
@@ -39,11 +39,11 @@ test_that("custom aggregators translated correctly", {
     translate_sql(!!enquo(x), window = FALSE, con = simulate_mssql())
   }
 
-  expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`)"))
-  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`)"))
+  expect_equal(trans( sd(x, na.rm = TRUE)),  sql("STDEV(`x`)"))
+  expect_equal(trans( var(x, na.rm = TRUE)), sql("VAR(`x`)"))
 
-  expect_error(trans(cor(x)), "not available")
-  expect_error(trans(cov(x)), "not available")
+  expect_error(trans( cor(x)), "not available")
+  expect_error(trans( cov(x)), "not available")
 })
 
 test_that("custom window functions translated correctly", {
@@ -52,11 +52,11 @@ test_that("custom window functions translated correctly", {
     translate_sql(!!enquo(x), window = TRUE, con = simulate_mssql())
   }
 
-  expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
-  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
+  expect_equal(trans( sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
+  expect_equal(trans( var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
 
-  expect_error(trans(cor(x)), "not supported")
-  expect_error(trans(cov(x)), "not supported")
+  expect_error(trans( cor(x)), "not supported")
+  expect_error(trans( cov(x)), "not supported")
 })
 
 test_that("filter and mutate translate is.na correctly", {
