@@ -1,18 +1,12 @@
 context("translate-Impala")
 
-# Impala base_scalar conversions -----------------------------------------
+test_that("custom scalar functions translated correctly", {
 
-test_that("as.Date()translates to VARCHAR(10) ", {
-  expect_equivalent(
-    translate_sql(
-      as.Date(field_name),
-      con = simulate_impala()),
-    sql("CAST(`field_name` AS VARCHAR(10))"))
-})
-test_that("ceiling() translates to CEIL ", {
-  expect_equivalent(
-    translate_sql(
-      ceiling(field_name),
-      con = simulate_impala()),
-    sql("CEIL(`field_name`)"))
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_impala())
+  }
+
+  expect_equal(trans(as.Date(x)), sql("CAST(`x` AS VARCHAR(10))"))
+  expect_equal(trans(ceiling(x)), sql("CEIL(`x`)"))
+
 })
