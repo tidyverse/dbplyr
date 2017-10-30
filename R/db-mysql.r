@@ -107,6 +107,8 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
   dbExecute(con, sql)
 
   invisible()
+
+  table
 }
 
 #' @export

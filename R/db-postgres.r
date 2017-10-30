@@ -98,6 +98,8 @@ db_write_table.PostgreSQLConnection <- function(con, table, types, values,
 
   sql <- build_sql("INSERT INTO ", as.sql(table), " VALUES ", sql(values))
   dbExecute(con, sql)
+
+  table
 }
 
 #' @export
