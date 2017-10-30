@@ -124,17 +124,7 @@
 }
 
 #' @export
-`db_copy_to.Microsoft SQL Server`  <- function(con, table, values,
-                                      overwrite = FALSE, types = NULL, temporary = TRUE,
-                                      unique_indexes = NULL, indexes = NULL,
-                                      analyze = TRUE, ...) {
-
-  # A simplified version of db_copy_to.DBIConnection has worked on all
-  # ODBCConnection variances so far
-
-  if (overwrite) {
-    db_drop_table(con, table, force = TRUE)
-  }
+`db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
 
   # check that name has prefixed '##' if temporary
   if(temporary && substr(table, 1, 1) != "#") {
@@ -142,11 +132,17 @@
     message("Created a temporary table named: ", table)
   }
 
-  dbWriteTable(con, table, values, temporary = FALSE)
-
-  if (analyze) db_analyze(con, table)
+  dbWriteTable(
+    con,
+    name = table,
+    types = types,
+    value = values,
+    temporary = FALSE,
+    row.names = FALSE
+  )
 
   table
+
 }
 
 # `IS NULL` returns a boolean expression, so you can't use it in a result set
