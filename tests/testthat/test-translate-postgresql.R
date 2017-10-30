@@ -6,11 +6,11 @@ test_that("custom scalar translated correctly", {
     translate_sql(!!enquo(x), con = simulate_odbc_postgresql())
   }
 
-  expect_equal(trans( log10(x)),               sql("LOG(`x`)"))
-  expect_equal(trans( log(x)),                 sql("LN(`x`)"))
-  expect_equal(trans( log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
-  expect_equal(trans( cot(x)),                 sql("1 / TAN(`x`)"))
-  expect_equal(trans( round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
+  expect_equal(trans(log10(x)),               sql("LOG(`x`)"))
+  expect_equal(trans(log(x)),                 sql("LN(`x`)"))
+  expect_equal(trans(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
+  expect_equal(trans(cot(x)),                 sql("1 / TAN(`x`)"))
+  expect_equal(trans(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
 
 })
 
@@ -21,8 +21,8 @@ test_that("custom stringr functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_odbc_postgresql())
   }
 
-  expect_equal(trans( str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
-  expect_equal(trans( str_detect(x, y)), sql("STRPOS(`x`, `y`) > 0"))
+  expect_equal(trans(str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
+  expect_equal(trans(str_detect(x, y)), sql("STRPOS(`x`, `y`) > 0"))
 
 })
 
