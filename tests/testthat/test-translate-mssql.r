@@ -17,7 +17,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1.0, 2.0)"))
   expect_equal(trans(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
 
-  expect_error(trans( paste(x)),        sql("not available"))
+  expect_error(trans(paste(x)),        sql("not available"))
 
 })
 
@@ -42,8 +42,8 @@ test_that("custom aggregators translated correctly", {
   expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`)"))
   expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`)"))
 
-  expect_error(trans( cor(x)), "not available")
-  expect_error(trans( cov(x)), "not available")
+  expect_error(trans(cor(x)), "not available")
+  expect_error(trans(cov(x)), "not available")
 })
 
 test_that("custom window functions translated correctly", {
@@ -55,8 +55,8 @@ test_that("custom window functions translated correctly", {
   expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
   expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
 
-  expect_error(trans( cor(x)), "not supported")
-  expect_error(trans( cov(x)), "not supported")
+  expect_error(trans(cor(x)), "not supported")
+  expect_error(trans(cov(x)), "not supported")
 })
 
 test_that("filter and mutate translate is.na correctly", {

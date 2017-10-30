@@ -18,7 +18,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(atan2(x, y)),     sql("ATAN2(`y`,`x`)"))
   expect_equal(trans(substr(x, 1, 2)), sql("SUBSTR(`x`, 1.0, 2.0)"))
 
-  expect_error(trans( paste(x)),        sql("not supported"))
+  expect_error(trans(paste(x)),        sql("not supported"))
 
 })
 
@@ -30,8 +30,8 @@ test_that("custom aggregators translated correctly", {
 
   expect_equal(trans(var(x)), sql("VAR_SAMP(`x`)"))
 
-  expect_error(trans( cor(x)), "not available")
-  expect_error(trans( cov(x)), "not available")
+  expect_error(trans(cor(x)), "not available")
+  expect_error(trans(cov(x)), "not available")
 })
 
 test_that("custom window functions translated correctly", {
@@ -42,8 +42,8 @@ test_that("custom window functions translated correctly", {
 
   expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
 
-  expect_error(trans( cor(x)), "not supported")
-  expect_error(trans( cov(x)), "not supported")
+  expect_error(trans(cor(x)), "not supported")
+  expect_error(trans(cov(x)), "not supported")
 })
 
 test_that("filter and mutate translate is.na correctly", {

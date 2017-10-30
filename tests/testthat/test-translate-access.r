@@ -54,9 +54,9 @@ test_that("custom aggregators translated correctly", {
   expect_equal(trans(sd(x)),  sql("STDEV(`x`)"))
   expect_equal(trans(var(x)), sql("VAR(`x`)"))
 
-  expect_error(trans( cor(x)), "not available")
-  expect_error(trans( cov(x)), "not available")
-  expect_error(trans( n_distinct(x)), "not available")
+  expect_error(trans(cor(x)), "not available")
+  expect_error(trans(cov(x)), "not available")
+  expect_error(trans(n_distinct(x)), "not available")
 
 })
 
