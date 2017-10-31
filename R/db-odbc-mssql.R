@@ -42,17 +42,17 @@
 
       `!`           = mssql_not_sql_prefix(),
 
-      `!=`           = mssql_sql_infix("!="),
-      `==`           = mssql_sql_infix("="),
-      `<`            = mssql_sql_infix("<"),
-      `<=`           = mssql_sql_infix("<="),
-      `>`            = mssql_sql_infix(">"),
-      `>=`           = mssql_sql_infix(">="),
+      `!=`           = mssql_logical_infix("!="),
+      `==`           = mssql_logical_infix("="),
+      `<`            = mssql_logical_infix("<"),
+      `<=`           = mssql_logical_infix("<="),
+      `>`            = mssql_logical_infix(">"),
+      `>=`           = mssql_logical_infix(">="),
 
-      `&`            = mssql_logical_infix("&", "AND"),
-      `&&`           = mssql_logical_infix("&", "AND"),
-      `|`            = mssql_logical_infix("|", "OR"),
-      `||`           = mssql_logical_infix("|", "OR"),
+      `&`            = mssql_generic_infix("&", "AND"),
+      `&&`           = mssql_generic_infix("&", "AND"),
+      `|`            = mssql_generic_infix("|", "OR"),
+      `||`           = mssql_generic_infix("|", "OR"),
 
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
@@ -168,7 +168,7 @@ mssql_not_sql_prefix <- function() {
   }
 }
 
-mssql_sql_infix <- function(f) {
+mssql_logical_infix <- function(f) {
   assert_that(is_string(f))
 
   f <- toupper(f)
@@ -182,7 +182,7 @@ mssql_sql_infix <- function(f) {
   }
 }
 
-mssql_logical_infix <- function(if_select, if_filter) {
+mssql_generic_infix <- function(if_select, if_filter) {
   assert_that(is_string(if_select))
   assert_that(is_string(if_filter))
 
