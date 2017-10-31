@@ -42,7 +42,6 @@ sql_translate_env.Teradata <- function(con) {
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
-      var           = sql_prefix("VAR_SAMP"),
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
       cot           = sql_cot(),

@@ -217,9 +217,9 @@ sql_cast <- function(type) {
 sql_log <- function() {
   function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(ln(!!x))
+      sql_expr(LN(!!x))
     } else {
-      sql_expr(log(!!x) / log(!!base))
+      sql_expr(LOG(!!x) / log(!!base))
     }
   }
 }
@@ -229,7 +229,7 @@ sql_log <- function() {
 #' @export
 sql_cot <- function(){
   function(x){
-    sql_expr(1L / tan(!!x))
+    sql_expr(1L / TAN(!!x))
   }
 }
 

@@ -1,127 +1,57 @@
 context("translate-teradata")
 
-# Teradata base_scalar conversions -----------------------------------------
 
-test_that("as.numeric() translated to NUMERIC ", {
-  expect_equivalent(
-    translate_sql(as.numeric(field_name), con = simulate_teradata()),
-    sql("CAST(`field_name` AS NUMERIC)")
-  )
+test_that("custom scalar translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_teradata())
+  }
+
+  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
+  expect_equal(trans(log(x)),          sql("LN(`x`)"))
+  expect_equal(trans(cot(x)),          sql("1 / TAN(`x`)"))
+  expect_equal(trans(nchar(x)),        sql("CHARACTER_LENGTH(`x`)"))
+  expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
+  expect_equal(trans(ceiling(x)),      sql("CEILING(`x`)"))
+  expect_equal(trans(atan2(x, y)),     sql("ATAN2(`y`,`x`)"))
+  expect_equal(trans(substr(x, 1, 2)), sql("SUBSTR(`x`, 1.0, 2.0)"))
+
+  expect_error(trans(paste(x)),        sql("not supported"))
+
 })
 
-test_that("as.double() translated to NUMERIC ", {
-  expect_equivalent(
-    translate_sql(as.double(field_name), con = simulate_teradata()),
-    sql("CAST(`field_name` AS NUMERIC)")
-  )
+test_that("custom aggregators translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_teradata())
+  }
+
+  expect_equal(trans(var(x)), sql("VAR_SAMP(`x`)"))
+
+  expect_error(trans(cor(x)), "not available")
+  expect_error(trans(cov(x)), "not available")
 })
 
-test_that("as.character() translate to VARCHAR(MAX) ", {
-  expect_equivalent(
-  translate_sql(as.character(field_name), con = simulate_teradata()),
-    sql("CAST(`field_name` AS VARCHAR(MAX))")
-  )
+test_that("custom window functions translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), window = TRUE, con = simulate_teradata())
+  }
+
+  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
+
+  expect_error(trans(cor(x)), "not supported")
+  expect_error(trans(cov(x)), "not supported")
 })
 
-test_that("log10() translates to LOG ", {
-  expect_equivalent(
-    translate_sql(log10(field_name), con = simulate_teradata()),
-    sql("LOG(`field_name`)")
+test_that("filter and mutate translate is.na correctly", {
+  mf <- lazy_frame(x = 1, src = simulate_teradata())
+
+  expect_equal(
+    mf %>% head() %>% show_query(),
+    sql("SELECT  TOP 6 *\nFROM `df`")
   )
-})
 
-test_that("ceiling() translates to CEILING ", {
-  expect_equivalent(
-    translate_sql(ceiling(field_name), con = simulate_teradata()),
-    sql("CEILING(`field_name`)")
-  )
-})
-
-test_that("paste() returns error message", {
-  expect_error(
-    translate_sql(paste(field_name),
-                  window = FALSE,
-                  con = simulate_teradata()),
-    "PASTE\\(\\) is not supported in this SQL variant, try PASTE0\\(\\) instead"
-  )
-})
-
-# Teradata base_agg conversions -----------------------------------------
-
-test_that("var() translates to VAR ", {
-  expect_equivalent(
-    translate_sql(var(field_name),
-                  window = FALSE,
-                  con = simulate_teradata()),
-    sql("VAR_SAMP(`field_name`)")
-  )
-})
-
-test_that("cor() returns error message", {
-  expect_error(
-    translate_sql(cor(field_name),
-                  window = FALSE,
-                  con = simulate_teradata()),
-    "COR\\(\\) is not available in this SQL variant"
-  )
-})
-
-test_that("cov() returns error message", {
-  expect_error(
-    translate_sql(cov(field_name),
-                  window = FALSE,
-                  con = simulate_teradata()),
-    "COV\\(\\) is not available in this SQL variant"
-  )
-})
-
-#nchar, atan2, substr, ceil, is.null, is.na, trimws
-
-test_that("nchar() translates to LEN ", {
-  expect_equivalent(
-    translate_sql(nchar(field_name),
-                  con = simulate_teradata()),
-    sql("CHARACTER_LENGTH(`field_name`)")
-  )
-})
-test_that("atan2() translates to ATN2 ", {
-  expect_equivalent(
-    translate_sql(atan2(field1, field2),
-                  con = simulate_teradata()),
-    sql("ATAN2(`field2`,`field1`)")
-  )
-})
-
-test_that("substr() translates to SUBSTRING ", {
-  expect_equivalent(
-    translate_sql(substr(field_name, 1, 2),
-                  con = simulate_teradata()),
-    sql("SUBSTR(`field_name`, 1.0, 2.0)")
-  )
-})
-
-test_that("ceil() translates to CEILING ", {
-  expect_equivalent(
-    translate_sql(ceil(field_name),
-                  con = simulate_teradata()),
-    sql("CEILING(`field_name`)")
-  )
-})
-test_that("trimws() translates to LTRIM-RTRIM ", {
-  expect_equivalent(
-    translate_sql(trimws(field_name),
-                  con = simulate_teradata()),
-    sql("TRIM(`field_name`)")
-  )
-})
-
-
-# Teradata query tests  ------------------------------------------------
-
-df <- data.frame(x = 1, y = 2)
-df_teradata <- tbl_lazy(df, src = simulate_teradata())
-test_that("query uses TOP instead of LIMIT ", {
-  expect_equivalent(
-    show_query(head(df_teradata)),
-    sql("SELECT  TOP 6 *\nFROM `df`"))
 })
