@@ -57,7 +57,7 @@
                         )},
                       # Casting as BIT converts the Integer result into an actual logical
                       # values TRUE and FALSE
-      is.null       = function(x) mssql_is_null(x,),
+      is.null       = function(x) mssql_is_null(x, sql_current_context()),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
