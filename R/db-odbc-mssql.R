@@ -40,7 +40,7 @@
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
 
-      `!`           = mssql_not_sql_prefix("not"),
+      `!`           = mssql_not_sql_prefix(),
 
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
@@ -57,7 +57,7 @@
                         )},
                       # Casting as BIT converts the Integer result into an actual logical
                       # values TRUE and FALSE
-      is.null       = function(x) mssql_is_null(x, sql_current_context()),
+      is.null       = function(x) mssql_is_null(x,),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
@@ -138,35 +138,27 @@
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
+    sql_expr(convert(BIT, !!x))
   } else {
     sql_expr( ((!!x) %is% NULL) )
   }
 }
 
-mssql_not_sql_prefix <- function(f) {
-  assert_that(is_string(f))
-
-  f <- toupper(f)
+mssql_not_sql_prefix <- function() {
   function(...) {
+    context <- sql_current_context()
     args <- list(...)
     if (any(names2(args) != "")) {
       warning("Named arguments ignored for SQL ", f, call. = FALSE)
     }
-
     # Special case for !is.na() on WHERE clause
-    args_c <- as.character(args)
-    if(substr(args_c, 1, 17) == "CONVERT(BIT, IIF(" &&
-       substr(args_c, nchar(args_c) - 5, nchar(args_c)) ==  "1, 0))"){
-
-        build_sql(sql(substr(args_c, 1, nchar(args_c) - 6)), "0, 1))")
-
-      } else {
-
-        build_sql(sql(f), args)
-
-      }
+    if (context$clause %in% c("SELECT", "ORDER")) {
+      build_sql(sql("~"), args)
+    } else {
+      build_sql(sql("NOT"), args)
     }
+  }
 }
+
 
 globalVariables(c("BIT", "%is%", "convert"))
