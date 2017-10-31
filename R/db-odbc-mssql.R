@@ -49,10 +49,10 @@
       `>`            = mssql_sql_infix(">"),
       `>=`           = mssql_sql_infix(">="),
 
-      `&`            = mssql_switch_sql_infix("&", "AND"),
-      `&&`           = mssql_switch_sql_infix("&", "AND"),
-      `|`            = mssql_switch_sql_infix("|", "OR"),
-      `||`           = mssql_switch_sql_infix("|", "OR"),
+      `&`            = mssql_logical_infix("&", "AND"),
+      `&&`           = mssql_logical_infix("&", "AND"),
+      `|`            = mssql_logical_infix("|", "OR"),
+      `||`           = mssql_logical_infix("|", "OR"),
 
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
@@ -148,19 +148,19 @@
 # known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
 # be specified as the data type of  a table column or variable, and cannot be returned in a result set.
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    sql_expr(convert(BIT, !!x))
+    sql_expr(CONVERT(BIT, IIF(UQ(x) %is% NULL, 1L, 0L)))
   } else {
-    sql_expr( ((!!x) %is% NULL) )
+    sql_expr(((!!x) %is% NULL) )
   }
 }
 
 mssql_not_sql_prefix <- function() {
   function(...) {
-    context <- sql_current_context()
     args <- list(...)
-    if (context$clause %in% c("SELECT", "ORDER")) {
+    if (sql_current_select()) {
       build_sql(sql("~"), args)
     } else {
       build_sql(sql("NOT"), args)
@@ -173,9 +173,8 @@ mssql_sql_infix <- function(f) {
 
   f <- toupper(f)
   function(x, y) {
-    context <- sql_current_context()
     condition <- build_sql(x, " ", sql(f), " ", y)
-    if (context$clause %in% c("SELECT", "ORDER")) {
+    if (sql_current_select()) {
       sql_expr(CONVERT(BIT, IIF(!!condition, 1, 0)))
     } else {
       condition
@@ -183,10 +182,7 @@ mssql_sql_infix <- function(f) {
   }
 }
 
-
-
-
-mssql_switch_sql_infix <- function(if_select, if_filter) {
+mssql_logical_infix <- function(if_select, if_filter) {
   assert_that(is_string(if_select))
   assert_that(is_string(if_filter))
 
@@ -194,8 +190,7 @@ mssql_switch_sql_infix <- function(if_select, if_filter) {
   if_filter <- toupper(if_filter)
 
   function(x, y) {
-    context <- sql_current_context()
-    if (context$clause %in% c("SELECT", "ORDER")) {
+    if (sql_current_select()) {
       f <- if_select
     } else {
       f <- if_filter
@@ -203,7 +198,5 @@ mssql_switch_sql_infix <- function(if_select, if_filter) {
     build_sql(x, " ", sql(f), " ", y)
   }
 }
-
-
 
 globalVariables(c("BIT", "%is%", "convert"))

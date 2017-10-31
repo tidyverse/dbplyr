@@ -69,12 +69,12 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% mutate(z = is.na(x)) %>% show_query(),
-    sql("SELECT `x`, CONVERT(BIT, `x`) AS `z`\nFROM `df`")
+    sql("SELECT `x`, CONVERT(BIT, IIF(`x` IS NULL, 1, 0)) AS `z`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(z = !is.na(x)) %>% show_query(),
-    sql("SELECT `x`, ~(CONVERT(BIT, `x`)) AS `z`\nFROM `df`")
+    sql("SELECT `x`, ~(CONVERT(BIT, IIF(`x` IS NULL, 1, 0))) AS `z`\nFROM `df`")
   )
 
   expect_equal(
