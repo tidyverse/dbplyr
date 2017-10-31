@@ -42,6 +42,18 @@
 
       `!`           = mssql_not_sql_prefix(),
 
+      `!=`           = mssql_sql_infix("!="),
+      `==`           = mssql_sql_infix("="),
+      `<`            = mssql_sql_infix("<"),
+      `<=`           = mssql_sql_infix("<="),
+      `>`            = mssql_sql_infix(">"),
+      `>=`           = mssql_sql_infix(">="),
+
+      `&`            = mssql_switch_sql_infix("&", "AND"),
+      `&&`           = mssql_switch_sql_infix("&", "AND"),
+      `|`            = mssql_switch_sql_infix("|", "OR"),
+      `||`           = mssql_switch_sql_infix("|", "OR"),
+
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -148,10 +160,6 @@ mssql_not_sql_prefix <- function() {
   function(...) {
     context <- sql_current_context()
     args <- list(...)
-    if (any(names2(args) != "")) {
-      warning("Named arguments ignored for SQL ", f, call. = FALSE)
-    }
-    # Special case for !is.na() on WHERE clause
     if (context$clause %in% c("SELECT", "ORDER")) {
       build_sql(sql("~"), args)
     } else {
@@ -159,6 +167,43 @@ mssql_not_sql_prefix <- function() {
     }
   }
 }
+
+mssql_sql_infix <- function(f) {
+  assert_that(is_string(f))
+
+  f <- toupper(f)
+  function(x, y) {
+    context <- sql_current_context()
+    condition <- build_sql(x, " ", sql(f), " ", y)
+    if (context$clause %in% c("SELECT", "ORDER")) {
+      sql_expr(CONVERT(BIT, IIF(!!condition, 1, 0)))
+    } else {
+      condition
+    }
+  }
+}
+
+
+
+
+mssql_switch_sql_infix <- function(if_select, if_filter) {
+  assert_that(is_string(if_select))
+  assert_that(is_string(if_filter))
+
+  if_select <- toupper(if_select)
+  if_filter <- toupper(if_filter)
+
+  function(x, y) {
+    context <- sql_current_context()
+    if (context$clause %in% c("SELECT", "ORDER")) {
+      f <- if_select
+    } else {
+      f <- if_filter
+    }
+    build_sql(x, " ", sql(f), " ", y)
+  }
+}
+
 
 
 globalVariables(c("BIT", "%is%", "convert"))
