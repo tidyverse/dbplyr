@@ -39,6 +39,8 @@
   SQL functions for aggregates. These take one argument, `x`, and warn if 
   `na.rm` is not `TRUE` (#3155). `win_recycled()` is equivalent to 
   `win_aggregate()` and has been soft-deprecated.
+  
+* `db_write_table` now needs to return the table name
 
 ## Minor improvements and bug fixes
 

@@ -106,8 +106,6 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
     as.sql(table), con = con)
   dbExecute(con, sql)
 
-  invisible()
-
   table
 }
 
