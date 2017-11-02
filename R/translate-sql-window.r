@@ -230,6 +230,8 @@ set_current_context <- function(context) {
 
 sql_current_context <- function() sql_context$context
 
+sql_current_select  <- function() sql_context$context %in% c("SELECT", "ORDER")
+
 # Where translation -------------------------------------------------------
 
 

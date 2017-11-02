@@ -73,8 +73,73 @@ test_that("filter and mutate translate is.na correctly", {
   )
 
   expect_equal(
+    mf %>% mutate(z = !is.na(x)) %>% show_query(),
+    sql("SELECT `x`, ~(CONVERT(BIT, IIF(`x` IS NULL, 1, 0))) AS `z`\nFROM `df`")
+  )
+
+  expect_equal(
     mf %>% filter(is.na(x)) %>% show_query(),
     sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x == 1) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` = 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x != 1) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` != 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x > 1) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` > 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x >= 1) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` >= 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = !(x == 1)) %>% show_query(),
+    sql("SELECT ~((CONVERT(BIT, IIF(`x` = 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = !(x != 1)) %>% show_query(),
+    sql("SELECT ~((CONVERT(BIT, IIF(`x` != 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = !(x > 1)) %>% show_query(),
+    sql("SELECT ~((CONVERT(BIT, IIF(`x` > 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = !(x >= 1)) %>% show_query(),
+    sql("SELECT ~((CONVERT(BIT, IIF(`x` >= 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x > 4 & x < 5) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` > 4.0, 1.0, 0.0)) & CONVERT(BIT, IIF(`x` < 5.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% filter(x > 4 & x < 5) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 AND `x` < 5.0)")
+  )
+
+  expect_equal(
+    mf %>% mutate(x = x > 4 | x < 5) %>% show_query(),
+    sql("SELECT CONVERT(BIT, IIF(`x` > 4.0, 1.0, 0.0)) | CONVERT(BIT, IIF(`x` < 5.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+  )
+
+  expect_equal(
+    mf %>% filter(x > 4 | x < 5) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 OR `x` < 5.0)")
   )
 
 })

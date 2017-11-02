@@ -80,7 +80,9 @@
   
     * Better support for temporary tables (@Hong-Revo)
     
-    * Different `is.na()` translations for filter/mutate contexts.
+    * Different translations for filter/mutate contexts for: `NULL` evaluation
+      (`is.na()`, `is.null()`), logical operators (`!`, `&`, `&&`, `|`, `||`),
+      and comparison operators (`==`, `!=`, `<`, `>`, `>=`, `<=`)
 
 *   MySQL: `copy_to()` (via `db_write_table()`) correctly translates logical 
     variables to integers (#3151).

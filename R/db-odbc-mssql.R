@@ -39,6 +39,21 @@
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
+
+      `!`           = mssql_not_sql_prefix(),
+
+      `!=`           = mssql_logical_infix("!="),
+      `==`           = mssql_logical_infix("="),
+      `<`            = mssql_logical_infix("<"),
+      `<=`           = mssql_logical_infix("<="),
+      `>`            = mssql_logical_infix(">"),
+      `>=`           = mssql_logical_infix(">="),
+
+      `&`            = mssql_generic_infix("&", "AND"),
+      `&&`           = mssql_generic_infix("&", "AND"),
+      `|`            = mssql_generic_infix("|", "OR"),
+      `||`           = mssql_generic_infix("|", "OR"),
+
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -133,11 +148,54 @@
 # known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
 # be specified as the data type of  a table column or variable, and cannot be returned in a result set.
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
+    sql_expr(CONVERT(BIT, IIF(UQ(x) %is% NULL, 1L, 0L)))
   } else {
-    sql_expr( ((!!x) %is% NULL) )
+    sql_expr(((!!x) %is% NULL) )
+  }
+}
+
+mssql_not_sql_prefix <- function() {
+  function(...) {
+    args <- list(...)
+    if (sql_current_select()) {
+      build_sql(sql("~"), args)
+    } else {
+      build_sql(sql("NOT"), args)
+    }
+  }
+}
+
+mssql_logical_infix <- function(f) {
+  assert_that(is_string(f))
+
+  f <- toupper(f)
+  function(x, y) {
+    condition <- build_sql(x, " ", sql(f), " ", y)
+    if (sql_current_select()) {
+      sql_expr(CONVERT(BIT, IIF(!!condition, 1, 0)))
+    } else {
+      condition
+    }
+  }
+}
+
+mssql_generic_infix <- function(if_select, if_filter) {
+  assert_that(is_string(if_select))
+  assert_that(is_string(if_filter))
+
+  if_select <- toupper(if_select)
+  if_filter <- toupper(if_filter)
+
+  function(x, y) {
+    if (sql_current_select()) {
+      f <- if_select
+    } else {
+      f <- if_filter
+    }
+    build_sql(x, " ", sql(f), " ", y)
   }
 }
 
