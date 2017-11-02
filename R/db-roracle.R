@@ -32,24 +32,3 @@ sql_subquery.OraConnection <- function(con, from, name = unique_name(), ...) {
 db_drop_table.OraConnection <- function(con, table, force = FALSE, ...) {
   db_drop_table.OdbcConnection(con = con, table = table, force = force, ...)
 }
-
-
-#' @export
-db_copy_to.OraConnection <- function(con, table, values,
-                                      overwrite = FALSE, types = NULL, temporary = FALSE,
-                                      unique_indexes = NULL, indexes = NULL,
-                                      analyze = TRUE, ...) {
-
-  db_copy_to.OdbcConnection(con = con,
-                            table = table,
-                            values = values,
-                            overwrite = overwrite,
-                            types = types,
-                            temporary = temporary,
-                            unique_indexes = unique_indexes,
-                            indexes = indexes,
-                            analyze = analyze,
-                            ...)
-}
-
-
