@@ -29,7 +29,7 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
 
   from <- sql_optimise(x$from)
 
-  # If all outer clauses are exeucted after the inner clauses, we
+  # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
   outer <- select_query_clauses(x)
   inner <- select_query_clauses(from)
@@ -43,4 +43,22 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
   } else {
     x
   }
+}
+
+# List clauses used by a query, in the order they are executed
+# https://sqlbolt.com/lesson/select_queries_order_of_execution
+
+# List clauses used by a query, in the order they are executed in
+select_query_clauses <- function(x) {
+  present <- c(
+    where =    length(x$where) > 0,
+    group_by = length(x$group_by) > 0,
+    having =   length(x$having) > 0,
+    select =   !identical(x$select, sql("*")),
+    distinct = x$distinct,
+    order_by = length(x$order_by) > 0,
+    limit    = !is.null(x$limit)
+  )
+
+  ordered(names(present)[present], levels = names(present))
 }
