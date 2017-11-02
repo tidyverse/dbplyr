@@ -47,6 +47,8 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
     temporary = temporary,
     row.names = FALSE
   )
+
+  table
 }
 
 #' @export

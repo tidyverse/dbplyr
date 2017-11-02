@@ -83,24 +83,3 @@ db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
   )
   DBI::dbExecute(con, sql)
 }
-
-
-#' @export
-db_copy_to.OdbcConnection <- function(con, table, values,
-                                      overwrite = FALSE, types = NULL, temporary = TRUE,
-                                      unique_indexes = NULL, indexes = NULL,
-                                      analyze = TRUE, ...) {
-
-  # A simplified version of db_copy_to.DBIConnection has worked on all
-  # ODBCConnection variances so far
-
-  if (overwrite) {
-    db_drop_table(con, table, force = TRUE)
-  }
-
-  dbWriteTable(con, table, values, temporary = temporary)
-
-  if (analyze) db_analyze(con, table)
-
-  table
-}

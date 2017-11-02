@@ -120,23 +120,44 @@
   DBI::dbExecute(con, sql)
 }
 
-#' @export
-`db_save_query.Microsoft SQL Server` <- function(con,
-                                                 sql,
-                                                 name,
-                                                 temporary = TRUE,
-                                                 ...)
-{
+mssql_temp_name <- function(name, temporary){
   # check that name has prefixed '##' if temporary
   if(temporary && substr(name, 1, 1) != "#") {
     name <- paste0("##", name)
-    message("Created temporary table named: ", name)
+    message("Created a temporary table named: ", name)
   }
+  name
+}
+
+#' @export
+`db_save_query.Microsoft SQL Server` <- function(con, sql, name,
+                                                 temporary = TRUE,...){
+
+  name <- mssql_temp_name(name, temporary)
 
   tt_sql <- build_sql("select * into ", as.sql(name), " from (", sql, ") ", as.sql(name), con = con)
 
   dbExecute(con, tt_sql)
+
   name
+}
+
+#' @export
+`db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
+
+  table <- mssql_temp_name(table, temporary)
+
+  dbWriteTable(
+    con,
+    name = table,
+    types = types,
+    value = values,
+    temporary = FALSE,
+    row.names = FALSE
+  )
+
+  table
+
 }
 
 # `IS NULL` returns a boolean expression, so you can't use it in a result set
