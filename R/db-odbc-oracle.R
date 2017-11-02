@@ -38,15 +38,7 @@ sql_translate_env.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
       as.character  = sql_cast("VARCHAR(255)"),
       as.numeric    = sql_cast("NUMBER"),
-      as.double     = sql_cast("NUMBER"),
-      is.null       = function(x){
-                        build_sql(
-                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                        )},
-      is.na         = function(x){
-                        build_sql(
-                          "CASE WHEN", x ," IS NULL THEN 1 ELSE 0 END "
-                        )}
+      as.double     = sql_cast("NUMBER")
     ),
     base_odbc_agg,
     base_odbc_win

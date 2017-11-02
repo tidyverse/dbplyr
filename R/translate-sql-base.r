@@ -118,12 +118,8 @@ base_scalar <- sql_translator(
     build_sql(x, sql(" DESC"))
   },
 
-  is.null = function(x) {
-    build_sql("((", x, ") IS NULL)")
-  },
-  is.na = function(x) {
-    build_sql("((", x, ") IS NULL)")
-  },
+  is.null = function(x) sql_expr(((!!x) %is% NULL)),
+  is.na = function(x)  sql_expr(((!!x) %is% NULL)),
   na_if = sql_prefix("NULL_IF", 2),
   coalesce = sql_prefix("coalesce"),
 
