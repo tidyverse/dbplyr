@@ -89,8 +89,8 @@ sql_translate_env.ACCESS <- function(con) {
                    },
                    trimws        = sql_prefix("TRIM"),
                    # No support for CONCAT in Access
-                   paste         = sql_paste_access,
-                   paste0        = sql_paste0_access,
+                   paste         = sql_paste_infix(" ", "&", function(x) sql_expr(Cstr(!!x))),
+                   paste0        = sql_paste_infix("", "&", function(x) sql_expr(Cstr(!!x))),
 
                    # Logic
                    # Access always returns -1 for True and 0 for False
@@ -154,32 +154,6 @@ db_analyze.ACCESS <- function(con, table, ...) {
 
 # Util -------------------------------------------
 
-sql_paste_access <- function(..., sep = " ", collapse = NULL) {
-
-  if (!is.null(collapse)) {
-    stop("`collapse` isn't supported in SQL translation", call. = FALSE)
-  }
-
-  # Access concatenates strings as `"ex1" & "ex2" & "ex3"`
-  binary_build <- function(x, y) {
-    sql_expr(!!x & !!sep & !!y)
-  }
-
-  .dots <- list(...)
-  n <- length(.dots)
-
-  if (n == 1) {
-    sql_expr(CStr(!!.dots[[1]]))
-  } else {
-    reduce(.dots, binary_build)
-  }
-
-}
-
-sql_paste0_access <- function(..., collapse = NULL) {
-  sql_paste_access(..., sep = "", collapse = collapse)
-}
-
 sql_escape_logical.ACCESS <- function(con, x) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)
@@ -187,4 +161,4 @@ sql_escape_logical.ACCESS <- function(con, x) {
   y
 }
 
-globalVariables(c("CStr", "iif", "isnull"))
+globalVariables(c("CStr", "iif", "isnull", "text"))

@@ -21,6 +21,7 @@
 \alias{base_odbc_agg}
 \alias{base_odbc_win}
 \alias{sql_paste}
+\alias{sql_paste_infix}
 \title{Create an sql translator}
 \usage{
 sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
@@ -59,6 +60,8 @@ base_odbc_agg
 base_odbc_win
 
 sql_paste(default_sep, f = "CONCAT_WS")
+
+sql_paste_infix(default_sep, op, cast)
 }
 \arguments{
 \item{scalar, aggregate, window}{The three families of functions than an

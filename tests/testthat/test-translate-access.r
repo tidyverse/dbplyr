@@ -39,9 +39,9 @@ test_that("custom scalar translated correctly", {
 
   # Special paste() tests
   expect_equal(trans(paste(x, y, sep = "+")), sql("`x` & '+' & `y`"))
-  expect_equal(trans(paste0(x, y)), trans(paste(x, y, sep = "")))
+  expect_equal(trans(paste0(x, y)), sql("`x` & `y`"))
 
-  expect_error(trans(paste(x, collapse = "-")),"`collapse` isn't supported in SQL translation")
+  expect_error(trans(paste(x, collapse = "-")),"`collapse` not supported")
 
 })
 

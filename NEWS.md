@@ -54,10 +54,10 @@
 * `mutate()` has better logic for splitting a single mutate into multiple
   subqueries (#3095).
 
-* Improved `paste()` and `paste0()` support in MySQL & PostgreSQL (#3168).
-  Both databases also gain support for `str_flatten()` function which behaves
-  like `paste(x, collapse = "-")` (but for technical reasons can't be 
-  implemented as a straightforward translation of `paste()`).
+* Improved `paste()` and `paste0()` support in MySQL, PostgreSQL (#3168),
+  and RSQLite (#3176). MySQL and PostgreSQL gain support for `str_flatten()` 
+  which behaves like `paste(x, collapse = "-")` (but for technical reasons 
+  can't be implemented as a straightforward translation of `paste()`).
 
 * `same_src.tbl_sql()` now performs correct comparison instead of always 
   returning `TRUE`. This means that `copy = TRUE` once again allows you to
