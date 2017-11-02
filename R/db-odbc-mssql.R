@@ -67,8 +67,6 @@
                         build_sql(
                           "SUBSTRING(", x, ", ", start, ", ", len, ")"
                         )},
-                      # Casting as BIT converts the Integer result into an actual logical
-                      # values TRUE and FALSE
       is.null       = function(x) mssql_is_null(x, sql_current_context()),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
@@ -151,7 +149,7 @@
 
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    sql_expr(CONVERT(BIT, IIF(UQ(x) %is% NULL, 1L, 0L)))
+    sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
   } else {
     sql_expr(((!!x) %is% NULL) )
   }
@@ -175,7 +173,7 @@ mssql_logical_infix <- function(f) {
   function(x, y) {
     condition <- build_sql(x, " ", sql(f), " ", y)
     if (sql_current_select()) {
-      sql_expr(CONVERT(BIT, IIF(!!condition, 1, 0)))
+      sql_expr(convert(BIT, iif(!!condition, 1, 0)))
     } else {
       condition
     }
@@ -199,4 +197,4 @@ mssql_generic_infix <- function(if_select, if_filter) {
   }
 }
 
-globalVariables(c("BIT", "%is%", "convert"))
+globalVariables(c("BIT", "%is%", "convert", "iif"))

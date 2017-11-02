@@ -217,9 +217,9 @@ sql_cast <- function(type) {
 sql_log <- function() {
   function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
-      sql_expr(LN(!!x))
+      sql_expr(ln(!!x))
     } else {
-      sql_expr(LOG(!!x) / log(!!base))
+      sql_expr(log(!!x) / log(!!base))
     }
   }
 }
@@ -229,8 +229,8 @@ sql_log <- function() {
 #' @export
 sql_cot <- function(){
   function(x){
-    sql_expr(1L / TAN(!!x))
+    sql_expr(1L / tan(!!x))
   }
 }
 
-globalVariables(c("%as%", "ln", "cast"))
+globalVariables(c("%as%", "cast", "ln"))

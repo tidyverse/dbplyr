@@ -89,8 +89,8 @@ sql_translate_env.ACCESS <- function(con) {
                    },
                    trimws        = sql_prefix("TRIM"),
                    # No support for CONCAT in Access
-                   paste         = sql_paste_infix(" ", "&", function(x) sql_expr(Cstr(!!x))),
-                   paste0        = sql_paste_infix("", "&", function(x) sql_expr(Cstr(!!x))),
+                   paste         = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
+                   paste0        = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
 
                    # Logic
                    # Access always returns -1 for True and 0 for False
