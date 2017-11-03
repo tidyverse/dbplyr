@@ -71,12 +71,6 @@ tbl_sum.tbl_sql <- function(x) {
 }
 
 #' @export
-glimpse.tbl_sql <- function(.data, width = NULL, n = 25, ...) {
-  .data <- collect(head(.data, n = n))
-  glimpse(.data, width = width, ...)
-}
-
-#' @export
 pull.tbl_sql <- function(.data, var = -1) {
   expr <- enquo(var)
   var <- dplyr:::find_var(expr, tbl_vars(.data))
