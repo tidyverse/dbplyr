@@ -1,2 +1,0 @@
-table<mtcars-output-test> [?? x 11]
-sqlite x.y.z [:memory:]

@@ -1,4 +1,0 @@
-table<iris-output-test> [?? x 5]
-sqlite x.y.z [:memory:]
-Species
-Sepal.Length
