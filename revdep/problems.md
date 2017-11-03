@@ -9,7 +9,6 @@ Version: 0.4.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      4. Failure: DBItest: Connection: disconnect_invalid_connection 
       5. Failure: DBItest: Connection: data_type_connection 
       6. Failure: DBItest: Connection: data_type_connection 
       7. Failure: DBItest: Connection: data_type_connection 
@@ -24,26 +23,14 @@ Version: 0.4.1
       3: Unused skip expressions: rows_affected 
       4: Unused skip expressions: read_only 
       Execution halted
+      Deleting test2668
     ```
 
 # dexter
 
-Version: 0.4.2
+Version: 0.5.1
 
 ## In both
-
-*   checking whether package ‘dexter’ can be installed ... WARNING
-    ```
-    Found the following significant warnings:
-      Warning: No Rd macros in package 'Rdpack'.
-    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks/dexter/new/dexter.Rcheck/00install.out’ for details.
-    ```
-
-*   checking Rd files ... WARNING
-    ```
-    Warning: No Rd macros in package 'Rdpack'.
-    prepare_Rd: create3DC.Rd:65: unknown macro '\insertRef'
-    ```
 
 *   checking data for non-ASCII characters ... NOTE
     ```
@@ -52,7 +39,7 @@ Version: 0.4.2
 
 # dplyr
 
-Version: 0.7.2
+Version: 0.7.4
 
 ## In both
 
@@ -153,6 +140,18 @@ Version: 0.2.1
       Execution halted
     ```
 
+# macleish
+
+Version: 0.3.1
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘DBI’
+      All declared Imports should be used.
+    ```
+
 # mdsr
 
 Version: 0.1.4
@@ -213,16 +212,50 @@ Version: 0.4.1
 
 ## In both
 
+*   checking tests ...
+    ```
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+      1: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      2: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      3: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      4: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      5: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      6: Connection is garbage-collected, use dbDisconnect() to avoid this. 
+      7: Connection is garbage-collected, use dbDisconnect() to avoid this. 
+      8: In .Internal(gc(verbose, reset)) :
+        Connection is garbage-collected, use dbDisconnect() to avoid this.
+      Execution halted
+    ```
+
 *   checking installed package size ... NOTE
     ```
-      installed size is  5.3Mb
+      installed size is  5.4Mb
       sub-directories of 1Mb or more:
         libs   5.1Mb
     ```
 
 # Organism.dplyr
 
-Version: 1.2.1
+Version: 1.2.2
+
+## Newly broken
+
+*   checking re-building of vignette outputs ... WARNING
+    ```
+    Error in re-building vignettes:
+      ...
+    Quitting from lines 134-151 (Organism.dplyr.Rmd) 
+    Error: processing vignette 'Organism.dplyr.Rmd' failed with diagnostics:
+    no applicable method for 'groups' applied to an object of class "c('sql', 'character')"
+    Execution halted
+    ```
 
 ## In both
 
@@ -234,6 +267,31 @@ Version: 1.2.1
       ‘GenomicFeatures:::get_TxDb_seqinfo0’
       ‘S4Vectors:::extract_data_frame_rows’
       See the note in ?`:::` about the use of this operator.
+    ```
+
+# replyr
+
+Version: 0.8.2
+
+## Newly broken
+
+*   checking re-building of vignette outputs ... WARNING
+    ```
+    Error in re-building vignettes:
+      ...
+    Quitting from lines 151-159 (DependencySorting.Rmd) 
+    Error: processing vignette 'DependencySorting.Rmd' failed with diagnostics:
+    missing value where TRUE/FALSE needed
+    Execution halted
+    ```
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespaces in Imports field not imported from:
+      ‘RSQLite’ ‘dbplyr’
+      All declared Imports should be used.
     ```
 
 # RSQLServer
@@ -325,11 +383,11 @@ Version: 0.1.4
      ERROR
     Running the tests in ‘tests/test-all.R’ failed.
     Last 13 lines of output:
-      1. Failure: db_load fails as expected - more (@test-db_load.R#33) --------------
+      [31m1. Failure: db_load fails as expected - more (@test-db_load.R#33) [39m--------------
       suppressMessages(db_load_col(path = f)) did not throw an error.
       
       
-      2. Failure: src fails well (@test-src.R#16) ------------------------------------
+      [31m2. Failure: src fails well (@test-src.R#16) [39m------------------------------------
       src_col() did not throw an error.
       
       

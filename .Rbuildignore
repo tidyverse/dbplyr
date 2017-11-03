@@ -9,3 +9,4 @@
 ^docs$
 ^cran-comments\.md$
 ^revdep$
+^\.httr-oauth$

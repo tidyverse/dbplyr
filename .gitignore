@@ -18,3 +18,5 @@ vignettes/*.R
 /GTAGS
 /TAGS
 /.dir-locals.el
+revdep/checks
+revdep/library
