@@ -9,6 +9,11 @@ Version: 0.4.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
+      OK: 933 SKIPPED: 9 FAILED: 137
+      1. Failure: DBItest: Driver: data_type_driver 
+      2. Failure: Visibility 
+      3. Failure: DBItest: Connection: cannot_forget_disconnect 
+      4. Failure: DBItest: Connection: disconnect_invalid_connection 
       5. Failure: DBItest: Connection: data_type_connection 
       6. Failure: DBItest: Connection: data_type_connection 
       7. Failure: DBItest: Connection: data_type_connection 
@@ -17,13 +22,36 @@ Version: 0.4.1
       1. ...
       
       Error: testthat unit tests failed
-      In addition: Warning messages:
-      1: Unused skip expressions: ^command_query$, ^data_logical_int.*, ^data_character_null_(above|below)$ 
-      2: Unused skip expressions: ^roundtrip_logical_int$, ^roundtrip_64_bit$, ^quote_identifier_not_vectorized$ 
-      3: Unused skip expressions: rows_affected 
-      4: Unused skip expressions: read_only 
       Execution halted
-      Deleting test2668
+      Deleting test5275
+    ```
+
+# civis
+
+Version: 1.0.2
+
+## Newly broken
+
+*   checking tests ...
+    ```
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+      ══ testthat results  ══════════════════════════════════════════════════════════════
+      OK: 742 SKIPPED: 4 FAILED: 17
+      1. Error: calls scripts_post_custom (@test_civis_ml.R#24) 
+      2. Error: calls civis_ml.data.frame for local df (@test_civis_ml.R#103) 
+      3. Error: calls scripts_post_custom (@test_civis_ml.R#326) 
+      4. Error: uploads local df and passes a file_id (@test_civis_ml.R#400) 
+      5. Error: uses the correct template_id (@test_civis_ml.R#547) 
+      6. Error: converts parameters arg to JSON string (@test_civis_ml.R#564) 
+      7. Error: converts cross_validation_parameters to JSON string (@test_civis_ml.R#581) 
+      8. Error: converts fit_params to JSON string (@test_civis_ml.R#600) 
+      9. Error: space separates excluded_columns (@test_civis_ml.R#618) 
+      1. ...
+      
+      Error: testthat unit tests failed
+      Execution halted
     ```
 
 # dexter
@@ -273,18 +301,6 @@ Version: 1.2.2
 
 Version: 0.8.2
 
-## Newly broken
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Quitting from lines 151-159 (DependencySorting.Rmd) 
-    Error: processing vignette 'DependencySorting.Rmd' failed with diagnostics:
-    missing value where TRUE/FALSE needed
-    Execution halted
-    ```
-
 ## In both
 
 *   checking dependencies in R code ... NOTE
@@ -362,11 +378,39 @@ Version: 0.5.2
       5: request_fetch.write_memory(req$output, req$url, handle)
       6: curl::curl_fetch_memory(url, handle = handle)
       
-      testthat results ================================================================
+      ══ testthat results  ══════════════════════════════════════════════════════════════
       OK: 1 SKIPPED: 0 FAILED: 3
       1. Error: Core dbplyr ops work (@test-sergeant.R#12) 
       2. Failure: REST API works (@test-sergeant.R#25) 
       3. Error: REST API works (@test-sergeant.R#27) 
+      
+      Error: testthat unit tests failed
+      Execution halted
+    ```
+
+# sparklyr
+
+Version: 0.6.4
+
+## Newly broken
+
+*   checking tests ...
+    ```
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+             else {
+                 msg <- core_read_spark_log_error(sc)
+                 stop(msg, call. = FALSE)
+             }
+         })
+      9: force(code)
+      10: stop(msg, call. = FALSE)
+      
+      tar: ./tests/testthat/packages.tar: Can't add archive to itself
+      ══ testthat results  ══════════════════════════════════════════════════════════════
+      OK: 478 SKIPPED: 5 FAILED: 1
+      1. Error: we can save + load tables using the various save/load APIs (@test-ml-saveload.R#44) 
       
       Error: testthat unit tests failed
       Execution halted
@@ -383,15 +427,15 @@ Version: 0.1.4
      ERROR
     Running the tests in ‘tests/test-all.R’ failed.
     Last 13 lines of output:
-      [31m1. Failure: db_load fails as expected - more (@test-db_load.R#33) [39m--------------
-      suppressMessages(db_load_col(path = f)) did not throw an error.
+      Loading required package: taxizedb
+      ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'hello world' at line 1
+      [31m──[39m [31m1. Failure: db_load fails as expected - more (@test-db_load.R#33) [39m [31m─────────────[39m
+      `suppressMessages(db_load_col(path = f))` did not throw an error.
       
+      [31m──[39m [31m2. Failure: src fails well (@test-src.R#16) [39m [31m───────────────────────────────────[39m
+      `src_col()` did not throw an error.
       
-      [31m2. Failure: src fails well (@test-src.R#16) [39m------------------------------------
-      src_col() did not throw an error.
-      
-      
-      testthat results ================================================================
+      ══ testthat results  ══════════════════════════════════════════════════════════════
       OK: 58 SKIPPED: 0 FAILED: 2
       1. Failure: db_load fails as expected - more (@test-db_load.R#33) 
       2. Failure: src fails well (@test-src.R#16) 

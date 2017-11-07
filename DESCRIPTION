@@ -39,6 +39,8 @@ Suggests:
     RPostgreSQL,
     RSQLite (>= 1.0.0),
     testthat
+Remotes:
+    tidyverse/tibble
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
