@@ -9,7 +9,7 @@
 |language |(EN)                         |
 |collate  |en_US.UTF-8                  |
 |tz       |America/Chicago              |
-|date     |2017-11-06                   |
+|date     |2017-11-07                   |
 
 # Dependencies
 
@@ -37,7 +37,7 @@
 |rlang      |0.1.4    |0.1.4      |   |
 |testthat   |NA       |1.0.2.9000 |*  |
 |tibble     |1.3.4    |1.3.4.9002 |*  |
-|tidyselect |NA       |0.2.2      |*  |
+|tidyselect |NA       |0.2.3      |*  |
 |withr      |NA       |2.1.0      |*  |
 
 # Revdeps
@@ -49,13 +49,12 @@
 |[grasp2db](problems.md#grasp2db)     |1.0.0   |1     |3       |4    |
 |[RSQLServer](problems.md#rsqlserver) |0.3.0   |1     |        |     |
 
-## Broken (3)
+## Broken (2)
 
 |package                                     |version |error  |warning |note |
 |:-------------------------------------------|:-------|:------|:-------|:----|
 |[civis](problems.md#civis)                  |1.0.2   |__+1__ |        |     |
 |[Organism.dplyr](problems.md#organismdplyr) |1.2.2   |       |__+1__  |1    |
-|[sparklyr](problems.md#sparklyr)            |0.6.4   |__+1__ |        |     |
 
 ## All (29)
 
@@ -85,7 +84,7 @@
 |RPresto                                              |1.3.0   |       |        |     |
 |[RSQLServer](problems.md#rsqlserver)                 |0.3.0   |1      |        |     |
 |[sergeant](problems.md#sergeant)                     |0.5.2   |1      |        |     |
-|[sparklyr](problems.md#sparklyr)                     |0.6.4   |__+1__ |        |     |
+|sparklyr                                             |0.6.4   |       |        |     |
 |sqlscore                                             |0.1.2   |       |        |     |
 |srvyr                                                |0.2.2   |       |        |     |
 |[taxizedb](problems.md#taxizedb)                     |0.1.4   |1      |        |     |
