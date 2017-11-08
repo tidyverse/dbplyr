@@ -224,15 +224,15 @@ mssql_generic_infix <- function(if_select, if_filter) {
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
   build_sql(
-    "CASE WHEN ((", cond, ") =  'TRUE')", " THEN (", if_true, ")",
-    if (!is.null(if_false)){
-      build_sql(" ELSE (", if_false, ")")
-    } else {
-      build_sql(" ELSE ('')")
-    }
-      ,
-    " END"
-  )
+     "CASE",
+     " WHEN ((", cond, ") =  'TRUE')", " THEN (", if_true, ")",
+     if (!is.null(if_false)){
+       build_sql(" WHEN ((", cond, ") =  'FALSE')", " THEN (", if_false, ")")
+     } else {
+       build_sql(" ELSE ('')")
+     },
+     " END"
+     )
 }
 
 globalVariables(c("BIT", "%is%", "convert", "iif"))
