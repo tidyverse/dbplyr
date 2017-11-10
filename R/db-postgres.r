@@ -21,6 +21,16 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         digits <- as.integer(digits)
         sql_expr(round((!!x) %::% numeric, !!digits))
       },
+      grepl  = function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+        if (any(c(perl, fixed, useBytes))) {
+          stop("perl, fixed and useBytes parameters are unsupported")
+        }
+        if (ignore.case) {
+          sql_expr((!!x) %~*% (!!pattern))
+        } else {
+          sql_expr((!!x) %~% (!!pattern))
+        }
+      },
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
       # stringr functions
