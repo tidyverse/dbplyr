@@ -54,6 +54,10 @@
       `|`            = mssql_generic_infix("|", "OR"),
       `||`           = mssql_generic_infix("|", "OR"),
 
+      `if`           = mssql_sql_if,
+      if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
+      ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
+
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -216,6 +220,19 @@ mssql_generic_infix <- function(if_select, if_filter) {
     }
     build_sql(x, " ", sql(f), " ", y)
   }
+}
+
+mssql_sql_if <- function(cond, if_true, if_false = NULL) {
+  build_sql(
+     "CASE",
+     " WHEN ((", cond, ") =  'TRUE')", " THEN (", if_true, ")",
+     if (!is.null(if_false)){
+       build_sql(" WHEN ((", cond, ") =  'FALSE')", " THEN (", if_false, ")")
+     } else {
+       build_sql(" ELSE ('')")
+     },
+     " END"
+     )
 }
 
 globalVariables(c("BIT", "%is%", "convert", "iif"))

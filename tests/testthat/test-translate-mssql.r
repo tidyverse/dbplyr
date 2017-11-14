@@ -142,5 +142,9 @@ test_that("filter and mutate translate is.na correctly", {
     sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 OR `x` < 5.0)")
   )
 
+  expect_equal(
+    mf %>% mutate(x = ifelse(x == 0, 0 ,1)) %>% show_query(),
+    sql("SELECT CASE WHEN ((CONVERT(BIT, IIF(`x` = 0.0, 1.0, 0.0))) =  'TRUE') THEN (0.0) WHEN ((CONVERT(BIT, IIF(`x` = 0.0, 1.0, 0.0))) =  'FALSE') THEN (1.0) END AS `x`\nFROM `df`")
+  )
 })
 
