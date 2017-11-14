@@ -11,7 +11,8 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
   expect_equal(trans(cot(x)),                 sql("1 / TAN(`x`)"))
   expect_equal(trans(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
-
+  expect_equal(trans(grepl("exp", x)),        sql("(`x`) ~ ('exp')"))
+  expect_equal(trans(grepl("exp", x, TRUE)), sql("(`x`) ~* ('exp')"))
 })
 
 

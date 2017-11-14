@@ -93,6 +93,8 @@
 
 *   SQLite: improved `na_if` translation (@cwarden)
 
+*   PostgreSQL: translation for `grepl()` added (@zozlak)
+
 # dbplyr 1.1.0
 
 ## New features
