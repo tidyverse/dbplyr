@@ -22,6 +22,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         sql_expr(round((!!x) %::% numeric, !!digits))
       },
       grepl  = function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+        # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
         if (any(c(perl, fixed, useBytes))) {
           stop("perl, fixed and useBytes parameters are unsupported")
         }
