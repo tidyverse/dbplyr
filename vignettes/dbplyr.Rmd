@@ -124,7 +124,7 @@ flights_db %>%
 
 However, in the long-run, I highly recommend you at least learn the basics of SQL. It's a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr's automatic translation. If you're completely new to SQL you might start with this [codeacademy tutorial](https://www.codecademy.com/learn/learn-sql). If you have some familiarity with SQL and you'd like to learn more, I found [how indexes work in SQLite](http://www.sqlite.org/queryplanner.html) and [10 easy steps to a complete understanding of SQL](http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql) to be particularly helpful.
 
-The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database, not in R. When working with databases, dplyr tries to be as lazy as possible:
+The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:
 
 * It never pulls data into R unless you explicitly ask for it.
 
