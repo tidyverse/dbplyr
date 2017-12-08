@@ -63,7 +63,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
     "SELECT ", select, "\n",
     "  FROM ", x, "\n",
     "  ", JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("  ON ", on, "\n") else NULL,
+    if (!is.null(on) & type != 'cross') build_sql("  ON ", on, "\n") else NULL,
     con = con
   )
 }
