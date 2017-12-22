@@ -7,6 +7,7 @@ test_that("custom scalar translated correctly", {
     translate_sql(!!enquo(x), con = simulate_teradata())
   }
 
+  expect_equal(trans(x != y),          sql("`x` <> `y`"))
   expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
   expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
   expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
