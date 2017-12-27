@@ -90,12 +90,21 @@ sql_build.op_mutate <- function(op, con, ...) {
     vars_frame = op_frame(op),
     context = list(clause = "SELECT")
   )
-  old_vars <- ident(setdiff(vars, names(new_vars)))
 
   select_query(
     sql_build(op$x, con),
-    select = c.sql(old_vars, new_vars, con = con)
+    select = overwrite_vars(vars, new_vars)
   )
+}
+
+overwrite_vars <- function(vars, new_vars) {
+  all_names <- unique(c(vars, names(new_vars)))
+  new_idx <- match(names(new_vars), all_names)
+  all_vars <- c.sql(ident(all_names))
+  names(all_vars) <- ""
+  names(all_vars)[new_idx] <- names(new_vars)
+  all_vars[new_idx] <- new_vars
+  all_vars
 }
 
 #' @export

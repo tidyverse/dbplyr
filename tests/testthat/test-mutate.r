@@ -40,6 +40,30 @@ test_that("queries are not nested unnecessarily", {
   expect_s3_class(sql$from$from, "ident")
 })
 
+test_that("maintains order of existing columns (#3216, #3223)", {
+  lazy <- lazy_frame(x = 1, y = 2) %>%
+    mutate(z = 3, y = 4, y = 5)
+
+  expect_equal(op_vars(lazy), c("x", "y", "z"))
+})
+
+test_that("supports overwriting variables (#3222)", {
+  df <- memdb_frame(x = 1, y = 2) %>%
+    mutate(y = 4, y = 5) %>%
+    collect()
+  expect_equal(df, tibble(x = 1, y = 5))
+
+  df <- memdb_frame(x = 1, y = 2) %>%
+    mutate(y = 4, y = y + 1) %>%
+    collect()
+  expect_equal(df, tibble(x = 1, y = 5))
+
+  df <- memdb_frame(x = 1, y = 2) %>%
+    mutate(y = 4, y = x + 4) %>%
+    collect()
+  expect_equal(df, tibble(x = 1, y = 5))
+})
+
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate calls windowed versions of sql functions", {
