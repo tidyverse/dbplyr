@@ -141,7 +141,7 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   }
 
   if (init != 0L) {
-    dots <- dots[-inc_seq(1L, init - 1)]
+    dots <- dots[-seq2(1L, init - 1)]
   }
   add_op_single("mutate", .data, dots = dots)
 }
