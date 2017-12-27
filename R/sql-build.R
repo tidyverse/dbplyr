@@ -93,14 +93,14 @@ sql_build.op_mutate <- function(op, con, ...) {
 
   select_query(
     sql_build(op$x, con),
-    select = overwrite_vars(vars, new_vars)
+    select = overwrite_vars(vars, new_vars, con)
   )
 }
 
-overwrite_vars <- function(vars, new_vars) {
+overwrite_vars <- function(vars, new_vars, con) {
   all_names <- unique(c(vars, names(new_vars)))
   new_idx <- match(names(new_vars), all_names)
-  all_vars <- c.sql(ident(all_names))
+  all_vars <- c.sql(ident(all_names), con = con)
   names(all_vars) <- ""
   names(all_vars)[new_idx] <- names(new_vars)
   all_vars[new_idx] <- new_vars
