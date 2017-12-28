@@ -101,9 +101,7 @@ overwrite_vars <- function(vars, new_vars, con) {
   all_names <- unique(c(vars, names(new_vars)))
   new_idx <- match(names(new_vars), all_names)
   all_vars <- c.sql(ident(all_names), con = con)
-  names(all_vars) <- ""
-  names(all_vars)[new_idx] <- names(new_vars)
-  all_vars[new_idx] <- new_vars
+  all_vars[new_idx] <- c.sql(new_vars, con = con)
   all_vars
 }
 
