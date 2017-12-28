@@ -10,7 +10,9 @@
     * Redshift.
 
 * dbplyr now supplies appropriate translations for the RMariaDB and 
-  (in-development) RPostgres packages (#3154)
+  RPostgres packages (#3154). We generally recommend using these packages
+  in favour of the older RMySQL and RPostgreSQL packages as they are
+  fully DBI compliant and tested with DBItest.
 
 ## New features
 
