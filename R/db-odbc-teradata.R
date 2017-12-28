@@ -39,6 +39,7 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
 sql_translate_env.Teradata <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
+      `!=`          = sql_infix("<>"),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
