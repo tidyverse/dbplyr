@@ -90,11 +90,3 @@ succeeds <- function(x, quiet = FALSE) {
     }
   )
 }
-
-inc_seq <- function(from, to) {
-  if (from > to) {
-    integer()
-  } else {
-    seq.int(from, to)
-  }
-}
