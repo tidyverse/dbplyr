@@ -27,7 +27,7 @@ Imports:
     rlang (>= 0.1.6),
     tibble (>= 1.4.1),
     tidyselect (>= 0.2.2),
-    utils (>= 3.4.2),
+    utils,
     utf8
 Suggests: 
     covr (>= 2.2.2),
@@ -40,8 +40,6 @@ Suggests:
     RPostgreSQL (>= 0.4.1),
     RSQLite (>= 2.0),
     testthat (>= 2.0.0)
-Remotes:
-    tidyverse/tibble
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
