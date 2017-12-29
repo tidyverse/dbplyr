@@ -50,7 +50,9 @@ db_analyze.Oracle <- function(con, table, ...) {
   sql <- dbplyr::build_sql(
     # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11524
     "ANALYZE TABLE ",
-    as.sql(table)
+    as.sql(table),
+    # Need to complete query
+    " COMPUTE STATISTICS FOR TABLE"
     , con = con)
   DBI::dbExecute(con, sql)
 }
