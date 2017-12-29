@@ -102,8 +102,10 @@ add_suffixes <- function(x, y, suffix) {
   out <- chr_along(x)
   for (i in seq_along(x)) {
     nm <- x[[i]]
-    while (nm %in% y || nm %in% out) {
-      nm <- paste0(nm, suffix)
+    if (!identical(suffix, "")) {
+      while (nm %in% y || nm %in% out) {
+        nm <- paste0(nm, suffix)
+      }
     }
 
     out[[i]] <- nm

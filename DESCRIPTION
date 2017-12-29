@@ -30,11 +30,11 @@ Imports:
     utils,
     utf8
 Suggests: 
-    covr (>= 2.2.2),
-    knitr (>= 1.17),
+    covr,
+    knitr,
     Lahman (>= 5.0.0),
     nycflights13 (>= 0.2.2),
-    rmarkdown (>= 1.8.5),
+    rmarkdown,
     RMariaDB (>= 1.0.2),
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
