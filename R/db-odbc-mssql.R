@@ -4,10 +4,11 @@
                                              order_by = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
+                                             sample = NULL,
                                              ...) {
-  out <- vector("list", 7)
+  out <- vector("list", 8)
   names(out) <- c("select", "from", "where", "group_by",
-                  "having", "order_by","limit")
+                  "having", "order_by","limit", "sample")
 
   assert_that(is.character(select), length(select) > 0L)
   out$select    <- build_sql(
@@ -24,6 +25,24 @@
 
     escape(select, collapse = ", ", con = con)
   )
+
+  # MS SQL Uses 10 PERCENT or 10 ROWS as the arguments for TABLESAMPLE
+  # https://technet.microsoft.com/en-us/library/ms189108.aspx
+  out$sample <-  if (!is.null(sample$size) && !identical(sample$size, Inf)) {
+      assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
+      if(sample$type == "n"){
+        build_sql(
+          "TABLESAMPLE (", sql(format(trunc(sample$size), scientific = FALSE)), " ROWS)",
+          con = con
+        )
+      } else {
+        build_sql(
+          "TABLESAMPLE (", sql(format(trunc(sample$size * 100), scientific = FALSE)), " PERCENT)",
+          con = con
+        )
+      }
+    }
+
 
   out$from      <- sql_clause_from(from, con)
   out$where     <- sql_clause_where(where, con)

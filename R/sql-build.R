@@ -168,6 +168,15 @@ sql_build.op_distinct <- function(op, con, ...) {
   }
 }
 
+sql_build.op_sample_n <- function(op, con, ...) {
+  select_query(sql_build(op$x, con), sample = list(type = "n", size = op$args$size))
+}
+
+sql_build.op_sample_frac <- function(op, con, ...) {
+  select_query(sql_build(op$x, con), sample = list(type = "frac", size = op$args$size))
+}
+
+
 # Dual table ops --------------------------------------------------------
 
 #' @export

@@ -11,7 +11,8 @@ select_query <- function(from,
                          having = character(),
                          order_by = character(),
                          limit = NULL,
-                         distinct = FALSE) {
+                         distinct = FALSE,
+                         sample = NULL) {
 
   stopifnot(is.character(select))
   stopifnot(is.character(where))
@@ -30,7 +31,8 @@ select_query <- function(from,
       having = having,
       order_by = order_by,
       distinct = distinct,
-      limit = limit
+      limit = limit,
+      sample = sample
     ),
     class = c("select_query", "query")
   )
@@ -51,6 +53,7 @@ print.select_query <- function(x, ...) {
   if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
   if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "")
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
+  if (length(x$sample_n))    cat("Limit:    ", x$sample_n, "\n", sep = "")
 }
 
 

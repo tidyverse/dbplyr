@@ -17,7 +17,7 @@ sql_optimise(x, con = NULL, ...)
 
 select_query(from, select = sql("*"), where = character(),
   group_by = character(), having = character(), order_by = character(),
-  limit = NULL, distinct = FALSE)
+  limit = NULL, distinct = FALSE, sample = NULL)
 
 join_query(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"))
 

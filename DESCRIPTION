@@ -81,6 +81,7 @@ Collate:
     'sql-optimise.R'
     'sql-query.R'
     'sql-render.R'
+    'sql-sample.R'
     'sql.R'
     'src-sql.r'
     'src_dbi.R'

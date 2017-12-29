@@ -57,7 +57,8 @@ select_query_clauses <- function(x) {
     select =   !identical(x$select, sql("*")),
     distinct = x$distinct,
     order_by = length(x$order_by) > 0,
-    limit    = !is.null(x$limit)
+    limit    = !is.null(x$limit),
+    sample_n = !is.null(x$sample_n)
   )
 
   ordered(names(present)[present], levels = names(present))

@@ -40,6 +40,25 @@ sql_clause_limit <- function(limit, con){
   }
 }
 
+sql_clause_sample <- function(sample, con){
+  if (!is.null(sample$size) && !identical(sample$size, Inf)) {
+    assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
+    if(sample$type == "n"){
+      build_sql(
+        "SAMPLE (", sql(format(trunc(sample$size), scientific = FALSE)), ")",
+        con = con
+      )
+    } else {
+      build_sql(
+        "SAMPLE (", sql(format(sample$size, scientific = FALSE)), ")",
+        con = con
+      )
+    }
+
+  }
+}
+
+
 sql_clause_from  <- function(from, con) sql_clause_generic("FROM", from, con)
 
 sql_clause_group_by <- function(group_by, con) sql_clause_generic("GROUP BY", group_by, con)
