@@ -22,4 +22,5 @@ Issues with CRAN packages are summarised below.
 
 ### Failed to check
 
-* RSQLServer (failed to install)
+* RSQLServer (failed to install) - this is a long-standing failure because
+  I don't have java configured.

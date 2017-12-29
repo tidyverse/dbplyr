@@ -1,4 +1,4 @@
-# dbplyr 1.1.0.9000
+# dbplyr 1.2.0
 
 ## New top-level translations
 
