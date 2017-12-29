@@ -28,7 +28,8 @@ Imports:
     tibble (>= 1.4.1),
     tidyselect (>= 0.2.2),
     utils
-Suggests: 
+Suggests:
+    bit64,
     covr,
     knitr,
     Lahman (>= 5.0.0),

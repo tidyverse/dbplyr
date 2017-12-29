@@ -91,6 +91,13 @@ escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  x <- as.character(x)
+  x[is.na(x)] <- "NULL"
+  sql_vector(x, parens, collapse)
+}
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }

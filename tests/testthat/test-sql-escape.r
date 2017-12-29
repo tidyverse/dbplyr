@@ -54,6 +54,13 @@ test_that("logical is SQL-99 compatible (by default)", {
   expect_equal(escape(NA), sql("NULL"))
 })
 
+test_that("can escape integer64 values", {
+  skip_if_not_installed("bit64")
+
+  expect_equal(escape(bit64::as.integer64(NA)), sql("NULL"))
+  expect_equal(escape(bit64::as.integer64("123456789123456789")), sql("123456789123456789"))
+})
+
 # Times -------------------------------------------------------------------
 
 test_that("times are converted to ISO 8601", {

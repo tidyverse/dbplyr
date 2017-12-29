@@ -49,6 +49,8 @@
 * Multiple `head()` calls in a row now collapse to a single call. This avoids 
   a printing problem with MS SQL (#3084).
 
+* `escape()` now works with integer64 values from the bit64 package (#3230)
+
 * `if`, `ifelse()`, and `if_else()` now correctly scope the false condition
   so that it only applies to non-NULL conditions (#3157)
 
