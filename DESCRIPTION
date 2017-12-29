@@ -27,7 +27,8 @@ Imports:
     rlang (>= 0.1.6),
     tibble (>= 1.4.1),
     tidyselect (>= 0.2.2),
-    utils (>= 3.4.2)
+    utils (>= 3.4.2),
+    utf8
 Suggests: 
     covr (>= 2.2.2),
     knitr (>= 1.17),
