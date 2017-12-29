@@ -47,11 +47,12 @@ sql_translate_env.Oracle <- function(con) {
 
 #' @export
 db_analyze.Oracle <- function(con, table, ...) {
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql <- dbplyr::build_sql(
-    # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11524
     "ANALYZE TABLE ",
-    as.sql(table)
-    , con = con)
+    as.sql(table),
+    " COMPUTE STATISTICS",
+    con = con)
   DBI::dbExecute(con, sql)
 }
 
