@@ -91,6 +91,9 @@ escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.integer64 <- escape.integer
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
