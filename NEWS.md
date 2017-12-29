@@ -55,6 +55,9 @@
 * `in_schema()` should now work in more places, particularly in `copy_to()` 
    (#3013, @baileych)
 
+* SQL generation for joins no longer gets stuck in a endless loop if you
+  request an empty suffix (#3220).
+
 * `mutate()` has better logic for splitting a single mutate into multiple
   subqueries (#3095).
 

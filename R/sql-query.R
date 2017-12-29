@@ -99,13 +99,15 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
 }
 
 add_suffixes <- function(x, y, suffix) {
+  if (identical(suffix, "")) {
+    return(x)
+  }
+
   out <- chr_along(x)
   for (i in seq_along(x)) {
     nm <- x[[i]]
-    if (!identical(suffix, "")) {
-      while (nm %in% y || nm %in% out) {
-        nm <- paste0(nm, suffix)
-      }
+    while (nm %in% y || nm %in% out) {
+      nm <- paste0(nm, suffix)
     }
 
     out[[i]] <- nm
