@@ -7,8 +7,12 @@ db_desc.PostgreSQLConnection <- function(x) {
     host, ":", info$port, "/", info$dbname, "]")
 }
 
+
 #' @export
-db_desc.PQConnection <- db_desc.PostgreSQLConnection
+db_desc.PostgreSQL <- db_desc.PostgreSQLConnection
+
+#' @export
+db_desc.PqConnection <- db_desc.PostgreSQLConnection
 
 #' @export
 sql_translate_env.PostgreSQLConnection <- function(con) {
