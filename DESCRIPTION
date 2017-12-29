@@ -21,7 +21,7 @@ Imports:
     DBI (>= 0.7),
     dplyr (>= 0.7.4),
     glue (>= 1.2.0),
-    methods (>= 3.4.2),
+    methods,
     purrr (>= 0.2.4),
     R6 (>= 2.2.2),
     rlang (>= 0.1.6),
