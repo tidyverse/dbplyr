@@ -61,8 +61,7 @@ Should be a character vector of length 2.}
 indices for the variables in \code{by}. This may speed up the join if
 there are matching indexes in \code{x}.}
 
-\item{...}{other parameters passed onto methods, for instance, \code{na_matches}
-to control how \code{NA} values are matched.  See \link{join.tbl_df} for more.}
+\item{...}{other parameters passed onto methods}
 }
 \description{
 See \link{join} for a description of the general purpose of the
