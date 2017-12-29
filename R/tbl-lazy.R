@@ -1,5 +1,3 @@
-setOldClass(c("tbl_lazy", "tbl"))
-
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
@@ -16,6 +14,8 @@ setOldClass(c("tbl_lazy", "tbl"))
 tbl_lazy <- function(df, src = NULL) {
   make_tbl("lazy", ops = op_base_local(df), src = src)
 }
+
+setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy

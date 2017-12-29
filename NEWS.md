@@ -52,6 +52,9 @@
 * `if`, `ifelse()`, and `if_else()` now correctly scope the false condition
   so that it only applies to non-NULL conditions (#3157)
 
+* `ident()` and `ident_q()` handle 0-length inputs better, and should
+  be easier to use with S3 (#3212)
+
 * `in_schema()` should now work in more places, particularly in `copy_to()` 
    (#3013, @baileych)
 

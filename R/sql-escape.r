@@ -109,6 +109,14 @@ escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
+  if (length(x) == 0) {
+    if (!is.null(collapse)) {
+      return(if (isTRUE(parens)) sql("()") else sql(""))
+    } else {
+      return(sql())
+    }
+  }
+
   if (is.na(parens)) {
     parens <- length(x) > 1L
   }
@@ -120,6 +128,10 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
 }
 
 names_to_as <- function(x, names = names2(x), con = NULL) {
+  if (length(x) == 0) {
+    return(character())
+  }
+
   names_esc <- sql_escape_ident(con, names)
   as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
 
@@ -183,6 +195,10 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
 #' sql_quote("I've had a good day", "'")
 #' sql_quote(c("abc", NA), "'")
 sql_quote <- function(x, quote) {
+  if (length(x) == 0) {
+    return(x)
+  }
+
   y <- gsub(quote, paste0(quote, quote), x, fixed = TRUE)
   y <- paste0(quote, y, quote)
   y[is.na(x)] <- "NULL"

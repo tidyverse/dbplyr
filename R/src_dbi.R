@@ -1,5 +1,3 @@
-setOldClass(c("src_dbi", "src_sql", "src"))
-
 #' dplyr backend for any DBI-compatible database
 #'
 #' @description
@@ -109,6 +107,8 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
     class = c("src_dbi", "src_sql", "src")
   )
 }
+
+setOldClass(c("src_dbi", "src_sql", "src"))
 
 # Methods -----------------------------------------------------------------
 

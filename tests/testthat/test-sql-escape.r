@@ -16,6 +16,24 @@ test_that("identifier names become AS", {
   expect_equal(ei(x = "y"), '"y" AS "x"')
 })
 
+
+# Zero-length inputs ------------------------------------------------------
+
+test_that("zero length inputs yield zero length output when not collapsed", {
+  expect_equal(sql_vector(sql(), collapse = NULL), sql())
+  expect_equal(sql_vector(ident(), collapse = NULL), sql())
+  expect_equal(sql_vector(ident_q(), collapse = NULL), sql())
+})
+
+test_that("zero length inputs yield length-1 output when collapsed", {
+  expect_equal(sql_vector(sql(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(sql(), parens = TRUE, collapse = ""), sql("()"))
+  expect_equal(sql_vector(ident(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(ident(), parens = TRUE, collapse = ""), sql("()"))
+  expect_equal(sql_vector(ident_q(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(ident_q(), parens = TRUE, collapse = ""), sql("()"))
+})
+
 # Special values ----------------------------------------------------------------
 
 test_that("missing vaues become null", {
