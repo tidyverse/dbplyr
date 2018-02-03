@@ -146,6 +146,22 @@ test_that("str_trim() translates correctly ", {
       sql("LTRIM(RTRIM(\"field_name\"))"))
 })
 
+# lubridate -------------------------------------------
 
+test_that("as_date() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      as_date("2017-01-01")
+    ),
+    sql("CAST('2017-01-01' AS DATE)")
+    )
+})
 
-
+test_that("as_datetime() translates correctly ", {
+  expect_equivalent(
+    translate_sql(
+      as_datetime("2017-01-01 01:02:03")
+    ),
+    sql("CAST('2017-01-01 01:02:03' AS DATETIME)")
+  )
+})
