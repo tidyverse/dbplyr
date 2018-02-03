@@ -166,7 +166,30 @@ base_scalar <- sql_translator(
                         sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
                         string
                         ,"))"
-                      )}
+                      )},
+
+  # lubridate functions
+
+  # SQL syntax reference links
+  # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
+
+  # SQLite - https://www.sqlite.org/lang_datefunc.html
+  #        - https://www.sqlite.org/datatype3.html
+  #
+  as_date = sql_cast("DATE"),
+  as_datetime = sql_cast("DATETIME"),
+
+  today = function(tzone = "") {build_sql("CURRENT_DATE")},
+  now = function(tzone = "") {build_sql("CURRENT_TIMESTAMP")},
+
+  year = function(x) {build_sql("EXTRACT(YEAR FROM ",x,")")},
+  month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
+    build_sql("EXTRACT(MONTH FROM",x,")")
+  },
+  day = function(x){build_sql("EXTRACT(DAY FROM ",x,")")},
+  hour = function(x){build_sql("EXTRACT(HOUR FROM ",x,")")},
+  minute = function(x){build_sql("EXTRACT(MINUTE FROM ",x,")")},
+  second = function(x){build_sql("EXTRACT(SECOND FROM ",x,")")}
 )
 
 base_symbols <- sql_translator(
