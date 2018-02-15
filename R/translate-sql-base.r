@@ -177,7 +177,7 @@ base_scalar <- sql_translator(
   #        - https://www.sqlite.org/datatype3.html
   #
   as_date = sql_cast("DATE"),
-  as_datetime = sql_cast("DATETIME"),
+  as_datetime = sql_cast("TIMESTAMP"),
 
   today = function(tzone = "") {build_sql("CURRENT_DATE")},
   now = function(tzone = "") {build_sql("CURRENT_TIMESTAMP")},
