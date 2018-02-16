@@ -14,6 +14,35 @@ db_desc.PostgreSQL <- db_desc.PostgreSQLConnection
 #' @export
 db_desc.PqConnection <- db_desc.PostgreSQLConnection
 
+postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+  # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
+  if (any(c(perl, fixed, useBytes))) {
+    abort("`perl`, `fixed` and `useBytes` parameters are unsupported")
+  }
+
+  if (old_qq()) {
+    if (ignore.case) {
+      sql_expr((!!x) %~*% (!!pattern))
+    } else {
+      sql_expr((!!x) %~% (!!pattern))
+    }
+  } else {
+    if (ignore.case) {
+      sql_expr(((!!x)) %~*% ((!!pattern)))
+    } else {
+      sql_expr(((!!x)) %~% ((!!pattern)))
+    }
+  }
+}
+postgres_round <- function(x, digits = 0L) {
+  digits <- as.integer(digits)
+  if (old_qq()) {
+    sql_expr(round((!!x) %::% numeric, !!digits))
+  } else {
+    sql_expr(round(((!!x)) %::% numeric, !!digits))
+  }
+}
+
 #' @export
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
@@ -21,21 +50,8 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       log10  = function(x) sql_expr(log(!!x)),
       log    = sql_log(),
       cot    = sql_cot(),
-      round  = function(x, digits = 0L) {
-        digits <- as.integer(digits)
-        sql_expr(round((!!x) %::% numeric, !!digits))
-      },
-      grepl  = function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
-        # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
-        if (any(c(perl, fixed, useBytes))) {
-          stop("perl, fixed and useBytes parameters are unsupported")
-        }
-        if (ignore.case) {
-          sql_expr((!!x) %~*% (!!pattern))
-        } else {
-          sql_expr((!!x) %~% (!!pattern))
-        }
-      },
+      round  = postgres_round,
+      grepl  = postgres_grepl,
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
       # stringr functions
