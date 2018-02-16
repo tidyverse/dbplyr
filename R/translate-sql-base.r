@@ -13,6 +13,15 @@ sql_if <- function(cond, if_true, if_false = NULL) {
   )
 }
 
+sql_null <- function(x) {
+  if (old_qq()) {
+    sql_expr(((!!x) %is% NULL))
+  } else {
+    sql_expr((((!!x)) %is% NULL))
+  }
+}
+
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -118,8 +127,8 @@ base_scalar <- sql_translator(
     build_sql(x, sql(" DESC"))
   },
 
-  is.null = function(x) sql_expr(((!!x) %is% NULL)),
-  is.na = function(x)  sql_expr(((!!x) %is% NULL)),
+  is.null = sql_null,
+  is.na = sql_null,
   na_if = sql_prefix("NULL_IF", 2),
   coalesce = sql_prefix("coalesce"),
 
