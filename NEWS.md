@@ -1,4 +1,6 @@
-# dbplyr 1.2.0.9000
+# dbplyr 1.2.1
+
+* Forward compatibility fixes for rlang 0.2.0
 
 # dbplyr 1.2.0
 
