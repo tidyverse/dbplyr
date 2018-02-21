@@ -56,6 +56,8 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       paste0 = sql_paste(""),
       substr = function(x, start, stop){
         len <- stop - start + 1
+        start <- as.integer(start)
+        len <- as.integer(len)
         build_sql(
           "SUBSTRING(", x, ", ", start, ", ", len, ")"
         )},
