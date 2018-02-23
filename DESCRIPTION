@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.2.1.9000
+Version: 1.2.1.9001
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("Edgar", "Ruiz", role = "aut"),
@@ -27,6 +27,7 @@ Imports:
     rlang (>= 0.1.6),
     tibble (>= 1.4.1),
     tidyselect (>= 0.2.2),
+    pool (>= 0.1.4),
     utils
 Suggests:
     bit64,
@@ -70,6 +71,7 @@ Collate:
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.r'
+    'pool.r'
     'query.r'
     'remote.R'
     'schema.R'
