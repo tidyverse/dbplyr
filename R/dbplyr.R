@@ -4,6 +4,7 @@
 #' @importFrom utils head tail
 #' @importFrom glue glue
 #' @importFrom methods setOldClass
+#' @importFrom tidyr spread
 #' @import dplyr
 #' @import rlang
 #' @import DBI

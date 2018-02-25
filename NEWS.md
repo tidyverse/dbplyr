@@ -2,6 +2,8 @@
 
 * Redshift `substr()` compatibility issue resolved (#3339)
 
+* Adds initial support for `tidyr::spread` 
+
 # dbplyr 1.2.1
 
 * Forward compatibility fixes for rlang 0.2.0
