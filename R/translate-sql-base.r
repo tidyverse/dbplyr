@@ -152,6 +152,7 @@ base_scalar <- sql_translator(
   # stringr functions
 
   # SQL Syntax reference links:
+  #   General https://docs.oracle.com/database/121/SQLRF/functions.htm#SQLRF006
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
   #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
   #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
@@ -161,6 +162,7 @@ base_scalar <- sql_translator(
   str_length      = sql_prefix("LENGTH"),
   str_to_upper    = sql_prefix("UPPER"),
   str_to_lower    = sql_prefix("LOWER"),
+  str_to_title    = sql_prefix("INITCAP"),
   str_replace_all = function(string, pattern, replacement){
                       build_sql(
                         "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
