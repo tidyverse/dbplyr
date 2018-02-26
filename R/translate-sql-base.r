@@ -166,7 +166,24 @@ base_scalar <- sql_translator(
                         sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
                         string
                         ,"))"
-                      )}
+                      )},
+  str_sub = function(string, start = 1L, end = -1L) {
+    build_sql(
+      "SUBSTR("
+      , string
+      , ","
+      , as.integer(start)
+      , sql(ifelse(end > -1L
+               , ifelse(
+                 end < start
+                 ,",0"
+                 , paste0(",",as.integer(end-start+1))
+                 )
+               , "")
+      )
+      , ")"
+    )
+  }
 )
 
 base_symbols <- sql_translator(
