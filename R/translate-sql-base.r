@@ -184,7 +184,19 @@ base_scalar <- sql_translator(
 
   year = function(x) {build_sql("EXTRACT(YEAR FROM ",x,")")},
   month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
-    build_sql("EXTRACT(MONTH FROM",x,")")
+    # need to add label=TRUE AND abbr=TRUE, abbr=FALSE variants...
+    # i.e. Feb (3 chr), February
+    # to_char(current_date,'Mon'), to_char(current_date,'Month') ?
+    if (!label) {
+      return(build_sql("EXTRACT(MONTH FROM",x,")"))
+    } else {
+      if (abbr) {
+        return(build_sql("TO_CHAR(",x,",'Mon')"))
+      } else {
+        return(build_sql("TO_CHAR(",x,",'Month')"))
+      }
+    }
+
   },
   day = function(x){build_sql("EXTRACT(DAY FROM ",x,")")},
   hour = function(x){build_sql("EXTRACT(HOUR FROM ",x,")")},
