@@ -1,4 +1,4 @@
-# dbplyr 1.2.2 (UNRELEASED)
+# dbplyr 1.2.1.9000
 
 * `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
 * Redshift `substr()` compatibility issue resolved (#3339)
