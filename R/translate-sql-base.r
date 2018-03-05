@@ -13,6 +13,15 @@ sql_if <- function(cond, if_true, if_false = NULL) {
   )
 }
 
+sql_null <- function(x) {
+  if (old_qq()) {
+    sql_expr(((!!x) %is% NULL))
+  } else {
+    sql_expr((((!!x)) %is% NULL))
+  }
+}
+
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -118,8 +127,8 @@ base_scalar <- sql_translator(
     build_sql(x, sql(" DESC"))
   },
 
-  is.null = function(x) sql_expr(((!!x) %is% NULL)),
-  is.na = function(x)  sql_expr(((!!x) %is% NULL)),
+  is.null = sql_null,
+  is.na = sql_null,
   na_if = sql_prefix("NULL_IF", 2),
   coalesce = sql_prefix("coalesce"),
 
@@ -143,6 +152,7 @@ base_scalar <- sql_translator(
   # stringr functions
 
   # SQL Syntax reference links:
+  #   General https://docs.oracle.com/database/121/SQLRF/functions.htm#SQLRF006
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
   #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
   #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
@@ -152,6 +162,7 @@ base_scalar <- sql_translator(
   str_length      = sql_prefix("LENGTH"),
   str_to_upper    = sql_prefix("UPPER"),
   str_to_lower    = sql_prefix("LOWER"),
+  str_to_title    = sql_prefix("INITCAP"),
   str_replace_all = function(string, pattern, replacement){
                       build_sql(
                         "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
@@ -166,7 +177,24 @@ base_scalar <- sql_translator(
                         sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
                         string
                         ,"))"
-                      )}
+                      )},
+  str_sub = function(string, start = 1L, end = -1L) {
+    build_sql(
+      "SUBSTR("
+      , string
+      , ","
+      , as.integer(start)
+      , sql(ifelse(end > -1L
+               , ifelse(
+                 end < start
+                 ,",0"
+                 , paste0(",",as.integer(end-start+1))
+                 )
+               , "")
+      )
+      , ")"
+    )
+  }
 )
 
 base_symbols <- sql_translator(

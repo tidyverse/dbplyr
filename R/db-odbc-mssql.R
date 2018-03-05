@@ -176,7 +176,7 @@ mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
     sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
   } else {
-    sql_expr(((!!x) %is% NULL) )
+    sql_null(x)
   }
 }
 
