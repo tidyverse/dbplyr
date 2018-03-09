@@ -44,6 +44,31 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       },
       str_detect  = function(string, pattern){
         sql_expr(strpos(!!string, !!pattern) > 0L)
+      },
+      # lubridate functions
+      wday = function(x, label=FALSE, abbr = TRUE
+                      , week_start = getOption("lubridate.week.start",7)
+                      , locale = Sys.getlocale("LC_TIME")) {
+        case_when(
+          label == FALSE ~ build_sql(
+            "EXTRACT('dow' FROM "
+            , x
+            , " + "
+            , 7 - week_start
+            , ") + 1"
+            )
+          , label == TRUE && abbr = FALSE ~ build_sql(
+            "TO_CHAR("
+            , x
+            , ",'Day')"
+          )
+          , label == TRUE && abbr = TRUE ~ build_sql(
+            "SUBSTR(TO_CHAR("
+            , x
+            , ",'Day'),1,3)"
+          )
+          , TRUE ~ stop("Unrecognized arguments to `wday`")
+        )
       }
     ),
     sql_translator(.parent = base_agg,
