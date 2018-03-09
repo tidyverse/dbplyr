@@ -57,12 +57,12 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
             , 7 - week_start
             , ") + 1"
             )
-          , label == TRUE && abbr = FALSE ~ build_sql(
+          , label == TRUE && abbr == FALSE ~ build_sql(
             "TO_CHAR("
             , x
             , ",'Day')"
           )
-          , label == TRUE && abbr = TRUE ~ build_sql(
+          , label == TRUE && abbr == TRUE ~ build_sql(
             "SUBSTR(TO_CHAR("
             , x
             , ",'Day'),1,3)"
