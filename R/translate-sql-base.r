@@ -159,10 +159,10 @@ base_scalar <- sql_translator(
   #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
   #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
   #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
-  str_length      = sql_prefix("LENGTH"),
-  str_to_upper    = sql_prefix("UPPER"),
-  str_to_lower    = sql_prefix("LOWER"),
-  str_to_title    = sql_prefix("INITCAP"),
+  str_length      = sql_prefix("LENGTH",1),
+  str_to_upper    = sql_prefix("UPPER",1),
+  str_to_lower    = sql_prefix("LOWER",1),
+  str_to_title    = sql_prefix("INITCAP",1),
   str_replace_all = function(string, pattern, replacement){
                       build_sql(
                         "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
