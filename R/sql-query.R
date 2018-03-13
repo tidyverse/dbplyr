@@ -71,7 +71,7 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 
 
 # Returns NULL if variables don't need to be renamed
-join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
+join_vars <- function(x_names, y_names, by, suffix = c(".x", ".y")) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
@@ -80,13 +80,8 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
 
-  # In left and inner joins, return key values only from x
-  # In right joins, return key values only from y
-  # In full joins, return key values by coalescing values from x and y
   x_x <- x_names
   x_y <- by$y[match(x_names, by$x)]
-  x_y[type == "left" | type == "inner"] <- NA
-  x_x[type == "right" & !is.na(x_y)] <- NA
   y_x <- rep_len(NA, length(y_names))
   y_y <- y_names
 
