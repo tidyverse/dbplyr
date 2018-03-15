@@ -152,13 +152,14 @@ base_scalar <- sql_translator(
   # stringr functions
 
   # SQL Syntax reference links:
-  #   General https://docs.oracle.com/database/121/SQLRF/functions.htm#SQLRF006
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
   #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
   #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
   #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
   #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
   #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
+  #   Alt Oracle: https://docs.oracle.com/database/121/SQLRF/functions.htm#SQLRF006
+  #   Redshift: https://docs.aws.amazon.com/redshift/latest/dg/String_functions_header.html
   str_length      = sql_prefix("LENGTH"),
   str_to_upper    = sql_prefix("UPPER"),
   str_to_lower    = sql_prefix("LOWER"),
