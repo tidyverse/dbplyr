@@ -108,7 +108,7 @@ The main difference is that you can see that it's a remote source in a SQLite da
 
 ## Generating queries
 
-To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you're not forced to use it. However, SQL is a very large language and dbplyr doesn't do everything. It focusses on `SELECT` statements, the SQL you write most often as an analyst.
+To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you're not forced to use it. However, SQL is a very large language and dbplyr doesn't do everything. It focuses on `SELECT` statements, the SQL you write most often as an analyst.
 
 Most of the time you don't need to know anything about SQL, and you can continue to use the dplyr verbs that you're already familiar with:
 
