@@ -128,20 +128,6 @@ semi_join_vars <- function(x_names, y_names) {
 }
 
 
-get_join_xy_names <- function(by, uniques) {
-  xy_by <- by$x[by$x == by$y]
-  x_names <- uniques$x
-  x_rename <- names(x_names) %in% xy_by
-  names(x_names)[!x_rename] <- ""
-
-  y_names <- uniques$y
-  y_remove <- names(y_names) %in% xy_by
-  y_names <- unname(y_names[!y_remove])
-
-  c(x_names, y_names)
-}
-
-
 #' @export
 print.join_query <- function(x, ...) {
   cat("<SQL JOIN (", toupper(x$type), ")>\n", sep = "")
