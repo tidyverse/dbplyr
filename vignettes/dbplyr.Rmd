@@ -21,7 +21,7 @@ As well as working with local in-memory data stored in data frames, dplyr also w
   
 (If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating.)
 
-This vignette focusses on the first scenario because it's the most common. If you're using R to do data analysis inside a company, most of the data you need probably already lives in a database (it's just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr's database tools. At  the end, I'll also give you a few pointers if you do need to set up your own database.
+This vignette focuses on the first scenario because it's the most common. If you're using R to do data analysis inside a company, most of the data you need probably already lives in a database (it's just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr's database tools. At  the end, I'll also give you a few pointers if you do need to set up your own database.
 
 ## Getting started
 
@@ -108,7 +108,7 @@ The main difference is that you can see that it's a remote source in a SQLite da
 
 ## Generating queries
 
-To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you're not forced to use it. However, SQL is a very large language and dbplyr doesn't do everything. It focusses on `SELECT` statements, the SQL you write most often as an analyst.
+To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you're not forced to use it. However, SQL is a very large language and dbplyr doesn't do everything. It focuses on `SELECT` statements, the SQL you write most often as an analyst.
 
 Most of the time you don't need to know anything about SQL, and you can continue to use the dplyr verbs that you're already familiar with:
 
