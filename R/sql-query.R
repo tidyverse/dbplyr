@@ -70,7 +70,6 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 }
 
 
-# Returns NULL if variables don't need to be renamed
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
