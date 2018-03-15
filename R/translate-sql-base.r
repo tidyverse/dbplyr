@@ -180,21 +180,10 @@ base_scalar <- sql_translator(
                         ,"))"
                       )},
   str_sub = function(string, start = 1L, end = -1L) {
-    build_sql(
-      "SUBSTR("
-      , string
-      , ","
-      , as.integer(start)
-      , sql(ifelse(end > -1L
-               , ifelse(
-                 end < start
-                 ,",0"
-                 , paste0(",",as.integer(end-start+1))
-                 )
-               , "")
-      )
-      , ")"
-    )
+    start <- as.integer(start)
+    length <- pmax(as.integer(stop) - start + 1L, 0L)
+
+    build_sql(sql("substr"), list(x, start, length))
   }
 )
 
