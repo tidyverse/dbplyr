@@ -133,7 +133,7 @@ Things get a little trickier with window functions, because SQL's window functio
   confusing, and is summarised visually below.
 
     ```{r echo = FALSE, out.width = "100%"}
-    knitr::include_graphics("windows.png", dpi = 200)
+    knitr::include_graphics("windows.png", dpi = 300)
     ```
 
     Of the many possible specifications, there are only three that commonly
