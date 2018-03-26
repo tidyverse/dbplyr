@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Lazy operations — lazy_ops • dbplyr</title>
+<title>Generate SQL from R expressions — sql_expr • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">Lazy operations</a>
+        <a class="navbar-brand" href="../index.html">Generate SQL from R expressions</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -92,47 +92,45 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Lazy operations</h1>
-    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/lazy-ops.R'><code>R/lazy-ops.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/window.R'><code>R/window.R</code></a></small>
+    <h1>Generate SQL from R expressions</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/sql-expr.R'><code>R/sql-expr.R</code></a></small>
     </div>
 
     
-    <p>This set of S3 classes describe the action of dplyr verbs. These are
-currently used for SQL sources to separate the description of operations
-in R from their computation in SQL. This API is very new so is likely
-to evolve in the future.</p>
+    <p>Low-level building block for generating SQL from R expressions.
+Strings are escaped; names become bare SQL identifiers. User infix
+functions have <code>\%</code> stripped.</p>
     
 
-    <pre class="usage"><span class='fu'>op_base</span>(<span class='no'>x</span>, <span class='no'>vars</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'>character</span>())
-
-<span class='fu'>op_single</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>add_op_single</span>(<span class='no'>name</span>, <span class='no'>.data</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>op_double</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>op_grps</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_vars</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_sort</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_frame</span>(<span class='no'>op</span>)</pre>
-        
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p><code>op_vars()</code> and <code>op_grps()</code> compute the variables and groups from
-a sequence of lazy operations. <code>op_sort()</code> tracks the order of the
-data for use in window functions.</p>
+    <pre class="usage"><span class='fu'>sql_expr</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>x</th>
+      <td><p>A quasiquoted expression</p></td>
+    </tr>
+    <tr>
+      <th>con</th>
+      <td><p>An optional database connection to control the details of
+the translation. The default, <code>NULL</code>, generates ANSI SQL.</p></td>
+    </tr>
+    </table>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span> + <span class='fl'>1</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x + 1.0)</div><div class='input'>
+<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F('x', 'y')</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span>, <span class='no'>y</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x, y)</div><div class='input'>
+<span class='fu'>sql_expr</span>(<span class='fu'>cast</span>(<span class='st'>"x"</span> <span class='kw'>%as%</span> <span class='no'>DECIMAL</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; CAST('x' AS DECIMAL)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>round</span>(<span class='no'>x</span>) <span class='kw'>%::%</span> <span class='no'>numeric</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; ROUND(x) :: numeric</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      
-      <li><a href="#details">Details</a></li>
-          </ul>
+      <li><a href="#arguments">Arguments</a></li>
+            
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

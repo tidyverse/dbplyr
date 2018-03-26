@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Refer to a table in a schema</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Refer to a table in a schema</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/schema.R'><code>R/schema.R</code></a></small>
     </div>
 
     
@@ -101,7 +102,7 @@
 
     <pre class="usage"><span class='fu'>in_schema</span>(<span class='no'>schema</span>, <span class='no'>table</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -114,40 +115,44 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>in_schema</span>(<span class='st'>"my_schema"</span>, <span class='st'>"my_table"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; my_schema.my_table</div><div class='input'>
 <span class='co'># Example using schemas with SQLite</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='kw'>DBI</span><span class='kw'>::</span><span class='fu'>dbConnect</span>(<span class='kw'>RSQLite</span><span class='kw'>::</span><span class='fu'>SQLite</span>(), <span class='st'>":memory:"</span>)
-<span class='no'>src</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='src_dbi.html'>src_dbi</a></span>(<span class='no'>con</span>)
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/DBI/topics/dbConnect'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/RSQLite/topics/SQLite'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
+<span class='no'>src</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='src_dbi.html'>src_dbi</a></span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># Add auxilary schema</span>
 <span class='no'>tmp</span> <span class='kw'>&lt;-</span> <span class='fu'>tempfile</span>()
-<span class='kw'>DBI</span><span class='kw'>::</span><span class='fu'>dbExecute</span>(<span class='no'>con</span>, <span class='fu'>paste0</span>(<span class='st'>"ATTACH '"</span>, <span class='no'>tmp</span>, <span class='st'>"' AS aux"</span>))</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
+<span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/DBI/topics/dbExecute'>dbExecute</a></span>(<span class='no'>con</span>, <span class='fu'>paste0</span>(<span class='st'>"ATTACH '"</span>, <span class='no'>tmp</span>, <span class='st'>"' AS aux"</span>))</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
 <span class='fu'>library</span>(<span class='no'>dplyr</span>, <span class='kw'>warn.conflicts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='fu'>copy_to</span>(<span class='no'>con</span>, <span class='no'>iris</span>, <span class='st'>"df"</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='fu'>copy_to</span>(<span class='no'>con</span>, <span class='no'>mtcars</span>, <span class='fu'>in_schema</span>(<span class='st'>"aux"</span>, <span class='st'>"df"</span>), <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'><a href='http://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>con</span>, <span class='no'>iris</span>, <span class='st'>"df"</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'><a href='http://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>con</span>, <span class='no'>mtcars</span>, <span class='fu'>in_schema</span>(<span class='st'>"aux"</span>, <span class='st'>"df"</span>), <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'>tbl</span>(<span class='st'>"df"</span>)</div><div class='output co'>#&gt; Source:     table&lt;df&gt; [?? x 5]
-#&gt; Database:   sqlite 3.11.1 [:memory:]
-#&gt; 
-#&gt; # S3: tbl_dbi
-#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-#&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;   &lt;chr&gt;
-#&gt; 1          5.1         3.5          1.4         0.2  setosa
-#&gt; 2          4.9         3.0          1.4         0.2  setosa
-#&gt; 3          4.7         3.2          1.3         0.2  setosa
-#&gt; 4          4.6         3.1          1.5         0.2  setosa
-#&gt; 5          5.0         3.6          1.4         0.2  setosa
-#&gt; 6          5.4         3.9          1.7         0.4  setosa
-#&gt; # ... with more rows</div><div class='input'><span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'>tbl</span>(<span class='fu'>in_schema</span>(<span class='st'>"aux"</span>, <span class='st'>"df"</span>))</div><div class='output co'>#&gt; Source:     table&lt;aux.df&gt; [?? x 11]
-#&gt; Database:   sqlite 3.11.1 [:memory:]
-#&gt; 
-#&gt; # S3: tbl_dbi
-#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4
-#&gt; 2  21.0     6   160   110  3.90 2.875 17.02     0     1     4     4
-#&gt; 3  22.8     4   108    93  3.85 2.320 18.61     1     1     4     1
-#&gt; 4  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
-#&gt; 5  18.7     8   360   175  3.15 3.440 17.02     0     0     3     2
-#&gt; 6  18.1     6   225   105  2.76 3.460 20.22     1     0     3     1
+<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"df"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;df&gt; [?? x 5]
+#&gt; # Database: sqlite 3.19.3 [:memory:]
+#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+#&gt;           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;  
+#&gt;  1         5.10        3.50         1.40       0.200 setosa 
+#&gt;  2         4.90        3.00         1.40       0.200 setosa 
+#&gt;  3         4.70        3.20         1.30       0.200 setosa 
+#&gt;  4         4.60        3.10         1.50       0.200 setosa 
+#&gt;  5         5.00        3.60         1.40       0.200 setosa 
+#&gt;  6         5.40        3.90         1.70       0.400 setosa 
+#&gt;  7         4.60        3.40         1.40       0.300 setosa 
+#&gt;  8         5.00        3.40         1.50       0.200 setosa 
+#&gt;  9         4.40        2.90         1.40       0.200 setosa 
+#&gt; 10         4.90        3.10         1.50       0.100 setosa 
+#&gt; # ... with more rows</div><div class='input'><span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'>in_schema</span>(<span class='st'>"aux"</span>, <span class='st'>"df"</span>))</div><div class='output co'>#&gt; # Source:   table&lt;aux.df&gt; [?? x 11]
+#&gt; # Database: sqlite 3.19.3 [:memory:]
+#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+#&gt;  1  21.0    6.  160.  110.  3.90  2.62  16.5    0.    1.    4.    4.
+#&gt;  2  21.0    6.  160.  110.  3.90  2.88  17.0    0.    1.    4.    4.
+#&gt;  3  22.8    4.  108.   93.  3.85  2.32  18.6    1.    1.    4.    1.
+#&gt;  4  21.4    6.  258.  110.  3.08  3.22  19.4    1.    0.    3.    1.
+#&gt;  5  18.7    8.  360.  175.  3.15  3.44  17.0    0.    0.    3.    2.
+#&gt;  6  18.1    6.  225.  105.  2.76  3.46  20.2    1.    0.    3.    1.
+#&gt;  7  14.3    8.  360.  245.  3.21  3.57  15.8    0.    0.    3.    4.
+#&gt;  8  24.4    4.  147.   62.  3.69  3.19  20.0    1.    0.    4.    2.
+#&gt;  9  22.8    4.  141.   95.  3.92  3.15  22.9    1.    0.    4.    2.
+#&gt; 10  19.2    6.  168.  123.  3.92  3.44  18.3    1.    0.    4.    4.
 #&gt; # ... with more rows</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -167,21 +172,21 @@
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

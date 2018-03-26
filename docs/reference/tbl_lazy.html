@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Create a local lazy tibble</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create a local lazy tibble</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/simulate.r'><code>R/simulate.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/tbl-lazy.R'><code>R/tbl-lazy.R</code></a></small>
     </div>
 
     
@@ -106,7 +107,23 @@ have an active database connection.</p>
 
 <span class='fu'>simulate_postgres</span>()
 
+<span class='fu'>simulate_mysql</span>()
+
+<span class='fu'>simulate_odbc</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>simulate_impala</span>()
+
 <span class='fu'>simulate_mssql</span>()
+
+<span class='fu'>simulate_oracle</span>()
+
+<span class='fu'>simulate_hive</span>()
+
+<span class='fu'>simulate_odbc_postgresql</span>()
+
+<span class='fu'>simulate_teradata</span>()
+
+<span class='fu'>simulate_odbc_access</span>()
 
 <span class='fu'>tbl_lazy</span>(<span class='no'>df</span>, <span class='kw'>src</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
@@ -118,7 +135,8 @@ have an active database connection.</p>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>2</span>)
 
 <span class='no'>df_sqlite</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl_lazy</span>(<span class='no'>df</span>, <span class='kw'>src</span> <span class='kw'>=</span> <span class='fu'>simulate_sqlite</span>())
-<span class='no'>df_sqlite</span> <span class='kw'>%&gt;%</span> <span class='fu'>summarise</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>sd</span>(<span class='no'>x</span>)) <span class='kw'>%&gt;%</span> <span class='fu'>show_query</span>()</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT STDEV(`x`) AS `x`
+<span class='no'>df_sqlite</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>sd</span>(<span class='no'>x</span>)) <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
+#&gt; <span class='warning'>Use `STDEV(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; SELECT STDEV(`x`) AS `x`
 #&gt; FROM `df`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -137,21 +155,21 @@ have an active database connection.</p>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

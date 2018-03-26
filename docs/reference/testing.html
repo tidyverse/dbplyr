@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Infrastructure for testing dplyr</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Infrastructure for testing dplyr</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/test-frame.R'><code>R/test-frame.R</code></a></small>
     </div>
 
     
@@ -105,6 +106,8 @@ use <code>test_frame()</code>.</p>
 
 <span class='fu'>test_register_con</span>(<span class='no'>name</span>, <span class='no'>...</span>)
 
+<span class='fu'>src_test</span>(<span class='no'>name</span>)
+
 <span class='fu'>test_load</span>(<span class='no'>df</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'>random_table_name</span>(), <span class='kw'>srcs</span> <span class='kw'>=</span> <span class='no'>test_srcs</span>$<span class='fu'>get</span>(),
   <span class='kw'>ignore</span> <span class='kw'>=</span> <span class='fu'>character</span>())
 
@@ -112,13 +115,13 @@ use <code>test_frame()</code>.</p>
         
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>not_run</span>({
-  <span class='fu'>test_register_src</span>(<span class='st'>"df"</span>, <span class='fu'>src_df</span>(<span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'>new.env</span>()))
-  <span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, <span class='fu'>src_sqlite</span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'>test_register_src</span>(<span class='st'>"df"</span>, <span class='fu'>src_df</span>(<span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'>new.env</span>()))
+<span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, <span class='fu'>src_sqlite</span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
 
-  <span class='fu'>test_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>:<span class='fl'>1</span>)
-  <span class='fu'>test_load</span>(<span class='no'>mtcars</span>)
-})</div></pre>
+<span class='fu'>test_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>:<span class='fl'>1</span>)
+<span class='fu'>test_load</span>(<span class='no'>mtcars</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -136,21 +139,21 @@ use <code>test_frame()</code>.</p>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+
