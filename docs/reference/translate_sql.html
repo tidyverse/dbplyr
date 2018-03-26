@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Translate an expression to sql.</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Translate an expression to sql.</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql.r'><code>R/translate-sql.r</code></a></small>
     </div>
 
     
@@ -100,12 +101,12 @@
     
 
     <pre class="usage"><span class='fu'>translate_sql</span>(<span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'>character</span>(), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>translate_sql_</span>(<span class='no'>dots</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>context</span> <span class='kw'>=</span> <span class='fu'>list</span>())</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -124,15 +125,19 @@ the translation. The default, <code>NULL</code>, generates ANSI SQL.</p></td>
       <td><p>Deprecated. Now call <code><a href='partial_eval.html'>partial_eval()</a></code> directly.</p></td>
     </tr>
     <tr>
-      <th>vars_group, vars_order</th>
-      <td><p>Grouping and ordering variables used for
-windowed functions.</p></td>
+      <th>vars_group, vars_order, vars_frame</th>
+      <td><p>Parameters used in the <code>OVER</code>
+expression of windowed functions.</p></td>
     </tr>
     <tr>
       <th>window</th>
       <td><p>Use <code>FALSE</code> to suppress generation of the <code>OVER</code>
 statement used for window functions. This is necessary when generating
 SQL for a grouped summary.</p></td>
+    </tr>
+    <tr>
+      <th>context</th>
+      <td><p>Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.</p></td>
     </tr>
     </table>
     
@@ -144,8 +149,8 @@ provides custom mappings for <code>!</code> (to NOT), <code>&amp;&amp;</code> an
 <code>AND</code>, <code>||</code> and <code>|</code> to <code>OR</code>, <code>^</code> to <code>POWER</code>,
 <code>%&gt;%</code> to <code>%</code>, <code>ceiling</code> to <code>CEIL</code>, <code>mean</code> to
 <code>AVG</code>, <code>var</code> to <code>VARIANCE</code>, <code>tolower</code> to <code>LOWER</code>,
-<code>toupper</code> to <code>UPPER</code> and <code>nchar</code> to <code>LENGTH</code>.
-    <code>c()</code> and <code>:</code> keep their usual R behaviour so you can easily create
+<code>toupper</code> to <code>UPPER</code> and <code>nchar</code> to <code>LENGTH</code>.</p>
+<p><code>c()</code> and <code>:</code> keep their usual R behaviour so you can easily create
 vectors that are passed to sql.</p>
 <p>All other functions will be preserved as is. R's infix functions
 (e.g. <code>%like%</code>) will be converted to their SQL equivalents
@@ -173,7 +178,7 @@ from <code>sd()</code> to the SQL aggregation function <code>STDEV</code>.</p>
 <span class='fu'>translate_sql</span>(<span class='no'>x</span> <span class='kw'>&lt;</span> <span class='fl'>5</span> <span class='kw'>&amp;</span> !(<span class='no'>y</span> <span class='kw'>&gt;=</span> <span class='fl'>5</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "x" &lt; 5.0 AND NOT(("y" &gt;= 5.0))</div><div class='input'><span class='co'># xor() doesn't have a direct SQL equivalent</span>
 <span class='fu'>translate_sql</span>(<span class='fu'>xor</span>(<span class='no'>x</span>, <span class='no'>y</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "x" OR "y" AND NOT ("x" AND "y")</div><div class='input'>
 <span class='co'># If is translated into case when</span>
-<span class='fu'>translate_sql</span>(<span class='kw'>if</span> (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>5</span>) <span class='st'>"big"</span> <span class='kw'>else</span> <span class='st'>"small"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') ELSE ('small') END</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='kw'>if</span> (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>5</span>) <span class='st'>"big"</span> <span class='kw'>else</span> <span class='st'>"small"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') WHEN NOT("x" &gt; 5.0) THEN ('small') END</div><div class='input'>
 <span class='co'># Infix functions are passed onto SQL with % removed</span>
 <span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%like%</span> <span class='st'>"Had%"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" LIKE 'Had%'</div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%is%</span> <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IS </div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%in%</span> <span class='fu'>c</span>(<span class='st'>"John"</span>, <span class='st'>"Roger"</span>, <span class='st'>"Robert"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IN ('John', 'Roger', 'Robert')</div><div class='input'>
 <span class='co'># And be careful if you really want integers</span>
@@ -183,14 +188,17 @@ from <code>sd()</code> to the SQL aggregation function <code>STDEV</code>.</p>
 <span class='fu'>translate_sql_</span>(<span class='fu'>list</span>(<span class='no'>x</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "y" + 1.0 / SIN("t")</div><div class='input'>
 <span class='co'># Windowed translation --------------------------------------------</span>
 <span class='co'># Known window functions automatically get OVER()</span>
-<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; avg("mpg") OVER ()</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
+#&gt; <span class='warning'>Use `avg(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; avg("mpg") OVER ()</div><div class='input'>
 <span class='co'># Suppress this with window = FALSE</span>
-<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>), <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; AVG("mpg")</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>), <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
+#&gt; <span class='warning'>Use `AVG(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; AVG("mpg")</div><div class='input'>
 <span class='co'># vars_group controls partition:</span>
-<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='st'>"cyl"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; avg("mpg") OVER (PARTITION BY "cyl")</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'>mean</span>(<span class='no'>mpg</span>), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='st'>"cyl"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
+#&gt; <span class='warning'>Use `avg(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; "mpg" &gt; avg("mpg") OVER (PARTITION BY "cyl")</div><div class='input'>
 <span class='co'># and vars_order controls ordering for those functions that need it</span>
 <span class='fu'>translate_sql</span>(<span class='fu'>cumsum</span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: Windowed expression 'sum("mpg")' does not have explicit order.</span>
-#&gt; <span class='warning'>Please use arrange() to make determinstic.</span></div><div class='output co'>#&gt; &lt;SQL&gt; sum("mpg") OVER (ROWS UNBOUNDED PRECEDING)</div><div class='input'><span class='fu'>translate_sql</span>(<span class='fu'>cumsum</span>(<span class='no'>mpg</span>), <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='st'>"mpg"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sum("mpg") OVER (ORDER BY "mpg" ROWS UNBOUNDED PRECEDING)</div></pre>
+#&gt; <span class='warning'>Please use arrange() or window_order() to make determinstic.</span></div><div class='output co'>#&gt; &lt;SQL&gt; sum("mpg") OVER (ROWS UNBOUNDED PRECEDING)</div><div class='input'><span class='fu'>translate_sql</span>(<span class='fu'>cumsum</span>(<span class='no'>mpg</span>), <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='st'>"mpg"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sum("mpg") OVER (ORDER BY "mpg" ROWS UNBOUNDED PRECEDING)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -213,21 +221,21 @@ from <code>sd()</code> to the SQL aggregation function <code>STDEV</code>.</p>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

@@ -6,22 +6,22 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Lazy operations — lazy_ops • dbplyr</title>
+<title>The MIT License (MIT) • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
 
 <!-- Bootstrap -->
-<link href="../tidyverse.css" rel="stylesheet">
+<link href="tidyverse.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
 <!-- tidyverse -->
-<link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
-<script src="../pkgdown.js"></script>
+<link href="pkgdown.css" rel="stylesheet">
+<script src="jquery.sticky-kit.min.js"></script>
+<script src="pkgdown.js"></script>
 
 <!-- mathjax -->
 <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
@@ -33,7 +33,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-topic">
+    <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -45,17 +45,17 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">Lazy operations</a>
+        <a class="navbar-brand" href="index.html"></a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="../articles/dbplyr.html">Intro</a>
+  <a href="articles/dbplyr.html">Intro</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -65,15 +65,15 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/sql-translation.html">SQL translation</a>
+      <a href="articles/sql-translation.html">SQL translation</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="articles/new-backend.html">Creating new backends</a>
     </li>
   </ul>
 </li>
 <li>
-  <a href="../news/index.html">News</a>
+  <a href="news/index.html">News</a>
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr">
@@ -90,52 +90,23 @@
       </header>
 
       <div class="row">
-  <div class="col-md-9 contents">
+  <div class="contents col-md-9">
     <div class="page-header">
-    <h1>Lazy operations</h1>
-    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/lazy-ops.R'><code>R/lazy-ops.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/window.R'><code>R/window.R</code></a></small>
+      <h1>The MIT License (MIT)</h1>
     </div>
 
-    
-    <p>This set of S3 classes describe the action of dplyr verbs. These are
-currently used for SQL sources to separate the description of operations
-in R from their computation in SQL. This API is very new so is likely
-to evolve in the future.</p>
-    
+<div id="the-mit-license-mit" class="section level1">
 
-    <pre class="usage"><span class='fu'>op_base</span>(<span class='no'>x</span>, <span class='no'>vars</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'>character</span>())
-
-<span class='fu'>op_single</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>add_op_single</span>(<span class='no'>name</span>, <span class='no'>.data</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'>list</span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>op_double</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'>list</span>())
-
-<span class='fu'>op_grps</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_vars</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_sort</span>(<span class='no'>op</span>)
-
-<span class='fu'>op_frame</span>(<span class='no'>op</span>)</pre>
-        
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p><code>op_vars()</code> and <code>op_grps()</code> compute the variables and groups from
-a sequence of lazy operations. <code>op_sort()</code> tracks the order of the
-data for use in window functions.</p>
-    
-
-  </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      
-      <li><a href="#details">Details</a></li>
-          </ul>
-
-  </div>
+<p>Copyright © 2013-2017 RStudio and others.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 </div>
+
+  </div>
+
+</div>
+
 
       <footer>
       <div class="tidyverse">

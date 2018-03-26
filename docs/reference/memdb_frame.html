@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Create a database table in temporary in-memory database.</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create a database table in temporary in-memory database.</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/memdb.R'><code>R/memdb.R</code></a></small>
     </div>
 
     
@@ -104,13 +105,15 @@ data frame in R, it creates a table in <code>src_memdb()</code>.</p>
 
 <span class='fu'>src_memdb</span>()</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>...</th>
       <td><p>A set of name-value pairs. Arguments are evaluated sequentially,
-so you can refer to previously created variables.</p></td>
+so you can refer to previously created variables.  These arguments are
+processed with <code><a href='http://www.rdocumentation.org/packages/rlang/topics/quotation'>rlang::quos()</a></code> and support unquote via <code>!!</code> and
+unquote-splice via <code>!!!</code>.</p></td>
     </tr>
     <tr>
       <th>.name</th>
@@ -122,22 +125,25 @@ unlikely to conflict with an existing table.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>library</span>(<span class='no'>dplyr</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>))</div><div class='output co'>#&gt; <span class='message'>Auto-disconnecting PostgreSQLConnection</span></div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; Source:     table&lt;guhwhzptvt&gt; [?? x 2]
-#&gt; Database:   sqlite 3.11.1 [:memory:]
-#&gt; Ordered by: x
-#&gt; 
-#&gt; # S3: tbl_dbi
-#&gt;            x           y
-#&gt;        &lt;dbl&gt;       &lt;dbl&gt;
-#&gt; 1 0.02006522 0.750603328
-#&gt; 2 0.02795603 0.383370670
-#&gt; 3 0.02806097 0.004496308
-#&gt; 4 0.03123033 0.164569248
-#&gt; 5 0.03424133 0.011479538
-#&gt; 6 0.05144628 0.402881212
-#&gt; # ... with more rows</div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'>arrange</span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'>show_query</span>()</div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>runif</span>(<span class='fl'>100</span>))
+<span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; # Source:     table&lt;weaikfkbkz&gt; [?? x 2]
+#&gt; # Database:   sqlite 3.19.3 [:memory:]
+#&gt; # Ordered by: x
+#&gt;         x       y
+#&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;  1 0.0115 0.288  
+#&gt;  2 0.0201 0.751  
+#&gt;  3 0.0280 0.383  
+#&gt;  4 0.0281 0.00450
+#&gt;  5 0.0312 0.165  
+#&gt;  6 0.0514 0.403  
+#&gt;  7 0.0586 0.164  
+#&gt;  8 0.0652 0.464  
+#&gt;  9 0.0960 0.909  
+#&gt; 10 0.149  0.322  
+#&gt; # ... with more rows</div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
 #&gt; <span class='message'>SELECT *</span>
-#&gt; <span class='message'>FROM `guhwhzptvt`</span>
+#&gt; <span class='message'>FROM `weaikfkbkz`</span>
 #&gt; <span class='message'>ORDER BY `x`</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -157,21 +163,21 @@ unlikely to conflict with an existing table.</p></td>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

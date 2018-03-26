@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Create an sql translator</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,6 +93,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create an sql translator</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.r'><code>R/translate-sql-helpers.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-base.r'><code>R/translate-sql-base.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-odbc.R'><code>R/translate-sql-odbc.R</code></a>, and 2 more</small>
     </div>
 
     
@@ -111,7 +112,17 @@ easy.</p>
 
 <span class='fu'>sql_prefix</span>(<span class='no'>f</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
+<span class='fu'>sql_aggregate</span>(<span class='no'>f</span>)
+
+<span class='fu'>sql_aggregate_2</span>(<span class='no'>f</span>)
+
 <span class='fu'>sql_not_supported</span>(<span class='no'>f</span>)
+
+<span class='fu'>sql_cast</span>(<span class='no'>type</span>)
+
+<span class='fu'>sql_log</span>()
+
+<span class='fu'>sql_cot</span>()
 
 <span class='no'>base_scalar</span>
 
@@ -119,9 +130,19 @@ easy.</p>
 
 <span class='no'>base_win</span>
 
-<span class='no'>base_no_win</span></pre>
+<span class='no'>base_no_win</span>
+
+<span class='no'>base_odbc_scalar</span>
+
+<span class='no'>base_odbc_agg</span>
+
+<span class='no'>base_odbc_win</span>
+
+<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
+
+<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -162,8 +183,8 @@ quickly providing default wrappers for a new SQL variant.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='win_over.html'>win_over()</a></code> for helper functions for window functions.
-    <code><a href='sql.html'>sql()</a></code> for an example of a more customised sql
+    <p><code><a href='win_over.html'>win_over()</a></code> for helper functions for window functions.</p>
+<p><code><a href='sql.html'>sql()</a></code> for an example of a more customised sql
 conversion function.</p>
     
 
@@ -172,23 +193,28 @@ conversion function.</p>
 <span class='co'># postgresql provides: http://bit.ly/K5EdTn</span>
 
 <span class='no'>postgres_agg</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_translator</span>(<span class='kw'>.parent</span> <span class='kw'>=</span> <span class='no'>base_agg</span>,
-  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_prefix</span>(<span class='st'>"corr"</span>),
-  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_prefix</span>(<span class='st'>"covar_samp"</span>),
-  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_prefix</span>(<span class='st'>"stddev_samp"</span>),
-  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_prefix</span>(<span class='st'>"var_samp"</span>)
+  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"corr"</span>),
+  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"covar_samp"</span>),
+  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"stddev_samp"</span>),
+  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"var_samp"</span>)
 )
 <span class='no'>postgres_var</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_variant</span>(
   <span class='no'>base_scalar</span>,
-  <span class='no'>postgres_agg</span>
+  <span class='no'>postgres_agg</span>,
+  <span class='no'>base_no_win</span>
 )
 
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>cor</span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>variant</span> <span class='kw'>=</span> <span class='no'>postgres_var</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; COR("x", "y")
-#&gt; &lt;SQL&gt; "postgres_var"</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>sd</span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>variant</span> <span class='kw'>=</span> <span class='no'>postgres_var</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SD("income" / "years")
-#&gt; &lt;SQL&gt; "postgres_var"</div><div class='input'>
+<span class='co'># Next we have to simulate a connection that uses this variant</span>
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'>structure</span>(
+  <span class='fu'>list</span>(),
+  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"TestCon"</span>, <span class='st'>"DBITestConnection"</span>, <span class='st'>"DBIConnection"</span>)
+)
+<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>postgres_var</span>
+
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>cor</span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; COR(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>sd</span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SD(`income` / `years`)</div><div class='input'>
 <span class='co'># Any functions not explicitly listed in the converter will be translated</span>
 <span class='co'># to sql as is, so you don't need to convert all functions.</span>
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>variant</span> <span class='kw'>=</span> <span class='no'>postgres_var</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; REGR_INTERCEPT("y", "x")
-#&gt; &lt;SQL&gt; "postgres_var"</div></pre>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; REGR_INTERCEPT(`y`, `x`)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -211,21 +237,21 @@ conversion function.</p>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

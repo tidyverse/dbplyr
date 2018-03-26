@@ -92,10 +92,7 @@
       <div class="row">
   <div class="col-md-9">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;0.0.0.9001</small>
-      </h1>
+      <h1>Reference</h1>
     </div>
 
     <div class="contents">
@@ -116,69 +113,87 @@
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="build_sql.html">build_sql</a></code> </p>
+            <p><code><a href="build_sql.html">build_sql()</a></code> </p>
           </td>
           <td><p>Build a SQL string.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="copy_to.src_sql.html">copy_to</a></code> </p>
+            <p><code><a href="copy_to.src_sql.html">copy_to(<i>&lt;src_sql&gt;</i>)</a></code> </p>
           </td>
           <td><p>Copy a local data frame to a DBI backend.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="do.tbl_sql.html">do</a></code> </p>
+            <p><code><a href="do.tbl_sql.html">do(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
           </td>
           <td><p>Perform arbitrary computation on remote backend</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="escape.html">escape</a></code> <code><a href="escape.html">sql_vector</a></code> </p>
+            <p><code><a href="escape.html">escape()</a></code> <code><a href="escape.html">sql_vector()</a></code> </p>
           </td>
           <td><p>Escape/quote a string.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="ident.html">ident</a></code> <code><a href="ident.html">ident_q</a></code> <code><a href="ident.html">is.ident</a></code> </p>
+            <p><code><a href="ident.html">ident()</a></code> <code><a href="ident.html">ident_q()</a></code> <code><a href="ident.html">is.ident()</a></code> </p>
           </td>
           <td><p>Flag a character vector as SQL identifiers</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="in_schema.html">in_schema</a></code> </p>
+            <p><code><a href="in_schema.html">in_schema()</a></code> </p>
           </td>
           <td><p>Refer to a table in a schema</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="join.tbl_sql.html">inner_join</a></code> <code><a href="join.tbl_sql.html">left_join</a></code> <code><a href="join.tbl_sql.html">right_join</a></code> <code><a href="join.tbl_sql.html">full_join</a></code> <code><a href="join.tbl_sql.html">semi_join</a></code> <code><a href="join.tbl_sql.html">anti_join</a></code> </p>
+            <p><code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
           </td>
           <td><p>Join sql tbls.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="memdb_frame.html">memdb_frame</a></code> <code><a href="memdb_frame.html">src_memdb</a></code> </p>
+            <p><code><a href="memdb_frame.html">memdb_frame()</a></code> <code><a href="memdb_frame.html">src_memdb()</a></code> </p>
           </td>
           <td><p>Create a database table in temporary in-memory database.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="sql.html">sql</a></code> <code><a href="sql.html">is.sql</a></code> <code><a href="sql.html">as.sql</a></code> </p>
+            <p><code><a href="remote_name.html">remote_name()</a></code> <code><a href="remote_name.html">remote_src()</a></code> <code><a href="remote_name.html">remote_con()</a></code> <code><a href="remote_name.html">remote_query()</a></code> <code><a href="remote_name.html">remote_query_plan()</a></code> </p>
+          </td>
+          <td><p>Metadata about a remote table</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="sql.html">sql()</a></code> <code><a href="sql.html">is.sql()</a></code> <code><a href="sql.html">as.sql()</a></code> </p>
           </td>
           <td><p>SQL escaping.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="src_dbi.html">src_dbi</a></code> <code><a href="src_dbi.html">tbl</a></code> </p>
+            <p><code><a href="sql_expr.html">sql_expr()</a></code> </p>
+          </td>
+          <td><p>Generate SQL from R expressions</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="src_dbi.html">src_dbi()</a></code> <code><a href="src_dbi.html">tbl(<i>&lt;src_dbi&gt;</i>)</a></code> </p>
           </td>
           <td><p>dplyr backend for any DBI-compatible database</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="translate_sql.html">translate_sql</a></code> <code><a href="translate_sql.html">translate_sql_</a></code> </p>
+            <p><code><a href="translate_sql.html">translate_sql()</a></code> <code><a href="translate_sql.html">translate_sql_()</a></code> </p>
           </td>
           <td><p>Translate an expression to sql.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="window_order.html">window_order()</a></code> <code><a href="window_order.html">window_frame()</a></code> </p>
+          </td>
+          <td><p>Override window order and frame</p></td>
         </tr>
       </tbody>
       </table>
@@ -199,21 +214,21 @@
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+

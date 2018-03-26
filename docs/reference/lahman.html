@@ -45,7 +45,7 @@
       </button>
 
       <div class="navbar-brand-container">
-        <a class="navbar-brand" href="../index.html">dbplyr</a>
+        <a class="navbar-brand" href="../index.html">Cache and retrieve an &lt;code&gt;src_sqlite&lt;/code&gt; of the Lahman baseball database.</a>
         <small class="tidyverse">part of the <a href="http://tidyverse.org">tidyverse</a></small>
       </div>
     </div>
@@ -93,12 +93,13 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Cache and retrieve an <code>src_sqlite</code> of the Lahman baseball database.</h1>
+    <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/data-lahman.r'><code>R/data-lahman.r</code></a></small>
     </div>
 
     
     <p>This creates an interesting database using data from the Lahman baseball
 data source, provided by Sean Lahman at
-<a href = 'http://www.seanlahman.com/baseball-archive/statistics/'>http://www.seanlahman.com/baseball-archive/statistics/</a>, and
+<a href='http://www.seanlahman.com/baseball-archive/statistics/'>http://www.seanlahman.com/baseball-archive/statistics/</a>, and
 made easily available in R through the <span class="pkg">Lahman</span> package by
 Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
 for that package for documentation of the inidividual tables.</p>
@@ -118,7 +119,7 @@ for that package for documentation of the inidividual tables.</p>
 
 <span class='fu'>lahman_srcs</span>(<span class='no'>...</span>, <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -141,31 +142,34 @@ connect.</p></td>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Connect to a local sqlite database, if already created</span>
-
-<span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"sqlite"</span>)) {
+    <pre class="examples"><div class='input'># Connect to a local sqlite database, if already created
+</div><div class='input'><span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"sqlite"</span>)) {
   <span class='fu'>lahman_sqlite</span>()
   <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl</span>(<span class='fu'>lahman_sqlite</span>(), <span class='st'>"Batting"</span>)
   <span class='no'>batting</span>
-}</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; Source:     table&lt;Batting&gt; [?? x 22]
-#&gt; Database:   sqlite 3.11.1 [/Users/hadley/R/dplyr/db/lahman.sqlite]
-#&gt; 
-#&gt; # S3: tbl_dbi
-#&gt;    playerID yearID stint teamID  lgID     G    AB     R     H   X2B   X3B    HR
-#&gt;       &lt;chr&gt;  &lt;int&gt; &lt;int&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-#&gt; 1 abercda01   1871     1    TRO    NA     1     4     0     0     0     0     0
-#&gt; 2  addybo01   1871     1    RC1    NA    25   118    30    32     6     0     0
-#&gt; 3 allisar01   1871     1    CL1    NA    29   137    28    40     4     5     0
-#&gt; 4 allisdo01   1871     1    WS3    NA    27   133    28    44    10     2     2
-#&gt; 5 ansonca01   1871     1    RC1    NA    25   120    29    39    11     3     0
-#&gt; 6 armstbo01   1871     1    FW1    NA    12    49     9    11     2     1     0
+}</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; # Source:   table&lt;Batting&gt; [?? x 22]
+#&gt; # Database: sqlite 3.19.3
+#&gt; #   [/Library/Frameworks/R.framework/Versions/3.4/Resources/library/dplyr/db/lahman.sqlite]
+#&gt;    playerID yearID stint teamID lgID      G    AB     R     H   X2B   X3B    HR
+#&gt;    &lt;chr&gt;     &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+#&gt;  1 abercda…   1871     1 TRO    NA        1     4     0     0     0     0     0
+#&gt;  2 addybo01   1871     1 RC1    NA       25   118    30    32     6     0     0
+#&gt;  3 allisar…   1871     1 CL1    NA       29   137    28    40     4     5     0
+#&gt;  4 allisdo…   1871     1 WS3    NA       27   133    28    44    10     2     2
+#&gt;  5 ansonca…   1871     1 RC1    NA       25   120    29    39    11     3     0
+#&gt;  6 armstbo…   1871     1 FW1    NA       12    49     9    11     2     1     0
+#&gt;  7 barkeal…   1871     1 RC1    NA        1     4     0     1     0     0     0
+#&gt;  8 barnero…   1871     1 BS1    NA       31   157    66    63    10     9     0
+#&gt;  9 barrebi…   1871     1 FW1    NA        1     5     1     1     1     0     0
+#&gt; 10 barrofr…   1871     1 BS1    NA       18    86    13    13     2     1     0
 #&gt; # ... with more rows, and 10 more variables: RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,
 #&gt; #   BB &lt;int&gt;, SO &lt;int&gt;, IBB &lt;int&gt;, HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, GIDP &lt;int&gt;</div><div class='input'>
 <span class='co'># Connect to a local postgres database with lahman database, if available</span>
 <span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"postgres"</span>)) {
   <span class='fu'>lahman_postgres</span>()
   <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl</span>(<span class='fu'>lahman_postgres</span>(), <span class='st'>"Batting"</span>)
-}</div></pre>
+}</div><div class='output co'>#&gt; <span class='message'>Error: RS-DBI driver: (could not connect maraaverick@localhost:5432 on dbname "lahman": FATAL:  database "lahman" does not exist</span>
+#&gt; <span class='message'>)</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -184,21 +188,21 @@ connect.</p></td>
 </div>
 
 <div class="author">
-  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' height='24' /></a>.</p>
-  <p>Site built by <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='http://tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
+  <p>Site built by <a href="http://pkgdown.r-lib.org">pkgdown</a>.</p>
 </div>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
 
-  ga('create', 'UA-67989-18', 'auto');
-  ga('send', 'pageview');
+ gtag('config', 'UA-115082821-1');
 </script>
       </footer>
    </div>
 
   </body>
 </html>
+
