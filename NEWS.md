@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9000
 
+* Custom `db_explain()` for Oracle connections (#3471)
+
 * Redshift `substr()` compatibility issue resolved (#3339)
 
 # dbplyr 1.2.1
