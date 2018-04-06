@@ -81,7 +81,7 @@ test_that("na_if is translated to NULL_IF", {
 })
 
 test_that("connection affects quoting character", {
-  dbTest <- src_sql("test", con = simulate_test())
+  dbTest <- src_sql("test", con = simulate_db())
   testTable <- tbl_sql("test", src = dbTest, from = ident("table1"))
 
   out <- select(testTable, field1)
@@ -136,7 +136,7 @@ test_that("str_detect() translates correctly ", {
   expect_equivalent(
     translate_sql(
       str_detect(field_name, "pattern")),
-      sql("INSTR('pattern', \"field_name\") > 0"))
+      sql("INSTR(\"field_name\", 'pattern') > 0"))
 })
 
 test_that("str_trim() translates correctly ", {

@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9000
 
+* Fixes default parameter order for the `str_detect()` translation (#3397)
+
 * Redshift `substr()` compatibility issue resolved (#3339)
 
 # dbplyr 1.2.1
