@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9000
 
+* Works on R 3.1
+
 * Redshift `substr()` compatibility issue resolved (#3339)
 
 # dbplyr 1.2.1
