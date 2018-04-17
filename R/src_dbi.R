@@ -99,12 +99,14 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
     disco <- db_disconnector(con, quiet = is_true(auto_disconnect))
   }
 
+  subclass <- paste0("src_", class(con)[[1]])
+
   structure(
     list(
       con = con,
       disco = disco
     ),
-    class = c("src_dbi", "src_sql", "src")
+    class = c(subclass, "src_dbi", "src_sql", "src")
   )
 }
 
@@ -119,7 +121,8 @@ setOldClass(c("src_dbi", "src_sql", "src"))
 #' @param from Either a string (giving a table name) or literal [sql()].
 #' @param ... Needed for compatibility with generic; currently ignored.
 tbl.src_dbi <- function(src, from, ...) {
-  tbl_sql("dbi", src = src, from = from)
+  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
+  tbl_sql(c(subclass, "dbi"), src = src, from = from)
 }
 
 # Creates an environment that disconnects the database when it's GC'd
@@ -132,3 +135,8 @@ db_disconnector <- function(con, quiet = FALSE) {
   })
   environment()
 }
+
+
+# Subclass helpers --------------------------------------------------------
+
+

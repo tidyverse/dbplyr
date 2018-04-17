@@ -1,4 +1,8 @@
-# dbplyr 1.2.1.9000
+# dbplyr 1.2.1.9001
+
+* `src` and `tbl` objects now include a class generated from the class of 
+  the underlying connection object. This makes it possible for dplyr backends 
+  to implement different behaviour at the dplyr level, when needed. (#2293)
 
 * Works on R 3.1
 
