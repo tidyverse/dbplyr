@@ -38,7 +38,8 @@ sql_translate_env.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
       as.character  = sql_cast("VARCHAR(255)"),
       as.numeric    = sql_cast("NUMBER"),
-      as.double     = sql_cast("NUMBER")
+      as.double     = sql_cast("NUMBER"),
+      case_when = function(...) sql_case_when_oracle(...)
     ),
     base_odbc_agg,
     base_odbc_win
@@ -79,4 +80,37 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   add_op_set_op(x, y, "MINUS", copy = copy, ...)
+}
+
+sql_case_when_oracle <- function(...) {
+  # TODO: switch to dplyr::case_when_prepare when available
+
+  formulas <- dots_list(...)
+  n <- length(formulas)
+
+  if (n == 0) {
+    abort("No cases provided")
+  }
+
+  query <- vector("list", n)
+  value <- vector("list", n)
+
+  for (i in seq_len(n)) {
+    f <- formulas[[i]]
+
+    env <- environment(f)
+    query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
+    value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
+  }
+
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
+  if (query[[n]] == "TRUE") {
+    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+  }
+  sql(paste0(
+    "CASE\n",
+    paste0(clauses, collapse = "\n"),
+    "\nEND"
+  ))
 }
