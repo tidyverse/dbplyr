@@ -17,3 +17,9 @@ test_that("summarise performs partial evaluation", {
 
   expect_equal(mf2$y, 1)
 })
+
+test_that("tally works on tbl_sql (#3075)", {
+  mf1 <- memdb_frame(n = 1:3)
+  expect_message(tally_remote <- tally(mf1))
+  expect_equal(pull(tally_remote, nn), 6)
+})
