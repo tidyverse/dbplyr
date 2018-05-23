@@ -30,5 +30,5 @@ sql_subquery.OraConnection <- function(con, from, name = unique_name(), ...) {
 
 #' @export
 db_drop_table.OraConnection <- function(con, table, force = FALSE, ...) {
-  db_drop_table.OdbcConnection(con = con, table = table, force = force, ...)
+  db_drop_table.Oracle(con = con, table = table, force = force, ...)
 }
