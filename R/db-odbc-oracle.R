@@ -47,9 +47,8 @@ sql_translate_env.Oracle <- function(con) {
 
 #' @export
 db_explain.Oracle <- function(con, sql, ...) {
-  exsql <- build_sql("EXPLAIN PLAN FOR ", sql, con = con)
-  invisible(dbGetQuery(con, exsql))
-  expl <- dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
+  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
+  expl <- DBI::dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
