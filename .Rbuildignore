@@ -10,4 +10,4 @@
 ^cran-comments\.md$
 ^revdep$
 ^\.httr-oauth$
-^NEWS$
+^NEWS\.md$

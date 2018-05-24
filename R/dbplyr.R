@@ -7,5 +7,6 @@
 #' @import dplyr
 #' @import rlang
 #' @import DBI
+#' @import tibble
 #' @keywords internal
 "_PACKAGE"
