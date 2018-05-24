@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* Adds custom `setdiff()` for Oracle connections (#3493)
+
 * `src` and `tbl` objects now include a class generated from the class of 
   the underlying connection object. This makes it possible for dplyr backends 
   to implement different behaviour at the dplyr level, when needed. (#2293)
