@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* Adds custom `db_drop_table()` function for Oracle connections (#3306)
+
 * `src` and `tbl` objects now include a class generated from the class of 
   the underlying connection object. This makes it possible for dplyr backends 
   to implement different behaviour at the dplyr level, when needed. (#2293)
