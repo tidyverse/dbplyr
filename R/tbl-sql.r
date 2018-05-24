@@ -287,7 +287,15 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 }
 # registered onLoad
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "EXCEPT", copy = copy, ...)
+
+  except <- "EXCEPT"
+
+  # Oracle uses MINUS instead of EXCEPT for this operation:
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
+  dbname <- x$src$con@info$dbms.name
+  if(dbname ==  "Oracle" | dbname == "OraConnection") except <- "MINUS"
+
+  add_op_set_op(x, y, except, copy = copy, ...)
 }
 
 # Copying ----------------------------------------------------------------------
