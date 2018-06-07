@@ -39,7 +39,8 @@ Suggests:
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
     RSQLite (>= 2.0),
-    testthat (>= 2.0.0)
+    testthat (>= 2.0.0),
+    withr (>= 2.1.2),
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))

@@ -19,7 +19,7 @@
 #' that you are grouping by. Use [explain()] to check that the database is using
 #' the indexes that you expect.
 #'
-#' There is one excpetion: [do()] is not lazy since it must pull the data
+#' There is one exception: [do()] is not lazy since it must pull the data
 #' into R.
 #'
 #' @param con An object that inherits from [DBI::DBIConnection-class],
