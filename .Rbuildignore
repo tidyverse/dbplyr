@@ -10,4 +10,5 @@
 ^cran-comments\.md$
 ^revdep$
 ^\.httr-oauth$
+^NEWS\.md$
 ^\.github$
