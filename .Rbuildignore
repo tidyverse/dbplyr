@@ -11,3 +11,4 @@
 ^revdep$
 ^\.httr-oauth$
 ^NEWS\.md$
+^\.github$
