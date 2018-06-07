@@ -22,9 +22,6 @@ knitr::opts_chunk$set(
 
 dbplyr is the database backend for dplyr. If you are using dplyr to connect to databases, you generally will not need to use any functions from dbplyr, but you will need to make sure it's installed. 
 
-## Issues
-If you find any bugs, please file in [dplyr](https://github.com/tidyverse/dplyr/issues).
-
 ## Installation
 
 ```{r, eval = FALSE}
