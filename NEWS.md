@@ -8,6 +8,7 @@
 
 * Fixes default parameter order for the `str_detect()` translation (#3397)
 
+* `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
 * Redshift `substr()` compatibility issue resolved (#3339)
 
 # dbplyr 1.2.1
