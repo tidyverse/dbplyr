@@ -2,11 +2,17 @@
 
 * `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
 
+* Custom `db_explain()` for Oracle connections (#3471)
+
 * `src` and `tbl` objects now include a class generated from the class of 
   the underlying connection object. This makes it possible for dplyr backends 
   to implement different behaviour at the dplyr level, when needed. (#2293)
 
 * Works on R 3.1
+
+* Fixes default parameter order for the `str_detect()` translation (#3397)
+
+* `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
 
 * Redshift `substr()` compatibility issue resolved (#3339)
 
