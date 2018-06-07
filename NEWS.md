@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
+
 * Custom `db_explain()` for Oracle connections (#3471)
 
 * `src` and `tbl` objects now include a class generated from the class of 
