@@ -85,5 +85,5 @@ Check that SQL translation for the key verbs work:
 
 ### Vectors
 
-Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `src_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
+Finally, you may have to provide custom R -> SQL translation at the vector level by providing a method for `sql_translate_env()`. This function should return an object created by `sql_variant()`. See existing methods for examples.
 
