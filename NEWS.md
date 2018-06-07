@@ -1,5 +1,8 @@
 # dbplyr 1.2.1.9001
 
+
+* Adds custom `setdiff()` for Oracle connections (#3493)
+
 * `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
 
 * Custom `db_explain()` for Oracle connections (#3471)

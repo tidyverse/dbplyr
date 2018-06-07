@@ -73,3 +73,10 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
     build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
   }
 }
+
+# registered onLoad located in the zzz.R script
+setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+  # Oracle uses MINUS instead of EXCEPT for this operation:
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
+  add_op_set_op(x, y, "MINUS", copy = copy, ...)
+}
