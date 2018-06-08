@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* `vars` argument to `tbl_sql()` has been formally deprecated; it hasn't 
+  actually done anything for a while (#3524).
 
 * Adds custom `setdiff()` for Oracle connections (#3493)
 
