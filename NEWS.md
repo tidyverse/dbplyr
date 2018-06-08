@@ -1,5 +1,9 @@
 # dbplyr 1.2.1.9001
 
+* `copy_to()` will only remove existing table when `overwrite = TRUE` and the
+  table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
+  (#3197).
+
 * `vars` argument to `tbl_sql()` has been formally deprecated; it hasn't 
   actually done anything for a while (#3254).
 
