@@ -18,7 +18,10 @@ from dbplyr, but you will need to make sure it’s installed.
 ## Installation
 
 ``` r
-# You can install the released version from CRAN
+# The easiest way to get dbplyr is to install the whole tidyverse:
+install.packages("tidyverse")
+
+# Alternatively, install just dbplyr:
 install.packages("dbplyr")
 
 # Or the the development version from GitHub:
