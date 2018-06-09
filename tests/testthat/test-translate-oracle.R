@@ -6,7 +6,7 @@ test_that("custom scalar functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_oracle())
   }
 
-  expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(255))"))
+  expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
   expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
 
 })
