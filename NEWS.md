@@ -107,6 +107,8 @@
 
 *   PostgreSQL: translation for `grepl()` added (@zozlak)
 
+*   Oracle: changed VARVHAR to VARCHAR2 datatype (@washcycle, #66)
+
 # dbplyr 1.1.0
 
 ## New features
