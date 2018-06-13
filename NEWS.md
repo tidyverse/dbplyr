@@ -25,6 +25,11 @@
 
 * Redshift `substr()` compatibility issue resolved (#3339)
 
+## Minor improvements and bug fixes
+
+*  Where appropriate, `mutate()` and `mutate_all()` now coerces `integer` and `character` columns into `numeric` 
+   in remote SQLite tables (@chris-park, #65).
+   
 # dbplyr 1.2.1
 
 * Forward compatibility fixes for rlang 0.2.0
