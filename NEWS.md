@@ -1,6 +1,6 @@
 # dbplyr 1.2.1.9000
 
-* sql translation of `%in%` now works with empty vectors (@mgirlich)
+* the statement `x %in% y` is now translated to `FALSE`. (@mgirlich)
 
 # dbplyr 1.2.1
 
