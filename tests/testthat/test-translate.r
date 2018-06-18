@@ -66,7 +66,6 @@ test_that("%in% translation parenthesises when needed", {
 })
 
 test_that("%in% with empty vector", {
-  expect_equal(translate_sql(x %in% !!c()), sql('FALSE'))
   expect_equal(translate_sql(x %in% !!integer()), sql('FALSE'))
 })
 
