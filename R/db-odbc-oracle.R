@@ -86,11 +86,12 @@ db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
     )
     DBI::dbExecute(con, sql)
   }
+}
 
   # registered onLoad located in the zzz.R script
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   add_op_set_op(x, y, "MINUS", copy = copy, ...)
-  
+
 }
