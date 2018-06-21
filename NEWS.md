@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. This allows more complex operations, such as `%in%`, to work properly (#93)
+
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).
