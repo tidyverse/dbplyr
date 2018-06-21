@@ -7,15 +7,16 @@
 #' @export
 #' @param subclass name of subclass
 #' @param ... needed for agreement with generic. Not otherwise used.
-#' @param vars If known, the names of the variables in the tbl. This is
-#'   relatively expensive to determine automatically, so is cached throughout
-#'   dplyr. However, you should usually be able to leave this blank and it
-#'   will be determined from the context.
+#' @param vars DEPRECATED
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
   from <- as.sql(from)
 
-  vars <- db_query_fields(src$con, from)
+  if (!missing(vars)) {
+    warning("`vars` argument is deprecated as it is no longer needed", call. = FALSE)
+  }
+
+  vars <- vars %||% db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
 
   make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
@@ -75,6 +76,7 @@ pull.tbl_sql <- function(.data, var = -1) {
   expr <- enquo(var)
   var <- dplyr:::find_var(expr, tbl_vars(.data))
 
+  .data <- ungroup(.data)
   .data <- select(.data, !! sym(var))
   .data <- collect(.data)
   .data[[1]]

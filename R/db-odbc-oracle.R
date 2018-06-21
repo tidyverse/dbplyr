@@ -46,6 +46,14 @@ sql_translate_env.Oracle <- function(con) {
 }
 
 #' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
+  expl <- DBI::dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
+}
+
+#' @export
 db_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql <- dbplyr::build_sql(
@@ -78,4 +86,11 @@ db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
     )
     DBI::dbExecute(con, sql)
   }
+
+  # registered onLoad located in the zzz.R script
+setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+  # Oracle uses MINUS instead of EXCEPT for this operation:
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
+  add_op_set_op(x, y, "MINUS", copy = copy, ...)
+  
 }
