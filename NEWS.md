@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* Adds support for `bit64::as.integer64()` (#3305)
+
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).
