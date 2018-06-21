@@ -206,6 +206,39 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
 }
 
 
+#' @export
+#' @importFrom dplyr sample_n
+sample_n.tbl_lazy <- function(tbl,
+                              size,
+                              replace = FALSE,
+                              weight = NULL,
+                              .env = parent.frame()) {
+
+  add_op_single("sample_n", .data = tbl, args = list(
+    size = size,
+    replace = replace,
+    weight = weight,
+    .env = .env
+  ))
+}
+
+#' @export
+#' @importFrom dplyr sample_frac
+sample_frac.tbl_lazy <- function(tbl,
+                                 size = 1,
+                                 replace = FALSE,
+                                 weight = NULL,
+                                 .env = parent.frame()) {
+
+  add_op_single("sample_frac", .data = tbl, args = list(
+    size = size,
+    replace = replace,
+    weight = weight,
+    .env = .env
+  ))
+}
+
+
 # Dual table verbs ------------------------------------------------------------
 
 add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
@@ -271,3 +304,4 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ...) {
 
 # Currently the dual table verbs are defined on tbl_sql, because the
 # because they definitions are bit too tightly connected to SQL.
+

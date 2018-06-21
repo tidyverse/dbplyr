@@ -63,6 +63,16 @@ test_that("filter and mutate translate is.na correctly", {
   mf <- lazy_frame(x = 1, src = simulate_mssql())
 
   expect_equal(
+    mf %>% sample_n(10) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nTABLESAMPLE (10 ROWS)")
+  )
+
+  expect_equal(
+    mf %>% sample_frac(0.1) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nTABLESAMPLE (10 PERCENT)")
+  )
+
+  expect_equal(
     mf %>% head() %>% show_query(),
     sql("SELECT  TOP 6 *\nFROM `df`")
   )
