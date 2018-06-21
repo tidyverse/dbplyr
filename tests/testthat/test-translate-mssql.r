@@ -84,47 +84,47 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% mutate(x = x == 1) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` = 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` = 1.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = x != 1) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` != 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` != 1.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = x > 1) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` > 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` > 1.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = x >= 1) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` >= 1.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` >= 1.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = !(x == 1)) %>% show_query(),
-    sql("SELECT ~((CONVERT(BIT, IIF(`x` = 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+    sql("SELECT ~((`x` = 1.0)) AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = !(x != 1)) %>% show_query(),
-    sql("SELECT ~((CONVERT(BIT, IIF(`x` != 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+    sql("SELECT ~((`x` != 1.0)) AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = !(x > 1)) %>% show_query(),
-    sql("SELECT ~((CONVERT(BIT, IIF(`x` > 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+    sql("SELECT ~((`x` > 1.0)) AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = !(x >= 1)) %>% show_query(),
-    sql("SELECT ~((CONVERT(BIT, IIF(`x` >= 1.0, 1.0, 0.0)))) AS `x`\nFROM `df`")
+    sql("SELECT ~((`x` >= 1.0)) AS `x`\nFROM `df`")
   )
 
   expect_equal(
     mf %>% mutate(x = x > 4 & x < 5) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` > 4.0, 1.0, 0.0)) & CONVERT(BIT, IIF(`x` < 5.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` > 4.0 & `x` < 5.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
@@ -134,7 +134,7 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% mutate(x = x > 4 | x < 5) %>% show_query(),
-    sql("SELECT CONVERT(BIT, IIF(`x` > 4.0, 1.0, 0.0)) | CONVERT(BIT, IIF(`x` < 5.0, 1.0, 0.0)) AS `x`\nFROM `df`")
+    sql("SELECT `x` > 4.0 | `x` < 5.0 AS `x`\nFROM `df`")
   )
 
   expect_equal(
@@ -144,7 +144,7 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% mutate(x = ifelse(x == 0, 0 ,1)) %>% show_query(),
-    sql("SELECT CASE WHEN ((CONVERT(BIT, IIF(`x` = 0.0, 1.0, 0.0))) =  'TRUE') THEN (0.0) WHEN ((CONVERT(BIT, IIF(`x` = 0.0, 1.0, 0.0))) =  'FALSE') THEN (1.0) END AS `x`\nFROM `df`")
+    sql("SELECT CASE WHEN ((`x` = 0.0)) THEN (0.0) WHEN (NOT(`x` = 0.0)) THEN (1.0) END AS `x`\nFROM `df`")
   )
 })
 
