@@ -1,4 +1,35 @@
-# dbplyr 1.1.0.9000
+# dbplyr 1.2.1.9001
+
+* `copy_to()` will only remove existing table when `overwrite = TRUE` and the
+  table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
+  (#3197).
+
+* `vars` argument to `tbl_sql()` has been formally deprecated; it hasn't 
+  actually done anything for a while (#3254).
+
+* Adds custom `setdiff()` for Oracle connections (#3493)
+
+* `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
+
+* Custom `db_explain()` for Oracle connections (#3471)
+
+* `src` and `tbl` objects now include a class generated from the class of 
+  the underlying connection object. This makes it possible for dplyr backends 
+  to implement different behaviour at the dplyr level, when needed. (#2293)
+
+* Works on R 3.1
+
+* Fixes default parameter order for the `str_detect()` translation (#3397)
+
+* `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
+
+* Redshift `substr()` compatibility issue resolved (#3339)
+
+# dbplyr 1.2.1
+
+* Forward compatibility fixes for rlang 0.2.0
+
+# dbplyr 1.2.0
 
 ## New top-level translations
 
@@ -49,11 +80,19 @@
 * Multiple `head()` calls in a row now collapse to a single call. This avoids 
   a printing problem with MS SQL (#3084).
 
+* `escape()` now works with integer64 values from the bit64 package (#3230)
+
 * `if`, `ifelse()`, and `if_else()` now correctly scope the false condition
   so that it only applies to non-NULL conditions (#3157)
 
+* `ident()` and `ident_q()` handle 0-length inputs better, and should
+  be easier to use with S3 (#3212)
+
 * `in_schema()` should now work in more places, particularly in `copy_to()` 
    (#3013, @baileych)
+
+* SQL generation for joins no longer gets stuck in a endless loop if you
+  request an empty suffix (#3220).
 
 * `mutate()` has better logic for splitting a single mutate into multiple
   subqueries (#3095).

@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.1.0.9000
+Version: 1.2.1.9001
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("Edgar", "Ruiz", role = "aut"),
@@ -17,30 +17,30 @@ BugReports: https://github.com/tidyverse/dplyr/issues
 Depends: 
     R (>= 3.1)
 Imports: 
-    assertthat,
-    DBI (>= 0.5),
-    dplyr (>= 0.5.0.9004),
-    glue,
+    assertthat (>= 0.2.0),
+    DBI (>= 1.0.0),
+    dplyr (>= 0.7.5),
+    glue (>= 1.2.0),
     methods,
-    purrr,
-    R6,
-    rlang (>= 0.1.0),
-    tibble (>= 1.3.4.9002),
-    tidyselect,
+    purrr (>= 0.2.5),
+    R6 (>= 2.2.2),
+    rlang (>= 0.2.0),
+    tibble (>= 1.4.2),
+    tidyselect (>= 0.2.4),
     utils
-Suggests: 
+Suggests:
+    bit64,
     covr,
     knitr,
-    Lahman (>= 3.0-1),
+    Lahman,
     nycflights13,
     rmarkdown,
-    RMariaDB,
-    RMySQL,
-    RPostgreSQL,
-    RSQLite (>= 1.0.0),
-    testthat
-Remotes:
-    tidyverse/tibble
+    RMariaDB (>= 1.0.2),
+    RMySQL (>= 0.10.11),
+    RPostgreSQL (>= 0.4.1),
+    RSQLite (>= 2.1.0),
+    testthat (>= 2.0.0),
+    withr (>= 2.1.2)
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
@@ -66,6 +66,7 @@ Collate:
     'dbplyr.R'
     'do.r'
     'explain.r'
+    'utils.r'
     'ident.R'
     'lazy-ops.R'
     'memdb.R'
@@ -97,6 +98,5 @@ Collate:
     'translate-sql-paste.R'
     'translate-sql.r'
     'utils-format.r'
-    'utils.r'
     'window.R'
     'zzz.R'

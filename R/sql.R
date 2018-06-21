@@ -8,14 +8,11 @@
 #'   expression.
 #' @export
 sql <- function(...) {
-  x <- c(...)
-  if (length(x) == 0) {
-    structure(character(), class = c("sql", "character"))
-  } else {
-    stopifnot(is.character(x))
-    structure(x, class = c("sql", "character"))
-  }
+  x <- c_character(...)
+  structure(x, class = c("sql", "character"))
 }
+
+# See setOldClass definition in zzz.R
 
 #' @export
 c.sql <- function(..., drop_null = FALSE, con = NULL) {
@@ -27,11 +24,12 @@ c.sql <- function(..., drop_null = FALSE, con = NULL) {
 }
 
 #' @export
+c.ident <- c.sql
+
+#' @export
 unique.sql <- function(x, ...) {
   sql(NextMethod())
 }
-
-setOldClass(c("sql", "character"))
 
 #' @rdname sql
 #' @export
@@ -40,7 +38,13 @@ is.sql <- function(x) inherits(x, "sql")
 #' @export
 print.sql <- function(x, ...) cat(format(x, ...), sep = "\n")
 #' @export
-format.sql <- function(x, ...) paste0("<SQL> ", x)
+format.sql <- function(x, ...) {
+  if (length(x) == 0) {
+    paste0("<SQL> [empty]")
+  } else {
+    paste0("<SQL> ", x)
+  }
+}
 
 #' @rdname sql
 #' @export

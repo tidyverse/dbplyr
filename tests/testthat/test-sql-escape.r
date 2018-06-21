@@ -16,6 +16,24 @@ test_that("identifier names become AS", {
   expect_equal(ei(x = "y"), '"y" AS "x"')
 })
 
+
+# Zero-length inputs ------------------------------------------------------
+
+test_that("zero length inputs yield zero length output when not collapsed", {
+  expect_equal(sql_vector(sql(), collapse = NULL), sql())
+  expect_equal(sql_vector(ident(), collapse = NULL), sql())
+  expect_equal(sql_vector(ident_q(), collapse = NULL), sql())
+})
+
+test_that("zero length inputs yield length-1 output when collapsed", {
+  expect_equal(sql_vector(sql(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(sql(), parens = TRUE, collapse = ""), sql("()"))
+  expect_equal(sql_vector(ident(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(ident(), parens = TRUE, collapse = ""), sql("()"))
+  expect_equal(sql_vector(ident_q(), parens = FALSE, collapse = ""), sql(""))
+  expect_equal(sql_vector(ident_q(), parens = TRUE, collapse = ""), sql("()"))
+})
+
 # Special values ----------------------------------------------------------------
 
 test_that("missing vaues become null", {
@@ -34,6 +52,13 @@ test_that("logical is SQL-99 compatible (by default)", {
   expect_equal(escape(TRUE), sql("TRUE"))
   expect_equal(escape(FALSE), sql("FALSE"))
   expect_equal(escape(NA), sql("NULL"))
+})
+
+test_that("can escape integer64 values", {
+  skip_if_not_installed("bit64")
+
+  expect_equal(escape(bit64::as.integer64(NA)), sql("NULL"))
+  expect_equal(escape(bit64::as.integer64("123456789123456789")), sql("123456789123456789"))
 })
 
 # Times -------------------------------------------------------------------

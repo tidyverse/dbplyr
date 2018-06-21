@@ -1,3 +1,5 @@
 checks
 library
 data.sqlite
+checks.noindex
+library.noindex

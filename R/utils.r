@@ -90,3 +90,20 @@ succeeds <- function(x, quiet = FALSE) {
     }
   )
 }
+
+c_character <- function(...) {
+  x <- c(...)
+  if (length(x) == 0) {
+    return(character())
+  }
+
+  if (!is.character(x)) {
+    stop("Character input expected", call. = FALSE)
+  }
+
+  x
+}
+
+old_qq <- function() {
+  utils::packageVersion("rlang") <= "0.1.6"
+}

@@ -1,3 +1,6 @@
+#' @include utils.r
+NULL
+
 #' Flag a character vector as SQL identifiers
 #'
 #' `ident()` takes unquoted strings and flags them as identifiers.
@@ -20,29 +23,29 @@
 #' ident(a = "x", b = "y")
 #' ident_q(a = "x", b = "y")
 ident <- function(...) {
-  x <- c(...)
-  if (length(x) == 0) return(sql())
-  stopifnot(is.character(x))
-
+  x <- c_character(...)
   structure(x, class = c("ident", "character"))
 }
-setOldClass(c("ident", "character"))
+setOldClass(c("ident", "character"), ident())
 
 #' @export
 #' @rdname ident
 ident_q <- function(...) {
-  x <- c(...)
-  if (length(x) == 0) return(sql())
-  stopifnot(is.character(x))
-
+  x <- c_character(...)
   structure(x, class = c("ident_q", "ident", "character"))
 }
-setOldClass(c("ident_q", "ident", "character"))
+setOldClass(c("ident_q", "ident", "character"), ident_q())
 
 #' @export
 print.ident <- function(x, ...) cat(format(x, ...), sep = "\n")
 #' @export
-format.ident <- function(x, ...) paste0("<IDENT> ", escape(x))
+format.ident <- function(x, ...) {
+  if (length(x) == 0) {
+    paste0("<IDENT> [empty]")
+  } else {
+    paste0("<IDENT> ", x)
+  }
+}
 
 #' @rdname ident
 #' @export

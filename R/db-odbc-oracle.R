@@ -46,12 +46,21 @@ sql_translate_env.Oracle <- function(con) {
 }
 
 #' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
+  expl <- DBI::dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
+}
+
+#' @export
 db_analyze.Oracle <- function(con, table, ...) {
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql <- dbplyr::build_sql(
-    # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://docs.oracle.com/cd/B28359_01/server.111/b28310/general002.htm#ADMIN11524
     "ANALYZE TABLE ",
-    as.sql(table)
-    , con = con)
+    as.sql(table),
+    " COMPUTE STATISTICS",
+    con = con)
   DBI::dbExecute(con, sql)
 }
 
@@ -63,4 +72,11 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   } else {
     build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
   }
+}
+
+# registered onLoad located in the zzz.R script
+setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+  # Oracle uses MINUS instead of EXCEPT for this operation:
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
+  add_op_set_op(x, y, "MINUS", copy = copy, ...)
 }

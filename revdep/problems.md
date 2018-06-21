@@ -9,54 +9,55 @@ Version: 0.4.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      OK: 936 SKIPPED: 9 FAILED: 134
-      1. Failure: DBItest: Driver: data_type_driver 
-      2. Failure: Visibility 
-      3. Failure: DBItest: Connection: cannot_forget_disconnect 
-      4. Failure: DBItest: Connection: disconnect_invalid_connection 
-      5. Failure: DBItest: Connection: data_type_connection 
-      6. Failure: DBItest: Connection: data_type_connection 
-      7. Failure: DBItest: Connection: data_type_connection 
-      8. Failure: DBItest: Result: send_query_invalid_connection 
-      9. Failure: DBItest: Result: fetch_n_bad 
-      1. ...
+      [31m──[39m [31m3. Error: date/times can be round-tripped (@test-upload.r#12) [39m [31m──────────────────────────────────────────[39m
+      Billing has not been enabled for this project. Enable billing at https://console.cloud.google.com/billing.
+      1: insert_upload_job("bigrquery-examples", "test", "x", df1) at testthat/test-upload.r:12
+      2: bq_upload(url, c(config_part, data_part))
+      3: process_request(req)
+      4: signal_reason(out$error$errors[[1L]]$reason, out$error$message)
+      
+      ══ testthat results  ═══════════════════════════════════════════════════════════════════════════════════════
+      OK: 55 SKIPPED: 0 FAILED: 3
+      1. Error: (unknown) (@test-DBItest.R#2) 
+      2. Error: extra arguments passed onto request (@test-datasets.r#6) 
+      3. Error: date/times can be round-tripped (@test-upload.r#12) 
       
       Error: testthat unit tests failed
       Execution halted
-      Deleting test4928
     ```
 
-# civis
+# BiocFileCache
 
-Version: 1.0.2
+Version: 1.0.1
 
-## Newly broken
+## In both
 
-*   checking tests ...
+*   checking re-building of vignette outputs ... WARNING
     ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════════
-      OK: 742 SKIPPED: 4 FAILED: 17
-      1. Error: calls scripts_post_custom (@test_civis_ml.R#24) 
-      2. Error: calls civis_ml.data.frame for local df (@test_civis_ml.R#103) 
-      3. Error: calls scripts_post_custom (@test_civis_ml.R#326) 
-      4. Error: uploads local df and passes a file_id (@test_civis_ml.R#400) 
-      5. Error: uses the correct template_id (@test_civis_ml.R#547) 
-      6. Error: converts parameters arg to JSON string (@test_civis_ml.R#564) 
-      7. Error: converts cross_validation_parameters to JSON string (@test_civis_ml.R#581) 
-      8. Error: converts fit_params to JSON string (@test_civis_ml.R#600) 
-      9. Error: space separates excluded_columns (@test_civis_ml.R#618) 
-      1. ...
-      
-      Error: testthat unit tests failed
-      Execution halted
+    Error in re-building vignettes:
+      ...
+    Loading required package: dbplyr
+    Error: processing vignette 'BiocFileCache.Rmd' failed with diagnostics:
+    path for html_dependency not found: 
+    Execution halted
+    ```
+
+# dbplot
+
+Version: 0.2.0
+
+## In both
+
+*   checking whether package ‘dbplot’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘rlang’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/dbplot/new/dbplot.Rcheck/00install.out’ for details.
     ```
 
 # dexter
 
-Version: 0.5.1
+Version: 0.6.0
 
 ## In both
 
@@ -74,6 +75,18 @@ Version: 0.7.4
 *   checking data for non-ASCII characters ... NOTE
     ```
       Note: found 4 marked UTF-8 strings
+    ```
+
+# dplyr.teradata
+
+Version: 0.1.1
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘bit64’
+      All declared Imports should be used.
     ```
 
 # grasp2db
@@ -140,9 +153,21 @@ Version: 1.0.0
       chr_hg19 gwrngs19 outputFile
     ```
 
+# hydrolinks
+
+Version: 0.7.1
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘dbplyr’
+      All declared Imports should be used.
+    ```
+
 # implyr
 
-Version: 0.2.1
+Version: 0.2.2
 
 ## In both
 
@@ -151,57 +176,56 @@ Version: 0.2.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      
           intersect, setdiff, setequal, union
       
       > library(RJDBC)
-      Loading required package: DBI
       Loading required package: rJava
       Error: package or namespace load failed for 'rJava':
        .onLoad failed in loadNamespace() for 'rJava', details:
         call: dyn.load(file, DLLpath = DLLpath, ...)
-        error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library/implyr/rJava/libs/rJava.so':
-        dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library/implyr/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
-        Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library/implyr/rJava/libs/rJava.so
+        error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/implyr/rJava/libs/rJava.so':
+        dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/implyr/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
+        Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/implyr/rJava/libs/rJava.so
         Reason: image not found
       Error: package 'rJava' could not be loaded
+      In addition: Warning message:
+      package 'RJDBC' was built under R version 3.4.3 
       Execution halted
-    ```
-
-# macleish
-
-Version: 0.3.1
-
-## In both
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘DBI’
-      All declared Imports should be used.
     ```
 
 # mdsr
 
-Version: 0.1.4
+Version: 0.1.5
 
 ## In both
 
-*   checking installed package size ... NOTE
+*   checking whether package ‘mdsr’ can be installed ... WARNING
     ```
-      installed size is  5.5Mb
-      sub-directories of 1Mb or more:
-        data   5.4Mb
+    Found the following significant warnings:
+      Warning: package ‘tibble’ was built under R version 3.4.3
+      Warning: package ‘mosaic’ was built under R version 3.4.3
+      Warning: package ‘ggformula’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/mdsr/new/mdsr.Rcheck/00install.out’ for details.
     ```
 
-*   checking dependencies in R code ... NOTE
+*   checking for missing documentation entries ... WARNING
     ```
-    Namespace in Imports field not imported from: ‘tidyverse’
-      All declared Imports should be used.
+    Warning: package ‘sp’ was built under R version 3.4.3
+    All user-level objects in a package should have documentation entries.
+    See chapter ‘Writing R documentation files’ in the ‘Writing R
+    Extensions’ manual.
+    ```
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  5.6Mb
+      sub-directories of 1Mb or more:
+        data   5.5Mb
     ```
 
 *   checking data for non-ASCII characters ... NOTE
     ```
-      Note: found 2698 marked UTF-8 strings
+      Note: found 2694 marked UTF-8 strings
     ```
 
 # metagenomeFeatures
@@ -212,8 +236,9 @@ Version: 1.8.1
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  8.7Mb
+      installed size is  8.8Mb
       sub-directories of 1Mb or more:
+        data      1.0Mb
         extdata   6.7Mb
     ```
 
@@ -234,46 +259,69 @@ Version: 1.8.1
     to your NAMESPACE file.
     ```
 
-# MonetDBLite
+# mlbgameday
 
-Version: 0.4.1
+Version: 0.0.1
 
 ## In both
 
-*   checking tests ...
+*   checking re-building of vignette outputs ... WARNING
     ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      1: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      2: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      3: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      4: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      5: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      6: Connection is garbage-collected, use dbDisconnect() to avoid this. 
-      7: Connection is garbage-collected, use dbDisconnect() to avoid this. 
-      8: In .Internal(gc(verbose, reset)) :
-        Connection is garbage-collected, use dbDisconnect() to avoid this.
-      Execution halted
+    Error in re-building vignettes:
+      ...
+    Warning in findCenvVar(name, cntxt$env) :
+      closing unused connection 6 (http://gd2.mlb.com/components/game/mlb//year_2016/month_04/day_21/gid_2016_04_21_seamlb_clemlb_1/inning/inning_all.xml)
+    Warning in findCenvVar(name, cntxt$env) :
+      closing unused connection 5 (http://gd2.mlb.com/components/game/mlb//year_2016/month_04/day_21/gid_2016_04_21_lanmlb_atlmlb_1/inning/inning_all.xml)
+    Quitting from lines 22-32 (pitch_plotting.Rmd) 
+    Error: processing vignette 'pitch_plotting.Rmd' failed with diagnostics:
+    `by` can't contain join column `batter` which is missing from LHS
+    Execution halted
     ```
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespaces in Imports field not imported from:
+      ‘doParallel’ ‘iterators’ ‘parallel’
+      All declared Imports should be used.
+    ```
+
+# MonetDBLite
+
+Version: 0.5.1
+
+## In both
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  5.4Mb
+      installed size is  5.3Mb
       sub-directories of 1Mb or more:
         libs   5.1Mb
+    ```
+
+*   checking for GNU extensions in Makefiles ... NOTE
+    ```
+    GNU make is a SystemRequirements.
+    ```
+
+# mudata2
+
+Version: 1.0.0
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespaces in Imports field not imported from:
+      ‘hms’ ‘methods’
+      All declared Imports should be used.
     ```
 
 # Organism.dplyr
 
 Version: 1.2.2
 
-## Newly broken
+## In both
 
 *   checking re-building of vignette outputs ... WARNING
     ```
@@ -285,8 +333,6 @@ Version: 1.2.2
     Execution halted
     ```
 
-## In both
-
 *   checking dependencies in R code ... NOTE
     ```
     Unexported objects imported by ':::' calls:
@@ -297,17 +343,31 @@ Version: 1.2.2
       See the note in ?`:::` about the use of this operator.
     ```
 
-# replyr
+# parsemsf
 
-Version: 0.8.2
+Version: 0.1.1
 
 ## In both
 
 *   checking dependencies in R code ... NOTE
     ```
-    Namespaces in Imports field not imported from:
-      ‘RSQLite’ ‘dbplyr’
+    Namespace in Imports field not imported from: ‘dbplyr’
       All declared Imports should be used.
+    ```
+
+# replyr
+
+Version: 0.9.1
+
+## In both
+
+*   checking whether package ‘replyr’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘seplyr’ was built under R version 3.4.3
+      Warning: package ‘wrapr’ was built under R version 3.4.3
+      Warning: package ‘cdata’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/replyr/new/replyr.Rcheck/00install.out’ for details.
     ```
 
 # RSQLServer
@@ -319,7 +379,7 @@ Version: 0.3.0
 *   checking whether package ‘RSQLServer’ can be installed ... ERROR
     ```
     Installation failed.
-    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks/RSQLServer/new/RSQLServer.Rcheck/00install.out’ for details.
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/RSQLServer/new/RSQLServer.Rcheck/00install.out’ for details.
     ```
 
 ## Installation
@@ -334,12 +394,12 @@ Version: 0.3.0
 ** preparing package for lazy loading
 Error : .onLoad failed in loadNamespace() for 'rJava', details:
   call: dyn.load(file, DLLpath = DLLpath, ...)
-  error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so':
-  dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
-  Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so
+  error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so':
+  dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
+  Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so
   Reason: image not found
 ERROR: lazy loading failed for package ‘RSQLServer’
-* removing ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks/RSQLServer/new/RSQLServer.Rcheck/RSQLServer’
+* removing ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/RSQLServer/new/RSQLServer.Rcheck/RSQLServer’
 
 ```
 ### CRAN
@@ -352,67 +412,58 @@ ERROR: lazy loading failed for package ‘RSQLServer’
 ** preparing package for lazy loading
 Error : .onLoad failed in loadNamespace() for 'rJava', details:
   call: dyn.load(file, DLLpath = DLLpath, ...)
-  error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so':
-  dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
-  Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library/RSQLServer/rJava/libs/rJava.so
+  error: unable to load shared object '/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so':
+  dlopen(/Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so, 6): Library not loaded: @rpath/libjvm.dylib
+  Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/RSQLServer/rJava/libs/rJava.so
   Reason: image not found
 ERROR: lazy loading failed for package ‘RSQLServer’
-* removing ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks/RSQLServer/old/RSQLServer.Rcheck/RSQLServer’
+* removing ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/RSQLServer/old/RSQLServer.Rcheck/RSQLServer’
 
 ```
-# sergeant
+# seplyr
 
-Version: 0.5.2
-
-## In both
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      2: httr::POST(sprintf("%s/query.json", drill_server), encode = "json", body = list(queryType = "SQL", 
-             query = query))
-      3: request_perform(req, hu$handle$handle)
-      4: request_fetch(req$output, req$url, handle)
-      5: request_fetch.write_memory(req$output, req$url, handle)
-      6: curl::curl_fetch_memory(url, handle = handle)
-      
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════════
-      OK: 1 SKIPPED: 0 FAILED: 3
-      1. Error: Core dbplyr ops work (@test-sergeant.R#12) 
-      2. Failure: REST API works (@test-sergeant.R#25) 
-      3. Error: REST API works (@test-sergeant.R#27) 
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
-# taxizedb
-
-Version: 0.1.4
+Version: 0.5.3
 
 ## In both
 
-*   checking tests ...
+*   checking whether package ‘seplyr’ can be installed ... WARNING
     ```
-     ERROR
-    Running the tests in ‘tests/test-all.R’ failed.
-    Last 13 lines of output:
-      Loading required package: taxizedb
-      ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'hello world' at line 1
-      [31m──[39m [31m1. Failure: db_load fails as expected - more (@test-db_load.R#33) [39m [31m────────────────────────────[39m
-      `suppressMessages(db_load_col(path = f))` did not throw an error.
-      
-      [31m──[39m [31m2. Failure: src fails well (@test-src.R#16) [39m [31m──────────────────────────────────────────────────[39m
-      `src_col()` did not throw an error.
-      
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════════
-      OK: 58 SKIPPED: 0 FAILED: 2
-      1. Failure: db_load fails as expected - more (@test-db_load.R#33) 
-      2. Failure: src fails well (@test-src.R#16) 
-      
-      Error: testthat unit tests failed
-      Execution halted
+    Found the following significant warnings:
+      Warning: package ‘wrapr’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/seplyr/new/seplyr.Rcheck/00install.out’ for details.
+    ```
+
+# tidypredict
+
+Version: 0.1.0
+
+## In both
+
+*   checking whether package ‘tidypredict’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘rlang’ was built under R version 3.4.3
+      Warning: package ‘tibble’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/tidypredict/new/tidypredict.Rcheck/00install.out’ for details.
+    ```
+
+# tidyverse
+
+Version: 1.2.1
+
+## In both
+
+*   checking whether package ‘tidyverse’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘tibble’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/tidyverse/new/tidyverse.Rcheck/00install.out’ for details.
+    ```
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespaces in Imports field not imported from:
+      ‘dbplyr’ ‘reprex’ ‘rlang’
+      All declared Imports should be used.
     ```
 

@@ -1,5 +1,10 @@
 context("ident")
 
+test_that("zero length inputs return correct clases", {
+  expect_s3_class(ident(), "ident")
+  expect_s3_class(ident_q(), "ident_q")
+})
+
 test_that("ident quotes and ident_q doesn't", {
   x1 <- ident("x")
   x2 <- ident_q('"x"')
