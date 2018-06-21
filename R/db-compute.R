@@ -27,13 +27,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
       db_drop_table(con, table, force = TRUE)
     }
 
-    table <- db_write_table(con,
-                            table,
-                            types = types,
-                            values = values,
-                            temporary = temporary,
-                            overwrite = overwrite
-                            )
+    table <- db_write_table(con, table, types = types, values = values, temporary = temporary)
     db_create_indexes(con, table, unique_indexes, unique = TRUE)
     db_create_indexes(con, table, indexes, unique = FALSE)
     if (analyze) db_analyze(con, table)

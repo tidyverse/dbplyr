@@ -70,10 +70,10 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
 db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
   if (db_has_table(con, table) && force) {
     sql <- build_sql(
-      sql("BEGIN "),
-      sql("EXECUTE IMMEDIATE 'DROP TABLE \""), sql(table), sql("\"';"),
-      sql("EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; "),
-      sql("END;"),
+      "BEGIN ",
+      "EXECUTE IMMEDIATE 'DROP TABLE \"", sql(table), "\"';",
+      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; ",
+      "END;",
       con = con
     )
     DBI::dbExecute(con, sql)
