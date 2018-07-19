@@ -20,7 +20,7 @@ sql_render.tbl_sql <- function(query, con = query$src$con, ...) {
 
 #' @export
 sql_render.op <- function(query, con = NULL, ...) {
-  sql_render(sql_build(query, ...), con = con, ...)
+  sql_render(sql_build(query, con = con, ...), con = con, ...)
 }
 
 #' @export

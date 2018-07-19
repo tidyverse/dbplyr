@@ -15,3 +15,14 @@ test_that("can extract by name, or positive/negative position", {
   expect_equal(pull(mf, -2), x)
   expect_equal(pull(mf, -2L), x)
 })
+
+test_that("extracts correct column from grouped tbl", {
+  mf <- memdb_frame(id = "a", value = 42)
+
+  expect_identical(
+    mf %>%
+      group_by(id) %>%
+      pull(value),
+    42
+  )
+})

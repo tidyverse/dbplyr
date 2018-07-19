@@ -170,7 +170,7 @@ base_scalar <- sql_translator(
                       )},
   str_detect      = function(string, pattern){
                       build_sql(
-                        "INSTR(", pattern, ", ", string, ") > 0"
+                        "INSTR(", string, ", ", pattern, ") > 0"
                       )},
   str_trim        = function(string, side = "both"){
                       build_sql(
