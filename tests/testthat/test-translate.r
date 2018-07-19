@@ -136,7 +136,7 @@ test_that("str_detect() translates correctly ", {
   expect_equivalent(
     translate_sql(
       str_detect(field_name, "pattern")),
-      sql("INSTR('pattern', \"field_name\") > 0"))
+      sql("INSTR(\"field_name\", 'pattern') > 0"))
 })
 
 test_that("str_trim() translates correctly ", {

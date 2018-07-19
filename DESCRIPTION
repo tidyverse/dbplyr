@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.2.0
+Version: 1.2.1.9001
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("Edgar", "Ruiz", role = "aut"),
@@ -15,31 +15,32 @@ License: MIT + file LICENSE
 URL: https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dplyr/issues
 Depends: 
-    R (>= 3.2)
+    R (>= 3.1)
 Imports: 
     assertthat (>= 0.2.0),
-    DBI (>= 0.7),
-    dplyr (>= 0.7.4),
+    DBI (>= 1.0.0),
+    dplyr (>= 0.7.5),
     glue (>= 1.2.0),
     methods,
-    purrr (>= 0.2.4),
+    purrr (>= 0.2.5),
     R6 (>= 2.2.2),
-    rlang (>= 0.1.6),
-    tibble (>= 1.4.1),
-    tidyselect (>= 0.2.2),
+    rlang (>= 0.2.0),
+    tibble (>= 1.4.2),
+    tidyselect (>= 0.2.4),
     utils
 Suggests:
     bit64,
     covr,
     knitr,
-    Lahman (>= 5.0.0),
-    nycflights13 (>= 0.2.2),
+    Lahman,
+    nycflights13,
     rmarkdown,
     RMariaDB (>= 1.0.2),
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
-    RSQLite (>= 2.0),
-    testthat (>= 2.0.0)
+    RSQLite (>= 2.1.0),
+    testthat (>= 2.0.0),
+    withr (>= 2.1.2)
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
