@@ -181,9 +181,9 @@ base_scalar <- sql_translator(
                       )},
   str_sub = function(string, start = 1L, end = -1L) {
     start <- as.integer(start)
-    length <- pmax(as.integer(stop) - start + 1L, 0L)
+    length <- pmax(as.integer(end) - start + 1L, 0L)
 
-    build_sql(sql("substr"), list(x, start, length))
+    build_sql(sql("substr"), list(string, start, length))
   }
 )
 
