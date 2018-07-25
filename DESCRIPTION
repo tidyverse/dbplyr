@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.2.1
+Version: 1.2.2
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
     person("Edgar", "Ruiz", role = "aut"),
@@ -39,11 +39,12 @@ Suggests:
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
     RSQLite (>= 2.0),
-    testthat (>= 2.0.0)
+    testthat (>= 2.0.0),
+    withr
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Collate: 
     'cache.r'
     'compat-purrr.R'

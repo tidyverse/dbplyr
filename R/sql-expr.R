@@ -2,7 +2,7 @@
 #'
 #' Low-level building block for generating SQL from R expressions.
 #' Strings are escaped; names become bare SQL identifiers. User infix
-#' functions have `\\%` stripped.
+#' functions have `%` stripped.
 #'
 #' @param x A quasiquoted expression
 #' @inheritParams translate_sql

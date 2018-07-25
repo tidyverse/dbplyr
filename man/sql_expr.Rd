@@ -15,7 +15,7 @@ the translation. The default, \code{NULL}, generates ANSI SQL.}
 \description{
 Low-level building block for generating SQL from R expressions.
 Strings are escaped; names become bare SQL identifiers. User infix
-functions have \code{\\\%} stripped.
+functions have \code{\%} stripped.
 }
 \examples{
 sql_expr(f(x + 1))

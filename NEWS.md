@@ -1,3 +1,7 @@
+# dbplyr 1.2.2
+
+* R CMD check fixes
+
 # dbplyr 1.2.1
 
 * Forward compatibility fixes for rlang 0.2.0
