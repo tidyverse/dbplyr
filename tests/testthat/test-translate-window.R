@@ -49,3 +49,19 @@ test_that("can override frame of recycled functions", {
   )
 
 })
+
+test_that("win_rank() is accepted by the sql_translator", {
+  expect_equal(
+    "<sql_variant> scalar:    test",
+    paste0(
+      capture.output(
+        sql_variant(
+          sql_translator(
+            test = win_rank("test")
+          )
+        )
+      ),
+      collapse = " "
+    )
+  )
+})
