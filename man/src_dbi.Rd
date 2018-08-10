@@ -66,7 +66,7 @@ DBI::dbListTables(con)
 src \%>\% tbl("mtcars")
 
 # You can also use pass raw SQL if you want a more sophisticated query
-src \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl == 8"))
+src \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 
 # Alternatively, you can use the `src_sqlite()` helper
 src2 <- src_sqlite(":memory:", create = TRUE)
