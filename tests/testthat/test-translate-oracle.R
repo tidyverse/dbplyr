@@ -30,17 +30,3 @@ test_that("queries translate correctly", {
   )
 
 })
-
-test_that("case_when translate correctly", {
-  mf <- lazy_frame(x = c(1L, 0L, -1L), src = simulate_oracle())
-
-  expect_match(
-    mf %>%
-      mutate(answer = case_when(
-        x== 1L ~ "yes",
-        x== 0L ~ "no",
-        TRUE   ~ "undefined")) %>%
-      sql_render(simulate_oracle()),
-    sql("^SELECT `x`, CASE\nWHEN [(]`x` = 1[)] THEN [(]'yes'[)]\nWHEN [(]`x` = 0[)] THEN [(]'no'[)]\nELSE [(]'undefined'[)]\nEND AS `answer`\nFROM [(]`df`[)]")
-  )
-})
