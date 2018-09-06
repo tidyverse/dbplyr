@@ -23,6 +23,7 @@
 #'   Defaults to `base_agg` which provides a standard set of
 #'   mappings for the most common operators and functions.
 #' @param f the name of the sql function as a string
+#' @param f_r the name of the r function being translated as a string
 #' @param n for `sql_infix()`, an optional number of arguments to expect.
 #'   Will signal error if not correct.
 #' @seealso [sql()] for an example of a more customised sql
@@ -158,13 +159,13 @@ sql_prefix <- function(f, n = NULL) {
 
 #' @rdname sql_variant
 #' @export
-sql_aggregate <- function(translated_f, untranslated_f = translated_f) {
-  assert_that(is_string(translated_f))
-  translated_f <- toupper(translated_f)
+sql_aggregate <- function(f, f_r = f) {
+  assert_that(is_string(f))
+  f <- toupper(f)
 
   function(x, na.rm = FALSE) {
-    check_na_rm(untranslated_f, na.rm)
-    build_sql(sql(translated_f), list(x))
+    check_na_rm(f_r, na.rm)
+    build_sql(sql(f), list(x))
   }
 }
 

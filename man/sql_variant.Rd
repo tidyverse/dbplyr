@@ -27,13 +27,14 @@
 sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
   window = sql_translator())
 
-sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
+sql_translator(..., .funs = list(), .parent = new.env(parent =
+  emptyenv()))
 
 sql_infix(f)
 
 sql_prefix(f, n = NULL)
 
-sql_aggregate(f)
+sql_aggregate(f, f_r = f)
 
 sql_aggregate_2(f)
 
@@ -79,6 +80,8 @@ mappings for the most common operators and functions.}
 
 \item{n}{for \code{sql_infix()}, an optional number of arguments to expect.
 Will signal error if not correct.}
+
+\item{f_r}{the name of the r function being translated as a string}
 }
 \description{
 When creating a package that maps to a new SQL based src, you'll often
