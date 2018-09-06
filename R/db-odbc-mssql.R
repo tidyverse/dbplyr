@@ -96,8 +96,8 @@
                             )}
     ),
     sql_translator(.parent = base_odbc_agg,
-      sd            = sql_aggregate("STDEV"),
-      var           = sql_aggregate("VAR"),
+      sd            = sql_aggregate("STDEV","sd"),
+      var           = sql_aggregate("VAR","var"),
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()")

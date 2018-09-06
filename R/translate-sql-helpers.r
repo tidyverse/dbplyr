@@ -158,13 +158,13 @@ sql_prefix <- function(f, n = NULL) {
 
 #' @rdname sql_variant
 #' @export
-sql_aggregate <- function(f) {
-  assert_that(is_string(f))
-  f <- toupper(f)
+sql_aggregate <- function(translated_f, untranslated_f = translated_f) {
+  assert_that(is_string(translated_f))
+  translated_f <- toupper(translated_f)
 
   function(x, na.rm = FALSE) {
-    check_na_rm(f, na.rm)
-    build_sql(sql(f), list(x))
+    check_na_rm(untranslated_f, na.rm)
+    build_sql(sql(translated_f), list(x))
   }
 }
 

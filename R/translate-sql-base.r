@@ -191,8 +191,8 @@ base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
   n          = function() sql("COUNT()"),
-  mean       = sql_aggregate("avg"),
-  var        = sql_aggregate("variance"),
+  mean       = sql_aggregate("avg","mean"),
+  var        = sql_aggregate("variance","var"),
   sum        = sql_aggregate("sum"),
   min        = sql_aggregate("min"),
   max        = sql_aggregate("max"),
