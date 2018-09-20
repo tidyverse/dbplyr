@@ -258,7 +258,6 @@ base_win <- sql_translator(
       order_by %||% win_current_order()
     )
   },
-
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_aggregate("avg"),
@@ -276,7 +275,7 @@ base_win <- sql_translator(
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
-  cummean = win_cumulative("mean"),
+  cummean = win_cumulative("avg"),
   cumsum  = win_cumulative("sum"),
   cummin  = win_cumulative("min"),
   cummax  = win_cumulative("max"),
