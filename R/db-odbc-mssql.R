@@ -209,6 +209,12 @@ mssql_generic_infix <- function(if_select, if_filter) {
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
+
+  old <- sql_current_context()
+  set_current_context("ifelse")
+  cond <- build_sql(cond)
+  set_current_context(old)
+
   build_sql(
      "CASE",
      " WHEN ((", cond, "))", " THEN (", if_true, ")",
