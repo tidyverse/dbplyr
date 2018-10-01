@@ -47,6 +47,7 @@ postgres_round <- function(x, digits = 0L) {
 sql_translate_env.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
+      as.double = sql_cast('DOUBLE PRECISION'),
       log10  = function(x) sql_expr(log(!!x)),
       log    = sql_log(),
       cot    = sql_cot(),
