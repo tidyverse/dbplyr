@@ -125,6 +125,13 @@ test_that("str_to_lower() translates correctly ", {
       sql("LOWER(\"field_name\")"))
 })
 
+test_that("str_to_title() translates correctly", {
+  expect_equivalent(
+    translate_sql(str_to_title(field_name)),
+    sql("INITCAP(\"field_name\")")
+  )
+})
+
 test_that("str_replace_all() translates correctly ", {
   expect_equivalent(
     translate_sql(
