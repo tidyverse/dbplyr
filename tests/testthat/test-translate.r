@@ -153,6 +153,21 @@ test_that("str_trim() translates correctly ", {
       sql("LTRIM(RTRIM(\"field_name\"))"))
 })
 
+test_that("str_sub() translates correctly", {
+  expect_equivalent(
+    translate_sql(
+      str_sub(field_name, 2L, 4L)
+    ),
+    sql("SUBSTR(\"field_name\", 2, 3)")
+  )
+  expect_equivalent(
+    translate_sql(
+      str_sub(field_name)
+    ),
+    sql("SUBSTR(\"field_name\", 1, 0)")
+  )
+})
+
 
 
 
