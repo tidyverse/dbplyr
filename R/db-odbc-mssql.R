@@ -93,7 +93,9 @@
       str_detect      = function(string, pattern){
                             build_sql(
                               "CHARINDEX(", pattern, ", ", string, ") > 0"
-                            )}
+                            )},
+      # mssql does not support INITCAP, toTitle, toPropCase, etc.
+      str_to_title    = sql_not_supported("str_to_title()")
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV"),
