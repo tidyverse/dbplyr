@@ -183,7 +183,7 @@ base_scalar <- sql_translator(
     start <- as.integer(start)
     length <- pmax(as.integer(end) - start + 1L, 0L)
 
-    build_sql(sql("substr"), list(string, start, length))
+    build_sql(sql("SUBSTR"), list(string, start, length))
   }
 )
 
