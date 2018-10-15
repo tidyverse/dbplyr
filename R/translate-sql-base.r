@@ -342,10 +342,10 @@ sql_case_when <- function(...) {
   query <- vector("list", n)
   value <- vector("list", n)
 
-
+  # Sets context to ifelse so infix operations, such as & are
+  # properly translated to AND in mssql
   old <- sql_current_context()
   set_current_context("ifelse")
-
   for (i in seq_len(n)) {
     f <- formulas[[i]]
 
@@ -353,7 +353,7 @@ sql_case_when <- function(...) {
     query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
     value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
   }
-
+  # Restores context
   set_current_context(old)
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
