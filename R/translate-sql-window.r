@@ -58,8 +58,13 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     frame <- build_sql("ROWS ", frame)
   }
 
-  over <- sql_vector(compact(list(partition, order, frame)), parens = TRUE)
-  sql <- build_sql(expr, " OVER ", over)
+  if (length(partition) > 0 || length(order) > 0 || length(frame) > 0 || getOption("dplyr.explicit.over", FALSE)) {
+    over <- sql_vector(compact(list(partition, order, frame)), parens = TRUE)
+    sql <- build_sql(expr, " OVER ", over)
+  }
+  else {
+    sql <- build_sql(expr)
+  }
 
   sql
 }
