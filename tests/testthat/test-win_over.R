@@ -1,7 +1,7 @@
 context("win_over")
 
 test_that("over() only requires first argument", {
-  expect_equal(win_over("X"), sql("'X' OVER ()"))
+  expect_equal(win_over("X"), sql("'X'"))
 })
 
 test_that("multiple group by or order values don't have parens", {
@@ -19,7 +19,7 @@ test_that("connection affects quoting window function fields", {
   old <- set_current_con(simulate_test())
   on.exit(set_current_con(old))
 
-  expect_equal(win_over(ident("x")), sql("`x` OVER ()"))
+  expect_equal(win_over(ident("x")), sql("`x`"))
   expect_equal(
     win_over(ident("x"), partition = "x"),
     sql("`x` OVER (PARTITION BY `x`)")

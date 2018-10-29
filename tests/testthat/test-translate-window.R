@@ -1,18 +1,18 @@
 context("translate-window")
 
 test_that("window functions without group have empty over", {
-  expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql('sum("x") OVER ()'))
+  expect_equal(translate_sql(n()), sql("COUNT(*)"))
+  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql('sum("x")'))
 })
 
 test_that("aggregating window functions ignore order_by", {
   expect_equal(
     translate_sql(n(), vars_order = "x"),
-    sql("COUNT(*) OVER ()")
+    sql("COUNT(*)")
   )
   expect_equal(
     translate_sql(sum(x, na.rm = TRUE), vars_order = "x"),
-    sql('sum("x") OVER ()')
+    sql('sum("x")')
   )
 })
 
@@ -36,9 +36,9 @@ test_that("ntile always casts to integer", {
 })
 
 test_that("first, last, and nth translated to _value", {
-  expect_equal(translate_sql(first(x)), sql('first_value("x") OVER ()'))
-  expect_equal(translate_sql(last(x)), sql('last_value("x") OVER ()'))
-  expect_equal(translate_sql(nth(x, 1)), sql('nth_value("x", 1) OVER ()'))
+  expect_equal(translate_sql(first(x)), sql('first_value("x")'))
+  expect_equal(translate_sql(last(x)), sql('last_value("x")'))
+  expect_equal(translate_sql(nth(x, 1)), sql('nth_value("x", 1)'))
 })
 
 

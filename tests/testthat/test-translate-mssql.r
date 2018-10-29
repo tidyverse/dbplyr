@@ -52,8 +52,8 @@ test_that("custom window functions translated correctly", {
     translate_sql(!!enquo(x), window = TRUE, con = simulate_mssql())
   }
 
-  expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
-  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
+  expect_equal(trans(sd(x, na.rm = TRUE)),  sql("STDEV(`x`)"))
+  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR(`x`)"))
 
   expect_error(trans(cor(x)), "not supported")
   expect_error(trans(cov(x)), "not supported")

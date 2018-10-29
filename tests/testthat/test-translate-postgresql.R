@@ -34,7 +34,7 @@ test_that("two variable aggregates are translated correctly", {
   }
 
   expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
-  expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
+  expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`)"))
 
 })
 

@@ -44,10 +44,10 @@ test_that("custom window functions translated correctly", {
     translate_sql(!!enquo(x), window = TRUE, con = simulate_odbc("OdbcConnection"))
   }
 
-  expect_equal(trans(sd(x, na.rm = TRUE)),         sql("STDDEV_SAMP(`x`) OVER ()"))
-  expect_equal(trans(count()),       sql("COUNT(*) OVER ()"))
-  expect_equal(trans(n()),           sql("COUNT(*) OVER ()"))
-  expect_equal(trans(n_distinct(x)), sql("COUNT(DISTINCT `x`) OVER ()"))
+  expect_equal(trans(sd(x, na.rm = TRUE)),         sql("STDDEV_SAMP(`x`)"))
+  expect_equal(trans(count()),       sql("COUNT(*)"))
+  expect_equal(trans(n()),           sql("COUNT(*)"))
+  expect_equal(trans(n_distinct(x)), sql("COUNT(DISTINCT `x`)"))
 
 
 })

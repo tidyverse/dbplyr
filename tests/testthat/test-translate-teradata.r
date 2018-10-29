@@ -41,7 +41,7 @@ test_that("custom window functions translated correctly", {
     translate_sql(!!enquo(x), window = TRUE, con = simulate_teradata())
   }
 
-  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
+  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`)"))
 
   expect_error(trans(cor(x)), "not supported")
   expect_error(trans(cov(x)), "not supported")
