@@ -1,5 +1,8 @@
 # dbplyr 1.2.1.9001
 
+* Calls of the form `dplyr::foo()` are now evaluated in the database, 
+  rather than locally (#197).
+
 * Adds custom `db_drop_table()` function for Oracle connections (#3306)
 
 * Fixes translation of `cummean()` from 'mean' to 'avg' (#157)
