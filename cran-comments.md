@@ -3,9 +3,11 @@
 This is a minor release designed to add forward compability with the next version of rlang.
 
 ## Test environments
-* OS X install: R 3.4
-* win-builder: R-devel
-* travis-ci: R 3.2, R 3.3, R 3.4, R-devel
+
+* local: darwin15.6.0-3.5.1
+* travis: 3.1, 3.2, 3.3, oldrel, release, devel
+* r-hub: windows-x86_64-devel, ubuntu-gcc-release, fedora-clang-devel
+* win-builder: windows-x86_64-devel
 
 ## R CMD check results
 
