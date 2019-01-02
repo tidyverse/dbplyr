@@ -13,6 +13,15 @@ sql_if <- function(cond, if_true, if_false = NULL) {
   )
 }
 
+sql_null <- function(x) {
+  if (old_qq()) {
+    sql_expr(((!!x) %is% NULL))
+  } else {
+    sql_expr((((!!x)) %is% NULL))
+  }
+}
+
+
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -44,6 +53,8 @@ base_scalar <- sql_translator(
   `%in%` = function(x, table) {
     if (is.sql(table) || length(table) > 1) {
       build_sql(x, " IN ", table)
+    } else if (length(table) == 0) {
+      build_sql(FALSE)
     } else {
       build_sql(x, " IN (", table, ")")
     }
@@ -118,8 +129,8 @@ base_scalar <- sql_translator(
     build_sql(x, sql(" DESC"))
   },
 
-  is.null = function(x) sql_expr(((!!x) %is% NULL)),
-  is.na = function(x)  sql_expr(((!!x) %is% NULL)),
+  is.null = sql_null,
+  is.na = sql_null,
   na_if = sql_prefix("NULL_IF", 2),
   coalesce = sql_prefix("coalesce"),
 
@@ -158,7 +169,7 @@ base_scalar <- sql_translator(
                       )},
   str_detect      = function(string, pattern){
                       build_sql(
-                        "INSTR(", pattern, ", ", string, ") > 0"
+                        "INSTR(", string, ", ", pattern, ") > 0"
                       )},
   str_trim        = function(string, side = "both"){
                       build_sql(
@@ -342,6 +353,10 @@ sql_case_when <- function(...) {
   }
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
+  if (query[[n]] == "TRUE") {
+    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+  }
   sql(paste0(
     "CASE\n",
     paste0(clauses, collapse = "\n"),

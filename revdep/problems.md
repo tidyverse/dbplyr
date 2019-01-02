@@ -9,14 +9,14 @@ Version: 0.4.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      [31m──[39m [31m3. Error: date/times can be round-tripped (@test-upload.r#12) [39m [31m────────────────────────────────[39m
+      [31m──[39m [31m3. Error: date/times can be round-tripped (@test-upload.r#12) [39m [31m──────────────────────────────────────────[39m
       Billing has not been enabled for this project. Enable billing at https://console.cloud.google.com/billing.
       1: insert_upload_job("bigrquery-examples", "test", "x", df1) at testthat/test-upload.r:12
       2: bq_upload(url, c(config_part, data_part))
       3: process_request(req)
       4: signal_reason(out$error$errors[[1L]]$reason, out$error$message)
       
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════════
+      ══ testthat results  ═══════════════════════════════════════════════════════════════════════════════════════
       OK: 55 SKIPPED: 0 FAILED: 3
       1. Error: (unknown) (@test-DBItest.R#2) 
       2. Error: extra arguments passed onto request (@test-datasets.r#6) 
@@ -44,7 +44,7 @@ Version: 1.0.1
 
 # dbplot
 
-Version: 0.1.1
+Version: 0.2.0
 
 ## In both
 
@@ -75,6 +75,18 @@ Version: 0.7.4
 *   checking data for non-ASCII characters ... NOTE
     ```
       Note: found 4 marked UTF-8 strings
+    ```
+
+# dplyr.teradata
+
+Version: 0.1.1
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘bit64’
+      All declared Imports should be used.
     ```
 
 # grasp2db
@@ -141,9 +153,21 @@ Version: 1.0.0
       chr_hg19 gwrngs19 outputFile
     ```
 
+# hydrolinks
+
+Version: 0.7.1
+
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘dbplyr’
+      All declared Imports should be used.
+    ```
+
 # implyr
 
-Version: 0.2.1
+Version: 0.2.2
 
 ## In both
 
@@ -152,11 +176,9 @@ Version: 0.2.1
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      
           intersect, setdiff, setequal, union
       
       > library(RJDBC)
-      Loading required package: DBI
       Loading required package: rJava
       Error: package or namespace load failed for 'rJava':
        .onLoad failed in loadNamespace() for 'rJava', details:
@@ -166,19 +188,9 @@ Version: 0.2.1
         Referenced from: /Users/hadley/Documents/dplyr/dbplyr/revdep/library.noindex/implyr/rJava/libs/rJava.so
         Reason: image not found
       Error: package 'rJava' could not be loaded
+      In addition: Warning message:
+      package 'RJDBC' was built under R version 3.4.3 
       Execution halted
-    ```
-
-# macleish
-
-Version: 0.3.1
-
-## In both
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘DBI’
-      All declared Imports should be used.
     ```
 
 # mdsr
@@ -190,15 +202,25 @@ Version: 0.1.5
 *   checking whether package ‘mdsr’ can be installed ... WARNING
     ```
     Found the following significant warnings:
+      Warning: package ‘tibble’ was built under R version 3.4.3
       Warning: package ‘mosaic’ was built under R version 3.4.3
+      Warning: package ‘ggformula’ was built under R version 3.4.3
     See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/mdsr/new/mdsr.Rcheck/00install.out’ for details.
+    ```
+
+*   checking for missing documentation entries ... WARNING
+    ```
+    Warning: package ‘sp’ was built under R version 3.4.3
+    All user-level objects in a package should have documentation entries.
+    See chapter ‘Writing R documentation files’ in the ‘Writing R
+    Extensions’ manual.
     ```
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  5.5Mb
+      installed size is  5.6Mb
       sub-directories of 1Mb or more:
-        data   5.4Mb
+        data   5.5Mb
     ```
 
 *   checking data for non-ASCII characters ... NOTE
@@ -214,8 +236,9 @@ Version: 1.8.1
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  8.7Mb
+      installed size is  8.8Mb
       sub-directories of 1Mb or more:
+        data      1.0Mb
         extdata   6.7Mb
     ```
 
@@ -242,6 +265,20 @@ Version: 0.0.1
 
 ## In both
 
+*   checking re-building of vignette outputs ... WARNING
+    ```
+    Error in re-building vignettes:
+      ...
+    Warning in findCenvVar(name, cntxt$env) :
+      closing unused connection 6 (http://gd2.mlb.com/components/game/mlb//year_2016/month_04/day_21/gid_2016_04_21_seamlb_clemlb_1/inning/inning_all.xml)
+    Warning in findCenvVar(name, cntxt$env) :
+      closing unused connection 5 (http://gd2.mlb.com/components/game/mlb//year_2016/month_04/day_21/gid_2016_04_21_lanmlb_atlmlb_1/inning/inning_all.xml)
+    Quitting from lines 22-32 (pitch_plotting.Rmd) 
+    Error: processing vignette 'pitch_plotting.Rmd' failed with diagnostics:
+    `by` can't contain join column `batter` which is missing from LHS
+    Execution halted
+    ```
+
 *   checking dependencies in R code ... NOTE
     ```
     Namespaces in Imports field not imported from:
@@ -251,7 +288,7 @@ Version: 0.0.1
 
 # MonetDBLite
 
-Version: 0.5.0
+Version: 0.5.1
 
 ## In both
 
@@ -320,7 +357,7 @@ Version: 0.1.1
 
 # replyr
 
-Version: 0.9.0
+Version: 0.9.1
 
 ## In both
 
@@ -329,14 +366,8 @@ Version: 0.9.0
     Found the following significant warnings:
       Warning: package ‘seplyr’ was built under R version 3.4.3
       Warning: package ‘wrapr’ was built under R version 3.4.3
+      Warning: package ‘cdata’ was built under R version 3.4.3
     See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/replyr/new/replyr.Rcheck/00install.out’ for details.
-    ```
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespaces in Imports field not imported from:
-      ‘RSQLite’ ‘dbplyr’
-      All declared Imports should be used.
     ```
 
 # RSQLServer
@@ -389,15 +420,31 @@ ERROR: lazy loading failed for package ‘RSQLServer’
 * removing ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/RSQLServer/old/RSQLServer.Rcheck/RSQLServer’
 
 ```
-# tidyhydat
+# seplyr
 
-Version: 0.3.1
+Version: 0.5.3
 
 ## In both
 
-*   checking data for non-ASCII characters ... NOTE
+*   checking whether package ‘seplyr’ can be installed ... WARNING
     ```
-      Note: found 7 marked UTF-8 strings
+    Found the following significant warnings:
+      Warning: package ‘wrapr’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/seplyr/new/seplyr.Rcheck/00install.out’ for details.
+    ```
+
+# tidypredict
+
+Version: 0.1.0
+
+## In both
+
+*   checking whether package ‘tidypredict’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘rlang’ was built under R version 3.4.3
+      Warning: package ‘tibble’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/tidypredict/new/tidypredict.Rcheck/00install.out’ for details.
     ```
 
 # tidyverse
@@ -405,6 +452,13 @@ Version: 0.3.1
 Version: 1.2.1
 
 ## In both
+
+*   checking whether package ‘tidyverse’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: package ‘tibble’ was built under R version 3.4.3
+    See ‘/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/tidyverse/new/tidyverse.Rcheck/00install.out’ for details.
+    ```
 
 *   checking dependencies in R code ... NOTE
     ```
