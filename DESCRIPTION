@@ -49,6 +49,8 @@ Suggests:
     withr (>= 2.1.2)
 VignetteBuilder: 
     knitr
+Remotes: 
+    tidyverse/dplyr
 Encoding: UTF-8
 LazyData: yes
 Roxygen: list(markdown = TRUE)
