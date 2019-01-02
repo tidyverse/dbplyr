@@ -1,5 +1,8 @@
 # dbplyr 1.2.1.9001
 
+* SQLite gains correct translation for `as.numeric()`/`as.double()` 
+  (@chris-park, #171).
+
 * New translation for `bit64::as.integer64()` (#3305)
 
 * `case_when` now create a `ELSE` clause if a formula of the form `TRUE ~ <RHS>` 
