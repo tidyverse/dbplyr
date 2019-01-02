@@ -70,7 +70,6 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 }
 
 
-# Returns NULL if variables don't need to be renamed
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
@@ -125,20 +124,6 @@ semi_join_vars <- function(x_names, y_names) {
   y_new[!all_names %in% y_names] <- NA
 
   list(x = x_new, y = y_new)
-}
-
-
-get_join_xy_names <- function(by, uniques) {
-  xy_by <- by$x[by$x == by$y]
-  x_names <- uniques$x
-  x_rename <- names(x_names) %in% xy_by
-  names(x_names)[!x_rename] <- ""
-
-  y_names <- uniques$y
-  y_remove <- names(y_names) %in% xy_by
-  y_names <- unname(y_names[!y_remove])
-
-  c(x_names, y_names)
 }
 
 

@@ -17,7 +17,9 @@ sqlite_version <- function() {
 sql_translate_env.SQLiteConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      log     = function(x, base = exp(1)) {
+      as.numeric = sql_cast("REAL"),
+      as.double = sql_cast("REAL"),
+      log = function(x, base = exp(1)) {
         if (base != exp(1)) {
           sql_expr(log(!!x) / log(!!base))
         } else {

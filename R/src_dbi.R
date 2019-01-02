@@ -19,7 +19,7 @@
 #' that you are grouping by. Use [explain()] to check that the database is using
 #' the indexes that you expect.
 #'
-#' There is one excpetion: [do()] is not lazy since it must pull the data
+#' There is one exception: [do()] is not lazy since it must pull the data
 #' into R.
 #'
 #' @param con An object that inherits from [DBI::DBIConnection-class],
@@ -46,7 +46,7 @@
 #' src %>% tbl("mtcars")
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
-#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl == 8"))
+#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #'
 #' # Alternatively, you can use the `src_sqlite()` helper
 #' src2 <- src_sqlite(":memory:", create = TRUE)

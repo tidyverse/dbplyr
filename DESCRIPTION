@@ -2,48 +2,57 @@ Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
 Version: 1.2.1.9001
-Authors@R: c(
-    person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
-    person("Edgar", "Ruiz", role = "aut"),
-    person("RStudio", role = c("cph", "fnd"))
-    )
-Description: A 'dplyr' back end for databases that allows you to work with 
-    remote database tables as if they are in-memory data frames. Basic features
-    works with any database that has a 'DBI' back end; more advanced features 
-    require 'SQL' translation to be provided by the package author.
+Authors@R: 
+    c(person(given = "Hadley",
+             family = "Wickham",
+             role = c("aut", "cre"),
+             email = "hadley@rstudio.com"),
+      person(given = "Edgar",
+             family = "Ruiz",
+             role = "aut"),
+      person(given = "RStudio",
+             role = c("cph", "fnd")))
+Description: A 'dplyr' back end for databases that allows you to
+    work with remote database tables as if they are in-memory data frames.
+    Basic features works with any database that has a 'DBI' back end; more
+    advanced features require 'SQL' translation to be provided by the
+    package author.
 License: MIT + file LICENSE
 URL: https://github.com/tidyverse/dbplyr
-BugReports: https://github.com/tidyverse/dplyr/issues
+BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
     R (>= 3.1)
 Imports: 
     assertthat (>= 0.2.0),
-    DBI (>= 0.7),
-    dplyr (>= 0.7.4),
+    DBI (>= 1.0.0),
+    dplyr (>= 0.7.5),
     glue (>= 1.2.0),
     methods,
-    purrr (>= 0.2.4),
+    purrr (>= 0.2.5),
     R6 (>= 2.2.2),
-    rlang (>= 0.1.6),
-    tibble (>= 1.4.1),
+    rlang (>= 0.2.0),
+    tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils
 Suggests:
     bit64,
     covr,
     knitr,
-    Lahman (>= 5.0.0),
-    nycflights13 (>= 0.2.2),
-    rmarkdown,
+    Lahman,
+    nycflights13,
     RMariaDB (>= 1.0.2),
+    rmarkdown,
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
-    RSQLite (>= 2.0),
-    testthat (>= 2.0.0)
-VignetteBuilder: knitr
+    RSQLite (>= 2.1.0),
+    testthat (>= 2.0.0),
+    withr (>= 2.1.2)
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
 LazyData: yes
-Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
-RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
 Collate: 
     'cache.r'
     'compat-purrr.R'

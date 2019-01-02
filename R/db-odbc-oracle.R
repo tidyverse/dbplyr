@@ -36,13 +36,27 @@ sql_translate_env.Oracle <- function(con) {
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
-      as.character  = sql_cast("VARCHAR(255)"),
+                   
+      # https://stackoverflow.com/questions/1171196
+      as.character  = sql_cast("VARCHAR2(255)"),
+      # bit64::as.integer64 can translate to BIGINT for some
+      # vendors, which is equivalent to NUMBER(19) in Oracle
+      # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
+      as.integer64  = sql_cast("NUMBER(19)"),
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER")
     ),
     base_odbc_agg,
     base_odbc_win
   )
+}
+
+#' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
+  expl <- DBI::dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
 }
 
 #' @export
@@ -64,4 +78,11 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   } else {
     build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
   }
+}
+
+# registered onLoad located in the zzz.R script
+setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
+  # Oracle uses MINUS instead of EXCEPT for this operation:
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
+  add_op_set_op(x, y, "MINUS", copy = copy, ...)
 }

@@ -23,7 +23,8 @@ db_copy_to.DBIConnection <- function(con, table, values,
 
   db_begin(con)
   tryCatch({
-    if (overwrite) {
+    # Only remove if it exists; returns NA for MySQL
+    if (overwrite && !is_false(db_has_table(con, table))) {
       db_drop_table(con, table, force = TRUE)
     }
 

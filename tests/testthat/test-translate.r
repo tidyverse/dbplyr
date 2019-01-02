@@ -65,6 +65,10 @@ test_that("%in% translation parenthesises when needed", {
   expect_equal(translate_sql(x %in% y), sql('"x" IN "y"'))
 })
 
+test_that("%in% with empty vector", {
+  expect_equal(translate_sql(x %in% !!integer()), sql('FALSE'))
+})
+
 test_that("n_distinct can take multiple values", {
   expect_equal(
     translate_sql(n_distinct(x), window = FALSE),
@@ -136,7 +140,7 @@ test_that("str_detect() translates correctly ", {
   expect_equivalent(
     translate_sql(
       str_detect(field_name, "pattern")),
-      sql("INSTR('pattern', \"field_name\") > 0"))
+      sql("INSTR(\"field_name\", 'pattern') > 0"))
 })
 
 test_that("str_trim() translates correctly ", {

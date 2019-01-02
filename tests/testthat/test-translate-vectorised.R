@@ -17,3 +17,17 @@ test_that("even inside mutate", {
     'CASE\nWHEN ("x" > 1) THEN (\'a\')\nEND AS "y"'
   )
 })
+
+test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
+  out <- translate_sql(
+    case_when(
+      x == 1L ~ "yes",
+      x == 0L ~ "no",
+      TRUE    ~ "undefined")
+  )
+
+  expect_equal(
+    out,
+    sql('CASE\nWHEN ("x" = 1) THEN (\'yes\')\nWHEN ("x" = 0) THEN (\'no\')\nELSE (\'undefined\')\nEND')
+  )
+})

@@ -8,8 +8,9 @@
 translate_sql(..., con = NULL, vars = character(), vars_group = NULL,
   vars_order = NULL, vars_frame = NULL, window = TRUE)
 
-translate_sql_(dots, con = NULL, vars_group = NULL, vars_order = NULL,
-  vars_frame = NULL, window = TRUE, context = list())
+translate_sql_(dots, con = NULL, vars_group = NULL,
+  vars_order = NULL, vars_frame = NULL, window = TRUE,
+  context = list())
 }
 \arguments{
 \item{..., dots}{Expressions to translate. \code{translate_sql()}

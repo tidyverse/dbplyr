@@ -6,16 +6,19 @@
 \alias{dbplyr-package}
 \title{dbplyr: A 'dplyr' Back End for Databases}
 \description{
-A 'dplyr' back end for databases that allows you to work with
-remote database tables as if they are in-memory data frames. Basic features
-works with any database that has a 'DBI' back end; more advanced features
-require 'SQL' translation to be provided by the package author.
+\if{html}{\figure{logo.png}{options: align='right'}}
+
+A 'dplyr' back end for databases that allows you to
+    work with remote database tables as if they are in-memory data frames.
+    Basic features works with any database that has a 'DBI' back end; more
+    advanced features require 'SQL' translation to be provided by the
+    package author.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/tidyverse/dbplyr}
-  \item Report bugs at \url{https://github.com/tidyverse/dplyr/issues}
+  \item Report bugs at \url{https://github.com/tidyverse/dbplyr/issues}
 }
 
 }

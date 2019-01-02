@@ -21,6 +21,18 @@ test_that("order_by overrides default ordering", {
     translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
     sql('sum("x") OVER (ORDER BY "y" ROWS UNBOUNDED PRECEDING)')
   )
+  expect_equal(
+    translate_sql(order_by(y, cummean(x)), vars_order = "x"),
+    sql('avg("x") OVER (ORDER BY "y" ROWS UNBOUNDED PRECEDING)')
+  )
+  expect_equal(
+    translate_sql(order_by(y, cummin(x)), vars_order = "x"),
+    sql('min("x") OVER (ORDER BY "y" ROWS UNBOUNDED PRECEDING)')
+  )
+  expect_equal(
+    translate_sql(order_by(y, cummax(x)), vars_order = "x"),
+    sql('max("x") OVER (ORDER BY "y" ROWS UNBOUNDED PRECEDING)')
+  )
 })
 
 test_that("cumulative windows warn if no order", {
