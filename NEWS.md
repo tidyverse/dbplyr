@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* `partial_eval()` handles unevaluated formulas (#184).
+
 * Calls of the form `dplyr::foo()` are now evaluated in the database, 
   rather than locally (#197).
 
