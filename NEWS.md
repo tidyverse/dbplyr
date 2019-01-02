@@ -32,6 +32,8 @@ is provided . (@cderv, #112)
 
 * Redshift `substr()` compatibility issue resolved (#3339)
 
+* the statement `x %in% y` is now translated to `FALSE` (@mgirlich, #160).
+
 # dbplyr 1.2.1
 
 * Forward compatibility fixes for rlang 0.2.0
