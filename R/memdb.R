@@ -3,7 +3,7 @@
 #' `memdb_frame()` works like [tibble::tibble()], but instead of creating a new
 #' data frame in R, it creates a table in [src_memdb()].
 #'
-#' @inheritParams tibble::data_frame
+#' @inheritParams tibble::tibble
 #' @param .name Name of table in database: defaults to a random name that's
 #'   unlikely to conflict with an existing table.
 #' @export

@@ -14,3 +14,7 @@ test_that("namespace operators always evaluated locally", {
   expect_equal(partial_eval(quote(base::sum(1, 2))), 3)
   expect_equal(partial_eval(quote(base:::sum(1, 2))), 3)
 })
+
+test_that("namespaced calls to dplyr functions are stripped", {
+  expect_equal(partial_eval(quote(dplyr::n())), expr(n()))
+})

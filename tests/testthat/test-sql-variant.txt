@@ -1,0 +1,4 @@
+<sql_variant>
+scalar:    +
+aggregate: +
+window:    +
