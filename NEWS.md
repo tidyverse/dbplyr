@@ -1,11 +1,9 @@
 # dbplyr 1.2.1.9001
 
-
 * New translation for `bit64::as.integer64()` (#3305)
 
-* `case_when` now translates with a ELSE clause if a formula of the form `TRUE~<RHS>`
-is provided . (@cderv, #112)
-
+* `case_when` now create a `ELSE` clause if a formula of the form `TRUE ~ <RHS>` 
+  is provided . (@cderv, #112)
 
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
@@ -32,7 +30,7 @@ is provided . (@cderv, #112)
 
 * Redshift `substr()` compatibility issue resolved (#3339)
 
-* the statement `x %in% y` is now translated to `FALSE` (@mgirlich, #160).
+* `x %in% y` is now translated to `FALSE` if `y` is empty (@mgirlich, #160).
 
 # dbplyr 1.2.1
 
