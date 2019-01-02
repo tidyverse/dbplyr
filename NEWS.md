@@ -1,6 +1,10 @@
 # dbplyr 1.2.1.9001
 
-* MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. This allows more complex operations, such as `%in%`, to work properly (#93)
+* MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. 
+  This allows more complex operations, such as `%in%`, to work properly (#93)
+
+* Calls of the form `dplyr::foo()` are now evaluated in the database, 
+  rather than locally (#197).
 
 * Adds custom `db_drop_table()` function for Oracle connections (#3306)
 
