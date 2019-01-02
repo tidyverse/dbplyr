@@ -65,6 +65,10 @@ test_that("%in% translation parenthesises when needed", {
   expect_equal(translate_sql(x %in% y), sql('"x" IN "y"'))
 })
 
+test_that("%in% with empty vector", {
+  expect_equal(translate_sql(x %in% !!integer()), sql('FALSE'))
+})
+
 test_that("n_distinct can take multiple values", {
   expect_equal(
     translate_sql(n_distinct(x), window = FALSE),

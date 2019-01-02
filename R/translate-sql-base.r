@@ -53,6 +53,8 @@ base_scalar <- sql_translator(
   `%in%` = function(x, table) {
     if (is.sql(table) || length(table) > 1) {
       build_sql(x, " IN ", table)
+    } else if (length(table) == 0) {
+      build_sql(FALSE)
     } else {
       build_sql(x, " IN (", table, ")")
     }

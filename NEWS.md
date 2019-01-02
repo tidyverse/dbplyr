@@ -11,6 +11,14 @@
 * `case_when` now translates with a ELSE clause if a formula of the form `TRUE~<RHS>`
 is provided . (@cderv, #112)
 
+* SQLite gains correct translation for `as.numeric()`/`as.double()` 
+  (@chris-park, #171).
+
+* New translation for `bit64::as.integer64()` (#3305)
+
+* `case_when` now create a `ELSE` clause if a formula of the form `TRUE ~ <RHS>` 
+  is provided . (@cderv, #112)
+
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).
@@ -35,6 +43,8 @@ is provided . (@cderv, #112)
 * `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
 
 * Redshift `substr()` compatibility issue resolved (#3339)
+
+* `x %in% y` is now translated to `FALSE` if `y` is empty (@mgirlich, #160).
 
 # dbplyr 1.2.1
 
@@ -146,6 +156,8 @@ is provided . (@cderv, #112)
 *   SQLite: improved `na_if` translation (@cwarden)
 
 *   PostgreSQL: translation for `grepl()` added (@zozlak)
+
+*   Oracle: changed VARVHAR to VARCHAR2 datatype (@washcycle, #66)
 
 # dbplyr 1.1.0
 
