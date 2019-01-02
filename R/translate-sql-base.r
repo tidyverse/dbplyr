@@ -346,7 +346,8 @@ sql_case_when <- function(...) {
   # Sets context to ifelse so infix operations, such as & are
   # properly translated to AND in mssql
   old <- sql_current_context()
-  set_current_context("ifelse")
+  on.exit(set_current_context(old), add = TRUE)
+  set_current_context(list(clause = ""))
   for (i in seq_len(n)) {
     f <- formulas[[i]]
 

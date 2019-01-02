@@ -211,7 +211,8 @@ mssql_generic_infix <- function(if_select, if_filter) {
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
 
   old <- sql_current_context()
-  set_current_context("ifelse")
+  on.exit(set_current_context(old), add = TRUE)
+  set_current_context(list(clause = ""))
   cond <- build_sql(cond)
   set_current_context(old)
 
