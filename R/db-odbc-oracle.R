@@ -37,6 +37,10 @@ sql_translate_env.Oracle <- function(con) {
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
       as.character  = sql_cast("VARCHAR(255)"),
+      # bit64::as.integer64 can translate to BIGINT for some
+      # vendors, which is equivalent to NUMBER(19) in Oracle
+      # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
+      as.integer64  = sql_cast("NUMBER(19)"),
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER")
     ),
