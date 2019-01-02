@@ -21,9 +21,9 @@ test_that("even inside mutate", {
 test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
   out <- translate_sql(
     case_when(
-      x== 1L ~ "yes",
-      x== 0L ~ "no",
-      TRUE   ~ "undefined")
+      x == 1L ~ "yes",
+      x == 0L ~ "no",
+      TRUE    ~ "undefined")
   )
 
   expect_equal(
