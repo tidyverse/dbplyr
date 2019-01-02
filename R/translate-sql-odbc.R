@@ -5,6 +5,12 @@ base_odbc_scalar <- sql_translator(.parent = base_scalar,
   as.numeric    = sql_cast("DOUBLE"),
   as.double     = sql_cast("DOUBLE"),
   as.integer    = sql_cast("INT"),
+  # bit64::as.integer64 can translate to BIGINT data type:
+  # MS SQL - https://docs.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql
+  # Hive - https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
+  # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
+  # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
+  as.integer64  = sql_cast("BIGINT"),
   as.logical    = sql_cast("BOOLEAN"),
   as.character  = sql_cast("STRING"),
   as.Date       = sql_cast("DATE"),

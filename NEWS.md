@@ -6,6 +6,11 @@
 
 * Adds tests for `cummean()`, `cummax()` and `cummin()`
 
+* New translation for `bit64::as.integer64()` (#3305)
+
+* `case_when` now translates with a ELSE clause if a formula of the form `TRUE~<RHS>`
+is provided . (@cderv, #112)
+
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).

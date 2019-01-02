@@ -350,6 +350,10 @@ sql_case_when <- function(...) {
   }
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
+  if (query[[n]] == "TRUE") {
+    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+  }
   sql(paste0(
     "CASE\n",
     paste0(clauses, collapse = "\n"),
