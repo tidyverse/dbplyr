@@ -129,6 +129,7 @@
 <a href="#dbplyr-1-2-1-9001" class="anchor"></a>dbplyr 1.2.1.9001<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> handles unevaluated formulas (<a href='https://github.com/tidyverse/dbplyr/issues/184'>#184</a>).</p></li>
 <li><p>Calls of the form <code>dplyr::foo()</code> are now evaluated in the database, rather than locally (<a href='https://github.com/tidyverse/dbplyr/issues/197'>#197</a>).</p></li>
 <li><p>Adds custom <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> function for Oracle connections (<a href='https://github.com/tidyverse/dbplyr/issues/3306'>#3306</a>)</p></li>
 <li><p>Fixes translation of <code><a href="http://dplyr.tidyverse.org/reference/cumall.html">cummean()</a></code> from ‘mean’ to ‘avg’ (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</p></li>
