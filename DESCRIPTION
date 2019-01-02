@@ -2,19 +2,24 @@ Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
 Version: 1.2.1.9001
-Authors@R: c(
-    person("Hadley", "Wickham", , "hadley@rstudio.com", c("aut", "cre")),
-    person("Edgar", "Ruiz", role = "aut"),
-    person("RStudio", role = c("cph", "fnd"))
-    )
-Description: A 'dplyr' back end for databases that allows you to work with 
-    remote database tables as if they are in-memory data frames. Basic features
-    works with any database that has a 'DBI' back end; more advanced features 
-    require 'SQL' translation to be provided by the package author.
+Authors@R: 
+    c(person(given = "Hadley",
+             family = "Wickham",
+             role = c("aut", "cre"),
+             email = "hadley@rstudio.com"),
+      person(given = "Edgar",
+             family = "Ruiz",
+             role = "aut"),
+      person(given = "RStudio",
+             role = c("cph", "fnd")))
+Description: A 'dplyr' back end for databases that allows you to
+    work with remote database tables as if they are in-memory data frames.
+    Basic features works with any database that has a 'DBI' back end; more
+    advanced features require 'SQL' translation to be provided by the
+    package author.
 License: MIT + file LICENSE
 URL: https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
-Encoding: UTF-8
 Depends: 
     R (>= 3.1)
 Imports: 
@@ -35,16 +40,18 @@ Suggests:
     knitr,
     Lahman,
     nycflights13,
-    rmarkdown,
     RMariaDB (>= 1.0.2),
+    rmarkdown,
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
     RSQLite (>= 2.1.0),
     testthat (>= 2.0.0),
     withr (>= 2.1.2)
-VignetteBuilder: knitr
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
 LazyData: yes
-Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Collate: 
     'cache.r'
