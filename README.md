@@ -35,12 +35,21 @@ devtools::install_github("tidyverse/dbplyr")
 
 ## Usage
 
+dbplyr is designed to work with database tables as if they were local
+data frames. To demonstrate this I’ll first create an in-memory SQLite
+database and copy over a dataset:
+
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 copy_to(con, mtcars)
+```
 
+Now you can retrieve a table using `tbl()` (see `?tbl_dbi` for more
+details):
+
+``` r
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<mtcars> [?? x 11]
@@ -58,4 +67,31 @@ mtcars2
 #>  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
 #> 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
 #> # … with more rows
+```
+
+More complicated expressions are evaluated lazily:
+
+``` r
+# Lazily generates query
+summary <- mtcars2 %>% 
+  group_by(cyl) %>% 
+  summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
+  arrange(desc(mpg))
+
+# see query
+summary %>% show_query()
+#> <SQL>
+#> SELECT `cyl`, AVG(`mpg`) AS `mpg`
+#> FROM `mtcars`
+#> GROUP BY `cyl`
+#> ORDER BY `mpg` DESC
+
+# execute query and retrieve results
+summary %>% collect()
+#> # A tibble: 3 x 2
+#>     cyl   mpg
+#>   <dbl> <dbl>
+#> 1     4  26.7
+#> 2     6  19.7
+#> 3     8  15.1
 ```

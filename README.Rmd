@@ -40,12 +40,35 @@ devtools::install_github("tidyverse/dbplyr")
 
 ## Usage
 
-```{r}
+dbplyr is designed to work with database tables as if they were local data frames. To demonstrate this I'll first create an in-memory SQLite database and copy over a dataset:
+
+```{r setup}
 library(dplyr, warn.conflicts = FALSE)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 copy_to(con, mtcars)
+```
 
+Now you can retrieve a table using `tbl()` (see `?tbl_dbi` for more details). Printing it just retrieves the first few rows so you can see its contents:
+
+```{r}
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 ```
+
+All expressions are evaluated lazily; dplyr pipelines generate SQL, which is only sent to the database when you request the data.
+
+```{r}
+# lazily generates query
+summary <- mtcars2 %>% 
+  group_by(cyl) %>% 
+  summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
+  arrange(desc(mpg))
+
+# see query
+summary %>% show_query()
+
+# execute query and retrieve results
+summary %>% collect()
+```
+
