@@ -36,6 +36,8 @@ sql_translate_env.Oracle <- function(con) {
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
+                   
+      # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
