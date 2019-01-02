@@ -4,16 +4,16 @@ language: R
 sudo: false
 cache: packages
 
-r:
-# - 3.1 # fails with S4 weirdness
-- 3.2
-- oldrel
-- release
-- devel
-
 before_script:
 - psql -c 'create database test;' -U postgres
 
-after_success:
-  - Rscript -e 'covr::codecov()'
-
+matrix:
+  include:
+  - r: devel
+  - r: release
+    after_success:
+    - Rscript -e 'covr::codecov()'
+  - r: oldrel
+  - r: 3.3
+  - r: 3.2
+# - r: 3.1  # fails with S4 weirdness

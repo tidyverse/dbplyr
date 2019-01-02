@@ -27,7 +27,8 @@
 sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
   window = sql_translator())
 
-sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
+sql_translator(..., .funs = list(), .parent = new.env(parent =
+  emptyenv()))
 
 sql_infix(f)
 
