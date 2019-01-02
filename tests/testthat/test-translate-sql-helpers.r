@@ -20,16 +20,19 @@ test_that("missing window functions create a warning", {
 
 test_that("output of print method for sql_variant is correct", {
   sim_trans <- sql_translator(`+` = sql_infix("+"))
-
-  expect_equal(
-    "<sql_variant> scalar:    + aggregate: + window:    +",
-    paste0(
-      capture.output(
-        print.sql_variant(
-          sql_variant(sim_trans, sim_trans, sim_trans)
-        )
-      ),
-      collapse = " "
-    )
+  expect_known_output(
+    sql_variant(sim_trans, sim_trans, sim_trans),
+    test_path("test-sql-variant.txt"),
+    print = TRUE
   )
+})
+
+test_that("win_rank() is accepted by the sql_translator", {
+  expect_known_output(
+    print(sql_variant(
+      sql_translator(
+        test = win_rank("test")
+      )
+    )),
+    test_path("test-sql-translator.txt"))
 })
