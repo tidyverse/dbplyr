@@ -1,5 +1,7 @@
 # dbplyr 1.2.1.9001
 
+* Adds custom `db_drop_table()` function for Oracle connections (#3306)
+
 * Fixes translation of `cummean()` from 'mean' to 'avg' (#157)
 
 * Generalizes `win_cummulative()` so that it works with MS SQL back ends 
@@ -18,7 +20,7 @@ is provided . (@cderv, #112)
 
 * `case_when` now create a `ELSE` clause if a formula of the form `TRUE ~ <RHS>` 
   is provided . (@cderv, #112)
-
+  
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).

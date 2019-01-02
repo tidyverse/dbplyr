@@ -80,9 +80,28 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   }
 }
 
-# registered onLoad located in the zzz.R script
+#' @export
+db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
+  if (db_has_table(con, table) && force) {
+    # Solution provided by @EdwardJRoss here:
+    # github.com/tidyverse/dplyr/issues/3306#issuecomment-358485062
+    # comment has link to SO article here:
+    # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
+    sql <- build_sql(
+      "BEGIN ",
+      "EXECUTE IMMEDIATE 'DROP TABLE ", ident(table), "';",
+      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; ",
+      "END;",
+      con = con
+    )
+    DBI::dbExecute(con, sql)
+  }
+}
+
+  # registered onLoad located in the zzz.R script
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   add_op_set_op(x, y, "MINUS", copy = copy, ...)
+
 }
