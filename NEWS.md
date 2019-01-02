@@ -1,6 +1,6 @@
 # dbplyr 1.2.1.9000
 
-* the statement `x %in% y` is now translated to `FALSE`. (@mgirlich)
+* the statement `x %in% y` is now translated to `FALSE` (@mgirlich, #160).
 
 # dbplyr 1.2.1
 
