@@ -53,6 +53,8 @@ base_scalar <- sql_translator(
   `%in%` = function(x, table) {
     if (is.sql(table) || length(table) > 1) {
       build_sql(x, " IN ", table)
+    } else if (length(table) == 0) {
+      build_sql(FALSE)
     } else {
       build_sql(x, " IN (", table, ")")
     }
@@ -258,7 +260,6 @@ base_win <- sql_translator(
       order_by %||% win_current_order()
     )
   },
-
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_aggregate("avg"),
@@ -276,7 +277,7 @@ base_win <- sql_translator(
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
-  cummean = win_cumulative("mean"),
+  cummean = win_cumulative("avg"),
   cumsum  = win_cumulative("sum"),
   cummin  = win_cumulative("min"),
   cummax  = win_cumulative("max"),
@@ -357,6 +358,10 @@ sql_case_when <- function(...) {
   set_current_context(old)
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
+  if (query[[n]] == "TRUE") {
+    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+  }
   sql(paste0(
     "CASE\n",
     paste0(clauses, collapse = "\n"),

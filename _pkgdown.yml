@@ -1,6 +1,7 @@
+url: https://dbplyr.tidyverse.org
+
 template:
   package: tidytemplate
-  default_assets: false
 
 home:
   strip_header: true
