@@ -14,6 +14,7 @@ Description: A 'dplyr' back end for databases that allows you to work with
 License: MIT + file LICENSE
 URL: https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
+Encoding: UTF-8
 Depends: 
     R (>= 3.1)
 Imports: 
@@ -44,7 +45,7 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Collate: 
     'cache.r'
     'compat-purrr.R'

@@ -47,7 +47,7 @@ For best performance, the database should have an index on the variables
 that you are grouping by. Use \code{\link[=explain]{explain()}} to check that the database is using
 the indexes that you expect.
 
-There is one excpetion: \code{\link[=do]{do()}} is not lazy since it must pull the data
+There is one exception: \code{\link[=do]{do()}} is not lazy since it must pull the data
 into R.
 }
 \examples{
