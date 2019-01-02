@@ -1,5 +1,11 @@
 # dbplyr 1.2.1.9001
 
+* Fixes translation of `cummean()` from 'mean' to 'avg' (#157)
+
+* Generalizes `win_cummulative()` so that it works with MS SQL back ends 
+
+* Adds tests for `cummean()`, `cummax()` and `cummin()`
+
 * `copy_to()` will only remove existing table when `overwrite = TRUE` and the
   table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
   (#3197).
