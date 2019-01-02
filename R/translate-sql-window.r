@@ -140,11 +140,11 @@ win_recycled <- win_aggregate
 #' @export
 win_cumulative <- function(f) {
   force(f)
-  function(x) {
+  function(x, order = NULL) {
     win_over(
       build_sql(sql(f), list(x)),
       partition = win_current_group(),
-      order = win_current_order(),
+      order = order %||% win_current_order(),
       frame = c(-Inf, 0)
     )
   }

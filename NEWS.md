@@ -1,5 +1,16 @@
 # dbplyr 1.2.1.9001
 
+* Fixes translation of `cummean()` from 'mean' to 'avg' (#157)
+
+* Generalizes `win_cummulative()` so that it works with MS SQL back ends 
+
+* Adds tests for `cummean()`, `cummax()` and `cummin()`
+
+* New translation for `bit64::as.integer64()` (#3305)
+
+* `case_when` now translates with a ELSE clause if a formula of the form `TRUE~<RHS>`
+is provided . (@cderv, #112)
+
 * SQLite gains correct translation for `as.numeric()`/`as.double()` 
   (@chris-park, #171).
 
