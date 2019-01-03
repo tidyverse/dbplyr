@@ -29,6 +29,8 @@
 
 * MS SQL
     * Cumulative summary functions now work (#157)
+    * `ifelse()` uses `CASE WHEN` instead of `IIF`; this allows more complex 
+       operations, such as `%in%`, to work properly (#93)
 
 * Oracle
     * Custom `db_drop_table()` now only drops tables if they exist (#3306)
