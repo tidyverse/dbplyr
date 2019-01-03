@@ -1,14 +1,8 @@
 # dbplyr 1.2.2.9001
 
-* MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. 
-  This allows more complex operations, such as `%in%`, to work properly (#93)
-
-* `partial_eval()` handles unevaluated formulas (#184).
-
 * Now supports for dplyr 0.8.0 (#190) and R 3.1.0
 
 ## API changes
-
 
 * Calls of the form `dplyr::foo()` are now evaluated in the database, 
   rather than locally (#197).
@@ -35,6 +29,8 @@
 
 * MS SQL
     * Cumulative summary functions now work (#157)
+    * `ifelse()` uses `CASE WHEN` instead of `IIF`; this allows more complex 
+       operations, such as `%in%`, to work properly (#93)
 
 * Oracle
     * Custom `db_drop_table()` now only drops tables if they exist (#3306)
