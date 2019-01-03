@@ -41,23 +41,16 @@ sql_clause_limit <- function(limit, con){
 }
 
 sql_clause_sample <- function(sample, con){
-  if (!is.null(sample$size) && !identical(sample$size, Inf)) {
-    assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
-    if(sample$type == "n"){
-      build_sql(
-        "SAMPLE (", sql(format(trunc(sample$size), scientific = FALSE)), ")",
-        con = con
-      )
+  if (is.null(sample$size) || identical(sample$size, Inf)) {
+    return(NULL)
     } else {
-      build_sql(
-        "SAMPLE (", sql(format(sample$size, scientific = FALSE)), ")",
-        con = con
-      )
-    }
+      assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
 
+      size <- format(sample$size, scientific = FALSE)
+      if(sample$type == "n") size <- trunc(size)
+      sql_expr("SAMPLE (", size, ")", con = con)
   }
 }
-
 
 sql_clause_from  <- function(from, con) sql_clause_generic("FROM", from, con)
 

@@ -212,7 +212,7 @@ sample_n.tbl_lazy <- function(tbl,
                               size,
                               replace = FALSE,
                               weight = NULL,
-                              .env = parent.frame()) {
+                              .env = NULL) {
 
   add_op_single("sample_n", .data = tbl, args = list(
     size = size,
@@ -228,7 +228,7 @@ sample_frac.tbl_lazy <- function(tbl,
                                  size = 1,
                                  replace = FALSE,
                                  weight = NULL,
-                                 .env = parent.frame()) {
+                                 .env = NULL) {
 
   add_op_single("sample_frac", .data = tbl, args = list(
     size = size,

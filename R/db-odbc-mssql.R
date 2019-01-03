@@ -13,9 +13,7 @@
   assert_that(is.character(select), length(select) > 0L)
   out$select    <- build_sql(
     "SELECT ",
-
     if (distinct) sql("DISTINCT "),
-
     # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
     # TOP is expected after DISTINCT and not at the end of the query
     # e.g: SELECT TOP 100 * FROM my_table
@@ -25,31 +23,25 @@
 
     escape(select, collapse = ", ", con = con)
   )
-
   # MS SQL Uses 10 PERCENT or 10 ROWS as the arguments for TABLESAMPLE
   # https://technet.microsoft.com/en-us/library/ms189108.aspx
-  out$sample <-  if (!is.null(sample$size) && !identical(sample$size, Inf)) {
-      assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
-      if(sample$type == "n"){
-        build_sql(
-          "TABLESAMPLE (", sql(format(trunc(sample$size), scientific = FALSE)), " ROWS)",
-          con = con
-        )
+  size <- sample$size
+  out$sample <-  if (!is.null(size) && !identical(size, Inf)) {
+      assert_that(is.numeric(size), length(size) == 1L, size >= 0)
+      if(sample$type == "n") {
+        type <- "ROWS"
       } else {
-        build_sql(
-          "TABLESAMPLE (", sql(format(trunc(sample$size * 100), scientific = FALSE)), " PERCENT)",
-          con = con
-        )
+        size <- size * 100
+        type <- "PERCENT"
       }
+      size <- format(size, scientific = FALSE)
+      sql_expr(TABLESAMPLE ((!! build_sql(sql(size), " " ,sql(type)))), con = con)
     }
-
-
   out$from      <- sql_clause_from(from, con)
   out$where     <- sql_clause_where(where, con)
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
-
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }

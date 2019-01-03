@@ -51,14 +51,14 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
 # List clauses used by a query, in the order they are executed in
 select_query_clauses <- function(x) {
   present <- c(
-    where =    length(x$where) > 0,
+    where    = length(x$where) > 0,
     group_by = length(x$group_by) > 0,
-    having =   length(x$having) > 0,
-    select =   !identical(x$select, sql("*")),
+    having   = length(x$having) > 0,
+    select   = !identical(x$select, sql("*")),
     distinct = x$distinct,
     order_by = length(x$order_by) > 0,
     limit    = !is.null(x$limit),
-    sample_n = !is.null(x$sample_n)
+    sample   = !is.null(x$sample)
   )
 
   ordered(names(present)[present], levels = names(present))

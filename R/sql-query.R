@@ -53,7 +53,7 @@ print.select_query <- function(x, ...) {
   if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
   if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "")
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
-  if (length(x$sample_n))    cat("Limit:    ", x$sample_n, "\n", sep = "")
+  if (length(x$sample))   cat("Sample:   ", x$sample, "\n", sep = "")
 }
 
 
