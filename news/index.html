@@ -152,6 +152,8 @@
 <li>MS SQL
 <ul>
 <li>Cumulative summary functions now work (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</li>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/base/topics/ifelse">ifelse()</a></code> uses <code>CASE WHEN</code> instead of <code>IIF</code>; this allows more complex operations, such as <code>%in%</code>, to work properly (<a href='https://github.com/tidyverse/dbplyr/issues/93'>#93</a>)</li>
 </ul>
 </li>
 <li>Oracle
