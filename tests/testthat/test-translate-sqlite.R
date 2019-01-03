@@ -17,3 +17,20 @@ test_that("as.numeric()/as.double() get custom translation", {
   expect_type(out$x1, "double")
   expect_type(out$x2, "double")
 })
+
+
+mf <- lazy_frame(x = 1, src = simulate_sqlite())
+
+test_that("sample_n() return the correct query", {
+  expect_equal(
+    mf %>% sample_n(10) %>% sql_render(simulate_sqlite()),
+    sql("SELECT *\nFROM `df`\nWHERE _rowid_ IN (SELECT _rowid_ FROM (`df`) ORDER BY RANDOM() LIMIT 10.0)")
+  )
+})
+
+test_that("sample_frac() return the expected error message", {
+  expect_error(
+    mf %>% sample_frac(0.1) %>% sql_render(simulate_sqlite()),
+    "Only number of rows is supported."
+  )
+})

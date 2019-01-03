@@ -87,18 +87,3 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_3), df)
 })
 
-test_that("can sample from remote sources", {
-  con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  df <- copy_to(con1, data.frame(x = 1:10), "df1")
-  on.exit(DBI::dbDisconnect(con1))
-
-  expect_equal(
-    remote_query(sample_n(df, 4)),
-    sql("SELECT *\nFROM `df1`\nSAMPLE (4)")
-    )
-
-  expect_equal(
-    remote_query(sample_frac(df, 0.1)),
-    sql("SELECT *\nFROM `df1`\nSAMPLE (0.1)")
-  )
-})

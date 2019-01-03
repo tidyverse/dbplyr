@@ -17,8 +17,20 @@ sql_select.SQLiteConnection<- function(con, select, from, where = NULL,
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
   out$limit     <- sql_clause_limit(limit, con)
-  out$sample    <- sql_clause_sample_unsupported(sample, con)
 
+  if (length(sample)) {
+    if(sample$type == "n"){
+      out$where <- build_sql(
+        "WHERE _rowid_ IN (SELECT _rowid_ FROM (",
+        escape(from, collapse = ", ", con = con) ,
+        ") ORDER BY RANDOM() LIMIT ",
+        sample$size,
+        ")"
+      )
+    } else {
+      stop("Only number of rows is supported. Try using sample_n() instead")
+    }
+  }
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
