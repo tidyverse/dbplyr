@@ -1,4 +1,29 @@
 #' @export
+sql_select.SQLiteConnection<- function(con, select, from, where = NULL,
+                                       group_by = NULL, having = NULL,
+                                       order_by = NULL,
+                                       limit = NULL,
+                                       distinct = FALSE,
+                                       sample = NULL,
+                                       ...) {
+  out <- vector("list", 8)
+  names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
+                  "limit", "sample")
+
+  out$select    <- sql_clause_select(select, con, distinct)
+  out$from      <- sql_clause_from(from, con)
+  out$where     <- sql_clause_where(where, con)
+  out$group_by  <- sql_clause_group_by(group_by, con)
+  out$having    <- sql_clause_having(having, con)
+  out$order_by  <- sql_clause_order_by(order_by, con)
+  out$limit     <- sql_clause_limit(limit, con)
+  out$sample    <- sql_clause_sample_unsupported(sample, con)
+
+  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+}
+
+
+#' @export
 db_desc.SQLiteConnection <- function(x) {
   paste0("sqlite ", sqlite_version(), " [", x@dbname, "]")
 }

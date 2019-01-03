@@ -40,18 +40,6 @@ sql_clause_limit <- function(limit, con){
   }
 }
 
-sql_clause_sample <- function(sample, con){
-  if (is.null(sample$size) || identical(sample$size, Inf)) {
-    return(NULL)
-    } else {
-      assert_that(is.numeric(sample$size), length(sample$size) == 1L, sample$size >= 0)
-
-      size <- format(sample$size, scientific = FALSE)
-      if(sample$type == "n") size <- trunc(size)
-      sql_expr("SAMPLE (", size, ")", con = con)
-  }
-}
-
 sql_clause_from  <- function(from, con) sql_clause_generic("FROM", from, con)
 
 sql_clause_group_by <- function(group_by, con) sql_clause_generic("GROUP BY", group_by, con)
@@ -60,4 +48,7 @@ sql_clause_having <- function(having, con) sql_clause_generic("HAVING", having, 
 
 sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY", order_by, con)
 
-
+sql_clause_sample_unsupported <- function(sample, con) {
+  if(length(sample))
+    stop(paste0("Sampling is not available for '", class(con)[1], "' back ends"))
+  }

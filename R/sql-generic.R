@@ -31,7 +31,7 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
   out$limit     <- sql_clause_limit(limit, con)
-  out$sample    <- sql_clause_sample(sample, con)
+  out$sample    <- sql_clause_sample_unsupported(sample, con)
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
