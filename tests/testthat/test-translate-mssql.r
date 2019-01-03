@@ -148,3 +148,15 @@ test_that("filter and mutate translate is.na correctly", {
   )
 })
 
+test_that("Special ifelse and case_when cases return the correct queries", {
+  mf <- lazy_frame(x = 1, src = simulate_mssql())
+  expect_equal(
+    mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)) %>% show_query(),
+    sql("SELECT `x`, CASE WHEN ((`x` IN (1.0, 2.0))) THEN (0.0) WHEN (NOT(`x` IN (1.0, 2.0))) THEN (1.0) END AS `z`
+FROM `df`")
+  )
+  expect_equal(
+    mf %>% mutate(z = case_when(is.na(x) ~ 1, !is.na(x) ~ 2, TRUE ~ 3)) %>% show_query(),
+    sql("SELECT `x`, CASE\nWHEN (((`x`) IS NULL)) THEN (1.0)\nWHEN (NOT(((`x`) IS NULL))) THEN (2.0)\nELSE (3.0)\nEND AS `z`\nFROM `df`")
+  )
+})
