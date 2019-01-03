@@ -72,7 +72,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
         </div>
       </div>
     </div>
@@ -134,17 +134,11 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <h2 id="section-dplyr-verbs" class="hasAnchor"><a href="#section-dplyr-verbs" class="anchor"></a>dplyr verbs</h2>
           <p class="section-desc"></p>
         </th>
       </tr>
       <tr>
-        
-        <td>
-          <p><code><a href="build_sql.html">build_sql()</a></code> </p>
-        </td>
-        <td><p>Build a SQL string.</p></td>
-      </tr><tr>
         
         <td>
           <p><code><a href="copy_to.src_sql.html">copy_to(<i>&lt;src_sql&gt;</i>)</a></code> </p>
@@ -156,6 +150,58 @@
           <p><code><a href="do.tbl_sql.html">do(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
         </td>
         <td><p>Perform arbitrary computation on remote backend</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Join sql tbls.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="src_dbi.html">src_dbi()</a></code> <code><a href="src_dbi.html">tbl(<i>&lt;src_dbi&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>dplyr backend for any DBI-compatible database</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-database-connection" class="hasAnchor"><a href="#section-database-connection" class="anchor"></a>Database connection</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="in_schema.html">in_schema()</a></code> </p>
+        </td>
+        <td><p>Refer to a table in a schema</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="memdb_frame.html">memdb_frame()</a></code> <code><a href="memdb_frame.html">src_memdb()</a></code> </p>
+        </td>
+        <td><p>Create a database table in temporary in-memory database.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="remote_name.html">remote_name()</a></code> <code><a href="remote_name.html">remote_src()</a></code> <code><a href="remote_name.html">remote_con()</a></code> <code><a href="remote_name.html">remote_query()</a></code> <code><a href="remote_name.html">remote_query_plan()</a></code> </p>
+        </td>
+        <td><p>Metadata about a remote table</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-sql-generation" class="hasAnchor"><a href="#section-sql-generation" class="anchor"></a>SQL generation</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="build_sql.html">build_sql()</a></code> </p>
+        </td>
+        <td><p>Build a SQL string.</p></td>
       </tr><tr>
         
         <td>
@@ -171,27 +217,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="in_schema.html">in_schema()</a></code> </p>
+          <p><code><a href="partial_eval.html">partial_eval()</a></code> </p>
         </td>
-        <td><p>Refer to a table in a schema</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Join sql tbls.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="memdb_frame.html">memdb_frame()</a></code> <code><a href="memdb_frame.html">src_memdb()</a></code> </p>
-        </td>
-        <td><p>Create a database table in temporary in-memory database.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="remote_name.html">remote_name()</a></code> <code><a href="remote_name.html">remote_src()</a></code> <code><a href="remote_name.html">remote_con()</a></code> <code><a href="remote_name.html">remote_query()</a></code> <code><a href="remote_name.html">remote_query_plan()</a></code> </p>
-        </td>
-        <td><p>Metadata about a remote table</p></td>
+        <td><p>Partially evaluate an expression.</p></td>
       </tr><tr>
         
         <td>
@@ -204,12 +232,6 @@
           <p><code><a href="sql_expr.html">sql_expr()</a></code> </p>
         </td>
         <td><p>Generate SQL from R expressions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="src_dbi.html">src_dbi()</a></code> <code><a href="src_dbi.html">tbl(<i>&lt;src_dbi&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>dplyr backend for any DBI-compatible database</p></td>
       </tr><tr>
         
         <td>
@@ -230,7 +252,9 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-dplyr-verbs">dplyr verbs</a></li>
+      <li><a href="#section-database-connection">Database connection</a></li>
+      <li><a href="#section-sql-generation">SQL generation</a></li>
     </ul>
   </div>
 </div>

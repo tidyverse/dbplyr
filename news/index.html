@@ -72,7 +72,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
         </div>
       </div>
     </div>
@@ -124,33 +124,73 @@
       <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="dbplyr-1-2-1-9001" class="section level1">
+    <div id="dbplyr-1-2-2-9001" class="section level1">
 <h1 class="page-header">
-<a href="#dbplyr-1-2-1-9001" class="anchor"></a>dbplyr 1.2.1.9001<small> Unreleased </small>
+<a href="#dbplyr-1-2-2-9001" class="anchor"></a>dbplyr 1.2.2.9001<small> Unreleased </small>
 </h1>
 <ul>
-<li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> handles unevaluated formulas (<a href='https://github.com/tidyverse/dbplyr/issues/184'>#184</a>).</p></li>
+<li>Now supports for dplyr 0.8.0 (<a href='https://github.com/tidyverse/dbplyr/issues/190'>#190</a>) and R 3.1.0</li>
+</ul>
+<div id="api-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#api-changes" class="anchor"></a>API changes</h2>
+<ul>
 <li><p>Calls of the form <code>dplyr::foo()</code> are now evaluated in the database, rather than locally (<a href='https://github.com/tidyverse/dbplyr/issues/197'>#197</a>).</p></li>
-<li><p>Adds custom <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> function for Oracle connections (<a href='https://github.com/tidyverse/dbplyr/issues/3306'>#3306</a>)</p></li>
-<li><p>Fixes translation of <code><a href="http://dplyr.tidyverse.org/reference/cumall.html">cummean()</a></code> from ‘mean’ to ‘avg’ (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</p></li>
-<li><p>Generalizes <code>win_cummulative()</code> so that it works with MS SQL back ends</p></li>
-<li><p>Adds tests for <code><a href="http://dplyr.tidyverse.org/reference/cumall.html">cummean()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/cumsum">cummax()</a></code> and <code><a href="https://www.rdocumentation.org/packages/base/topics/cumsum">cummin()</a></code></p></li>
-<li><p>New translation for <code><a href="https://www.rdocumentation.org/packages/bit64/topics/as.integer64.character">bit64::as.integer64()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/3305'>#3305</a>)</p></li>
-<li><p><code>case_when</code> now translates with a ELSE clause if a formula of the form <code>TRUE~&lt;RHS&gt;</code> is provided . (<a href='https://github.com/cderv'>@cderv</a>, <a href='https://github.com/tidyverse/dbplyr/issues/112'>#112</a>)</p></li>
-<li><p>SQLite gains correct translation for <code><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric()</a></code>/<code><a href="https://www.rdocumentation.org/packages/base/topics/double">as.double()</a></code> (<a href='https://github.com/chris-park'>@chris-park</a>, <a href='https://github.com/tidyverse/dbplyr/issues/171'>#171</a>).</p></li>
-<li><p>New translation for <code><a href="https://www.rdocumentation.org/packages/bit64/topics/as.integer64.character">bit64::as.integer64()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/3305'>#3305</a>)</p></li>
-<li><p><code>case_when</code> now create a <code>ELSE</code> clause if a formula of the form <code>TRUE ~ &lt;RHS&gt;</code> is provided . (<a href='https://github.com/cderv'>@cderv</a>, <a href='https://github.com/tidyverse/dbplyr/issues/112'>#112</a>)</p></li>
-<li><p><code><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> will only remove existing table when <code>overwrite = TRUE</code> and the table already exists, eliminating a confusion “NOTICE” from PostgreSQL (<a href='https://github.com/tidyverse/dbplyr/issues/3197'>#3197</a>).</p></li>
 <li><p><code>vars</code> argument to <code><a href="../reference/tbl_sql.html">tbl_sql()</a></code> has been formally deprecated; it hasn’t actually done anything for a while (<a href='https://github.com/tidyverse/dbplyr/issues/3254'>#3254</a>).</p></li>
-<li><p>Adds custom <code><a href="http://dplyr.tidyverse.org/reference/setops.html">setdiff()</a></code> for Oracle connections (<a href='https://github.com/tidyverse/dbplyr/issues/3493'>#3493</a>)</p></li>
-<li><p><code>pull.tbl_sql()</code> now extracts correctly from grouped tables (<a href='https://github.com/tidyverse/dbplyr/issues/3562'>#3562</a>).</p></li>
-<li><p>Custom <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> for Oracle connections (<a href='https://github.com/tidyverse/dbplyr/issues/3471'>#3471</a>)</p></li>
 <li><p><code>src</code> and <code>tbl</code> objects now include a class generated from the class of the underlying connection object. This makes it possible for dplyr backends to implement different behaviour at the dplyr level, when needed. (<a href='https://github.com/tidyverse/dbplyr/issues/2293'>#2293</a>)</p></li>
-<li><p>Works on R 3.1</p></li>
-<li><p>Fixes default parameter order for the <code>str_detect()</code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3397'>#3397</a>)</p></li>
-<li><p><code>sql_render.op()</code> now correctly forwards the <code>con</code> argument (<a href='https://github.com/kevinykuo'>@kevinykuo</a>, <a href='https://github.com/tidyverse/dbplyr/issues/73'>#73</a>).</p></li>
-<li><p>Redshift <code><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr()</a></code> compatibility issue resolved (<a href='https://github.com/tidyverse/dbplyr/issues/3339'>#3339</a>)</p></li>
+</ul>
+</div>
+<div id="sql-translation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#sql-translation" class="anchor"></a>SQL translation</h2>
+<ul>
 <li><p><code>x %in% y</code> is now translated to <code>FALSE</code> if <code>y</code> is empty (<a href='https://github.com/mgirlich'>@mgirlich</a>, <a href='https://github.com/tidyverse/dbplyr/issues/160'>#160</a>).</p></li>
+<li><p>New <code>as.integer64(x)</code> translation to <code>CAST(x AS BIGINT)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/3305'>#3305</a>)</p></li>
+<li><p><code>case_when</code> now translates with a ELSE clause if a formula of the form <code>TRUE~&lt;RHS&gt;</code> is provided . (<a href='https://github.com/cderv'>@cderv</a>, <a href='https://github.com/tidyverse/dbplyr/issues/112'>#112</a>)</p></li>
+<li><p><code><a href="http://dplyr.tidyverse.org/reference/cumall.html">cummean()</a></code> now generates <code>AVG()</code> not <code>MEAN()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</p></li>
+<li><p><code>str_detect()</code> now uses correct parameter order (<a href='https://github.com/tidyverse/dbplyr/issues/3397'>#3397</a>)</p></li>
+<li>MS SQL
+<ul>
+<li>Cumulative summary functions now work (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</li>
+</ul>
+</li>
+<li>Oracle
+<ul>
+<li>Custom <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> now only drops tables if they exist (<a href='https://github.com/tidyverse/dbplyr/issues/3306'>#3306</a>)</li>
+<li>Custom <code><a href="http://dplyr.tidyverse.org/reference/setops.html">setdiff()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3493'>#3493</a>)</li>
+<li>Custom <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3471'>#3471</a>)</li>
+</ul>
+</li>
+<li>SQLite
+<ul>
+<li>Correct translation for <code><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric()</a></code>/<code><a href="https://www.rdocumentation.org/packages/base/topics/double">as.double()</a></code> (<a href='https://github.com/chris-park'>@chris-park</a>, <a href='https://github.com/tidyverse/dbplyr/issues/171'>#171</a>).</li>
+</ul>
+</li>
+<li>Redshift
+<ul>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr()</a></code> translation improved (<a href='https://github.com/tidyverse/dbplyr/issues/3339'>#3339</a>)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="minor-improvements-and-bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<ul>
+<li><p><code><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> will only remove existing table when <code>overwrite = TRUE</code> and the table already exists, eliminating a confusing “NOTICE” from PostgreSQL (<a href='https://github.com/tidyverse/dbplyr/issues/3197'>#3197</a>).</p></li>
+<li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> handles unevaluated formulas (<a href='https://github.com/tidyverse/dbplyr/issues/184'>#184</a>).</p></li>
+<li><p><code>pull.tbl_sql()</code> now extracts correctly from grouped tables (<a href='https://github.com/tidyverse/dbplyr/issues/3562'>#3562</a>).</p></li>
+<li><p><code>sql_render.op()</code> now correctly forwards the <code>con</code> argument (<a href='https://github.com/kevinykuo'>@kevinykuo</a>, <a href='https://github.com/tidyverse/dbplyr/issues/73'>#73</a>).</p></li>
+</ul>
+</div>
+</div>
+    <div id="dbplyr-1-2-2" class="section level1">
+<h1 class="page-header">
+<a href="#dbplyr-1-2-2" class="anchor"></a>dbplyr 1.2.2<small> 2018-07-25 </small>
+</h1>
+<ul>
+<li>R CMD check fixes</li>
 </ul>
 </div>
     <div id="dbplyr-1-2-1" class="section level1">
@@ -200,9 +240,9 @@
 <li><p><code>db_write_table</code> now needs to return the table name</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes" class="section level2">
+<div id="minor-improvements-and-bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p>Multiple <code><a href="https://www.rdocumentation.org/packages/utils/topics/head">head()</a></code> calls in a row now collapse to a single call. This avoids a printing problem with MS SQL (<a href='https://github.com/tidyverse/dbplyr/issues/3084'>#3084</a>).</p></li>
 <li><p><code><a href="../reference/escape.html">escape()</a></code> now works with integer64 values from the bit64 package (<a href='https://github.com/tidyverse/dbplyr/issues/3230'>#3230</a>)</p></li>
@@ -253,9 +293,9 @@
 <li><p>Added SQL translations for Oracle (<a href='https://github.com/edgararuiz'>@edgararuiz</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-1" class="section level2">
+<div id="minor-improvements-and-bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-2" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p><code>x %in% c(1)</code> now generates the same SQL as <code>x %in% 1</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2898'>#2898</a>).</p></li>
 <li><p><code><a href="https://www.rdocumentation.org/packages/utils/topics/head">head(tbl, 0)</a></code> is now supported (<a href='https://github.com/tidyverse/dbplyr/issues/2863'>#2863</a>).</p></li>
@@ -417,7 +457,8 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#dbplyr-1-2-1-9001">1.2.1.9001</a></li>
+        <li><a href="#dbplyr-1-2-2-9001">1.2.2.9001</a></li>
+        <li><a href="#dbplyr-1-2-2">1.2.2</a></li>
         <li><a href="#dbplyr-1-2-1">1.2.1</a></li>
         <li><a href="#dbplyr-1-2-0">1.2.0</a></li>
         <li><a href="#dbplyr-1-1-0">1.1.0</a></li>
