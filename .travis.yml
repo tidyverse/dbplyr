@@ -11,6 +11,7 @@ matrix:
   include:
   - r: devel
   - r: release
+    env: dplyr='CRAN'
     after_success:
       - Rscript -e 'covr::codecov()'
     before_cache:
@@ -20,6 +21,9 @@ matrix:
       provider: script
       script: Rscript -e 'pkgdown::deploy_site_github()'
       skip_cleanup: true
+  - r: release
+    env: dplyr='github'
+    r_github_packages: tidyverse/dplyr
   - r: oldrel
   - r: 3.3
   - r: 3.2

@@ -55,7 +55,7 @@ render_lazy <- function(x, ...) {
 # Single table methods ----------------------------------------------------
 
 # registered onLoad
-filter.tbl_lazy <- function(.data, ...) {
+filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   dots <- quos(...)
   dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("filter", .data, dots = dots)

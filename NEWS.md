@@ -1,60 +1,67 @@
-# dbplyr 1.2.1.9001
+# dbplyr 1.2.2.9001
 
 * MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. 
   This allows more complex operations, such as `%in%`, to work properly (#93)
 
 * `partial_eval()` handles unevaluated formulas (#184).
 
+* Now supports for dplyr 0.8.0 (#190) and R 3.1.0
+
+## API changes
+
+
 * Calls of the form `dplyr::foo()` are now evaluated in the database, 
   rather than locally (#197).
 
-* Adds custom `db_drop_table()` function for Oracle connections (#3306)
-
-* Fixes translation of `cummean()` from 'mean' to 'avg' (#157)
-
-* Generalizes `win_cummulative()` so that it works with MS SQL back ends 
-
-* Adds tests for `cummean()`, `cummax()` and `cummin()`
-
-* New translation for `bit64::as.integer64()` (#3305)
-
-* `case_when` now translates with a ELSE clause if a formula of the form `TRUE~<RHS>`
-is provided . (@cderv, #112)
-
-* SQLite gains correct translation for `as.numeric()`/`as.double()` 
-  (@chris-park, #171).
-
-* New translation for `bit64::as.integer64()` (#3305)
-
-* `case_when` now create a `ELSE` clause if a formula of the form `TRUE ~ <RHS>` 
-  is provided . (@cderv, #112)
-  
-* `copy_to()` will only remove existing table when `overwrite = TRUE` and the
-  table already exists, eliminating a confusion "NOTICE" from PostgreSQL 
-  (#3197).
-
 * `vars` argument to `tbl_sql()` has been formally deprecated; it hasn't 
   actually done anything for a while (#3254).
-
-* Adds custom `setdiff()` for Oracle connections (#3493)
-
-* `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
-
-* Custom `db_explain()` for Oracle connections (#3471)
 
 * `src` and `tbl` objects now include a class generated from the class of 
   the underlying connection object. This makes it possible for dplyr backends 
   to implement different behaviour at the dplyr level, when needed. (#2293)
 
-* Works on R 3.1
+## SQL translation
 
-* Fixes default parameter order for the `str_detect()` translation (#3397)
+* `x %in% y` is now translated to `FALSE` if `y` is empty (@mgirlich, #160).
+
+* New `as.integer64(x)` translation to `CAST(x AS BIGINT)` (#3305)
+
+* `case_when` now translates with a ELSE clause if a formula of the form 
+  `TRUE~<RHS>` is provided . (@cderv, #112)
+
+* `cummean()` now generates `AVG()` not `MEAN()` (#157)
+
+* `str_detect()` now uses correct parameter order (#3397)
+
+* MS SQL
+    * Cumulative summary functions now work (#157)
+
+* Oracle
+    * Custom `db_drop_table()` now only drops tables if they exist (#3306)
+    * Custom `setdiff()` translation  (#3493)
+    * Custom `db_explain()` translation (#3471)
+
+* SQLite
+  * Correct translation for `as.numeric()`/`as.double()` (@chris-park, #171).
+
+* Redshift 
+  * `substr()` translation improved (#3339)
+
+## Minor improvements and bug fixes
+
+* `copy_to()` will only remove existing table when `overwrite = TRUE` and the
+  table already exists, eliminating a confusing "NOTICE" from PostgreSQL 
+  (#3197).
+
+* `partial_eval()` handles unevaluated formulas (#184).
+
+* `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
 
 * `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
 
-* Redshift `substr()` compatibility issue resolved (#3339)
+# dbplyr 1.2.2
 
-* `x %in% y` is now translated to `FALSE` if `y` is empty (@mgirlich, #160).
+* R CMD check fixes
 
 # dbplyr 1.2.1
 

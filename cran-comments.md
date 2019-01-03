@@ -1,7 +1,3 @@
-## Release summary
-
-This is a minor release designed to add forward compability with the next version of rlang.
-
 ## Test environments
 
 * local: darwin15.6.0-3.5.1
@@ -11,7 +7,10 @@ This is a minor release designed to add forward compability with the next versio
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 notes
+
+* Missing or unexported object: 'dplyr::group_rows'
+  This is only used for dplyr > 0.7.9, where it exists.
 
 ## revdepcheck results
 

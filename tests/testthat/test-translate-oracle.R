@@ -19,15 +19,4 @@ test_that("queries translate correctly", {
     mf %>% head() %>% sql_render(simulate_oracle()),
     sql("^SELECT [*] FROM [(]SELECT [*]\nFROM [(]`df`[)] [)] `[^`]*` WHERE ROWNUM [<][=] 6")
   )
-
-  expect_match(
-    mf %>%
-      group_by(x) %>%
-      tally %>%
-      ungroup() %>%
-      tally() %>%
-      sql_render(simulate_oracle()),
-    sql("^SELECT COUNT[(][*][)] AS `nn`\nFROM [(]SELECT `x`, COUNT[(][*][)] AS `n`\nFROM [(]`df`[)] \nGROUP BY `x`[)] `[^`]*`$")
-  )
-
 })
