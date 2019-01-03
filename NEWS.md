@@ -4,15 +4,15 @@
 
 ## API changes
 
+* Calls of the form `dplyr::foo()` are now evaluated in the database, 
+  rather than locally (#197).
+
 * `vars` argument to `tbl_sql()` has been formally deprecated; it hasn't 
   actually done anything for a while (#3254).
 
 * `src` and `tbl` objects now include a class generated from the class of 
   the underlying connection object. This makes it possible for dplyr backends 
   to implement different behaviour at the dplyr level, when needed. (#2293)
-
-* Calls of the form `dplyr::foo()` are now evaluated in the database, 
-  rather than locally (#197).
 
 ## SQL translation
 
