@@ -1,4 +1,4 @@
-# dbplyr 1.2.1.9001
+# dbplyr 1.2.2.9001
 
 * Now supports for dplyr 0.8.0 (#190) and R 3.1.0
 
@@ -52,6 +52,10 @@
 * `pull.tbl_sql()` now extracts correctly from grouped tables (#3562).
 
 * `sql_render.op()` now correctly forwards the `con` argument (@kevinykuo, #73).
+
+# dbplyr 1.2.2
+
+* R CMD check fixes
 
 # dbplyr 1.2.1
 
