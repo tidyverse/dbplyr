@@ -215,16 +215,7 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL) {
   set_current_context(list(clause = ""))
   cond <- build_sql(cond)
 
-  build_sql(
-     "CASE",
-     " WHEN ((", cond, "))", " THEN (", if_true, ")",
-     if (!is.null(if_false)){
-       build_sql(" WHEN (NOT(", cond, "))", " THEN (", if_false, ")")
-     } else {
-       build_sql(" ELSE ('')")
-     },
-     " END"
-     )
+  sql_if(cond, if_true, if_false)
 }
 
 globalVariables(c("BIT", "%is%", "convert", "iif"))
