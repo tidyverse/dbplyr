@@ -61,9 +61,9 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
     formula = {
       # This approach may be ill-founded: might be better to have a separate
       # function for partially evaluating a list of quos/lazy_dots
-      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call))
+      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call) %||% env)
       if (length(call) == 3) {
-        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call))
+        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call) %||% env)
       }
       call
     },
