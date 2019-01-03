@@ -51,16 +51,16 @@ test_that("pasting translated correctly", {
 
 mf <- lazy_frame(x = 1, src = simulate_odbc_postgresql())
 
-test_that("sample_frac() return the correct query", {
+test_that("sample_frac() returns the correct query", {
   expect_equal(
     mf %>% sample_frac(0.1) %>% show_query(),
     sql("SELECT *\nFROM `df`\nTABLESAMPLE SYSTEM (10)")
   )
 })
 
-test_that("sample_n() return the expected error message", {
+test_that("sample_n() returns the expected error message", {
   expect_error(
-    mf %>% sample_n(10) %>% sql_render(simulate_odbc_postgresql()),
+    mf %>% sample_n(10) %>% show_query(),
     "Only sample fractions are supported"
   )
 })

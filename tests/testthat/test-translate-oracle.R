@@ -31,3 +31,19 @@ test_that("queries translate correctly", {
   )
 
 })
+
+mf <- lazy_frame(x = 1, src = simulate_oracle())
+
+test_that("sample_frac() returns the correct query", {
+  expect_equal(
+    mf %>% sample_frac(0.1) %>% show_query(),
+    sql("SELECT *\nFROM (`df`) \nSAMPLE (10)")
+  )
+})
+
+test_that("sample_n() returns the expected error message", {
+  expect_error(
+    mf %>% sample_n(10) %>% show_query(),
+    "Only sample fractions are supported"
+  )
+})

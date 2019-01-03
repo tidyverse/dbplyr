@@ -4,10 +4,11 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
                              order_by = NULL,
                              limit = NULL,
                              distinct = FALSE,
+                             sample = NULL,
                              ...) {
-  out <- vector("list", 7)
+  out <- vector("list", 8)
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
-                  "limit")
+                  "limit", "sample")
 
   out$select    <- sql_clause_select(select, con, distinct)
   out$from      <- sql_clause_from(from, con)
@@ -15,6 +16,18 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
+
+  size <- sample$size
+  out$sample <-  if (!is.null(size) && !identical(size, Inf)) {
+    assert_that(is.numeric(size), length(size) == 1L, size >= 0)
+    if(sample$type == "n") {
+      stop("Only sample fractions are supported. Try using sample_frac() instead")
+    } else {
+      size <- size * 100
+      size <- format(size, scientific = FALSE)
+      build_sql("SAMPLE (", sql(size) ,")")
+    }
+  }
 
   # Processing limit via ROWNUM in a WHERE clause, thie method
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
@@ -36,7 +49,7 @@ sql_translate_env.Oracle <- function(con) {
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
-                   
+
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # bit64::as.integer64 can translate to BIGINT for some
