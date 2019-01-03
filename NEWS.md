@@ -3,6 +3,8 @@
 * MS SQL - Logical conditions will use CASE WHEN instead of IIF going forward. 
   This allows more complex operations, such as `%in%`, to work properly (#93)
 
+* `partial_eval()` handles unevaluated formulas (#184).
+
 * Calls of the form `dplyr::foo()` are now evaluated in the database, 
   rather than locally (#197).
 
