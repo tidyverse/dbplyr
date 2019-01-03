@@ -13,10 +13,10 @@ matrix:
   - r: release
     env: dplyr='CRAN'
     after_success:
-    - Rscript -e 'covr::codecov()'
+      - Rscript -e 'covr::codecov()'
     before_cache:
-    - Rscript -e 'remotes::install_cran("pkgdown")'
-    - Rscript -e 'remotes::install_github("tidyverse/tidytemplate")'
+      - Rscript -e 'remotes::install_cran("pkgdown")'
+      - Rscript -e 'remotes::install_github("tidyverse/tidytemplate")'
     deploy:
       provider: script
       script: Rscript -e 'pkgdown::deploy_site_github()'
@@ -24,7 +24,7 @@ matrix:
   - r: release
     env: dplyr='github'
     before_script:
-    - Rscript -e 'remotes::install_github("tidyverse/dplyr")'
+      - Rscript -e 'remotes::install_github("tidyverse/dplyr")'
   - r: oldrel
   - r: 3.3
   - r: 3.2
