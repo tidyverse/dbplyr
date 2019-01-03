@@ -26,26 +26,3 @@ test_that("group_size correct for grouped data", {
   }
 })
 
-
-# For following tests, add an extra level that's not present in data
-df$x = factor(df$x, levels = 1:4)
-tbls <- test_load(df, ignore = "MariaDB")
-
-test_that("n_groups drops zero-length groups", {
-  for (tbl in tbls) {
-    grp <- group_by(tbl, x)
-    expect_equal(n_groups(grp), 3, info = class(tbl)[1])
-  }
-})
-
-test_that("summarise drops zero-length groups", {
-  for (tbl in tbls) {
-    res <- tbl %>%
-      group_by(x) %>%
-      summarise(n = n(), mn = mean(y, na.rm = TRUE)) %>%
-      collect
-    expect_equal(nrow(res), 3, info = class(tbl)[1])
-    expect_equal(tail(res$n, n = 1), 10, info = class(tbl)[1])
-    expect_false(is.nan(tail(res$mn, n = 1)), info = class(tbl)[1])
-  }
-})
