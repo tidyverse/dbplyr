@@ -48,3 +48,20 @@ test_that("pasting translated correctly", {
 
   expect_error(trans(paste0(x, collapse = "")), "`collapse` not supported")
 })
+
+mf <- lazy_frame(x = 1, src = simulate_odbc_postgresql())
+
+test_that("sample_frac() return the correct query", {
+  expect_equal(
+    mf %>% sample_frac(0.1) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nTABLESAMPLE SYSTEM (10)")
+  )
+})
+
+test_that("sample_n() return the expected error message", {
+  expect_error(
+    mf %>% sample_n(10) %>% sql_render(simulate_odbc_postgresql()),
+    "Only sample fractions are supported"
+  )
+})
+

@@ -150,6 +150,15 @@ test_that("str_trim() translates correctly ", {
       sql("LTRIM(RTRIM(\"field_name\"))"))
 })
 
+test_that("Sampling functions return the expected error message", {
+  mf <- lazy_frame(x = 1, src = simulate_dbi())
 
-
-
+  expect_error(
+    mf %>% sample_n(10) %>% show_query(),
+    "Sampling is not available "
+  )
+  expect_error(
+    mf %>% sample_frac(0.1) %>% show_query(),
+    "Sampling is not available "
+  )
+})
