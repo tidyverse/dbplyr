@@ -9,7 +9,7 @@
 \alias{semi_join_query}
 \alias{set_op_query}
 \alias{sql_render}
-\alias{sql_clause_sample.default}
+\alias{sql_clause_sample}
 \title{Build and render SQL from a sequence of lazy operations}
 \usage{
 sql_build(op, con = NULL, ...)
@@ -30,7 +30,7 @@ set_op_query(x, y, type = type)
 
 sql_render(query, con = NULL, ...)
 
-\method{sql_clause_sample}{default}(sample, con)
+sql_clause_sample(sample, con)
 }
 \arguments{
 \item{op}{A sequence of lazy operations}
