@@ -1,4 +1,14 @@
 #' @export
+sql_clause_sample.Hive<- function(sample, con) {
+  # https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Sampling
+  sample_clause_default(
+    sample,
+    "TABLESAMPLE({size} ROWS)",
+    "TABLESAMPLE({size} PERCENT)"
+  )
+}
+
+#' @export
 sql_translate_env.Hive <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
