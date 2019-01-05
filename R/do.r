@@ -58,13 +58,21 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 
     # Create an id for each group
     grouped <- chunk %>% group_by(!!! syms(names(chunk)[gvars]))
-    index <- attr(grouped, "indices") # zero indexed
+
+    if (utils::packageVersion("dplyr") < "0.7.9") {
+      index <- attr(grouped, "indices")
+      # convert from 0-index
+      index <- lapply(index, `+`, 1L)
+    } else {
+      index <- dplyr::group_rows(grouped)
+    }
+
     n <- length(index)
 
-    last_group <<- chunk[index[[length(index)]] + 1L, , drop = FALSE]
+    last_group <<- chunk[index[[length(index)]], , drop = FALSE]
 
     for (j in seq_len(n - 1)) {
-      cur_chunk <- chunk[index[[j]] + 1L, , drop = FALSE]
+      cur_chunk <- chunk[index[[j]], , drop = FALSE]
       # Update pronouns within the overscope
       env$. <- env$.data <- cur_chunk
       for (k in seq_len(m)) {
