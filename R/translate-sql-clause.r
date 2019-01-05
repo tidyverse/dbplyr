@@ -48,12 +48,14 @@ sql_clause_having <- function(having, con) sql_clause_generic("HAVING", having, 
 
 sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY", order_by, con)
 
+
 #' @export
 sql_clause_sample <- function(sample, con) {
   UseMethod("sql_clause_sample", con)
 }
 
 #' @export
+#' @rdname sql_build
 sql_clause_sample.default <- function(sample, con) {
   if(length(sample))
     stop(paste0("Sampling is not available for '", class(con)[1], "' back ends"))
