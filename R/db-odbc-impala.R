@@ -1,4 +1,13 @@
 #' @export
+sql_clause_sample.Impala <- function(sample, con) {
+  sample_clause_default(
+    sample,
+    NULL,
+    "TABLESAMPLE SYSTEM ({size})"
+  )
+}
+
+#' @export
 sql_translate_env.Impala <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
