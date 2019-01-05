@@ -6,6 +6,31 @@ template:
 home:
   strip_header: true
 
+reference:
+- title: dplyr verbs
+  contents:
+  - copy_to.src_sql
+  - do.tbl_sql
+  - inner_join.tbl_lazy
+  - src_dbi
+
+- title: Database connection
+  contents:
+  - in_schema
+  - memdb_frame
+  - remote_name
+
+- title: SQL generation
+  contents:
+  - build_sql
+  - escape
+  - ident
+  - partial_eval
+  - sql
+  - sql_expr
+  - translate_sql
+  - window_order
+
 navbar:
   title: ~
   type: default
