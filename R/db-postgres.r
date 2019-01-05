@@ -1,42 +1,17 @@
 #' @export
-sql_select.PostgreSQLConnection <- function(con, select, from, where = NULL,
-                                       group_by = NULL, having = NULL,
-                                       order_by = NULL,
-                                       limit = NULL,
-                                       distinct = FALSE,
-                                       sample = NULL,
-                                       ...) {
-  out <- vector("list", 8)
-  names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
-                  "limit", "sample")
-
-  out$select    <- sql_clause_select(select, con, distinct)
-  out$from      <- sql_clause_from(from, con)
-  out$where     <- sql_clause_where(where, con)
-  out$group_by  <- sql_clause_group_by(group_by, con)
-  out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
-  out$limit     <- sql_clause_limit(limit, con)
-  size <- sample$size
-  out$sample <-  if (!is.null(size) && !identical(size, Inf)) {
-    assert_that(is.numeric(size), length(size) == 1L, size >= 0)
-    if(sample$type == "n") {
-      stop("Only sample fractions are supported. Try using sample_frac() instead")
-    } else {
-      size <- size * 100
-      size <- format(size, scientific = FALSE)
-      build_sql("TABLESAMPLE SYSTEM (", sql(size) ,")")
-    }
-  }
-  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+sql_clause_sample.PostgreSQLConnection <- function(sample, con) {
+  sample_clause_default(
+    sample,
+    NULL,
+    "TABLESAMPLE SYSTEM ({size})"
+  )
 }
 
 #' @export
-sql_select.PostgreSQL <- sql_select.PostgreSQLConnection
+sql_clause_sample.PostgreSQL <- sql_clause_sample.PostgreSQLConnection
 
 #' @export
-sql_select.PqConnection <- sql_select.PostgreSQLConnection
-
+sql_clause_sample.PqConnection <- sql_clause_sample.PostgreSQLConnection
 
 #' @export
 db_desc.PostgreSQLConnection <- function(x) {

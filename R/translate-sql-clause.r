@@ -48,7 +48,38 @@ sql_clause_having <- function(having, con) sql_clause_generic("HAVING", having, 
 
 sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY", order_by, con)
 
-sql_clause_sample_unsupported <- function(sample, con) {
+#' @export
+sql_clause_sample <- function(sample, con) {
+  UseMethod("sql_clause_sample", con)
+}
+
+#' @export
+sql_clause_sample.default <- function(sample, con) {
   if(length(sample))
     stop(paste0("Sampling is not available for '", class(con)[1], "' back ends"))
+}
+
+sample_clause_default <- function(sample, n_f = NULL, frac_f = NULL){
+  size <- sample$size
+  if (!is.null(size) && !identical(size, Inf)) {
+    assert_that(is.numeric(size), length(size) == 1L, size >= 0)
+    if(sample$type == "n") {
+      if(is.null(n_f)){
+        stop("Explicit row size sample is not supported by this back end database")
+      } else {
+        fs <- 1
+        use_f <- n_f
+      }
+    }
+    if(sample$type == "frac") {
+      if(is.null(frac_f)){
+        stop("Explicit fraction size sample is not supported by this back end database")
+      } else {
+        fs <- 100
+        use_f <- frac_f
+      }
+    }
+    size <- format(size * fs, scientific = FALSE)
+    sql(glue(use_f, size = size))
   }
+}

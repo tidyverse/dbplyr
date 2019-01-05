@@ -61,7 +61,7 @@ test_that("sample_frac() returns the correct query", {
 test_that("sample_n() returns the expected error message", {
   expect_error(
     mf %>% sample_n(10) %>% show_query(),
-    "Only sample fractions are supported"
+    "Explicit row size sample is not supported"
   )
 })
 

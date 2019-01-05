@@ -34,6 +34,10 @@ sql_select.SQLiteConnection<- function(con, select, from, where = NULL,
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
+#' @export
+sql_clause_sample.SQLiteConnection <- function(sample, con) {
+
+}
 
 #' @export
 db_desc.SQLiteConnection <- function(x) {

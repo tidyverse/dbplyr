@@ -17,18 +17,6 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
 
-  size <- sample$size
-  out$sample <-  if (!is.null(size) && !identical(size, Inf)) {
-    assert_that(is.numeric(size), length(size) == 1L, size >= 0)
-    if(sample$type == "n") {
-      stop("Only sample fractions are supported. Try using sample_frac() instead")
-    } else {
-      size <- size * 100
-      size <- format(size, scientific = FALSE)
-      build_sql("SAMPLE (", sql(size) ,")")
-    }
-  }
-
   # Processing limit via ROWNUM in a WHERE clause, thie method
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
   if (!is.null(limit) && !identical(limit, Inf)) {
@@ -41,7 +29,6 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
     escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
   }
 }
-
 
 #' @export
 sql_translate_env.Oracle <- function(con) {

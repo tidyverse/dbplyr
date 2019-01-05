@@ -23,28 +23,28 @@
 
     escape(select, collapse = ", ", con = con)
   )
-  # MS SQL Uses 10 PERCENT or 10 ROWS as the arguments for TABLESAMPLE
-  # https://technet.microsoft.com/en-us/library/ms189108.aspx
-  size <- sample$size
-  out$sample <-  if (!is.null(size) && !identical(size, Inf)) {
-      assert_that(is.numeric(size), length(size) == 1L, size >= 0)
-      if(sample$type == "n") {
-        type <- "ROWS"
-      } else {
-        size <- size * 100
-        type <- "PERCENT"
-      }
-      size <- format(size, scientific = FALSE)
-      sql_expr(TABLESAMPLE ((!! build_sql(sql(size), " " ,sql(type)))), con = con)
-    }
+
   out$from      <- sql_clause_from(from, con)
   out$where     <- sql_clause_where(where, con)
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
+  out$sample    <- sql_clause_sample(sample, con)
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
+
+#' @export
+`sql_clause_sample.Microsoft SQL Server` <- function(sample, con) {
+  # MS SQL Uses 10 PERCENT or 10 ROWS as the arguments for TABLESAMPLE
+  # https://technet.microsoft.com/en-us/library/ms189108.aspx
+  sample_clause_default(
+    sample,
+    "TABLESAMPLE({size} ROWS)",
+    "TABLESAMPLE({size} PERCENT)"
+  )
+}
+
 
 #' @export
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
