@@ -148,7 +148,8 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 # Utility functions ------------------------------------------------------------
 
 random_table_name <- function(n = 10) {
-  paste0(sample(letters, n, replace = TRUE), collapse = "")
+  prefix <- "dplyr_"
+  paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
 }
 
 res_warn_incomplete <- function(res, hint = "n = -1") {
