@@ -9,3 +9,11 @@ test_that("vectorised translations", {
   expect_equal(trans(paste(x, y)), sql("`x` || ' ' || `y`"))
   expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
 })
+
+test_that("as.numeric()/as.double() get custom translation", {
+  mf <- dbplyr::memdb_frame(x = 1L)
+
+  out <- mf %>% mutate(x1 = as.numeric(x), x2 = as.double(x)) %>% collect()
+  expect_type(out$x1, "double")
+  expect_type(out$x2, "double")
+})

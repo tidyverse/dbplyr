@@ -20,3 +20,4 @@ vignettes/*.R
 /.dir-locals.el
 revdep/checks
 revdep/library
+docs

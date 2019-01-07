@@ -61,9 +61,9 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
     formula = {
       # This approach may be ill-founded: might be better to have a separate
       # function for partially evaluating a list of quos/lazy_dots
-      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call))
+      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call) %||% env)
       if (length(call) == 3) {
-        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call))
+        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call) %||% env)
       }
       call
     },
@@ -88,27 +88,39 @@ sym_partial_eval <- function(sym, vars, env) {
   }
 }
 
+is_namespaced_dplyr_call <- function(call) {
+  is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
+}
+
 lang_partial_eval <- function(call, vars, env) {
-  switch_lang(call,
-    # Evaluate locally if complex CAR
-    inlined = ,
-    namespaced = ,
-    recursive = eval_bare(call, env),
-    named = {
-      # Process call arguments recursively, unless user has manually called
-      # remote/local
-      name <- as_string(node_car(call))
-      if (name == "local") {
-        eval_bare(call[[2]], env)
-      } else if (name %in% c("$", "[[", "[")) {
-        # Subsetting is always done locally
-        eval_bare(call, env)
-      } else if (name == "remote") {
-        call[[2]]
-      } else {
-        call[-1] <- lapply(call[-1], partial_eval, vars = vars, env = env)
-        call
-      }
+  fun <- call[[1]]
+
+  # Inlined functions are evaluated directly
+  if (is.function(fun)) {
+    return(eval_bare(call, env))
+  }
+
+  # So are compound calls, EXCEPT dplyr::foo()
+  if (is.call(fun)) {
+    if (is_namespaced_dplyr_call(fun)) {
+      call[[1]] <- fun[[3]]
+    } else {
+      return(eval_bare(call, env))
     }
-  )
+  }
+
+  # Process call arguments recursively, unless user has manually called
+  # remote/local
+  name <- as_string(call[[1]])
+  if (name == "local") {
+    eval_bare(call[[2]], env)
+  } else if (name %in% c("$", "[[", "[")) {
+    # Subsetting is always done locally
+    eval_bare(call, env)
+  } else if (name == "remote") {
+    call[[2]]
+  } else {
+    call[-1] <- lapply(call[-1], partial_eval, vars = vars, env = env)
+    call
+  }
 }

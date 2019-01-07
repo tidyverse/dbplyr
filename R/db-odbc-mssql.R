@@ -42,12 +42,12 @@
 
       `!`           = mssql_not_sql_prefix(),
 
-      `!=`           = mssql_logical_infix("!="),
-      `==`           = mssql_logical_infix("="),
-      `<`            = mssql_logical_infix("<"),
-      `<=`           = mssql_logical_infix("<="),
-      `>`            = mssql_logical_infix(">"),
-      `>=`           = mssql_logical_infix(">="),
+      `!=`           = sql_infix("!="),
+      `==`           = sql_infix("="),
+      `<`            = sql_infix("<"),
+      `<=`           = sql_infix("<="),
+      `>`            = sql_infix(">"),
+      `>=`           = sql_infix(">="),
 
       `&`            = mssql_generic_infix("&", "AND"),
       `&&`           = mssql_generic_infix("&", "AND"),
@@ -191,20 +191,6 @@ mssql_not_sql_prefix <- function() {
   }
 }
 
-mssql_logical_infix <- function(f) {
-  assert_that(is_string(f))
-
-  f <- toupper(f)
-  function(x, y) {
-    condition <- build_sql(x, " ", sql(f), " ", y)
-    if (sql_current_select()) {
-      sql_expr(convert(BIT, iif(!!condition, 1, 0)))
-    } else {
-      condition
-    }
-  }
-}
-
 mssql_generic_infix <- function(if_select, if_filter) {
   assert_that(is_string(if_select))
   assert_that(is_string(if_filter))
@@ -223,16 +209,13 @@ mssql_generic_infix <- function(if_select, if_filter) {
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
-  build_sql(
-     "CASE",
-     " WHEN ((", cond, ") =  'TRUE')", " THEN (", if_true, ")",
-     if (!is.null(if_false)){
-       build_sql(" WHEN ((", cond, ") =  'FALSE')", " THEN (", if_false, ")")
-     } else {
-       build_sql(" ELSE ('')")
-     },
-     " END"
-     )
+
+  old <- sql_current_context()
+  on.exit(set_current_context(old), add = TRUE)
+  set_current_context(list(clause = ""))
+  cond <- build_sql(cond)
+
+  sql_if(cond, if_true, if_false)
 }
 
 globalVariables(c("BIT", "%is%", "convert", "iif"))

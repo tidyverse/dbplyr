@@ -9,6 +9,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(as.numeric(x)),            sql("CAST(`x` AS DOUBLE)"))
   expect_equal(trans(as.double(x)),             sql("CAST(`x` AS DOUBLE)"))
   expect_equal(trans(as.integer(x)),            sql("CAST(`x` AS INT)"))
+  expect_equal(trans(as.integer64(x)),          sql("CAST(`x` AS BIGINT)"))
   expect_equal(trans(as.logical(x)),            sql("CAST(`x` AS BOOLEAN)"))
   expect_equal(trans(as.character(x)),          sql("CAST(`x` AS STRING)"))
   expect_equal(trans(as.Date(x)),               sql("CAST(`x` AS DATE)"))
