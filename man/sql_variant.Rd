@@ -105,8 +105,8 @@ quickly providing default wrappers for a new SQL variant.
 postgres_agg <- sql_translator(.parent = base_agg,
   cor = sql_aggregate_2("corr"),
   cov = sql_aggregate_2("covar_samp"),
-  sd =  sql_aggregate("stddev_samp"),
-  var = sql_aggregate("var_samp")
+  sd =  sql_aggregate("stddev_samp", "sd"),
+  var = sql_aggregate("var_samp", "var")
 )
 postgres_var <- sql_variant(
   base_scalar,
