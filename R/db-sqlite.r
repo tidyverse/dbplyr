@@ -31,7 +31,7 @@ sql_translate_env.SQLiteConnection <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(UQ(x) %as% text)))
     ),
     sql_translator(.parent = base_agg,
-      sd = sql_aggregate("stdev","sd")
+      sd = sql_aggregate("stdev", "sd")
     ),
     base_no_win
   )
