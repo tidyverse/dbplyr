@@ -23,8 +23,8 @@ sql_translate_env.SQLiteConnection <- function(con) {
         }
       },
       na_if = sql_prefix("NULLIF", 2),
-      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(UQ(x) %as% text))),
-      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(UQ(x) %as% text)))
+      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
+      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text)))
     ),
     sql_translator(.parent = base_agg,
       sd = sql_aggregate("stdev", "sd")

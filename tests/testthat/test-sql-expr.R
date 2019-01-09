@@ -11,7 +11,7 @@ test_that("user infix functions have % stripped", {
 
 test_that("string function names are not quoted", {
   f <- "foo"
-  expect_equal(sql_expr(UQ(f)()), sql("FOO()"))
+  expect_equal(sql_expr((!!f)()), sql("FOO()"))
 })
 
 test_that("correct number of parens", {

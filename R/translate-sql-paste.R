@@ -5,8 +5,7 @@ sql_paste <- function(default_sep, f = "CONCAT_WS") {
 
   function(..., sep = default_sep, collapse = NULL){
     check_collapse(collapse)
-
-    sql_expr(UQ(f)(!!sep, !!!list(...)))
+    sql_call2(f, sep, ...)
   }
 }
 
@@ -26,9 +25,9 @@ sql_paste_infix <- function(default_sep, op, cast) {
     }
 
     if (sep == "") {
-      infix <- function(x, y) sql_expr(UQ(op)(!!x, !!y))
+      infix <- function(x, y) sql_call2(op, x, y)
     } else {
-      infix <- function(x, y) sql_expr(UQ(op)(UQ(op)(!!x, !!sep), !!y))
+      infix <- function(x, y) sql_call2(op, sql_call2(op, x, sep), y)
     }
 
     reduce(args, infix)

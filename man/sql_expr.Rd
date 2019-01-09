@@ -2,15 +2,22 @@
 % Please edit documentation in R/sql-expr.R
 \name{sql_expr}
 \alias{sql_expr}
+\alias{sql_call2}
 \title{Generate SQL from R expressions}
 \usage{
 sql_expr(x, con = sql_current_con())
+
+sql_call2(.fn, ..., con = sql_current_con())
 }
 \arguments{
 \item{x}{A quasiquoted expression}
 
 \item{con}{An optional database connection to control the details of
 the translation. The default, \code{NULL}, generates ANSI SQL.}
+
+\item{.fn}{Function name (as string, call, or symbol)}
+
+\item{...}{Arguments to function}
 }
 \description{
 Low-level building block for generating SQL from R expressions.
@@ -25,4 +32,8 @@ sql_expr(f(x, y))
 
 sql_expr(cast("x" \%as\% DECIMAL))
 sql_expr(round(x) \%::\% numeric)
+
+sql_call2("+", quote(x), 1)
+sql_call2("+", "x", 1)
 }
+\keyword{internal}

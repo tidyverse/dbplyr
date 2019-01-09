@@ -5,6 +5,9 @@
 #' functions have `%` stripped.
 #'
 #' @param x A quasiquoted expression
+#' @param .fn Function name (as string, call, or symbol)
+#' @param ... Arguments to function
+#' @keywords internal
 #' @inheritParams translate_sql
 #' @export
 #' @examples
@@ -15,11 +18,23 @@
 #'
 #' sql_expr(cast("x" %as% DECIMAL))
 #' sql_expr(round(x) %::% numeric)
+#'
+#' sql_call2("+", quote(x), 1)
+#' sql_call2("+", "x", 1)
 sql_expr <- function(x, con = sql_current_con()) {
   x <- enexpr(x)
   x <- replace_expr(x, con = con)
   sql(x)
 }
+
+#' @export
+#' @rdname sql_expr
+sql_call2 <- function(.fn, ..., con = sql_current_con()) {
+  fn <- call2(.fn, ...)
+  fn <- replace_expr(fn, con = con)
+  sql(fn)
+}
+
 
 replace_expr <- function(x, con) {
   if (is.atomic(x)) {

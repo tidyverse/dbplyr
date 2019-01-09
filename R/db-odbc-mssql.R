@@ -174,7 +174,7 @@ mssql_temp_name <- function(name, temporary){
 
 mssql_is_null <- function(x, context) {
   if (context$clause %in% c("SELECT", "ORDER")) {
-    sql_expr(convert(BIT, iif(UQ(x) %is% NULL, 1L, 0L)))
+    sql_expr(convert(BIT, iif(!!x %is% NULL, 1L, 0L)))
   } else {
     sql_null(x)
   }

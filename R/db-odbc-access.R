@@ -67,14 +67,14 @@ sql_translate_env.ACCESS <- function(con) {
                    floor         = sql_prefix("INT"),
                    # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
                    ceiling       = function(x) {
-                     sql_expr(int(UQ(x) + .9999999999))
+                     sql_expr(int(!!x + .9999999999))
                    },
                    ceil          = function(x) {
-                     sql_expr(int(UQ(x) + .9999999999))
+                     sql_expr(int(!!x + .9999999999))
                    },
                    # There is no POWER function in Access. It uses ^ instead
                    `^`           = function(x, y) {
-                     sql_expr(UQ(x) ^ UQ(y))
+                     sql_expr((!!x) ^ (!!y))
                    },
 
                    # Strings
@@ -110,11 +110,11 @@ sql_translate_env.ACCESS <- function(con) {
 
                    # pmin/pmax for 2 columns
                    pmin          = function(x, y) {
-                     sql_expr(iif(UQ(x) <= UQ(y), !!x, !!y))
+                     sql_expr(iif(!!x <= !!y, !!x, !!y))
                    },
 
                    pmax          = function(x, y) {
-                     sql_expr(iif(UQ(x) <= UQ(y), !!y, !!x))
+                     sql_expr(iif(!!x <= !!y, !!y, !!x))
                    },
 
                    # Dates

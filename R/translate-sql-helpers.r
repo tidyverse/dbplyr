@@ -209,7 +209,7 @@ sql_not_supported <- function(f) {
 sql_cast <- function(type) {
   type <- sql(type)
   function(x) {
-    sql_expr(cast(UQ(x) %as% UQ(type)))
+    sql_expr(cast(!!x %as% !!type))
   }
 }
 
