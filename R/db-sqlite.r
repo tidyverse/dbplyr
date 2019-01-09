@@ -27,7 +27,7 @@ sql_translate_env.SQLiteConnection <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(UQ(x) %as% text)))
     ),
     sql_translator(.parent = base_agg,
-      sd = sql_aggregate("stdev")
+      sd = sql_aggregate("stdev", "sd")
     ),
     if (sqlite_version() >= "3.25") {
       sql_translator(.parent = base_win,

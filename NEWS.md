@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `sql_aggregate()` now takes an optional argument `f_r` for passing to
+  `check_na_rm()`. "Missing values are always removed" warning for aggregate
+  functions now shows the dplyr verb in the usage suggestion (@sverchkov, #153).
+
 * SQLite translation gains support for window functions   
   (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25.
 

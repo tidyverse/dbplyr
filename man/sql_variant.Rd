@@ -34,7 +34,7 @@ sql_infix(f)
 
 sql_prefix(f, n = NULL)
 
-sql_aggregate(f)
+sql_aggregate(f, f_r = f)
 
 sql_aggregate_2(f)
 
@@ -80,6 +80,8 @@ mappings for the most common operators and functions.}
 
 \item{n}{for \code{sql_infix()}, an optional number of arguments to expect.
 Will signal error if not correct.}
+
+\item{f_r}{the name of the r function being translated as a string}
 }
 \description{
 When creating a package that maps to a new SQL based src, you'll often
@@ -103,8 +105,8 @@ quickly providing default wrappers for a new SQL variant.
 postgres_agg <- sql_translator(.parent = base_agg,
   cor = sql_aggregate_2("corr"),
   cov = sql_aggregate_2("covar_samp"),
-  sd =  sql_aggregate("stddev_samp"),
-  var = sql_aggregate("var_samp")
+  sd =  sql_aggregate("stddev_samp", "sd"),
+  var = sql_aggregate("var_samp", "var")
 )
 postgres_var <- sql_variant(
   base_scalar,
