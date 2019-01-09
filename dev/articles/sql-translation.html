@@ -155,7 +155,7 @@
 <li>
 <p>And some functions have different argument orders:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr</a></span>(x, <span class="dv">5</span>, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; substr("x", 5, 6)</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR("x", 5, 6)</span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(x, <span class="dv">10</span>))</a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; LOG(10.0, "x")</span></a></code></pre></div>
 </li>

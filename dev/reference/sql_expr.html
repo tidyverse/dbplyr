@@ -157,7 +157,9 @@ functions have <code>%</code> stripped.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sql_expr</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())</pre>
+    <pre class="usage"><span class='fu'>sql_expr</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())
+
+<span class='fu'>sql_call2</span>(<span class='no'>.fn</span>, <span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,19 +173,38 @@ functions have <code>%</code> stripped.</p>
       <td><p>An optional database connection to control the details of
 the translation. The default, <code>NULL</code>, generates ANSI SQL.</p></td>
     </tr>
+    <tr>
+      <th>.fn</th>
+      <td><p>Function name (as string, call, or symbol)</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Arguments to function</p></td>
+    </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Using <code>sql_expr()</code> in package will require use of <code><a href='https://www.rdocumentation.org/packages/utils/topics/globalVariables'>globalVariables()</a></code>
+to avoid <code>R CMD check</code> NOTES. This is a small amount of additional pain,
+which I think is worthwhile because it leads to more readable translation
+code.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span> + <span class='fl'>1</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x + 1.0)</div><div class='input'>
-<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F('x', 'y')</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span>, <span class='no'>y</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x, y)</div><div class='input'>
-<span class='fu'>sql_expr</span>(<span class='fu'>cast</span>(<span class='st'>"x"</span> <span class='kw'>%as%</span> <span class='no'>DECIMAL</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; CAST('x' AS DECIMAL)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='no'>x</span>) <span class='kw'>%::%</span> <span class='no'>numeric</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; ROUND(x) :: numeric</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span> + <span class='fl'>1</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x + 1.0)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F('x', 'y')</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span>, <span class='no'>y</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F(x, y)</div><div class='input'>
+<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"x"</span>)
+<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(!!<span class='no'>x</span>, <span class='no'>y</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; F("x", y)</div><div class='input'>
+<span class='fu'>sql_expr</span>(<span class='fu'>cast</span>(<span class='st'>"x"</span> <span class='kw'>%as%</span> <span class='no'>DECIMAL</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; CAST('x' AS DECIMAL)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Round'>round</a></span>(<span class='no'>x</span>) <span class='kw'>%::%</span> <span class='no'>numeric</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; ROUND(x) :: numeric</div><div class='input'>
+<span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/substitute'>quote</a></span>(<span class='no'>x</span>), <span class='fl'>1</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; x + 1.0</div><div class='input'><span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='st'>"x"</span>, <span class='fl'>1</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'x' + 1.0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
+      
+      <li><a href="#details">Details</a></li>
+      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
