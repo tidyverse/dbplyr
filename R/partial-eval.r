@@ -114,9 +114,6 @@ lang_partial_eval <- function(call, vars, env) {
   name <- as_string(call[[1]])
   if (name == "local") {
     eval_bare(call[[2]], env)
-  } else if (name %in% c("$", "[[", "[")) {
-    # Subsetting is always done locally
-    eval_bare(call, env)
   } else if (name == "remote") {
     call[[2]]
   } else {

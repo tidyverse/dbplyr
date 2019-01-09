@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* (Breaking change) Subsetting (`[[`, `$`, and `[`) are no longer evaluated 
+  locally. This makes the translation more consistent enables useful new idioms
+  (#200).
+
 * New `sql_call2()` which is to `rlang::call2()` as `sql_expr()` is to 
   `rlang::expr()`.
 
