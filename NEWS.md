@@ -5,12 +5,12 @@
   functions now shows the dplyr verb in the usage suggestion (@sverchkov, #153).
 
 * SQLite translation gains support for window functions   
-  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25.
+  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25 (#144).
 
 * MySQL/MariaDB translation gains support for window functions 
   (https://mariadb.com/kb/en/library/window-functions/). They are available
   in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
-  syntax error if you attempt to use with window functions.
+  syntax error if you attempt to use with window functions (#191).
 
 # dbplyr 1.3.0
 
