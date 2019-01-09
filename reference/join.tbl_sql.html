@@ -75,7 +75,7 @@ functions." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
         </div>
       </div>
     </div>
@@ -227,51 +227,51 @@ compared with <code>=</code> not with more general operators.</p>
 
 <span class='co'># Left joins ----------------------------------------------------------------</span>
 <span class='no'>lahman_s</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lahman.html'>lahman_sqlite</a></span>()
-<span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Batting"</span>)
-<span class='no'>team_info</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Teams"</span>), <span class='no'>yearID</span>, <span class='no'>lgID</span>, <span class='no'>teamID</span>, <span class='no'>G</span>, <span class='no'>R</span>:<span class='no'>H</span>)
+<span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Batting"</span>)
+<span class='no'>team_info</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Teams"</span>), <span class='no'>yearID</span>, <span class='no'>lgID</span>, <span class='no'>teamID</span>, <span class='no'>G</span>, <span class='no'>R</span>:<span class='no'>H</span>)
 
 <span class='co'># Combine player and whole team statistics</span>
-<span class='no'>first_stint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>stint</span> <span class='kw'>==</span> <span class='fl'>1</span>), <span class='no'>playerID</span>:<span class='no'>H</span>)
-<span class='no'>both</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>first_stint</span>, <span class='no'>team_info</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"yearID"</span>, <span class='st'>"teamID"</span>, <span class='st'>"lgID"</span>))
+<span class='no'>first_stint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>stint</span> <span class='kw'>==</span> <span class='fl'>1</span>), <span class='no'>playerID</span>:<span class='no'>H</span>)
+<span class='no'>both</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>first_stint</span>, <span class='no'>team_info</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"yearID"</span>, <span class='st'>"teamID"</span>, <span class='st'>"lgID"</span>))
 <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/head'>head</a></span>(<span class='no'>both</span>)
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>both</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>both</span>)
 
 <span class='co'># Join with a local data frame</span>
 <span class='no'>grid</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/expand.grid'>expand.grid</a></span>(
   <span class='kw'>teamID</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"WAS"</span>, <span class='st'>"ATL"</span>, <span class='st'>"PHI"</span>, <span class='st'>"NYA"</span>),
   <span class='kw'>yearID</span> <span class='kw'>=</span> <span class='fl'>2010</span>:<span class='fl'>2012</span>)
-<span class='no'>top4a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4a</span>)
+<span class='no'>top4a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4a</span>)
 
 <span class='co'># Indices don't really help here because there's no matching index on</span>
 <span class='co'># batting</span>
-<span class='no'>top4b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4b</span>)
+<span class='no'>top4b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4b</span>)
 
 <span class='co'># Semi-joins ----------------------------------------------------------------</span>
 
-<span class='no'>people</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Master"</span>)
+<span class='no'>people</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Master"</span>)
 
 <span class='co'># All people in half of fame</span>
-<span class='no'>hof</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"HallOfFame"</span>)
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
+<span class='no'>hof</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"HallOfFame"</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
 
 <span class='co'># All people not in the hall of fame</span>
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
 
 <span class='co'># Find all managers</span>
-<span class='no'>manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Managers"</span>)
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>)
+<span class='no'>manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Managers"</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>)
 
 <span class='co'># Find all managers in hall of fame</span>
-<span class='no'>famous_manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>), <span class='no'>hof</span>)
+<span class='no'>famous_manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>), <span class='no'>hof</span>)
 <span class='no'>famous_manager</span>
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>famous_manager</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>famous_manager</span>)
 
 <span class='co'># Anti-joins ----------------------------------------------------------------</span>
 
 <span class='co'># batters without person covariates</span>
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>batting</span>, <span class='no'>people</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>batting</span>, <span class='no'>people</span>)
 }
 <span class='co'># }</span></pre>
   </div>

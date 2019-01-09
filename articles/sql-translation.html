@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
         </div>
       </div>
     </div>
@@ -102,7 +102,7 @@
 <p>There are two components to dplyr’s SQL translation system:</p>
 <ul>
 <li><p>translation of vector expressions like <code>x * y + 10</code></p></li>
-<li><p>translation of whole verbs like <code><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code></p></li>
+<li><p>translation of whole verbs like <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code></p></li>
 </ul>
 <p>To explore them, you’ll need to load both dbplyr and dplyr:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dbplyr)</a>
@@ -176,7 +176,7 @@
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; avg("x") OVER ()</span></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">trim =</span> <span class="fl">0.1</span>))</a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; Error in mean(x, trim = 0.1): unused argument (trim = 0.1)</span></a></code></pre></div>
-<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details.</p>
+<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details.</p>
 </div>
 <div id="unknown-functions" class="section level3">
 <h3 class="hasAnchor">
@@ -193,7 +193,7 @@
 <p>Things get a little trickier with window functions, because SQL’s window functions are considerably more expressive than the specific variants provided by base R or dplyr. They have the form <code>[expression] OVER ([partition clause] [order clause] [frame_clause])</code>:</p>
 <ul>
 <li><p>The <strong>expression</strong> is a combination of variable names and window functions. Support for window functions varies from database to database, but most support the ranking functions, <code>lead</code>, <code>lag</code>, <code>nth</code>, <code>first</code>, <code>last</code>, <code>count</code>, <code>min</code>, <code>max</code>, <code>sum</code>, <code>avg</code> and <code>stddev</code>.</p></li>
-<li><p>The <strong>partition clause</strong> specifies how the window function is broken down over groups. It plays an analogous role to <code>GROUP BY</code> for aggregate functions, and <code><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> in dplyr. It is possible for different window functions to be partitioned into different groups, but not all databases support it, and neither does dplyr.</p></li>
+<li><p>The <strong>partition clause</strong> specifies how the window function is broken down over groups. It plays an analogous role to <code>GROUP BY</code> for aggregate functions, and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> in dplyr. It is possible for different window functions to be partitioned into different groups, but not all databases support it, and neither does dplyr.</p></li>
 <li><p>The <strong>order clause</strong> controls the ordering (when it makes a difference). This is important for the ranking functions since it specifies which variables to rank by, but it’s also needed for cumulative functions and lead. Whenever you’re thinking about before and after in SQL, you must always tell it which variable defines the order. If the order clause is missing when needed, some databases fail with an error message while others return non-deterministic results.</p></li>
 <li>
 <p>The <strong>frame clause</strong> defines which rows, or <strong>frame</strong>, that are passed to the window function, describing which rows (relative to the current row) should be included. The frame clause provides two offsets which determine the start and end of frame. There are three special values: -Inf means to include all preceeding rows (in SQL, “unbounded preceding”), 0 means the current row (“current row”), and Inf means all following rows (“unbounded following)”. The complete set of options is comprehensive, but fairly confusing, and is summarised visually below.</p>
@@ -214,28 +214,28 @@
 <a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg("G") OVER ()</span></a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(G))</a>
 <a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (ORDER BY "G")</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY "G")</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(G))</a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(G))</a>
 <a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; &lt;SQL&gt; LAG("G", 1, NULL) OVER ()</span></a></code></pre></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; avg("G") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING)</span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (PARTITION BY "ID")</span></a></code></pre></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
-<li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank(x)</a></code>, <code><a href="http://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
-<li><p>Accumulating aggregates only take a single argument (the vector to aggregate). To control ordering, use <code><a href="http://dplyr.tidyverse.org/reference/order_by.html">order_by()</a></code>.</p></li>
+<li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
+<li><p>Accumulating aggregates only take a single argument (the vector to aggregate). To control ordering, use <code><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by()</a></code>.</p></li>
 <li><p>Aggregates implemented in dplyr (<code>lead</code>, <code>lag</code>, <code>nth_value</code>, <code>first_value</code>, <code>last_value</code>) have an <code>order_by</code> argument. Supply it to override the default ordering.</p></li>
 </ul>
 <p>The three options are illustrated in the snippet below:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(players,</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="kw"><a href="http://dplyr.tidyverse.org/reference/ranking.html">min_rank</a></span>(yearID),</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3">  <span class="kw"><a href="http://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(yearID, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cumsum">cumsum</a></span>(G)),</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">  <span class="kw"><a href="http://dplyr.tidyverse.org/reference/lead-lag.html">lead</a></span>(G, <span class="dt">order_by =</span> yearID)</a>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(players,</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">min_rank</a></span>(yearID),</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(yearID, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cumsum">cumsum</a></span>(G)),</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lead</a></span>(G, <span class="dt">order_by =</span> yearID)</a>
 <a class="sourceLine" id="cb11-5" data-line-number="5">)</a></code></pre></div>
-<p>Currently there is no way to order by multiple variables, except by setting the default ordering with <code><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>. This will be added in a future release.</p>
+<p>Currently there is no way to order by multiple variables, except by setting the default ordering with <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>. This will be added in a future release.</p>
 </div>
 </div>
 <div id="whole-tables" class="section level2">
@@ -243,25 +243,25 @@
 <a href="#whole-tables" class="anchor"></a>Whole tables</h2>
 <p>All dplyr verbs generate a <code>SELECT</code> statement. To demonstrate we’ll make a temporary database with a couple of tables</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="st">":memory:"</span>)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">flights &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, nycflights13<span class="op">::</span>flights)</a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">airports &lt;-<span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, nycflights13<span class="op">::</span>airports)</a></code></pre></div>
+<a class="sourceLine" id="cb12-2" data-line-number="2">flights &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, nycflights13<span class="op">::</span>flights)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">airports &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, nycflights13<span class="op">::</span>airports)</a></code></pre></div>
 <div id="single-table-verbs" class="section level3">
 <h3 class="hasAnchor">
 <a href="#single-table-verbs" class="anchor"></a>Single table verbs</h3>
 <ul>
 <li>
-<p><code><a href="http://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> modify the <code>SELECT</code> clause:</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> modify the <code>SELECT</code> clause:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">flights <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="kw"><a href="http://dplyr.tidyverse.org/reference/reexports.html">contains</a></span>(<span class="st">"delay"</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">contains</a></span>(<span class="st">"delay"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt; SELECT `dep_delay`, `arr_delay`</span></a>
 <a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt; FROM `nycflights13::flights`</span></a>
 <a class="sourceLine" id="cb13-7" data-line-number="7"></a>
 <a class="sourceLine" id="cb13-8" data-line-number="8">flights <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(distance, air_time) <span class="op">%&gt;%</span><span class="st">  </span></a>
-<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">speed =</span> distance <span class="op">/</span><span class="st"> </span>(air_time <span class="op">/</span><span class="st"> </span><span class="dv">60</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(distance, air_time) <span class="op">%&gt;%</span><span class="st">  </span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">speed =</span> distance <span class="op">/</span><span class="st"> </span>(air_time <span class="op">/</span><span class="st"> </span><span class="dv">60</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb13-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb13-12" data-line-number="12"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb13-13" data-line-number="13"><span class="co">#&gt; SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`</span></a>
 <a class="sourceLine" id="cb13-14" data-line-number="14"><span class="co">#&gt; FROM (SELECT `distance`, `air_time`</span></a>
@@ -269,31 +269,31 @@
 <p>(As you can see here, the generated SQL isn’t always as minimal as you might generate by hand.)</p>
 </li>
 <li>
-<p><code><a href="http://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">flights <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(month <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, day <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(month <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, day <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb14-5" data-line-number="5"><span class="co">#&gt; SELECT *</span></a>
 <a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co">#&gt; FROM `nycflights13::flights`</span></a>
 <a class="sourceLine" id="cb14-7" data-line-number="7"><span class="co">#&gt; WHERE ((`month` = 1.0) AND (`day` = 1.0))</span></a></code></pre></div>
 </li>
 <li>
-<p><code><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> generates an <code>ORDER BY</code> clause:</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> generates an <code>ORDER BY</code> clause:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">flights <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(carrier, <span class="kw"><a href="http://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(arr_delay)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(carrier, <span class="kw"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(arr_delay)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt; SELECT *</span></a>
 <a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; FROM `nycflights13::flights`</span></a>
 <a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co">#&gt; ORDER BY `carrier`, `arr_delay` DESC</span></a></code></pre></div>
 </li>
 <li>
-<p><code><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> and <code><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> work together to generate a <code>GROUP BY</code> clause:</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> work together to generate a <code>GROUP BY</code> clause:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">flights <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(month, day) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(dep_delay)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(month, day) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(dep_delay)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
 <a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
 <a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt; &lt;SQL&gt;</span></a>
@@ -317,44 +317,44 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">inner_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join()</a></code></td>
 <td><code>SELECT * FROM x JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">left_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">left_join()</a></code></td>
 <td><code>SELECT * FROM x LEFT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">right_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">right_join()</a></code></td>
 <td><code>SELECT * FROM x RIGHT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">full_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">full_join()</a></code></td>
 <td><code>SELECT * FROM x FULL JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="http://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="http://dplyr.tidyverse.org/reference/setops.html">intersect(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">intersect(x, y)</a></code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="http://dplyr.tidyverse.org/reference/setops.html">union(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">union(x, y)</a></code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="http://dplyr.tidyverse.org/reference/setops.html">setdiff(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff(x, y)</a></code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="http://dplyr.tidyverse.org/reference/join.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
+<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set <code>auto_index = TRUE</code>. That will automatically add an index on the join variables to the temporary table.</p>
 </div>
 <div id="behind-the-scenes" class="section level3">
@@ -364,7 +364,7 @@
 <ul>
 <li><p><code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy op data structure building up query objects (<code><a href="../reference/sql_build.html">select_query()</a></code>, <code><a href="../reference/sql_build.html">join_query()</a></code>, <code><a href="../reference/sql_build.html">set_op_query()</a></code> etc) that represent the different subtypes of <code>SELECT</code> queries that we might generate.</p></li>
 <li><p><code><a href="../reference/sql_build.html">sql_optimise()</a></code> takes a pass over these SQL objects, looking for potential optimisations. Currently this only involves removing subqueries where possible.</p></li>
-<li><p><code><a href="../reference/sql_build.html">sql_render()</a></code> calls an SQL generation function (<code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_select()</a></code>, <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_join()</a></code>, <code><a href="http://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_subquery()</a></code>, <code>sql_semijoin()</code> etc) to produce the actual SQL. Each of these functions is a generic, taking the connection as an argument, so that the details can be customised for different databases.</p></li>
+<li><p><code><a href="../reference/sql_build.html">sql_render()</a></code> calls an SQL generation function (<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_select()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_subquery()</a></code>, <code>sql_semijoin()</code> etc) to produce the actual SQL. Each of these functions is a generic, taking the connection as an argument, so that the details can be customised for different databases.</p></li>
 </ul>
 </div>
 </div>

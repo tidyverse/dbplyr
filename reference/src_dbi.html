@@ -78,7 +78,7 @@ go via src_dbi()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
         </div>
       </div>
     </div>
@@ -183,13 +183,13 @@ when this happens.</p></td>
 
     <p>All data manipulation on SQL tbls are lazy: they will not actually
 run the query or retrieve the data unless you ask for it: they all return
-a new <code>tbl_dbi</code> object. Use <code><a href='http://dplyr.tidyverse.org/reference/compute.html'>compute()</a></code> to run the query and save the
-results in a temporary in the database, or use <code><a href='http://dplyr.tidyverse.org/reference/compute.html'>collect()</a></code> to retrieve the
-results to R. You can see the query with <code><a href='http://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code>.</p>
+a new <code>tbl_dbi</code> object. Use <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>compute()</a></code> to run the query and save the
+results in a temporary in the database, or use <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect()</a></code> to retrieve the
+results to R. You can see the query with <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code>.</p>
 <p>For best performance, the database should have an index on the variables
-that you are grouping by. Use <code><a href='http://dplyr.tidyverse.org/reference/explain.html'>explain()</a></code> to check that the database is using
+that you are grouping by. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain()</a></code> to check that the database is using
 the indexes that you expect.</p>
-<p>There is one exception: <code><a href='http://dplyr.tidyverse.org/reference/do.html'>do()</a></code> is not lazy since it must pull the data
+<p>There is one exception: <code><a href='https://dplyr.tidyverse.org/reference/do.html'>do()</a></code> is not lazy since it must pull the data
 into R.</p>
     
 
@@ -201,11 +201,11 @@ into R.</p>
 <span class='no'>src</span> <span class='kw'>&lt;-</span> <span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># Add some data</span>
-<span class='fu'><a href='http://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>src</span>, <span class='no'>mtcars</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>src</span>, <span class='no'>mtcars</span>)
 <span class='no'>src</span></div><div class='output co'>#&gt; src:  sqlite 3.22.0 [:memory:]
 #&gt; tbls: mtcars, sqlite_stat1, sqlite_stat4</div><div class='input'><span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/DBI/topics/dbListTables'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"</div><div class='input'>
 <span class='co'># To retrieve a single table from a source, use `tbl()`</span>
-<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]
+<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]
 #&gt; # Database: sqlite 3.22.0 [:memory:]
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -219,9 +219,9 @@ into R.</p>
 #&gt;  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
 #&gt;  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
 #&gt; 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#&gt; # ... with more rows</div><div class='input'>
+#&gt; # … with more rows</div><div class='input'>
 <span class='co'># You can also use pass raw SQL if you want a more sophisticated query</span>
-<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; # Source:   SQL [?? x 11]
+<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; # Source:   SQL [?? x 11]
 #&gt; # Database: sqlite 3.22.0 [:memory:]
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -235,9 +235,9 @@ into R.</p>
 #&gt;  8  14.7     8  440    230  3.23  5.34  17.4     0     0     3     4
 #&gt;  9  15.5     8  318    150  2.76  3.52  16.9     0     0     3     2
 #&gt; 10  15.2     8  304    150  3.15  3.44  17.3     0     0     3     2
-#&gt; # ... with more rows</div><div class='input'>
+#&gt; # … with more rows</div><div class='input'>
 <span class='co'># Alternatively, you can use the `src_sqlite()` helper</span>
-<span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># If you just want a temporary in-memory database, use src_memdb()</span>
 <span class='no'>src3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>()
@@ -248,20 +248,20 @@ into R.</p>
 
 <span class='kw'>if</span> (<span class='fu'><a href='lahman.html'>has_lahman</a></span>(<span class='st'>"sqlite"</span>)) {
 <span class='no'>lahman_p</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lahman.html'>lahman_sqlite</a></span>()
-<span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='no'>lahman_p</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"Batting"</span>)
+<span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='no'>lahman_p</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"Batting"</span>)
 <span class='no'>batting</span>
 
 <span class='co'># Basic data manipulation verbs work in the same way as with a tibble</span>
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2005</span>, <span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>130</span>)
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>)
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>playerID</span>, <span class='fu'><a href='http://dplyr.tidyverse.org/reference/desc.html'>desc</a></span>(<span class='no'>yearID</span>))
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>G</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>G</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/n.html'>n</a></span>())
+<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2005</span>, <span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>130</span>)
+<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>)
+<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>playerID</span>, <span class='fu'><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc</a></span>(<span class='no'>yearID</span>))
+<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>G</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>G</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>())
 
 <span class='co'># There are a few exceptions. For example, databases give integer results</span>
 <span class='co'># when dividing one integer by another. Multiply by 1 to fix the problem</span>
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>, <span class='no'>AB</span>, <span class='no'>R</span>, <span class='no'>G</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>, <span class='no'>AB</span>, <span class='no'>R</span>, <span class='no'>G</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(
    <span class='kw'>R_per_game1</span> <span class='kw'>=</span> <span class='no'>R</span> / <span class='no'>G</span>,
    <span class='kw'>R_per_game2</span> <span class='kw'>=</span> <span class='no'>R</span> * <span class='fl'>1.0</span> / <span class='no'>G</span>
  )
@@ -269,15 +269,15 @@ into R.</p>
 <span class='co'># All operations are lazy: they don't do anything until you request the</span>
 <span class='co'># data, either by `print()`ing it (which shows the first ten rows),</span>
 <span class='co'># or by `collect()`ing the results locally.</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>recent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2010</span>))
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='fu'><a href='http://dplyr.tidyverse.org/reference/compute.html'>collect</a></span>(<span class='no'>recent</span>))
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='no'>recent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2010</span>))
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.time'>system.time</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect</a></span>(<span class='no'>recent</span>))
 
 <span class='co'># You can see the query that dplyr creates with show_query()</span>
 <span class='no'>batting</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>playerID</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/n.html'>n</a></span>()) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='http://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>playerID</span>) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>()) <span class='kw'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 }</div><div class='output co'>#&gt; <span class='message'>&lt;SQL&gt;</span>
 #&gt; <span class='message'>SELECT `playerID`, COUNT() AS `n`</span>
 #&gt; <span class='message'>FROM `Batting`</span>

@@ -79,7 +79,7 @@ for that package for documentation of the inidividual tables." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
         </div>
       </div>
     </div>
@@ -186,7 +186,7 @@ connect.</p></td>
   <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl</span>(<span class='fu'>lahman_sqlite</span>(), <span class='st'>"Batting"</span>)
   <span class='no'>batting</span>
 }</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; # Source:   table&lt;Batting&gt; [?? x 22]
-#&gt; # Database: sqlite 3.22.0 [/tmp/Rtmprqy3O9/lahman.sqlite]
+#&gt; # Database: sqlite 3.22.0 [/tmp/RtmpaE3UxY/lahman.sqlite]
 #&gt;    playerID yearID stint teamID lgID      G    AB     R     H   X2B   X3B    HR
 #&gt;    &lt;chr&gt;     &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
 #&gt;  1 abercda…   1871     1 TRO    NA        1     4     0     0     0     0     0
@@ -199,7 +199,7 @@ connect.</p></td>
 #&gt;  8 barnero…   1871     1 BS1    NA       31   157    66    63    10     9     0
 #&gt;  9 barrebi…   1871     1 FW1    NA        1     5     1     1     1     0     0
 #&gt; 10 barrofr…   1871     1 BS1    NA       18    86    13    13     2     1     0
-#&gt; # ... with more rows, and 10 more variables: RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,
+#&gt; # … with more rows, and 10 more variables: RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,
 #&gt; #   BB &lt;int&gt;, SO &lt;int&gt;, IBB &lt;int&gt;, HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, GIDP &lt;int&gt;</div><div class='input'>
 <span class='co'># Connect to a local postgres database with lahman database, if available</span>
 <span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"postgres"</span>)) {
