@@ -47,6 +47,9 @@ base_scalar <- sql_translator(
     }
     build_sql(x, ".", ident(i))
   },
+  `[` = function(x, i) {
+    build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+  },
 
   `!=`    = sql_infix("!="),
   `==`    = sql_infix("="),

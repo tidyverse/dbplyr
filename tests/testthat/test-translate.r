@@ -163,3 +163,7 @@ test_that("can only subset with strings", {
   expect_error(translate_sql(a[[x]]), "index with strings")
 })
 
+test_that("[ treated as if it is logical subsetting", {
+  expect_equal(translate_sql(y[x == 0L]), sql('CASE WHEN ("x" = 0) THEN ("y") END'))
+})
+

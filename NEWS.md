@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* `x[y]` now translated to `CASE WHEN y THEN x END`. This enables 
+  `sum(x[y == 0])` to work as you expect from R (#202). `y` needs to be
+  a logical expression; if not you will likely get a type error from your 
+  database.
+
 * `x$y` and `x[["y"]]` are now translated to `x.y`, enabling you to index
   into nested fields in databases that provide them (#158).
 
