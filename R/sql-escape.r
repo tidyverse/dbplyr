@@ -154,12 +154,17 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' treating bare strings as sql. This is unlikely to prevent any serious
 #' attack, but should make it unlikely that you produce invalid sql.
 #'
+#' This function should be used only when generating `SELECT` clauses or
+#' other high level queries. For individual function translations, prefer
+#' [sql_expr()].
+#'
 #' @param ... input to convert to SQL. Use [sql()] to preserve
 #'   user input as is (dangerous), and [ident()] to label user
 #'   input as sql identifiers (safe)
 #' @param .env the environment in which to evalute the arguments. Should not
 #'   be needed in typical use.
 #' @param con database connection; used to select correct quoting characters.
+#' @keywords internal
 #' @export
 #' @examples
 #' build_sql("SELECT * FROM TABLE")

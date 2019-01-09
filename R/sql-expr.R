@@ -4,6 +4,11 @@
 #' Strings are escaped; names become bare SQL identifiers. User infix
 #' functions have `%` stripped.
 #'
+#' Using `sql_expr()` in package will require use of [globalVariables()]
+#' to avoid `R CMD check` NOTES. This is a small amount of additional pain,
+#' which I think is worthwhile because it leads to more readable translation
+#' code.
+#'
 #' @param x A quasiquoted expression
 #' @param .fn Function name (as string, call, or symbol)
 #' @param ... Arguments to function
@@ -12,9 +17,11 @@
 #' @export
 #' @examples
 #' sql_expr(f(x + 1))
-#'
 #' sql_expr(f("x", "y"))
 #' sql_expr(f(x, y))
+#'
+#' x <- ident("x")
+#' sql_expr(f(!!x, y))
 #'
 #' sql_expr(cast("x" %as% DECIMAL))
 #' sql_expr(round(x) %::% numeric)

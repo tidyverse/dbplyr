@@ -23,6 +23,11 @@ deliberate) by automatically escaping all expressions in the input, while
 treating bare strings as sql. This is unlikely to prevent any serious
 attack, but should make it unlikely that you produce invalid sql.
 }
+\details{
+This function should be used only when generating \code{SELECT} clauses or
+other high level queries. For individual function translations, prefer
+\code{\link[=sql_expr]{sql_expr()}}.
+}
 \examples{
 build_sql("SELECT * FROM TABLE")
 x <- "TABLE"
@@ -34,3 +39,4 @@ build_sql("SELECT * FROM ", sql(x))
 name <- "Robert'); DROP TABLE Students;--"
 build_sql("INSERT INTO Students (Name) VALUES (", name, ")")
 }
+\keyword{internal}

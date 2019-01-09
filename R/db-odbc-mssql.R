@@ -40,7 +40,13 @@
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
 
-      `!`           = mssql_not_sql_prefix(),
+      `!`           = function(x) {
+                        if (sql_current_select()) {
+                          build_sql(sql("~"), list(x))
+                        } else {
+                          sql_expr(NOT(!!x))
+                        }
+                      },
 
       `!=`           = sql_infix("!="),
       `==`           = sql_infix("="),
@@ -49,10 +55,10 @@
       `>`            = sql_infix(">"),
       `>=`           = sql_infix(">="),
 
-      `&`            = mssql_generic_infix("&", "AND"),
-      `&&`           = mssql_generic_infix("&", "AND"),
-      `|`            = mssql_generic_infix("|", "OR"),
-      `||`           = mssql_generic_infix("|", "OR"),
+      `&`            = mssql_generic_infix("&", "%AND%"),
+      `&&`           = mssql_generic_infix("&", "%AND%"),
+      `|`            = mssql_generic_infix("|", "%OR%"),
+      `||`           = mssql_generic_infix("|", "%OR%"),
 
       `if`           = mssql_sql_if,
       if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
@@ -66,34 +72,30 @@
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
-      substr        = function(x, start, stop){
+      substr        = function(x, start, stop) {
                         len <- stop - start + 1
-                        build_sql(
-                          "SUBSTRING(", x, ", ", start, ", ", len, ")"
-                        )},
+                        sql_expr(SUBSTRING(!!x, !!start, !!len))
+                      },
       is.null       = function(x) mssql_is_null(x, sql_current_context()),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
                       # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
-                      # Best solution was to nest a left and right trims.
-      trimws        = function(x){
-                          build_sql(
-                            "LTRIM(RTRIM(", x ,"))"
-                          )},
+                      # Best solution is to nest a left and right trims.
+      trimws        = function(x) {
+                        sql_expr(LTRIM(RTRIM(!!x)))
+                      },
                       # MSSQL supports CONCAT_WS in the CTP version of 2016
       paste         = sql_not_supported("paste()"),
 
       # stringr functions
 
       str_length      = sql_prefix("LEN"),
-      str_locate      = function(string, pattern){
-                            build_sql(
-                              "CHARINDEX(", pattern, ", ", string, ")"
-                            )},
-      str_detect      = function(string, pattern){
-                            build_sql(
-                              "CHARINDEX(", pattern, ", ", string, ") > 0"
-                            )}
+      str_locate      = function(string, pattern) {
+                          sql_expr(CHARINDEX(!!pattern, !!string))
+                        },
+      str_detect      = function(string, pattern) {
+                          sql_expr(CHARINDEX(!!pattern, !!string) > 0L)
+                        }
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
@@ -180,17 +182,6 @@ mssql_is_null <- function(x, context) {
   }
 }
 
-mssql_not_sql_prefix <- function() {
-  function(...) {
-    args <- list(...)
-    if (sql_current_select()) {
-      build_sql(sql("~"), args)
-    } else {
-      build_sql(sql("NOT"), args)
-    }
-  }
-}
-
 mssql_generic_infix <- function(if_select, if_filter) {
   assert_that(is_string(if_select))
   assert_that(is_string(if_filter))
@@ -204,7 +195,7 @@ mssql_generic_infix <- function(if_select, if_filter) {
     } else {
       f <- if_filter
     }
-    build_sql(x, " ", sql(f), " ", y)
+    sql_call2(f, x, y)
   }
 }
 
@@ -218,4 +209,4 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL) {
   sql_if(cond, if_true, if_false)
 }
 
-globalVariables(c("BIT", "%is%", "convert", "iif"))
+globalVariables(c("BIT", "%is%", "convert", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX"))
