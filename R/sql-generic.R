@@ -87,9 +87,11 @@ sql_join_vars <- function(con, vars) {
 
 sql_join_var <- function(con, alias, x, y) {
   if (!is.na(x) & !is.na(y)) {
-    sql_coalesce(
-      sql_table_prefix(con, x, table = "TBL_LEFT"),
-      sql_table_prefix(con, y, table = "TBL_RIGHT")
+    sql_expr(
+      COALESCE(
+        !!sql_table_prefix(con, x, table = "TBL_LEFT"),
+        !!sql_table_prefix(con, y, table = "TBL_RIGHT")
+      )
     )
   } else if (!is.na(x)) {
     sql_table_prefix(con, x, table = "TBL_LEFT")
@@ -115,11 +117,6 @@ sql_join_tbls <- function(con, by) {
   }
 
   on
-}
-
-sql_coalesce <- function(...) {
-  vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
-  build_sql("coalesce(", vars, ")")
 }
 
 sql_as <- function(con, var, alias = names(var), table = NULL) {
@@ -237,3 +234,5 @@ sql_translate_env.DBIConnection <- function(con) {
     base_win
   )
 }
+
+utils::globalVariables("COALESCE")

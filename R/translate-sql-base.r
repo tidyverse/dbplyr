@@ -36,10 +36,10 @@ base_scalar <- sql_translator(
       if (is.numeric(x)) {
         -x
       } else {
-        build_sql(sql("-"), x)
+        sql_expr(-!!x)
       }
     } else {
-      build_sql(x, sql(" - "), y)
+      sql_expr(!!x - !!y)
     }
   },
 
@@ -52,11 +52,11 @@ base_scalar <- sql_translator(
 
   `%in%` = function(x, table) {
     if (is.sql(table) || length(table) > 1) {
-      build_sql(x, " IN ", table)
+      sql_expr(!!x %in% !!table)
     } else if (length(table) == 0) {
-      build_sql(FALSE)
+      sql_expr(FALSE)
     } else {
-      build_sql(x, " IN (", table, ")")
+      sql_expr(!!x %in% ((!!table)))
     }
   },
 
@@ -109,7 +109,7 @@ base_scalar <- sql_translator(
     start <- as.integer(start)
     length <- pmax(as.integer(stop) - start + 1L, 0L)
 
-    build_sql(sql("substr"), list(x, start, length))
+    sql_expr(SUBSTR(!!x, !!start, !!length))
   },
 
   `if` = sql_if,
@@ -120,10 +120,10 @@ base_scalar <- sql_translator(
 
   sql = function(...) sql(...),
   `(` = function(x) {
-    build_sql("(", x, ")")
+    sql_expr(((!!x)))
   },
   `{` = function(x) {
-    build_sql("(", x, ")")
+    sql_expr(((!!x)))
   },
   desc = function(x) {
     build_sql(x, sql(" DESC"))
@@ -143,7 +143,7 @@ base_scalar <- sql_translator(
   `:` = function(from, to) from:to,
 
   between = function(x, left, right) {
-    build_sql(x, " BETWEEN ", left, " AND ", right)
+    sql_expr(!!x %BETWEEN% !!left %AND% !!right)
   },
 
   pmin = sql_prefix("min"),
@@ -163,21 +163,20 @@ base_scalar <- sql_translator(
   str_length      = sql_prefix("LENGTH"),
   str_to_upper    = sql_prefix("UPPER"),
   str_to_lower    = sql_prefix("LOWER"),
-  str_replace_all = function(string, pattern, replacement){
-                      build_sql(
-                        "REPLACE(", string, ", ", pattern, ", ", replacement, ")"
-                      )},
-  str_detect      = function(string, pattern){
-                      build_sql(
-                        "INSTR(", string, ", ", pattern, ") > 0"
-                      )},
-  str_trim        = function(string, side = "both"){
-                      build_sql(
-                        sql(ifelse(side == "both" | side == "left", "LTRIM(", "(")),
-                        sql(ifelse(side == "both" | side == "right", "RTRIM(", "(")),
-                        string
-                        ,"))"
-                      )}
+  str_replace_all = function(string, pattern, replacement) {
+                      sql_expr(REPLACE(!!string, !!pattern, !!replacement))
+                    },
+  str_detect      = function(string, pattern) {
+                      sql_expr(INSTR(!!string, !!pattern) > 0L)
+                    },
+  str_trim        = function(string, side = c("both", "left", "right")) {
+                      side <- match.arg(side)
+                      switch(side,
+                        left = sql_expr(LTRIM(!!string)),
+                        right = sql_expr(RTRIM(!!string)),
+                        both = sql_expr(LTRIM(RTRIM(!!string))),
+                      )
+                    }
 )
 
 base_symbols <- sql_translator(
@@ -217,7 +216,7 @@ base_win <- sql_translator(
   cume_dist    = win_rank("cume_dist"),
   ntile        = function(order_by, n) {
     win_over(
-      build_sql("NTILE", list(as.integer(n))),
+      sql_expr(NTILE(!!as.integer(n))),
       win_current_group(),
       order_by %||% win_current_order()
     )
@@ -226,21 +225,21 @@ base_win <- sql_translator(
   # Variants that take more arguments
   first = function(x, order_by = NULL) {
     win_over(
-      build_sql("first_value", list(x)),
+      sql_expr(FIRST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order()
     )
   },
   last = function(x, order_by = NULL) {
     win_over(
-      build_sql("last_value", list(x)),
+      sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order()
     )
   },
   nth = function(x, n, order_by = NULL) {
     win_over(
-      build_sql("nth_value", list(x, as.integer(n))),
+      sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
       win_current_group(),
       order_by %||% win_current_order()
     )
@@ -248,14 +247,14 @@ base_win <- sql_translator(
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
-      build_sql("LEAD", list(x, n, default)),
+      sql_expr(LEAD(!!x, !!n, !!default)),
       win_current_group(),
       order_by %||% win_current_order()
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
-      build_sql("LAG", list(x, as.integer(n), default)),
+      sql_expr(LAG(!!x, !!as.integer(n), !!default)),
       win_current_group(),
       order_by %||% win_current_order()
     )

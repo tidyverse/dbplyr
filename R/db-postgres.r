@@ -54,18 +54,18 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       grepl  = postgres_grepl,
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
-      substr = function(x, start, stop){
+      substr = function(x, start, stop) {
         len <- stop - start + 1
         start <- as.integer(start)
         len <- as.integer(len)
-        build_sql(
-          "SUBSTRING(", x, ", ", start, ", ", len, ")"
-        )},
+
+        sql_expr(SUBSTRING(!!x, !!start, !!len))
+      },
       # stringr functions
       str_locate  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
-      str_detect  = function(string, pattern){
+      str_detect  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern) > 0L)
       }
     ),

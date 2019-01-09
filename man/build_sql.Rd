@@ -24,9 +24,9 @@ treating bare strings as sql. This is unlikely to prevent any serious
 attack, but should make it unlikely that you produce invalid sql.
 }
 \details{
-This function should be used only when generating \code{SELECT} clauses or
-other high level queries. For individual function translations, prefer
-\code{\link[=sql_expr]{sql_expr()}}.
+This function should be used only when generating \code{SELECT} clauses,
+other high level queries, or for other syntax that has no R equivalnt.
+For individual function translations, prefer \code{\link[=sql_expr]{sql_expr()}}.
 }
 \examples{
 build_sql("SELECT * FROM TABLE")

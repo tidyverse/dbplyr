@@ -49,18 +49,19 @@ sql_translate_env.Teradata <- function(con) {
       nchar         = sql_prefix("CHARACTER_LENGTH"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
-      atan2         = function(x, y){
-                          build_sql(
-                            "ATAN2(", y, ",", x, ")"
-                          )},
-      substr        = function(x, start, stop){
+      atan2         = function(x, y) {
+                        sql_expr(ATAN2(!!y, !!x))
+                      },
+      substr        = function(x, start, stop) {
                         len <- stop - start + 1
-                        build_sql(
-                          "SUBSTR(", x, ", ", start, ", ", len, ")"
-                        )},
+                        sql_expr(SUBSTR(!!x, !!start, !!len))
+                      },
       paste         =  function(...) {
-                          stop("PASTE() is not supported in this SQL variant, try PASTE0() instead", call. = FALSE)
-                        }
+                        stop(
+                          "`paste()`` is not supported in this SQL variant, try `paste0()` instead",
+                          call. = FALSE
+                        )
+                      }
     ),
     sql_translator(.parent = base_odbc_agg,
       cor           = sql_not_supported("cor()"),
@@ -86,3 +87,5 @@ db_analyze.Teradata <- function(con, table, ...) {
   )
   DBI::dbExecute(con, sql)
 }
+
+utils::globalVariables(c("ATAN2", "SUBSTR"))

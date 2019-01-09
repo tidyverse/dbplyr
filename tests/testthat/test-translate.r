@@ -100,10 +100,10 @@ test_that("magrittr pipe is translated", {
 # string functions --------------------------------------------------------
 
 test_that("different arguments of substr are corrected", {
-  expect_equal(translate_sql(substr(x, 3, 4)), sql('substr("x", 3, 2)'))
-  expect_equal(translate_sql(substr(x, 3, 3)), sql('substr("x", 3, 1)'))
-  expect_equal(translate_sql(substr(x, 3, 2)), sql('substr("x", 3, 0)'))
-  expect_equal(translate_sql(substr(x, 3, 1)), sql('substr("x", 3, 0)'))
+  expect_equal(translate_sql(substr(x, 3, 4)), sql('SUBSTR("x", 3, 2)'))
+  expect_equal(translate_sql(substr(x, 3, 3)), sql('SUBSTR("x", 3, 1)'))
+  expect_equal(translate_sql(substr(x, 3, 2)), sql('SUBSTR("x", 3, 0)'))
+  expect_equal(translate_sql(substr(x, 3, 1)), sql('SUBSTR("x", 3, 0)'))
 })
 
 # stringr -------------------------------------------

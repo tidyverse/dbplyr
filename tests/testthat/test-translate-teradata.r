@@ -16,7 +16,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(nchar(x)),        sql("CHARACTER_LENGTH(`x`)"))
   expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
   expect_equal(trans(ceiling(x)),      sql("CEILING(`x`)"))
-  expect_equal(trans(atan2(x, y)),     sql("ATAN2(`y`,`x`)"))
+  expect_equal(trans(atan2(x, y)),     sql("ATAN2(`y`, `x`)"))
   expect_equal(trans(substr(x, 1, 2)), sql("SUBSTR(`x`, 1.0, 2.0)"))
 
   expect_error(trans(paste(x)),        sql("not supported"))

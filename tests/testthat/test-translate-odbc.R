@@ -16,12 +16,12 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(paste0(x, y)),             sql("CONCAT(`x`, `y`)"))
   expect_equal(trans(cosh(x)),                  sql("(EXP(`x`) + EXP(-(`x`))) / 2"))
   expect_equal(trans(sinh(x)),                  sql("(EXP(`x`) - EXP(-(`x`))) / 2"))
-  expect_equal(trans(tanh(x)),                  sql("((EXP(`x`) - EXP(-(`x`))) / 2) / ((EXP(`x`) + EXP(-(`x`))) / 2)"))
+  expect_equal(trans(tanh(x)),                  sql("(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"))
+  expect_equal(trans(coth(x)),                  sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"))
   expect_equal(trans(round(10.1)),              sql("ROUND(10.1, 0)"))
   expect_equal(trans(round(10.1, digits = 1)),  sql("ROUND(10.1, 1)"))
-  expect_equal(trans(coth(x)),                  sql("((EXP(`x`) + EXP(-(`x`))) / 2) / ((EXP(`x`) - EXP(-(`x`))) / 2)"))
-  expect_equal(trans(paste(x, y)),              sql("CONCAT_WS(' ', `x`,`y`)"))
-  expect_equal(trans(paste(x, y, sep = ",")),   sql("CONCAT_WS(',', `x`,`y`)"))
+  expect_equal(trans(paste(x, y)),              sql("CONCAT_WS(' ', `x`, `y`)"))
+  expect_equal(trans(paste(x, y, sep = ",")),   sql("CONCAT_WS(',', `x`, `y`)"))
 
 })
 

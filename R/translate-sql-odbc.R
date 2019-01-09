@@ -1,3 +1,4 @@
+#' @include translate-sql-paste.R
 #' @export
 #' @rdname sql_variant
 #' @format NULL
@@ -17,25 +18,26 @@ base_odbc_scalar <- sql_translator(.parent = base_scalar,
   paste0        = sql_prefix("CONCAT"),
                   # cosh, sinh, coth and tanh calculations are based on this article
                   # https://en.wikipedia.org/wiki/Hyperbolic_function
-  cosh          = function(x) build_sql("(EXP(", x, ") + EXP(-(", x,"))) / 2"),
-  sinh          = function(x) build_sql("(EXP(", x, ") - EXP(-(", x,"))) / 2"),
-  tanh          = function(x){
-                    build_sql(
-                      "((EXP(", x, ") - EXP(-(", x,"))) / 2) / ((EXP(", x, ") + EXP(-(", x,"))) / 2)"
-                    )},
   round         = function(x, digits = 0L){
-                    build_sql(
-                      "ROUND(", x, ", ", as.integer(digits),")"
-                    )},
-  coth          = function(x){
-                    build_sql(
-                      "((EXP(", x, ") + EXP(-(", x,"))) / 2) / ((EXP(", x, ") - EXP(-(", x,"))) / 2)"
-                    )},
-  paste         = function(..., sep = " "){
-                    build_sql(
-                      "CONCAT_WS(",sep, ", ",escape(c(...), parens = "", collapse = ","),")"
-                    )}
+                    sql_expr(ROUND(!!x, !!as.integer(digits)))
+                  },
+  cosh          = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
+  sinh          = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
+  tanh          = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
+  coth          = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+  paste         = sql_paste(" ")
 )
+
+sql_exp <- function(a, x) {
+  a <- as.integer(a)
+  if (identical(a, 1L)) {
+    sql_expr(EXP(!!x))
+  } else if (identical(a, -1L)) {
+   sql_expr(EXP(-((!!x))))
+  } else {
+    sql_expr(EXP(!!a * ((!!x))))
+  }
+}
 
 #' @export
 #' @rdname sql_variant
@@ -89,3 +91,5 @@ db_drop_table.OdbcConnection <- function(con, table, force = FALSE, ...) {
   )
   DBI::dbExecute(con, sql)
 }
+
+utils::globalVariables("EXP")
