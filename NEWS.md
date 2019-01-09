@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+* SQLite translation gains support for window functions   
+  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25.
+
+* MySQL/MariaDB translation gains support for window functions 
+  (https://mariadb.com/kb/en/library/window-functions/). They are available
+  in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
+  syntax error if you attempt to use with window functions.
+
 # dbplyr 1.3.0
 
 * Now supports for dplyr 0.8.0 (#190) and R 3.1.0
