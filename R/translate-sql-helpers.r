@@ -127,12 +127,18 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 
 #' @rdname sql_variant
 #' @export
-sql_infix <- function(f) {
+sql_infix <- function(f, pad = TRUE) {
   assert_that(is_string(f))
 
   f <- toupper(f)
-  function(x, y) {
-    build_sql(x, " ", sql(f), " ", y)
+  if (pad) {
+    function(x, y) {
+      build_sql(x, " ", sql(f), " ", y)
+    }
+  } else {
+    function(x, y) {
+      build_sql(x, sql(f), y)
+    }
   }
 }
 

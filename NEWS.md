@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `x$y` and `x[["y"]]` are now translated to `x.y`, enabling you to index
+  into nested fields in databases that provide them (#158).
+
 * (Breaking change) Subsetting (`[[`, `$`, and `[`) are no longer evaluated 
   locally. This makes the translation more consistent enables useful new idioms
   (#200).

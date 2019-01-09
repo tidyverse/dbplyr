@@ -150,6 +150,16 @@ test_that("str_trim() translates correctly ", {
       sql("LTRIM(RTRIM(\"field_name\"))"))
 })
 
+# subsetting --------------------------------------------------------------
 
+test_that("$ and [[ index into nested fields", {
+  expect_equal(translate_sql(a$b), sql('"a"."b"'))
 
+  expect_equal(translate_sql(a[["b"]]), sql('"a"."b"'))
+})
+
+test_that("can only subset with strings", {
+  expect_error(translate_sql(a[[1]]), "index with strings")
+  expect_error(translate_sql(a[[x]]), "index with strings")
+})
 

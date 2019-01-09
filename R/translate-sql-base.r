@@ -39,6 +39,15 @@ base_scalar <- sql_translator(
     }
   },
 
+  `$`   = sql_infix(".", pad = FALSE),
+  `[[`   = function(x, i) {
+    i <- enexpr(i)
+    if (!is.character(i)) {
+      stop("Can only index with strings", call. = FALSE)
+    }
+    build_sql(x, ".", ident(i))
+  },
+
   `!=`    = sql_infix("!="),
   `==`    = sql_infix("="),
   `<`     = sql_infix("<"),
