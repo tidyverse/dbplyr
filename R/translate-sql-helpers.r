@@ -23,6 +23,7 @@
 #'   Defaults to `base_agg` which provides a standard set of
 #'   mappings for the most common operators and functions.
 #' @param f the name of the sql function as a string
+#' @param f_r the name of the r function being translated as a string
 #' @param n for `sql_infix()`, an optional number of arguments to expect.
 #'   Will signal error if not correct.
 #' @seealso [sql()] for an example of a more customised sql
@@ -35,8 +36,8 @@
 #' postgres_agg <- sql_translator(.parent = base_agg,
 #'   cor = sql_aggregate_2("corr"),
 #'   cov = sql_aggregate_2("covar_samp"),
-#'   sd =  sql_aggregate("stddev_samp"),
-#'   var = sql_aggregate("var_samp")
+#'   sd =  sql_aggregate("stddev_samp", "sd"),
+#'   var = sql_aggregate("var_samp", "var")
 #' )
 #' postgres_var <- sql_variant(
 #'   base_scalar,
@@ -158,12 +159,12 @@ sql_prefix <- function(f, n = NULL) {
 
 #' @rdname sql_variant
 #' @export
-sql_aggregate <- function(f) {
+sql_aggregate <- function(f, f_r = f) {
   assert_that(is_string(f))
   f <- toupper(f)
 
   function(x, na.rm = FALSE) {
-    check_na_rm(f, na.rm)
+    check_na_rm(f_r, na.rm)
     build_sql(sql(f), list(x))
   }
 }

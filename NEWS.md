@@ -1,4 +1,18 @@
-# dbplyr 1.2.2.9001
+# dbplyr (development version)
+
+* `sql_aggregate()` now takes an optional argument `f_r` for passing to
+  `check_na_rm()`. "Missing values are always removed" warning for aggregate
+  functions now shows the dplyr verb in the usage suggestion (@sverchkov, #153).
+
+* SQLite translation gains support for window functions   
+  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25 (#144).
+
+* MySQL/MariaDB translation gains support for window functions 
+  (https://mariadb.com/kb/en/library/window-functions/). They are available
+  in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
+  syntax error if you attempt to use with window functions (#191).
+
+# dbplyr 1.3.0
 
 * Now supports for dplyr 0.8.0 (#190) and R 3.1.0
 
