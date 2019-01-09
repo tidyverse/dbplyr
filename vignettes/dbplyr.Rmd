@@ -183,13 +183,13 @@ You can also ask the database how it plans to execute the query with `explain()`
 
 ## Creating your own database
 
-If you don't already have a database, here's some advice from my experiences setting up and running all of them. SQLite is by far the easiest to get started with, but the lack of window functions makes it limited for data analysis. PostgreSQL is not too much harder to use and has a wide range of built-in functions. In my opinion, you shouldn't bother with MySQL/MariaDB: it's a pain to set up, the documentation is subpar, and it's less featureful than Postgres. Google BigQuery might be a good fit if you have very large data, or if you're willing to pay (a small amount of) money to someone who'll look after your database.
+If you don't already have a database, here's some advice from my experiences setting up and running all of them. SQLite is by far the easiest to get started with. PostgreSQL is not too much harder to use and has a wide range of built-in functions. In my opinion, you shouldn't bother with MySQL/MariaDB: it's a pain to set up, the documentation is subpar, and it's less featureful than Postgres. Google BigQuery might be a good fit if you have very large data, or if you're willing to pay (a small amount of) money to someone who'll look after your database.
 
 All of these databases follow a client-server model - a computer that connects to the database and the computer that is running the database (the two may be one and the same but usually isn't). Getting one of these databases up and running is beyond the scope of this article, but there are plenty of tutorials available on the web.
 
 ### MySQL/MariaDB
 
-In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. It provides a wider range of [built-in functions](http://dev.mysql.com/doc/refman/5.0/en/functions.html), but it does not support window functions (so you can't do grouped mutates and filters).
+In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. It provides a wider range of [built-in functions](http://dev.mysql.com/doc/refman/5.0/en/functions.html). It gained support for window functions in 2018.
 
 ### PostgreSQL
 

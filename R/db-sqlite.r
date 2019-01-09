@@ -4,11 +4,7 @@ db_desc.SQLiteConnection <- function(x) {
 }
 
 sqlite_version <- function() {
-  if (utils::packageVersion("RSQLite") > 1) {
-    RSQLite::rsqliteVersion()[[2]]
-  } else {
-    DBI::dbGetInfo(RSQLite::SQLite())$clientVersion
-  }
+  numeric_version(RSQLite::rsqliteVersion()[[2]])
 }
 
 # SQL methods -------------------------------------------------------------
@@ -33,7 +29,13 @@ sql_translate_env.SQLiteConnection <- function(con) {
     sql_translator(.parent = base_agg,
       sd = sql_aggregate("stdev", "sd")
     ),
-    base_no_win
+    if (sqlite_version() >= "3.25") {
+      sql_translator(.parent = base_win,
+        sd = win_aggregate("stdev")
+      )
+    } else {
+      base_no_win
+    }
   )
 }
 
