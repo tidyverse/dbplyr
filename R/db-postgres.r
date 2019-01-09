@@ -20,27 +20,15 @@ postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed 
     abort("`perl`, `fixed` and `useBytes` parameters are unsupported")
   }
 
-  if (old_qq()) {
-    if (ignore.case) {
-      sql_expr((!!x) %~*% (!!pattern))
-    } else {
-      sql_expr((!!x) %~% (!!pattern))
-    }
+  if (ignore.case) {
+    sql_expr(((!!x)) %~*% ((!!pattern)))
   } else {
-    if (ignore.case) {
-      sql_expr(((!!x)) %~*% ((!!pattern)))
-    } else {
-      sql_expr(((!!x)) %~% ((!!pattern)))
-    }
+    sql_expr(((!!x)) %~% ((!!pattern)))
   }
 }
 postgres_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
-  if (old_qq()) {
-    sql_expr(round((!!x) %::% numeric, !!digits))
-  } else {
-    sql_expr(round(((!!x)) %::% numeric, !!digits))
-  }
+  sql_expr(round(((!!x)) %::% numeric, !!digits))
 }
 
 #' @export

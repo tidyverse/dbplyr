@@ -103,7 +103,3 @@ c_character <- function(...) {
 
   x
 }
-
-old_qq <- function() {
-  utils::packageVersion("rlang") <= "0.1.6"
-}

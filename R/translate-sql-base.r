@@ -14,11 +14,7 @@ sql_if <- function(cond, if_true, if_false = NULL) {
 }
 
 sql_null <- function(x) {
-  if (old_qq()) {
-    sql_expr(((!!x) %is% NULL))
-  } else {
-    sql_expr((((!!x)) %is% NULL))
-  }
+  sql_expr((((!!x)) %is% NULL))
 }
 
 
