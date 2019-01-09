@@ -1,7 +1,5 @@
 # dbplyr 1.3.0
 
-# dbplyr 1.2.2.9001
-
 * Now supports for dplyr 0.8.0 (#190) and R 3.1.0
 
 ## API changes
