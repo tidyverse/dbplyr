@@ -22,6 +22,11 @@ test_that("summarise replaces existing", {
   expect_equal(op_vars(out), "z")
 })
 
+test_that("transmute replaces existing", {
+  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% transmute(z = 1)
+  expect_equal(op_vars(out), "z")
+})
+
 test_that("summarised and mutated vars are always named", {
   mf <- dbplyr::memdb_frame(a = 1)
 

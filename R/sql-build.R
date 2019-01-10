@@ -97,6 +97,22 @@ sql_build.op_mutate <- function(op, con, ...) {
   )
 }
 
+#' @export
+sql_build.op_transmute <- function(op, con, ...) {
+  new_vars <- translate_sql_(
+    op$dots, con,
+    vars_group = op_grps(op),
+    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
+    vars_frame = op_frame(op),
+    context = list(clause = "SELECT")
+  )
+
+  select_query(
+    sql_build(op$x, con),
+    select = new_vars
+  )
+}
+
 overwrite_vars <- function(vars, new_vars, con) {
   all_names <- unique(c(vars, names(new_vars)))
   new_idx <- match(names(new_vars), all_names)

@@ -125,6 +125,13 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
 }
 
 #' @export
+transmute.tbl_lazy <- function(.data, ...) {
+  dots <- quos(..., .named = TRUE)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+  add_op_single("transmute", .data, dots = dots)
+}
+
+#' @export
 group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
   dots <- quos(...)
   dots <- partial_eval(dots, vars = op_vars(.data))

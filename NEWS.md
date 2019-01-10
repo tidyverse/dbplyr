@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `transmute()` now generates simpler SQL instead of being a `mutate()` + 
+   a `select()` (#193).
+
 * `union()`, `union_all()`, `setdiff()` and `intersect()` do a better job
   of matching columns across all backends (#183).
 

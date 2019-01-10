@@ -185,6 +185,10 @@ op_vars.op_mutate <- function(op) {
   unique(c(op_vars(op$x), names(op$dots)))
 }
 #' @export
+op_vars.op_transmute <- function(op) {
+  c(op_grps(op$x), names(op$dots))
+}
+#' @export
 op_vars.op_single <- function(op) {
   op_vars(op$x)
 }
