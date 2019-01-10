@@ -243,13 +243,11 @@
 <div id="conditional-evauation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conditional-evauation" class="anchor"></a>Conditional evauation</h3>
-<ul>
-<li>
-<p>If statements are translated into a case statement:</p>
+<p><code>if</code> and <code><a href="https://www.rdocumentation.org/packages/base/topics/switch">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">if</span> (x <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> <span class="cf">else</span> <span class="st">"small"</span>)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') WHEN NOT("x" &gt; 5.0) THEN ('small') </span><span class="re">END</span></a></code></pre></div>
-</li>
-</ul>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') WHEN NOT("x" &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">switch</span>(x, <span class="dt">a =</span> 1L, <span class="dt">b =</span> 2L, 3L))</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; CASE "x" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) </span><span class="re">END</span></a></code></pre></div>
 </div>
 <div id="string-manipulation" class="section level3">
 <h3 class="hasAnchor">
