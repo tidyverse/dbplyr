@@ -13,6 +13,7 @@ reference:
 - title: dplyr verbs
   contents:
   - copy_to.src_sql
+  - collapse.tbl_sql
   - do.tbl_sql
   - inner_join.tbl_lazy
   - src_dbi

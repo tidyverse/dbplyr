@@ -379,8 +379,15 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   invisible(out)
 }
 
+#' Force computation of query
+#'
+#' `collapse()` creates a subquery; `compute()` stores the results in a
+#' remote table; `collect()` donwloads the results into the current
+#' R session.
+#'
 #' @export
-collapse.tbl_sql <- function(x, vars = NULL, ...) {
+#' @param x A `tbl_sql`
+collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 
   tbl(x$src, sql) %>%
@@ -388,6 +395,11 @@ collapse.tbl_sql <- function(x, vars = NULL, ...) {
     add_op_order(op_sort(x))
 }
 
+#' @rdname collapse.tbl_sql
+#' @param name Table name in remote database.
+#' @param temporary Should the table be temporary (`TRUE`, the default`) or
+#'   persistent (`FALSE`)?
+#' @inheritParams copy_to.src_sql
 #' @export
 compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
                             unique_indexes = list(), indexes = list(),
@@ -413,6 +425,9 @@ compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
     add_op_order(op_sort(x))
 }
 
+#' @rdname collapse.tbl_sql
+#' @param n Number of rows to fetch. Defaults to `Inf`, meaning all rows.
+#' @param warn_incomplete Warn if `n` is less than the number of result rows?
 #' @export
 collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   assert_that(length(n) == 1, n > 0L)
@@ -428,5 +443,3 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete)
   grouped_df(out, intersect(op_grps(x), names(out)))
 }
-
-
