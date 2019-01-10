@@ -62,7 +62,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/sql-translation.html">SQL translation</a>
+      <a href="../articles/translation-verb.html">Translation of functions to SQL</a>
+    </li>
+    <li>
+      <a href="../articles/translation-function.html">Translation of dplyr verbs to SQL</a>
     </li>
     <li>
       <a href="../articles/new-backend.html">Creating new backends</a>
@@ -282,7 +285,7 @@
 <a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; GROUP BY `tailnum`)</span></a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; ORDER BY `delay` DESC)</span></a>
 <a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></a></code></pre></div>
-<p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/sql-translation.html">vignette("sql-translation")</a></code>.</p>
+<p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> to pull all the data down into a local tibble:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">tailnum_delay &lt;-<span class="st"> </span>tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span>()</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>

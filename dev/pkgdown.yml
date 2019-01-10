@@ -6,7 +6,8 @@ articles:
   new-backend: new-backend.html
   mysql-setup: notes/mysql-setup.html
   postgres-setup: notes/postgres-setup.html
-  sql-translation: sql-translation.html
+  translation-function: translation-function.html
+  translation-verb: translation-verb.html
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles
