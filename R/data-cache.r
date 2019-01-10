@@ -1,4 +1,3 @@
-# Environment for caching connections etc
 cache <- new.env(parent = emptyenv())
 
 is_cached <- function(name) exists(name, envir = cache)
