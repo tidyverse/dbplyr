@@ -14,14 +14,29 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translate-verb")` describes how entire verbs are translated.
 
-Most filtering, mutating or summarising operations only perform simple mathematical operations. These operations are very similar between R and SQL, so they're easy to translate. To see what's happening yourself, you can use `translate_sql()`. The basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
-
-To explore them, you'll need to load both dbplyr and dplyr:
 
 ```{r, message = FALSE}
 library(dbplyr)
 library(dplyr)
 ```
+
+`dbplyr::translate_sql()` powers translation of individual function calls, and I'll use it extensively in this vignette to show what's happening. You shouldn't need to use it ordinary code as dbplyr takes care of the translation automatically.
+
+```{r}
+translate_sql((x + y) / 2)
+```
+
+`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translate_env()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details.  You can use the various simulate helpers to see the translations used by different backends:
+
+```{r}
+translate_sql(x ^ 2L)
+translate_sql(x ^ 2L, con = simulate_sqlite())
+translate_sql(x ^ 2L, con = simulate_odbc_access())
+```
+
+Perfect translation is not possible because databases don't have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. 
+
+If you're interested in how `translate_sql()` is implemented, the basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.hadley.nz/translation.html). 
 
 ## Basic differences
 
@@ -36,13 +51,6 @@ The following examples work through some of the basic differences between R and 
     translate_sql("x")
     ```
     
-*   Many functions have slightly different names
-  
-    ```{r}
-    translate_sql(x == 1 && (y < 2 || z > 3))
-    translate_sql(x ^ 2 < 10)
-    translate_sql(x %% 2 == 10)
-    ```
 *   And some functions have different argument orders:
     
     ```{r}
@@ -58,34 +66,50 @@ The following examples work through some of the basic differences between R and 
     translate_sql(1L)
     ```
 
+## Known functions
+
+### Mathematics
+
+* basic math operators: `+`, `-`, `*`, `/`, `%%`, `^`
+* trigonometry: `acos()`, `asin()`, `atan()`, `atan2()`, `cos()`, `cot()`, `tan()`, `sin()`
+* hypergeometric: `cosh()`, `coth()`, `sinh()`, `tanh()`
+* logarithmic: `log()`, `log10()`, `exp()`
+* misc: `abs()`, `ceiling()`, `sqrt()`, `sign()`, `round()`
+
+### Logical comparisons
+
+* logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
+* boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor()`
+
+### Aggregation
+
+All database provide translation for the basic aggregations: `mean()`, `sum()`, `min()`, `max()`, `sd()`, `var()`. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:
+
+```{r}
+translate_sql(mean(x))
+translate_sql(mean(x, na.rm = TRUE))
+```
+
+Note that, by default, `translate()` assumes that the call is inside a `mutate()` or `filter()` and generates a window translation. If you want to see the equivalent `summarise()`/aggregation translation, use `window = FALSE`:
+
+```{r}
+translate_sql(mean(x, na.rm = TRUE), window = FALSE)
+```
+
+### Conditional evauation
+
 *   If statements are translated into a case statement:
 
     ```{r}
     translate_sql(if (x > 5) "big" else "small")
     ```
 
-## Known functions
+### String manipulation
 
-dplyr knows how to convert the following R functions to SQL:
+### Date/time
 
-* basic math operators: `+`, `-`, `*`, `/`, `%%`, `^`
-* math functions: `abs`, `acos`, `acosh`, `asin`, `asinh`, `atan`, `atan2`,
-  `atanh`, `ceiling`, `cos`, `cosh`, `cot`, `coth`, `exp`, `floor`,
-  `log`, `log10`, `round`, `sign`, `sin`, `sinh`, `sqrt`, `tan`, `tanh`
-* logical comparisons: `<`, `<=`, `!=`, `>=`, `>`, `==`, `%in%`
-* boolean operations: `&`, `&&`, `|`, `||`, `!`, `xor`
-* basic aggregations: `mean`, `sum`, `min`, `max`, `sd`, `var`
 * string functions: `tolower`, `toupper`, `trimws`, `nchar`, `substr`
 * coerce types: `as.numeric`, `as.integer`, `as.character`
-
-Perfect translation is not possible because databases don't have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean rather than what is done. In fact, even for functions that exist both in databases and R, you shouldn't expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, `mean()` loops through the data twice. R's `mean()` also provides a `trim` option for computing trimmed means; this is something that databases do not provide. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. This means the essence of simple calls like `mean(x)` will be translated accurately, but more complicated calls like `mean(x, trim = 0.5, na.rm = TRUE)` will raise an error:
-
-```{r, error = TRUE}
-translate_sql(mean(x, na.rm = TRUE))
-translate_sql(mean(x, trim = 0.1))
-```
-
-`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translate_env()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details. 
 
 ## Unknown functions
 
