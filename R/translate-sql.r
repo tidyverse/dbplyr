@@ -186,7 +186,7 @@ sql_overscope <- function(expr, variant, con, window = FALSE,
   # Known sql expressions
   symbol_env <- env_clone(base_symbols, parent = name_env)
 
-  new_overscope(symbol_env, top_env)
+  new_data_mask(symbol_env, top_env)
 }
 
 is_infix_base <- function(x) {

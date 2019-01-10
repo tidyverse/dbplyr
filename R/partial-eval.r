@@ -19,6 +19,9 @@
 #'   \item Otherwise, remote.
 #' }
 #'
+#' You can override the guesses using `local()` and `remote()` to force
+#' computation, or by using the `.data` and `.env` pronouns of tidy evaluation.
+#'
 #' @param call an unevaluated expression, as produced by [quote()]
 #' @param vars character vector of variable names.
 #' @param env environment in which to search for local values
@@ -31,11 +34,15 @@
 #' ids <- c("ansonca01", "forceda01", "mathebo01")
 #' partial_eval(quote(id %in% ids), vars = vars)
 #'
-#' # You can use local to disambiguate between local and remote
+#' # cf.
+#' partial_eval(quote(id == .data$ids), vars = vars)
+#'
+#' # You can use local() or .env to disambiguate between local and remote
 #' # variables: otherwise remote is always preferred
 #' year <- 1980
 #' partial_eval(quote(year > year), vars = vars)
 #' partial_eval(quote(year > local(year)), vars = vars)
+#' partial_eval(quote(year > .env$year), vars = vars)
 #'
 #' # Functions are always assumed to be remote. Use local to force evaluation
 #' # in R.
@@ -92,6 +99,10 @@ is_namespaced_dplyr_call <- function(call) {
   is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
 }
 
+is_tidy_pronoun <- function(call) {
+  is_symbol(call[[1]], c("$", "[[")) && is_symbol(call[[2]], c(".data", ".env"))
+}
+
 lang_partial_eval <- function(call, vars, env) {
   fun <- call[[1]]
 
@@ -104,20 +115,38 @@ lang_partial_eval <- function(call, vars, env) {
   if (is.call(fun)) {
     if (is_namespaced_dplyr_call(fun)) {
       call[[1]] <- fun[[3]]
+    } else if (is_tidy_pronoun(fun)) {
+      stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
     } else {
       return(eval_bare(call, env))
     }
   }
 
-  # Process call arguments recursively, unless user has manually called
-  # remote/local
-  name <- as_string(call[[1]])
-  if (name == "local") {
-    eval_bare(call[[2]], env)
-  } else if (name == "remote") {
-    call[[2]]
+  # .data$, .data[[]], .env$, .env[[]] need special handling
+  if (is_tidy_pronoun(call)) {
+    if (is_symbol(call[[1]], "$")) {
+      idx <- call[[3]]
+    } else {
+      idx <- as.name(eval_bare(call[[3]], env))
+    }
+
+    if (is_symbol(call[[2]], ".data")) {
+      idx
+    } else {
+      eval_bare(idx, env)
+    }
   } else {
-    call[-1] <- lapply(call[-1], partial_eval, vars = vars, env = env)
-    call
+    # Process call arguments recursively, unless user has manually called
+    # remote/local
+    name <- as_string(call[[1]])
+    if (name == "local") {
+      eval_bare(call[[2]], env)
+    } else if (name == "remote") {
+      call[[2]]
+    } else {
+      call[-1] <- lapply(call[-1], partial_eval, vars = vars, env = env)
+      call
+    }
   }
+
 }

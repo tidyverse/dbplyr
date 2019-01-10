@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQL translation (via `partial_eval()`) now correctly interprets the 
+  `.data` and `.env` pronouns of tidy evaluation (#132).
+
 * Default translation for `pmin()` and `pmax()` becomes `LEAST()` and 
   `GREATEST()` (#118). SQLite instead uses `MIN()` and `MAX()`, and MS SQL 
   throws an error.

@@ -13,3 +13,16 @@ test_that("use quosure environment for unevaluted formulas", {
   x <- 1
   expect_equal(partial_eval(expr(~x)), ~1)
 })
+
+test_that("respects tidy evaluation pronouns", {
+  x <- "X"
+  X <- "XX"
+
+  expect_equal(partial_eval(expr(.data$x)), expr(x))
+  expect_equal(partial_eval(expr(.data[["x"]])), expr(x))
+  expect_equal(partial_eval(expr(.data[[x]])), expr(X))
+
+  expect_equal(partial_eval(expr(.env$x)), "X")
+  expect_equal(partial_eval(expr(.env[["x"]])), "X")
+  expect_equal(partial_eval(expr(.env[[x]])), "XX")
+})
