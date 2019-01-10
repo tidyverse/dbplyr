@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `show_query()` and `explain()` now use `cat()` rather than message.
+
 * `transmute()` now generates simpler SQL instead of being a `mutate()` + 
    a `select()` (#193).
 

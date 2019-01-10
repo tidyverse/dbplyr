@@ -99,3 +99,5 @@ c_character <- function(...) {
 
   x
 }
+
+cat_line <- function(...) cat(..., "\n", sep = "")
