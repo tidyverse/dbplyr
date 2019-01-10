@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `na_if()` is translated to `NULLIF()` for all databases (#211).
+
 * SQL translation (via `partial_eval()`) now correctly interprets the 
   `.data` and `.env` pronouns of tidy evaluation (#132).
 

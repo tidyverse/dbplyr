@@ -22,7 +22,6 @@ sql_translate_env.SQLiteConnection <- function(con) {
           sql_expr(log(!!x))
         }
       },
-      na_if = sql_prefix("NULLIF", 2),
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc

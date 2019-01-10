@@ -145,7 +145,7 @@ base_scalar <- sql_translator(
 
   is.null = sql_null,
   is.na = sql_null,
-  na_if = sql_prefix("NULL_IF", 2),
+  na_if = sql_prefix("NULLIF", 2),
   coalesce = sql_prefix("coalesce"),
 
   as.numeric = sql_cast("NUMERIC"),
