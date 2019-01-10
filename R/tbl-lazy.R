@@ -202,6 +202,59 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
   x
 }
 
+join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
+  # Remove join keys from y
+  y_names <- setdiff(y_names, by$y)
+
+  # Add suffix where needed
+  suffix <- check_suffix(suffix)
+  x_new <- add_suffixes(x_names, y_names, suffix$x)
+  y_new <- add_suffixes(y_names, x_names, suffix$y)
+
+  # In left and inner joins, return key values only from x
+  # In right joins, return key values only from y
+  # In full joins, return key values by coalescing values from x and y
+  x_x <- x_names
+  x_y <- by$y[match(x_names, by$x)]
+  x_y[type == "left" | type == "inner"] <- NA
+  x_x[type == "right" & !is.na(x_y)] <- NA
+  y_x <- rep_len(NA, length(y_names))
+  y_y <- y_names
+
+  # Return a list with 3 parallel vectors
+  # At each position, values in the 3 vectors represent
+  #  alias - name of column in join result
+  #  x - name of column from left table or NA if only from right table
+  #  y - name of column from right table or NA if only from left table
+  list(alias = c(x_new, y_new), x = c(x_x, y_x), y = c(x_y, y_y))
+}
+
+check_suffix <- function(x) {
+  if (!is.character(x) || length(x) != 2) {
+    stop("`suffix` must be a character vector of length 2.", call. = FALSE)
+  }
+
+  list(x = x[1], y = x[2])
+}
+
+add_suffixes <- function(x, y, suffix) {
+  if (identical(suffix, "")) {
+    return(x)
+  }
+
+  out <- chr_along(x)
+  for (i in seq_along(x)) {
+    nm <- x[[i]]
+    while (nm %in% y || nm %in% out) {
+      nm <- paste0(nm, suffix)
+    }
+
+    out[[i]] <- nm
+  }
+  out
+}
+
+
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, copy = FALSE,
                              auto_index = FALSE, ...) {
   by <- common_by(by, x, y)
