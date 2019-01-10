@@ -75,12 +75,6 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("filter", .data, dots = dots)
 }
-#' @export
-filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("filter", .data, dots = dots)
-}
 
 #' @export
 arrange.tbl_lazy <- function(.data, ...) {
@@ -90,20 +84,10 @@ arrange.tbl_lazy <- function(.data, ...) {
 
   add_op_single("arrange", .data, dots = dots)
 }
-#' @export
-arrange_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  arrange(.data, !!! dots)
-}
 
 #' @export
 select.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
-  add_op_single("select", .data, dots = dots)
-}
-#' @export
-select_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   add_op_single("select", .data, dots = dots)
 }
 
@@ -113,22 +97,10 @@ rename.tbl_lazy <- function(.data, ...) {
   dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("rename", .data, dots = dots)
 }
-#' @export
-rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("rename", .data, dots = dots)
-}
 
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("summarise", .data, dots = dots)
-}
-#' @export
-summarise_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("summarise", .data, dots = dots)
 }
@@ -161,14 +133,6 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   add_op_single("mutate", .data, dots = dots)
 }
 
-
-#' @export
-mutate_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("mutate", .data, dots = dots)
-}
-
 #' @export
 group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
   dots <- quos(...)
@@ -186,11 +150,6 @@ group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
     dots = set_names(groups$groups, names),
     args = list(add = FALSE)
   )
-}
-#' @export
-group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  group_by(.data, !!! dots, add = add)
 }
 
 #' @export
@@ -214,12 +173,6 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   dots <- partial_eval(dots, vars = op_vars(.data))
   add_op_single("distinct", .data, dots = dots, args = list(.keep_all = .keep_all))
 }
-#' @export
-distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  distinct(.data, !!! dots, .keep_all = .keep_all)
-}
-
 
 # Dual table verbs ------------------------------------------------------------
 
@@ -308,3 +261,50 @@ fill_vars <- function(x, vars) {
 
 # Currently the dual table verbs are defined on tbl_sql, because the
 # because they definitions are bit too tightly connected to SQL.
+
+# lazyeval ----------------------------------------------------------------
+
+#' @export
+filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+  add_op_single("filter", .data, dots = dots)
+}
+#' @export
+arrange_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  arrange(.data, !!! dots)
+}
+#' @export
+select_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  add_op_single("select", .data, dots = dots)
+}
+#' @export
+rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+  add_op_single("rename", .data, dots = dots)
+}
+#' @export
+summarise_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+  add_op_single("summarise", .data, dots = dots)
+}
+#' @export
+mutate_.tbl_lazy <- function(.data, ..., .dots = list()) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+  add_op_single("mutate", .data, dots = dots)
+}
+#' @export
+group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  group_by(.data, !!! dots, add = add)
+}
+#' @export
+distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  distinct(.data, !!! dots, .keep_all = .keep_all)
+}
