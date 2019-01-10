@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `switch()` is translated to the simple form of `SELECT CASE` (#192).
+
 * Translation of `n_distinct()` now only supports a single argument 
   (#101, #133).
 

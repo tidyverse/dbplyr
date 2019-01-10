@@ -130,6 +130,7 @@ base_scalar <- sql_translator(
   if_else = function(condition, true, false) sql_if(condition, true, false),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
 
+  switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),
 
   sql = function(...) sql(...),
@@ -355,7 +356,7 @@ base_no_win <- sql_translator(
 sql_case_when <- function(...) {
   # TODO: switch to dplyr::case_when_prepare when available
 
-  formulas <- dots_list(...)
+  formulas <- list2(...)
   n <- length(formulas)
 
   if (n == 0) {
@@ -388,3 +389,23 @@ sql_case_when <- function(...) {
   ))
 }
 
+sql_switch <- function(x, ...) {
+  input <- list2(...)
+
+  named <- names(input) != ""
+
+  clauses <- map2_chr(names(input)[named], input[named], function(x, y) {
+    build_sql("WHEN (", x , ") THEN (", y, ") ")
+  })
+
+  n_unnamed <- sum(!named)
+  if (n_unnamed == 0) {
+    # do nothing
+  } else if (n_unnamed == 1) {
+    clauses <- c(clauses, build_sql("ELSE ", input[!named], " "))
+  } else {
+    stop("Can only have one unnamed (ELSE) input", call. = FALSE)
+  }
+
+  build_sql("CASE ", x, " ", !!!clauses, "END")
+}

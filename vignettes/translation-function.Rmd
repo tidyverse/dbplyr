@@ -115,12 +115,13 @@ translate_sql(mean(x, na.rm = TRUE), window = FALSE)
 
 ### Conditional evauation
 
-*   If statements are translated into a case statement:
+`if` and `switch()` are translate to `CASE WHEN`:
 
-    ```{r}
-    translate_sql(if (x > 5) "big" else "small")
-    ```
-
+```{r}
+translate_sql(if (x > 5) "big" else "small")
+translate_sql(switch(x, a = 1L, b = 2L, 3L))
+```
+  
 ### String manipulation
 
 ### Date/time
