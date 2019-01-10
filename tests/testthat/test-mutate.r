@@ -68,7 +68,7 @@ test_that("supports overwriting variables (#3222)", {
 
 test_that("mutate calls windowed versions of sql functions", {
   dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- map(dfs, . %>% group_by(g) %>% mutate(r = as.numeric(row_number(x))))
+  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = as.numeric(row_number(x))))
 
   expect_equal(out$df$r, c(1, 2, 1, 2))
   expect_equal_tbls(out)
@@ -76,7 +76,7 @@ test_that("mutate calls windowed versions of sql functions", {
 
 test_that("recycled aggregates generate window function", {
   dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- map(dfs, . %>% group_by(g) %>% mutate(r = x > mean(x, na.rm = TRUE)))
+  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = x > mean(x, na.rm = TRUE)))
 
   expect_equal(out$df$r, c(FALSE, TRUE, FALSE, TRUE))
   expect_equal_tbls(out)
@@ -84,7 +84,7 @@ test_that("recycled aggregates generate window function", {
 
 test_that("cumulative aggregates generate window function", {
   dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- map(dfs, . %>%
+  out <- lapply(dfs, . %>%
     group_by(g) %>%
     arrange(x) %>%
     mutate(r = as.numeric(cumsum(x)))

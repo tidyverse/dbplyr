@@ -15,7 +15,7 @@ tbl_lazy <- function(df, src = simulate_dbi()) {
   subclass <- class(src)[[1]]
 
   make_tbl(
-    compact(c(subclass, "lazy")),
+    purrr::compact(c(subclass, "lazy")),
     ops = op_base_local(df),
     src = src
   )
@@ -179,7 +179,7 @@ group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
   }
 
   groups <- group_by_prepare(.data, .dots = dots, add = add)
-  names <- map_chr(groups$groups, as_string)
+  names <- purrr::map_chr(groups$groups, as_string)
 
   add_op_single("group_by",
     groups$data,

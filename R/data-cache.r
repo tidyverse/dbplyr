@@ -31,7 +31,7 @@ load_srcs <- function(f, src_names, quiet = NULL) {
     out
   })
 
-  compact(setNames(srcs, src_names))
+  purrr::compact(setNames(srcs, src_names))
 }
 
 

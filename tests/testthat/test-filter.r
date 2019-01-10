@@ -38,7 +38,7 @@ test_that("basic filter works across all backends", {
   dfs <- test_frame(x = 1:5, y = 5:1)
 
   dfs %>%
-    map(. %>% filter(x > 3)) %>%
+    lapply(. %>% filter(x > 3)) %>%
     expect_equal_tbls()
 })
 
@@ -49,7 +49,7 @@ test_that("filter calls windowed versions of sql functions", {
   )
 
   dfs %>%
-    map(. %>% group_by(g) %>% filter(row_number(x) < 3)) %>%
+    lapply(. %>% group_by(g) %>% filter(row_number(x) < 3)) %>%
     expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(1L, 2L, 6L, 7L)))
 })
 
@@ -60,7 +60,7 @@ test_that("recycled aggregates generate window function", {
   )
 
   dfs %>%
-    map(. %>% group_by(g) %>% filter(x > mean(x, na.rm = TRUE))) %>%
+    lapply(. %>% group_by(g) %>% filter(x > mean(x, na.rm = TRUE))) %>%
     expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(4L, 5L, 9L, 10L)))
 })
 
@@ -71,7 +71,7 @@ test_that("cumulative aggregates generate window function", {
   )
 
   dfs %>%
-    map(. %>%
+    lapply(. %>%
       group_by(g) %>%
       arrange(x) %>%
       filter(cumsum(x) > 3)

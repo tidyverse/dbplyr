@@ -29,13 +29,13 @@ is.wholenumber <- function(x) {
 }
 
 deparse_all <- function(x) {
-  x <- map_if(x, is_formula, f_rhs)
-  map_chr(x, expr_text, width = 500L)
+  x <- purrr::map_if(x, is_formula, f_rhs)
+  purrr::map_chr(x, expr_text, width = 500L)
 }
 
 deparse_names <- function(x) {
-  x <- map_if(x, is_formula, f_rhs)
-  map_chr(x, deparse)
+  x <- purrr::map_if(as.list(x), is_formula, f_rhs)
+  purrr::map_chr(x, deparse)
 }
 
 #' Provides comma-separated string out ot the parameters

@@ -31,7 +31,7 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
   out$order_by  <- sql_clause_order_by(order_by, con)
   out$limit     <- sql_clause_limit(limit, con)
 
-  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 #' @export

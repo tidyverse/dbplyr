@@ -25,11 +25,11 @@ test_that("union and union all work for all backends", {
   tbls_filter <- test_load(filter(df, y == 0))
 
   tbls_full %>%
-    map2(tbls_filter, union) %>%
+    purrr::map2(tbls_filter, union) %>%
     expect_equal_tbls()
 
   tbls_full %>%
-    map2(tbls_filter, union_all) %>%
+    purrr::map2(tbls_filter, union_all) %>%
     expect_equal_tbls()
 })
 
@@ -41,11 +41,11 @@ test_that("intersect and setdiff work for supported backends", {
   tbls_filter <- test_load(filter(df, y == 0), ignore = c("mysql", "MariaDB"))
 
   tbls_full %>%
-    map2(tbls_filter, intersect) %>%
+    purrr::map2(tbls_filter, intersect) %>%
     expect_equal_tbls()
 
   tbls_full %>%
-    map2(tbls_filter, setdiff) %>%
+    purrr::map2(tbls_filter, setdiff) %>%
     expect_equal_tbls()
 })
 
@@ -65,9 +65,9 @@ test_that("other backends can combine with a limit", {
   tbls_head <- lapply(test_load(df, ignore = "sqlite"), head, n = 1)
 
   tbls_full %>%
-    map2(tbls_head, union) %>%
+    purrr::map2(tbls_head, union) %>%
     expect_equal_tbls()
   tbls_full %>%
-    map2(tbls_head, union_all) %>%
+    purrr::map2(tbls_head, union_all) %>%
     expect_equal_tbls()
 })

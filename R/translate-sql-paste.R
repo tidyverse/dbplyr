@@ -30,7 +30,7 @@ sql_paste_infix <- function(default_sep, op, cast) {
       infix <- function(x, y) sql_call2(op, sql_call2(op, x, sep), y)
     }
 
-    reduce(args, infix)
+    purrr::reduce(args, infix)
   }
 }
 

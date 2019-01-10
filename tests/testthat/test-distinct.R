@@ -9,17 +9,17 @@ dfs <- test_load(df)
 
 test_that("distinct equivalent to local unique when keep_all is TRUE", {
   dfs %>%
-    map(. %>% distinct()) %>%
+    lapply(. %>% distinct()) %>%
     expect_equal_tbls(unique(df))
 })
 
 test_that("distinct for single column equivalent to local unique (#1937)", {
   dfs %>%
-    map(. %>% distinct(x, .keep_all = FALSE)) %>%
+    lapply(. %>% distinct(x, .keep_all = FALSE)) %>%
     expect_equal_tbls(unique(df["x"]))
 
   dfs %>%
-    map(. %>% distinct(y, .keep_all = FALSE)) %>%
+    lapply(. %>% distinct(y, .keep_all = FALSE)) %>%
     expect_equal_tbls(unique(df["y"]))
 })
 

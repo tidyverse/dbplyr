@@ -142,7 +142,7 @@ translate_sql_ <- function(dots,
   }
 
   variant <- sql_translate_env(con)
-  pieces <- map(dots, function(x) {
+  pieces <- lapply(dots, function(x) {
     if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {

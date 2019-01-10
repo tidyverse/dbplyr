@@ -78,7 +78,7 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
       if (inherits(call, "lazy_dots")) {
         call <- dplyr:::compat_lazy_dots(call, env)
       }
-      map(call, partial_eval, vars = vars, env = env)
+      lapply(call, partial_eval, vars = vars, env = env)
     },
     abort(glue("Unknown input type: ", class(call)))
   )

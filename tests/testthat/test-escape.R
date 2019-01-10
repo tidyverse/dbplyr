@@ -5,8 +5,8 @@ context("escape")
 
 test_that("multiplication works", {
   dfs <- test_frame(x = c(1, NA)) %>%
-    map(. %>% mutate(y = coalesce(x > 0, TRUE)))
-  out <- dfs %>% map(collect)
+    lapply(. %>% mutate(y = coalesce(x > 0, TRUE)))
+  out <- dfs %>% lapply(collect)
 
   # SQLite treats as integers
   expect_identical(out$sqlite$y, c(1L, 1L))

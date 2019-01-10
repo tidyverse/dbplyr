@@ -19,13 +19,13 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   # Processing limit via ROWNUM in a WHERE clause, thie method
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
   if (!is.null(limit) && !identical(limit, Inf)) {
-    out <- escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+    out <- escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
     assertthat::assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
     out <- build_sql(
       "SELECT * FROM ", sql_subquery(con, out), " WHERE ROWNUM <= ", limit,
       con = con)
   }else{
-    escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+    escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
   }
 }
 
@@ -36,7 +36,7 @@ sql_translate_env.Oracle <- function(con) {
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
-                   
+
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # bit64::as.integer64 can translate to BIGINT for some

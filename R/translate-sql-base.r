@@ -394,7 +394,7 @@ sql_switch <- function(x, ...) {
 
   named <- names(input) != ""
 
-  clauses <- map2_chr(names(input)[named], input[named], function(x, y) {
+  clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
     build_sql("WHEN (", x , ") THEN (", y, ") ")
   })
 

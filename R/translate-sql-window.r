@@ -58,7 +58,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     frame <- build_sql("ROWS ", frame)
   }
 
-  over <- sql_vector(compact(list(partition, order, frame)), parens = TRUE)
+  over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE)
   sql <- build_sql(expr, " OVER ", over)
 
   sql
@@ -274,12 +274,12 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
         name <- unique_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
-        args <- map(expr[-1], translate_window_where, window_funs = window_funs)
-        expr <- lang(node_car(expr), splice(map(args, "[[", "expr")))
+        args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)
+        expr <- lang(node_car(expr), splice(lapply(args, "[[", "expr")))
 
         window_where(
           expr = expr,
-          comp = unlist(map(args, "[[", "comp"), recursive = FALSE)
+          comp = unlist(lapply(args, "[[", "comp"), recursive = FALSE)
         )
 
       }

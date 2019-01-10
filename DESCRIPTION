@@ -54,7 +54,6 @@ LazyData: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Collate: 
-    'compat-purrr.R'
     'data-cache.r'
     'data-lahman.r'
     'data-nycflights13.r'
