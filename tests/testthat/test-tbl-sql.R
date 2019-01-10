@@ -70,6 +70,8 @@ test_that("same_src distinguishes srcs", {
   expect_false(same_src(db1, mtcars))
 })
 
+# copy_to -----------------------------------------------------------------
+
 test_that("can copy to from remote sources", {
   df <- data.frame(x = 1:10)
   con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -86,3 +88,84 @@ test_that("can copy to from remote sources", {
   df_3 <- copy_to(con2, df_1, "df3")
   expect_equal(collect(df_3), df)
 })
+
+test_that("can round trip basic data frame", {
+  df <- test_frame(x = c(1, 10, 9, NA), y = letters[1:4])
+  expect_equal_tbls(df)
+})
+
+test_that("NAs in character fields handled by db sources (#2256)", {
+  df <- test_frame(
+    x = c("a", "aa", NA),
+    y = c(NA, "b", "bb"),
+    z = c("cc", NA, "c")
+  )
+  expect_equal_tbls(df)
+})
+
+test_that("only overwrite existing table if explicitly requested", {
+  con <- DBI::dbConnect(RSQLite::SQLite())
+  on.exit(DBI::dbDisconnect(con))
+  DBI::dbWriteTable(con, "df", data.frame(x = 1:5))
+
+  expect_error(copy_to(con, data.frame(x = 1), name = "df"), "exists")
+  expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
+})
+
+# collect/compute/collapse ------------------------------------------------
+
+test_that("collect equivalent to as.data.frame/as_tibble", {
+  mf <- memdb_frame(letters)
+
+  expect_equal(as.data.frame(mf), data.frame(letters, stringsAsFactors = FALSE))
+  expect_equal(tibble::as_tibble(mf), tibble::tibble(letters))
+  expect_equal(collect(mf), tibble::tibble(letters))
+})
+
+test_that("explicit collection returns all data", {
+  n <- 1e5 + 10 # previous default was 1e5
+  big <- memdb_frame(x = seq_len(n))
+
+  nrow1 <- big %>% as.data.frame() %>% nrow()
+  nrow2 <- big %>% tibble::as_tibble() %>% nrow()
+  nrow3 <- big %>% collect() %>% nrow()
+
+  expect_equal(nrow1, n)
+  expect_equal(nrow2, n)
+  expect_equal(nrow3, n)
+})
+
+test_that("compute doesn't change representation", {
+  mf1 <- memdb_frame(x = 5:1, y = 1:5, z = "a")
+  expect_equal_tbl(mf1, mf1 %>% compute)
+  expect_equal_tbl(mf1, mf1 %>% compute %>% compute)
+
+  mf2 <- mf1 %>% mutate(z = x + y)
+  expect_equal_tbl(mf2, mf2 %>% compute)
+})
+
+test_that("compute can create indexes", {
+  mfs <- test_frame(x = 5:1, y = 1:5, z = 10)
+
+  mfs %>%
+    lapply(. %>% compute(indexes = c("x", "y"))) %>%
+    expect_equal_tbls()
+
+  mfs %>%
+    lapply(. %>% compute(indexes = list("x", "y", c("x", "y")))) %>%
+    expect_equal_tbls()
+
+  mfs %>%
+    lapply(. %>% compute(indexes = "x", unique_indexes = "y")) %>%
+    expect_equal_tbls()
+
+  mfs %>%
+    lapply(. %>% compute(unique_indexes = list(c("x", "z"), c("y", "z")))) %>%
+    expect_equal_tbls()
+})
+
+test_that("unique index fails if values are duplicated", {
+  mfs <- test_frame(x = 5:1, y = "a", ignore = "df")
+  lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
+})
+

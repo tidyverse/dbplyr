@@ -1,4 +1,4 @@
-context("do")
+context("test-do.R")
 
 test_that("ungrouped data collected first", {
   out <- memdb_frame(x = 1:2) %>% do(head(.))
