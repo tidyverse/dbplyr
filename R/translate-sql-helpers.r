@@ -74,6 +74,11 @@ sql_variant <- function(scalar = sql_translator(),
     ))
   }
 
+  # An ensure that every window function is flagged in aggregate context
+  missing <- setdiff(ls(window), ls(aggregate))
+  missing_funs <- map(missing, sql_aggregate_win)
+  env_bind(aggregate, !!!set_names(missing_funs, missing))
+
   structure(
     list(scalar = scalar, aggregate = aggregate, window = window),
     class = "sql_variant"
@@ -184,6 +189,17 @@ sql_aggregate_2 <- function(f) {
 
   function(x, y) {
     build_sql(sql(f), list(x, y))
+  }
+}
+
+sql_aggregate_win <- function(f) {
+  force(f)
+
+  function(...) {
+    stop(
+      "`", f, "()` is only available in a windowed (`mutate()`) context",
+      call. = FALSE
+    )
   }
 }
 

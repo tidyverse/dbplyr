@@ -217,6 +217,11 @@ base_agg <- sql_translator(
   sum        = sql_aggregate("sum"),
   min        = sql_aggregate("min"),
   max        = sql_aggregate("max"),
+
+  # first = sql_prefix("FIRST_VALUE", 1),
+  # last = sql_prefix("LAST_VALUE", 1),
+  # nth = sql_prefix("NTH_VALUE", 2),
+
   n_distinct = function(...) {
     vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
     build_sql("COUNT(DISTINCT ", vars, ")")

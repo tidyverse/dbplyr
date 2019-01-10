@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Functions that are only available in a windowed (`mutate()`) query now
+  throw an error when called in a aggregate (`summarise()`) query (#129)
+
 * `na_if()` is translated to `NULLIF()` for all databases (#211).
 
 * SQL translation (via `partial_eval()`) now correctly interprets the 

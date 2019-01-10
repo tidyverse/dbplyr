@@ -18,6 +18,15 @@ test_that("missing window functions create a warning", {
   )
 })
 
+test_that("missing aggregate functions filled in", {
+  sim_scalar <- sql_translator()
+  sim_agg <- sql_translator()
+  sim_win <- sql_translator(mean = function() {})
+
+  trans <- sql_variant(sim_scalar, sim_agg, sim_win)
+  expect_error(trans$aggregate$mean(), "only available in a window")
+})
+
 test_that("output of print method for sql_variant is correct", {
   sim_trans <- sql_translator(`+` = sql_infix("+"))
   expect_known_output(
