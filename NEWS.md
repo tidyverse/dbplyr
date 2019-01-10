@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* MySQL/MariaDB gains an improved translation for `as.logical()`.
+
 * SQLite `explain()` translation now generates `EXPLAIN QUERY PLAN` which
   generates a higher-level, more human friendly explanation.
 

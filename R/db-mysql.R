@@ -16,6 +16,9 @@ db_desc.MariaDBConnection <- db_desc.MySQLConnection
 sql_translate_env.MySQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
+      as.logical = function(x) {
+        sql_expr(IF(x, TRUE, FALSE))
+      },
       as.character = sql_cast("CHAR"),
       paste = sql_paste(" "),
       paste0 = sql_paste("")
