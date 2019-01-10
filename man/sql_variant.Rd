@@ -30,7 +30,7 @@ sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
 sql_translator(..., .funs = list(), .parent = new.env(parent =
   emptyenv()))
 
-sql_infix(f)
+sql_infix(f, pad = TRUE)
 
 sql_prefix(f, n = NULL)
 
@@ -77,6 +77,8 @@ Defaults to \code{base_agg} which provides a standard set of
 mappings for the most common operators and functions.}
 
 \item{f}{the name of the sql function as a string}
+
+\item{pad}{If \code{TRUE}, the default, pad the infix operator with spaces.}
 
 \item{n}{for \code{sql_infix()}, an optional number of arguments to expect.
 Will signal error if not correct.}

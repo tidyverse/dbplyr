@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `sql_infix()` gains a `pad` argument for the occassional operator that 
+  doesn't need to be surrounded by spaces.
+
 * `x[y]` now translated to `CASE WHEN y THEN x END`. This enables 
   `sum(x[y == 0])` to work as you expect from R (#202). `y` needs to be
   a logical expression; if not you will likely get a type error from your 

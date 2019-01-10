@@ -126,6 +126,7 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 }
 
 #' @rdname sql_variant
+#' @param pad If `TRUE`, the default, pad the infix operator with spaces.
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   assert_that(is_string(f))
