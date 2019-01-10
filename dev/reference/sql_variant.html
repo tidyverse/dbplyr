@@ -165,7 +165,7 @@ easy.</p>
 <span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
   <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>emptyenv</a></span>()))
 
-<span class='fu'>sql_infix</span>(<span class='no'>f</span>)
+<span class='fu'>sql_infix</span>(<span class='no'>f</span>, <span class='kw'>pad</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>sql_prefix</span>(<span class='no'>f</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
@@ -222,6 +222,10 @@ mappings for the most common operators and functions.</p></td>
     <tr>
       <th>f</th>
       <td><p>the name of the sql function as a string</p></td>
+    </tr>
+    <tr>
+      <th>pad</th>
+      <td><p>If <code>TRUE</code>, the default, pad the infix operator with spaces.</p></td>
     </tr>
     <tr>
       <th>n</th>
