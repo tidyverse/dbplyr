@@ -71,27 +71,23 @@ test_frame_windowed <- function(...) {
 
 # Manage cache of testing srcs
 test_srcs <- local({
-  e <- new.env(parent = emptyenv())
-  e$srcs <- list()
-
   list(
-    get = function() e$srcs,
+    get = function() env_get(cache(), "srcs", list()),
 
-    has = function(x) x %in% names(e$srcs),
+    has = function(x) env_has(cache(), x),
 
     add = function(name, src) {
-      stopifnot(is.src(src))
-      e$srcs[[name]] <- src
+      srcs <- env_get(cache(), "srcs", list())
+      srcs[[name]] <- src
+      env_poke(cache(), "srcs", srcs)
     },
 
     set = function(...) {
-      old <- e$srcs
-      e$srcs <- list(...)
-      invisible(old)
+      env_poke(cache(), "src", list(...))
     },
 
     length = function() {
-      length(e$srcs)
+      length(cache()$srcs)
     }
   )
 })

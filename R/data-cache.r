@@ -1,22 +1,18 @@
-cache <- new.env(parent = emptyenv())
-
-is_cached <- function(name) exists(name, envir = cache)
-set_cache <- function(name, value) {
-#   message("Setting ", name, " in cache")
-  assign(name, value, envir = cache)
-  value
-}
-get_cache <- function(name) {
-#   message("Getting ", name, " from cache")
-  get(name, envir = cache)
+cache <- function() {
+  if (!is_attached("dbplyr_cache")) {
+    get("attach")(new_environment(), name = "dbplyr_cache")
+  }
+  search_env("dbplyr_cache")
 }
 
 cache_computation <- function(name, computation) {
-  if (is_cached(name)) {
-    get_cache(name)
+  cache <- cache()
+
+  if (env_has(cache, name)) {
+    env_get(cache, name)
   } else {
     res <- force(computation)
-    set_cache(name, res)
+    env_poke(cache, name, res)
     res
   }
 }
@@ -25,7 +21,6 @@ load_srcs <- function(f, src_names, quiet = NULL) {
   if (is.null(quiet)) {
     quiet <- !identical(Sys.getenv("NOT_CRAN"), "true")
   }
-
 
   srcs <- lapply(src_names, function(x) {
     out <- NULL
