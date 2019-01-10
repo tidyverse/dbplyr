@@ -156,7 +156,7 @@ Behind the scenes, dplyr is translating your R code into SQL. You can see the SQ
 tailnum_delay_db %>% show_query()
 ```
 
-If you're familiar with SQL, this probably isn't exactly what you'd write by hand, but it does the job. You can learn more about the SQL translation in `vignette("sql-translation")`.
+If you're familiar with SQL, this probably isn't exactly what you'd write by hand, but it does the job. You can learn more about the SQL translation in `vignette("translation-verb")` and `vignette("translation-function")`.
 
 Typically, you'll iterate a few times before you figure out what data you need from the database. Once you've figured it out, use `collect()` to pull all the data down into a local tibble:
 

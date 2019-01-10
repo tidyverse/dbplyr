@@ -1,5 +1,5 @@
 ---
-title: "SQL translation"
+title: "Function translation"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{SQL translation}
@@ -12,11 +12,9 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-There are two components to dplyr's SQL translation system:
+There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translate-verb")` describes how entire verbs are translated.
 
-* translation of vector expressions like `x * y + 10`
-
-* translation of whole verbs like `mutate()` or `summarise()`
+Most filtering, mutating or summarising operations only perform simple mathematical operations. These operations are very similar between R and SQL, so they're easy to translate. To see what's happening yourself, you can use `translate_sql()`. The basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
 
 To explore them, you'll need to load both dbplyr and dplyr:
 
@@ -25,9 +23,7 @@ library(dbplyr)
 library(dplyr)
 ```
 
-## Vectors
-
-Most filtering, mutating or summarising operations only perform simple mathematical operations. These operations are very similar between R and SQL, so they're easy to translate. To see what's happening yourself, you can use `translate_sql()`. The basic techniques that underlie the implementation of `translate_sql()` are described in ["Advanced R"](http://adv-r.had.co.nz/dsl.html). `translate_sql()` is built on top of R's parsing engine and has been carefully designed to generate correct SQL. It also protects you against SQL injection attacks by correctly escaping the strings and variable names needed by the database that you're connecting to.
+## Basic differences
 
 The following examples work through some of the basic differences between R and SQL.
 
@@ -68,7 +64,7 @@ The following examples work through some of the basic differences between R and 
     translate_sql(if (x > 5) "big" else "small")
     ```
 
-### Known functions
+## Known functions
 
 dplyr knows how to convert the following R functions to SQL:
 
@@ -91,7 +87,7 @@ translate_sql(mean(x, trim = 0.1))
 
 `translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translate_env()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details. 
 
-### Unknown functions
+## Unknown functions
 
 Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](http://www.sqlite.org/lang_corefunc.html):
 
@@ -100,7 +96,7 @@ translate_sql(glob(x, y))
 translate_sql(x %like% "ab%")
 ```
 
-### Window functions
+## Window functions
 
 Things get a little trickier with window functions, because SQL's window functions are considerably more expressive than the specific variants provided by base R or dplyr. They have the form `[expression] OVER ([partition clause] [order clause] [frame_clause])`:
 
@@ -189,91 +185,3 @@ mutate(players,
 
 Currently there is no way to order by multiple variables, except by setting the default ordering with `arrange()`. This will be added in a future release. 
 
-## Whole tables
-
-All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
-
-```{r}
-con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-flights <- copy_to(con, nycflights13::flights)
-airports <- copy_to(con, nycflights13::airports)
-```
-
-### Single table verbs
-
-*  `select()` and `mutate()` modify the `SELECT` clause:
-
-    ```{r}
-    flights %>%
-      select(contains("delay")) %>%
-      show_query()
-    
-    flights %>%
-      select(distance, air_time) %>%  
-      mutate(speed = distance / (air_time / 60)) %>%
-      show_query()
-    ```
-    
-    (As you can see here, the generated SQL isn't always as minimal as you
-    might generate by hand.)
-    
-*  `filter()` generates a `WHERE` clause:
-    
-    ```{r}
-    flights %>% 
-      filter(month == 1, day == 1) %>%
-      show_query()
-    ```
-
-*  `arrange()` generates an `ORDER BY` clause:
-
-    ```{r}
-    flights %>% 
-      arrange(carrier, desc(arr_delay)) %>%
-      show_query()
-    ```
-
-*  `summarise()` and `group_by()` work together to generate a `GROUP BY` clause:
-
-    ```{r}
-    flights %>%
-      group_by(month, day) %>%
-      summarise(delay = mean(dep_delay)) %>%
-      show_query()
-    ```
-
-### Dual table verbs
-
-| R                | SQL
-|------------------|------------------------------------------------------------
-| `inner_join()`   | `SELECT * FROM x JOIN y ON x.a = y.a`
-| `left_join()`    | `SELECT * FROM x LEFT JOIN y ON x.a = y.a`
-| `right_join()`   | `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`
-| `full_join()`    | `SELECT * FROM x FULL JOIN y ON x.a = y.a`
-| `semi_join()`    | `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
-| `anti_join()`    | `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
-| `intersect(x, y)`| `SELECT * FROM x INTERSECT SELECT * FROM y`
-| `union(x, y)`    | `SELECT * FROM x UNION SELECT * FROM y`
-| `setdiff(x, y)`  | `SELECT * FROM x EXCEPT SELECT * FROM y`
-
-`x` and `y` don't have to be tables in the same database. If you specify `copy = TRUE`, dplyr will copy the `y` table into the same location as the `x` variable. This is useful if you've downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use `semi_join(x, y, copy = TRUE)` to upload the indices of interest to a temporary table in the same database as `x`, and then perform a efficient semi join in the database. 
-
-If you're working with large data, it maybe also be helpful to set `auto_index = TRUE`. That will automatically add an index on the join variables to the temporary table.
-
-### Behind the scenes
-
-The verb level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in three steps:
-
-* `sql_build()` recurses over the lazy op data structure building up query 
-  objects (`select_query()`, `join_query()`, `set_op_query()` etc) 
-  that represent the different subtypes of `SELECT` queries that we might
-  generate.
-
-* `sql_optimise()` takes a pass over these SQL objects, looking for potential
-  optimisations. Currently this only involves removing subqueries where
-  possible.
-
-* `sql_render()` calls an SQL generation function (`sql_select()`, `sql_join()`, 
-  `sql_subquery()`, `sql_semijoin()` etc) to produce the actual SQL.
-  Each of these functions is a generic, taking the connection as an argument,
-  so that the details can be customised for different databases.

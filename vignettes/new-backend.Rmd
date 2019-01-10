@@ -72,7 +72,7 @@ Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work.
 
 ## SQL translation
 
-Make sure you've read `vignette("sql-translation")` so you have the lay of the land. 
+Make sure you've read `vignette("translation-verb")` so you have the lay of the land. 
 
 ### Verbs
 
