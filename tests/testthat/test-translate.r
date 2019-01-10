@@ -53,11 +53,6 @@ test_that("all forms of if translated to case statement", {
   expect_equal(translate_sql(if_else(x, 1L, 2L)), expected)
 })
 
-test_that("pmin and pmax become min and max", {
-  expect_equal(translate_sql(pmin(x, y)), sql('MIN("x", "y")'))
-  expect_equal(translate_sql(pmax(x, y)), sql('MAX("x", "y")'))
-})
-
 test_that("%in% translation parenthesises when needed", {
   expect_equal(translate_sql(x %in% 1L), sql('"x" IN (1)'))
   expect_equal(translate_sql(x %in% c(1L)), sql('"x" IN (1)'))
@@ -112,6 +107,12 @@ test_that("hypergeometric functions use manual calculation", {
   expect_equal(translate_sql(sinh(x)), sql('(EXP("x") - EXP(-("x"))) / 2'))
   expect_equal(translate_sql(tanh(x)), sql('(EXP(2 * ("x")) - 1) / (EXP(2 * ("x")) + 1)'))
   expect_equal(translate_sql(coth(x)), sql('(EXP(2 * ("x")) + 1) / (EXP(2 * ("x")) - 1)'))
+})
+
+
+test_that("pmin and max use GREATEST and LEAST", {
+  expect_equal(translate_sql(pmin(x, y)), sql('LEAST("x", "y")'))
+  expect_equal(translate_sql(pmax(x, y)), sql('GREATEST("x", "y")'))
 })
 
 test_that("round uses integer digits", {

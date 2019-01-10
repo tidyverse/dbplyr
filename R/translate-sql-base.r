@@ -167,8 +167,8 @@ base_scalar <- sql_translator(
     sql_expr(!!x %BETWEEN% !!left %AND% !!right)
   },
 
-  pmin = sql_prefix("min"),
-  pmax = sql_prefix("max"),
+  pmin = sql_prefix("LEAST"),
+  pmax = sql_prefix("GREATEST"),
 
   `%>%` = `%>%`,
 

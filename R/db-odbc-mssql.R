@@ -72,6 +72,11 @@
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
+
+      # https://dba.stackexchange.com/questions/187090
+      pmin          = sql_not_supported("pmin()"),
+      pmax          = sql_not_supported("pmax()"),
+
       substr        = function(x, start, stop) {
                         len <- stop - start + 1
                         sql_expr(SUBSTRING(!!x, !!start, !!len))

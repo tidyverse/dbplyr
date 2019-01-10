@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Default translation for `pmin()` and `pmax()` becomes `LEAST()` and 
+  `GREATEST()` (#118). SQLite instead uses `MIN()` and `MAX()`, and MS SQL 
+  throws an error.
+
 * Default translator gains translations for `paste()`, `paste0()`, 
   and the hyperbolic functions (these previously were only available for 
   ODBC based translations).

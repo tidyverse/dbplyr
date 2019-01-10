@@ -10,6 +10,15 @@ test_that("vectorised translations", {
   expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
 })
 
+test_that("pmin and max become MIN and MAX", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_sqlite(), window = FALSE)
+  }
+
+  expect_equal(trans(pmin(x, y)), sql('MIN(`x`, `y`)'))
+  expect_equal(trans(pmax(x, y)), sql('MAX(`x`, `y`)'))
+})
+
 test_that("as.numeric()/as.double() get custom translation", {
   mf <- dbplyr::memdb_frame(x = 1L)
 
