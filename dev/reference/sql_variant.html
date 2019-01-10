@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create an sql translator — sql_variant • dbplyr</title>
+<title>Create an sql translator — sql_paste • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -29,7 +29,7 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
-<meta property="og:title" content="Create an sql translator — sql_variant" />
+<meta property="og:title" content="Create an sql translator — sql_paste" />
 
 <meta property="og:description" content="When creating a package that maps to a new SQL based src, you'll often
 want to provide some additional mappings from common R commands to the
@@ -146,7 +146,7 @@ easy." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create an sql translator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.r'><code>R/translate-sql-helpers.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-base.r'><code>R/translate-sql-base.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.r'><code>R/translate-sql-helpers.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-base.r'><code>R/translate-sql-base.r</code></a>, and 2 more</small>
     <div class="hidden name"><code>sql_variant.Rd</code></div>
     </div>
 
@@ -159,7 +159,11 @@ easy.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
+    <pre class="usage"><span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
+
+<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
+
+<span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
   <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>())
 
 <span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
@@ -189,10 +193,6 @@ easy.</p>
 
 <span class='no'>base_no_win</span>
 
-<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
-
-<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
-
 <span class='no'>base_odbc_scalar</span>
 
 <span class='no'>base_odbc_agg</span>
@@ -202,6 +202,10 @@ easy.</p>
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>f</th>
+      <td><p>the name of the sql function as a string</p></td>
+    </tr>
     <tr>
       <th>scalar, aggregate, window</th>
       <td><p>The three families of functions than an
@@ -218,10 +222,6 @@ provide a list of <code>.funs</code></p></td>
       <td><p>the sql variant that this variant should inherit from.
 Defaults to <code>base_agg</code> which provides a standard set of
 mappings for the most common operators and functions.</p></td>
-    </tr>
-    <tr>
-      <th>f</th>
-      <td><p>the name of the sql function as a string</p></td>
     </tr>
     <tr>
       <th>pad</th>
