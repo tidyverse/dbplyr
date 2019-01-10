@@ -41,7 +41,7 @@ simulate_teradata()
 
 simulate_odbc_access()
 
-tbl_lazy(df, src = NULL)
+tbl_lazy(df, src = simulate_dbi())
 
 lazy_frame(..., src = NULL)
 }
@@ -54,6 +54,6 @@ library(dplyr)
 df <- data.frame(x = 1, y = 2)
 
 df_sqlite <- tbl_lazy(df, src = simulate_sqlite())
-df_sqlite \%>\% summarise(x = sd(x)) \%>\% show_query()
+df_sqlite \%>\% summarise(x = sd(x, na.rm = TRUE)) \%>\% show_query()
 }
 \keyword{internal}

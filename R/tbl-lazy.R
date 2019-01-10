@@ -10,12 +10,27 @@
 #' df <- data.frame(x = 1, y = 2)
 #'
 #' df_sqlite <- tbl_lazy(df, src = simulate_sqlite())
-#' df_sqlite %>% summarise(x = sd(x)) %>% show_query()
-tbl_lazy <- function(df, src = NULL) {
-  make_tbl("lazy", ops = op_base_local(df), src = src)
+#' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
+tbl_lazy <- function(df, src = simulate_dbi()) {
+  subclass <- class(src)[[1]]
+
+  make_tbl(
+    compact(c(subclass, "lazy")),
+    ops = op_base_local(df),
+    src = src
+  )
 }
 
 setOldClass(c("tbl_lazy", "tbl"))
+
+#' @export
+dim.tbl_lazy <- function(x) c(NA, length(op_vars(x)))
+
+#' @export
+as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
+  message("Use show_query() to see generated SQL")
+  data.frame()
+}
 
 #' @export
 #' @rdname tbl_lazy
