@@ -1,4 +1,4 @@
-#' @include utils.r
+#' @include utils.R
 NULL
 
 #' Flag a character vector as SQL identifiers
