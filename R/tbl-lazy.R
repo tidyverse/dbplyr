@@ -34,7 +34,7 @@ as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
 
 #' @export
 #' @rdname tbl_lazy
-lazy_frame <- function(..., src = NULL) {
+lazy_frame <- function(..., src = simulate_dbi()) {
   tbl_lazy(tibble(...), src = src)
 }
 

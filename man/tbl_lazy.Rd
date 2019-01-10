@@ -43,7 +43,7 @@ simulate_odbc_access()
 
 tbl_lazy(df, src = simulate_dbi())
 
-lazy_frame(..., src = NULL)
+lazy_frame(..., src = simulate_dbi())
 }
 \description{
 These functions are useful for testing SQL generation without having to
