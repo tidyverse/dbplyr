@@ -64,15 +64,16 @@ test_that("%in% with empty vector", {
   expect_equal(translate_sql(x %in% !!integer()), sql('FALSE'))
 })
 
-test_that("n_distinct can take multiple values", {
+test_that("n_distinct(x) translated to COUNT(distinct, x)", {
   expect_equal(
     translate_sql(n_distinct(x), window = FALSE),
     sql('COUNT(DISTINCT "x")')
   )
   expect_equal(
-    translate_sql(n_distinct(x, y), window = FALSE),
-    sql('COUNT(DISTINCT "x", "y")')
+    translate_sql(n_distinct(x), window = TRUE),
+    sql('COUNT(DISTINCT "x") OVER ()')
   )
+  expect_error(translate_sql(n_distinct(x, y), window = FALSE), "unused argument")
 })
 
 test_that("na_if is translated to NULLIF (#211)", {

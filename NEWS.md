@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Translation of `n_distinct()` now only supports a single argument 
+  (#101, #133).
+
 * Functions that are only available in a windowed (`mutate()`) query now
   throw an error when called in a aggregate (`summarise()`) query (#129)
 

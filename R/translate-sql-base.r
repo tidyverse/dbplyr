@@ -222,9 +222,8 @@ base_agg <- sql_translator(
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
 
-  n_distinct = function(...) {
-    vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
-    build_sql("COUNT(DISTINCT ", vars, ")")
+  n_distinct = function(x) {
+    build_sql("COUNT(DISTINCT ", x, ")")
   }
 )
 
@@ -294,9 +293,8 @@ base_win <- sql_translator(
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
-  n_distinct = function(...) {
-    vars <- sql_vector(list(...), parens = FALSE, collapse = ", ")
-    win_over(build_sql("COUNT(DISTINCT ", vars, ")"), win_current_group())
+  n_distinct = function(x) {
+    win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
   },
 
   # Cumulative function are like recycled aggregates except that R names
