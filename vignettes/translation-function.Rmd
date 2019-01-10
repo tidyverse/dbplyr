@@ -70,11 +70,28 @@ The following examples work through some of the basic differences between R and 
 
 ### Mathematics
 
-* basic math operators: `+`, `-`, `*`, `/`, `%%`, `^`
+* basic math operators: `+`, `-`, `*`, `/`, `^`
 * trigonometry: `acos()`, `asin()`, `atan()`, `atan2()`, `cos()`, `cot()`, `tan()`, `sin()`
 * hypergeometric: `cosh()`, `coth()`, `sinh()`, `tanh()`
 * logarithmic: `log()`, `log10()`, `exp()`
 * misc: `abs()`, `ceiling()`, `sqrt()`, `sign()`, `round()`
+
+## Modulo arithmetic
+
+dbplyr translates `%%` and `%/%` to their SQL equivalents but note that they are not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.
+
+```{r}
+df <- tibble(
+  x = c(10L, 10L, -10L, -10L), 
+  y = c(3L, -3L, 3L, -3L)
+)
+mf <- src_memdb() %>% copy_to(df, overwrite = TRUE)
+
+df %>% mutate(x %% y, x %/% y)
+
+mf %>% mutate(x %% y, x %/% y)
+```
+
 
 ### Logical comparisons
 
