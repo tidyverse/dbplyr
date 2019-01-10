@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQLite `explain()` translation now generates `EXPLAIN QUERY PLAN` which
+  generates a higher-level, more human friendly explanation.
+
 * `show_query()` and `explain()` now use `cat()` rather than message.
 
 * `transmute()` now generates simpler SQL instead of being a `mutate()` + 

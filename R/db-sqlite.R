@@ -3,6 +3,15 @@ db_desc.SQLiteConnection <- function(x) {
   paste0("sqlite ", sqlite_version(), " [", x@dbname, "]")
 }
 
+#' @export
+db_explain.SQLiteConnection <- function(con, sql, ...) {
+  exsql <- build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
+  expl <- dbGetQuery(con, exsql)
+  out <- utils::capture.output(print(expl))
+
+  paste(out, collapse = "\n")
+}
+
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
 }
