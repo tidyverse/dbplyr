@@ -58,15 +58,6 @@ group_vars.tbl_lazy <- function(x) {
   op_grps(x$ops)
 }
 
-render_lazy <- function(x, ...) {
-  cat("Source: lazy\n")
-  cat("Vars  : ", commas(op_vars(x$ops)), "\n", sep = "")
-  cat("Groups: ", commas(op_grps(x$ops)), "\n", sep = "")
-  cat("\n")
-
-  print(x$ops)
-}
-
 # Single table methods ----------------------------------------------------
 
 # registered onLoad
