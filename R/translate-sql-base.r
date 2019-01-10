@@ -1,5 +1,6 @@
 #' @include translate-sql-window.r
 #' @include translate-sql-helpers.r
+#' @include translate-sql-paste.R
 #' @include sql-escape.r
 NULL
 
@@ -79,18 +80,13 @@ base_scalar <- sql_translator(
 
   abs     = sql_prefix("abs", 1),
   acos    = sql_prefix("acos", 1),
-  acosh   = sql_prefix("acosh", 1),
   asin    = sql_prefix("asin", 1),
-  asinh   = sql_prefix("asinh", 1),
   atan    = sql_prefix("atan", 1),
   atan2   = sql_prefix("atan2", 2),
-  atanh   = sql_prefix("atanh", 1),
   ceil    = sql_prefix("ceil", 1),
   ceiling = sql_prefix("ceil", 1),
   cos     = sql_prefix("cos", 1),
-  cosh    = sql_prefix("cosh", 1),
   cot     = sql_prefix("cot", 1),
-  coth    = sql_prefix("coth", 1),
   exp     = sql_prefix("exp", 1),
   floor   = sql_prefix("floor", 1),
   log     = function(x, base = exp(1)) {
@@ -104,10 +100,18 @@ base_scalar <- sql_translator(
   round   = sql_prefix("round", 2),
   sign    = sql_prefix("sign", 1),
   sin     = sql_prefix("sin", 1),
-  sinh    = sql_prefix("sinh", 1),
   sqrt    = sql_prefix("sqrt", 1),
   tan     = sql_prefix("tan", 1),
-  tanh     = sql_prefix("tanh", 1),
+  # cosh, sinh, coth and tanh calculations are based on this article
+  # https://en.wikipedia.org/wiki/Hyperbolic_function
+  cosh     = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
+  sinh     = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
+  tanh     = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
+  coth     = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+
+  round = function(x, digits = 0L) {
+    sql_expr(ROUND(!!x, !!as.integer(digits)))
+  },
 
   tolower = sql_prefix("lower", 1),
   toupper = sql_prefix("upper", 1),
@@ -119,6 +123,8 @@ base_scalar <- sql_translator(
 
     sql_expr(SUBSTR(!!x, !!start, !!length))
   },
+  paste = sql_paste(" "),
+  paste0 = sql_paste(""),
 
   `if` = sql_if,
   if_else = function(condition, true, false) sql_if(condition, true, false),
@@ -146,6 +152,13 @@ base_scalar <- sql_translator(
   as.double = sql_cast("NUMERIC"),
   as.integer = sql_cast("INTEGER"),
   as.character = sql_cast("TEXT"),
+  as.logical = sql_cast("BOOLEAN"),
+  as.Date = sql_cast("DATE"),
+  # MS SQL - https://docs.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql
+  # Hive - https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
+  # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
+  # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
+  as.integer64  = sql_cast("BIGINT"),
 
   c = function(...) c(...),
   `:` = function(from, to) from:to,
@@ -160,7 +173,6 @@ base_scalar <- sql_translator(
   `%>%` = `%>%`,
 
   # stringr functions
-
   # SQL Syntax reference links:
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
   #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions

@@ -115,7 +115,7 @@ names.sql_variant <- function(x) {
 #' @rdname sql_variant
 sql_translator <- function(..., .funs = list(),
                            .parent = new.env(parent = emptyenv())) {
-  funs <- c(list(...), .funs)
+  funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
 
   list2env(funs, copy_env(.parent))

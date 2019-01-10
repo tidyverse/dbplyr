@@ -97,6 +97,28 @@ test_that("magrittr pipe is translated", {
 })
 
 
+# casts -------------------------------------------------------------------
+
+test_that("casts as expected", {
+  expect_equal(translate_sql(as.integer64(x)), sql('CAST("x" AS BIGINT)'))
+  expect_equal(translate_sql(as.logical(x)),   sql('CAST("x" AS BOOLEAN)'))
+  expect_equal(translate_sql(as.Date(x)),      sql('CAST("x" AS DATE)'))
+})
+
+# numeric -----------------------------------------------------------------
+
+test_that("hypergeometric functions use manual calculation", {
+  expect_equal(translate_sql(cosh(x)), sql('(EXP("x") + EXP(-("x"))) / 2'))
+  expect_equal(translate_sql(sinh(x)), sql('(EXP("x") - EXP(-("x"))) / 2'))
+  expect_equal(translate_sql(tanh(x)), sql('(EXP(2 * ("x")) - 1) / (EXP(2 * ("x")) + 1)'))
+  expect_equal(translate_sql(coth(x)), sql('(EXP(2 * ("x")) + 1) / (EXP(2 * ("x")) - 1)'))
+})
+
+test_that("round uses integer digits", {
+  expect_equal(translate_sql(round(10.1)), sql("ROUND(10.1, 0)"))
+  expect_equal(translate_sql(round(10.1, digits = 1)),  sql("ROUND(10.1, 1)"))
+})
+
 # string functions --------------------------------------------------------
 
 test_that("different arguments of substr are corrected", {
@@ -104,6 +126,12 @@ test_that("different arguments of substr are corrected", {
   expect_equal(translate_sql(substr(x, 3, 3)), sql('SUBSTR("x", 3, 1)'))
   expect_equal(translate_sql(substr(x, 3, 2)), sql('SUBSTR("x", 3, 0)'))
   expect_equal(translate_sql(substr(x, 3, 1)), sql('SUBSTR("x", 3, 0)'))
+})
+
+test_that("paste() translated to CONCAT_WS", {
+  expect_equal(translate_sql(paste0(x, y)),             sql('CONCAT_WS(\'\', "x", "y")'))
+  expect_equal(translate_sql(paste(x, y)),              sql('CONCAT_WS(\' \', "x", "y")'))
+  expect_equal(translate_sql(paste(x, y, sep = ",")),   sql('CONCAT_WS(\',\', "x", "y")'))
 })
 
 # stringr -------------------------------------------

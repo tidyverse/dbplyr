@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Default translator gains translations for `paste()`, `paste0()`, 
+  and the hyperbolic functions (these previously were only available for 
+  ODBC based translations).
+
 * `tbl_lazy()` (used for testing) now records class of src simulation, and 
   gains informative print method (#111).
 

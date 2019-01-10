@@ -9,20 +9,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(as.numeric(x)),            sql("CAST(`x` AS DOUBLE)"))
   expect_equal(trans(as.double(x)),             sql("CAST(`x` AS DOUBLE)"))
   expect_equal(trans(as.integer(x)),            sql("CAST(`x` AS INT)"))
-  expect_equal(trans(as.integer64(x)),          sql("CAST(`x` AS BIGINT)"))
-  expect_equal(trans(as.logical(x)),            sql("CAST(`x` AS BOOLEAN)"))
   expect_equal(trans(as.character(x)),          sql("CAST(`x` AS STRING)"))
-  expect_equal(trans(as.Date(x)),               sql("CAST(`x` AS DATE)"))
-  expect_equal(trans(paste0(x, y)),             sql("CONCAT(`x`, `y`)"))
-  expect_equal(trans(cosh(x)),                  sql("(EXP(`x`) + EXP(-(`x`))) / 2"))
-  expect_equal(trans(sinh(x)),                  sql("(EXP(`x`) - EXP(-(`x`))) / 2"))
-  expect_equal(trans(tanh(x)),                  sql("(EXP(2 * (`x`)) - 1) / (EXP(2 * (`x`)) + 1)"))
-  expect_equal(trans(coth(x)),                  sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"))
-  expect_equal(trans(round(10.1)),              sql("ROUND(10.1, 0)"))
-  expect_equal(trans(round(10.1, digits = 1)),  sql("ROUND(10.1, 1)"))
-  expect_equal(trans(paste(x, y)),              sql("CONCAT_WS(' ', `x`, `y`)"))
-  expect_equal(trans(paste(x, y, sep = ",")),   sql("CONCAT_WS(',', `x`, `y`)"))
-
 })
 
 test_that("custom aggregators translated correctly", {
