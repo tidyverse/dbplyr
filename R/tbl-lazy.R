@@ -280,8 +280,30 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ...) {
     }
   }
 
+  # Ensure each has same variables
+  vars <- union(op_vars(x), op_vars(y))
+  x <- fill_vars(x, vars)
+  y <- fill_vars(y, vars)
+
   x$ops <- op_double("set_op", x, y, args = list(type = type))
   x
+}
+
+fill_vars <- function(x, vars) {
+  x_vars <- op_vars(x)
+  if (identical(x_vars, vars)) {
+    return(x)
+  }
+
+  new_vars <- lapply(set_names(vars), function(var) {
+    if (var %in% x_vars) {
+      sym(var)
+    } else {
+      NA
+    }
+  })
+
+  transmute(x, !!!new_vars)
 }
 
 # Currently the dual table verbs are defined on tbl_sql, because the

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `union()`, `union_all()`, `setdiff()` and `intersect()` do a better job
+  of matching columns across all backends (#183).
+
 * `switch()` is translated to the simple form of `SELECT CASE` (#192).
 
 * Translation of `n_distinct()` now only supports a single argument 
