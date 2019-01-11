@@ -1,5 +1,11 @@
 context("translate-sqlite")
 
+test_that("logicals translated to integers", {
+  expect_equal(escape(FALSE, con = simulate_sqlite()), sql("0"))
+  expect_equal(escape(TRUE, con = simulate_sqlite()), sql("1"))
+  expect_equal(escape(NA, con = simulate_sqlite()), sql("NULL"))
+})
+
 test_that("vectorised translations", {
   trans <- function(x) {
     translate_sql(!!enquo(x), con = simulate_sqlite(), window = FALSE)
