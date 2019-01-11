@@ -29,14 +29,15 @@ other high level queries, or for other syntax that has no R equivalnt.
 For individual function translations, prefer \code{\link[=sql_expr]{sql_expr()}}.
 }
 \examples{
-build_sql("SELECT * FROM TABLE")
+con <- simulate_dbi()
+build_sql("SELECT * FROM TABLE", con = con)
 x <- "TABLE"
-build_sql("SELECT * FROM ", x)
-build_sql("SELECT * FROM ", ident(x))
-build_sql("SELECT * FROM ", sql(x))
+build_sql("SELECT * FROM ", x, con = con)
+build_sql("SELECT * FROM ", ident(x), con = con)
+build_sql("SELECT * FROM ", sql(x), con = con)
 
 # http://xkcd.com/327/
 name <- "Robert'); DROP TABLE Students;--"
-build_sql("INSERT INTO Students (Name) VALUES (", name, ")")
+build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
 }
 \keyword{internal}

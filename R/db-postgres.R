@@ -122,7 +122,7 @@ db_write_table.PostgreSQLConnection <- function(con, table, types, values,
   rows <- apply(col_mat, 1, paste0, collapse = ", ")
   values <- paste0("(", rows, ")", collapse = "\n, ")
 
-  sql <- build_sql("INSERT INTO ", as.sql(table), " VALUES ", sql(values))
+  sql <- build_sql("INSERT INTO ", as.sql(table), " VALUES ", sql(values), con = con)
   dbExecute(con, sql)
 
   table

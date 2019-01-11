@@ -18,7 +18,7 @@ test_that("group by then limit is collapsed", {
 
   qry <- lf %>% sql_build()
   expect_equal(qry$limit, 1L)
-  expect_equal(qry$group_by, sql('"x"'))
+  expect_equal(qry$group_by, sql('`x`'))
 
   # And check that it returns the correct value
   expect_equal(collect(lf), tibble(x = 1L, y = 2))
@@ -31,7 +31,7 @@ test_that("filter and rename are correctly composed", {
 
   qry <- lf %>% sql_build()
   expect_equal(qry$select, ident(x = "y"))
-  expect_equal(qry$where, sql('"x" = 1.0'))
+  expect_equal(qry$where, sql('`x` = 1.0'))
 
   # It surprises me that this SQL works!
   expect_equal(collect(lf), tibble(x = 2))

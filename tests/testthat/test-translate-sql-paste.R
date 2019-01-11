@@ -1,6 +1,9 @@
 context("test-translate-sql-paste.R")
 
 test_that("basic prefix operation", {
+  old <- set_current_con(simulate_dbi())
+  on.exit(set_current_con(old))
+
   paste <- sql_paste("")
   x <- ident("x")
   y <- ident("y")
@@ -12,6 +15,9 @@ test_that("basic prefix operation", {
 
 
 test_that("basic infix operation", {
+  old <- set_current_con(simulate_dbi())
+  on.exit(set_current_con(old))
+
   paste <- sql_paste_infix("", "&&", function(x) sql_expr(cast((!!x) %as% text)))
   x <- ident("x")
   y <- ident("y")

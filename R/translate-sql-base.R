@@ -75,7 +75,7 @@ base_scalar <- sql_translator(
   `|`     = sql_infix("or"),
   `||`    = sql_infix("or"),
   xor     = function(x, y) {
-    sql(sprintf("%1$s OR %2$s AND NOT (%1$s AND %2$s)", escape(x), escape(y)))
+    sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
 
   abs     = sql_prefix("abs", 1),

@@ -5,8 +5,9 @@
 \alias{translate_sql_}
 \title{Translate an expression to sql.}
 \usage{
-translate_sql(..., con = NULL, vars = character(), vars_group = NULL,
-  vars_order = NULL, vars_frame = NULL, window = TRUE)
+translate_sql(..., con = simulate_dbi(), vars = character(),
+  vars_group = NULL, vars_order = NULL, vars_frame = NULL,
+  window = TRUE)
 
 translate_sql_(dots, con = NULL, vars_group = NULL,
   vars_order = NULL, vars_frame = NULL, window = TRUE,
@@ -82,7 +83,7 @@ translate_sql(if (x > 5) "big" else "small")
 
 # Infix functions are passed onto SQL with \% removed
 translate_sql(first \%like\% "Had\%")
-translate_sql(first \%is\% NULL)
+translate_sql(first \%is\% NA)
 translate_sql(first \%in\% c("John", "Roger", "Robert"))
 
 # And be careful if you really want integers
@@ -91,7 +92,7 @@ translate_sql(x == 1L)
 
 # If you have an already quoted object, use translate_sql_:
 x <- quote(y + 1 / sin(t))
-translate_sql_(list(x))
+translate_sql_(list(x), con = simulate_dbi())
 
 # Windowed translation --------------------------------------------
 # Known window functions automatically get OVER()

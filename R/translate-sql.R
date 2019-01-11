@@ -57,7 +57,7 @@
 #'
 #' # Infix functions are passed onto SQL with % removed
 #' translate_sql(first %like% "Had%")
-#' translate_sql(first %is% NULL)
+#' translate_sql(first %is% NA)
 #' translate_sql(first %in% c("John", "Roger", "Robert"))
 #'
 #' # And be careful if you really want integers
@@ -66,7 +66,7 @@
 #'
 #' # If you have an already quoted object, use translate_sql_:
 #' x <- quote(y + 1 / sin(t))
-#' translate_sql_(list(x))
+#' translate_sql_(list(x), con = simulate_dbi())
 #'
 #' # Windowed translation --------------------------------------------
 #' # Known window functions automatically get OVER()
@@ -82,12 +82,13 @@
 #' translate_sql(cumsum(mpg))
 #' translate_sql(cumsum(mpg), vars_order = "mpg")
 translate_sql <- function(...,
-                          con = NULL,
+                          con = simulate_dbi(),
                           vars = character(),
                           vars_group = NULL,
                           vars_order = NULL,
                           vars_frame = NULL,
                           window = TRUE) {
+
   if (!missing(vars)) {
     abort("`vars` is deprecated. Please use partial_eval() directly.")
   }
@@ -127,7 +128,7 @@ translate_sql_ <- function(dots,
 
   if (length(context) > 0) {
     old_context <- set_current_context(context)
-    on.exit(set_current_context(context), add = TRUE)
+    on.exit(set_current_context(old_context), add = TRUE)
   }
 
   if (window) {
@@ -146,9 +147,9 @@ translate_sql_ <- function(dots,
     if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {
-      overscope <- sql_overscope(x, variant, con, window = window)
+      overscope <- sql_overscope(x, variant, con = con, window = window)
       on.exit(overscope_clean(overscope))
-      escape(overscope_eval_next(overscope, x))
+      escape(overscope_eval_next(overscope, x), con = con)
     }
   })
 
@@ -178,10 +179,8 @@ sql_overscope <- function(expr, variant, con, window = FALSE,
 
   # Existing symbols in expression
   names <- all_names(expr)
-  name_env <- ceply(
-    names, function(x) escape(ident(x), con = con),
-    parent = special_calls2
-  )
+  idents <- lapply(names, ident)
+  name_env <- ceply(idents, escape, con = con, parent = special_calls2)
 
   # Known sql expressions
   symbol_env <- env_clone(base_symbols, parent = name_env)

@@ -54,7 +54,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
     "SELECT ", select, "\n",
     "  FROM ", x, "\n",
     "  ", JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("  ON ", on, "\n") else NULL,
+    if (!is.null(on)) build_sql("  ON ", on, "\n", con = con) else NULL,
     con = con
   )
 }
@@ -82,7 +82,8 @@ sql_join_var <- function(con, alias, x, y) {
       COALESCE(
         !!sql_table_prefix(con, x, table = "TBL_LEFT"),
         !!sql_table_prefix(con, y, table = "TBL_RIGHT")
-      )
+      ),
+      con = con
     )
   } else if (!is.na(x)) {
     sql_table_prefix(con, x, table = "TBL_LEFT")
@@ -103,7 +104,8 @@ sql_join_tbls <- function(con, by) {
         sql_table_prefix(con, by$y, "TBL_RIGHT")
       ),
       collapse = " AND ",
-      parens = TRUE
+      parens = TRUE,
+      con = con
     )
   }
 

@@ -43,7 +43,7 @@ deparse_names <- function(x) {
 #' @keywords internal
 #' @param ... Arguments to be constructed into the string
 named_commas <- function(...) {
-  x <- c(...)
+  x <- unlist(purrr::map(list2(...), as.character))
   if (is_null(names(x))) {
     paste0(x, collapse = ", ")
   } else {

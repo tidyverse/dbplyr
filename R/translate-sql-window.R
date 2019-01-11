@@ -14,22 +14,26 @@
 #' @export
 #' @keywords internal
 #' @examples
-#' win_over(sql("avg(x)"))
-#' win_over(sql("avg(x)"), "y")
-#' win_over(sql("avg(x)"), order = "y")
-#' win_over(sql("avg(x)"), order = c("x", "y"))
-#' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y")
-win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
+#' con <- simulate_dbi()
+#'
+#' win_over(sql("avg(x)"), con = con)
+#' win_over(sql("avg(x)"), "y", con = con)
+#' win_over(sql("avg(x)"), order = "y", con = con)
+#' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
+#' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
+win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition)
 
     partition <- build_sql(
       "PARTITION BY ",
       sql_vector(
-        escape(partition, con = sql_current_con()),
+        escape(partition, con = con),
         collapse = ", ",
-        parens = FALSE
-      )
+        parens = FALSE,
+        con = con
+      ),
+      con = con
     )
   }
 
@@ -39,10 +43,12 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     order <- build_sql(
       "ORDER BY ",
       sql_vector(
-        escape(order, con = sql_current_con()),
+        escape(order, con = con),
         collapse = ", ",
-        parens = FALSE
-      )
+        parens = FALSE,
+        con = con
+      ),
+      con = con
     )
   }
   if (length(frame) > 0) {
@@ -55,11 +61,11 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL) {
     }
 
     if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
-    frame <- build_sql("ROWS ", frame)
+    frame <- build_sql("ROWS ", frame, con = con)
   }
 
-  over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE)
-  sql <- build_sql(expr, " OVER ", over)
+  over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE, con = con)
+  sql <- build_sql(expr, " OVER ", over, con = con)
 
   sql
 }
@@ -219,7 +225,9 @@ win_current_order <- function() sql_context$order_by
 win_current_frame <- function() sql_context$frame
 
 # Not exported, because you shouldn't need it
-sql_current_con <- function() sql_context$con
+sql_current_con <- function() {
+  sql_context$con
+}
 
 # Functions to manage information for special cases
 set_current_context <- function(context) {

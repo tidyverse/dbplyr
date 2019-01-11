@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+* `escape()`, `sql_expr()` and `build_sql()` no longer accept `con = NULL` as 
+  a shortcut for `con = simulate_dbi()`. This made it too easy to forget to 
+  pass `con` along, introducing extremely subtle escaping bugs. `win_over()`
+  gains a `con` argument.
+  
+* New `escape_ansi()` always uses ANSI SQL 92 standard escaping (for use 
+  in examples and documentation).
+
 * MySQL/MariaDB gains an improved translation for `as.logical()`.
 
 * SQLite `explain()` translation now generates `EXPLAIN QUERY PLAN` which

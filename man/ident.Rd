@@ -25,11 +25,11 @@ for \code{schema.table}.
 }
 \examples{
 # SQL92 quotes strings with '
-escape("x")
+escape_ansi("x")
 
 # And identifiers with "
 ident("x")
-escape(ident("x"))
+escape_ansi(ident("x"))
 
 # You can supply multiple inputs
 ident(a = "x", b = "y")

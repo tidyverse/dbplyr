@@ -20,9 +20,11 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
     # e.g: SELECT TOP 100 * FROM my_table
     if (!is.null(limit) && !identical(limit, Inf)) {
       assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-      build_sql(" TOP ", as.integer(limit), " ")},
+      build_sql(" TOP ", as.integer(limit), " ", con = con)
+    },
 
-    escape(select, collapse = ", ", con = con)
+    escape(select, collapse = ", ", con = con),
+    con = con
   )
 
   out$from      <- sql_clause_from(from, con)
@@ -30,7 +32,6 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
-
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }

@@ -27,7 +27,7 @@ sql_build <- function(op, con = NULL, ...) {
 }
 
 #' @export
-sql_build.tbl_lazy <- function(op, con = NULL, ...) {
+sql_build.tbl_lazy <- function(op, con = op$src$con %||% op$src, ...) {
   # only used for testing
   qry <- sql_build(op$ops, con = con, ...)
   sql_optimise(qry, con = con, ...)
@@ -84,7 +84,8 @@ sql_build.op_mutate <- function(op, con, ...) {
   vars <- op_vars(op$x)
 
   new_vars <- translate_sql_(
-    op$dots, con,
+    op$dots,
+    con = con,
     vars_group = op_grps(op),
     vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
     vars_frame = op_frame(op),
@@ -153,7 +154,7 @@ sql_build.op_filter <- function(op, con, ...) {
 
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
-    mutated <- sql_build(op_single("mutate", op$x, dots = where$comp), con)
+    mutated <- sql_build(op_single("mutate", op$x, dots = where$comp), con = con)
     where_sql <- translate_sql_(where$expr, con = con, context = list(clause = "WHERE"))
 
     select_query(mutated, select = ident(vars), where = where_sql)

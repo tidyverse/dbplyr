@@ -22,11 +22,12 @@ sql_select.ACCESS <- function(con, select, from,
     # TOP is expected after DISTINCT and not at the end of the query
     # e.g: SELECT TOP 100 * FROM my_table
     if (!is.null(limit) && !identical(limit, Inf)) {
-
       assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-      build_sql("TOP ", as.integer(limit), " ")},
+      build_sql("TOP ", as.integer(limit), " ", con = con)
+    },
 
-    escape(select, collapse = ", ", con = con)
+    escape(select, collapse = ", ", con = con),
+    con = con
   )
 
   out$from      <- sql_clause_from(from, con)

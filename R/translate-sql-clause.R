@@ -4,7 +4,8 @@ sql_clause_generic <- function(clause, fields, con){
     assert_that(is.character(fields))
     build_sql(
       sql(clause), " ",
-      escape(fields, collapse = ", ", con = con)
+      escape(fields, collapse = ", ", con = con),
+      con = con
     )
   }
 }
@@ -18,7 +19,8 @@ sql_clause_select <- function(select, con, distinct = FALSE){
   build_sql(
     "SELECT ",
     if (distinct) sql("DISTINCT "),
-    escape(select, collapse = ", ", con = con)
+    escape(select, collapse = ", ", con = con),
+    con = con
   )
 }
 
@@ -26,7 +28,10 @@ sql_clause_where <- function(where, con){
   if (length(where) > 0L) {
     assert_that(is.character(where))
     where_paren <- escape(where, parens = TRUE, con = con)
-    build_sql("WHERE ", sql_vector(where_paren, collapse = " AND "))
+    build_sql(
+      "WHERE ", sql_vector(where_paren, collapse = " AND ", con = con),
+      con = con
+    )
   }
 }
 

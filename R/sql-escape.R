@@ -1,5 +1,8 @@
 #' Escape/quote a string.
 #'
+#' `escape()` requires you to provide a database connection to control the
+#' details of escaping. `escape_ansi()` uses the SQL 92 ANSI standard.
+#'
 #' @param x An object to escape. Existing sql vectors will be left as is,
 #'   character vectors are escaped with single quotes, numeric vectors have
 #'   trailing `.0` added if they're whole numbers, identifiers are
@@ -11,36 +14,46 @@
 #'   Default behaviour: lists are always wrapped in parens and separated by
 #'   commas, identifiers are separated by commas and never wrapped,
 #'   atomic vectors are separated by spaces and wrapped in parens if needed.
-#' @param con Database connection. If not specified, uses SQL 92 conventions.
+#' @param con Database connection.
 #' @rdname escape
 #' @export
 #' @examples
 #' # Doubles vs. integers
-#' escape(1:5)
-#' escape(c(1, 5.4))
+#' escape_ansi(1:5)
+#' escape_ansi(c(1, 5.4))
 #'
 #' # String vs known sql vs. sql identifier
-#' escape("X")
-#' escape(sql("X"))
-#' escape(ident("X"))
+#' escape_ansi("X")
+#' escape_ansi(sql("X"))
+#' escape_ansi(ident("X"))
 #'
 #' # Escaping is idempotent
-#' escape("X")
-#' escape(escape("X"))
-#' escape(escape(escape("X")))
+#' escape_ansi("X")
+#' escape_ansi(escape_ansi("X"))
+#' escape_ansi(escape_ansi(escape_ansi("X")))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
+  if (is.null(con)) {
+    stop("`con` must not be NULL", call. = FALSE)
+  }
+
   UseMethod("escape")
+}
+
+#' @export
+#' @rdname escape
+escape_ansi <- function(x, parens = NA, collapse = "") {
+  escape(x, parens = parens, collapse = collapse, con = simulate_dbi())
 }
 
 #' @export
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse)
+  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
 }
 
 #' @export
 escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse)
+  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
 }
 
 #' @export
@@ -81,20 +94,20 @@ escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   out[inf & x > 0] <- "'Infinity'"
   out[inf & x < 0] <- "'-Infinity'"
 
-  sql_vector(out, parens, collapse)
+  sql_vector(out, parens, collapse, con = con)
 }
 
 #' @export
 escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x[is.na(x)] <- "NULL"
-  sql_vector(x, parens, collapse)
+  sql_vector(x, parens, collapse, con = con)
 }
 
 #' @export
 escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x <- as.character(x)
   x[is.na(x)] <- "NULL"
-  sql_vector(x, parens, collapse)
+  sql_vector(x, parens, collapse, con = con)
 }
 
 #' @export
@@ -110,12 +123,16 @@ escape.sql <- function(x, parens = NULL, collapse = NULL, con = NULL) {
 #' @export
 escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   pieces <- vapply(x, escape, character(1), con = con)
-  sql_vector(pieces, parens, collapse)
+  sql_vector(pieces, parens, collapse, con = con)
 }
 
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
+  if (is.null(con)) {
+    stop("`con` must not be NULL", call. = FALSE)
+  }
+
   if (length(x) == 0) {
     if (!is.null(collapse)) {
       return(if (isTRUE(parens)) sql("()") else sql(""))
@@ -167,17 +184,22 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' @keywords internal
 #' @export
 #' @examples
-#' build_sql("SELECT * FROM TABLE")
+#' con <- simulate_dbi()
+#' build_sql("SELECT * FROM TABLE", con = con)
 #' x <- "TABLE"
-#' build_sql("SELECT * FROM ", x)
-#' build_sql("SELECT * FROM ", ident(x))
-#' build_sql("SELECT * FROM ", sql(x))
+#' build_sql("SELECT * FROM ", x, con = con)
+#' build_sql("SELECT * FROM ", ident(x), con = con)
+#' build_sql("SELECT * FROM ", sql(x), con = con)
 #'
 #' # http://xkcd.com/327/
 #' name <- "Robert'); DROP TABLE Students;--"
-#' build_sql("INSERT INTO Students (Name) VALUES (", name, ")")
+#' build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
-  escape_expr <- function(x) {
+  if (is.null(con)) {
+    stop("`con` must not be NULL", call. = FALSE)
+  }
+
+  escape_expr <- function(x, con) {
     # If it's a string, leave it as is
     if (is.character(x)) return(x)
 
@@ -188,7 +210,7 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
     escape(val, con = con)
   }
 
-  pieces <- vapply(enexprs(...), escape_expr, character(1))
+  pieces <- purrr::map_chr(enexprs(...), escape_expr, con = con)
   sql(paste0(pieces, collapse = ""))
 }
 

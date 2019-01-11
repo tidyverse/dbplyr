@@ -2,7 +2,7 @@ context("SQL: escaping")
 
 # Identifiers ------------------------------------------------------------------
 
-ei <- function(...) unclass(escape(ident(c(...))))
+ei <- function(...) unclass(escape(ident(c(...)), con = simulate_dbi()))
 
 test_that("identifiers are doubled quoted", {
   expect_equal(ei("x"), '"x"')
@@ -20,52 +20,67 @@ test_that("identifier names become AS", {
 # Zero-length inputs ------------------------------------------------------
 
 test_that("zero length inputs yield zero length output when not collapsed", {
-  expect_equal(sql_vector(sql(), collapse = NULL), sql())
-  expect_equal(sql_vector(ident(), collapse = NULL), sql())
-  expect_equal(sql_vector(ident_q(), collapse = NULL), sql())
+  con <- simulate_dbi()
+  expect_equal(sql_vector(sql(), collapse = NULL, con = con), sql())
+  expect_equal(sql_vector(ident(), collapse = NULL, con = con), sql())
+  expect_equal(sql_vector(ident_q(), collapse = NULL, con = con), sql())
 })
 
 test_that("zero length inputs yield length-1 output when collapsed", {
-  expect_equal(sql_vector(sql(), parens = FALSE, collapse = ""), sql(""))
-  expect_equal(sql_vector(sql(), parens = TRUE, collapse = ""), sql("()"))
-  expect_equal(sql_vector(ident(), parens = FALSE, collapse = ""), sql(""))
-  expect_equal(sql_vector(ident(), parens = TRUE, collapse = ""), sql("()"))
-  expect_equal(sql_vector(ident_q(), parens = FALSE, collapse = ""), sql(""))
-  expect_equal(sql_vector(ident_q(), parens = TRUE, collapse = ""), sql("()"))
+  con <- simulate_dbi()
+
+  expect_equal(sql_vector(sql(), parens = FALSE, collapse = "", con = con), sql(""))
+  expect_equal(sql_vector(sql(), parens = TRUE, collapse = "", con = con), sql("()"))
+  expect_equal(sql_vector(ident(), parens = FALSE, collapse = "", con = con), sql(""))
+  expect_equal(sql_vector(ident(), parens = TRUE, collapse = "", con = con), sql("()"))
+  expect_equal(sql_vector(ident_q(), parens = FALSE, collapse = "", con = con), sql(""))
+  expect_equal(sql_vector(ident_q(), parens = TRUE, collapse = "", con = con), sql("()"))
 })
 
 # Special values ----------------------------------------------------------------
 
 test_that("missing vaues become null", {
-  expect_equal(escape(NA), sql("NULL"))
-  expect_equal(escape(NA_real_), sql("NULL"))
-  expect_equal(escape(NA_integer_), sql("NULL"))
-  expect_equal(escape(NA_character_), sql("NULL"))
+  con <- simulate_dbi()
+
+  expect_equal(escape(NA, con = con), sql("NULL"))
+  expect_equal(escape(NA_real_, con = con), sql("NULL"))
+  expect_equal(escape(NA_integer_, con = con), sql("NULL"))
+  expect_equal(escape(NA_character_, con = con), sql("NULL"))
 })
 
 test_that("-Inf and Inf are expanded and quoted", {
-  expect_equal(escape(Inf), sql("'Infinity'"))
-  expect_equal(escape(-Inf), sql("'-Infinity'"))
+  con <- simulate_dbi()
+  expect_equal(escape(Inf, con = con), sql("'Infinity'"))
+  expect_equal(escape(-Inf, con = con), sql("'-Infinity'"))
 })
 
 test_that("logical is SQL-99 compatible (by default)", {
-  expect_equal(escape(TRUE), sql("TRUE"))
-  expect_equal(escape(FALSE), sql("FALSE"))
-  expect_equal(escape(NA), sql("NULL"))
+  con <- simulate_dbi()
+  expect_equal(escape(TRUE, con = con), sql("TRUE"))
+  expect_equal(escape(FALSE, con = con), sql("FALSE"))
+  expect_equal(escape(NA, con = con), sql("NULL"))
 })
 
 test_that("can escape integer64 values", {
+  con <- simulate_dbi()
   skip_if_not_installed("bit64")
 
-  expect_equal(escape(bit64::as.integer64(NA)), sql("NULL"))
-  expect_equal(escape(bit64::as.integer64("123456789123456789")), sql("123456789123456789"))
+  expect_equal(
+    escape(bit64::as.integer64(NA), con = con),
+    sql("NULL")
+  )
+  expect_equal(
+    escape(bit64::as.integer64("123456789123456789"), con = con),
+    sql("123456789123456789")
+  )
 })
 
 # Times -------------------------------------------------------------------
 
 test_that("times are converted to ISO 8601", {
+  con <- simulate_dbi()
   x <- ISOdatetime(2000, 1, 2, 3, 4, 5, tz = "US/Central")
-  expect_equal(escape(x), sql("'2000-01-02T09:04:05Z'"))
+  expect_equal(escape(x, con = con), sql("'2000-01-02T09:04:05Z'"))
 })
 
 # Name aliasing -----------------------------------------------------------

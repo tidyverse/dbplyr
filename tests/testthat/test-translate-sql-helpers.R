@@ -1,5 +1,9 @@
 context("test-translate-sql-helpers.r")
 
+old <- NULL
+setup(old <<- set_current_con(simulate_dbi()))
+teardown(set_current_con(old))
+
 test_that("aggregation functions warn if na.rm = FALSE", {
   sql_mean <- sql_aggregate("mean")
 

@@ -36,7 +36,8 @@ sql_set_op.default <- function(con, x, y, method) {
   build_sql(
     "(", x, ")",
     "\n", sql(method), "\n",
-    "(", y, ")"
+    "(", y, ")",
+    con = con
   )
 }
 
@@ -46,6 +47,7 @@ sql_set_op.SQLiteConnection <- function(con, x, y, method) {
   build_sql(
     x,
     "\n", sql(method), "\n",
-    y
+    y,
+    con = con
   )
 }
