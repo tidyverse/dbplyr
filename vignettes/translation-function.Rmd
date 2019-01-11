@@ -2,7 +2,7 @@
 title: "Function translation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SQL translation}
+  %\VignetteIndexEntry{Function translation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

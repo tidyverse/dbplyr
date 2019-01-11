@@ -2,7 +2,7 @@
 title: "Verb translation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SQL translation}
+  %\VignetteIndexEntry{Verb translation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
