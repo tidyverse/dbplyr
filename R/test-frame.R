@@ -74,7 +74,10 @@ test_srcs <- local({
   list(
     get = function() env_get(cache(), "srcs", list()),
 
-    has = function(x) env_has(cache(), x),
+    has = function(x) {
+      srcs <- env_get(cache(), "srcs", list())
+      has_name(srcs, x)
+    },
 
     add = function(name, src) {
       srcs <- env_get(cache(), "srcs", list())
