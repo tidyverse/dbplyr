@@ -146,7 +146,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Translate an expression to sql.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql.r'><code>R/translate-sql.r</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql.R'><code>R/translate-sql.R</code></a></small>
     <div class="hidden name"><code>translate_sql.Rd</code></div>
     </div>
 
@@ -156,8 +156,9 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>translate_sql</span>(<span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+    <pre class="usage"><span class='fu'>translate_sql</span>(<span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'><a href='tbl_lazy.html'>simulate_dbi</a></span>(), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(),
+  <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>translate_sql_</span>(<span class='no'>dots</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -237,12 +238,12 @@ from <code><a href='https://www.rdocumentation.org/packages/stats/topics/sd'>sd(
 <span class='co'># If is translated into case when</span>
 <span class='fu'>translate_sql</span>(<span class='kw'>if</span> (<span class='no'>x</span> <span class='kw'>&gt;</span> <span class='fl'>5</span>) <span class='st'>"big"</span> <span class='kw'>else</span> <span class='st'>"small"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') WHEN NOT("x" &gt; 5.0) THEN ('small') END</div><div class='input'>
 <span class='co'># Infix functions are passed onto SQL with % removed</span>
-<span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%like%</span> <span class='st'>"Had%"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" LIKE 'Had%'</div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%is%</span> <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IS </div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%in%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"John"</span>, <span class='st'>"Roger"</span>, <span class='st'>"Robert"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IN ('John', 'Roger', 'Robert')</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%like%</span> <span class='st'>"Had%"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" LIKE 'Had%'</div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%is%</span> <span class='fl'>NA</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IS NULL</div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>first</span> <span class='kw'>%in%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"John"</span>, <span class='st'>"Roger"</span>, <span class='st'>"Robert"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "first" IN ('John', 'Roger', 'Robert')</div><div class='input'>
 <span class='co'># And be careful if you really want integers</span>
 <span class='fu'>translate_sql</span>(<span class='no'>x</span> <span class='kw'>==</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "x" = 1.0</div><div class='input'><span class='fu'>translate_sql</span>(<span class='no'>x</span> <span class='kw'>==</span> <span class='fl'>1L</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; "x" = 1</div><div class='input'>
 <span class='co'># If you have an already quoted object, use translate_sql_:</span>
 <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/substitute'>quote</a></span>(<span class='no'>y</span> + <span class='fl'>1</span> / <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Trig'>sin</a></span>(<span class='no'>t</span>))
-<span class='fu'>translate_sql_</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='no'>x</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "y" + 1.0 / SIN("t")</div><div class='input'>
+<span class='fu'>translate_sql_</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'><a href='tbl_lazy.html'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; "y" + 1.0 / SIN("t")</div><div class='input'>
 <span class='co'># Windowed translation --------------------------------------------</span>
 <span class='co'># Known window functions automatically get OVER()</span>
 <span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>

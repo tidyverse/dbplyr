@@ -275,9 +275,9 @@
 <a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt;</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt;</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
 <a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; SELECT *</span></a>
 <a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; FROM (SELECT *</span></a>
 <a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span></a>

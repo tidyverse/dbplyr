@@ -178,10 +178,10 @@
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(month, day) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(dep_delay)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a></code></pre></div>
+<pre><code>## &lt;SQL&gt;</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning</code></pre>
-<pre><code>## &lt;SQL&gt;
-## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+<pre><code>## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
 ## FROM `nycflights13::flights`
 ## GROUP BY `month`, `day`</code></pre>
 </li>
