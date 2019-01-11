@@ -75,7 +75,7 @@ test_that("same_src distinguishes srcs", {
 test_that("can copy to from remote sources", {
   df <- data.frame(x = 1:10)
   con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con1))
+  on.exit(DBI::dbDisconnect(con1), add = TRUE)
   df_1 <- copy_to(con1, df, "df1")
 
   # Create from tbl in same database
@@ -84,7 +84,7 @@ test_that("can copy to from remote sources", {
 
   # Create from tbl in another data
   con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con2))
+  on.exit(DBI::dbDisconnect(con2), add = TRUE)
   df_3 <- copy_to(con2, df_1, "df3")
   expect_equal(collect(df_3), df)
 })
