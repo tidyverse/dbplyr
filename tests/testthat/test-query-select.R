@@ -1,4 +1,4 @@
-context("test-query-select")
+context("test-query-select.R")
 
 test_that("add_suffixes works if no suffix requested", {
   expect_equal(add_suffixes(c("x", "x"), "y", ""), c("x", "x"))

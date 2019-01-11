@@ -1,4 +1,4 @@
-context("ident")
+context("test-ident.R")
 
 test_that("zero length inputs return correct clases", {
   expect_s3_class(ident(), "ident")

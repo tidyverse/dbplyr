@@ -169,3 +169,71 @@ test_that("unique index fails if values are duplicated", {
   lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
 })
 
+
+# n_groups ----------------------------------------------------------------
+
+# Data for the first three test_that groups below
+df <- data.frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
+# MariaDB returns bit64 instead of int, which makes testing hard
+tbls <- test_load(df, ignore = "MariaDB")
+
+test_that("ungrouped data has 1 group, with group size = nrow()", {
+  for (tbl in tbls) {
+    expect_equal(n_groups(tbl), 1L)
+    expect_equal(group_size(tbl), 30)
+  }
+})
+
+test_that("rowwise data has one group for each group", {
+  rw <- rowwise(df)
+  expect_equal(n_groups(rw), 30)
+  expect_equal(group_size(rw), rep(1, 30))
+})
+
+test_that("group_size correct for grouped data", {
+  for (tbl in tbls) {
+    grp <- group_by(tbl, x)
+    expect_equal(n_groups(grp), 3L)
+    expect_equal(group_size(grp), rep(10, 3))
+  }
+})
+
+# tbl_sum -------------------------------------------------------------------
+
+test_that("ungrouped output", {
+  mf <- memdb_frame(x = 1:5, y = 1:5, .name = "tbl_sum_test")
+
+  out1 <- tbl_sum(mf)
+  expect_named(out1, c("Source", "Database"))
+  expect_equal(out1[["Source"]], "table<tbl_sum_test> [?? x 2]")
+  expect_match(out1[["Database"]], "sqlite (.*) \\[:memory:\\]")
+
+  out2 <- tbl_sum(mf %>% group_by(x, y))
+  expect_named(out2, c("Source", "Database", "Groups"))
+  expect_equal(out2[["Groups"]], c("x, y"))
+
+  out3 <- tbl_sum(mf %>% arrange(x))
+  expect_named(out3, c("Source", "Database", "Ordered by"))
+  expect_equal(out3[["Ordered by"]], c("x"))
+})
+
+
+# pull --------------------------------------------------------------------
+
+test_that("can extract default, by name, or positive/negative position", {
+  x <- 1:10
+  y <- runif(10)
+  mf <- memdb_frame(x = x, y = y)
+
+  expect_equal(pull(mf), y)
+  expect_equal(pull(mf, x), x)
+  expect_equal(pull(mf, 1L), x)
+  expect_equal(pull(mf, -1), y)
+})
+
+test_that("extracts correct column from grouped tbl", {
+  mf <- memdb_frame(id = "a", value = 42)
+  gf <- mf %>% group_by(id)
+
+  expect_equal(pull(mf, value), 42)
+})
