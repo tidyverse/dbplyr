@@ -4,7 +4,7 @@ test_that("column order is matched", {
   df1 <- memdb_frame(x = 1, y = 2)
   df2 <- memdb_frame(y = 1, x = 2)
 
-  out <- collect(dplyr::union(df1, df2))
+  out <- collect(union(df1, df2))
   expect_equal(out, tibble(x = c(1, 2), y = c(2, 1)))
 })
 
@@ -12,7 +12,7 @@ test_that("missing columns filled with NULL", {
   df1 <- memdb_frame(x = 1)
   df2 <- memdb_frame(y = 1)
 
-  out <- collect(dplyr::union(df1, df2))
+  out <- collect(union(df1, df2))
   expect_equal(out, tibble(x = c(1, NA), y = c(NA, 1)))
 })
 
@@ -53,8 +53,8 @@ test_that("SQLite warns if set op attempted when tbl has LIMIT", {
   mf <- memdb_frame(x = 1:2)
   m1 <- head(mf, 1)
 
-  expect_error(dplyr::union(mf, m1), "does not support")
-  expect_error(dplyr::union(m1, mf), "does not support")
+  expect_error(union(mf, m1), "does not support")
+  expect_error(union(m1, mf), "does not support")
 })
 
 test_that("other backends can combine with a limit", {
