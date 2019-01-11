@@ -1,4 +1,4 @@
-context("test-sql-query.R")
+context("test-query-select")
 
 test_that("add_suffixes works if no suffix requested", {
   expect_equal(add_suffixes(c("x", "x"), "y", ""), c("x", "x"))
@@ -7,5 +7,5 @@ test_that("add_suffixes works if no suffix requested", {
 
 test_that("select_query() print method output is as expected", {
   mf <- select_query(lazy_frame(x = 1, src = simulate_dbi()))
-  expect_known_output(mf, test_path("test-sql-query-select.txt"), print = TRUE)
+  expect_known_output(mf, test_path("test-query-select-print.txt"), print = TRUE)
 })
