@@ -54,6 +54,7 @@ LazyData: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Collate: 
+    'copy-to.R'
     'data-cache.R'
     'data-lahman.R'
     'data-nycflights13.R'
