@@ -8,9 +8,9 @@ test_that("basic prefix operation", {
   x <- ident("x")
   y <- ident("y")
 
-  expect_equal(paste(x), sql('CONCAT_WS(\'\', "x")'))
-  expect_equal(paste(x, y), sql('CONCAT_WS(\'\', "x", "y")'))
-  expect_equal(paste(x, y, sep = " "), sql('CONCAT_WS(\' \', "x", "y")'))
+  expect_equal(paste(x), sql("CONCAT_WS('', `x`)"))
+  expect_equal(paste(x, y), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(paste(x, y, sep = " "), sql("CONCAT_WS(' ', `x`, `y`)"))
 })
 
 
@@ -22,7 +22,7 @@ test_that("basic infix operation", {
   x <- ident("x")
   y <- ident("y")
 
-  expect_equal(paste(x), sql('CAST("x" AS text)'))
-  expect_equal(paste(x, y), sql('"x" && "y"'))
-  expect_equal(paste(x, y, sep = " "), sql('"x" && \' \' && "y"'))
+  expect_equal(paste(x), sql("CAST(`x` AS text)"))
+  expect_equal(paste(x, y), sql("`x` && `y`"))
+  expect_equal(paste(x, y, sep = " "), sql("`x` && ' ' && `y`"))
 })

@@ -2,12 +2,12 @@
 % Please edit documentation in R/simulate.R
 \name{simulate_dbi}
 \alias{simulate_dbi}
-\alias{simulate_test}
 \alias{simulate_access}
 \alias{simulate_hive}
 \alias{simulate_mysql}
 \alias{simulate_impala}
 \alias{simulate_mssql}
+\alias{simulate_odbc}
 \alias{simulate_oracle}
 \alias{simulate_postgres}
 \alias{simulate_sqlite}
@@ -15,8 +15,6 @@
 \title{Simulate database connections}
 \usage{
 simulate_dbi(class = character())
-
-simulate_test(class = character())
 
 simulate_access()
 
@@ -27,6 +25,8 @@ simulate_mysql()
 simulate_impala()
 
 simulate_mssql()
+
+simulate_odbc()
 
 simulate_oracle()
 
@@ -42,5 +42,9 @@ the action of a database connection, without actually having the database
 available. Obviously, this simulation can only be incomplete, but most
 importantly it allows us to simulate SQL generation for any database without
 actually connecting to it.
+}
+\details{
+Simulated SQL always quotes identifies with \code{`x`}, and strings with
+\code{'x'}.
 }
 \keyword{internal}

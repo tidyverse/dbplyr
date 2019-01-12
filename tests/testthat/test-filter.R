@@ -86,7 +86,7 @@ test_that("filter generates simple expressions", {
     filter(x > 1L) %>%
     sql_build()
 
-  expect_equal(out$where, sql('"x" > 1'))
+  expect_equal(out$where, sql('`x` > 1'))
 })
 
 

@@ -4,16 +4,16 @@ context("test-escape.R")
 
 ei <- function(...) unclass(escape(ident(c(...)), con = simulate_dbi()))
 
-test_that("identifiers are doubled quoted", {
-  expect_equal(ei("x"), '"x"')
+test_that("identifiers get identifier quoting", {
+  expect_equal(ei("x"), '`x`')
 })
 
 test_that("identifiers are comma separated", {
-  expect_equal(ei("x", "y"), '"x", "y"')
+  expect_equal(ei("x", "y"), '`x`, `y`')
 })
 
 test_that("identifier names become AS", {
-  expect_equal(ei(x = "y"), '"y" AS "x"')
+  expect_equal(ei(x = "y"), '`y` AS `x`')
 })
 
 # Zero-length inputs ------------------------------------------------------
@@ -90,19 +90,19 @@ test_that("names_to_as() doesn't alias when ident name and value are identical",
   x <- ident(name = "name")
   y <- sql_escape_ident(con = simulate_dbi(),  x = x)
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "\"name\"")
+  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name`")
 })
 
 test_that("names_to_as() doesn't alias when ident name is missing", {
   x <- ident("*")
   y <- sql_escape_ident(con = simulate_dbi(),  x = x)
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "\"*\"")
+  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`*`")
 })
 
 test_that("names_to_as() aliases when ident name and value are different", {
   x <- ident(new_name = "name")
   y <- sql_escape_ident(con = simulate_dbi(),  x = x)
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "\"name\" AS \"new_name\"")
+  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name` AS `new_name`")
 })

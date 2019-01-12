@@ -3,7 +3,7 @@ context("test-backend-odbc.R")
 test_that("custom scalar translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_test("OdbcConnection"))
+    translate_sql(!!enquo(x), con = simulate_odbc())
   }
 
   expect_equal(trans(as.numeric(x)),            sql("CAST(`x` AS DOUBLE)"))
@@ -15,7 +15,7 @@ test_that("custom scalar translated correctly", {
 test_that("custom aggregators translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_test("OdbcConnection"))
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_odbc())
   }
 
   expect_equal(trans(sd(x)),         sql("STDDEV_SAMP(`x`)"))
@@ -26,7 +26,7 @@ test_that("custom aggregators translated correctly", {
 test_that("custom window functions translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), window = TRUE, con = simulate_test("OdbcConnection"))
+    translate_sql(!!enquo(x), window = TRUE, con = simulate_odbc())
   }
 
   expect_equal(trans(sd(x, na.rm = TRUE)),         sql("STDDEV_SAMP(`x`) OVER ()"))

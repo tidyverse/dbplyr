@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQL simulation has been overhauled. It's now better documented, and it always
+  uses `` ` `` for field names and `'` for string.
+
 * `escape()`, `sql_expr()` and `build_sql()` no longer accept `con = NULL` as 
   a shortcut for `con = simulate_dbi()`. This made it too easy to forget to 
   pass `con` along, introducing extremely subtle escaping bugs. `win_over()`

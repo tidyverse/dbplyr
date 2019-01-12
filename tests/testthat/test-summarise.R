@@ -27,7 +27,7 @@ test_that("summarise generates group_by and select", {
     summarise(n = n()) %>%
     sql_build()
 
-  expect_equal(out$group_by, sql('"g"'))
-  expect_equal(out$select, sql('"g"', 'COUNT() AS "n"'))
+  expect_equal(out$group_by, sql('`g`'))
+  expect_equal(out$select, sql('`g`', 'COUNT() AS `n`'))
 })
 

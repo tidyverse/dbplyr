@@ -6,18 +6,12 @@
 #' importantly it allows us to simulate SQL generation for any database without
 #' actually connecting to it.
 #'
+#' Simulated SQL always quotes identifies with `` `x` ``, and strings with
+#' `'x'`.
+#'
 #' @keywords internal
 #' @export
 simulate_dbi <- function(class = character()) {
-  structure(
-    list(),
-    class = c(class, "DBIConnection")
-  )
-}
-
-#' @export
-#' @rdname simulate_dbi
-simulate_test <- function(class = character()) {
   structure(
     list(),
     class = c(class, "TestConnection", "DBIConnection")
@@ -36,36 +30,40 @@ sql_escape_string.TestConnection <- function(con, x) {
 
 #' @export
 #' @rdname simulate_dbi
-simulate_access <- function() simulate_test("ACCESS")
+simulate_access <- function() simulate_dbi("ACCESS")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_hive <- function() simulate_test("Hive")
+simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_mysql <- function() simulate_test("MySQLConnection")
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_impala <- function() simulate_test("Impala")
+simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_mssql <- function() simulate_test("Microsoft SQL Server")
+simulate_mssql <- function() simulate_dbi("Microsoft SQL Server")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_oracle <- function() simulate_test("Oracle")
+simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_postgres <- function() simulate_test("PostgreSQLConnection")
+simulate_oracle <- function() simulate_dbi("Oracle")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_sqlite <- function() simulate_test("SQLiteConnection")
+simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_teradata <- function() simulate_test("Teradata")
+simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
+
+#' @export
+#' @rdname simulate_dbi
+simulate_teradata <- function() simulate_dbi("Teradata")
