@@ -1,4 +1,4 @@
-context("SQL: escaping")
+context("test-sql-escape.R")
 
 # Identifiers ------------------------------------------------------------------
 
@@ -15,7 +15,6 @@ test_that("identifiers are comma separated", {
 test_that("identifier names become AS", {
   expect_equal(ei(x = "y"), '"y" AS "x"')
 })
-
 
 # Zero-length inputs ------------------------------------------------------
 

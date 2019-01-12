@@ -275,3 +275,46 @@ test_that("consistent result of full natural join", {
   compare_tbls2(tbls_left, tbls_right, op = test_f_j)
 })
 
+
+# sql_build ---------------------------------------------------------------
+
+
+test_that("join captures both tables", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- inner_join(lf1, lf2) %>% sql_build()
+
+  expect_s3_class(out, "join_query")
+  expect_equal(op_vars(out$x), c("x", "y"))
+  expect_equal(op_vars(out$y), c("x", "z"))
+  expect_equal(out$type, "inner")
+})
+
+test_that("semi join captures both tables", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- semi_join(lf1, lf2) %>% sql_build()
+
+  expect_equal(op_vars(out$x), c("x", "y"))
+  expect_equal(op_vars(out$y), c("x", "z"))
+  expect_equal(out$anti, FALSE)
+})
+
+test_that("set ops captures both tables", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  out <- union(lf1, lf2) %>% sql_build()
+  expect_equal(out$type, "UNION")
+})
+
+
+# Helpers -----------------------------------------------------------------
+
+test_that("add_suffixes works if no suffix requested", {
+  expect_equal(add_suffixes(c("x", "x"), "y", ""), c("x", "x"))
+  expect_equal(add_suffixes(c("x", "y"), "y", ""), c("x", "y"))
+})
+

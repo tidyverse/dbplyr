@@ -35,3 +35,17 @@ test_that("group_by can perform mutate", {
 
   expect_equal(out, tibble(z = 4L, n = 3L))
 })
+
+
+# sql_build ---------------------------------------------------------------
+
+test_that("ungroup drops PARTITION BY", {
+  out <- lazy_frame(x = 1) %>%
+    group_by(x) %>%
+    ungroup() %>%
+    mutate(x = rank(x)) %>%
+    sql_build()
+  expect_equal(out$select, sql('rank() OVER (ORDER BY "x") AS "x"'))
+
+})
+

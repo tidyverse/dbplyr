@@ -30,20 +30,6 @@ test_that("quoting for rendering summarized grouped table", {
 
 # Single table verbs ------------------------------------------------------
 
-test_that("select quotes correctly", {
-  out <- memdb_frame(x = 1, y = 1) %>%
-    select(x) %>%
-    collect()
-  expect_equal(out, data_frame(x = 1))
-})
-
-test_that("select can rename", {
-  out <- memdb_frame(x = 1, y = 2) %>%
-    select(y = x) %>%
-    collect()
-  expect_equal(out, data_frame(y = 1))
-})
-
 test_that("distinct adds DISTINCT suffix", {
   out <- memdb_frame(x = c(1, 1)) %>% distinct()
 
@@ -56,22 +42,6 @@ test_that("distinct over columns uses GROUP BY", {
 
   expect_match(out %>% sql_render(), "SELECT `y`.*GROUP BY `y`")
   expect_equal(out %>% collect(), data_frame(y = 1))
-})
-
-test_that("head limits rows returned", {
-  out <- memdb_frame(x = 1:100) %>%
-    head(10) %>%
-    collect()
-
-  expect_equal(nrow(out), 10)
-})
-
-test_that("head accepts fractional input", {
-  out <- memdb_frame(x = 1:100) %>%
-    head(10.5) %>%
-    collect()
-
-  expect_equal(nrow(out), 10)
 })
 
 test_that("head renders to integer fractional input", {

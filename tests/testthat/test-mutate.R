@@ -93,3 +93,16 @@ test_that("cumulative aggregates generate window function", {
   expect_equal(out$df$r, c(1, 3, 3, 7))
   expect_equal_tbls(out)
 })
+
+
+# sql_build ---------------------------------------------------------------
+
+
+test_that("mutate generates simple expressions", {
+  out <- lazy_frame(x = 1) %>%
+    mutate(y = x + 1L) %>%
+    sql_build()
+
+  expect_equal(out$select, sql('"x"', '"x" + 1 AS "y"'))
+})
+

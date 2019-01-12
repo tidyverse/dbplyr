@@ -17,3 +17,17 @@ test_that("summarise performs partial evaluation", {
 
   expect_equal(mf2$y, 1)
 })
+
+
+# sql-build ---------------------------------------------------------------
+
+test_that("summarise generates group_by and select", {
+  out <- lazy_frame(g = 1) %>%
+    group_by(g) %>%
+    summarise(n = n()) %>%
+    sql_build()
+
+  expect_equal(out$group_by, sql('"g"'))
+  expect_equal(out$select, sql('"g"', 'COUNT() AS "n"'))
+})
+

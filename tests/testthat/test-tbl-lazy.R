@@ -1,11 +1,11 @@
-context("test-tbl-lazy")
+context("test-tbl-lazy.R")
 
-test_that("tbl_lazy adds src class", {
+test_that("adds src class", {
   tb <- tbl_lazy(mtcars, src = simulate_sqlite())
   expect_s3_class(tb, "tbl_SQLiteConnection")
 })
 
-test_that("tbl_lazy has print method", {
+test_that("has print method", {
   expect_known_output(
     tbl_lazy(mtcars),
     test_path("test-tbl-lazy-print.txt"),
@@ -13,18 +13,7 @@ test_that("tbl_lazy has print method", {
   )
 })
 
-# Single table verbs ------------------------------------------------------
-
-test_that("two arranges equivalent to one", {
-  mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
-
-  mf1 <- mf %>% arrange(x, y)
-  mf2 <- mf %>% arrange(y) %>% arrange(x)
-
-  expect_equal_tbl(mf1, mf2)
-})
-
-test_that("tbl_dbi support colwise variants", {
+test_that("support colwise variants", {
   mf <- memdb_frame(x = 1:5, y = factor(letters[1:5]))
   exp <- mf %>% collect() %>% mutate(y = as.character(y))
 
@@ -38,35 +27,25 @@ test_that("tbl_dbi support colwise variants", {
   expect_equal_tbl(mf2, exp)
 })
 
-# Distinct ----------------------------------------------------------------
-
-df <- tibble(
-  x = c(1, 1, 1, 1),
-  y = c(1, 1, 2, 2),
-  z = c(1, 2, 1, 2)
-)
-dfs <- test_load(df)
-
-test_that("distinct equivalent to local unique when keep_all is TRUE", {
-  dfs %>%
-    lapply(. %>% distinct()) %>%
-    expect_equal_tbls(unique(df))
+test_that("base source of tbl_lazy is always 'df'", {
+  out <- lazy_frame(x = 1, y = 5) %>% sql_build()
+  expect_equal(out, ident("df"))
 })
 
-test_that("distinct for single column equivalent to local unique (#1937)", {
-  dfs %>%
-    lapply(. %>% distinct(x, .keep_all = FALSE)) %>%
-    expect_equal_tbls(unique(df["x"]))
+# head --------------------------------------------------------------------
 
-  dfs %>%
-    lapply(. %>% distinct(y, .keep_all = FALSE)) %>%
-    expect_equal_tbls(unique(df["y"]))
+test_that("head limits rows returned", {
+  out <- memdb_frame(x = 1:100) %>%
+    head(10) %>%
+    collect()
+
+  expect_equal(nrow(out), 10)
 })
 
-test_that("distinct throws error if column is specified and .keep_all is TRUE", {
-  mf <- memdb_frame(x = 1:10)
-  expect_error(
-    mf %>% distinct(x, .keep_all = TRUE) %>% collect(),
-    "specified columns.*[.]keep_all"
-  )
+test_that("head limits rows", {
+  out <- lazy_frame(x = 1:100) %>%
+    head(10) %>%
+    sql_build()
+
+  expect_equal(out$limit, 10)
 })

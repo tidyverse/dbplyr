@@ -3,6 +3,21 @@ context("select")
 df <- as.data.frame(as.list(setNames(1:26, letters)))
 tbls <- test_load(df)
 
+
+test_that("select quotes correctly", {
+  out <- memdb_frame(x = 1, y = 1) %>%
+    select(x) %>%
+    collect()
+  expect_equal(out, data_frame(x = 1))
+})
+
+test_that("select can rename", {
+  out <- memdb_frame(x = 1, y = 2) %>%
+    select(y = x) %>%
+    collect()
+  expect_equal(out, data_frame(y = 1))
+})
+
 test_that("two selects equivalent to one", {
   mf <- memdb_frame(a = 1, b = 1, c = 1, d = 2)
 
@@ -40,7 +55,6 @@ test_that("rename renames variables", {
   expect_equal_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
 })
 
-
 test_that("can rename multiple vars", {
   mf <- memdb_frame(a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
@@ -55,3 +69,40 @@ test_that("select preserves grouping vars", {
 
   expect_named(out, c("b", "a"))
 })
+
+
+# sql_build -------------------------------------------------------------
+
+test_that("select picks variables", {
+  out <- lazy_frame(x1 = 1, x2 = 1, x3 = 2) %>%
+    select(x1:x2) %>%
+    sql_build()
+
+  expect_equal(out$select, ident("x1" = "x1", "x2" = "x2"))
+})
+
+test_that("select renames variables", {
+  out <- lazy_frame(x1 = 1, x2 = 1, x3 = 2) %>%
+    select(y = x1, z = x2) %>%
+    sql_build()
+
+  expect_equal(out$select, ident("y" = "x1", "z" = "x2"))
+})
+
+test_that("select can refer to variables in local env", {
+  vars <- c("x", "y")
+  out <- lazy_frame(x = 1, y = 1) %>%
+    select(one_of(vars)) %>%
+    sql_build()
+
+  expect_equal(out$select, ident("x" = "x", "y" = "y"))
+})
+
+test_that("rename preserves existing vars", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    rename(z = y) %>%
+    sql_build()
+
+  expect_equal(out$select, ident("x" = "x", "z" = "y"))
+})
+

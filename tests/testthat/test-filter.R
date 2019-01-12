@@ -79,4 +79,14 @@ test_that("cumulative aggregates generate window function", {
     expect_equal_tbls(tibble(g = c(1, 2, 2), x = c(3L, 3L, 4L)))
 })
 
+# sql_build ---------------------------------------------------------------
+
+test_that("filter generates simple expressions", {
+  out <- lazy_frame(x = 1) %>%
+    filter(x > 1L) %>%
+    sql_build()
+
+  expect_equal(out$where, sql('"x" > 1'))
+})
+
 
