@@ -1,21 +1,10 @@
-context("tbl_sql")
-
-test_that("can generate sql tbls with raw sql", {
-  mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x, con = simulate_dbi()))
-
-  expect_equal(collect(mf1), collect(mf2))
-})
+context("test-tbl_sql.R")
 
 test_that("tbl_sql() works with string argument", {
   name <- unclass(random_table_name())
   df <- memdb_frame(a = 1, .name = name)
 
   expect_equal(collect(tbl_sql("sqlite", df$src, name)), collect(df))
-})
-
-test_that("memdb_frame() returns visible output", {
-  expect_true(withVisible(memdb_frame(a = 1))$visible)
 })
 
 test_that("head/print respects n" ,{
@@ -37,25 +26,6 @@ test_that("head/print respects n" ,{
   )
 })
 
-test_that("db_write_table calls dbQuoteIdentifier on table name" ,{
-  idents <- character()
-
-  setClass("DummyDBIConnection", representation("DBIConnection"))
-  setMethod("dbQuoteIdentifier", c("DummyDBIConnection", "character"),
-    function(conn, x, ...) {
-      idents <<- c(idents, x)
-    }
-  )
-
-  setMethod("dbWriteTable", c("DummyDBIConnection", "character", "ANY"),
-    function(conn, name, value, ...) {TRUE}
-  )
-
-  dummy_con <- new("DummyDBIConnection")
-  db_write_table(dummy_con, "somecrazytablename", NA, NA)
-  expect_true("somecrazytablename" %in% idents)
-})
-
 test_that("same_src distinguishes srcs", {
   src1 <- src_sqlite(":memory:", create = TRUE)
   src2 <- src_sqlite(":memory:", create = TRUE)
@@ -68,6 +38,43 @@ test_that("same_src distinguishes srcs", {
   expect_false(same_src(db1, db2))
 
   expect_false(same_src(db1, mtcars))
+})
+
+# tbl ---------------------------------------------------------------------
+
+test_that("can generate sql tbls with raw sql", {
+  mf1 <- memdb_frame(x = 1:3, y = 3:1)
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x, con = simulate_dbi()))
+
+  expect_equal(collect(mf1), collect(mf2))
+})
+
+sqlite_con_with_aux <- function() {
+  tmp <- tempfile()
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
+
+  con
+}
+
+test_that("can refer to default schema explicitly", {
+  con <- sqlite_con_with_aux()
+  on.exit(DBI::dbDisconnect(con))
+  DBI::dbExecute(con, "CREATE TABLE t1 (x)")
+
+  expect_equal(tbl_vars(tbl(con, "t1")), "x")
+  expect_equal(tbl_vars(tbl(con, in_schema("main", "t1"))), "x")
+})
+
+test_that("can distinguish 'schema.table' from 'schema'.'table'", {
+  con <- sqlite_con_with_aux()
+  on.exit(DBI::dbDisconnect(con))
+  DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
+  DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
+
+  expect_equal(tbl_vars(tbl(con, in_schema("aux", "t1"))), c("x", "y", "z"))
+  expect_equal(tbl_vars(tbl(con, ident("aux.t1"))), c("a", "b", "c"))
 })
 
 # copy_to -----------------------------------------------------------------
@@ -110,6 +117,14 @@ test_that("only overwrite existing table if explicitly requested", {
 
   expect_error(copy_to(con, data.frame(x = 1), name = "df"), "exists")
   expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
+})
+
+test_that("can create a new table in non-default schema", {
+  con <- sqlite_con_with_aux()
+  on.exit(DBI::dbDisconnect(con))
+  aux_mtcars <- copy_to(con, mtcars, in_schema("aux", "mtcars"), temporary = FALSE)
+
+  expect_equal(tbl_vars(aux_mtcars), tbl_vars(mtcars))
 })
 
 # collect/compute/collapse ------------------------------------------------
