@@ -1,7 +1,8 @@
 #' Create a local lazy tibble
 #'
 #' These functions are useful for testing SQL generation without having to
-#' have an active database connection.
+#' have an active database connection. See [simulate_dbi()] for a list
+#' available database simulations.
 #'
 #' @keywords internal
 #' @export

@@ -46,10 +46,7 @@
 #' )
 #'
 #' # Next we have to simulate a connection that uses this variant
-#' con <- structure(
-#'   list(),
-#'   class = c("TestCon", "DBITestConnection", "DBIConnection")
-#' )
+#' con <- simulate_test("TestCon")
 #' sql_translate_env.TestCon <- function(x) postgres_var
 #'
 #' translate_sql(cor(x, y), con = con, window = FALSE)

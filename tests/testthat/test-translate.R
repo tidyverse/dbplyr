@@ -54,17 +54,14 @@ test_that("na_if is translated to NULLIF (#211)", {
 })
 
 test_that("connection affects quoting character", {
-  dbTest <- src_sql("test", con = simulate_test())
-  testTable <- tbl_sql("test", src = dbTest, from = ident("table1"))
-
-  out <- select(testTable, field1)
-  expect_match(sql_render(out), "^SELECT `field1`\nFROM `table1`$")
+  lf <- lazy_frame(field1 = 1, src = simulate_sqlite())
+  out <- select(lf, field1)
+  expect_match(sql_render(out), "^SELECT `field1`\nFROM `df`$")
 })
 
 test_that("magrittr pipe is translated", {
   expect_identical(translate_sql(1 %>% is.na()), translate_sql(is.na(1)))
 })
-
 
 # casts -------------------------------------------------------------------
 

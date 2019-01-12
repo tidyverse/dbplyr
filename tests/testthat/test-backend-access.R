@@ -4,7 +4,7 @@ context("test-backend-access.R")
 test_that("custom scalar translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_odbc_access())
+    translate_sql(!!enquo(x), con = simulate_access())
   }
   # Conversion
   expect_equal(trans(as.numeric(x)),   sql("CDBL(`x`)"))
@@ -48,7 +48,7 @@ test_that("custom scalar translated correctly", {
 test_that("custom aggregators translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_odbc_access())
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_access())
   }
 
   expect_equal(trans(sd(x)),  sql("STDEV(`x`)"))
@@ -61,7 +61,7 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, src = simulate_odbc_access())
+  mf <- lazy_frame(x = 1, src = simulate_access())
 
   expect_equal(
     mf %>% head() %>% show_query(),

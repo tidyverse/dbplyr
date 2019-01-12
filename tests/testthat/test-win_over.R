@@ -22,7 +22,7 @@ test_that("multiple group by or order values don't have parens", {
 })
 
 test_that("connection affects quoting window function fields", {
-  old <- set_current_con(simulate_test())
+  old <- set_current_con(simulate_sqlite())
   on.exit(set_current_con(old))
 
   expect_equal(win_over(ident("x")), sql("`x` OVER ()"))

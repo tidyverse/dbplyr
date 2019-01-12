@@ -3,7 +3,7 @@ context("test-backend-postgres.R")
 test_that("custom scalar translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_odbc_postgresql())
+    translate_sql(!!enquo(x), con = simulate_postgres())
   }
 
   expect_equal(trans(log10(x)),               sql("LOG(`x`)"))
@@ -20,7 +20,7 @@ test_that("custom scalar translated correctly", {
 test_that("custom stringr functions translated correctly", {
 
   trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_odbc_postgresql())
+    translate_sql(!!enquo(x), con = simulate_postgres())
   }
 
   expect_equal(trans(str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
@@ -30,7 +30,7 @@ test_that("custom stringr functions translated correctly", {
 
 test_that("two variable aggregates are translated correctly", {
   trans <- function(x, window) {
-    translate_sql(!!enquo(x), window = window, con = simulate_odbc_postgresql())
+    translate_sql(!!enquo(x), window = window, con = simulate_postgres())
   }
 
   expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
@@ -40,11 +40,21 @@ test_that("two variable aggregates are translated correctly", {
 
 test_that("pasting translated correctly", {
   trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_odbc_postgresql())
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_postgres())
   }
 
   expect_equal(trans(paste(x, y)),  sql("CONCAT_WS(' ', `x`, `y`)"))
   expect_equal(trans(paste0(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
 
   expect_error(trans(paste0(x, collapse = "")), "`collapse` not supported")
+})
+
+test_that("postgres mimics two argument log", {
+  trans <- function(...) {
+    translate_sql(..., con = simulate_postgres())
+  }
+
+  expect_equal(trans(log(x)), sql('LN(`x`)'))
+  expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+  expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
