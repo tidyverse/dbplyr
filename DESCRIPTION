@@ -98,7 +98,6 @@ Collate:
     'simulate.R'
     'sql-build.R'
     'sql-expr.R'
-    'sql-generic.R'
     'sql-optimise.R'
     'sql-render.R'
     'src-sql.R'

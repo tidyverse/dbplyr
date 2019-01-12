@@ -7,6 +7,23 @@
 #' @include utils.R
 NULL
 
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
+#' @export
+sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+  }
+}
 
 #' @export
 #' @rdname sql_variant

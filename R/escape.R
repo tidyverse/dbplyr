@@ -162,7 +162,6 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
   paste0(x, as)
 }
 
-
 #' Helper function for quoting sql elements.
 #'
 #' If the quote character is present in the string, it will be doubled.
@@ -189,3 +188,38 @@ sql_quote <- function(x, quote) {
 
   y
 }
+
+
+
+#' More SQL generics
+#'
+#' These are new, so not included in dplyr for backward compatibility
+#' purposes.
+#'
+#' @keywords internal
+#' @export
+sql_escape_logical <- function(con, x) {
+  UseMethod("sql_escape_logical")
+}
+
+# DBIConnection methods --------------------------------------------------------
+
+#' @export
+sql_escape_string.DBIConnection <- function(con, x) {
+  dbQuoteString(con, x)
+}
+
+#' @export
+sql_escape_ident.DBIConnection <- function(con, x) {
+  dbQuoteIdentifier(con, x)
+}
+
+#' @export
+sql_escape_logical.DBIConnection <- function(con, x) {
+  y <- as.character(x)
+  y[is.na(x)] <- "NULL"
+
+  y
+}
+
+
