@@ -1,7 +1,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
-#' @include sql-escape.R
+#' @include escape.R
 NULL
 
 
