@@ -73,6 +73,7 @@ Collate:
     'backend-redshift.R'
     'backend-sqlite.R'
     'backend-teradata.R'
+    'build-sql.R'
     'copy-to.R'
     'data-cache.R'
     'data-lahman.R'
