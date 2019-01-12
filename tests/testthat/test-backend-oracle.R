@@ -1,4 +1,4 @@
-context("translate-Oracle")
+context("test-backend-oracle.R")
 
 test_that("custom scalar functions translated correctly", {
 

@@ -1,4 +1,4 @@
-context("translate-MSSQL")
+context("test-backend-mssql.R")
 
 test_that("custom scalar translated correctly", {
 

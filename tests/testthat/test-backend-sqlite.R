@@ -1,4 +1,4 @@
-context("translate-sqlite")
+context("test-backend-sqlite.R")
 
 test_that("logicals translated to integers", {
   expect_equal(escape(FALSE, con = simulate_sqlite()), sql("0"))

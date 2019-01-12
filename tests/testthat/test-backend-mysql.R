@@ -1,4 +1,4 @@
-context("translate-MySQL")
+context("test-backend-mysql.R")
 
 test_that("use CHAR type for as.character", {
   expect_equivalent(

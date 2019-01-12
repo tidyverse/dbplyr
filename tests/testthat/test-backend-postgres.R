@@ -1,4 +1,4 @@
-context("translate-postgresql")
+context("test-backend-postgres.R")
 
 test_that("custom scalar translated correctly", {
 

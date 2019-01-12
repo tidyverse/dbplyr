@@ -1,4 +1,4 @@
-context("translate-Impala")
+context("test-backend-impala.R")
 
 test_that("custom scalar functions translated correctly", {
 

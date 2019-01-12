@@ -1,4 +1,4 @@
-context("translate-odbc")
+context("test-backend-odbc.R")
 
 test_that("custom scalar translated correctly", {
 
@@ -33,19 +33,3 @@ test_that("custom window functions translated correctly", {
   expect_equal(trans(count()),       sql("COUNT(*) OVER ()"))
   expect_equal(trans(n()),           sql("COUNT(*) OVER ()"))
 })
-
-test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, src = simulate_odbc("OdbcConnection"))
-
-  expect_equal(
-    mf %>% tally() %>% show_query(),
-    sql("SELECT COUNT(*) AS `n`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% summarise(count = n()) %>% show_query(),
-    sql("SELECT COUNT(*) AS `count`\nFROM `df`")
-  )
-})
-
-

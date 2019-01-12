@@ -1,4 +1,4 @@
-context("translate-ACCESS")
+context("test-backend-access.R")
 
 
 test_that("custom scalar translated correctly", {

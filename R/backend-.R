@@ -2,8 +2,9 @@
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
 #' @include escape.R
+#' @include sql.R
+#' @include utils.R
 NULL
-
 
 sql_if <- function(cond, if_true, if_false = NULL) {
   build_sql(
@@ -205,6 +206,16 @@ base_symbols <- sql_translator(
   `*` = sql("*"),
   `NULL` = sql("NULL")
 )
+sql_exp <- function(a, x) {
+  a <- as.integer(a)
+  if (identical(a, 1L)) {
+    sql_expr(EXP(!!x))
+  } else if (identical(a, -1L)) {
+    sql_expr(EXP(-((!!x))))
+  } else {
+    sql_expr(EXP(!!a * ((!!x))))
+  }
+}
 
 #' @export
 #' @rdname sql_variant

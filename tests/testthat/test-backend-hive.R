@@ -1,4 +1,4 @@
-context("translate-Hive")
+context("test-backend-hive.R")
 
 test_that("custom scalar & string functions translated correctly", {
 
