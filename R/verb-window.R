@@ -61,11 +61,11 @@ window_frame <- function(.data, from = -Inf, to = Inf) {
 }
 
 #' @export
-sql_build.op_frame <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+op_frame.op_frame <- function(op) {
+  op$args$range
 }
 
 #' @export
-op_frame.op_frame <- function(op) {
-  op$args$range
+sql_build.op_frame <- function(op, con, ...) {
+  sql_build(op$x, con, ...)
 }

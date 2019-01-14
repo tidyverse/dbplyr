@@ -1,4 +1,3 @@
-
 # registered onLoad
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "INTERSECT", copy = copy, ...)
@@ -15,7 +14,6 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "EXCEPT", copy = copy, ...)
 }
-
 
 add_op_set_op <- function(x, y, type, copy = FALSE, ...) {
   y <- auto_copy(x, y, copy)

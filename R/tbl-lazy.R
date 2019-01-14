@@ -112,3 +112,8 @@ distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
   dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   distinct(.data, !!! dots, .keep_all = .keep_all)
 }
+#' @export
+do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
+  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  do(.data, !!! dots, .chunk_size = .chunk_size)
+}

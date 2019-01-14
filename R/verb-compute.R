@@ -14,7 +14,6 @@ collapse.tbl_sql <- function(x, ...) {
     add_op_order(op_sort(x))
 }
 
-
 # compute -----------------------------------------------------------------
 
 #' @rdname collapse.tbl_sql
@@ -23,9 +22,13 @@ collapse.tbl_sql <- function(x, ...) {
 #'   persistent (`FALSE`)?
 #' @inheritParams copy_to.src_sql
 #' @export
-compute.tbl_sql <- function(x, name = random_table_name(), temporary = TRUE,
-                            unique_indexes = list(), indexes = list(),
-                            analyze = TRUE, ...) {
+compute.tbl_sql <- function(x,
+                            name = random_table_name(),
+                            temporary = TRUE,
+                            unique_indexes = list(),
+                            indexes = list(),
+                            analyze = TRUE,
+                            ...) {
 
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
@@ -84,7 +87,6 @@ db_compute.DBIConnection <- function(con,
   table
 }
 
-
 # collect -----------------------------------------------------------------
 
 #' @rdname collapse.tbl_sql
@@ -127,7 +129,6 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
   out
 }
 
-
 # sql_render --------------------------------------------------------------
 
 #' @rdname db_copy_to
@@ -141,4 +142,3 @@ db_sql_render.DBIConnection <- function(con, sql, ...) {
   qry <- sql_build(sql, con = con, ...)
   sql_render(qry, con = con, ...)
 }
-

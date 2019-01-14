@@ -42,7 +42,7 @@ sql_render <- function(query, con = NULL, ...) {
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = op$src$con %||% op$src, ...) {
+sql_render.tbl_lazy <- function(query, con = query$src$con %||% query$src, ...) {
   # only used for testing
   qry <- sql_build(query$ops, con = con, ...)
   sql_render(qry, con = con, ...)

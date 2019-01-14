@@ -118,6 +118,5 @@ Collate:
     'verb-select.R'
     'verb-set-ops.R'
     'verb-summarise.R'
-    'verb-transmute.R'
     'verb-window.R'
     'zzz.R'

@@ -5,12 +5,10 @@ summarise.tbl_lazy <- function(.data, ...) {
   add_op_single("summarise", .data, dots = dots)
 }
 
-
 #' @export
 op_vars.op_summarise <- function(op) {
   c(op_grps(op$x), names(op$dots))
 }
-
 
 #' @export
 op_grps.op_summarise <- function(op) {
