@@ -33,14 +33,50 @@ sql_build.tbl_lazy <- function(op, con = op$src$con %||% op$src, ...) {
   sql_optimise(qry, con = con, ...)
 }
 
-# Base ops --------------------------------------------------------
+# Render ------------------------------------------------------------------
 
 #' @export
-sql_build.op_base_remote <- function(op, con, ...) {
-  op$x
+#' @rdname sql_build
+sql_render <- function(query, con = NULL, ...) {
+  UseMethod("sql_render")
 }
 
 #' @export
-sql_build.op_base_local <- function(op, con, ...) {
-  ident("df")
+sql_render.tbl_lazy <- function(query, con = op$src$con %||% op$src, ...) {
+  # only used for testing
+  qry <- sql_build(query$ops, con = con, ...)
+  sql_render(qry, con = con, ...)
+}
+
+#' @export
+sql_render.sql <- function(query, con = NULL, ...) {
+  query
+}
+
+#' @export
+sql_render.ident <- function(query, con = NULL, ..., root = TRUE) {
+  if (root) {
+    sql_select(con, sql("*"), query)
+  } else {
+    query
+  }
+}
+
+# Optimise ----------------------------------------------------------------
+
+#' @export
+#' @rdname sql_build
+sql_optimise <- function(x, con = NULL, ...) {
+  UseMethod("sql_optimise")
+}
+
+#' @export
+sql_optimise.sql <- function(x, con = NULL, ...) {
+  # Can't optimise raw SQL
+  x
+}
+
+#' @export
+sql_optimise.ident <- function(x, con = NULL, ...) {
+  x
 }

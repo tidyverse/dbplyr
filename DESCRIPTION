@@ -94,8 +94,6 @@ Collate:
     'simulate.R'
     'sql-build.R'
     'sql-expr.R'
-    'sql-optimise.R'
-    'sql-render.R'
     'src-sql.R'
     'src_dbi.R'
     'tbl-lazy.R'

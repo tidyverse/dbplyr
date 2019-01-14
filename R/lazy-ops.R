@@ -54,6 +54,16 @@ print.op_base_local <- function(x, ...) {
   cat("<Local data frame> ", dim_desc(x$x), "\n", sep = "")
 }
 
+#' @export
+sql_build.op_base_remote <- function(op, con, ...) {
+  op$x
+}
+
+#' @export
+sql_build.op_base_local <- function(op, con, ...) {
+  ident("df")
+}
+
 # Operators ---------------------------------------------------------------
 
 #' @export
