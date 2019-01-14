@@ -109,18 +109,7 @@ op_double <- function(name, x, y, args = list()) {
 op_grps <- function(op) UseMethod("op_grps")
 #' @export
 op_grps.op_base <- function(op) character()
-#' @export
-op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
-  }
-}
-#' @export
-op_grps.op_ungroup <- function(op) {
-  character()
-}
+
 #' @export
 op_grps.op_summarise <- function(op) {
   grps <- op_grps(op$x)
@@ -161,49 +150,10 @@ op_vars.op_base <- function(op) {
   op$vars
 }
 #' @export
-op_vars.op_select <- function(op) {
-  names(tidyselect::vars_select(op_vars(op$x), !!! op$dots, .include = op_grps(op$x)))
-}
-#' @export
-op_vars.op_rename <- function(op) {
-  names(rename_vars(op_vars(op$x), !!! op$dots))
-}
-#' @export
-op_vars.op_summarise <- function(op) {
-  c(op_grps(op$x), names(op$dots))
-}
-#' @export
-op_vars.op_distinct <- function(op) {
-  if (length(op$dots) == 0 || op$args$.keep_all) {
-    op_vars(op$x)
-  } else  {
-    c(op_grps(op$x), names(op$dots))
-  }
-}
-#' @export
-op_vars.op_mutate <- function(op) {
-  unique(c(op_vars(op$x), names(op$dots)))
-}
-#' @export
-op_vars.op_transmute <- function(op) {
-  c(op_grps(op$x), names(op$dots))
-}
-#' @export
 op_vars.op_single <- function(op) {
   op_vars(op$x)
 }
-#' @export
-op_vars.op_join <- function(op) {
-  op$args$vars$alias
-}
-#' @export
-op_vars.op_semi_join <- function(op) {
-  op_vars(op$x)
-}
-#' @export
-op_vars.op_set_op <- function(op) {
-  union(op_vars(op$x), op_vars(op$y))
-}
+
 #' @export
 op_vars.tbl_lazy <- function(op) {
   op_vars(op$ops)
@@ -217,16 +167,9 @@ op_vars.tbl_lazy <- function(op) {
 #' @export
 #' @rdname lazy_ops
 op_sort <- function(op) UseMethod("op_sort")
+
 #' @export
 op_sort.op_base <- function(op) NULL
-
-#' @export
-op_sort.op_summarise <- function(op) NULL
-
-#' @export
-op_sort.op_arrange <- function(op) {
-  c(op_sort(op$x), op$dots)
-}
 
 #' @export
 op_sort.op_single <- function(op) {
@@ -243,27 +186,30 @@ op_sort.tbl_lazy <- function(op) {
   op_sort(op$ops)
 }
 
-# We want to preserve this ordering (for window functions) without
-# imposing an additional arrange, so we have a special op_order
+# op_frame ----------------------------------------------------------------
 
-add_op_order <- function(.data, dots = list()) {
-  if (length(dots) == 0) {
-    return(.data)
-  }
-
-  .data$ops <- op_single("order", x = .data$ops, dots = dots)
-  .data
-}
 #' @export
-op_sort.op_order <- function(op) {
-  c(op_sort(op$x), op$dots)
+#' @rdname lazy_ops
+op_frame <- function(op) UseMethod("op_frame")
+
+#' @export
+op_frame.tbl_lazy <- function(op) {
+  op_frame(op$ops)
 }
 
 #' @export
-sql_build.op_order <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+op_frame.op_base <- function(op) {
+  NULL
+}
+#' @export
+op_frame.op_single <- function(op) {
+  op_frame(op$x)
 }
 
+#' @export
+op_frame.op_double <- function(op) {
+  op_frame(op$x)
+}
 
 # Description -------------------------------------------------------------
 
@@ -289,16 +235,6 @@ op_desc.op_base_remote <- function(op) {
   } else {
     "SQL"
   }
-}
-
-#' @export
-op_desc.op_group_by <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-op_desc.op_arrange <- function(x, ...) {
-  op_desc(x$x, ...)
 }
 
 #' @export
