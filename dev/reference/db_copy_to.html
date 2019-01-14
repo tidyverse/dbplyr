@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>More db generics — db_copy_to • dbplyr</title>
+<title>More db generics — db_compute • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -29,7 +29,7 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
-<meta property="og:title" content="More db generics — db_copy_to" />
+<meta property="og:title" content="More db generics — db_compute" />
 
 <meta property="og:description" content="These are new, so not included in dplyr for backward compatibility
 purposes." />
@@ -147,7 +147,7 @@ purposes." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>More db generics</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/db-compute.R'><code>R/db-compute.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-compute.R'><code>R/verb-compute.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-copy-to.R'><code>R/verb-copy-to.R</code></a></small>
     <div class="hidden name"><code>db_copy_to.Rd</code></div>
     </div>
 
@@ -158,16 +158,16 @@ purposes.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>db_copy_to</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>values</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
-
-<span class='fu'>db_compute</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>sql</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
+    <pre class="usage"><span class='fu'>db_compute</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>sql</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
   <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='fu'>db_collect</span>(<span class='no'>con</span>, <span class='no'>sql</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>warn_incomplete</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
-<span class='fu'>db_sql_render</span>(<span class='no'>con</span>, <span class='no'>sql</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>db_sql_render</span>(<span class='no'>con</span>, <span class='no'>sql</span>, <span class='no'>...</span>)
+
+<span class='fu'>db_copy_to</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>values</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
         
 
   </div>

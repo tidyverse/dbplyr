@@ -147,7 +147,7 @@ details of escaping. escape_ansi() uses the SQL 92 ANSI standard." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Escape/quote a string.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/sql-escape.R'><code>R/sql-escape.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/escape.R'><code>R/escape.R</code></a></small>
     <div class="hidden name"><code>escape.Rd</code></div>
     </div>
 
@@ -194,7 +194,7 @@ atomic vectors are separated by spaces and wrapped in parens if needed.</p></td>
     <pre class="examples"><div class='input'><span class='co'># Doubles vs. integers</span>
 <span class='fu'>escape_ansi</span>(<span class='fl'>1</span>:<span class='fl'>5</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; (12345)</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>5.4</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; (1.05.4)</div><div class='input'>
 <span class='co'># String vs known sql vs. sql identifier</span>
-<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; X</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; "X"</div><div class='input'>
+<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; X</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; `X`</div><div class='input'>
 <span class='co'># Escaping is idempotent</span>
 <span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)))</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div></pre>
   </div>

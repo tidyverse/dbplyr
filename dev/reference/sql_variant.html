@@ -149,7 +149,7 @@ easy." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create an sql translator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-base.R'><code>R/translate-sql-base.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-.R'><code>R/backend-.R</code></a>, and 2 more</small>
     <div class="hidden name"><code>sql_variant.Rd</code></div>
     </div>
 
@@ -266,18 +266,16 @@ conversion function.</p></div>
   <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"stddev_samp"</span>, <span class='st'>"sd"</span>),
   <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"var_samp"</span>, <span class='st'>"var"</span>)
 )
-<span class='no'>postgres_var</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_variant</span>(
-  <span class='no'>base_scalar</span>,
-  <span class='no'>postgres_agg</span>,
-  <span class='no'>base_no_win</span>
-)
 
 <span class='co'># Next we have to simulate a connection that uses this variant</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/structure'>structure</a></span>(
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"TestCon"</span>, <span class='st'>"DBITestConnection"</span>, <span class='st'>"DBIConnection"</span>)
-)
-<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>postgres_var</span>
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>(<span class='st'>"TestCon"</span>)
+<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) {
+  <span class='fu'>sql_variant</span>(
+    <span class='no'>base_scalar</span>,
+    <span class='no'>postgres_agg</span>,
+    <span class='no'>base_no_win</span>
+  )
+}
 
 <span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/cor'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; COR(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/sd'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SD(`income` / `years`)</div><div class='input'>
 <span class='co'># Any functions not explicitly listed in the converter will be translated</span>

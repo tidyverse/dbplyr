@@ -128,13 +128,13 @@
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a></code></pre></div>
 <p><code><a href="../reference/translate_sql.html">dbplyr::translate_sql()</a></code> powers translation of individual function calls, and I’ll use it extensively in this vignette to show what’s happening. You shouldn’t need to use it ordinary code as dbplyr takes care of the translation automatically.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>((x <span class="op">+</span><span class="st"> </span>y) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; ("x" + "y") / 2.0</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></a></code></pre></div>
 <p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details. You can use the various simulate helpers to see the translations used by different backends:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; POWER("x", 2)</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/tbl_lazy.html">simulate_sqlite</a></span>())</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/tbl_lazy.html">simulate_odbc_access</a></span>())</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_access</a></span>())</a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span></a></code></pre></div>
 <p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code> loops through the data twice. R’s <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide.</p>
 <p>If you’re interested in how <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is implemented, the basic techniques that underlie the implementation of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> are described in <a href="http://adv-r.hadley.nz/translation.html">“Advanced R”</a>.</p>
@@ -147,7 +147,7 @@
 <p><code>"</code> and <code>'</code> mean different things</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># In SQLite variable names are escaped by double quotes:</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; &lt;SQL&gt; "x"</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; &lt;SQL&gt; `x`</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># And strings are escaped by single quotes</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="st">"x"</span>)</a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; 'x'</span></a></code></pre></div>
@@ -155,9 +155,9 @@
 <li>
 <p>And some functions have different argument orders:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr</a></span>(x, <span class="dv">5</span>, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR("x", 5, 6)</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 5, 6)</span></a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(x, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; LOG(10.0, "x")</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; LOG(10.0, `x`)</span></a></code></pre></div>
 </li>
 <li>
 <p>R and SQL have different defaults for integers and reals. In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real</p>
@@ -233,21 +233,21 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x))</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Use `avg(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg("x") OVER ()</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg(`x`) OVER ()</span></a>
 <a class="sourceLine" id="cb8-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; avg("x") OVER ()</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; avg(`x`) OVER ()</span></a></code></pre></div>
 <p>Note that, by default, <code>translate()</code> assumes that the call is inside a <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> and generates a window translation. If you want to see the equivalent <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>/aggregation translation, use <code>window = FALSE</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG("x")</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></a></code></pre></div>
 </div>
 <div id="conditional-evauation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conditional-evauation" class="anchor"></a>Conditional evauation</h3>
 <p><code>if</code> and <code><a href="https://www.rdocumentation.org/packages/base/topics/switch">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">if</span> (x <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> <span class="cf">else</span> <span class="st">"small"</span>)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN ("x" &gt; 5.0) THEN ('big') WHEN NOT("x" &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">switch</span>(x, <span class="dt">a =</span> 1L, <span class="dt">b =</span> 2L, 3L))</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; CASE "x" WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) </span><span class="re">END</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) </span><span class="re">END</span></a></code></pre></div>
 </div>
 <div id="string-manipulation" class="section level3">
 <h3 class="hasAnchor">
@@ -269,9 +269,9 @@
 <a href="#unknown-functions" class="anchor"></a>Unknown functions</h2>
 <p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="http://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">glob</span>(x, y))</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; GLOB("x", "y")</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; GLOB(`x`, `y`)</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">%like%</span><span class="st"> "ab%"</span>)</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; "x" LIKE 'ab%'</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; `x` LIKE 'ab%'</span></a></code></pre></div>
 </div>
 <div id="window-functions" class="section level2">
 <h2 class="hasAnchor">
@@ -297,18 +297,18 @@
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(G))</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
 <a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; Use `avg(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg("G") OVER ()</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg(`G`) OVER ()</span></a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(G))</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (ORDER BY "G")</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (ORDER BY `G`)</span></a>
 <a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY "G")</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></a>
 <a class="sourceLine" id="cb12-9" data-line-number="9"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(G))</a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; &lt;SQL&gt; LAG("G", 1, NULL) OVER ()</span></a></code></pre></div>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></a></code></pre></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; avg("G") OVER (ORDER BY "year" ROWS UNBOUNDED PRECEDING)</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; avg(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (PARTITION BY "ID")</span></a></code></pre></div>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (PARTITION BY `ID`)</span></a></code></pre></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
 <li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
