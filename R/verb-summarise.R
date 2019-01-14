@@ -11,9 +11,19 @@ op_vars.op_summarise <- function(op) {
   c(op_grps(op$x), names(op$dots))
 }
 
+
+#' @export
+op_grps.op_summarise <- function(op) {
+  grps <- op_grps(op$x)
+  if (length(grps) == 1) {
+    character()
+  } else {
+    grps[-length(grps)]
+  }
+}
+
 #' @export
 op_sort.op_summarise <- function(op) NULL
-
 
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {

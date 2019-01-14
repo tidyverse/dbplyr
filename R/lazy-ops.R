@@ -6,8 +6,8 @@
 #' to evolve in the future.
 #'
 #' `op_vars()` and `op_grps()` compute the variables and groups from
-#' a sequence of lazy operations. `op_sort()` tracks the order of the
-#' data for use in window functions.
+#' a sequence of lazy operations. `op_sort()` and `op_frame()` tracks the
+#' order and frame for use in window functions.
 #'
 #' @keywords internal
 #' @name lazy_ops
@@ -27,7 +27,10 @@ op_base <- function(x, vars, class = character()) {
     ),
     class = c(paste0("op_base_", class), "op_base", "op")
   )
+}
 
+op_base_local <- function(df) {
+  op_base(df, names(df), class = "local")
 }
 
 op_base_remote <- function(x, vars) {
@@ -44,10 +47,6 @@ print.op_base_remote <- function(x, ...) {
   }
 
   cat("<Table: ", x$x, ">\n", sep = "")
-}
-
-op_base_local <- function(df) {
-  op_base(df, names(df), class = "local")
 }
 
 #' @export
@@ -109,116 +108,68 @@ op_double <- function(name, x, y, args = list()) {
 op_grps <- function(op) UseMethod("op_grps")
 #' @export
 op_grps.op_base <- function(op) character()
-
 #' @export
-op_grps.op_summarise <- function(op) {
-  grps <- op_grps(op$x)
-  if (length(grps) == 1) {
-    character()
-  } else {
-    grps[-length(grps)]
-  }
-}
-
+op_grps.op_single <- function(op) op_grps(op$x)
 #' @export
-op_grps.op_rename <- function(op) {
-  names(tidyselect::vars_rename(op_grps(op$x), !!! op$dots, .strict = FALSE))
-}
-
+op_grps.op_double <- function(op) op_grps(op$x)
 #' @export
-op_grps.op_single <- function(op) {
-  op_grps(op$x)
-}
-#' @export
-op_grps.op_double <- function(op) {
-  op_grps(op$x)
-}
-
-#' @export
-op_grps.tbl_lazy <- function(op) {
-  op_grps(op$ops)
-}
+op_grps.tbl_lazy <- function(op) op_grps(op$ops)
 
 # op_vars -----------------------------------------------------------------
 
 #' @export
 #' @rdname lazy_ops
 op_vars <- function(op) UseMethod("op_vars")
-
 #' @export
-op_vars.op_base <- function(op) {
-  op$vars
-}
+op_vars.op_base <- function(op) op$vars
 #' @export
-op_vars.op_single <- function(op) {
-  op_vars(op$x)
-}
-
+op_vars.op_single <- function(op) op_vars(op$x)
 #' @export
-op_vars.tbl_lazy <- function(op) {
-  op_vars(op$ops)
-}
+op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
+#' @export
+op_vars.tbl_lazy <- function(op) op_vars(op$ops)
 
 # op_sort -----------------------------------------------------------------
-
-# This is only used to determine the order for window functions
-# so it purposely ignores grouping. Returns a list of expressions.
 
 #' @export
 #' @rdname lazy_ops
 op_sort <- function(op) UseMethod("op_sort")
-
 #' @export
 op_sort.op_base <- function(op) NULL
-
 #' @export
-op_sort.op_single <- function(op) {
-  op_sort(op$x)
-}
-
+op_sort.op_single <- function(op) op_sort(op$x)
 #' @export
-op_sort.op_double <- function(op) {
-  op_sort(op$x)
-}
-
+op_sort.op_double <- function(op) op_sort(op$x)
 #' @export
-op_sort.tbl_lazy <- function(op) {
-  op_sort(op$ops)
-}
+op_sort.tbl_lazy <- function(op) op_sort(op$ops)
 
 # op_frame ----------------------------------------------------------------
 
 #' @export
 #' @rdname lazy_ops
 op_frame <- function(op) UseMethod("op_frame")
-
 #' @export
-op_frame.tbl_lazy <- function(op) {
-  op_frame(op$ops)
-}
-
+op_frame.op_base <- function(op) NULL
 #' @export
-op_frame.op_base <- function(op) {
-  NULL
-}
+op_frame.op_single <- function(op) op_frame(op$x)
 #' @export
-op_frame.op_single <- function(op) {
-  op_frame(op$x)
-}
-
+op_frame.op_double <- function(op) op_frame(op$x)
 #' @export
-op_frame.op_double <- function(op) {
-  op_frame(op$x)
-}
+op_frame.tbl_lazy <- function(op) op_frame(op$ops)
 
 # Description -------------------------------------------------------------
-
 
 op_rows <- function(op) "??"
 op_cols <- function(op) length(op_vars(op))
 
 op_desc <- function(op) UseMethod("op_desc")
 
+#' @export
+op_desc.op <- function(x, ..., con = con) {
+  "lazy query"
+}
+
+#' @export
 op_desc.op_base_remote <- function(op) {
   if (is.ident(op$x)) {
     paste0("table<", op$x, ">")
@@ -227,7 +178,3 @@ op_desc.op_base_remote <- function(op) {
   }
 }
 
-#' @export
-op_desc.op <- function(x, ..., con = con) {
-  "lazy query"
-}

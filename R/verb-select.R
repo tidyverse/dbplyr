@@ -33,6 +33,11 @@ op_vars.op_rename <- function(op) {
 }
 
 #' @export
+op_grps.op_rename <- function(op) {
+  names(tidyselect::vars_rename(op_grps(op$x), !!! op$dots, .strict = FALSE))
+}
+
+#' @export
 sql_build.op_rename <- function(op, con, ...) {
   vars <- tidyselect::vars_rename(op_vars(op$x), !!! op$dots)
   select_query(sql_build(op$x, con), ident(vars))
