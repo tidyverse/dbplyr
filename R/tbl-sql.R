@@ -24,8 +24,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
 
 #' @export
 same_src.tbl_sql <- function(x, y) {
-  if (!inherits(y, "tbl_sql")) return(FALSE)
-  same_src(x$src, y$src)
+  inherits(y, "tbl_sql") && same_src(x$src, y$src)
 }
 
 # Grouping methods -------------------------------------------------------------
@@ -65,8 +64,8 @@ tbl_sum.tbl_sql <- function(x) {
   c(
     "Source" = tbl_desc(x),
     "Database" = db_desc(x$src$con),
-    if (length(grps) > 0) c("Groups" = commas(grps)),
-    if (length(sort) > 0) c("Ordered by" = commas(deparse_all(sort)))
+    "Groups" = if (length(grps) > 0) commas(grps),
+    "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )
 }
 
@@ -79,25 +78,4 @@ tbl_desc <- function(x) {
     big_mark(op_cols(x$ops)),
     "]"
   )
-}
-
-#' @export
-pull.tbl_sql <- function(.data, var = -1) {
-  expr <- enquo(var)
-  var <- dplyr:::find_var(expr, tbl_vars(.data))
-
-  .data <- ungroup(.data)
-  .data <- select(.data, !! sym(var))
-  .data <- collect(.data)
-  .data[[1]]
-}
-
-#' @export
-dimnames.tbl_sql <- function(x) {
-  list(NULL, op_vars(x$ops))
-}
-
-#' @export
-dim.tbl_sql <- function(x) {
-  c(NA, length(op_vars(x$ops)))
 }

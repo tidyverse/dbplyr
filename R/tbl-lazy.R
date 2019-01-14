@@ -21,22 +21,29 @@ tbl_lazy <- function(df, src = simulate_dbi()) {
     src = src
   )
 }
-
 setOldClass(c("tbl_lazy", "tbl"))
-
-#' @export
-dim.tbl_lazy <- function(x) c(NA, length(op_vars(x)))
-
-#' @export
-as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
-  message("Use show_query() to see generated SQL")
-  data.frame()
-}
 
 #' @export
 #' @rdname tbl_lazy
 lazy_frame <- function(..., src = simulate_dbi()) {
   tbl_lazy(tibble(...), src = src)
+}
+
+
+#' @export
+dimnames.tbl_lazy <- function(x) {
+  list(NULL, op_vars(x$ops))
+}
+
+#' @export
+dim.tbl_lazy <- function(x) {
+  c(NA, length(op_vars(x$ops)))
+}
+
+#' @export
+as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
+  message("Use show_query() to see generated SQL")
+  data.frame()
 }
 
 #' @export

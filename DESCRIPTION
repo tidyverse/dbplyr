@@ -116,6 +116,7 @@ Collate:
     'verb-head.R'
     'verb-joins.R'
     'verb-mutate.R'
+    'verb-pull.R'
     'verb-select.R'
     'verb-set-ops.R'
     'verb-summarise.R'
