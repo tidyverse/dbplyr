@@ -9,6 +9,11 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
 }
 
 #' @export
+tail.tbl_sql <- function(x, n = 6L, ...) {
+  stop("tail() is not supported by sql sources", call. = FALSE)
+}
+
+#' @export
 sql_build.op_head <- function(op, con, ...) {
   select_query(sql_build(op$x, con), limit = op$args$n)
 }
