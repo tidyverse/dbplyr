@@ -70,6 +70,17 @@ tbl_sum.tbl_sql <- function(x) {
   )
 }
 
+tbl_desc <- function(x) {
+  paste0(
+    op_desc(x$ops),
+    " [",
+    op_rows(x$ops),
+    " x ",
+    big_mark(op_cols(x$ops)),
+    "]"
+  )
+}
+
 #' @export
 pull.tbl_sql <- function(.data, var = -1) {
   expr <- enquo(var)

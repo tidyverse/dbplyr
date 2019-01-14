@@ -213,16 +213,6 @@ op_frame.op_double <- function(op) {
 
 # Description -------------------------------------------------------------
 
-tbl_desc <- function(x) {
-  paste0(
-    op_desc(x$ops),
-    " [",
-    op_rows(x$ops),
-    " x ",
-    big_mark(op_cols(x$ops)),
-    "]"
-  )
-}
 
 op_rows <- function(op) "??"
 op_cols <- function(op) length(op_vars(op))
