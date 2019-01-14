@@ -17,5 +17,3 @@ db_analyze.Impala <- function(con, table, ...) {
   sql <- build_sql("COMPUTE STATS ", as.sql(table), con = con)
   DBI::dbExecute(con, sql)
 }
-
-

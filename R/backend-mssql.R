@@ -125,17 +125,13 @@
 `db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  sql <- build_sql(
-    "UPDATE STATISTICS ",
-    as.sql(table)
-    , con = con
-  )
+  sql <- build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
   DBI::dbExecute(con, sql)
 }
 
 mssql_temp_name <- function(name, temporary){
   # check that name has prefixed '##' if temporary
-  if(temporary && substr(name, 1, 1) != "#") {
+  if (temporary && substr(name, 1, 1) != "#") {
     name <- paste0("##", name)
     message("Created a temporary table named: ", name)
   }
@@ -144,12 +140,12 @@ mssql_temp_name <- function(name, temporary){
 
 #' @export
 `db_save_query.Microsoft SQL Server` <- function(con, sql, name,
-                                                 temporary = TRUE,...){
-
+                                                 temporary = TRUE, ...){
   name <- mssql_temp_name(name, temporary)
-
-  tt_sql <- build_sql("select * into ", as.sql(name), " from (", sql, ") ", as.sql(name), con = con)
-
+  tt_sql <- build_sql(
+    "SELECT * INTO ", as.sql(name), " FROM (", sql, ") ", as.sql(name),
+    con = con
+  )
   dbExecute(con, tt_sql)
 
   name
@@ -159,7 +155,6 @@ mssql_temp_name <- function(name, temporary){
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
 
   table <- mssql_temp_name(table, temporary)
-
   dbWriteTable(
     con,
     name = table,
@@ -190,11 +185,8 @@ mssql_is_null <- function(x, context) {
 }
 
 mssql_generic_infix <- function(if_select, if_filter) {
-  assert_that(is_string(if_select))
-  assert_that(is_string(if_filter))
-
-  if_select <- toupper(if_select)
-  if_filter <- toupper(if_filter)
+  force(if_select)
+  force(if_filter)
 
   function(x, y) {
     if (sql_current_select()) {
@@ -207,10 +199,8 @@ mssql_generic_infix <- function(if_select, if_filter) {
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
-
-  old <- sql_current_context()
+  old <- set_current_context(list(clause = ""))
   on.exit(set_current_context(old), add = TRUE)
-  set_current_context(list(clause = ""))
   cond <- build_sql(cond)
 
   sql_if(cond, if_true, if_false)

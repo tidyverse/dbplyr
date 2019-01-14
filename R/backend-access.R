@@ -155,6 +155,7 @@ db_analyze.ACCESS <- function(con, table, ...) {
 
 # Util -------------------------------------------
 
+#' @export
 sql_escape_logical.ACCESS <- function(con, x) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)

@@ -7,7 +7,6 @@ db_desc.PostgreSQLConnection <- function(x) {
     host, ":", info$port, "/", info$dbname, "]")
 }
 
-
 #' @export
 db_desc.PostgreSQL <- db_desc.PostgreSQLConnection
 
@@ -93,6 +92,10 @@ sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
 
 #' @export
 sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
+
+#' @export
+sql_translate_env.Redshift <- sql_translate_env.PostgreSQLConnection
+
 
 # DBI methods ------------------------------------------------------------------
 

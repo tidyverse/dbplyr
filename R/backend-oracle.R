@@ -54,7 +54,7 @@ sql_translate_env.Oracle <- function(con) {
 #' @export
 db_explain.Oracle <- function(con, sql, ...) {
   DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
-  expl <- DBI::dbGetQuery(con, 'SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())')
+  expl <- DBI::dbGetQuery(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
@@ -63,10 +63,9 @@ db_explain.Oracle <- function(con, sql, ...) {
 db_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
   sql <- dbplyr::build_sql(
-    "ANALYZE TABLE ",
-    as.sql(table),
-    " COMPUTE STATISTICS",
-    con = con)
+    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
+    con = con
+  )
   DBI::dbExecute(con, sql)
 }
 
@@ -74,7 +73,7 @@ db_analyze.Oracle <- function(con, table, ...) {
 sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
-    build_sql("(", from, ") ", if(!is.null(name)) ident(name) , con = con)
+    build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
     build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
   }
@@ -83,9 +82,6 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
 #' @export
 db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
   if (db_has_table(con, table) && force) {
-    # Solution provided by @EdwardJRoss here:
-    # github.com/tidyverse/dplyr/issues/3306#issuecomment-358485062
-    # comment has link to SO article here:
     # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
     sql <- build_sql(
       "BEGIN ",
@@ -103,48 +99,24 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
   add_op_set_op(x, y, "MINUS", copy = copy, ...)
-
 }
 
 # roacle package ----------------------------------------------------------
 
 #' @export
-sql_translate_env.OraConnection <- function(con) {
-  sql_translate_env.Oracle(con)
-}
+sql_translate_env.OraConnection <- sql_translate_env.Oracle
 
 #' @export
-sql_select.OraConnection <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
-                             order_by = NULL,
-                             limit = NULL,
-                             distinct = FALSE,
-                             ...) {
-  sql_select.Oracle(con, select, from, where = where,
-                               group_by = group_by, having = having,
-                               order_by = order_by,
-                               limit = limit,
-                               distinct = distinct,
-                               ...)
-}
+sql_select.OraConnection <- sql_select.Oracle
 
 #' @export
-db_analyze.OraConnection <- function(con, table, ...) {
-  db_analyze.Oracle(con = con, table = table, ...)
-}
+db_analyze.OraConnection <- db_analyze.Oracle
 
 #' @export
-sql_subquery.OraConnection <- function(con, from, name = unique_name(), ...) {
-  sql_subquery.Oracle(con = con, from = from, name = name, ...)
-}
+sql_subquery.OraConnection <- sql_subquery.Oracle
 
 #' @export
-db_drop_table.OraConnection <- function(con, table, force = FALSE, ...) {
-  db_drop_table.Oracle(con = con, table = table, force = force, ...)
-}
+db_drop_table.OraConnection <- db_drop_table.Oracle
 
 # registered onLoad located in the zzz.R script
-setdiff.OraConnection<- function(x, y, copy = FALSE, ...) {
-  setdiff.tbl_Oracle(x = x, y = y, copy = copy, ...)
-}
-
+setdiff.OraConnection <- setdiff.tbl_Oracle
