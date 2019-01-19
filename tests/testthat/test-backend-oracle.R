@@ -21,13 +21,11 @@ test_that("queries translate correctly", {
   )
 })
 
-test_that("vectorised translations", {
+test_that("paste and paste0 translate correctly", {
   trans <- function(x) {
     translate_sql(!!enquo(x), con = simulate_oracle(), window = FALSE)
   }
 
   expect_equal(trans(paste(x, y)), sql("`x` || ' ' || `y`"))
-  expect_equal(trans(paste(x, y, z)), sql("`x` || ' ' || `y` || ' ' || `z`"))
-  expect_equal(trans(paste(x, y, sep = "#")), sql("`x` || '#' || `y`"))
   expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
 })
