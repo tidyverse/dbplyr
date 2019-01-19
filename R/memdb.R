@@ -13,7 +13,7 @@
 #' df %>% arrange(x)
 #' df %>% arrange(x) %>% show_query()
 memdb_frame <- function(..., .name = random_table_name()) {
-  x <- copy_to(src_memdb(), data_frame(...), name = .name)
+  x <- copy_to(src_memdb(), tibble(...), name = .name)
   x
 }
 

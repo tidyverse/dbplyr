@@ -8,14 +8,14 @@ test_that("select quotes correctly", {
   out <- memdb_frame(x = 1, y = 1) %>%
     select(x) %>%
     collect()
-  expect_equal(out, data_frame(x = 1))
+  expect_equal(out, tibble(x = 1))
 })
 
 test_that("select can rename", {
   out <- memdb_frame(x = 1, y = 2) %>%
     select(y = x) %>%
     collect()
-  expect_equal(out, data_frame(y = 1))
+  expect_equal(out, tibble(y = 1))
 })
 
 test_that("two selects equivalent to one", {

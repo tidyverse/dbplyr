@@ -60,7 +60,7 @@ test_load <- function(df, name = random_table_name(), srcs = test_srcs$get(),
 #' @export
 #' @rdname testing
 test_frame <- function(..., srcs = test_srcs$get(), ignore = character()) {
-  df <- data_frame(...)
+  df <- tibble(...)
   test_load(df, srcs = srcs, ignore = ignore)
 }
 
