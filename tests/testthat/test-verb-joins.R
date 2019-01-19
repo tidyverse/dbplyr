@@ -265,8 +265,8 @@ test_that("consistent result of full natural join", {
     full_join(tbl_left, tbl_right) %>% arrange(x, y, z, w)
   }
 
-  tbl_left <- data_frame(x = 1L:4L, y = 1L:4L, w = 1L:4L)
-  tbl_right <- data_frame(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
+  tbl_left <- tibble(x = 1L:4L, y = 1L:4L, w = 1L:4L)
+  tbl_right <- tibble(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
 
   # SQLite and MySQL do not support full joins
   tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
