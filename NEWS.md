@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
+
 * SQL simulation has been overhauled. It's now better documented, and it always
   uses `` ` `` for field names and `'` for string.
 
