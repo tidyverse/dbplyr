@@ -151,7 +151,6 @@ sql_infix <- function(f, pad = TRUE) {
 sql_prefix <- function(f, n = NULL) {
   assert_that(is_string(f))
 
-  f <- toupper(f)
   function(...) {
     args <- list(...)
     if (!is.null(n) && length(args) != n) {

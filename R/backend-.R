@@ -33,7 +33,7 @@ base_scalar <- sql_translator(
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
   `%%`   = sql_infix("%"),
-  `^`    = sql_prefix("power", 2),
+  `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {
     if (is.null(y)) {
       if (is.numeric(x)) {
@@ -75,7 +75,7 @@ base_scalar <- sql_translator(
     }
   },
 
-  `!`     = sql_prefix("not"),
+  `!`     = sql_prefix("NOT"),
   `&`     = sql_infix("and"),
   `&&`    = sql_infix("and"),
   `|`     = sql_infix("or"),
@@ -84,17 +84,17 @@ base_scalar <- sql_translator(
     sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
 
-  abs     = sql_prefix("abs", 1),
-  acos    = sql_prefix("acos", 1),
-  asin    = sql_prefix("asin", 1),
-  atan    = sql_prefix("atan", 1),
-  atan2   = sql_prefix("atan2", 2),
-  ceil    = sql_prefix("ceil", 1),
-  ceiling = sql_prefix("ceil", 1),
-  cos     = sql_prefix("cos", 1),
-  cot     = sql_prefix("cot", 1),
-  exp     = sql_prefix("exp", 1),
-  floor   = sql_prefix("floor", 1),
+  abs     = sql_prefix("ABS", 1),
+  acos    = sql_prefix("ACOS", 1),
+  asin    = sql_prefix("ASIN", 1),
+  atan    = sql_prefix("ATAN", 1),
+  atan2   = sql_prefix("ATAN2", 2),
+  ceil    = sql_prefix("CEIL", 1),
+  ceiling = sql_prefix("CEIL", 1),
+  cos     = sql_prefix("COS", 1),
+  cot     = sql_prefix("COT", 1),
+  exp     = sql_prefix("EXP", 1),
+  floor   = sql_prefix("FLOOR", 1),
   log     = function(x, base = exp(1)) {
     if (isTRUE(all.equal(base, exp(1)))) {
       sql_expr(ln(!!x))
@@ -102,12 +102,12 @@ base_scalar <- sql_translator(
       sql_expr(log(!!base, !!x))
     }
   },
-  log10   = sql_prefix("log10", 1),
-  round   = sql_prefix("round", 2),
-  sign    = sql_prefix("sign", 1),
-  sin     = sql_prefix("sin", 1),
-  sqrt    = sql_prefix("sqrt", 1),
-  tan     = sql_prefix("tan", 1),
+  log10   = sql_prefix("LOG10", 1),
+  round   = sql_prefix("ROUND", 2),
+  sign    = sql_prefix("SIGN", 1),
+  sin     = sql_prefix("SIN", 1),
+  sqrt    = sql_prefix("SQRT", 1),
+  tan     = sql_prefix("TAN", 1),
   # cosh, sinh, coth and tanh calculations are based on this article
   # https://en.wikipedia.org/wiki/Hyperbolic_function
   cosh     = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
@@ -119,10 +119,10 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  tolower = sql_prefix("lower", 1),
-  toupper = sql_prefix("upper", 1),
-  trimws = sql_prefix("trim", 1),
-  nchar   = sql_prefix("length", 1),
+  tolower = sql_prefix("LOWER", 1),
+  toupper = sql_prefix("UPPER", 1),
+  trimws = sql_prefix("TRIM", 1),
+  nchar   = sql_prefix("LENGTH", 1),
   substr = function(x, start, stop) {
     start <- as.integer(start)
     length <- pmax(as.integer(stop) - start + 1L, 0L)
@@ -153,7 +153,7 @@ base_scalar <- sql_translator(
   is.null = sql_is_null,
   is.na = sql_is_null,
   na_if = sql_prefix("NULLIF", 2),
-  coalesce = sql_prefix("coalesce"),
+  coalesce = sql_prefix("COALESCE"),
 
   as.numeric = sql_cast("NUMERIC"),
   as.double = sql_cast("NUMERIC"),

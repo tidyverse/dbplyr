@@ -2,6 +2,8 @@
 
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
+* `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
+
 * SQL simulation has been overhauled. It's now better documented, and it always
   uses `` ` `` for field names and `'` for string.
 
