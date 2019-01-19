@@ -269,7 +269,7 @@
 <a href="#unknown-functions" class="anchor"></a>Unknown functions</h2>
 <p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="http://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">glob</span>(x, y))</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; GLOB(`x`, `y`)</span></a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">%like%</span><span class="st"> "ab%"</span>)</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; `x` LIKE 'ab%'</span></a></code></pre></div>
 </div>
