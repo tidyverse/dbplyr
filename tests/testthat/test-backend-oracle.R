@@ -20,3 +20,12 @@ test_that("queries translate correctly", {
     sql("^SELECT [*] FROM [(]SELECT [*]\nFROM [(]`df`[)] [)] `[^`]*` WHERE ROWNUM [<][=] 6")
   )
 })
+
+test_that("paste and paste0 translate correctly", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_oracle(), window = FALSE)
+  }
+
+  expect_equal(trans(paste(x, y)), sql("`x` || ' ' || `y`"))
+  expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
+})

@@ -44,7 +44,10 @@ sql_translate_env.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
       as.integer64  = sql_cast("NUMBER(19)"),
       as.numeric    = sql_cast("NUMBER"),
-      as.double     = sql_cast("NUMBER")
+      as.double     = sql_cast("NUMBER"),
+      # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
+      paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
+      paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
     ),
     base_odbc_agg,
     base_odbc_win
