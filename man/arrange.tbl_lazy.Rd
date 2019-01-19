@@ -2,7 +2,7 @@
 % Please edit documentation in R/verb-arrange.R
 \name{arrange.tbl_lazy}
 \alias{arrange.tbl_lazy}
-\title{Arrange rows by variables in a local lazy tibble}
+\title{Arrange rows by variables in a remote database table}
 \usage{
 \method{arrange}{tbl_lazy}(.data, ...)
 }
@@ -17,13 +17,13 @@ involving variable names. Use \code{\link[=desc]{desc()}} to sort a variable in 
 An object of the same class as \code{.data}.
 }
 \description{
-Order tbl_lazy rows by an expression involving its variables.
+Order rows of database tables by an expression involving its variables.
 }
 \section{Missing values}{
 
-When applied to \code{tbl_lazy}, the \code{\link[=arrange]{arrange()}} method sorts NAs first (at the
-beginning) compared to the default sort behavior on data frames, which places
-NA values last (at the end).
+Compared to its sorting behavior on local data, the \code{\link[=arrange]{arrange()}} method for
+most database tables sorts NA at the beginning unless wrapped with \code{\link[=desc]{desc()}}.
+Users can override this behaviour by explicitly sorting on \code{is.na(x)}.
 }
 
 \examples{
@@ -32,12 +32,12 @@ library(dplyr)
 dbplyr::memdb_frame(a = c(3, 4, 1, 2)) \%>\%
   arrange(a)
 
-# tbl_lazy: NAs sorted first
+# NA sorted first
 dbplyr::memdb_frame(a = c(3, 4, NA, 2)) \%>\%
   arrange(a)
 
-# tbl_df: NAs sorted last
-tibble(a = c(3, 5, NA, 2)) \%>\%
-  arrange(a)
+# override by sorting on is.na() first
+dbplyr::memdb_frame(a = c(3, 4, NA, 2)) \%>\%
+  arrange(is.na(a), a)
 
 }

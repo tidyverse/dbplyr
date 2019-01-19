@@ -1,11 +1,11 @@
-#' Arrange rows by variables in a local lazy tibble
+#' Arrange rows by variables in a remote database table
 #'
-#' Order tbl_lazy rows by an expression involving its variables.
+#' Order rows of database tables by an expression involving its variables.
 #'
 #' @section Missing values:
-#' When applied to `tbl_lazy`, the [arrange()] method sorts NAs first (at the
-#' beginning) compared to the default sort behavior on data frames, which places
-#' NA values last (at the end).
+#' Compared to its sorting behavior on local data, the [arrange()] method for
+#' most database tables sorts NA at the beginning unless wrapped with [desc()].
+#' Users can override this behaviour by explicitly sorting on `is.na(x)`.
 #'
 #' @inheritParams dplyr::arrange
 #' @return An object of the same class as `.data`.
@@ -15,13 +15,13 @@
 #' dbplyr::memdb_frame(a = c(3, 4, 1, 2)) %>%
 #'   arrange(a)
 #'
-#' # tbl_lazy: NAs sorted first
+#' # NA sorted first
 #' dbplyr::memdb_frame(a = c(3, 4, NA, 2)) %>%
 #'   arrange(a)
 #'
-#' # tbl_df: NAs sorted last
-#' tibble(a = c(3, 5, NA, 2)) %>%
-#'   arrange(a)
+#' # override by sorting on is.na() first
+#' dbplyr::memdb_frame(a = c(3, 4, NA, 2)) %>%
+#'   arrange(is.na(a), a)
 #'
 #' @export
 arrange.tbl_lazy <- function(.data, ...) {
