@@ -182,26 +182,7 @@ unlikely to conflict with an existing table.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>dplyr</span>)
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>100</span>))
-<span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_weaikfkbkz&gt; [?? x 2]
-#&gt; # Database:   sqlite 3.22.0 [:memory:]
-#&gt; # Ordered by: x
-#&gt;         x       y
-#&gt;     &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 0.0115 0.288  
-#&gt;  2 0.0201 0.751  
-#&gt;  3 0.0280 0.383  
-#&gt;  4 0.0281 0.00450
-#&gt;  5 0.0312 0.165  
-#&gt;  6 0.0514 0.403  
-#&gt;  7 0.0586 0.164  
-#&gt;  8 0.0652 0.464  
-#&gt;  9 0.0960 0.909  
-#&gt; 10 0.149  0.322  
-#&gt; # … with more rows</div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT *
-#&gt; FROM `dbplyr_weaikfkbkz`
-#&gt; ORDER BY `x`</div></pre>
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/Uniform'>runif</a></span>(<span class='fl'>100</span>))</div><div class='output co'>#&gt; <span class='error'>Error: Table `dbplyr_weaikfkbkz` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; <span class='error'>Error in UseMethod("arrange_"): no applicable method for 'arrange_' applied to an object of class "function"</span></div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in UseMethod("arrange_"): no applicable method for 'arrange_' applied to an object of class "function"</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

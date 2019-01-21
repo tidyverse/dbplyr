@@ -232,10 +232,10 @@
 <p>All database provide translation for the basic aggregations: <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">min()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max()</a></code>, <code><a href="https://www.rdocumentation.org/packages/stats/topics/sd">sd()</a></code>, <code><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var()</a></code>. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x))</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Use `avg(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg(`x`) OVER ()</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a>
 <a class="sourceLine" id="cb8-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; avg(`x`) OVER ()</span></a></code></pre></div>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a></code></pre></div>
 <p>Note that, by default, <code>translate()</code> assumes that the call is inside a <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> and generates a window translation. If you want to see the equivalent <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>/aggregation translation, use <code>window = FALSE</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></a></code></pre></div>
@@ -271,7 +271,7 @@
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">glob</span>(x, y))</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">%like%</span><span class="st"> "ab%"</span>)</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; `x` LIKE 'ab%'</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; `x` like 'ab%'</span></a></code></pre></div>
 </div>
 <div id="window-functions" class="section level2">
 <h2 class="hasAnchor">
@@ -296,19 +296,19 @@
 <p>To see how individual window functions are translated to SQL, we can again use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(G))</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; Use `avg(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; avg(`G`) OVER ()</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span></a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(G))</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (ORDER BY `G`)</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (ORDER BY `G`)</span></a>
 <a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></a>
 <a class="sourceLine" id="cb12-9" data-line-number="9"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(G))</a>
 <a class="sourceLine" id="cb12-10" data-line-number="10"><span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></a></code></pre></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; avg(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; rank() OVER (PARTITION BY `ID`)</span></a></code></pre></div>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></a></code></pre></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
 <li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>

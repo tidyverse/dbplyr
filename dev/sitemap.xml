@@ -4,6 +4,9 @@
     <loc>https://dbplyr.tidyverse.org/index.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/arrange.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/build_sql.html</loc>
   </url>
   <url>

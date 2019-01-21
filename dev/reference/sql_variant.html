@@ -261,10 +261,10 @@ conversion function.</p></div>
 <span class='co'># postgresql provides: http://bit.ly/K5EdTn</span>
 
 <span class='no'>postgres_agg</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_translator</span>(<span class='kw'>.parent</span> <span class='kw'>=</span> <span class='no'>base_agg</span>,
-  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"corr"</span>),
-  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"covar_samp"</span>),
-  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"stddev_samp"</span>, <span class='st'>"sd"</span>),
-  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"var_samp"</span>, <span class='st'>"var"</span>)
+  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"CORR"</span>),
+  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"COVAR_SAMP"</span>),
+  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"STDDEV_SAMP"</span>, <span class='st'>"sd"</span>),
+  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"VAR_SAMP"</span>, <span class='st'>"var"</span>)
 )
 
 <span class='co'># Next we have to simulate a connection that uses this variant</span>
