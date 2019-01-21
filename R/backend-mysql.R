@@ -25,8 +25,8 @@ sql_translate_env.MySQLConnection <- function(con) {
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
-      sd =  sql_aggregate("stddev_samp", "sd"),
-      var = sql_aggregate("var_samp", "var"),
+      sd =  sql_aggregate("STDDEV_SAMP", "sd"),
+      var = sql_aggregate("VAR_SAMP", "var"),
       str_flatten = function(x, collapse) {
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
@@ -35,8 +35,8 @@ sql_translate_env.MySQLConnection <- function(con) {
       n = function() {
         win_over(sql("COUNT(*)"), partition = win_current_group())
       },
-      sd = win_aggregate("stddev_samp"),
-      var = win_aggregate("var_samp"),
+      sd = win_aggregate("STDDEV_SAMP"),
+      var = win_aggregate("VAR_SAMP"),
       # GROUP_CONCAT not currently available as window function
       # https://mariadb.com/kb/en/library/aggregate-functions-as-window-functions/
       str_flatten = win_absent("str_flatten")

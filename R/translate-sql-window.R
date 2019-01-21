@@ -122,7 +122,6 @@ win_aggregate <- function(f) {
 #' @rdname win_over
 #' @export
 win_aggregate_2 <- function(f) {
-  f <- toupper(f)
 
   function(x, y) {
     frame <- win_current_frame()

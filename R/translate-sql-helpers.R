@@ -34,10 +34,10 @@
 #' # postgresql provides: http://bit.ly/K5EdTn
 #'
 #' postgres_agg <- sql_translator(.parent = base_agg,
-#'   cor = sql_aggregate_2("corr"),
-#'   cov = sql_aggregate_2("covar_samp"),
-#'   sd =  sql_aggregate("stddev_samp", "sd"),
-#'   var = sql_aggregate("var_samp", "var")
+#'   cor = sql_aggregate_2("CORR"),
+#'   cov = sql_aggregate_2("COVAR_SAMP"),
+#'   sd =  sql_aggregate("STDDEV_SAMP", "sd"),
+#'   var = sql_aggregate("VAR_SAMP", "var")
 #' )
 #'
 #' # Next we have to simulate a connection that uses this variant
@@ -134,7 +134,6 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 sql_infix <- function(f, pad = TRUE) {
   assert_that(is_string(f))
 
-  f <- toupper(f)
   if (pad) {
     function(x, y) {
       build_sql(x, " ", sql(f), " ", y)
@@ -170,7 +169,6 @@ sql_prefix <- function(f, n = NULL) {
 #' @export
 sql_aggregate <- function(f, f_r = f) {
   assert_that(is_string(f))
-  f <- toupper(f)
 
   function(x, na.rm = FALSE) {
     check_na_rm(f_r, na.rm)
@@ -182,7 +180,6 @@ sql_aggregate <- function(f, f_r = f) {
 #' @export
 sql_aggregate_2 <- function(f) {
   assert_that(is_string(f))
-  f <- toupper(f)
 
   function(x, y) {
     build_sql(sql(f), list(x, y))
@@ -218,7 +215,6 @@ check_na_rm <- function(f, na.rm) {
 sql_not_supported <- function(f) {
   assert_that(is_string(f))
 
-  f <- toupper(f)
   function(...) {
     stop(f, " is not available in this SQL variant", call. = FALSE)
   }

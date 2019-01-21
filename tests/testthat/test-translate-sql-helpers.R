@@ -5,7 +5,7 @@ setup(old <<- set_current_con(simulate_dbi()))
 teardown(set_current_con(old))
 
 test_that("aggregation functions warn if na.rm = FALSE", {
-  sql_mean <- sql_aggregate("mean")
+  sql_mean <- sql_aggregate("MEAN")
 
   expect_warning(sql_mean("x"), "Missing values")
   expect_warning(sql_mean("x", na.rm = TRUE), NA)
