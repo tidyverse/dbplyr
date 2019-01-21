@@ -1,3 +1,28 @@
+#' Arrange rows by variables in a remote database table
+#'
+#' Order rows of database tables by an expression involving its variables.
+#'
+#' @section Missing values:
+#' Compared to its sorting behavior on local data, the [arrange()] method for
+#' most database tables sorts NA at the beginning unless wrapped with [desc()].
+#' Users can override this behaviour by explicitly sorting on `is.na(x)`.
+#'
+#' @inheritParams dplyr::arrange
+#' @return An object of the same class as `.data`.
+#' @examples
+#' library(dplyr)
+#'
+#' dbplyr::memdb_frame(a = c(3, 4, 1, 2)) %>%
+#'   arrange(a)
+#'
+#' # NA sorted first
+#' dbplyr::memdb_frame(a = c(3, 4, NA, 2)) %>%
+#'   arrange(a)
+#'
+#' # override by sorting on is.na() first
+#' dbplyr::memdb_frame(a = c(3, 4, NA, 2)) %>%
+#'   arrange(is.na(a), a)
+#'
 #' @export
 arrange.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
