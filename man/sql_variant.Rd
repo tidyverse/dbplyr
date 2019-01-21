@@ -105,10 +105,10 @@ quickly providing default wrappers for a new SQL variant.
 # postgresql provides: http://bit.ly/K5EdTn
 
 postgres_agg <- sql_translator(.parent = base_agg,
-  cor = sql_aggregate_2("corr"),
-  cov = sql_aggregate_2("covar_samp"),
-  sd =  sql_aggregate("stddev_samp", "sd"),
-  var = sql_aggregate("var_samp", "var")
+  cor = sql_aggregate_2("CORR"),
+  cov = sql_aggregate_2("COVAR_SAMP"),
+  sd =  sql_aggregate("STDDEV_SAMP", "sd"),
+  var = sql_aggregate("VAR_SAMP", "var")
 )
 
 # Next we have to simulate a connection that uses this variant

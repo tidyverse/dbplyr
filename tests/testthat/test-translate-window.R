@@ -2,7 +2,7 @@ context("translate-window")
 
 test_that("window functions without group have empty over", {
   expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql("sum(`x`) OVER ()"))
+  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql("SUM(`x`) OVER ()"))
 })
 
 test_that("aggregating window functions ignore order_by", {
@@ -12,26 +12,26 @@ test_that("aggregating window functions ignore order_by", {
   )
   expect_equal(
     translate_sql(sum(x, na.rm = TRUE), vars_order = "x"),
-    sql("sum(`x`) OVER ()")
+    sql("SUM(`x`) OVER ()")
   )
 })
 
 test_that("order_by overrides default ordering", {
   expect_equal(
     translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
-    sql("sum(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+    sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
     translate_sql(order_by(y, cummean(x)), vars_order = "x"),
-    sql("avg(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+    sql("AVG(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
     translate_sql(order_by(y, cummin(x)), vars_order = "x"),
-    sql("min(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+    sql("MIN(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
     translate_sql(order_by(y, cummax(x)), vars_order = "x"),
-    sql("max(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+    sql("MAX(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
 })
 
@@ -56,7 +56,7 @@ test_that("first, last, and nth translated to _value", {
 test_that("can override frame of recycled functions", {
   expect_equal(
     translate_sql(sum(x, na.rm = TRUE), vars_frame = c(-1, 0), vars_order = "y"),
-    sql("sum(`x`) OVER (ORDER BY `y` ROWS 1 PRECEDING)")
+    sql("SUM(`x`) OVER (ORDER BY `y` ROWS 1 PRECEDING)")
   )
 })
 

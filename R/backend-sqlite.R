@@ -39,11 +39,11 @@ sql_translate_env.SQLiteConnection <- function(con) {
 
     ),
     sql_translator(.parent = base_agg,
-      sd = sql_aggregate("stdev", "sd")
+      sd = sql_aggregate("STDEV", "sd")
     ),
     if (sqlite_version() >= "3.25") {
       sql_translator(.parent = base_win,
-        sd = win_aggregate("stdev")
+        sd = win_aggregate("STDEV")
       )
     } else {
       base_no_win

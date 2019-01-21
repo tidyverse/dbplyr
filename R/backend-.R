@@ -76,10 +76,10 @@ base_scalar <- sql_translator(
   },
 
   `!`     = sql_prefix("NOT"),
-  `&`     = sql_infix("and"),
-  `&&`    = sql_infix("and"),
-  `|`     = sql_infix("or"),
-  `||`    = sql_infix("or"),
+  `&`     = sql_infix("AND"),
+  `&&`    = sql_infix("AND"),
+  `|`     = sql_infix("OR"),
+  `||`    = sql_infix("OR"),
   xor     = function(x, y) {
     sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
@@ -229,11 +229,11 @@ base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
   n          = function() sql("COUNT()"),
-  mean       = sql_aggregate("avg", "mean"),
-  var        = sql_aggregate("variance", "var"),
-  sum        = sql_aggregate("sum"),
-  min        = sql_aggregate("min"),
-  max        = sql_aggregate("max"),
+  mean       = sql_aggregate("AVG", "mean"),
+  var        = sql_aggregate("VARIANCE", "var"),
+  sum        = sql_aggregate("SUM"),
+  min        = sql_aggregate("MIN"),
+  max        = sql_aggregate("MAX"),
 
   # first = sql_prefix("FIRST_VALUE", 1),
   # last = sql_prefix("LAST_VALUE", 1),
@@ -249,12 +249,12 @@ base_agg <- sql_translator(
 #' @format NULL
 base_win <- sql_translator(
   # rank functions have a single order argument that overrides the default
-  row_number   = win_rank("row_number"),
-  min_rank     = win_rank("rank"),
-  rank         = win_rank("rank"),
-  dense_rank   = win_rank("dense_rank"),
-  percent_rank = win_rank("percent_rank"),
-  cume_dist    = win_rank("cume_dist"),
+  row_number   = win_rank("ROW_NUMBER"),
+  min_rank     = win_rank("RANK"),
+  rank         = win_rank("RANK"),
+  dense_rank   = win_rank("DENSE_RANK"),
+  percent_rank = win_rank("PERCENT_RANK"),
+  cume_dist    = win_rank("CUME_DIST"),
   ntile        = function(order_by, n) {
     win_over(
       sql_expr(NTILE(!!as.integer(n))),
@@ -302,11 +302,11 @@ base_win <- sql_translator(
   },
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
-  mean  = win_aggregate("avg"),
-  var   = win_aggregate("variance"),
-  sum   = win_aggregate("sum"),
-  min   = win_aggregate("min"),
-  max   = win_aggregate("max"),
+  mean  = win_aggregate("AVG"),
+  var   = win_aggregate("VARIANCE"),
+  sum   = win_aggregate("SUM"),
+  min   = win_aggregate("MIN"),
+  max   = win_aggregate("MAX"),
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
@@ -316,10 +316,10 @@ base_win <- sql_translator(
 
   # Cumulative function are like recycled aggregates except that R names
   # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
-  cummean = win_cumulative("avg"),
-  cumsum  = win_cumulative("sum"),
-  cummin  = win_cumulative("min"),
-  cummax  = win_cumulative("max"),
+  cummean = win_cumulative("AVG"),
+  cumsum  = win_cumulative("SUM"),
+  cummin  = win_cumulative("MIN"),
+  cummax  = win_cumulative("MAX"),
 
   # Manually override other parameters --------------------------------------
   order_by = function(order_by, expr) {
@@ -334,35 +334,35 @@ base_win <- sql_translator(
 #' @rdname sql_variant
 #' @format NULL
 base_no_win <- sql_translator(
-  row_number   = win_absent("row_number"),
-  min_rank     = win_absent("rank"),
-  rank         = win_absent("rank"),
-  dense_rank   = win_absent("dense_rank"),
-  percent_rank = win_absent("percent_rank"),
-  cume_dist    = win_absent("cume_dist"),
-  ntile        = win_absent("ntile"),
-  mean         = win_absent("avg"),
-  sd           = win_absent("sd"),
-  var          = win_absent("var"),
-  cov          = win_absent("cov"),
-  cor          = win_absent("cor"),
-  sum          = win_absent("sum"),
-  min          = win_absent("min"),
-  max          = win_absent("max"),
-  n            = win_absent("n"),
-  n_distinct   = win_absent("n_distinct"),
-  cummean      = win_absent("mean"),
-  cumsum       = win_absent("sum"),
-  cummin       = win_absent("min"),
-  cummax       = win_absent("max"),
-  nth          = win_absent("nth_value"),
-  first        = win_absent("first_value"),
-  last         = win_absent("last_value"),
-  lead         = win_absent("lead"),
-  lag          = win_absent("lag"),
-  order_by     = win_absent("order_by"),
-  str_flatten = win_absent("str_flatten"),
-  count        = win_absent("count")
+  row_number   = win_absent("ROW_NUMBER"),
+  min_rank     = win_absent("RANK"),
+  rank         = win_absent("RANK"),
+  dense_rank   = win_absent("DENSE_RANK"),
+  percent_rank = win_absent("PERCENT_RANK"),
+  cume_dist    = win_absent("CUME_DIST"),
+  ntile        = win_absent("NTILE"),
+  mean         = win_absent("AVG"),
+  sd           = win_absent("SD"),
+  var          = win_absent("VAR"),
+  cov          = win_absent("COV"),
+  cor          = win_absent("COR"),
+  sum          = win_absent("SUM"),
+  min          = win_absent("MIN"),
+  max          = win_absent("MAX"),
+  n            = win_absent("N"),
+  n_distinct   = win_absent("N_DISTINCT"),
+  cummean      = win_absent("MEAN"),
+  cumsum       = win_absent("SUM"),
+  cummin       = win_absent("MIN"),
+  cummax       = win_absent("MAX"),
+  nth          = win_absent("NTH_VALUE"),
+  first        = win_absent("FIRST_VALUE"),
+  last         = win_absent("LAST_VALUE"),
+  lead         = win_absent("LEAD"),
+  lag          = win_absent("LAG"),
+  order_by     = win_absent("ORDER_BY"),
+  str_flatten  = win_absent("STR_FLATTEN"),
+  count        = win_absent("COUNT")
 )
 
 # db_ methods -------------------------------------------------------------
@@ -509,7 +509,7 @@ db_query_fields.DBIConnection <- function(con, sql, ...) {
 #' @export
 db_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- sql_subquery(con, sql, "master")
-  rows <- build_sql("SELECT count(*) FROM ", from, con = con)
+  rows <- build_sql("SELECT COUNT(*) FROM ", from, con = con)
 
   as.integer(dbGetQuery(con, rows)[[1]])
 }

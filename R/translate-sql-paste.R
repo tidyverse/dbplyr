@@ -1,7 +1,6 @@
 #' @export
 #' @rdname sql_variant
 sql_paste <- function(default_sep, f = "CONCAT_WS") {
-  f <- toupper(f)
 
   function(..., sep = default_sep, collapse = NULL){
     check_collapse(collapse)
