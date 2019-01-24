@@ -9,6 +9,8 @@ test_that("custom scalar functions translated correctly", {
   expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
   expect_equal(trans(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
   expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
+  expect_equal(trans(as.Date(x)),    sql("DATE `x`"))
+  expect_equal(trans(as.POSIXct(x)),    sql("DATE `x`"))
 
 })
 
