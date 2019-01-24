@@ -39,6 +39,9 @@ sql_translate_env.Oracle <- function(con) {
       as.Date = function(x){
         build_sql(sql("DATE "), x)
         },
+      as.POSIXct = function(x){
+        build_sql(sql("DATE "), x)
+      },
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # bit64::as.integer64 can translate to BIGINT for some
