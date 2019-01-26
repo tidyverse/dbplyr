@@ -91,9 +91,122 @@ sql_translate_env.Oracle <- function(con) {
 
       # lubridate functions https://lubridate.tidyverse.org/reference/index.html
       # Date-time helpers
-      now = sql("SYSDATE"),
-      today = sql("TRUNC(SYSDATE)"),
-      origin = sql("DATE '1970-01-01'")
+      now = function() build_sql("SYSDATE"),
+      today = function() build_sql("TRUNC(SYSDATE)"),
+
+      #Setting, getting, and rounding
+      year = function(x) sql_expr(extract(year %from% !!x)),
+      quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        if (with_year){
+          build_sql(sql_expr(extract(year %from% !!x)),
+                    "|| '.' ||",
+                    sql_expr(to_char(add_months(!!x, 13-!!fiscal_start),'Q'))
+          )
+        }
+        else{
+          sql_expr(to_char(add_months(!!x, 13-!!fiscal_start),'Q'))
+        }
+      },
+      semester = function(x, with_year = FALSE) {
+        if (with_year){
+          build_sql(sql_expr(extract(year %from% !!x)),
+                    "|| '.' ||",
+                    sql_expr(ceil(extract(month %from% !!x)/6))
+          )
+        }
+        else{
+          sql_expr(ceil(extract(month %from% !!x)/6))
+        }
+      },
+      month = function(x, label = FALSE, abbr = TRUE){
+        if (label){
+          sql_expr(extract(month %from% !!x))
+        }
+        else if (abbr){
+          sql_expr(to_char(!!x, 'Mon'))
+        }
+        else {
+          sql_expr(to_char(!!x, 'Month'))
+        }
+      },
+      # https://asktom.oracle.com/pls/apex/asktom.search?tag=changing-a-year-within-a-date
+      # TODO make this work
+      `month<-` = function(x, value){
+        build_sql(
+          "to_date(",
+          case_when(
+            toupper(!!value) %in% c('JAN','JANUARY','1', '01', 1) ~ '01',
+            toupper(!!value) %in% c('FEB','FEBRUARY','2', '02', 2) ~ '02',
+            toupper(!!value) %in% c('MAR','MARCH','3', '03', 3) ~ '03',
+            toupper(!!value) %in% c('APR','APRIL','4', '04', 4) ~ '04',
+            toupper(!!value) %in% c('MAY','5', '05', 5) ~ '05',
+            toupper(!!value) %in% c('JUN','JUNE','6', '06', 6) ~ '06',
+            toupper(!!value) %in% c('JUL','JULY','7', '07', 7) ~ '07',
+            toupper(!!value) %in% c('AUG','AUGUST','8', '08', 8) ~ '08',
+            toupper(!!value) %in% c('SEP','SEPTEMBER','9', '09', 9) ~ '09',
+            toupper(!!value) %in% c('OCT','OCTOBER','10', 10) ~ '10',
+            toupper(!!value) %in% c('NOV','NOVEMBER','11', 11) ~ '11',
+            toupper(!!value) %in% c('DEC','DECEMBER','12', 12) ~ '12'
+            ),
+          "||to_char(", !!x,",'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS')"
+        )
+      },
+      #############################
+
+      week = function(x){
+        sql_expr(to_char(!!x, 'WW'))
+      },
+      #`week<-`()
+      isoweek = function(x){
+        sql_expr(to_char(!!x, 'IW'))
+      },
+      #epiweek() # needs to use next_date rounding probably
+      day = function(x){
+        sql_expr(to_char(!!x, 'DD'))
+      },
+      mday = function(x){
+        sql_expr(to_char(!!x, 'DD'))
+      },
+      #TODO in week start support?
+      wday = function(x, label = FALSE, abbr = TRUE){
+        if (label){
+          sql_expr(to_char(!!x, 'D'))
+        }
+        else if (abbr){
+          sql_expr(to_char(!!x, 'Dy'))
+        }
+        else {
+          sql_expr(to_char(!!x, 'Day'))
+        }
+      },
+
+      #qday()
+
+      yday = function(x){
+        sql_expr(to_char(!!x, 'DDD'))
+      },
+
+      #`day<-`() `mday<-`() `qday<-`() `wday<-`() `yday<-`()
+
+      hour = function(x){
+        sql_expr(to_char(!!x, 'HH24'))
+      },
+
+      #`hour<-`()
+
+      minute = function(x){
+        sql_expr(to_char(!!x, 'MI'))
+      },
+
+      #`minute<-`()
+
+      second = function(x){
+        sql_expr(to_char(!!x, 'SS'))
+      },
+
+      #`second<-`()
+
+      #tz() `tz<-`()
 
       # Other modification functions
       #round_date = ,

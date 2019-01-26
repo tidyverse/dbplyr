@@ -13,8 +13,11 @@ test_that("custom scalar functions translated correctly", {
   #expect_equal(trans(as.POSIXct(x)),    sql("DATE `x`"))
   expect_equal(trans(as.Date(x, format = '%Y-%b-%d %X')),    sql("TO_DATE(`x`, 'YYYY-MON-DD HH24:MI:SS')"))
   expect_equal(trans(today()), sql("TRUNC(SYSDATE)"))
-  expect_equal(trans(now()), sql("SYDATE"))
-  expect_equal(trans(origin), sql("DATE '1970-01-1'"))
+  expect_equal(trans(now()), sql("SYSDATE"))
+
+  expect_equal(trans(today() %>% `month<-`(3)), sql("to_date('03'||to_char(TRUNC(SYSDATE),'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS')"))
+  expect_equal(trans(today() %>% `month<-`('Mar')), sql("to_date('03'||to_char(TRUNC(SYSDATE),'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS')"))
+  expect_equal(trans(today() %>% `month<-`('October')), sql("to_date('10'||to_char(TRUNC(SYSDATE),'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS')"))
 
 })
 
