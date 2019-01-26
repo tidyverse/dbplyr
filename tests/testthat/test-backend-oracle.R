@@ -10,7 +10,11 @@ test_that("custom scalar functions translated correctly", {
   expect_equal(trans(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
   expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
   expect_equal(trans(as.Date(x)),    sql("DATE `x`"))
-  expect_equal(trans(as.POSIXct(x)),    sql("DATE `x`"))
+  #expect_equal(trans(as.POSIXct(x)),    sql("DATE `x`"))
+  expect_equal(trans(as.Date(x, format = '%Y-%b-%d %X')),    sql("TO_DATE(`x`, 'YYYY-MON-DD HH24:MI:SS')"))
+  expect_equal(trans(today()), sql("TRUNC(SYSDATE)"))
+  expect_equal(trans(now()), sql("SYDATE"))
+  expect_equal(trans(origin), sql("DATE '1970-01-1'"))
 
 })
 

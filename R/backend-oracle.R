@@ -35,13 +35,48 @@ sql_translate_env.Oracle <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
-      # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements001.htm
-      as.Date = function(x){
-        build_sql(sql("DATE "), x)
-        },
-      as.POSIXct = function(x){
-        build_sql(sql("DATE "), x)
+      # https://docs.oracle.com/cd/B28359_01/olap.111/b28126/dml_commands_1029.htm#OLADM780
+      # and the details for strptime https://stat.ethz.ch/R-manual/R-devel/library/base/html/strptime.html
+      as.Date = function(x, format = NA){
+        if(is.na(format) | format == '%F' | format == '%Y-%m-%d'){
+          build_sql(sql("DATE "), x)
+        }
+        else if(grepl(x, '%C') | grepl(x, '%e') | grepl(x, '%w') |
+                grepl(x, '%W') | grepl(x, '%U') | grepl(x, '%x') |
+                grepl(x, '%y') | grepl(x, '%z') | grepl(x, '%D')){
+          stop("Error: One or more of the format identifiers is not curerntly supported by dbplyr for Oracle SQL")
+        }
+        else{
+          format <- gsub('%c', '%a %b %e %H:%M:%S %Y', format) %>%
+            gsub('%a', 'DY', .) %>%
+            gsub('%A', 'DAY', .) %>%
+            gsub('%b', 'MON', .) %>%
+            gsub('%B', 'MONTH', .) %>%
+            gsub('%d', 'DD', .) %>%
+            gsub('%F', 'YYYY-MM-DD', .) %>%
+            gsub('%h', 'MON', .) %>%
+            gsub('%H', 'HH24', .) %>%
+            gsub('%I', 'HH12', .) %>%
+            gsub('%j', 'DDD', .) %>%
+            gsub('%m', 'MM', .) %>%
+            gsub('%M', 'MI', .) %>%
+            gsub('%p', 'AM', .) %>%
+            gsub('%R', 'HH24:MI', .) %>%
+            gsub('%S', 'SS', .) %>%
+            gsub('%T', 'HH24:MI:SS', .) %>%
+            #special consideration is needed due to NLS regions
+            # gsub('%u', 'DD', .) %>%
+            gsub('%V', 'IW', .) %>%
+            gsub('%X', 'HH24:MI:SS', .) %>%
+            gsub('%Y', 'YYYY', .)
+
+          build_sql(sql("TO_DATE("), x, sql(", "), format, sql(")"))
+
+        }
       },
+      # as.POSIXct = function(x){
+        # deal with timezones
+      # },
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # bit64::as.integer64 can translate to BIGINT for some
@@ -53,6 +88,18 @@ sql_translate_env.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+
+      # lubridate functions https://lubridate.tidyverse.org/reference/index.html
+      # Date-time helpers
+      now = sql("SYSDATE"),
+      today = sql("TRUNC(SYSDATE)"),
+      origin = sql("DATE '1970-01-01'")
+
+      # Other modification functions
+      #round_date = ,
+      #floor_date = ,
+      #ceiling_date =
+
     ),
     base_odbc_agg,
     base_odbc_win
