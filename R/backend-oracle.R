@@ -210,8 +210,386 @@ sql_translate_env.Oracle <- function(con) {
 
       # Other modification functions
       #round_date = ,
-      #floor_date = ,
-      #ceiling_date =
+      floor_date = function(x, unit = "second", week_start = getOption("lubridate.week.start", 7)) {
+        if (!length(x))
+          return(x)
+        parsed_unit <- parse_period_unit(unit)
+        n <- parsed_unit$n
+        unit <- standardise_period_names(parsed_unit$unit)
+        switch(
+          unit,
+          # second is more complicated due to the fact that trunc will implicetely convert timestamps to date
+          # and date does not have milliseconds
+          # TODO make sure this works for non-interger seconds
+          second = {
+            if (n > 60)
+              stop('Error: Rounding with with second > 60 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              " 'mi') + EXTRACT(second FROM cast(",
+              !!x,
+              " as timestamp)) / (24 * 60*60)-
+              mod(EXTRACT(second FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24 * 60*60)"
+              )
+          },
+          minute = {
+            if (n > 60)
+              stop('Error: Rounding with with minute > 60 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              ", 'mi') -
+              mod(EXTRACT(minute FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24 * 60)"
+              )
+          },
+          hour = {
+            if (n > 60)
+              stop('Error: Rounding with with second > 24 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              ", 'hh24') -
+              mod(EXTRACT(hour FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24)"
+              )
+          },
+          day = {
+            if (n > 60)
+              stop('Error: Rounding with with day > 31 is not supported')
+            build_sql("trunc(",
+                      !!x,
+                      ") -
+                      mod(EXTRACT(day FROM cast(",
+                      !!x,
+                      " as timestamp)), ",
+                      n,
+                      ")")
+          },
+          week = {
+            if (n != 1)
+              warning('Multi-unit not supported for weeks. Ignoring.')
+            switch(
+              week_start,
+              build_sql("trunc(next_day(",!!x, "'MON') -7)"),
+              build_sql("trunc(next_day(",!!x, "'TUE') -7)"),
+              build_sql("trunc(next_day(",!!x, "'WED') -7)"),
+              build_sql("trunc(next_day(",!!x, "'THU') -7)"),
+              build_sql("trunc(next_day(",!!x, "'FRI') -7)"),
+              build_sql("trunc(next_day(",!!x, "'SAT') -7)"),
+              build_sql("trunc(next_day(",!!x, "'SUN') -7)"),
+              stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?
+            )
+          },
+          month = {
+            if (n < 12) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, ",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("trunc(",!!x, ", 'yyyy')")
+            }
+          },
+          year = {
+            build_sql(
+              "add_months(trunc(",
+              !!x,
+              ", 'yyyy'), -
+              mod(EXTRACT(year FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ")*12 )"
+              )
+          },
+          bimonth = {
+            if (n < 6) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 2*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("trunc(",!!x, ", 'yyyy')")
+            }
+          },
+          quarter = {
+            if (n < 4) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 3*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("trunc(",!!x, ", 'yyyy')")
+            }
+          },
+          halfyear = {
+            if (n < 2) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 6*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("trunc(",!!x, ", 'yyyy')")
+            }
+          },
+          season = {
+            if (n < 4) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), -
+                (mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 3*",
+                n,
+                ")+1))"
+                )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), -1)")
+            }
+          },
+          stop("Error: Failed to parse units.")
+          )
+      },
+      ceiling_date = function(x, unit = "second", week_start = getOption("lubridate.week.start", 7)) {
+        if (!length(x))
+          return(x)
+        parsed_unit <- parse_period_unit(unit)
+        n <- parsed_unit$n
+        unit <- standardise_period_names(parsed_unit$unit)
+        switch(
+          unit,
+          # second is more complicated due to the fact that trunc will implicetely convert timestamps to date
+          # and date does not have milliseconds
+          # TODO make sure this works for non-interger seconds
+          second = {
+            if (n > 60)
+              stop('Error: Rounding with with second > 60 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              " 'mi') + EXTRACT(second FROM cast(",
+              !!x,
+              " as timestamp)) / (24 * 60*60)-
+              mod(EXTRACT(second FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24 * 60*60) +",
+              n,
+              "/(24*60*60)"
+              )
+          },
+          minute = {
+            if (n > 60)
+              stop('Error: Rounding with with minute > 60 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              ", 'mi') -
+              mod(EXTRACT(minute FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24 * 60) +",
+              n,
+              "/(24*60)"
+              )
+          },
+          hour = {
+            if (n > 60)
+              stop('Error: Rounding with with second > 24 is not supported')
+            build_sql(
+              "trunc(",
+              !!x,
+              ", 'hh24') -
+              mod(EXTRACT(hour FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ") / (24)+",
+              n,
+              "/(24)"
+              )
+          },
+          day = {
+            if (n > 60)
+              stop('Error: Rounding with with day > 31 is not supported')
+            build_sql("trunc(",
+                      !!x,
+                      ") -
+                      mod(EXTRACT(day FROM cast(",
+                      !!x,
+                      " as timestamp)), ",
+                      n,
+                      ") + 1")
+          },
+          week = {
+            if (n != 1)
+              warning('Multi-unit not supported for weeks. Ignoring.')
+            switch(
+              week_start,
+              build_sql("trunc(next_day(",!!x, "'MON'))"),
+              build_sql("trunc(next_day(",!!x, "'TUE'))"),
+              build_sql("trunc(next_day(",!!x, "'WED'))"),
+              build_sql("trunc(next_day(",!!x, "'THU'))"),
+              build_sql("trunc(next_day(",!!x, "'FRI'))"),
+              build_sql("trunc(next_day(",!!x, "'SAT'))"),
+              build_sql("trunc(next_day(",!!x, "'SUN'))"),
+              stop('week_start value must be 1-7 (Monday-Sunday)')
+            )
+          },
+          month = {
+            if (n < 12) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), 1 -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, ",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+            }
+          },
+          year = {
+            build_sql(
+              "add_months(trunc(",
+              !!x,
+              ", 'yyyy'), (12*",
+              n,
+              ") -
+              mod(EXTRACT(year FROM cast(",
+              !!x,
+              " as timestamp)), ",
+              n,
+              ")*12 )"
+              )
+          },
+          bimonth = {
+            if (n < 6) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), (2*",
+                n,
+                ") -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 2*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+            }
+          },
+          quarter = {
+            if (n < 4) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), (3*",
+                n,
+                ") -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 3*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+            }
+          },
+          halfyear = {
+            if (n < 2) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), (6*",
+                n,
+                ") -
+                mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 6*",
+                n,
+                "))"
+                )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+            }
+          },
+          season = {
+            if (n < 4) {
+              build_sql(
+                "add_months(trunc(",
+                !!x,
+                ", 'mm'), (3*",
+                n,
+                ") -
+                (mod(EXTRACT(month FROM cast(",
+                !!x,
+                " as timestamp))-1, 3*",
+                n,
+                ")+1))"
+              )
+            }
+            else{
+              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+            }
+          },
+          stop("Error: Failed to parse units.")
+          )
+      }
 
     ),
     base_odbc_agg,
