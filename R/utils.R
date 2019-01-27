@@ -68,3 +68,43 @@ c_character <- function(...) {
 }
 
 cat_line <- function(...) cat(..., "\n", sep = "")
+
+parse_period_unit <- function(unit){
+  if (length(unit) > 1) {
+    warning("Unit argument longer than 1. Taking first element.")
+    unit <- unit[[1]]
+  }
+  m <- regexpr(" *(?<n>[0-9.,]+)? *(?<unit>[^ \t\n]+)",
+               unit[[1]], perl = T)
+  if (m > 0) {
+    nms <- attr(m, "capture.names")
+    nms <- nms[nzchar(nms)]
+    start <- attr(m, "capture.start")
+    end <- start + attr(m, "capture.length") - 1L
+    n <- if (end[[1]] >= start[[1]]) {
+      as.integer(str_sub(unit, start[[1]], end[[1]]))
+    }
+    else {
+      1
+    }
+    unit <- str_sub(unit, start[[2]], end[[2]])
+    list(n = n, unit = unit)
+  }
+  else {
+    stop(sprintf("Invalid unit specification '%s'",
+                 unit))
+  }
+}
+
+standardise_period_names <- function(x){
+  dates <- c("second", "minute", "hour", "day", "week", "month",
+             "year", "bimonth", "quarter", "halfyear", "season")
+  y <- gsub("(.)s$", "\\1", x)
+  y <- substr(y, 1, 3)
+  res <- dates[pmatch(y, dates)]
+  if (any(is.na(res))) {
+    stop("Invalid period name: ", paste(x[is.na(res)], collapse = ", "),
+         call. = FALSE)
+  }
+  res
+}
