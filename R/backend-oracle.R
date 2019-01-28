@@ -282,13 +282,13 @@ sql_translate_env.Oracle <- function(con) {
               warning('Multi-unit not supported for weeks. Ignoring.')
             switch(
               week_start,
-              build_sql("trunc(next_day(",!!x, "'MON') -7)"),
-              build_sql("trunc(next_day(",!!x, "'TUE') -7)"),
-              build_sql("trunc(next_day(",!!x, "'WED') -7)"),
-              build_sql("trunc(next_day(",!!x, "'THU') -7)"),
-              build_sql("trunc(next_day(",!!x, "'FRI') -7)"),
-              build_sql("trunc(next_day(",!!x, "'SAT') -7)"),
-              build_sql("trunc(next_day(",!!x, "'SUN') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'MON') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'TUE') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'WED') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'THU') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'FRI') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'SAT') -7)"),
+              build_sql("trunc(next_day(",!!x, ",'SUN') -7)"),
               stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?
             )
           },
@@ -470,13 +470,13 @@ sql_translate_env.Oracle <- function(con) {
               warning('Multi-unit not supported for weeks. Ignoring.')
             switch(
               week_start,
-              build_sql("trunc(next_day(",!!x, "'MON'))"),
-              build_sql("trunc(next_day(",!!x, "'TUE'))"),
-              build_sql("trunc(next_day(",!!x, "'WED'))"),
-              build_sql("trunc(next_day(",!!x, "'THU'))"),
-              build_sql("trunc(next_day(",!!x, "'FRI'))"),
-              build_sql("trunc(next_day(",!!x, "'SAT'))"),
-              build_sql("trunc(next_day(",!!x, "'SUN'))"),
+              build_sql("trunc(next_day(",!!x, ",'MON'))"),
+              build_sql("trunc(next_day(",!!x, ",'TUE'))"),
+              build_sql("trunc(next_day(",!!x, ",'WED'))"),
+              build_sql("trunc(next_day(",!!x, ",'THU'))"),
+              build_sql("trunc(next_day(",!!x, ",'FRI'))"),
+              build_sql("trunc(next_day(",!!x, ",'SAT'))"),
+              build_sql("trunc(next_day(",!!x, ",'SUN'))"),
               stop('week_start value must be 1-7 (Monday-Sunday)')
             )
           },
