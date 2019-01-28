@@ -91,16 +91,40 @@ sql_translate_env.Oracle <- function(con) {
 
       # lubridate functions https://lubridate.tidyverse.org/reference/index.html
       # Date-time helpers
+      # make_datetime()
+      # make_date()
+      # date()
+      # `date<-`()
+      #is.instant()
+      #is.timepoint()
+      #is.Date()
+      #Date()
+      #NA_Date_
+      #is.POSIXt()
+      #is.POSIXlt()
+      #is.POSIXct()
+      #POSIXct()
+      #NA_POSIXct_
       now = function() build_sql("SYSDATE"),
       today = function() build_sql("TRUNC(SYSDATE)"),
+      #origin
+      #decimal_date()
+      #as_date()
+      #as_datetime()
 
       #Setting, getting, and rounding
       year = function(x) sql_expr(extract(year %from% !!x)),
+      `year<-` = function(x, value){
+        build_sql(
+          "to_date(lpad(",!!value,",4,'0')||to_char(", !!x,",'DDMMHH24MISS'), 'YYYYDDMMHH24MISS')"
+        )
+      },
+      #isoyear()
+      #epiyear()
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (with_year){
           build_sql(sql_expr(extract(year %from% !!x)),
-                    "|| '.' ||",
-                    sql_expr(to_char(add_months(!!x, 13-!!fiscal_start),'Q'))
+                    "|| '.' ||to_char(add_months(", x ,", 13-", fiscal_start, "),'Q')"
           )
         }
         else{
@@ -123,60 +147,59 @@ sql_translate_env.Oracle <- function(con) {
           sql_expr(extract(month %from% !!x))
         }
         else if (abbr){
-          sql_expr(to_char(!!x, 'Mon'))
+          build_sql("TO_CHAR(", x,", 'Mon')")
         }
         else {
-          sql_expr(to_char(!!x, 'Month'))
+          build_sql("TO_CHAR(", x,", 'Month')")
         }
       },
       # https://asktom.oracle.com/pls/apex/asktom.search?tag=changing-a-year-within-a-date
-      # TODO make this work
+      # TODO error: cannot overflow more than 12 months due to the case when type requirements...
       `month<-` = function(x, value){
         build_sql(
-          "to_date(",
+          "add_months(to_date('01'||to_char(", !!x,",'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS'),-1+",
           case_when(
-            toupper(!!value) %in% c('JAN','JANUARY','1', '01', 1) ~ '01',
-            toupper(!!value) %in% c('FEB','FEBRUARY','2', '02', 2) ~ '02',
-            toupper(!!value) %in% c('MAR','MARCH','3', '03', 3) ~ '03',
-            toupper(!!value) %in% c('APR','APRIL','4', '04', 4) ~ '04',
-            toupper(!!value) %in% c('MAY','5', '05', 5) ~ '05',
-            toupper(!!value) %in% c('JUN','JUNE','6', '06', 6) ~ '06',
-            toupper(!!value) %in% c('JUL','JULY','7', '07', 7) ~ '07',
-            toupper(!!value) %in% c('AUG','AUGUST','8', '08', 8) ~ '08',
-            toupper(!!value) %in% c('SEP','SEPTEMBER','9', '09', 9) ~ '09',
+            toupper(!!value) %in% c('JAN','JANUARY','1', '01', 1) ~ '1',
+            toupper(!!value) %in% c('FEB','FEBRUARY','2', '02', 2) ~ '2',
+            toupper(!!value) %in% c('MAR','MARCH','3', '03', 3) ~ '3',
+            toupper(!!value) %in% c('APR','APRIL','4', '04', 4) ~ '4',
+            toupper(!!value) %in% c('MAY','5', '05', 5) ~ '5',
+            toupper(!!value) %in% c('JUN','JUNE','6', '06', 6) ~ '6',
+            toupper(!!value) %in% c('JUL','JULY','7', '07', 7) ~ '7',
+            toupper(!!value) %in% c('AUG','AUGUST','8', '08', 8) ~ '8',
+            toupper(!!value) %in% c('SEP','SEPTEMBER','9', '09', 9) ~ '9',
             toupper(!!value) %in% c('OCT','OCTOBER','10', 10) ~ '10',
             toupper(!!value) %in% c('NOV','NOVEMBER','11', 11) ~ '11',
-            toupper(!!value) %in% c('DEC','DECEMBER','12', 12) ~ '12'
+            toupper(!!value) %in% c('DEC','DECEMBER','12', 12) ~ '12',
+            TRUE ~ as.character(!!value)
             ),
-          "||to_char(", !!x,",'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS')"
+          ")"
         )
       },
-      #############################
-
       week = function(x){
-        sql_expr(to_char(!!x, 'WW'))
+        build_sql("TO_CHAR(", x,", 'WW')")
       },
       #`week<-`()
       isoweek = function(x){
-        sql_expr(to_char(!!x, 'IW'))
+        build_sql("TO_CHAR(", x,", 'IW')")
       },
       #epiweek() # needs to use next_date rounding probably
       day = function(x){
-        sql_expr(to_char(!!x, 'DD'))
+        build_sql("TO_CHAR(", x,", 'DD')")
       },
       mday = function(x){
-        sql_expr(to_char(!!x, 'DD'))
+        build_sql("TO_CHAR(", x,", 'DD')")
       },
       #TODO in week start support?
       wday = function(x, label = FALSE, abbr = TRUE){
         if (label){
-          sql_expr(to_char(!!x, 'D'))
+          build_sql("TO_CHAR(", x,", 'D')")
         }
         else if (abbr){
-          sql_expr(to_char(!!x, 'Dy'))
+          build_sql("TO_CHAR(", x,", 'DY')")
         }
         else {
-          sql_expr(to_char(!!x, 'Day'))
+          build_sql("TO_CHAR(", x,", 'DAY')")
         }
       },
 
@@ -185,26 +208,51 @@ sql_translate_env.Oracle <- function(con) {
       yday = function(x){
         sql_expr(to_char(!!x, 'DDD'))
       },
-
-      #`day<-`() `mday<-`() `qday<-`() `wday<-`() `yday<-`()
-
+      # Does not currently support carryover days i.e. value > days in month, will generate
+      # "ORA-01847: day of month must be between 1 and last day of month" error in database
+      `day<-` = function(x, value){
+        build_sql(
+          "to_date(01||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+        )
+      },
+      # Does not currently support carryover days i.e. value > days in month, will generate
+      # "ORA-01847: day of month must be between 1 and last day of month" error in database
+      `mday<-` = function(x, value){
+        build_sql(
+          "to_date(01||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+        )
+      },
+      #`qday<-`() `wday<-`()
+      `yday<-` = function(x, value){
+        build_sql(
+          "to_date('001'||to_char(", !!x,",'YYYYHH24MISS'), 'DDDYYYYHH24MISS') + ",!!value,"-1"
+        )
+      },
       hour = function(x){
-        sql_expr(to_char(!!x, 'HH24'))
+        build_sql("TO_CHAR(",x,", 'HH24')")
       },
-
-      #`hour<-`()
-
+      `hour<-` = function(x, value){
+        build_sql(
+          "to_date(lpad(mod(",!!value,",24),2,'0')||to_char(", !!x,",'DDMMYYYYMISS'), 'HH24DDMMYYYYMISS') + floor(", !!value,"/24)"
+        )
+      },
       minute = function(x){
-        sql_expr(to_char(!!x, 'MI'))
+        build_sql("to_char(",x ,", 'MI')")
       },
-
-      #`minute<-`()
-
+      `minute<-` = function(x, value){
+        build_sql(
+          "to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'HH24DDMMYYYYSS'), 'MIHH24DDMMYYYYSS') + floor(", !!value,"/60)/24"
+        )
+      },
       second = function(x){
-        sql_expr(to_char(!!x, 'SS'))
+        build_sql("to_char(", x, ", 'SS')")
       },
 
-      #`second<-`()
+      `second<-` = function(x, value){
+        build_sql(
+          "to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'MIHH24DDMMYYYY'), 'SSMIHH24DDMMYYYY') + floor(", !!value,"/60)/24/60"
+        )
+      },
 
       #tz() `tz<-`()
 
@@ -589,7 +637,19 @@ sql_translate_env.Oracle <- function(con) {
           },
           stop("Error: Failed to parse units.")
           )
-      }
+      },
+      # Other date-time components
+      #TODO make sure all these work
+      # No boolean type in oracle SQL https://community.oracle.com/thread/2473001?start=0&tstart=0
+      #am = function(x) build_sql(case_when( 12 ~ 'TRUE', TRUE ~ 'FALSE')),
+      #pm()
+      days_in_month = function(x) build_sql("to_char(add_months(trunc(", x, ", 'mm'), 1)-1,'DD')")
+      #dst()
+      #leap_year()
+      #stamp()
+      #stamp_date()
+      #stamp_time()
+      #date_decimal()
 
     ),
     base_odbc_agg,
