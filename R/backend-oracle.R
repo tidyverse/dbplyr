@@ -143,7 +143,7 @@ sql_translate_env.Oracle <- function(con) {
         }
       },
       month = function(x, label = FALSE, abbr = TRUE){
-        if (label){
+        if (!label){
           sql_expr(extract(month %from% !!x))
         }
         else if (abbr){
@@ -192,7 +192,7 @@ sql_translate_env.Oracle <- function(con) {
       },
       #TODO in week start support?
       wday = function(x, label = FALSE, abbr = TRUE){
-        if (label){
+        if (!label){
           build_sql("TO_CHAR(", x,", 'D')")
         }
         else if (abbr){
