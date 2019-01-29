@@ -275,7 +275,7 @@ sql_translate_env.Oracle <- function(con) {
             build_sql(
               "trunc(",
               !!x,
-              " 'mi') + EXTRACT(second FROM cast(",
+              ", 'mi') + EXTRACT(second FROM cast(",
               !!x,
               " as timestamp)) / (24 * 60*60)-
               mod(EXTRACT(second FROM cast(",
@@ -300,7 +300,7 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           hour = {
-            if (n > 60)
+            if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
               "trunc(",
@@ -314,16 +314,17 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           day = {
-            if (n > 60)
+            if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql("trunc(",
                       !!x,
-                      ") -
-                      mod(EXTRACT(day FROM cast(",
+                      ", 'mm') -
+                      floor(EXTRACT(day FROM cast(",
                       !!x,
-                      " as timestamp)), ",
+                      " as timestamp))/",
                       n,
-                      ")")
+                      ")*",
+                      n)
           },
           week = {
             if (n != 1)
@@ -457,7 +458,7 @@ sql_translate_env.Oracle <- function(con) {
             build_sql(
               "trunc(",
               !!x,
-              " 'mi') + EXTRACT(second FROM cast(",
+              ", 'mi') + EXTRACT(second FROM cast(",
               !!x,
               " as timestamp)) / (24 * 60*60)-
               mod(EXTRACT(second FROM cast(",
@@ -486,7 +487,7 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           hour = {
-            if (n > 60)
+            if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
               "trunc(",
@@ -502,7 +503,7 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           day = {
-            if (n > 60)
+            if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql("trunc(",
                       !!x,
