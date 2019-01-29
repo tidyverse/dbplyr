@@ -212,14 +212,14 @@ sql_translate_env.Oracle <- function(con) {
       # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `day<-` = function(x, value){
         build_sql(
-          "to_date(01||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+          "to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
         )
       },
       # Does not currently support carryover days i.e. value > days in month, will generate
       # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `mday<-` = function(x, value){
         build_sql(
-          "to_date(01||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+          "to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
         )
       },
       #`qday<-`() `wday<-`()
@@ -318,7 +318,7 @@ sql_translate_env.Oracle <- function(con) {
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql("trunc(",
                       !!x,
-                      ", 'mm') -
+                      ", 'mm') +
                       floor(EXTRACT(day FROM cast(",
                       !!x,
                       " as timestamp))/",
@@ -512,7 +512,8 @@ sql_translate_env.Oracle <- function(con) {
                       !!x,
                       " as timestamp)), ",
                       n,
-                      ") + 1")
+                      ") + ",
+                      n)
           },
           week = {
             if (n != 1)
@@ -534,8 +535,9 @@ sql_translate_env.Oracle <- function(con) {
               build_sql(
                 "add_months(trunc(",
                 !!x,
-                ", 'mm'), 1 -
-                mod(EXTRACT(month FROM cast(",
+                ", 'mm'), ",
+                n,
+                " - mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, ",
                 n,
