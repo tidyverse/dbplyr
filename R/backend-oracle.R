@@ -123,8 +123,8 @@ sql_translate_env.Oracle <- function(con) {
       #epiyear()
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (with_year){
-          build_sql(sql_expr(extract(year %from% !!x)),
-                    "|| '.' ||to_char(add_months(", x ,", 13-", fiscal_start, "),'Q')"
+          build_sql("(",sql_expr(extract(year %from% !!x)),
+                    "|| '.' ||to_char(add_months(", x ,", 13-", fiscal_start, "),'Q'))"
           )
         }
         else{
@@ -157,7 +157,7 @@ sql_translate_env.Oracle <- function(con) {
       # TODO error: cannot overflow more than 12 months due to the case when type requirements...
       `month<-` = function(x, value){
         build_sql(
-          "add_months(to_date('01'||to_char(", !!x,",'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS'),-1+",
+          "(add_months(to_date('01'||to_char(", !!x,",'DDYYYYHH24MISS'), 'MMDDYYYYHH24MISS'),-1+",
           case_when(
             toupper(!!value) %in% c('JAN','JANUARY','1', '01', 1) ~ '1',
             toupper(!!value) %in% c('FEB','FEBRUARY','2', '02', 2) ~ '2',
@@ -173,7 +173,7 @@ sql_translate_env.Oracle <- function(con) {
             toupper(!!value) %in% c('DEC','DECEMBER','12', 12) ~ '12',
             TRUE ~ as.character(!!value)
             ),
-          ")"
+          "))"
         )
       },
       week = function(x){
@@ -212,28 +212,28 @@ sql_translate_env.Oracle <- function(con) {
       # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `day<-` = function(x, value){
         build_sql(
-          "to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+          "(to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1)"
         )
       },
       # Does not currently support carryover days i.e. value > days in month, will generate
       # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `mday<-` = function(x, value){
         build_sql(
-          "to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1"
+          "(to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1)"
         )
       },
       #`qday<-`() `wday<-`()
       `yday<-` = function(x, value){
         build_sql(
-          "to_date('001'||to_char(", !!x,",'YYYYHH24MISS'), 'DDDYYYYHH24MISS') + ",!!value,"-1"
+          "(to_date('001'||to_char(", !!x,",'YYYYHH24MISS'), 'DDDYYYYHH24MISS') + ",!!value,"-1)"
         )
       },
       hour = function(x){
-        build_sql("TO_CHAR(",x,", 'HH24')")
+        build_sql("(TO_CHAR(",x,", 'HH24'))")
       },
       `hour<-` = function(x, value){
         build_sql(
-          "to_date(lpad(mod(",!!value,",24),2,'0')||to_char(", !!x,",'DDMMYYYYMISS'), 'HH24DDMMYYYYMISS') + floor(", !!value,"/24)"
+          "(to_date(lpad(mod(",!!value,",24),2,'0')||to_char(", !!x,",'DDMMYYYYMISS'), 'HH24DDMMYYYYMISS') + floor(", !!value,"/24))"
         )
       },
       minute = function(x){
@@ -241,16 +241,16 @@ sql_translate_env.Oracle <- function(con) {
       },
       `minute<-` = function(x, value){
         build_sql(
-          "to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'HH24DDMMYYYYSS'), 'MIHH24DDMMYYYYSS') + floor(", !!value,"/60)/24"
+          "(to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'HH24DDMMYYYYSS'), 'MIHH24DDMMYYYYSS') + floor(", !!value,"/60)/24)"
         )
       },
       second = function(x){
-        build_sql("to_char(", x, ", 'SS')")
+        build_sql("(to_char(", x, ", 'SS'))")
       },
 
       `second<-` = function(x, value){
         build_sql(
-          "to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'MIHH24DDMMYYYY'), 'SSMIHH24DDMMYYYY') + floor(", !!value,"/60)/24/60"
+          "(to_date(lpad(mod(",!!value,",60),2,'0')||to_char(", !!x,",'MIHH24DDMMYYYY'), 'SSMIHH24DDMMYYYY') + floor(", !!value,"/60)/24/60)"
         )
       },
 
@@ -273,7 +273,7 @@ sql_translate_env.Oracle <- function(con) {
             if (n > 60)
               stop('Error: Rounding with with second > 60 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'mi') + EXTRACT(second FROM cast(",
               !!x,
@@ -282,41 +282,41 @@ sql_translate_env.Oracle <- function(con) {
               !!x,
               " as timestamp)), ",
               n,
-              ") / (24 * 60*60)"
+              ") / (24 * 60*60))"
               )
           },
           minute = {
             if (n > 60)
               stop('Error: Rounding with with minute > 60 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'mi') -
               mod(EXTRACT(minute FROM cast(",
               !!x,
               " as timestamp)), ",
               n,
-              ") / (24 * 60)"
+              ") / (24 * 60))"
               )
           },
           hour = {
             if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'hh24') -
               mod(EXTRACT(hour FROM cast(",
               !!x,
               " as timestamp)), ",
               n,
-              ") / (24)"
+              ") / (24))"
               )
           },
           day = {
             if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
-            build_sql("trunc(",
+            build_sql("(trunc(",
                       !!x,
                       ", 'mm') +
                       floor(EXTRACT(day FROM cast(",
@@ -325,118 +325,118 @@ sql_translate_env.Oracle <- function(con) {
                       n,
                       ")*",
                       n,
-                      "-1")
+                      "-1)")
           },
           week = {
             if (n != 1)
               warning('Multi-unit not supported for weeks. Ignoring.')
             switch(
               week_start,
-              build_sql("trunc(next_day(",!!x, ",'MON') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'TUE') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'WED') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'THU') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'FRI') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'SAT') -7)"),
-              build_sql("trunc(next_day(",!!x, ",'SUN') -7)"),
+              build_sql("(trunc(next_day(",!!x, ",'MON') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'TUE') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'WED') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'THU') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'FRI') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'SAT') -7))"),
+              build_sql("(trunc(next_day(",!!x, ",'SUN') -7))"),
               stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?
             )
           },
           month = {
             if (n < 12) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), -
                 mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, ",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("trunc(",!!x, ", 'yyyy')")
+              build_sql("(trunc(",!!x, ", 'yyyy'))")
             }
           },
           year = {
             build_sql(
-              "add_months(trunc(",
+              "(add_months(trunc(",
               !!x,
               ", 'yyyy'), -
               mod(EXTRACT(year FROM cast(",
               !!x,
               " as timestamp)), ",
               n,
-              ")*12 )"
+              ")*12 ))"
               )
           },
           bimonth = {
             if (n < 6) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), -
                 mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, 2*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("trunc(",!!x, ", 'yyyy')")
+              build_sql("(trunc(",!!x, ", 'yyyy'))")
             }
           },
           quarter = {
             if (n < 4) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), -
                 mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, 3*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("trunc(",!!x, ", 'yyyy')")
+              build_sql("(trunc(",!!x, ", 'yyyy'))")
             }
           },
           halfyear = {
             if (n < 2) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), -
                 mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, 6*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("trunc(",!!x, ", 'yyyy')")
+              build_sql("(trunc(",!!x, ", 'yyyy'))")
             }
           },
           season = {
             if (n < 4) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), -
                 (mod(EXTRACT(month FROM cast(",
                 !!x,
                 " as timestamp))-1, 3*",
                 n,
-                ")+1))"
+                ")+1)))"
                 )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), -1)")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), -1))")
             }
           },
           stop("Error: Failed to parse units.")
@@ -457,7 +457,7 @@ sql_translate_env.Oracle <- function(con) {
             if (n > 60)
               stop('Error: Rounding with with second > 60 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'mi') + EXTRACT(second FROM cast(",
               !!x,
@@ -468,14 +468,14 @@ sql_translate_env.Oracle <- function(con) {
               n,
               ") / (24 * 60*60) +",
               n,
-              "/(24*60*60)"
+              "/(24*60*60))"
               )
           },
           minute = {
             if (n > 60)
               stop('Error: Rounding with with minute > 60 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'mi') -
               mod(EXTRACT(minute FROM cast(",
@@ -484,14 +484,14 @@ sql_translate_env.Oracle <- function(con) {
               n,
               ") / (24 * 60) +",
               n,
-              "/(24*60)"
+              "/(24*60))"
               )
           },
           hour = {
             if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
-              "trunc(",
+              "(trunc(",
               !!x,
               ", 'hh24') -
               mod(EXTRACT(hour FROM cast(",
@@ -500,13 +500,13 @@ sql_translate_env.Oracle <- function(con) {
               n,
               ") / (24)+",
               n,
-              "/(24)"
+              "/(24))"
               )
           },
           day = {
             if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
-            build_sql("trunc(",
+            build_sql("(trunc(",
                       !!x,
                       ") -
                       mod(EXTRACT(day FROM cast(",
@@ -514,27 +514,28 @@ sql_translate_env.Oracle <- function(con) {
                       " as timestamp)), ",
                       n,
                       ") + ",
-                      n)
+                      n,
+                      ")")
           },
           week = {
             if (n != 1)
               warning('Multi-unit not supported for weeks. Ignoring.')
             switch(
               week_start,
-              build_sql("trunc(next_day(",!!x, ",'MON'))"),
-              build_sql("trunc(next_day(",!!x, ",'TUE'))"),
-              build_sql("trunc(next_day(",!!x, ",'WED'))"),
-              build_sql("trunc(next_day(",!!x, ",'THU'))"),
-              build_sql("trunc(next_day(",!!x, ",'FRI'))"),
-              build_sql("trunc(next_day(",!!x, ",'SAT'))"),
-              build_sql("trunc(next_day(",!!x, ",'SUN'))"),
+              build_sql("(trunc(next_day(",!!x, ",'MON')))"),
+              build_sql("(trunc(next_day(",!!x, ",'TUE')))"),
+              build_sql("(trunc(next_day(",!!x, ",'WED')))"),
+              build_sql("(trunc(next_day(",!!x, ",'THU')))"),
+              build_sql("(trunc(next_day(",!!x, ",'FRI')))"),
+              build_sql("(trunc(next_day(",!!x, ",'SAT')))"),
+              build_sql("(trunc(next_day(",!!x, ",'SUN')))"),
               stop('week_start value must be 1-7 (Monday-Sunday)')
             )
           },
           month = {
             if (n < 12) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), ",
                 n,
@@ -542,16 +543,16 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 " as timestamp))-1, ",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), ", n,"))")
             }
           },
           year = {
             build_sql(
-              "add_months(trunc(",
+              "(add_months(trunc(",
               !!x,
               ", 'yyyy'), (12*",
               n,
@@ -560,13 +561,13 @@ sql_translate_env.Oracle <- function(con) {
               !!x,
               " as timestamp)), ",
               n,
-              ")*12 )"
+              ")*12 ))"
               )
           },
           bimonth = {
             if (n < 6) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), (2*",
                 n,
@@ -575,17 +576,17 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 " as timestamp))-1, 2*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), ", n,"))")
             }
           },
           quarter = {
             if (n < 4) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), (3*",
                 n,
@@ -594,17 +595,17 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 " as timestamp))-1, 3*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), ", n,"))")
             }
           },
           halfyear = {
             if (n < 2) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), (6*",
                 n,
@@ -613,17 +614,17 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 " as timestamp))-1, 6*",
                 n,
-                "))"
+                ")))"
                 )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), ", n,"))")
             }
           },
           season = {
             if (n < 4) {
               build_sql(
-                "add_months(trunc(",
+                "(add_months(trunc(",
                 !!x,
                 ", 'mm'), (3*",
                 n,
@@ -632,11 +633,11 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 " as timestamp))-1, 3*",
                 n,
-                ")+1))"
+                ")+1)))"
               )
             }
             else{
-              build_sql("add_months(trunc(",!!x, ", 'yyyy'), ", n,")")
+              build_sql("(add_months(trunc(",!!x, ", 'yyyy'), ", n,"))")
             }
           },
           stop("Error: Failed to parse units.")
@@ -647,7 +648,7 @@ sql_translate_env.Oracle <- function(con) {
       # No boolean type in oracle SQL https://community.oracle.com/thread/2473001?start=0&tstart=0
       #am = function(x) build_sql(case_when( 12 ~ 'TRUE', TRUE ~ 'FALSE')),
       #pm()
-      days_in_month = function(x) build_sql("to_char(add_months(trunc(", x, ", 'mm'), 1)-1,'DD')")
+      days_in_month = function(x) build_sql("(to_char(add_months(trunc(", x, ", 'mm'), 1)-1,'DD'))")
       #dst()
       #leap_year()
       #stamp()
