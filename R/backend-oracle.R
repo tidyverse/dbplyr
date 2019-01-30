@@ -324,7 +324,8 @@ sql_translate_env.Oracle <- function(con) {
                       " as timestamp))/",
                       n,
                       ")*",
-                      n)
+                      n,
+                      "-1")
           },
           week = {
             if (n != 1)
