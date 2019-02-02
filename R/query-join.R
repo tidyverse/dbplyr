@@ -118,6 +118,8 @@ sql_join_tbls <- function(con, by) {
       parens = TRUE,
       con = con
     )
+  } else if (length(by$on) > 0) {
+    on <- build_sql("(", by$on, ")", con = con)
   }
 
   on

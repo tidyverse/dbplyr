@@ -11,22 +11,22 @@
 \title{Join sql tbls.}
 \usage{
 \method{inner_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ...)
+  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
 
 \method{left_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ...)
+  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
 
 \method{right_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ...)
+  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
 
 \method{full_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ...)
+  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
 
 \method{semi_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  auto_index = FALSE, ...)
+  auto_index = FALSE, ..., sql_on = NULL)
 
 \method{anti_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  auto_index = FALSE, ...)
+  auto_index = FALSE, ..., sql_on = NULL)
 }
 \arguments{
 \item{x}{tbls to join}
@@ -63,6 +63,10 @@ there are matching indexes in \code{x}.}
 
 \item{...}{other parameters passed onto methods, for instance, \code{na_matches}
 to control how \code{NA} values are matched.  See \link{join.tbl_df} for more.}
+
+\item{sql_on}{A custom join predicate as an SQL expression. The SQL
+can refer to the \code{LHS} and \code{RHS} aliases to disambiguate
+column names.}
 }
 \description{
 See \link{join} for a description of the general purpose of the
@@ -72,9 +76,13 @@ functions.
 
 
 Semi-joins are implemented using \code{WHERE EXISTS}, and anti-joins with
-\code{WHERE NOT EXISTS}. Support for semi-joins is somewhat partial: you
-can only create semi joins where the \code{x} and \code{y} columns are
-compared with \code{=} not with more general operators.
+\code{WHERE NOT EXISTS}.
+
+All joins use column equality by default.
+An arbitrary join predicate can be specified by passing
+an SQL expression to the \code{sql_on} argument.
+Use \code{LHS} and \code{RHS} to refer to the left-hand side or
+right-hand side table, respectively.
 }
 
 \examples{
@@ -129,6 +137,19 @@ explain(famous_manager)
 
 # batters without person covariates
 anti_join(batting, people)
+
+# Arbitrary predicates ------------------------------------------------------
+
+# Find all pairs of awards given to the same player
+# with at least 18 years between the awards:
+awards_players <- tbl(lahman_s, "AwardsPlayers")
+inner_join(
+  awards_players, awards_players,
+  sql_on = paste0(
+    "(LHS.playerID = RHS.playerID) AND ",
+    "(LHS.yearID < RHS.yearID - 18)"
+  )
+)
 }
 }
 }
