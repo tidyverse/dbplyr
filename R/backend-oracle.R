@@ -91,26 +91,9 @@ sql_translate_env.Oracle <- function(con) {
 
       # lubridate functions https://lubridate.tidyverse.org/reference/index.html
       # Date-time helpers
-      # make_datetime()
-      # make_date()
-      # date()
-      # `date<-`()
-      #is.instant()
-      #is.timepoint()
-      #is.Date()
-      #Date()
-      #NA_Date_
-      #is.POSIXt()
-      #is.POSIXlt()
-      #is.POSIXct()
-      #POSIXct()
-      #NA_POSIXct_
       now = function() build_sql("SYSDATE"),
       today = function() build_sql("TRUNC(SYSDATE)"),
-      #origin
-      #decimal_date()
-      #as_date()
-      #as_datetime()
+
 
       #Setting, getting, and rounding
       year = function(x) sql_expr(extract(year %from% !!x)),
@@ -208,15 +191,11 @@ sql_translate_env.Oracle <- function(con) {
       yday = function(x){
         sql_expr(to_char(!!x, 'DDD'))
       },
-      # Does not currently support carryover days i.e. value > days in month, will generate
-      # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `day<-` = function(x, value){
         build_sql(
           "(to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1)"
         )
       },
-      # Does not currently support carryover days i.e. value > days in month, will generate
-      # "ORA-01847: day of month must be between 1 and last day of month" error in database
       `mday<-` = function(x, value){
         build_sql(
           "(to_date('01'||to_char(", !!x,",'MMYYYYHH24MISS'), 'DDMMYYYYHH24MISS') + ",!!value," -1)"
@@ -319,13 +298,10 @@ sql_translate_env.Oracle <- function(con) {
             build_sql("(trunc(",
                       !!x,
                       ", 'mm') +
-                      floor(EXTRACT(day FROM cast(",
-                      !!x,
-                      " as timestamp))/",
-                      n,
-                      ")*",
-                      n,
-                      "-1)")
+                      case when floor(EXTRACT(day FROM cast(", !!x, " as timestamp))/", n, ")*", n, "-1 < 0
+                      then 0 else
+                      floor(EXTRACT(day FROM cast(", !!x, " as timestamp))/", n, ")*", n, "-1 end
+                      )")
           },
           week = {
             if (n != 1)
