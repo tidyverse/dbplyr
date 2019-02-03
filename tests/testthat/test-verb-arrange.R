@@ -36,3 +36,15 @@ test_that("grouped arrange doesn't order by groups", {
 
   expect_equal(out$order_by, sql('`y`'))
 })
+
+test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
+  lf <- dbplyr::lazy_frame(x = 1, y = 1, src = simulate_dbi())
+
+  out <- lf %>%
+    group_by(x) %>%
+    arrange(y, .by_group = TRUE) %>%
+    sql_build()
+
+  expect_equal(out$order_by, sql(c('`x`','`y`')))
+})
+

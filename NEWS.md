@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Adds support for the `.by_group` argument in `arrange()` (#115)
+
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
