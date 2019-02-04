@@ -1,7 +1,7 @@
 context("test-tbl-lazy.R")
 
 test_that("adds src class", {
-  tb <- tbl_lazy(mtcars, src = simulate_sqlite())
+  tb <- tbl_lazy(mtcars, con = simulate_sqlite())
   expect_s3_class(tb, "tbl_SQLiteConnection")
 })
 

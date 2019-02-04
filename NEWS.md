@@ -4,6 +4,10 @@
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
 
+* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
+  shouldn't affect any downstream code unless you were previously working
+  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
+
 * SQL simulation has been overhauled. It's now better documented, and it always
   uses `` ` `` for field names and `'` for string.
 

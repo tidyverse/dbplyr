@@ -1,7 +1,7 @@
 context("test-query-select.R")
 
 test_that("select_query() print method output is as expected", {
-  mf <- select_query(lazy_frame(x = 1, src = simulate_dbi()))
+  mf <- select_query(lazy_frame(x = 1, con = simulate_dbi()))
   expect_known_output(mf, test_path("test-query-select-print.txt"), print = TRUE)
 })
 

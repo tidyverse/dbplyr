@@ -61,11 +61,10 @@ test_that("custom aggregators translated correctly", {
 })
 
 test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, src = simulate_access())
+  mf <- lazy_frame(x = 1, con = simulate_access())
 
   expect_equal(
-    mf %>% head() %>% show_query(),
+    mf %>% head() %>% sql_render(),
     sql("SELECT TOP 6 *\nFROM `df`")
   )
-
 })

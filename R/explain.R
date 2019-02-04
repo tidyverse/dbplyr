@@ -1,13 +1,8 @@
 #' @export
-show_query.tbl_sql <- function(x, ...) {
+show_query.tbl_lazy <- function(x, ...) {
   cat_line("<SQL>")
   cat_line(remote_query(x))
   invisible(x)
-}
-
-#' @export
-show_query.tbl_lazy <- function(x, ...) {
-  sql_render(x, con = x$src, ...)
 }
 
 #' @export

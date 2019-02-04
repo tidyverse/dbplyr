@@ -28,7 +28,7 @@ sql_build <- function(op, con = NULL, ...) {
 }
 
 #' @export
-sql_build.tbl_lazy <- function(op, con = op$src$con %||% op$src, ...) {
+sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
   # only used for testing
   qry <- sql_build(op$ops, con = con, ...)
   sql_optimise(qry, con = con, ...)
@@ -43,12 +43,12 @@ sql_render <- function(query, con = NULL, ...) {
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con %||% query$src, ...) {
+sql_render.tbl_lazy <- function(query, con = query$src$con, ...) {
   sql_render(query$ops, con = con, ...)
 }
 
 #' @export
-sql_render.op <- function(query, con = query$src$con %||% query$src, ...) {
+sql_render.op <- function(query, con = NULL, ...) {
   qry <- sql_build(query, con = con, ...)
   qry <- sql_optimise(qry, con = con, ...)
   sql_render(qry, con = con, ...)
