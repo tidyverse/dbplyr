@@ -84,7 +84,7 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
 
 #' @export
 db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
-  if (db_has_table(con, table) && force) {
+  if (force) {
     # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
     sql <- build_sql(
       "BEGIN ",
@@ -93,8 +93,10 @@ db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
       "END;",
       con = con
     )
-    DBI::dbExecute(con, sql)
+  } else {
+    sql <- build_sql("DROP TABLE ", ident(table))
   }
+  DBI::dbExecute(con, sql)
 }
 
 # registered onLoad located in the zzz.R script
