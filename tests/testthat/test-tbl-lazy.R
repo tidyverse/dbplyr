@@ -31,21 +31,3 @@ test_that("base source of tbl_lazy is always 'df'", {
   out <- lazy_frame(x = 1, y = 5) %>% sql_build()
   expect_equal(out, ident("df"))
 })
-
-# head --------------------------------------------------------------------
-
-test_that("head limits rows returned", {
-  out <- memdb_frame(x = 1:100) %>%
-    head(10) %>%
-    collect()
-
-  expect_equal(nrow(out), 10)
-})
-
-test_that("head limits rows", {
-  out <- lazy_frame(x = 1:100) %>%
-    head(10) %>%
-    sql_build()
-
-  expect_equal(out$limit, 10)
-})
