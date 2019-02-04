@@ -7,8 +7,7 @@ show_query.tbl_sql <- function(x, ...) {
 
 #' @export
 show_query.tbl_lazy <- function(x, ...) {
-  qry <- sql_build(x, con = x$src, ...)
-  sql_render(qry, con = x$src, ...)
+  sql_render(x, con = x$src, ...)
 }
 
 #' @export
