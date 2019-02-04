@@ -126,8 +126,13 @@ sql_translate_env.Oracle <- function(con) {
 
 
       #Setting, getting, and rounding
-      year = function(x)
-        sql_expr(extract(year %from% !!x)),
+      year = function(x) {
+        build_sql(
+          "to_number(",
+          sql_expr(extract(year %from% !!x)),
+          ")"
+          )
+        },
       `year<-` = function(x, value) {
         build_sql(
           "to_date(lpad(",
@@ -144,26 +149,28 @@ sql_translate_env.Oracle <- function(con) {
                          fiscal_start = 1) {
         if (with_year) {
           build_sql(
-            "(",
+            "(to_number(",
             sql_expr(extract(year %from% !!x)),
             "|| '.' ||to_char(add_months(",
             x ,
             ", 13-",
             fiscal_start,
-            "),'Q'))"
+            "),'Q')))"
           )
         }
         else{
-          sql_expr(to_char(add_months(!!x, 13-!!fiscal_start), 'Q'))
+          sql_expr((to_number(to_char(add_months(!!x, 13-!!fiscal_start), 'Q'))))
         }
       },
       semester = function(x, with_year = FALSE) {
         if (with_year) {
-          build_sql(sql_expr(extract(year %from% !!x)),
+          build_sql("(to_number(",
+                    sql_expr(extract(year %from% !!x)),
                     "|| '.' ||",
                     sql_expr(ceil(extract(
                       month %from% !!x
-                    ) / 6)))
+                    ) / 6)),
+                    "))")
         }
         else{
           sql_expr(ceil(extract(month %from% !!x) / 6))
@@ -171,7 +178,7 @@ sql_translate_env.Oracle <- function(con) {
       },
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          sql_expr(extract(month %from% !!x))
+          sql_expr((to_number(extract(month %from% !!x))))
         }
         else if (abbr) {
           build_sql("TO_CHAR(", x, ", 'Mon')")
@@ -206,23 +213,23 @@ sql_translate_env.Oracle <- function(con) {
         )
       },
       week = function(x) {
-        build_sql("TO_CHAR(", x, ", 'WW')")
+        build_sql("(to_number(TO_CHAR(", x, ", 'WW')))")
       },
       #`week<-`()
       isoweek = function(x) {
-        build_sql("TO_CHAR(", x, ", 'IW')")
+        build_sql("(to_number(TO_CHAR(", x, ", 'IW')))")
       },
       #epiweek() # needs to use next_date rounding probably
       day = function(x) {
-        build_sql("TO_CHAR(", x, ", 'DD')")
+        build_sql("(to_number(TO_CHAR(", x, ", 'DD')))")
       },
       mday = function(x) {
-        build_sql("TO_CHAR(", x, ", 'DD')")
+        build_sql("(to_number(TO_CHAR(", x, ", 'DD')))")
       },
       #TODO in week start support?
       wday = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          build_sql("TO_CHAR(", x, ", 'D')")
+          build_sql("(to_number(TO_CHAR(", x, ", 'D')))")
         }
         else if (abbr) {
           build_sql("TO_CHAR(", x, ", 'DY')")
@@ -235,7 +242,7 @@ sql_translate_env.Oracle <- function(con) {
       #qday()
 
       yday = function(x) {
-        sql_expr(to_char(!!x, 'DDD'))
+        sql_expr((to_number(to_char(!!x, 'DDD'))))
       },
       `day<-` = function(x, value) {
         build_sql(
@@ -266,7 +273,7 @@ sql_translate_env.Oracle <- function(con) {
         )
       },
       hour = function(x) {
-        build_sql("(TO_CHAR(", x, ", 'HH24'))")
+        build_sql("(to_number(TO_CHAR(", x, ", 'HH24')))")
       },
       `hour<-` = function(x, value) {
         build_sql(
@@ -280,7 +287,7 @@ sql_translate_env.Oracle <- function(con) {
         )
       },
       minute = function(x) {
-        build_sql("to_char(", x , ", 'MI')")
+        build_sql("(to_number(to_char(", x , ", 'MI')))")
       },
       `minute<-` = function(x, value) {
         build_sql(
@@ -294,7 +301,7 @@ sql_translate_env.Oracle <- function(con) {
         )
       },
       second = function(x) {
-        build_sql("(to_char(", x, ", 'SS'))")
+        build_sql("(to_number(to_char(", x, ", 'SS')))")
       },
 
       `second<-` = function(x, value) {
