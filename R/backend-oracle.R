@@ -392,16 +392,16 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           # TODO make week work
-          week = {
-            if (n != 1)
-              warning('Multi-unit not supported for weeks. Ignoring.')
-            switch(week_start,
-                   #
-                   #
-                   #
-                   #
-                   stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?)
-          },
+      #    week = {
+      #      if (n != 1)
+      #        warning('Multi-unit not supported for weeks. Ignoring.')
+      #      switch(week_start,
+      #             #
+      #             #
+      #             #
+      #             #
+      #             stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?)
+      #    },
           # TODO test month work
           month = {
             build_sql(
