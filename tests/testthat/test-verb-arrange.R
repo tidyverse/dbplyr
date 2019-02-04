@@ -36,3 +36,20 @@ test_that("grouped arrange doesn't order by groups", {
 
   expect_equal(out$order_by, sql('`y`'))
 })
+
+
+# ops ---------------------------------------------------------------------
+
+test_that("arranges captures DESC", {
+  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(desc(x))
+
+  expect_equal(op_sort(out), list(~desc(x)))
+})
+
+test_that("multiple arranges combine", {
+  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
+  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+
+  expect_equal(op_sort(out), list(~x, ~y))
+})
+

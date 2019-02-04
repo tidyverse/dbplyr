@@ -31,3 +31,35 @@ test_that("summarise generates group_by and select", {
   expect_equal(out$select, sql('`g`', 'COUNT() AS `n`'))
 })
 
+
+# ops ---------------------------------------------------------------------
+
+test_that("summarise replaces existing", {
+  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% summarise(z = 1)
+  expect_equal(op_vars(out), "z")
+})
+
+test_that("summarised vars are always named", {
+  mf <- dbplyr::memdb_frame(a = 1)
+
+  out1 <- mf %>% summarise(1) %>% op_vars()
+  expect_equal(out1, "1")
+})
+
+test_that("grouped summary keeps groups", {
+  out <- data_frame(g = 1, x = 1) %>%
+    tbl_lazy() %>%
+    group_by(g) %>%
+    summarise(y = 1)
+  expect_equal(op_vars(out), c("g", "y"))
+})
+
+test_that("summarise drops one grouping level", {
+  df <- data_frame(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy() %>% group_by(g1, g2)
+  out1 <- df %>% summarise(y = 1)
+  out2 <- out1 %>% summarise(y = 2)
+
+  expect_equal(op_grps(out1), "g1")
+  expect_equal(op_grps(out2), character())
+})
+

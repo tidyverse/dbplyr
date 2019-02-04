@@ -106,3 +106,22 @@ test_that("rename preserves existing vars", {
   expect_equal(out$select, ident("x" = "x", "z" = "y"))
 })
 
+
+# ops ---------------------------------------------------------------------
+
+test_that("select reduces variables", {
+  out <- mtcars %>% tbl_lazy() %>% select(mpg:disp)
+  expect_equal(op_vars(out), c("mpg", "cyl", "disp"))
+})
+
+test_that("rename preserves existing", {
+  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% rename(z = y)
+  expect_equal(op_vars(out), c("x", "z"))
+})
+
+test_that("rename renames grouping vars", {
+  df <- lazy_frame(a = 1, b = 2) %>% group_by(a) %>% rename(c = a)
+  expect_equal(op_grps(df), "c")
+})
+
+

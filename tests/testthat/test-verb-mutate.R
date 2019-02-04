@@ -106,3 +106,18 @@ test_that("mutate generates simple expressions", {
   expect_equal(out$select, sql('`x`', '`x` + 1 AS `y`'))
 })
 
+
+# ops ---------------------------------------------------------------------
+
+test_that("mutate adds new", {
+  out <- data_frame(x = 1) %>% tbl_lazy() %>% mutate(y = x + 1, z = y + 1)
+  expect_equal(op_vars(out), c("x", "y", "z"))
+})
+
+test_that("mutated vars are always named", {
+  mf <- dbplyr::memdb_frame(a = 1)
+
+  out2 <- mf %>% mutate(1) %>% op_vars()
+  expect_equal(out2, c("a", "1"))
+})
+
