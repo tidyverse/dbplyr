@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* New vignette describing some advantages for dplyr of SQL (#205) and giving
+  some advice about writing SQL if needed (#196).
+
 * Aggregation functions only warn once per session about the use of 
   `na.rm = TRUE` (#216).
 
