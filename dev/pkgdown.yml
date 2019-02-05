@@ -7,6 +7,7 @@ articles:
   _mysql-setup: notes/_mysql-setup.html
   _postgres-setup: notes/_postgres-setup.html
   reprex: reprex.html
+  sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
 urls:

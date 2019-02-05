@@ -72,6 +72,9 @@
       <a href="articles/reprex.html">Reprexes for dbplyr</a>
     </li>
     <li>
+      <a href="articles/sql.html">Writing SQL with dbplyr</a>
+    </li>
+    <li>
       <a href="articles/translation-function.html">Function translation</a>
     </li>
     <li>
@@ -132,7 +135,8 @@
 <div id="overview" class="section level2">
 <h2 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h2>
-<p>dbplyr is the database backend for dplyr. If you are using dplyr to connect to databases, you generally will not need to use any functions from dbplyr, but you will need to make sure it’s installed.</p>
+<p>dbplyr is the database backend for <a href="https://dplyr.tidyverse.org">dplyr</a>. It allows you to use remote database tables as if they are in-memory data frames by automatically converting dplyr code into SQL.</p>
+<p>To learn more about why you might use dbplyr instead of writing SQL, see <code><a href="articles/sql.html">vignette("sql")</a></code>. To learn more about the details of the SQL translation, see <code><a href="articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -155,7 +159,8 @@
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="st">":memory:"</span>)</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, mtcars)</a></code></pre></div>
-<p>Now you can retrieve a table using <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> (see <code><a href="reference/src_dbi.html">?tbl_dbi</a></code> for more details). Printing it just retrieves the first few rows so you can see its contents:</p>
+<p>Note that you don’t actually need to load dbplyr with <code><a href="https://www.rdocumentation.org/packages/base/topics/library">library(dbplyr)</a></code>; dplyr automatically loads it for you when it sees you working with a database. Database connections are coordinated by the DBI package. Learn more at <a href="http://dbi.r-dbi.org/" class="uri">http://dbi.r-dbi.org/</a></p>
+<p>Now you can retrieve a table using <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> (see <code><a href="reference/src_dbi.html">?tbl_dbi</a></code> for more details). Printing it just retrieves the first few rows:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">mtcars2 &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(con, <span class="st">"mtcars"</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">mtcars2</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]</span></a>
@@ -173,7 +178,7 @@
 <a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt;  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2</span></a>
 <a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4</span></a>
 <a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
-<p>All expressions are evaluated lazily; dplyr pipelines generate SQL, which is only sent to the database when you request the data.</p>
+<p>All dplyr calls are evaluated lazily, generating SQL that is only sent to the database when you request the data.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># lazily generates query</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">summary &lt;-<span class="st"> </span>mtcars2 <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(cyl) <span class="op">%&gt;%</span><span class="st"> </span></a>
