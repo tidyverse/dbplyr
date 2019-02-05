@@ -101,6 +101,8 @@
       # related SO post:
       # https://stackoverflow.com/questions/230138/sql-server-make-all-upper-case-to-proper-case-title-case
       str_to_title    = sql_not_supported("str_to_title()"),
+      # potentially helpful in the future
+      # https://stackoverflow.com/questions/38911588/replace-first-occurrence-of-substring-in-a-string-in-sql
       str_replace     = sql_not_supported("str_replace()"),
       str_locate      = function(string, pattern) {
                           sql_expr(CHARINDEX(!!pattern, !!string))
