@@ -415,7 +415,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               add_months(trunc(",!!x,
               ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm),-1))/",
+              ", 'mm'),-1))/",
               n,
               ")*",
               n,
@@ -446,7 +446,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               add_months(trunc(",!!x,
               ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm),-1))/(",
+              ", 'mm'),-1))/(",
               n,
               "*2)*(",
               n,
@@ -459,7 +459,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               add_months(trunc(",!!x,
               ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm),-1))/(",
+              ", 'mm'),-1))/(",
               n,
               "*3)*(",
               n,
@@ -472,7 +472,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               add_months(trunc(",!!x,
               ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm),-1))/(",
+              ", 'mm'),-1))/(",
               n,
               "*6)*(",
               n,
@@ -485,7 +485,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               add_months(trunc(",!!x,
               ", 'YYYY'), -1 + floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm),-1))/(",
+              ", 'mm'),-1))/(",
               n,
               "*3)*(",
               n,
