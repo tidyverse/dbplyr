@@ -186,7 +186,7 @@ base_scalar <- sql_translator(
   #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
   #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
   #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
-  #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
+  #   Oracle: https://docs.oracle.com/database/121/SQLRF/functions002.htm#SQLRF51180
   str_length      = sql_prefix("LENGTH", 1),
   str_to_upper    = sql_prefix("UPPER", 1),
   str_to_lower    = sql_prefix("LOWER", 1),
