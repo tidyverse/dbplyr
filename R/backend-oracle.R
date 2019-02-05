@@ -672,9 +672,9 @@ sql_translate_env.Oracle <- function(con) {
                 !!x,
                 ",-1))/(",
                 n,
-                "*3))*(",
+                "*6))*(",
                 n,
-                "*3)))"
+                "*6)))"
               )
             }
             else{
