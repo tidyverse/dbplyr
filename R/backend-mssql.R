@@ -106,6 +106,11 @@
                         },
       str_detect      = function(string, pattern) {
                           sql_expr(CHARINDEX(!!pattern, !!string) > 0L)
+                        },
+      str_sub         = function(string, start = 1L, end = -1L) {
+                          start <- as.integer(start)
+                          length <- pmax(as.integer(end) - start + 1L, 0L)
+                          sql_expr(SUBSTRING(!!string, !!start, !!length))
                         }
     ),
     sql_translator(.parent = base_odbc_agg,
