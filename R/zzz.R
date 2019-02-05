@@ -2,6 +2,8 @@
   register_s3_method("dplyr", "union", "tbl_lazy")
   register_s3_method("dplyr", "intersect", "tbl_lazy")
   register_s3_method("dplyr", "setdiff", "tbl_lazy")
+  register_s3_method("dplyr", "setdiff", "tbl_Oracle")
+  register_s3_method("dplyr", "setdiff", "OraConnection")
   register_s3_method("dplyr", "filter", "tbl_lazy")
 
   # These are also currently defined in dplyr, and we want to avoid a warning

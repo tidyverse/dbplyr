@@ -69,7 +69,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         sql_expr(strpos(!!string, !!pattern) > 0L)
       },
       str_replace = function(string, pattern, replacement){
-        sql_expr(regexp_replace(string, pattern, replacement))
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
     sql_translator(.parent = base_agg,

@@ -125,6 +125,13 @@ test_that("str_to_lower() translates correctly ", {
       sql("LOWER(\"field_name\")"))
 })
 
+test_that("str_to_title() translates correctly", {
+  expect_equivalent(
+    translate_sql(str_to_title(field_name)),
+    sql("INITCAP(\"field_name\")")
+  )
+})
+
 test_that("str_replace_all() translates correctly ", {
   expect_equivalent(
     translate_sql(
@@ -136,7 +143,7 @@ test_that("str_detect() translates correctly ", {
   expect_equivalent(
     translate_sql(
       str_detect(field_name, "pattern")),
-      sql("INSTR('pattern', \"field_name\") > 0"))
+      sql("INSTR(\"field_name\", 'pattern') > 0"))
 })
 
 test_that("str_trim() translates correctly ", {
@@ -144,6 +151,21 @@ test_that("str_trim() translates correctly ", {
     translate_sql(
       str_trim(field_name, "both")),
       sql("LTRIM(RTRIM(\"field_name\"))"))
+})
+
+test_that("str_sub() translates correctly", {
+  expect_equivalent(
+    translate_sql(
+      str_sub(field_name, 2L, 4L)
+    ),
+    sql("SUBSTR(\"field_name\", 2, 3)")
+  )
+  expect_equivalent(
+    translate_sql(
+      str_sub(field_name)
+    ),
+    sql("SUBSTR(\"field_name\", 1, 0)")
+  )
 })
 
 

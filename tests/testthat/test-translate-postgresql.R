@@ -25,7 +25,7 @@ test_that("custom stringr functions translated correctly", {
 
   expect_equal(trans(str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
   expect_equal(trans(str_detect(x, y)), sql("STRPOS(`x`, `y`) > 0"))
-
+  expect_equal(trans(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
 })
 
 test_that("two variable aggregates are translated correctly", {

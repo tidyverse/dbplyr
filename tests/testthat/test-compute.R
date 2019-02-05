@@ -33,3 +33,14 @@ test_that("unique index fails if values are duplicated", {
   mfs <- test_frame(x = 5:1, y = "a", ignore = "df")
   map(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
 })
+
+
+# copy_to -----------------------------------------------------------------
+
+test_that("only overwrite existing table if explicitly requested", {
+  con <- DBI::dbConnect(RSQLite::SQLite())
+  DBI::dbWriteTable(con, "df", data.frame(x = 1:5))
+
+  expect_error(copy_to(con, data.frame(x = 1), name = "df"), "exists")
+  expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
+})
