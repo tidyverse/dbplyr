@@ -1,5 +1,8 @@
 context("translate-math")
 
+
+# basic arithmetic --------------------------------------------------------
+
 test_that("basic arithmetic is correct", {
   expect_equal(translate_sql(1 + 2), sql("1.0 + 2.0"))
   expect_equal(translate_sql(2 * 4), sql("2.0 * 4.0"))
