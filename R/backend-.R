@@ -216,28 +216,25 @@ base_scalar <- sql_translator(
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
-  today = function(tzone = "") {build_sql("CURRENT_DATE")},
-  now = function(tzone = "") {build_sql("CURRENT_TIMESTAMP")},
-  year = function(x) {build_sql("EXTRACT(YEAR FROM ",x,")")},
+  today = function(tzone = "") build_sql("CURRENT_DATE"),
+  now = function(tzone = "") build_sql("CURRENT_TIMESTAMP"),
+  year = function(x) sql_expr(extract(year %from% !!x)),
   month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
-    # need to add label=TRUE AND abbr=TRUE, abbr=FALSE variants...
-    # i.e. Feb (3 chr), February
-    # to_char(current_date,'Mon'), to_char(current_date,'Month') ?
     if (!label) {
-      return(build_sql("EXTRACT(MONTH FROM",x,")"))
+      return(sql_expr(extract(month %from% !!x)))
     } else {
       if (abbr) {
-        return(build_sql("TO_CHAR(",x,",'Mon')"))
+        return(sql_expr(TO_CHAR(!!x, "Mon")))
       } else {
-        return(build_sql("TO_CHAR(",x,",'Month')"))
+        return(sql_expr(TO_CHAR(!!x, "Month")))
       }
     }
 
   },
-  day = function(x){build_sql("EXTRACT(DAY FROM ",x,")")},
-  hour = function(x){build_sql("EXTRACT(HOUR FROM ",x,")")},
-  minute = function(x){build_sql("EXTRACT(MINUTE FROM ",x,")")},
-  second = function(x){build_sql("EXTRACT(SECOND FROM ",x,")")}
+  day = function(x) sql_expr(extract(day %from% !!x)),
+  hour = function(x) sql_expr(extract(hour %from% !!x)),
+  minute = function(x) sql_expr(extract(minute %from% !!x)),
+  second = function(x) sql_expr(extract(second %from% !!x))
 )
 
 base_symbols <- sql_translator(
