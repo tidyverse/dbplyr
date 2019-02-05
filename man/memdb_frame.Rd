@@ -18,7 +18,9 @@ so you can refer to previously created elements. These arguments are
 processed with \code{\link[rlang:quos]{rlang::quos()}} and support unquote via \code{\link{!!}} and
 unquote-splice via \code{\link{!!!}}. Use \code{:=} to create columns that start with a dot.}
 
-\item{.name}{Name of table in database: defaults to a random name that's
+\item{df}{Data frame to copy}
+
+\item{name, .name}{Name of table in database: defaults to a random name that's
 unlikely to conflict with an existing table.}
 }
 \description{

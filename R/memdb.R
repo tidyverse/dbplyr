@@ -4,8 +4,9 @@
 #' data frame in R, it creates a table in [src_memdb()].
 #'
 #' @inheritParams tibble::tibble
-#' @param .name Name of table in database: defaults to a random name that's
+#' @param name,.name Name of table in database: defaults to a random name that's
 #'   unlikely to conflict with an existing table.
+#' @param df Data frame to copy
 #' @export
 #' @examples
 #' library(dplyr)
