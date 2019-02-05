@@ -1,3 +1,6 @@
+^CRAN-RELEASE$
+^pkgdown$
+^\.covrignore$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.travis\.yml$
@@ -10,5 +13,4 @@
 ^cran-comments\.md$
 ^revdep$
 ^\.httr-oauth$
-^NEWS\.md$
 ^\.github$

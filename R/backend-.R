@@ -1,0 +1,538 @@
+#' @include translate-sql-conditional.R
+#' @include translate-sql-window.R
+#' @include translate-sql-helpers.R
+#' @include translate-sql-paste.R
+#' @include escape.R
+#' @include sql.R
+#' @include utils.R
+NULL
+
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
+#' @export
+sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+  }
+}
+
+#' @export
+#' @rdname sql_variant
+#' @format NULL
+base_scalar <- sql_translator(
+  `+`    = sql_infix("+"),
+  `*`    = sql_infix("*"),
+  `/`    = sql_infix("/"),
+  `%%`   = sql_infix("%"),
+  `^`    = sql_prefix("POWER", 2),
+  `-`    = function(x, y = NULL) {
+    if (is.null(y)) {
+      if (is.numeric(x)) {
+        -x
+      } else {
+        sql_expr(-!!x)
+      }
+    } else {
+      sql_expr(!!x - !!y)
+    }
+  },
+
+  `$`   = sql_infix(".", pad = FALSE),
+  `[[`   = function(x, i) {
+    i <- enexpr(i)
+    if (!is.character(i)) {
+      stop("Can only index with strings", call. = FALSE)
+    }
+    build_sql(x, ".", ident(i))
+  },
+  `[` = function(x, i) {
+    build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+  },
+
+  `!=`    = sql_infix("!="),
+  `==`    = sql_infix("="),
+  `<`     = sql_infix("<"),
+  `<=`    = sql_infix("<="),
+  `>`     = sql_infix(">"),
+  `>=`    = sql_infix(">="),
+
+  `%in%` = function(x, table) {
+    if (is.sql(table) || length(table) > 1) {
+      sql_expr(!!x %in% !!table)
+    } else if (length(table) == 0) {
+      sql_expr(FALSE)
+    } else {
+      sql_expr(!!x %in% ((!!table)))
+    }
+  },
+
+  `!`     = sql_prefix("NOT"),
+  `&`     = sql_infix("AND"),
+  `&&`    = sql_infix("AND"),
+  `|`     = sql_infix("OR"),
+  `||`    = sql_infix("OR"),
+  xor     = function(x, y) {
+    sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
+  },
+
+  abs     = sql_prefix("ABS", 1),
+  acos    = sql_prefix("ACOS", 1),
+  asin    = sql_prefix("ASIN", 1),
+  atan    = sql_prefix("ATAN", 1),
+  atan2   = sql_prefix("ATAN2", 2),
+  ceil    = sql_prefix("CEIL", 1),
+  ceiling = sql_prefix("CEIL", 1),
+  cos     = sql_prefix("COS", 1),
+  cot     = sql_prefix("COT", 1),
+  exp     = sql_prefix("EXP", 1),
+  floor   = sql_prefix("FLOOR", 1),
+  log     = function(x, base = exp(1)) {
+    if (isTRUE(all.equal(base, exp(1)))) {
+      sql_expr(ln(!!x))
+    } else {
+      sql_expr(log(!!base, !!x))
+    }
+  },
+  log10   = sql_prefix("LOG10", 1),
+  round   = sql_prefix("ROUND", 2),
+  sign    = sql_prefix("SIGN", 1),
+  sin     = sql_prefix("SIN", 1),
+  sqrt    = sql_prefix("SQRT", 1),
+  tan     = sql_prefix("TAN", 1),
+  # cosh, sinh, coth and tanh calculations are based on this article
+  # https://en.wikipedia.org/wiki/Hyperbolic_function
+  cosh     = function(x) sql_expr((!!sql_exp(1, x) + !!sql_exp(-1, x)) / 2L),
+  sinh     = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
+  tanh     = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
+  coth     = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
+
+  round = function(x, digits = 0L) {
+    sql_expr(ROUND(!!x, !!as.integer(digits)))
+  },
+
+  tolower = sql_prefix("LOWER", 1),
+  toupper = sql_prefix("UPPER", 1),
+  trimws = sql_prefix("TRIM", 1),
+  nchar   = sql_prefix("LENGTH", 1),
+  substr = function(x, start, stop) {
+    start <- as.integer(start)
+    length <- pmax(as.integer(stop) - start + 1L, 0L)
+
+    sql_expr(SUBSTR(!!x, !!start, !!length))
+  },
+  paste = sql_paste(" "),
+  paste0 = sql_paste(""),
+
+  `if` = sql_if,
+  if_else = function(condition, true, false) sql_if(condition, true, false),
+  ifelse = function(test, yes, no) sql_if(test, yes, no),
+
+  switch = function(x, ...) sql_switch(x, ...),
+  case_when = function(...) sql_case_when(...),
+
+  sql = function(...) sql(...),
+  `(` = function(x) {
+    sql_expr(((!!x)))
+  },
+  `{` = function(x) {
+    sql_expr(((!!x)))
+  },
+  desc = function(x) {
+    build_sql(x, sql(" DESC"))
+  },
+
+  is.null = sql_is_null,
+  is.na = sql_is_null,
+  na_if = sql_prefix("NULLIF", 2),
+  coalesce = sql_prefix("COALESCE"),
+
+  as.numeric = sql_cast("NUMERIC"),
+  as.double = sql_cast("NUMERIC"),
+  as.integer = sql_cast("INTEGER"),
+  as.character = sql_cast("TEXT"),
+  as.logical = sql_cast("BOOLEAN"),
+  as.Date = sql_cast("DATE"),
+  # MS SQL - https://docs.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql
+  # Hive - https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
+  # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
+  # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
+  as.integer64  = sql_cast("BIGINT"),
+
+  c = function(...) c(...),
+  `:` = function(from, to) from:to,
+
+  between = function(x, left, right) {
+    sql_expr(!!x %BETWEEN% !!left %AND% !!right)
+  },
+
+  pmin = sql_prefix("LEAST"),
+  pmax = sql_prefix("GREATEST"),
+
+  `%>%` = `%>%`,
+
+  # stringr functions
+  # SQL Syntax reference links:
+  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
+  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
+  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
+  #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
+  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
+  #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
+  str_length      = sql_prefix("LENGTH"),
+  str_to_upper    = sql_prefix("UPPER"),
+  str_to_lower    = sql_prefix("LOWER"),
+  str_replace_all = function(string, pattern, replacement) {
+                      sql_expr(REPLACE(!!string, !!pattern, !!replacement))
+                    },
+  str_detect      = function(string, pattern) {
+                      sql_expr(INSTR(!!string, !!pattern) > 0L)
+                    },
+  str_trim        = function(string, side = c("both", "left", "right")) {
+                      side <- match.arg(side)
+                      switch(side,
+                        left = sql_expr(LTRIM(!!string)),
+                        right = sql_expr(RTRIM(!!string)),
+                        both = sql_expr(LTRIM(RTRIM(!!string))),
+                      )
+                    }
+)
+
+base_symbols <- sql_translator(
+  pi = sql("PI()"),
+  `*` = sql("*"),
+  `NULL` = sql("NULL")
+)
+sql_exp <- function(a, x) {
+  a <- as.integer(a)
+  if (identical(a, 1L)) {
+    sql_expr(EXP(!!x))
+  } else if (identical(a, -1L)) {
+    sql_expr(EXP(-((!!x))))
+  } else {
+    sql_expr(EXP(!!a * ((!!x))))
+  }
+}
+
+#' @export
+#' @rdname sql_variant
+#' @format NULL
+base_agg <- sql_translator(
+  # SQL-92 aggregates
+  # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
+  n          = function() sql("COUNT()"),
+  mean       = sql_aggregate("AVG", "mean"),
+  var        = sql_aggregate("VARIANCE", "var"),
+  sum        = sql_aggregate("SUM"),
+  min        = sql_aggregate("MIN"),
+  max        = sql_aggregate("MAX"),
+
+  # first = sql_prefix("FIRST_VALUE", 1),
+  # last = sql_prefix("LAST_VALUE", 1),
+  # nth = sql_prefix("NTH_VALUE", 2),
+
+  n_distinct = function(x) {
+    build_sql("COUNT(DISTINCT ", x, ")")
+  }
+)
+
+#' @export
+#' @rdname sql_variant
+#' @format NULL
+base_win <- sql_translator(
+  # rank functions have a single order argument that overrides the default
+  row_number   = win_rank("ROW_NUMBER"),
+  min_rank     = win_rank("RANK"),
+  rank         = win_rank("RANK"),
+  dense_rank   = win_rank("DENSE_RANK"),
+  percent_rank = win_rank("PERCENT_RANK"),
+  cume_dist    = win_rank("CUME_DIST"),
+  ntile        = function(order_by, n) {
+    win_over(
+      sql_expr(NTILE(!!as.integer(n))),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+
+  # Variants that take more arguments
+  first = function(x, order_by = NULL) {
+    win_over(
+      sql_expr(FIRST_VALUE(!!x)),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+  last = function(x, order_by = NULL) {
+    win_over(
+      sql_expr(LAST_VALUE(!!x)),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+  nth = function(x, n, order_by = NULL) {
+    win_over(
+      sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+
+  lead = function(x, n = 1L, default = NA, order_by = NULL) {
+    win_over(
+      sql_expr(LEAD(!!x, !!n, !!default)),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+  lag = function(x, n = 1L, default = NA, order_by = NULL) {
+    win_over(
+      sql_expr(LAG(!!x, !!as.integer(n), !!default)),
+      win_current_group(),
+      order_by %||% win_current_order()
+    )
+  },
+  # Recycled aggregate fuctions take single argument, don't need order and
+  # include entire partition in frame.
+  mean  = win_aggregate("AVG"),
+  var   = win_aggregate("VARIANCE"),
+  sum   = win_aggregate("SUM"),
+  min   = win_aggregate("MIN"),
+  max   = win_aggregate("MAX"),
+  n     = function() {
+    win_over(sql("COUNT(*)"), win_current_group())
+  },
+  n_distinct = function(x) {
+    win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
+  },
+
+  # Cumulative function are like recycled aggregates except that R names
+  # have cum prefix, order_by is inherited and frame goes from -Inf to 0.
+  cummean = win_cumulative("AVG"),
+  cumsum  = win_cumulative("SUM"),
+  cummin  = win_cumulative("MIN"),
+  cummax  = win_cumulative("MAX"),
+
+  # Manually override other parameters --------------------------------------
+  order_by = function(order_by, expr) {
+    old <- set_win_current_order(order_by)
+    on.exit(set_win_current_order(old))
+
+    expr
+  }
+)
+
+#' @export
+#' @rdname sql_variant
+#' @format NULL
+base_no_win <- sql_translator(
+  row_number   = win_absent("ROW_NUMBER"),
+  min_rank     = win_absent("RANK"),
+  rank         = win_absent("RANK"),
+  dense_rank   = win_absent("DENSE_RANK"),
+  percent_rank = win_absent("PERCENT_RANK"),
+  cume_dist    = win_absent("CUME_DIST"),
+  ntile        = win_absent("NTILE"),
+  mean         = win_absent("AVG"),
+  sd           = win_absent("SD"),
+  var          = win_absent("VAR"),
+  cov          = win_absent("COV"),
+  cor          = win_absent("COR"),
+  sum          = win_absent("SUM"),
+  min          = win_absent("MIN"),
+  max          = win_absent("MAX"),
+  n            = win_absent("N"),
+  n_distinct   = win_absent("N_DISTINCT"),
+  cummean      = win_absent("MEAN"),
+  cumsum       = win_absent("SUM"),
+  cummin       = win_absent("MIN"),
+  cummax       = win_absent("MAX"),
+  nth          = win_absent("NTH_VALUE"),
+  first        = win_absent("FIRST_VALUE"),
+  last         = win_absent("LAST_VALUE"),
+  lead         = win_absent("LEAD"),
+  lag          = win_absent("LAG"),
+  order_by     = win_absent("ORDER_BY"),
+  str_flatten  = win_absent("STR_FLATTEN"),
+  count        = win_absent("COUNT")
+)
+
+# db_ methods -------------------------------------------------------------
+
+#' @export
+db_desc.DBIConnection <- function(x) {
+  class(x)[[1]]
+}
+
+#' @export
+db_list_tables.DBIConnection <- function(con) dbListTables(con)
+
+#' @export
+db_has_table.DBIConnection <- function(con, table) dbExistsTable(con, table)
+
+#' @export
+db_data_type.DBIConnection <- function(con, fields) {
+  vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
+}
+
+#' @export
+db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
+                                        ...) {
+  tt_sql <- build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "),
+    "TABLE ", as.sql(name), " AS ", sql,
+    con = con
+  )
+  dbExecute(con, tt_sql)
+  name
+}
+
+#' @export
+db_begin.DBIConnection <- function(con, ...) {
+  dbBegin(con)
+}
+
+#' @export
+db_commit.DBIConnection <- function(con, ...) dbCommit(con)
+
+#' @export
+db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
+
+#' @export
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
+  dbWriteTable(
+    con,
+    name = dbi_quote(as.sql(table), con),
+    value = values,
+    field.types = types,
+    temporary = temporary,
+    row.names = FALSE
+  )
+
+  table
+}
+
+#' @export
+db_create_table.DBIConnection <- function(con, table, types,
+                                          temporary = TRUE, ...) {
+  assert_that(is_string(table), is.character(types))
+
+  field_names <- escape(ident(names(types)), collapse = NULL, con = con)
+  fields <- sql_vector(
+    paste0(field_names, " ", types),
+    parens = TRUE,
+    collapse = ", ",
+    con = con
+  )
+  sql <- build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "),
+    "TABLE ", as.sql(table), " ", fields,
+    con = con
+  )
+
+  dbExecute(con, sql)
+}
+
+#' @export
+db_insert_into.DBIConnection <- function(con, table, values, ...) {
+  dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
+}
+
+#' @export
+db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
+                                            unique = FALSE, ...) {
+  if (is.null(indexes)) return()
+  assert_that(is.list(indexes))
+
+  for (index in indexes) {
+    db_create_index(con, table, index, unique = unique, ...)
+  }
+}
+
+#' @export
+db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
+                                          unique = FALSE, ...) {
+  assert_that(is_string(table), is.character(columns))
+
+  name <- name %||% paste0(c(table, columns), collapse = "_")
+  fields <- escape(ident(columns), parens = TRUE, con = con)
+  sql <- build_sql(
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
+    " ON ", as.sql(table), " ", fields,
+    con = con)
+
+  dbExecute(con, sql)
+}
+
+#' @export
+db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
+  sql <- build_sql(
+    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
+    con = con
+  )
+  dbExecute(con, sql)
+}
+
+#' @export
+db_analyze.DBIConnection <- function(con, table, ...) {
+  sql <- build_sql("ANALYZE ", as.sql(table), con = con)
+  dbExecute(con, sql)
+}
+
+#' @export
+db_explain.DBIConnection <- function(con, sql, ...) {
+  exsql <- build_sql("EXPLAIN ", sql, con = con)
+  expl <- dbGetQuery(con, exsql)
+  out <- utils::capture.output(print(expl))
+
+  paste(out, collapse = "\n")
+}
+
+#' @export
+db_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
+  qry <- dbSendQuery(con, sql)
+  on.exit(dbClearResult(qry))
+
+  res <- dbFetch(qry, 0)
+  names(res)
+}
+
+#' @export
+db_query_rows.DBIConnection <- function(con, sql, ...) {
+  from <- sql_subquery(con, sql, "master")
+  rows <- build_sql("SELECT COUNT(*) FROM ", from, con = con)
+
+  as.integer(dbGetQuery(con, rows)[[1]])
+}
+
+# Utility functions ------------------------------------------------------------
+
+random_table_name <- function(n = 10) {
+  prefix <- "dbplyr_"
+  paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
+}
+
+res_warn_incomplete <- function(res, hint = "n = -1") {
+  if (dbHasCompleted(res)) return()
+
+  rows <- big_mark(dbGetRowCount(res))
+  warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
+    call. = FALSE)
+}
+
+
+dbi_quote <- function(x, con) UseMethod("dbi_quote")
+dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
+dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
+dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
+dbi_quote.sql <- function(x, con) DBI::SQL(x)
+

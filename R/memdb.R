@@ -3,7 +3,7 @@
 #' `memdb_frame()` works like [tibble::tibble()], but instead of creating a new
 #' data frame in R, it creates a table in [src_memdb()].
 #'
-#' @inheritParams tibble::data_frame
+#' @inheritParams tibble::tibble
 #' @param .name Name of table in database: defaults to a random name that's
 #'   unlikely to conflict with an existing table.
 #' @export
@@ -13,7 +13,7 @@
 #' df %>% arrange(x)
 #' df %>% arrange(x) %>% show_query()
 memdb_frame <- function(..., .name = random_table_name()) {
-  x <- copy_to(src_memdb(), data_frame(...), name = .name)
+  x <- copy_to(src_memdb(), tibble(...), name = .name)
   x
 }
 

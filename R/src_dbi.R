@@ -46,7 +46,7 @@
 #' src %>% tbl("mtcars")
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
-#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl == 8"))
+#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #'
 #' # Alternatively, you can use the `src_sqlite()` helper
 #' src2 <- src_sqlite(":memory:", create = TRUE)
@@ -112,8 +112,6 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 
 setOldClass(c("src_dbi", "src_sql", "src"))
 
-# Methods -----------------------------------------------------------------
-
 #' @export
 #' @aliases tbl_dbi
 #' @rdname src_dbi
@@ -135,8 +133,3 @@ db_disconnector <- function(con, quiet = FALSE) {
   })
   environment()
 }
-
-
-# Subclass helpers --------------------------------------------------------
-
-
