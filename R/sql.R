@@ -17,7 +17,7 @@ sql <- function(...) {
 #' @export
 c.sql <- function(..., drop_null = FALSE, con = NULL) {
   input <- list(...)
-  if (drop_null) input <- compact(input)
+  if (drop_null) input <- purrr::compact(input)
 
   out <- unlist(lapply(input, escape, collapse = NULL, con = con))
   sql(out)

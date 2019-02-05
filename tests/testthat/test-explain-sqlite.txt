@@ -1,0 +1,8 @@
+<SQL>
+SELECT *
+FROM `XYZ`
+WHERE (`x` > 5.0)
+
+<PLAN>
+  id parent notused         detail
+1  2      0       0 SCAN TABLE XYZ

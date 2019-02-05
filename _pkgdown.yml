@@ -1,26 +1,62 @@
+url: https://dbplyr.tidyverse.org
+
 template:
   package: tidytemplate
-  default_assets: false
+
+development:
+  mode: auto
 
 home:
   strip_header: true
 
+reference:
+- title: dplyr verbs
+  contents:
+  - copy_to.src_sql
+  - collapse.tbl_sql
+  - do.tbl_sql
+  - inner_join.tbl_lazy
+  - src_dbi
+
+- title: Database connection
+  contents:
+  - in_schema
+  - memdb_frame
+  - remote_name
+
+- title: SQL generation
+  contents:
+  - build_sql
+  - escape
+  - ident
+  - partial_eval
+  - sql
+  - sql_expr
+  - translate_sql
+  - window_order
+
 navbar:
-  title: ~
-  type: default
-  left:
-  - text: Reference
-    href: reference/index.html
-  - text: Intro
-    href: articles/dbplyr.html
-  - text: Articles
-    menu:
-    - text: SQL translation
-      href: articles/sql-translation.html
-    - text: Creating new backends
-      href: articles/new-backend.html
-  - text: News
-    href: news/index.html
-  right:
-  - icon: fa-github fa-lg
-    href: https://github.com/tidyverse/dbplyr
+  components:
+    home: ~
+    articles:
+      text: Articles
+      menu:
+      - text: Translation of functions to SQL
+        href: articles/translation-verb.html
+      - text: Translation of dplyr verbs to SQL
+        href: articles/translation-function.html
+      - text: Creating new backends
+        href: articles/new-backend.html
+    news:
+      text: News
+      menu:
+      - text: "Release notes"
+      - text: "Version 1.3.0"
+        href: https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/
+      - text: "Version 1.2.0"
+        href: https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/
+      - text: "Version 1.1.0"
+        href: https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/
+      - text: "------------------"
+      - text: "Change log"
+        href: news/index.html

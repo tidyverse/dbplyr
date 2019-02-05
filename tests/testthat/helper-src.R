@@ -32,3 +32,12 @@ skip_if_no_db <- function(db) {
   if (!test_srcs$has(db))
     skip(paste0("No ", db))
 }
+
+sqlite_con_with_aux <- function() {
+  tmp <- tempfile()
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
+
+  con
+}
