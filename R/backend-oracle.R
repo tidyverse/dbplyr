@@ -433,7 +433,7 @@ sql_translate_env.Oracle <- function(con) {
               ", 'YYYY')
               else add_months(round(",
               !!x,
-              ", 'YYYY'),  (-remainder(extract(year from, ",
+              ", 'YYYY'),  (-remainder(extract(year from ",
               !!x,
               "), ",
               !!n,
@@ -620,7 +620,7 @@ sql_translate_env.Oracle <- function(con) {
               ", 'YYYY')
               else add_months(trunc(",
               !!x,
-              ", 'YYYY'),  (-mod(extract(year from, ",
+              ", 'YYYY'),  (-mod(extract(year from ",
               !!x,
               "), ",
               !!n,
