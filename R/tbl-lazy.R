@@ -34,7 +34,6 @@ lazy_frame <- function(..., con = simulate_dbi(), src = NULL) {
   tbl_lazy(tibble(...), con = con, src = src)
 }
 
-
 #' @export
 dimnames.tbl_lazy <- function(x) {
   list(NULL, op_vars(x$ops))

@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* New `vignette("reprex")` gives some hints on creeating reprexes that work 
+  anywhere (#117).
+
+* New `tbl_memdb()` for creating reprexes (to match `tbl_lazy()`)
+
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).

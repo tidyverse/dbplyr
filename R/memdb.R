@@ -12,9 +12,18 @@
 #' df <- memdb_frame(x = runif(100), y = runif(100))
 #' df %>% arrange(x)
 #' df %>% arrange(x) %>% show_query()
+#'
+#' mtcars_db <- tbl_memdb(mtcars)
+#' mtcars_db %>% count(cyl) %>% show_query()
 memdb_frame <- function(..., .name = random_table_name()) {
   x <- copy_to(src_memdb(), tibble(...), name = .name)
   x
+}
+
+#' @rdname memdb_frame
+#' @export
+tbl_memdb <- function(df, name = deparse(substitute(df))) {
+  copy_to(src_memdb(), df, name = name)
 }
 
 #' @rdname memdb_frame

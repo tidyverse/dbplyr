@@ -2,10 +2,13 @@
 % Please edit documentation in R/memdb.R
 \name{memdb_frame}
 \alias{memdb_frame}
+\alias{tbl_memdb}
 \alias{src_memdb}
 \title{Create a database table in temporary in-memory database.}
 \usage{
 memdb_frame(..., .name = random_table_name())
+
+tbl_memdb(df, name = deparse(substitute(df)))
 
 src_memdb()
 }
@@ -27,4 +30,7 @@ library(dplyr)
 df <- memdb_frame(x = runif(100), y = runif(100))
 df \%>\% arrange(x)
 df \%>\% arrange(x) \%>\% show_query()
+
+mtcars_db <- tbl_memdb(mtcars)
+mtcars_db \%>\% count(cyl) \%>\% show_query()
 }
