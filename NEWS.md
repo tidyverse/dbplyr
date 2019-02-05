@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Aggregation functions only warn once per session about the use of 
+  `na.rm = TRUE` (#216).
+
 * New `vignette("reprex")` gives some hints on creeating reprexes that work 
   anywhere (#117).
 
