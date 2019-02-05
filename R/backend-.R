@@ -542,4 +542,3 @@ dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
 dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
 dbi_quote.sql <- function(x, con) DBI::SQL(x)
-
