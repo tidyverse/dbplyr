@@ -73,6 +73,7 @@ group_vars.tbl_lazy <- function(x) {
 
 # lazyeval ----------------------------------------------------------------
 
+# nocov start
 #' @export
 filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
   dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
@@ -122,3 +123,4 @@ do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
   dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   do(.data, !!! dots, .chunk_size = .chunk_size)
 }
+# nocov end
