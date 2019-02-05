@@ -9,6 +9,14 @@ test_that("two arranges equivalent to one", {
   expect_equal_tbl(mf1, mf2)
 })
 
+# sql_render --------------------------------------------------------------
+
+test_that("quoting for rendering ordered grouped table", {
+  out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y)
+  expect_match(out %>% sql_render, "^SELECT [*]\nFROM `[^`]*`\nORDER BY `y`$")
+  expect_equal(out %>% collect, tibble(x = 1, y = 2))
+})
+
 
 # sql_build ---------------------------------------------------------------
 

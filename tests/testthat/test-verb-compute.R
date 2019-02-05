@@ -55,6 +55,15 @@ test_that("unique index fails if values are duplicated", {
   lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
 })
 
+test_that("compute creates correct column names", {
+  out <- memdb_frame(x = 1) %>%
+    group_by(x) %>%
+    summarize(n = n()) %>%
+    compute() %>%
+    collect()
+
+  expect_equal(out, tibble(x = 1, n = 1L))
+})
 
 # ops ---------------------------------------------------------------------
 

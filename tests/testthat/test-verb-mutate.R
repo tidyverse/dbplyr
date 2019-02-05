@@ -94,9 +94,36 @@ test_that("cumulative aggregates generate window function", {
   expect_equal_tbls(out)
 })
 
+test_that("mutate overwrites previous variables", {
+  df <- memdb_frame(x = 1:5) %>%
+    mutate(x = x + 1) %>%
+    mutate(x = x + 1) %>%
+    collect()
+
+  expect_equal(names(df), "x")
+  expect_equal(df$x, 1:5 + 2)
+})
+
+test_that("sequence of operations work", {
+  out <- memdb_frame(x = c(1, 2, 3, 4)) %>%
+    select(y = x) %>%
+    mutate(z = 2 * y) %>%
+    filter(z == 2) %>%
+    collect()
+
+  expect_equal(out, tibble(y = 1, z = 2))
+})
+
+
+# sql_render --------------------------------------------------------------
+
+test_that("quoting for rendering mutated grouped table", {
+  out <- memdb_frame(x = 1, y = 2) %>% mutate(y = x)
+  expect_match(out %>% sql_render, "^SELECT `x`, `x` AS `y`\nFROM `[^`]*`$")
+  expect_equal(out %>% collect, tibble(x = 1, y = 1))
+})
 
 # sql_build ---------------------------------------------------------------
-
 
 test_that("mutate generates simple expressions", {
   out <- lazy_frame(x = 1) %>%

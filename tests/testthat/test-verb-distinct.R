@@ -32,6 +32,22 @@ test_that("distinct throws error if column is specified and .keep_all is TRUE", 
 })
 
 
+# sql-render --------------------------------------------------------------
+
+test_that("distinct adds DISTINCT suffix", {
+  out <- memdb_frame(x = c(1, 1)) %>% distinct()
+
+  expect_match(out %>% sql_render(), "SELECT DISTINCT")
+  expect_equal(out %>% collect(), tibble(x = 1))
+})
+
+test_that("distinct over columns uses GROUP BY", {
+  out <- memdb_frame(x = c(1, 2), y = c(1, 1)) %>% distinct(y)
+
+  expect_match(out %>% sql_render(), "SELECT `y`.*GROUP BY `y`")
+  expect_equal(out %>% collect(), tibble(y = 1))
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("distinct sets flagged", {
