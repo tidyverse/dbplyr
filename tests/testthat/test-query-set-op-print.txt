@@ -1,0 +1,11 @@
+<SQL UNION>
+X:
+  <SQL SELECT>
+  From:
+    <IDENT> df
+  Select:   `x`, `y`, NULL
+Y:
+  <SQL SELECT>
+  From:
+    <IDENT> df
+  Select:   `x`, NULL, `z`

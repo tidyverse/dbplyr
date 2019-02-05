@@ -14,17 +14,16 @@ semi_join_query <- function(x, y, anti = FALSE, by = NULL) {
 
 #' @export
 print.semi_join_query <- function(x, ...) {
-  cat(
-    "<SQL ",
-    if (x$anti) "ANTI" else "SEMI", " JOIN>\n",
-    sep = ""
-  )
-  cat("By:   ", paste0(x$by$x, "-", x$by$y, collapse = ", "), "\n", sep = "")
+  cat_line("<SQL ", if (x$anti) "ANTI" else "SEMI", " JOIN>")
 
-  cat(named_rule("X"), "\n", sep = "")
-  print(x$x$ops)
-  cat(named_rule("Y"), "\n", sep = "")
-  print(x$y$ops)
+  cat_line("By:")
+  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  cat_line("Y:")
+  cat_line(indent_print(sql_build(x$y)))
 }
 
 #' @export

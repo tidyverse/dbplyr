@@ -39,7 +39,8 @@ print.select_query <- function(x, ...) {
     if (x$distinct) " DISTINCT", ">\n",
     sep = ""
   )
-  cat("From:     ", gsub("\n", " ", sql_render(x$from, root = FALSE)), "\n", sep = "")
+  cat_line("From:")
+  cat_line(indent_print(sql_build(x$from)))
 
   if (length(x$select))   cat("Select:   ", named_commas(x$select), "\n", sep = "")
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")

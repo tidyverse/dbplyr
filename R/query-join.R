@@ -15,13 +15,16 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 
 #' @export
 print.join_query <- function(x, ...) {
-  cat("<SQL JOIN (", toupper(x$type), ")>\n", sep = "")
-  cat("By:   ", paste0(x$by$x, "-", x$by$y, collapse = ", "), "\n", sep = "")
+  cat_line("<SQL JOIN (", toupper(x$type), ")>")
 
-  cat(named_rule("X"), "\n", sep = "")
-  print(x$x$ops)
-  cat(named_rule("Y"), "\n", sep = "")
-  print(x$y$ops)
+  cat_line("By:")
+  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  cat_line("Y:")
+  cat_line(indent_print(sql_build(x$y)))
 }
 
 #' @export
