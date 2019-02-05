@@ -109,10 +109,7 @@
     <loc>https://dbplyr.tidyverse.org/articles/new-backend.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/articles/notes/mysql-setup.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/articles/notes/postgres-setup.html</loc>
+    <loc>https://dbplyr.tidyverse.org/articles/reprex.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/articles/translation-function.html</loc>

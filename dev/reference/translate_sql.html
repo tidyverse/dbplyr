@@ -96,13 +96,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/translation-verb.html">Translation of functions to SQL</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/translation-function.html">Translation of dplyr verbs to SQL</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
@@ -249,13 +252,14 @@ from <code><a href='https://www.rdocumentation.org/packages/stats/topics/sd'>sd(
 <span class='co'># Windowed translation --------------------------------------------</span>
 <span class='co'># Known window functions automatically get OVER()</span>
 <span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `AVG(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER ()</div><div class='input'>
+#&gt; <span class='warning'>Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+#&gt; <span class='warning'>This warning is displayed only once per session.</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER ()</div><div class='input'>
 <span class='co'># Suppress this with window = FALSE</span>
 <span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>mpg</span>), <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `mean(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`)</div><div class='input'>
+#&gt; <span class='warning'>Use `mean(x, na.rm = TRUE)` to silence this warning</span>
+#&gt; <span class='warning'>This warning is displayed only once per session.</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`)</div><div class='input'>
 <span class='co'># vars_group controls partition:</span>
-<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>mpg</span>), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='st'>"cyl"</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `AVG(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER (PARTITION BY `cyl`)</div><div class='input'>
+<span class='fu'>translate_sql</span>(<span class='no'>mpg</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/mean'>mean</a></span>(<span class='no'>mpg</span>), <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='st'>"cyl"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER (PARTITION BY `cyl`)</div><div class='input'>
 <span class='co'># and vars_order controls ordering for those functions that need it</span>
 <span class='fu'>translate_sql</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='no'>mpg</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: Windowed expression 'SUM(`mpg`)' does not have explicit order.</span>
 #&gt; <span class='warning'>Please use arrange() or window_order() to make determinstic.</span></div><div class='output co'>#&gt; &lt;SQL&gt; SUM(`mpg`) OVER (ROWS UNBOUNDED PRECEDING)</div><div class='input'><span class='fu'>translate_sql</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cumsum'>cumsum</a></span>(<span class='no'>mpg</span>), <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='st'>"mpg"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SUM(`mpg`) OVER (ORDER BY `mpg` ROWS UNBOUNDED PRECEDING)</div></pre>

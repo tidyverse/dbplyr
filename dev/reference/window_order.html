@@ -96,13 +96,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/translation-verb.html">Translation of functions to SQL</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/translation-function.html">Translation of dplyr verbs to SQL</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
@@ -196,7 +199,8 @@
   <span class='fu'>window_order</span>(<span class='no'>z</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>z</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>x</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='sql_build.html'>sql_build</a></span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `SUM(x, na.rm = TRUE)` to silence this warning</span></div><div class='output co'>#&gt; &lt;SQL SELECT&gt;
+#&gt; <span class='warning'>Use `SUM(x, na.rm = TRUE)` to silence this warning</span>
+#&gt; <span class='warning'>This warning is displayed only once per session.</span></div><div class='output co'>#&gt; &lt;SQL SELECT&gt;
 #&gt; From:     df
 #&gt; Select:   `g`, `y`, SUM(`x`) OVER (PARTITION BY `g` ORDER BY `z` ROWS 3 PRECEDING) AS `z`</div></pre>
   </div>

@@ -62,13 +62,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/translation-verb.html">Translation of functions to SQL</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/translation-function.html">Translation of dplyr verbs to SQL</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
@@ -231,17 +234,18 @@
 <a class="sourceLine" id="cb7-32" data-line-number="32"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(dep_time))</a>
 <a class="sourceLine" id="cb7-33" data-line-number="33"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
 <a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
-<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt;   dest  delay</span></a>
-<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt; 1 ABQ   2006.</span></a>
-<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 2 ACK   1033.</span></a>
-<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 3 ALB   1627.</span></a>
-<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 4 ANC   1635.</span></a>
-<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 5 ATL   1293.</span></a>
-<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 6 AUS   1521.</span></a>
-<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
+<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
+<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   dest  delay</span></a>
+<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 1 ABQ   2006.</span></a>
+<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 2 ACK   1033.</span></a>
+<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 3 ALB   1627.</span></a>
+<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 4 ANC   1635.</span></a>
+<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 5 ATL   1293.</span></a>
+<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; 6 AUS   1521.</span></a>
+<a class="sourceLine" id="cb7-46" data-line-number="46"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="http://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
@@ -259,48 +263,42 @@
 <a class="sourceLine" id="cb8-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)</a></code></pre></div>
 <p>Suprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tailnum_delay_db</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; # Ordered by: desc(delay)</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt;   tailnum delay     n</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # Ordered by: desc(delay)</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   tailnum delay     n</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt;</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; SELECT *</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; FROM (SELECT *</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; FROM `flights`</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; GROUP BY `tailnum`)</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; ORDER BY `delay` DESC)</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></a></code></pre></div>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; SELECT *</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; FROM (SELECT *</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; FROM `flights`</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; GROUP BY `tailnum`)</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; ORDER BY `delay` DESC)</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></a></code></pre></div>
 <p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> to pull all the data down into a local tibble:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">tailnum_delay &lt;-<span class="st"> </span>tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span>()</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">tailnum_delay</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; # A tibble: 1,201 x 3</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt;   tailnum delay     n</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
-<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; # … with 1,195 more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-2" data-line-number="2">tailnum_delay</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; # A tibble: 1,201 x 3</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt;   tailnum delay     n</span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
+<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; # … with 1,195 more rows</span></a></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> requires that database does some work, so it may take a long time to complete. Otherwise, dplyr tries to prevent you from accidentally performing expensive query operations:</p>
 <ul>
 <li><p>Because there’s generally no way to determine how many rows a query will return unless you actually run it, <code><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow()</a></code> is always <code>NA</code>.</p></li>

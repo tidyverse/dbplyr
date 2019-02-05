@@ -62,13 +62,16 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/translation-verb.html">Translation of functions to SQL</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/translation-function.html">Translation of dplyr verbs to SQL</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
@@ -180,7 +183,8 @@
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a></code></pre></div>
 <pre><code>## &lt;SQL&gt;</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
-## Use `mean(x, na.rm = TRUE)` to silence this warning</code></pre>
+## Use `mean(x, na.rm = TRUE)` to silence this warning
+## This warning is displayed only once per session.</code></pre>
 <pre><code>## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
 ## FROM `nycflights13::flights`
 ## GROUP BY `month`, `day`</code></pre>
