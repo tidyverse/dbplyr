@@ -6,6 +6,9 @@ sql_translate_env.Hive <- function(con) {
       cot = function(x){
         sql_expr(1 / tan(!!x))
       },
+      quantile = sql_quantile("PERCENTILE"),
+      median = sql_median("PERCENTILE"),
+
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }

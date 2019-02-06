@@ -4,6 +4,11 @@
   more consistent with `dplyr`. It allows to sort by groups if desired. The default 
   is `FALSE` (#115)
 
+* New translation for `median()` and `quantile()`. Works for ANSI compliant
+  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
+  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  (#169)
+
 * Joins and semi-joins no longer add an unneeded subquery (#236). This is
   faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
   the previous argument was called `root` and confused me.

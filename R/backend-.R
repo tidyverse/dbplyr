@@ -2,6 +2,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
+#' @include translate-sql-quantile.R
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
@@ -235,6 +236,10 @@ base_agg <- sql_translator(
   min        = sql_aggregate("MIN"),
   max        = sql_aggregate("MAX"),
 
+  # Ordered set functions
+  quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
+  median = sql_median("PERCENTILE_CONT", "ordered"),
+
   # first = sql_prefix("FIRST_VALUE", 1),
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
@@ -307,6 +312,12 @@ base_win <- sql_translator(
   sum   = win_aggregate("SUM"),
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
+
+  # Ordered set functions
+  quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),
+  median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
+
+  # Counts
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
@@ -349,6 +360,8 @@ base_no_win <- sql_translator(
   sum          = win_absent("SUM"),
   min          = win_absent("MIN"),
   max          = win_absent("MAX"),
+  median       = win_absent("PERCENTILE_CONT"),
+  quantile    = win_absent("PERCENTILE_CONT"),
   n            = win_absent("N"),
   n_distinct   = win_absent("N_DISTINCT"),
   cummean      = win_absent("MEAN"),

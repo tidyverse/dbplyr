@@ -47,6 +47,8 @@ sql_translate_env.Teradata <- function(con) {
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
       cot           = sql_cot(),
+      quantile = sql_quantile("APPROX_PERCENTILE"),
+      median = sql_median("APPROX_PERCENTILE"),
       nchar         = sql_prefix("CHARACTER_LENGTH"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
@@ -72,7 +74,9 @@ sql_translate_env.Teradata <- function(con) {
     sql_translator(.parent = base_odbc_win,
       cor           = win_absent("cor"),
       cov           = win_absent("cov"),
-      var           = win_recycled("VAR_SAMP")
+      var           = win_recycled("VAR_SAMP"),
+      quantile = sql_quantile("APPROX_PERCENTILE", window = TRUE),
+      median = sql_median("APPROX_PERCENTILE", window = TRUE),
     )
 
   )}
