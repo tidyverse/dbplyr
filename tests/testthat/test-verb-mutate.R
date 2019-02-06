@@ -130,7 +130,7 @@ test_that("mutate generates simple expressions", {
     mutate(y = x + 1L) %>%
     sql_build()
 
-  expect_equal(out$select, sql('`x`', '`x` + 1 AS `y`'))
+  expect_equal(out$select, sql(x = '`x`', y = '`x` + 1'))
 })
 
 

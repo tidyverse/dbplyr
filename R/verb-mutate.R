@@ -5,6 +5,23 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval(dots, vars = op_vars(.data))
 
+  nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
+}
+
+# transmute ---------------------------------------------------------------
+
+#' @export
+transmute.tbl_lazy <- function(.data, ...) {
+  dots <- quos(..., .named = TRUE)
+  dots <- partial_eval(dots, vars = op_vars(.data))
+
+  nest_vars(.data, dots, character())
+}
+
+# helpers -----------------------------------------------------------------
+
+# TODO: refactor to remove `.data` argument and return a list of layers.
+nest_vars <- function(.data, dots, all_vars) {
   # For each expression, check if it uses any newly created variables.
   # If so, nest the mutate()
   new_vars <- character()
@@ -14,7 +31,8 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
     used_vars <- all_names(get_expr(dots[[i]]))
 
     if (any(used_vars %in% new_vars)) {
-      .data <- add_op_single("mutate", .data, dots = dots[new_vars])
+      .data$ops <- new_op_select(.data$ops, carry_over(all_vars, dots[new_vars]))
+      all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
     } else {
@@ -25,70 +43,28 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   if (init != 0L) {
     dots <- dots[-seq2(1L, init - 1)]
   }
-  add_op_single("mutate", .data, dots = dots)
+  .data$ops <- new_op_select(.data$ops, carry_over(all_vars, dots))
+  .data
 }
 
-#' @export
-op_vars.op_mutate <- function(op) {
-  unique(c(op_vars(op$x), names(op$dots)))
-}
+# Combine a selection (passed through from subquery)
+# with new actions
+carry_over <- function(sel = character(), act = list()) {
+  if (is.null(names(sel))) {
+    names(sel) <- sel
+  }
+  sel <- syms(sel)
 
-#' @export
-sql_build.op_mutate <- function(op, con, ...) {
-  vars <- op_vars(op$x)
+  # Keep last of duplicated acts
+  act <- act[!duplicated(names(act), fromLast = TRUE)]
 
-  new_vars <- translate_sql_(
-    op$dots,
-    con = con,
-    vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
-    vars_frame = op_frame(op),
-    context = list(clause = "SELECT")
-  )
+  # Preserve order of sel
+  both <- intersect(names(sel), names(act))
+  sel[both] <- act[both]
 
-  select_query(
-    sql_build(op$x, con),
-    select = overwrite_vars(vars, new_vars, con)
-  )
-}
+  # Adding new variables at end
+  new <- setdiff(names(act), names(sel))
 
-# transmute ---------------------------------------------------------------
-
-#' @export
-transmute.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("transmute", .data, dots = dots)
-}
-
-#' @export
-op_vars.op_transmute <- function(op) {
-  c(op_grps(op$x), names(op$dots))
-}
-
-#' @export
-sql_build.op_transmute <- function(op, con, ...) {
-  new_vars <- translate_sql_(
-    op$dots, con,
-    vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
-    vars_frame = op_frame(op),
-    context = list(clause = "SELECT")
-  )
-
-  select_query(
-    sql_build(op$x, con),
-    select = new_vars
-  )
-}
-
-# helpers -----------------------------------------------------------------
-
-overwrite_vars <- function(vars, new_vars, con) {
-  all_names <- unique(c(vars, names(new_vars)))
-  new_idx <- match(names(new_vars), all_names)
-  all_vars <- c.sql(ident(all_names), con = con)
-  all_vars[new_idx] <- c.sql(new_vars, con = con)
-  all_vars
+  c(sel, act[new])
 }
 

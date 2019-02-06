@@ -22,7 +22,7 @@ sql_build.op_filter <- function(op, con, ...) {
 
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
-    mutated <- sql_build(op_single("mutate", op$x, dots = where$comp), con = con)
+    mutated <- sql_build(new_op_select(op$x, carry_over(vars, where$comp)), con = con)
     where_sql <- translate_sql_(where$expr, con = con, context = list(clause = "WHERE"))
 
     select_query(mutated, select = ident(vars), where = where_sql)

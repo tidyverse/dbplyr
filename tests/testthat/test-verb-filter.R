@@ -88,5 +88,3 @@ test_that("filter generates simple expressions", {
 
   expect_equal(out$where, sql('`x` > 1'))
 })
-
-

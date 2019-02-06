@@ -45,10 +45,8 @@ test_that("ungroup drops PARTITION BY", {
     ungroup() %>%
     mutate(x = rank(x)) %>%
     sql_build()
-  expect_equal(out$select, sql('RANK() OVER (ORDER BY `x`) AS `x`'))
-
+  expect_equal(out$select, sql(x = 'RANK() OVER (ORDER BY `x`)'))
 })
-
 
 # ops ---------------------------------------------------------------------
 

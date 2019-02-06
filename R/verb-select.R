@@ -41,13 +41,17 @@ op_vars.op_select <- function(op) {
 op_grps.op_select <- function(op) {
   # Find renamed variables
   symbols <- purrr::keep(op$args$vars, is_symbol)
-  vars <- purrr::map_chr(symbols, as_string)
+  new2old <- purrr::map_chr(symbols, as_string)
+  old2new <- set_names(names(new2old), new2old)
 
-  names(vars)[match(op_grps(op$x), vars)]
+  grps <- op_grps(op$x)
+  grps[grps %in% names(old2new)] <- old2new[grps]
+  grps
 }
 
 #' @export
 sql_build.op_select <- function(op, con, ...) {
+
   new_vars <- translate_sql_(
     op$args$vars, con,
     vars_group = op_grps(op),
