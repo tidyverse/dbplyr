@@ -34,7 +34,7 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
     .data,
     dots = dots,
     args = list(.by_group = .by_group)
-    )
+  )
 }
 
 #' @export
@@ -50,10 +50,11 @@ op_desc.op_arrange <- function(x, ...) {
 #' @export
 sql_build.op_arrange <- function(op, con, ...) {
   order_vars <- translate_sql_(op$dots, con, context = list(clause = "ORDER"))
-  if(op$args$.by_group) {
+  if (op$args$.by_group) {
+    order_by <- c.sql(ident(op_grps(op$x)), order_vars, con = con)
     select_query(
       sql_build(op$x, con),
-      order_by =  c.sql(ident(op_grps(op$x)), order_vars, con = con)
+      order_by = order_by
     )
   } else {
     select_query(
