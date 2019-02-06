@@ -1,46 +1,63 @@
-# select ------------------------------------------------------------------
+# select and rename -----------------------------------------------------------
 
 #' @export
 select.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
-  add_op_single("select", .data, dots = dots)
-}
 
-#' @export
-sql_build.op_select <- function(op, con, ...) {
-  vars <- tidyselect::vars_select(op_vars(op$x), !!!op$dots, .include = op_grps(op$x))
-  select_query(sql_build(op$x, con), ident(vars))
-}
+  old_vars <- op_vars(.data$ops)
+  new_vars <- tidyselect::vars_select(old_vars, !!!dots, .include = op_grps(.data$ops))
 
-#' @export
-op_vars.op_select <- function(op) {
-  names(tidyselect::vars_select(op_vars(op$x), !!!op$dots, .include = op_grps(op$x)))
+  .data$ops <- new_op_select(.data$ops, syms(new_vars))
+  .data
 }
-
-# rename ------------------------------------------------------------------
 
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
-  add_op_single("rename", .data, dots = dots)
+
+  old_vars <- op_vars(.data$ops)
+  new_vars <- tidyselect::vars_rename(old_vars, !!!dots)
+
+  .data$ops <- new_op_select(.data$ops, syms(new_vars))
+  .data
+}
+
+# op_select ---------------------------------------------------------------
+
+# SELECT in the SQL sense - powers select(), rename(), mutate(), and transmute()
+new_op_select <- function(x, vars) {
+  stopifnot(inherits(x, "op"))
+  stopifnot(is.list(vars))
+
+  op_single("select", x, dots = list(), args = list(vars = vars))
 }
 
 #' @export
-op_vars.op_rename <- function(op) {
-  vars <- tidyselect::vars_rename(op_vars(op$x), !!!op$dots)
-  names(vars)
+op_vars.op_select <- function(op) {
+  names(op$args$vars)
 }
 
 #' @export
-op_grps.op_rename <- function(op) {
-  vars <- tidyselect::vars_rename(op_grps(op$x), !!!op$dots, .strict = FALSE)
-  names(vars)
+op_grps.op_select <- function(op) {
+  # Find renamed variables
+  symbols <- purrr::keep(op$args$vars, is_symbol)
+  vars <- purrr::map_chr(symbols, as_string)
+
+  names(vars)[match(op_grps(op$x), vars)]
 }
 
 #' @export
-sql_build.op_rename <- function(op, con, ...) {
-  vars <- tidyselect::vars_rename(op_vars(op$x), !!!op$dots)
-  select_query(sql_build(op$x, con), ident(vars))
-}
+sql_build.op_select <- function(op, con, ...) {
+  new_vars <- translate_sql_(
+    op$args$vars, con,
+    vars_group = op_grps(op),
+    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
+    vars_frame = op_frame(op),
+    context = list(clause = "SELECT")
+  )
 
+  select_query(
+    sql_build(op$x, con),
+    select = new_vars
+  )
+}
