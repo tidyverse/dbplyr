@@ -46,7 +46,7 @@ test_that("grouped arrange doesn't order by groups", {
 })
 
 test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
-  lf <- dbplyr::lazy_frame(x = 1, y = 1, con = simulate_dbi())
+  lf <- lazy_frame(x = 1, y = 1, con = simulate_dbi())
   out <- lf %>%
     group_by(x) %>%
     arrange(y, .by_group = TRUE) %>%
@@ -67,6 +67,5 @@ test_that("multiple arranges combine", {
   out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
 
   expect_equal(op_sort(out), list(~x, ~y))
-
 })
 
