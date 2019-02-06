@@ -7,7 +7,7 @@ select.tbl_lazy <- function(.data, ...) {
   old_vars <- op_vars(.data$ops)
   new_vars <- tidyselect::vars_select(old_vars, !!!dots, .include = op_grps(.data$ops))
 
-  .data$ops <- new_op_select(.data$ops, syms(new_vars))
+  .data$ops <- op_select(.data$ops, syms(new_vars))
   .data
 }
 
@@ -18,11 +18,38 @@ rename.tbl_lazy <- function(.data, ...) {
   old_vars <- op_vars(.data$ops)
   new_vars <- tidyselect::vars_rename(old_vars, !!!dots)
 
-  .data$ops <- new_op_select(.data$ops, syms(new_vars))
+  .data$ops <- op_select(.data$ops, syms(new_vars))
   .data
 }
 
 # op_select ---------------------------------------------------------------
+
+op_select <- function(x, vars) {
+  if (inherits(x, "op_select")) {
+    # Special optimisation when applied to pure projection() - this is
+    # conservative and we could expand to any op_select() if combined with
+    # the logic in nest_vars()
+    prev_vars <- x$args$vars
+
+    if (purrr::every(vars, is.symbol)) {
+      # if current operation is pure projection
+      # we can just subset the previous selection
+      sel_vars <- purrr::map_chr(vars, as_string)
+      vars <- set_names(prev_vars[sel_vars], names(sel_vars))
+      x <- x$x
+    } else if (purrr::every(prev_vars, is.symbol)) {
+      # if previous operation is pure projection
+      sel_vars <- purrr::map_chr(prev_vars, as_string)
+      if (all(names(sel_vars) == sel_vars)) {
+        # and there's no renaming
+        # we can just ignore the previous step
+        x <- x$x
+      }
+    }
+  }
+
+  new_op_select(x, vars)
+}
 
 # SELECT in the SQL sense - powers select(), rename(), mutate(), and transmute()
 new_op_select <- function(x, vars) {

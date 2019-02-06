@@ -31,7 +31,7 @@ nest_vars <- function(.data, dots, all_vars) {
     used_vars <- all_names(get_expr(dots[[i]]))
 
     if (any(used_vars %in% new_vars)) {
-      .data$ops <- new_op_select(.data$ops, carry_over(all_vars, dots[new_vars]))
+      .data$ops <- op_select(.data$ops, carry_over(all_vars, dots[new_vars]))
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
@@ -43,7 +43,7 @@ nest_vars <- function(.data, dots, all_vars) {
   if (init != 0L) {
     dots <- dots[-seq2(1L, init - 1)]
   }
-  .data$ops <- new_op_select(.data$ops, carry_over(all_vars, dots))
+  .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
   .data
 }
 

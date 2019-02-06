@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
+  be collapsed into a single query, instead of always generate a subquery
+  (#213).
+
 * New vignette describing some advantages for dplyr of SQL (#205) and giving
   some advice about writing SQL if needed (#196).
 
