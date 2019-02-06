@@ -6,8 +6,8 @@ test_that("custom scalar functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_impala())
   }
 
-  expect_equal(trans(as.Date(x)),       sql("CAST(`x` AS VARCHAR(10))"))
-  expect_equal(trans(ceiling(x)),       sql("CEIL(`x`)"))
+  expect_equal(trans(as.Date(x)), sql("CAST(`x` AS VARCHAR(10))"))
+  expect_equal(trans(ceiling(x)), sql("CEIL(`x`)"))
 
 })
 
