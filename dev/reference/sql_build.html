@@ -185,7 +185,7 @@ always call <code>sql_render()</code>.</p>
 
 <span class='fu'>sql_build</span>(<span class='no'>op</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
-<span class='fu'>sql_render</span>(<span class='no'>query</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>sql_render</span>(<span class='no'>query</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>bare_identifier_ok</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='fu'>sql_optimise</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
@@ -205,6 +205,12 @@ without an active database connection.</p></td>
     <tr>
       <th>...</th>
       <td><p>Other arguments passed on to the methods. Not currently used.</p></td>
+    </tr>
+    <tr>
+      <th>bare_identifier_ok</th>
+      <td><p>Is it ok to return a bare table identifier.
+Set to <code>TRUE</code> when generating queries to be nested within other
+queries where a bare table name is ok.</p></td>
     </tr>
     </table>
     

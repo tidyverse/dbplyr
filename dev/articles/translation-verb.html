@@ -154,8 +154,7 @@
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a></code></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
-## FROM (SELECT `distance`, `air_time`
-## FROM `nycflights13::flights`)</code></pre>
+## FROM `nycflights13::flights`</code></pre>
 <p>(As you can see here, the generated SQL isn’t always as minimal as you might generate by hand.)</p>
 </li>
 <li>
