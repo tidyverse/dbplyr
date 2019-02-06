@@ -165,7 +165,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
-<span class='fu'>arrange</span>(<span class='no'>.data</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>arrange</span>(<span class='no'>.data</span>, <span class='no'>...</span>, <span class='kw'>.by_group</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -179,6 +179,11 @@ for <code>tbl_df()</code>, <code>dtplyr::tbl_dt()</code> and <code><a href='src_
       <th>...</th>
       <td><p>Comma separated list of unquoted variable names. Use
 <code>desc()</code> to sort a variable in descending order.</p></td>
+    </tr>
+    <tr>
+      <th>.by_group</th>
+      <td><p>If <code>TRUE</code>, will sort first by grouping variable. Applies to
+grouped data frames only.</p></td>
     </tr>
     </table>
     
