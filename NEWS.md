@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `mutate(df, x = NULL)` now drops `x` from the output, like when working with
+  local data frames (#194).
+
 * `partial_eval()` processes inlined functions (including rlang lambda 
   functions). This makes dbplyr work with more forms of scoped verbs like
   `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
