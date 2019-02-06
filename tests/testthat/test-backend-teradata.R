@@ -7,12 +7,6 @@ test_that("custom scalar translated correctly", {
   }
 
   expect_equal(trans(x != y),           sql("`x` <> `y`"))
-  expect_equal(trans(bitwNot(x)),       sql("BITNOT(`x`)"))
-  expect_equal(trans(bitwAnd(x, 128)),  sql("BITAND(`x`, 128)"))
-  expect_equal(trans(bitwOr(x, 128)),   sql("BITOR(`x`, 128)"))
-  expect_equal(trans(bitwXor(x, 128)),  sql("BITXOR(`x`, 128)"))
-  expect_equal(trans(bitwShiftL(x, 2)), sql("SHIFTLEFT(`x`, 2)"))
-  expect_equal(trans(bitwShiftR(x, 2)), sql("SHIFTRIGHT(`x`, 2)"))
   expect_equal(trans(as.numeric(x)),    sql("CAST(`x` AS NUMERIC)"))
   expect_equal(trans(as.double(x)),     sql("CAST(`x` AS NUMERIC)"))
   expect_equal(trans(as.character(x)),  sql("CAST(`x` AS VARCHAR(MAX))"))
@@ -25,6 +19,21 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(substr(x, 1, 2)),  sql("SUBSTR(`x`, 1.0, 2.0)"))
 
   expect_error(trans(paste(x)),         sql("not supported"))
+
+})
+
+test_that("custom bitwise operations translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_impala())
+  }
+
+  expect_equal(trans(bitwNot(x)),       sql("BITNOT(`x`)"))
+  expect_equal(trans(bitwAnd(x, 128)),  sql("BITAND(`x`, 128)"))
+  expect_equal(trans(bitwOr(x, 128)),   sql("BITOR(`x`, 128)"))
+  expect_equal(trans(bitwXor(x, 128)),  sql("BITXOR(`x`, 128)"))
+  expect_equal(trans(bitwShiftL(x, 2)), sql("SHIFTLEFT(`x`, 2)"))
+  expect_equal(trans(bitwShiftR(x, 2)), sql("SHIFTRIGHT(`x`, 2)"))
 
 })
 
