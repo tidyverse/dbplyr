@@ -41,6 +41,12 @@ sql_translate_env.Teradata <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       `!=`          = sql_infix("<>"),
+      bitwNot       = sql_prefix("BITNOT", 1),
+      bitwAnd       = function(x, y) sql_prefix("BITAND", 2)(x, as.integer(y)),
+      bitwOr        = function(x, y) sql_prefix("BITOR", 2)(x, as.integer(y)),
+      bitwXor       = function(x, y) sql_prefix("BITXOR", 2)(x, as.integer(y)),
+      bitwShiftL    = function(x, y) sql_prefix("SHIFTLEFT", 2)(x, as.integer(y)),
+      bitwShiftR    = function(x, y) sql_prefix("SHIFTRIGHT", 2)(x, as.integer(y)),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),

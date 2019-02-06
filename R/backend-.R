@@ -84,6 +84,23 @@ base_scalar <- sql_translator(
     sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
 
+  # bitwise operators
+  # SQL Syntax reference links:
+  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-ArithmeticOperators
+  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_bit_functions.html
+  #   PostgreSQL: https://www.postgresql.org/docs/7.4/functions-math.html
+  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/bitwise-operators-transact-sql?view=sql-server-2017
+  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html
+  #   Oracle: https://docs.oracle.com/cd/E19253-01/817-6223/chp-typeopexpr-7/index.html
+  #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
+  #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
+  bitwNot    = function(x) sql_expr(~ !!x),
+  bitwAnd    = function(x, y) sql_infix("&")(x, as.integer(y)),
+  bitwOr     = function(x, y) sql_infix("|")(x, as.integer(y)),
+  bitwXor    = function(x, y) sql_infix("^")(x, as.integer(y)),
+  bitwShiftL = function(x, y) sql_infix("<<")(x, as.integer(y)),
+  bitwShiftR = function(x, y) sql_infix(">>")(x, as.integer(y)),
+
   abs     = sql_prefix("ABS", 1),
   acos    = sql_prefix("ACOS", 1),
   asin    = sql_prefix("ASIN", 1),
