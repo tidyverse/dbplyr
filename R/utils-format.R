@@ -1,4 +1,3 @@
-
 wrap <- function(..., indent = 0) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(
@@ -11,17 +10,13 @@ wrap <- function(..., indent = 0) {
   paste0(wrapped, collapse = "\n")
 }
 
-rule <- function(pad = "-", gap = 2L) {
-  paste0(rep(pad, getOption("width") - gap), collapse = "")
+indent <- function(x) {
+  x <- paste0(x, collapse = "\n")
+  paste0("  ", gsub("\n", "\n  ", x))
 }
 
-named_rule <- function(..., pad = "-") {
-  if (nargs() == 0) {
-    title <- ""
-  } else {
-    title <- paste0(...)
-  }
-  paste0(title, " ", rule(pad = pad, gap = nchar(title) - 1))
+indent_print <- function(x) {
+  indent(utils::capture.output(print(x)))
 }
 
 # function for the thousand separator,

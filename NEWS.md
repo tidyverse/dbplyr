@@ -1,7 +1,16 @@
 # dbplyr (development version)
 
-* Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` more consistent
-with `dplyr`. It allows to sort by groups if desired. The default is `FALSE` (#115)
+* Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
+  more consistent with `dplyr`. It allows to sort by groups if desired. The default 
+  is `FALSE` (#115)
+
+* Joins and semi-joins no longer add an unneeded subquery (#236). This is
+  faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
+  the previous argument was called `root` and confused me.
+
+* Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
+  be collapsed into a single query, instead of always generate a subquery
+  (#213).
 
 * New vignette describing some advantages for dplyr of SQL (#205) and giving
   some advice about writing SQL if needed (#196).
@@ -68,7 +77,7 @@ with `dplyr`. It allows to sort by groups if desired. The default is `FALSE` (#1
   ODBC based translations).
 
 * `tbl_lazy()` (used for testing) now records class of src simulation, and 
-  gains informative print method (#111).
+  prints generated SQL (#111).
 
 * `sql_infix()` gains a `pad` argument for the occassional operator that 
   doesn't need to be surrounded by spaces.

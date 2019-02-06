@@ -39,7 +39,8 @@ print.select_query <- function(x, ...) {
     if (x$distinct) " DISTINCT", ">\n",
     sep = ""
   )
-  cat("From:     ", gsub("\n", " ", sql_render(x$from, root = FALSE)), "\n", sep = "")
+  cat_line("From:")
+  cat_line(indent_print(sql_build(x$from)))
 
   if (length(x$select))   cat("Select:   ", named_commas(x$select), "\n", sep = "")
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
@@ -92,8 +93,11 @@ select_query_clauses <- function(x) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., root = FALSE) {
-  from <- sql_subquery(con, sql_render(query$from, con, ..., root = root), name = NULL)
+sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE) {
+  from <- sql_subquery(con,
+    sql_render(query$from, con, ..., bare_identifier_ok = TRUE),
+    name = NULL
+  )
 
   sql_select(
     con, query$select, from, where = query$where, group_by = query$group_by,
