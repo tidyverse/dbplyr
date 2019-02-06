@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
+  more consistent with `dplyr`. It allows to sort by groups if desired. The default 
+  is `FALSE` (#115)
+
 * Joins and semi-joins no longer add an unneeded subquery (#236). This is
   faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
   the previous argument was called `root` and confused me.
