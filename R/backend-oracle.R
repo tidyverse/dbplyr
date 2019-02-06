@@ -898,14 +898,14 @@ sql_translate_env.Oracle <- function(con) {
       leap_year = function(x) {
         warning("Oracle SQL does not support boolean types, return will be 'TRUE' or 'FALSE' strings")
         build_sql(
-          "CASE WHEN REMAINDER(",
+          "CASE WHEN REMAINDER(extract( year from ",
           !!x,
-          "4) = 0 AND (
-          REMAINDER(",
+          "), 4) = 0 AND (
+          REMAINDER(extract( year from ",
           !!x,
-          "100) != 0 or REMAINDER(",
+          "), 100) != 0 or REMAINDER(extract( year from ",
           !!x,
-          "400) = 0)
+          "), 400) = 0)
           THEN 'TRUE' ELSE 'FALSE' END"
           )
       }
