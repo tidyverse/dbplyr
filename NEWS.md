@@ -65,7 +65,7 @@
   ODBC based translations).
 
 * `tbl_lazy()` (used for testing) now records class of src simulation, and 
-  gains informative print method (#111).
+  prints generated SQL (#111).
 
 * `sql_infix()` gains a `pad` argument for the occassional operator that 
   doesn't need to be surrounded by spaces.

@@ -45,9 +45,13 @@ dim.tbl_lazy <- function(x) {
 }
 
 #' @export
+print.tbl_lazy <- function(x, ...) {
+  show_query(x)
+}
+
+#' @export
 as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
-  message("Use show_query() to see generated SQL")
-  data.frame()
+  stop("Can not coerce `tbl_lazy` to data.frame", call. = FALSE)
 }
 
 #' @export
