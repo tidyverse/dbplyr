@@ -9,6 +9,14 @@ test_that("two arranges equivalent to one", {
   expect_equal_tbl(mf1, mf2)
 })
 
+# sql_render --------------------------------------------------------------
+
+test_that("quoting for rendering ordered grouped table", {
+  out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y)
+  expect_match(out %>% sql_render, "^SELECT [*]\nFROM `[^`]*`\nORDER BY `y`$")
+  expect_equal(out %>% collect, tibble(x = 1, y = 2))
+})
+
 
 # sql_build ---------------------------------------------------------------
 
@@ -46,5 +54,20 @@ test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
     sql_build()
 
   expect_equal(out$order_by, sql(c('`x`','`y`')))
+
+# ops ---------------------------------------------------------------------
+
+test_that("arranges captures DESC", {
+  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(desc(x))
+
+  expect_equal(op_sort(out), list(~desc(x)))
+})
+
+test_that("multiple arranges combine", {
+  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
+  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+
+  expect_equal(op_sort(out), list(~x, ~y))
+
 })
 

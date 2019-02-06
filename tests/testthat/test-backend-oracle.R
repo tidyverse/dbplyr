@@ -13,7 +13,7 @@ test_that("custom scalar functions translated correctly", {
 })
 
 test_that("queries translate correctly", {
-  mf <- lazy_frame(x = 1, src = simulate_oracle())
+  mf <- lazy_frame(x = 1, con = simulate_oracle())
 
   expect_match(
     mf %>% head() %>% sql_render(simulate_oracle()),

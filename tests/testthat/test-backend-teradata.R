@@ -47,10 +47,10 @@ test_that("custom window functions translated correctly", {
 })
 
 test_that("filter and mutate translate is.na correctly", {
-  mf <- lazy_frame(x = 1, src = simulate_teradata())
+  mf <- lazy_frame(x = 1, con = simulate_teradata())
 
   expect_equal(
-    mf %>% head() %>% show_query(),
+    mf %>% head() %>% sql_render(),
     sql("SELECT  TOP 6 *\nFROM `df`")
   )
 

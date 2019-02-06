@@ -3,7 +3,8 @@
 #' `sql_build()` creates a `select_query` S3 object, that is rendered
 #' to a SQL string by `sql_render()`. The output from `sql_build()` is
 #' designed to be easy to test, as it's database agnostic, and has
-#' a hierarchical structure.
+#' a hierarchical structure. Outside of testing, however, you should
+#' always call `sql_render()`.
 #'
 #' `sql_build()` is generic over the lazy operations, \link{lazy_ops},
 #' and generates an S3 object that represents the query. `sql_render()`
@@ -27,7 +28,7 @@ sql_build <- function(op, con = NULL, ...) {
 }
 
 #' @export
-sql_build.tbl_lazy <- function(op, con = op$src$con %||% op$src, ...) {
+sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
   # only used for testing
   qry <- sql_build(op$ops, con = con, ...)
   sql_optimise(qry, con = con, ...)
@@ -42,9 +43,14 @@ sql_render <- function(query, con = NULL, ...) {
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con %||% query$src, ...) {
-  # only used for testing
-  qry <- sql_build(query$ops, con = con, ...)
+sql_render.tbl_lazy <- function(query, con = query$src$con, ...) {
+  sql_render(query$ops, con = con, ...)
+}
+
+#' @export
+sql_render.op <- function(query, con = NULL, ...) {
+  qry <- sql_build(query, con = con, ...)
+  qry <- sql_optimise(qry, con = con, ...)
   sql_render(qry, con = con, ...)
 }
 

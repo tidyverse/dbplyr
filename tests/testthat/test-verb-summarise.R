@@ -18,6 +18,13 @@ test_that("summarise performs partial evaluation", {
   expect_equal(mf2$y, 1)
 })
 
+# sql-render --------------------------------------------------------------
+
+test_that("quoting for rendering summarized grouped table", {
+  out <- memdb_frame(x = 1) %>% group_by(x) %>% summarize(n = n())
+  expect_match(out %>% sql_render, "^SELECT `x`, COUNT[(][)] AS `n`\nFROM `[^`]*`\nGROUP BY `x`$")
+  expect_equal(out %>% collect, tibble(x = 1, n = 1L))
+})
 
 # sql-build ---------------------------------------------------------------
 
@@ -29,5 +36,37 @@ test_that("summarise generates group_by and select", {
 
   expect_equal(out$group_by, sql('`g`'))
   expect_equal(out$select, sql('`g`', 'COUNT() AS `n`'))
+})
+
+
+# ops ---------------------------------------------------------------------
+
+test_that("summarise replaces existing", {
+  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% summarise(z = 1)
+  expect_equal(op_vars(out), "z")
+})
+
+test_that("summarised vars are always named", {
+  mf <- dbplyr::memdb_frame(a = 1)
+
+  out1 <- mf %>% summarise(1) %>% op_vars()
+  expect_equal(out1, "1")
+})
+
+test_that("grouped summary keeps groups", {
+  out <- data_frame(g = 1, x = 1) %>%
+    tbl_lazy() %>%
+    group_by(g) %>%
+    summarise(y = 1)
+  expect_equal(op_vars(out), c("g", "y"))
+})
+
+test_that("summarise drops one grouping level", {
+  df <- data_frame(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy() %>% group_by(g1, g2)
+  out1 <- df %>% summarise(y = 1)
+  out2 <- out1 %>% summarise(y = 2)
+
+  expect_equal(op_grps(out1), "g1")
+  expect_equal(op_grps(out2), character())
 })
 

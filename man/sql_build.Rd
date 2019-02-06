@@ -41,7 +41,8 @@ without an active database connection.}
 \code{sql_build()} creates a \code{select_query} S3 object, that is rendered
 to a SQL string by \code{sql_render()}. The output from \code{sql_build()} is
 designed to be easy to test, as it's database agnostic, and has
-a hierarchical structure.
+a hierarchical structure. Outside of testing, however, you should
+always call \code{sql_render()}.
 }
 \details{
 \code{sql_build()} is generic over the lazy operations, \link{lazy_ops},

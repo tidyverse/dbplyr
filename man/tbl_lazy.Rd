@@ -5,9 +5,9 @@
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
 \usage{
-tbl_lazy(df, src = simulate_dbi())
+tbl_lazy(df, con = simulate_dbi(), src = NULL)
 
-lazy_frame(..., src = simulate_dbi())
+lazy_frame(..., con = simulate_dbi(), src = NULL)
 }
 \description{
 These functions are useful for testing SQL generation without having to
@@ -18,7 +18,7 @@ available database simulations.
 library(dplyr)
 df <- data.frame(x = 1, y = 2)
 
-df_sqlite <- tbl_lazy(df, src = simulate_sqlite())
+df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
 df_sqlite \%>\% summarise(x = sd(x, na.rm = TRUE)) \%>\% show_query()
 }
 \keyword{internal}

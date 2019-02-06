@@ -32,6 +32,22 @@ test_that("distinct throws error if column is specified and .keep_all is TRUE", 
 })
 
 
+# sql-render --------------------------------------------------------------
+
+test_that("distinct adds DISTINCT suffix", {
+  out <- memdb_frame(x = c(1, 1)) %>% distinct()
+
+  expect_match(out %>% sql_render(), "SELECT DISTINCT")
+  expect_equal(out %>% collect(), tibble(x = 1))
+})
+
+test_that("distinct over columns uses GROUP BY", {
+  out <- memdb_frame(x = c(1, 2), y = c(1, 1)) %>% distinct(y)
+
+  expect_match(out %>% sql_render(), "SELECT `y`.*GROUP BY `y`")
+  expect_equal(out %>% collect(), tibble(y = 1))
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("distinct sets flagged", {
@@ -44,5 +60,22 @@ test_that("distinct sets flagged", {
     distinct() %>%
     sql_build()
   expect_true(out2$distinct)
+})
+
+
+# ops ---------------------------------------------------------------------
+
+test_that("distinct has complicated rules", {
+  out <- lazy_frame(x = 1, y = 2) %>% distinct()
+  expect_equal(op_vars(out), c("x", "y"))
+
+  out <- lazy_frame(x = 1, y = 2) %>% distinct(x, .keep_all = TRUE)
+  expect_equal(op_vars(out), c("x", "y"))
+
+  out <- lazy_frame(x = 1, y = 2, z = 3) %>% distinct(x, y)
+  expect_equal(op_vars(out), c("x", "y"))
+
+  out <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(x) %>% distinct(y)
+  expect_equal(op_vars(out), c("x", "y"))
 })
 

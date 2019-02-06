@@ -3,9 +3,24 @@
 * Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` more consistent
 with `dplyr`. It allows to sort by groups if desired. The default is `FALSE` (#115)
 
+* New vignette describing some advantages for dplyr of SQL (#205) and giving
+  some advice about writing SQL if needed (#196).
+
+* Aggregation functions only warn once per session about the use of 
+  `na.rm = TRUE` (#216).
+
+* New `vignette("reprex")` gives some hints on creeating reprexes that work 
+  anywhere (#117).
+
+* New `tbl_memdb()` for creating reprexes (to match `tbl_lazy()`)
+
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
+
+* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
+  shouldn't affect any downstream code unless you were previously working
+  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
 
 * SQL simulation has been overhauled. It's now better documented, and it always
   uses `` ` `` for field names and `'` for string.

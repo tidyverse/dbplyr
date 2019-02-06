@@ -131,6 +131,7 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
 
 # sql_render --------------------------------------------------------------
 
+# Used by implyr
 #' @rdname db_copy_to
 #' @export
 db_sql_render <- function(con, sql, ...) {
@@ -139,6 +140,5 @@ db_sql_render <- function(con, sql, ...) {
 
 #' @export
 db_sql_render.DBIConnection <- function(con, sql, ...) {
-  qry <- sql_build(sql, con = con, ...)
-  sql_render(qry, con = con, ...)
+  sql_render(sql, con = con, ...)
 }

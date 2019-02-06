@@ -106,8 +106,9 @@ win_rank <- function(f) {
 #' @export
 win_aggregate <- function(f) {
   force(f)
+  warned <- FALSE
   function(x, na.rm = FALSE) {
-    check_na_rm(f, na.rm)
+    warned <<- check_na_rm(f, na.rm, warned)
     frame <- win_current_frame()
 
     win_over(
