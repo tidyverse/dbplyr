@@ -42,7 +42,11 @@ format.sql <- function(x, ...) {
   if (length(x) == 0) {
     paste0("<SQL> [empty]")
   } else {
-    paste0("<SQL> ", x)
+    if (!is.null(names(x))) {
+      paste0("<SQL> ", paste0(x, " AS ", names(x)))
+    } else {
+      paste0("<SQL> ", x)
+    }
   }
 }
 

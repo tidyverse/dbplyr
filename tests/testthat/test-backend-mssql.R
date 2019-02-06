@@ -66,7 +66,7 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% head() %>% sql_render(),
-    sql("SELECT  TOP 6 *\nFROM `df`")
+    sql("SELECT TOP(6) *\nFROM `df`")
   )
 
   expect_equal(

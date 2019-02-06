@@ -13,18 +13,19 @@ set_op_query <- function(x, y, type = type) {
 
 #' @export
 print.set_op_query <- function(x, ...) {
-  cat("<SQL ", x$type, ">\n", sep = "")
+  cat_line("<SQL ", toupper(x$type), ">")
 
-  cat(named_rule("X"), "\n", sep = "")
-  print(x$x$ops)
-  cat(named_rule("Y"), "\n", sep = "")
-  print(x$y$ops)
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  cat_line("Y:")
+  cat_line(indent_print(sql_build(x$y)))
 }
 
 #' @export
-sql_render.set_op_query <- function(query, con = NULL, ..., root = FALSE) {
-  from_x <- sql_render(query$x, con, ..., root = TRUE)
-  from_y <- sql_render(query$y, con, ..., root = TRUE)
+sql_render.set_op_query <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+  from_x <- sql_render(query$x, con, ..., bare_identifier_ok = FALSE)
+  from_y <- sql_render(query$y, con, ..., bare_identifier_ok = FALSE)
 
   sql_set_op(con, from_x, from_y, method = query$type)
 }

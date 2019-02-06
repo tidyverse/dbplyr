@@ -14,7 +14,7 @@ test_that("even inside mutate", {
 
   expect_equal(
     out$select[[2]],
-    "CASE\nWHEN (`x` > 1) THEN ('a')\nEND AS `y`"
+    "CASE\nWHEN (`x` > 1) THEN ('a')\nEND"
   )
 })
 

@@ -44,7 +44,7 @@ test_that("filter and rename are correctly composed", {
     select(x = y)
 
   qry <- lf %>% sql_build()
-  expect_equal(qry$select, ident(x = "y"))
+  expect_equal(qry$select, sql(x = "`y`"))
   expect_equal(qry$where, sql('`x` = 1.0'))
 
   # It surprises me that this SQL works!
