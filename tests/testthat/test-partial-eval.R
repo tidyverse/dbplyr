@@ -14,6 +14,18 @@ test_that("use quosure environment for unevaluted formulas", {
   expect_equal(partial_eval(expr(~x)), ~1)
 })
 
+test_that("can look up inlined function", {
+  expect_equal(
+    partial_eval(expr((!!mean)(x)), vars = "x"),
+    expr(mean(x))
+  )
+
+  expect_equal(
+    partial_eval(expr((!!as_function("mean"))(x)), vars = "x"),
+    expr(mean(x))
+  )
+})
+
 test_that("respects tidy evaluation pronouns", {
   x <- "X"
   X <- "XX"

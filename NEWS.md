@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `partial_eval()` processes inlined functions (including rlang lambda 
+  functions). This makes dbplyr work with more forms of scoped verbs like
+  `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
+
 * Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
   more consistent with `dplyr`. It allows to sort by groups if desired. The default 
   is `FALSE` (#115)
