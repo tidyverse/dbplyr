@@ -7,3 +7,14 @@ test_that("print method doesn't change unexpectedly", {
 
   expect_known_output(print(qry), test_path("test-query-join-print.txt"))
 })
+
+test_that("generated sql doesn't change unexpectedly", {
+  lf <- lazy_frame(x = 1, y = 2)
+  reg <- list(
+    inner = inner_join(lf, lf),
+    left = left_join(lf, lf),
+    right = right_join(lf, lf),
+    full = full_join(lf, lf)
+  )
+  expect_known_output(print(reg), test_path("sql/join.sql"))
+})

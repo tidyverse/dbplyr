@@ -7,3 +7,13 @@ test_that("print method doesn't change unexpectedly", {
 
   expect_known_output(print(qry), test_path("test-query-set-op-print.txt"))
 })
+
+test_that("generated sql doesn't change unexpectedly", {
+  lf <- lazy_frame(x = 1, y = 2)
+  reg <- list(
+    union = union(lf, lf),
+    setdiff = setdiff(lf, lf),
+    intersect = intersect(lf, lf)
+  )
+  expect_known_output(print(reg), test_path("sql/setop.sql"))
+})

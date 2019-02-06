@@ -23,9 +23,9 @@ print.set_op_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.set_op_query <- function(query, con = NULL, ..., root = FALSE) {
-  from_x <- sql_render(query$x, con, ..., root = TRUE)
-  from_y <- sql_render(query$y, con, ..., root = TRUE)
+sql_render.set_op_query <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+  from_x <- sql_render(query$x, con, ..., bare_identifier_ok = FALSE)
+  from_y <- sql_render(query$y, con, ..., bare_identifier_ok = FALSE)
 
   sql_set_op(con, from_x, from_y, method = query$type)
 }

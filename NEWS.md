@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Joins and semi-joins no longer add an unneeded subquery (#236). This is
+  faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
+  the previous argument was called `root` and confused me.
+
 * Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
   be collapsed into a single query, instead of always generate a subquery
   (#213).
