@@ -62,6 +62,9 @@
       `|`            = mssql_generic_infix("|", "%OR%"),
       `||`           = mssql_generic_infix("|", "%OR%"),
 
+      bitwShiftL     = sql_not_supported("bitwShiftL"),
+      bitwShiftR     = sql_not_supported("bitwShiftR"),
+
       `if`           = mssql_sql_if,
       if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),

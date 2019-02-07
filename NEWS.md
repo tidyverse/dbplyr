@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
+  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
+  functions, the translations do not coerce arguments to integers (@davidchall, #235).
+
 * `mutate(df, x = NULL)` now drops `x` from the output, like when working with
   local data frames (#194).
 

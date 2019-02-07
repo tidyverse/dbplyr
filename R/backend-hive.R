@@ -2,6 +2,9 @@
 sql_translate_env.Hive <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
+      bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
+      bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
+
       var = sql_prefix("VARIANCE"),
       cot = function(x){
         sql_expr(1 / tan(!!x))
