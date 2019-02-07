@@ -106,9 +106,15 @@ is_tidy_pronoun <- function(call) {
 lang_partial_eval <- function(call, vars, env) {
   fun <- call[[1]]
 
-  # Inlined functions are evaluated directly
+  # Try to find the name of inlined functions
   if (is.function(fun)) {
-    return(eval_bare(call, env))
+    fun_name <- find_fun(fun)
+    if (is.null(fun_name)) {
+      # This probably won't work, but it seems like it's worth a shot.
+      return(eval_bare(call, env))
+    }
+
+    call[[1]] <- fun <- sym(fun_name)
   }
 
   # So are compound calls, EXCEPT dplyr::foo()
@@ -149,4 +155,38 @@ lang_partial_eval <- function(call, vars, env) {
     }
   }
 
+}
+
+find_fun <- function(fun) {
+  if (is_lambda(fun)) {
+    body <- body(fun)
+    if (!is_call(body)) {
+      return(NULL)
+    }
+
+    fun_name <- body[[1]]
+    if (!is_symbol(fun_name)) {
+      return(NULL)
+    }
+
+    as.character(fun_name)
+  } else if (is.function(fun)) {
+    fun_name(fun)
+  }
+}
+
+fun_name <- function(fun) {
+  pkg_env <- env_parent(global_env())
+  known <- c(ls(base_agg), ls(base_scalar))
+
+  for (x in known) {
+    if (!env_has(pkg_env, x, inherit = TRUE))
+      next
+
+    fun_x <- env_get(pkg_env, x, inherit = TRUE)
+    if (identical(fun, fun_x))
+      return(x)
+  }
+
+  NULL
 }

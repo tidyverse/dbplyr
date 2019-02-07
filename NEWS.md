@@ -3,10 +3,21 @@
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
   functions, the translations do not coerce arguments to integers (@davidchall, #235).
+* `mutate(df, x = NULL)` now drops `x` from the output, like when working with
+  local data frames (#194).
+
+* `partial_eval()` processes inlined functions (including rlang lambda 
+  functions). This makes dbplyr work with more forms of scoped verbs like
+  `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
 
 * Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
   more consistent with `dplyr`. It allows to sort by groups if desired. The default 
   is `FALSE` (#115)
+
+* New translation for `median()` and `quantile()`. Works for ANSI compliant
+  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
+  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  (#169)
 
 * Joins and semi-joins no longer add an unneeded subquery (#236). This is
   faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
