@@ -95,11 +95,11 @@ base_scalar <- sql_translator(
   #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
   #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
   bitwNot    = function(x) sql_expr(~ ((!!x))),
-  bitwAnd    = function(x, y) sql_infix("&")(x, as.integer(y)),
-  bitwOr     = function(x, y) sql_infix("|")(x, as.integer(y)),
-  bitwXor    = function(x, y) sql_infix("^")(x, as.integer(y)),
-  bitwShiftL = function(x, y) sql_infix("<<")(x, as.integer(y)),
-  bitwShiftR = function(x, y) sql_infix(">>")(x, as.integer(y)),
+  bitwAnd    = sql_infix("&"),
+  bitwOr     = sql_infix("|"),
+  bitwXor    = sql_infix("^"),
+  bitwShiftL = sql_infix("<<"),
+  bitwShiftR = sql_infix(">>"),
 
   abs     = sql_prefix("ABS", 1),
   acos    = sql_prefix("ACOS", 1),

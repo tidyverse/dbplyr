@@ -1,7 +1,8 @@
 # dbplyr (development version)
 
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
-  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()` (@davidchall, #235).
+  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
+  functions, the translations do not coerce arguments to integers (@davidchall, #235).
 
 * Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
   more consistent with `dplyr`. It allows to sort by groups if desired. The default 

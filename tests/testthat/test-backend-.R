@@ -63,10 +63,10 @@ test_that("log becomes ln", {
 # bitwise -----------------------------------------------------------------
 
 test_that("bitwise operations", {
-  expect_equal(translate_sql(bitwNot(x)),       sql("~(`x`)"))
-  expect_equal(translate_sql(bitwAnd(x, 128)),  sql("`x` & 128"))
-  expect_equal(translate_sql(bitwOr(x, 128)),   sql("`x` | 128"))
-  expect_equal(translate_sql(bitwXor(x, 128)),  sql("`x` ^ 128"))
-  expect_equal(translate_sql(bitwShiftL(x, 2)), sql("`x` << 2"))
-  expect_equal(translate_sql(bitwShiftR(x, 2)), sql("`x` >> 2"))
+  expect_equal(translate_sql(bitwNot(x)),        sql("~(`x`)"))
+  expect_equal(translate_sql(bitwAnd(x, 128L)),  sql("`x` & 128"))
+  expect_equal(translate_sql(bitwOr(x, 128L)),   sql("`x` | 128"))
+  expect_equal(translate_sql(bitwXor(x, 128L)),  sql("`x` ^ 128"))
+  expect_equal(translate_sql(bitwShiftL(x, 2L)), sql("`x` << 2"))
+  expect_equal(translate_sql(bitwShiftR(x, 2L)), sql("`x` >> 2"))
 })
