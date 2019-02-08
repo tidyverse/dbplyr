@@ -31,7 +31,7 @@ sql_select.SQLiteConnection<- function(con, select, from, where = NULL,
       stop("Only number of rows is supported. Try using sample_n() instead")
     }
   }
-  escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
+  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 #' @export
