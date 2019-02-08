@@ -41,12 +41,20 @@ sql_translate_env.Teradata <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       `!=`          = sql_infix("<>"),
+      bitwNot       = sql_prefix("BITNOT", 1),
+      bitwAnd       = sql_prefix("BITAND", 2),
+      bitwOr        = sql_prefix("BITOR", 2),
+      bitwXor       = sql_prefix("BITXOR", 2),
+      bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
+      bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
       cot           = sql_cot(),
+      quantile = sql_quantile("APPROX_PERCENTILE"),
+      median = sql_median("APPROX_PERCENTILE"),
       nchar         = sql_prefix("CHARACTER_LENGTH"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
@@ -72,7 +80,9 @@ sql_translate_env.Teradata <- function(con) {
     sql_translator(.parent = base_odbc_win,
       cor           = win_absent("cor"),
       cov           = win_absent("cov"),
-      var           = win_recycled("VAR_SAMP")
+      var           = win_recycled("VAR_SAMP"),
+      quantile = sql_quantile("APPROX_PERCENTILE", window = TRUE),
+      median = sql_median("APPROX_PERCENTILE", window = TRUE),
     )
 
   )}

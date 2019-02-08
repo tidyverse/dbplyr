@@ -24,12 +24,17 @@
 #'   arrange(is.na(a), a)
 #'
 #' @export
-arrange.tbl_lazy <- function(.data, ...) {
+arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- quos(...)
   dots <- partial_eval(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
-  add_op_single("arrange", .data, dots = dots)
+  add_op_single(
+    "arrange",
+    .data,
+    dots = dots,
+    args = list(.by_group = .by_group)
+  )
 }
 
 #' @export
@@ -45,7 +50,13 @@ op_desc.op_arrange <- function(x, ...) {
 #' @export
 sql_build.op_arrange <- function(op, con, ...) {
   order_vars <- translate_sql_(op$dots, con, context = list(clause = "ORDER"))
-  group_vars <- c.sql(ident(op_grps(op$x)), con = con)
 
-  select_query(sql_build(op$x, con), order_by = order_vars)
+  if (op$args$.by_group) {
+    order_vars <- c.sql(ident(op_grps(op$x)), order_vars, con = con)
+  }
+
+  select_query(
+    sql_build(op$x, con),
+    order_by = order_vars
+  )
 }

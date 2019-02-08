@@ -17,7 +17,9 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1.0, 2.0)"))
   expect_equal(trans(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
 
-  expect_error(trans(paste(x)),        sql("not available"))
+  expect_error(trans(bitwShiftL(x, 2L)), sql("not available"))
+  expect_error(trans(bitwShiftR(x, 2L)), sql("not available"))
+  expect_error(trans(paste(x)),          sql("not available"))
 
 })
 
@@ -64,7 +66,7 @@ test_that("filter and mutate translate is.na correctly", {
 
   expect_equal(
     mf %>% head() %>% sql_render(),
-    sql("SELECT  TOP 6 *\nFROM `df`")
+    sql("SELECT TOP(6) *\nFROM `df`")
   )
 
   expect_equal(

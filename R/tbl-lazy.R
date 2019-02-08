@@ -34,7 +34,6 @@ lazy_frame <- function(..., con = simulate_dbi(), src = NULL) {
   tbl_lazy(tibble(...), con = con, src = src)
 }
 
-
 #' @export
 dimnames.tbl_lazy <- function(x) {
   list(NULL, op_vars(x$ops))
@@ -46,9 +45,13 @@ dim.tbl_lazy <- function(x) {
 }
 
 #' @export
+print.tbl_lazy <- function(x, ...) {
+  show_query(x)
+}
+
+#' @export
 as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
-  message("Use show_query() to see generated SQL")
-  data.frame()
+  stop("Can not coerce `tbl_lazy` to data.frame", call. = FALSE)
 }
 
 #' @export
@@ -73,6 +76,7 @@ group_vars.tbl_lazy <- function(x) {
 
 # lazyeval ----------------------------------------------------------------
 
+# nocov start
 #' @export
 filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
   dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
@@ -122,3 +126,4 @@ do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
   dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
   do(.data, !!! dots, .chunk_size = .chunk_size)
 }
+# nocov end

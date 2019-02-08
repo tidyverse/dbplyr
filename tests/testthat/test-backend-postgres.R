@@ -6,6 +6,7 @@ test_that("custom scalar translated correctly", {
     translate_sql(!!enquo(x), con = simulate_postgres())
   }
 
+  expect_equal(trans(bitwXor(x, 128L)),       sql("`x` # 128"))
   expect_equal(trans(log10(x)),               sql("LOG(`x`)"))
   expect_equal(trans(log(x)),                 sql("LN(`x`)"))
   expect_equal(trans(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))

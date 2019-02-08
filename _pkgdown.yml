@@ -38,15 +38,6 @@ reference:
 navbar:
   components:
     home: ~
-    articles:
-      text: Articles
-      menu:
-      - text: Translation of functions to SQL
-        href: articles/translation-verb.html
-      - text: Translation of dplyr verbs to SQL
-        href: articles/translation-function.html
-      - text: Creating new backends
-        href: articles/new-backend.html
     news:
       text: News
       menu:

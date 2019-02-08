@@ -83,6 +83,39 @@ test_that("join functions error on column not found for SQL sources #1928", {
   )
 })
 
+test_that("join generates correct sql", {
+  lf1 <- memdb_frame(x = 1, y = 2)
+  lf2 <- memdb_frame(x = 1, z = 3)
+
+  out <- lf1 %>%
+    inner_join(lf2, by = "x") %>%
+    collect()
+
+  expect_equal(out, data.frame(x = 1, y = 2, z = 3))
+})
+
+test_that("semi join generates correct sql", {
+  lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- memdb_frame(x = 1)
+
+  lf3 <- inner_join(lf1, lf2, by = "x")
+  expect_equal(op_vars(lf3), c("x", "y"))
+
+  out <- collect(lf3)
+  expect_equal(out, data.frame(x = 1, y = 2))
+})
+
+
+test_that("set ops generates correct sql", {
+  lf1 <- memdb_frame(x = 1)
+  lf2 <- memdb_frame(x = c(1, 2))
+
+  out <- lf1 %>%
+    union(lf2) %>%
+    collect()
+
+  expect_equal(out, data.frame(x = c(1, 2)))
+})
 # All sources -------------------------------------------------------------
 
 test_that("sql generated correctly for all sources", {
