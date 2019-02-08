@@ -141,12 +141,7 @@ base_scalar <- sql_translator(
   toupper = sql_prefix("UPPER", 1),
   trimws = sql_prefix("TRIM", 1),
   nchar   = sql_prefix("LENGTH", 1),
-  substr = function(x, start, stop) {
-    start <- as.integer(start)
-    length <- pmax(as.integer(stop) - start + 1L, 0L)
-
-    sql_expr(SUBSTR(!!x, !!start, !!length))
-  },
+  substr = sql_substr,
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
 
@@ -224,9 +219,7 @@ base_scalar <- sql_translator(
     )
    },
   str_sub = function(string, start = 1L, end = -1L) {
-      start <- as.integer(start)
-      length <- pmax(as.integer(end) - start + 1L, 0L)
-      sql_expr(SUBSTR(!!string, !!start, !!length))
+      sql_substr(x = string, start = start, stop = end)
     }
 )
 
