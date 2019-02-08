@@ -4,26 +4,52 @@
 #' Strings are escaped; names become bare SQL identifiers. User infix
 #' functions have `%` stripped.
 #'
+#' Using `sql_expr()` in package will require use of [globalVariables()]
+#' to avoid `R CMD check` NOTES. This is a small amount of additional pain,
+#' which I think is worthwhile because it leads to more readable translation
+#' code.
+#'
 #' @param x A quasiquoted expression
+#' @param con Connection to use for escaping. Will be set automatically when
+#'   called from a function translation.
+#' @param .fn Function name (as string, call, or symbol)
+#' @param ... Arguments to function
+#' @keywords internal
 #' @inheritParams translate_sql
 #' @export
 #' @examples
-#' sql_expr(f(x + 1))
+#' con <- simulate_dbi() # not necessary when writing translations
 #'
-#' sql_expr(f("x", "y"))
-#' sql_expr(f(x, y))
+#' sql_expr(f(x + 1), con = con)
+#' sql_expr(f("x", "y"), con = con)
+#' sql_expr(f(x, y), con = con)
 #'
-#' sql_expr(cast("x" %as% DECIMAL))
-#' sql_expr(round(x) %::% numeric)
+#' x <- ident("x")
+#' sql_expr(f(!!x, y), con = con)
+#'
+#' sql_expr(cast("x" %as% DECIMAL), con = con)
+#' sql_expr(round(x) %::% numeric, con = con)
+#'
+#' sql_call2("+", quote(x), 1, con = con)
+#' sql_call2("+", "x", 1, con = con)
 sql_expr <- function(x, con = sql_current_con()) {
   x <- enexpr(x)
   x <- replace_expr(x, con = con)
   sql(x)
 }
 
+#' @export
+#' @rdname sql_expr
+sql_call2 <- function(.fn, ..., con = sql_current_con()) {
+  fn <- call2(.fn, ...)
+  fn <- replace_expr(fn, con = con)
+  sql(fn)
+}
+
+
 replace_expr <- function(x, con) {
   if (is.atomic(x)) {
-    escape(x, con = con)
+    as.character(escape(x, con = con))
   } else if (is.name(x)) {
     as.character(x)
   # } else if (is.call(x) && identical(x[[1]], quote(I))) {

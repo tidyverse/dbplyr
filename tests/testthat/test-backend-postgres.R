@@ -1,0 +1,77 @@
+context("test-backend-postgres.R")
+
+test_that("custom scalar translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_postgres())
+  }
+
+  expect_equal(trans(bitwXor(x, 128L)),       sql("`x` # 128"))
+  expect_equal(trans(log10(x)),               sql("LOG(`x`)"))
+  expect_equal(trans(log(x)),                 sql("LN(`x`)"))
+  expect_equal(trans(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
+  expect_equal(trans(cot(x)),                 sql("1 / TAN(`x`)"))
+  expect_equal(trans(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
+  expect_equal(trans(grepl("exp", x)),        sql("(`x`) ~ ('exp')"))
+  expect_equal(trans(grepl("exp", x, TRUE)),  sql("(`x`) ~* ('exp')"))
+  expect_equal(trans(substr("test", 2 , 3)),  sql("SUBSTRING('test', 2, 2)"))
+})
+
+
+test_that("custom stringr functions translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_postgres())
+  }
+
+  expect_equal(trans(str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
+  expect_equal(trans(str_detect(x, y)), sql("STRPOS(`x`, `y`) > 0"))
+
+})
+
+test_that("two variable aggregates are translated correctly", {
+  trans <- function(x, window) {
+    translate_sql(!!enquo(x), window = window, con = simulate_postgres())
+  }
+
+  expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
+  expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
+
+})
+
+test_that("pasting translated correctly", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), window = FALSE, con = simulate_postgres())
+  }
+
+  expect_equal(trans(paste(x, y)),  sql("CONCAT_WS(' ', `x`, `y`)"))
+  expect_equal(trans(paste0(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+
+  expect_error(trans(paste0(x, collapse = "")), "`collapse` not supported")
+})
+
+test_that("postgres mimics two argument log", {
+  trans <- function(...) {
+    translate_sql(..., con = simulate_postgres())
+  }
+
+  expect_equal(trans(log(x)), sql('LN(`x`)'))
+  expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+  expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
+})
+
+mf <- lazy_frame(x = 1, src = simulate_odbc_postgresql())
+
+test_that("sample_frac() returns the correct query", {
+  expect_equal(
+    mf %>% sample_frac(0.1) %>% show_query(),
+    sql("SELECT *\nFROM `df`\nTABLESAMPLE SYSTEM (10)")
+  )
+})
+
+test_that("sample_n() returns the expected error message", {
+  expect_error(
+    mf %>% sample_n(10) %>% show_query(),
+    "Explicit row size sample is not supported"
+  )
+})

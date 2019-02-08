@@ -2,27 +2,48 @@
 % Please edit documentation in R/sql-expr.R
 \name{sql_expr}
 \alias{sql_expr}
+\alias{sql_call2}
 \title{Generate SQL from R expressions}
 \usage{
 sql_expr(x, con = sql_current_con())
+
+sql_call2(.fn, ..., con = sql_current_con())
 }
 \arguments{
 \item{x}{A quasiquoted expression}
 
-\item{con}{An optional database connection to control the details of
-the translation. The default, \code{NULL}, generates ANSI SQL.}
+\item{con}{Connection to use for escaping. Will be set automatically when
+called from a function translation.}
+
+\item{.fn}{Function name (as string, call, or symbol)}
+
+\item{...}{Arguments to function}
 }
 \description{
 Low-level building block for generating SQL from R expressions.
 Strings are escaped; names become bare SQL identifiers. User infix
 functions have \code{\%} stripped.
 }
-\examples{
-sql_expr(f(x + 1))
-
-sql_expr(f("x", "y"))
-sql_expr(f(x, y))
-
-sql_expr(cast("x" \%as\% DECIMAL))
-sql_expr(round(x) \%::\% numeric)
+\details{
+Using \code{sql_expr()} in package will require use of \code{\link[=globalVariables]{globalVariables()}}
+to avoid \code{R CMD check} NOTES. This is a small amount of additional pain,
+which I think is worthwhile because it leads to more readable translation
+code.
 }
+\examples{
+con <- simulate_dbi() # not necessary when writing translations
+
+sql_expr(f(x + 1), con = con)
+sql_expr(f("x", "y"), con = con)
+sql_expr(f(x, y), con = con)
+
+x <- ident("x")
+sql_expr(f(!!x, y), con = con)
+
+sql_expr(cast("x" \%as\% DECIMAL), con = con)
+sql_expr(round(x) \%::\% numeric, con = con)
+
+sql_call2("+", quote(x), 1, con = con)
+sql_call2("+", "x", 1, con = con)
+}
+\keyword{internal}

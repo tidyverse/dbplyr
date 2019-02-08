@@ -15,9 +15,14 @@ coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/master/graph/badge.svg)]
 
 ## Overview
 
-dbplyr is the database backend for dplyr. If you are using dplyr to
-connect to databases, you generally will not need to use any functions
-from dbplyr, but you will need to make sure it’s installed.
+dbplyr is the database backend for [dplyr](https://dplyr.tidyverse.org).
+It allows you to use remote database tables as if they are in-memory
+data frames by automatically converting dplyr code into SQL.
+
+To learn more about why you might use dbplyr instead of writing SQL, see
+`vignette("sql")`. To learn more about the details of the SQL
+translation, see `vignette("translation-verb")` and
+`vignette("translation-function")`.
 
 ## Installation
 
@@ -46,14 +51,19 @@ con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 copy_to(con, mtcars)
 ```
 
+Note that you don’t actually need to load dbplyr with `library(dbplyr)`;
+dplyr automatically loads it for you when it sees you working with a
+database. Database connections are coordinated by the DBI package. Learn
+more at <http://dbi.r-dbi.org/>
+
 Now you can retrieve a table using `tbl()` (see `?tbl_dbi` for more
-details):
+details). Printing it just retrieves the first few rows:
 
 ``` r
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<mtcars> [?? x 11]
-#> # Database: sqlite 3.22.0 [:memory:]
+#> # Database: sqlite 3.25.3 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
@@ -69,10 +79,11 @@ mtcars2
 #> # … with more rows
 ```
 
-More complicated expressions are evaluated lazily:
+All dplyr calls are evaluated lazily, generating SQL that is only sent
+to the database when you request the data.
 
 ``` r
-# Lazily generates query
+# lazily generates query
 summary <- mtcars2 %>% 
   group_by(cyl) %>% 
   summarise(mpg = mean(mpg, na.rm = TRUE)) %>% 
