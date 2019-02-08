@@ -16,6 +16,7 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
+  out$sample    <- sql_clause_sample(sample, con)
 
   # Processing limit via ROWNUM in a WHERE clause, thie method
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries

@@ -122,7 +122,7 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                distinct = FALSE,
                                sample = NULL,
                                ...) {
-  out <- vector("list", 7)
+  out <- vector("list", 8)
   names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
     "limit", "sample")
 
