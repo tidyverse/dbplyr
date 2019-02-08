@@ -336,29 +336,25 @@ sql_translate_env.Oracle <- function(con) {
             if (n > 60)
               stop('Error: Rounding with with second > 60 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'mi') +
-              round(EXTRACT(second FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60 * 60))"
-              )
+              "(trunc(", !!x,
+              ") + (round((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * 60 * (60/", !!n,
+              "))/ (24* 60 * (60/", !!n,
+              "))))"
+            )
           },
           # TODO test minutes work
           minute = {
             if (n > 60)
               stop('Error: Rounding with with minute > 60 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'HH24') +
-              round(EXTRACT(minute FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60))"
+              "(trunc(", !!x,
+              ") + (round((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * (60/", !!n,
+              "))/ (24*(60/", !!n,
+              "))))"
               )
           },
           # TODO test hours work
@@ -366,37 +362,26 @@ sql_translate_env.Oracle <- function(con) {
             if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'DD') +
-              floor(EXTRACT(hour FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24))"
-              )
+              "(trunc(", !!x,
+              ") + (round((", !!x,
+              "- trunc(", !!x,
+              ")) * 24/", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           # TODO test day work
           day = {
             if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql(
-              "(
-              case when ",
-              !!n,
-              "= 1 then trunc(",
-              !!x,
-              ", 'DD')
-              else trunc(",
-              !!x,
-              ", 'MM') + floor(EXTRACT(day FROM ",
-              !!x,
-              ")/",
-              n,
-              "-1)*",
-              n,
-              "end)"
-              )
+              "(trunc(", !!x,
+              ", 'mm') + (round((", !!x,
+              "- trunc(", !!x,
+              ", 'mm')) * 24/", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           # TODO make week work
       #    week = {
@@ -512,64 +497,49 @@ sql_translate_env.Oracle <- function(con) {
             if (n > 60)
               stop('Error: Rounding with with second > 60 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'mi') +
-              floor(EXTRACT(second FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60 * 60))"
-              )
+              "(trunc(", !!x,
+              ") + (floor((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * 60 * (60/", !!n,
+              "))/ (24* 60 *(60/", !!n,
+              "))))"
+            )
           },
           minute = {
             if (n > 60)
               stop('Error: Rounding with with minute > 60 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'HH24') +
-              floor(EXTRACT(minute FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60))"
-              )
+              "(trunc(", !!x,
+              ") + (floor((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * (60/", !!n,
+              "))/ (24*(60/", !!n,
+              "))))"
+            )
           },
           hour = {
             if (n > 24)
               stop('Error: Rounding with with second > 24 is not supported')
             build_sql(
-              "(trunc(",!!x,
-              ", 'DD') +
-              floor(EXTRACT(hour FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24))"
-              )
+              "(trunc(", !!x,
+              ") + (floor((", !!x,
+              "- trunc(", !!x,
+              ")) * 24/", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           day = {
             if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql(
-              "(
-              case when ",
-              !!n,
-              "= 1 then trunc(",
-              !!x,
-              ", 'DD')
-              else trunc(",
-              !!x,
-              ", 'MM') + floor(EXTRACT(day FROM ",
-              !!x,
-              "-1)/",
-              n,
-              ")*",
-              n,
-              "end)"
-              )
+              "(trunc(", !!x,
+              ", 'mm') + (floor((", !!x,
+              "- trunc(", !!x,
+              ", 'mm')) * 24/", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           week = {
             if (n != 1)
@@ -717,60 +687,45 @@ sql_translate_env.Oracle <- function(con) {
           # TODO make sure this works for non-interger seconds
           second = {
             build_sql(
-              "(trunc(",!!x,
-              ", 'mi') +
-              ceil(EXTRACT(second FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60 * 60))"
-              )
+              "(trunc(", !!x,
+              ") + (ceil((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * 60 * (60/", !!n,
+              "))/ (24 * 60 * (60/", !!n,
+              "))))"
+            )
           },
           minute = {
             build_sql(
-              "(trunc(",!!x,
-              ", 'HH24') +
-              ceil(EXTRACT(minute FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24 * 60))"
-              )
+              "(trunc(", !!x,
+              ") + (ceil((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 * (60/", !!n,
+              "))/ (24*(60/", !!n,
+              "))))"
+            )
           },
           hour = {
             build_sql(
-              "(trunc(",!!x,
-              ", 'DD') +
-              ceil(EXTRACT(hour FROM cast(",!!x,
-              " as timestamp))/",
-              n,
-              ")*",
-              n,
-              "/ (24))"
-              )
+              "(trunc(", !!x,
+              ") + (ceil((", !!x,
+              "- trunc(", !!x,
+              ")) * 24 /", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           day = {
             if (n > 31)
               stop('Error: Rounding with with day > 31 is not supported')
             build_sql(
-              "(
-              case when ",
-              !!n,
-              "= 1 then trunc(",
-              !!x,
-              ", 'DD') +1
-              else trunc(",
-              !!x,
-              ", 'MM') + ceil(EXTRACT(day FROM ",
-              !!x,
-              "-1)/",
-              n,
-              ")*",
-              n,
-              "end)"
-              )
+              "(trunc(", !!x,
+              ", 'mm') + (ceil((", !!x,
+              "- trunc(", !!x,
+              ", 'mm')) * 24/", !!n,
+              ")/ (24/", !!n,
+              ")))"
+            )
           },
           week = {
             if (n != 1)
