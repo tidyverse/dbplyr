@@ -378,8 +378,8 @@ sql_translate_env.Oracle <- function(con) {
               "(trunc(", !!x,
               ", 'mm') + (round((", !!x,
               "- trunc(", !!x,
-              ", 'mm')) * 24/", !!n,
-              ")/ (24/", !!n,
+              ", 'mm')) * 1/", !!n,
+              ")/ (1/", !!n,
               ")))"
             )
           },
@@ -526,8 +526,8 @@ sql_translate_env.Oracle <- function(con) {
               "(trunc(", !!x,
               ", 'mm') + (floor((", !!x,
               "- trunc(", !!x,
-              ", 'mm')) * 24/", !!n,
-              ")/ (24/", !!n,
+              ", 'mm')) * 1/", !!n,
+              ")/ (1/", !!n,
               ")))"
             )
           },
@@ -666,8 +666,8 @@ sql_translate_env.Oracle <- function(con) {
               "(trunc(", !!x,
               ", 'mm') + (ceil((", !!x,
               "- trunc(", !!x,
-              ", 'mm')) * 24/", !!n,
-              ")/ (24/", !!n,
+              ", 'mm')) * 1/", !!n,
+              ")/ (1/", !!n,
               ")))"
             )
           },
