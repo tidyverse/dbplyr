@@ -192,25 +192,24 @@ base_scalar <- sql_translator(
   str_to_lower    = sql_prefix("LOWER", 1),
   str_to_title    = sql_prefix("INITCAP", 1),
   str_replace_all = function(string, pattern, replacement) {
-                      sql_expr(REPLACE(!!string, !!pattern, !!replacement))
-                    },
-  str_detect      = function(string, pattern) {
-                      sql_expr(INSTR(!!string, !!pattern) > 0L)
-                    },
-  str_trim        = function(string, side = c("both", "left", "right")) {
-                      side <- match.arg(side)
-                      switch(side,
-                        left = sql_expr(LTRIM(!!string)),
-                        right = sql_expr(RTRIM(!!string)),
-                        both = sql_expr(LTRIM(RTRIM(!!string))),
-                      )
-                    },
-  str_sub         = function(string, start = 1L, end = -1L) {
-                      start <- as.integer(start)
-                      length <- pmax(as.integer(end) - start + 1L, 0L)
-
-                      sql_expr(SUBSTR(!!string, !!start, !!length))
-                    }
+    sql_expr(REPLACE(!!string, !!pattern, !!replacement))
+  },
+  str_detect = function(string, pattern) {
+    sql_expr(INSTR(!!string, !!pattern) > 0L)
+  },
+  str_trim = function(string, side = c("both", "left", "right")) {
+    side <- match.arg(side)
+    switch(side,
+      left = sql_expr(LTRIM(!!string)),
+      right = sql_expr(RTRIM(!!string)),
+      both = sql_expr(LTRIM(RTRIM(!!string))),
+    )
+   },
+  str_sub = function(string, start = 1L, end = -1L) {
+      start <- as.integer(start)
+      length <- pmax(as.integer(end) - start + 1L, 0L)
+      sql_expr(SUBSTR(!!string, !!start, !!length))
+    }
 )
 
 base_symbols <- sql_translator(
