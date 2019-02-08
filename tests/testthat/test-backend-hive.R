@@ -14,15 +14,15 @@ test_that("custom scalar & string functions translated correctly", {
 })
 
 test_that("Sampling functions return their respective expected query", {
-  mf <- lazy_frame(x = 1, src = simulate_hive())
+  mf <- lazy_frame(x = 1, con = simulate_hive())
 
   expect_equal(
-    mf %>% sample_n(10) %>% show_query(),
+    mf %>% sample_n(10) %>% remote_query(),
     sql("SELECT *\nFROM `df`\nTABLESAMPLE(10 ROWS)")
   )
 
   expect_equal(
-    mf %>% sample_frac(0.1) %>% show_query(),
+    mf %>% sample_frac(0.1) %>% remote_query(),
     sql("SELECT *\nFROM `df`\nTABLESAMPLE(10 PERCENT)")
   )
 })

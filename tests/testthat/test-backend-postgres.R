@@ -60,18 +60,18 @@ test_that("postgres mimics two argument log", {
   expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
 
-mf <- lazy_frame(x = 1, src = simulate_odbc_postgresql())
+mf <- lazy_frame(x = 1, con = simulate_postgres())
 
 test_that("sample_frac() returns the correct query", {
   expect_equal(
-    mf %>% sample_frac(0.1) %>% show_query(),
+    mf %>% sample_frac(0.1) %>% remote_query(),
     sql("SELECT *\nFROM `df`\nTABLESAMPLE SYSTEM (10)")
   )
 })
 
 test_that("sample_n() returns the expected error message", {
   expect_error(
-    mf %>% sample_n(10) %>% show_query(),
+    mf %>% sample_n(10) %>% remote_query(),
     "Explicit row size sample is not supported"
   )
 })
