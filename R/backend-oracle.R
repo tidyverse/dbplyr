@@ -397,15 +397,13 @@ sql_translate_env.Oracle <- function(con) {
           # TODO test month work
           month = {
             build_sql(
-              "(
-              add_months(trunc(",!!x,
-              ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm'),-1))/",
-              n,
-              ")*",
-              n,
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), round(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/", !!n,
+              ")*", !!n,
               "))"
-              )
+            )
           },
           # TODO test year work
           year = {
@@ -428,54 +426,46 @@ sql_translate_env.Oracle <- function(con) {
           # TODO test bimonth work
           bimonth = {
             build_sql(
-              "(
-              add_months(trunc(",!!x,
-              ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm'),-1))/(",
-              n,
-              "*2)*(",
-              n,
-              "*2))))"
-              )
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), round(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*2))*", !!n,
+              "*2))"
+            )
           },
           # TODO test quarter work
           quarter = {
             build_sql(
-              "(
-              add_months(trunc(",!!x,
-              ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm'),-1))/(",
-              n,
-              "*3)*(",
-              n,
-              "*3))))"
-              )
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), round(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*3))*", !!n,
+              "*3))"
+            )
           },
           # TODO test halfyear work
           halfyear = {
             build_sql(
-              "(
-              add_months(trunc(",!!x,
-              ", 'YYYY'), floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm'),-1))/(",
-              n,
-              "*6)*(",
-              n,
-              "*6))))"
-              )
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), round(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*6))*", !!n,
+              "*6))"
+            )
           },
           # TODO test season work
           season = {
             build_sql(
-              "(
-              add_months(trunc(",!!x,
-              ", 'YYYY'), -1 + floor(EXTRACT(month FROM add_months(round(",!!x,
-              ", 'mm'),-1))/(",
-              n,
-              "*3)*(",
-              n,
-              "*3))))"
-              )
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), -1 + round(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*3))*", !!n,
+              "*3))"
+            )
           },
           stop("Error: Failed to parse units.")
               )
@@ -557,28 +547,14 @@ sql_translate_env.Oracle <- function(con) {
             )
           },
           month = {
-            if (n < 12) {
               build_sql(
-                "(
-                case when ",
-                !!n,
-                "= 1 then trunc(",
-                !!x,
-                ", 'MM')
-                else add_months(trunc(",
-                !!x,
-                ", 'YYYY'), floor(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/",
-                n,
-                ")*",
-                n,
-                ")end)"
-                )
-            }
-            else{
-              build_sql("(trunc(", !!x, ", 'YYYY'))")
-            }
+                "(add_months(trunc(", !!x,
+                ", 'yyyy'), floor(months_between(", !!x,
+                ", trunc(", !!x,
+                ", 'yyyy'))/", !!n,
+                ")*", !!n,
+                "))"
+              )
           },
           year = {
             build_sql(
@@ -598,76 +574,44 @@ sql_translate_env.Oracle <- function(con) {
               )
           },
           bimonth = {
-            if (n < 6) {
               build_sql(
-                "(add_months(trunc(",
-                !!x,
-                ", 'YYYY'), floor(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*2))*(",
-                n,
-                "*2)))"
+                "(add_months(trunc(", !!x,
+                ", 'yyyy'), floor(months_between(", !!x,
+                ", trunc(", !!x,
+                ", 'yyyy'))/(", !!n,
+                "*2))*", !!n,
+                "*2))"
               )
-            }
-            else{
-              build_sql("(trunc(", !!x, ", 'yyyy'))")
-            }
           },
           quarter = {
-            if (n < 4) {
               build_sql(
-                "(add_months(trunc(",
-                !!x,
-                ", 'YYYY'), floor(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*3))*(",
-                n,
-                "*3)))"
+                "(add_months(trunc(", !!x,
+                ", 'yyyy'), floor(months_between(", !!x,
+                ", trunc(", !!x,
+                ", 'yyyy'))/(", !!n,
+                "*3))*", !!n,
+                "*3))"
               )
-            }
-            else{
-              build_sql("(trunc(", !!x, ", 'yyyy'))")
-            }
           },
           halfyear = {
-            if (n < 2) {
               build_sql(
-                "(add_months(trunc(",
-                !!x,
-                ", 'YYYY'), floor(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*6))*(",
-                n,
-                "*6)))"
+                "(add_months(trunc(", !!x,
+                ", 'yyyy'), floor(months_between(", !!x,
+                ", trunc(", !!x,
+                ", 'yyyy'))/(", !!n,
+                "*6))*", !!n,
+                "*6))"
               )
-            }
-            else{
-              build_sql("(trunc(", !!x, ", 'yyyy'))")
-            }
           },
           season = {
-            if (n < 4) {
               build_sql(
-                "(add_months(trunc(",
-                !!x,
-                ", 'YYYY'), (-1) + floor(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*3))*(",
-                n,
-                "*3)))"
+                "(add_months(trunc(", !!x,
+                ", 'yyyy'), -1 + floor(months_between(", !!x,
+                ", trunc(", !!x,
+                ", 'yyyy'))/(", !!n,
+                "*3))*", !!n,
+                "*3))"
               )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), -1))")
-            }
           },
           stop("Error: Failed to parse units.")
               )
@@ -743,104 +687,58 @@ sql_translate_env.Oracle <- function(con) {
             )
           },
           month = {
-            if (n < 12) {
-              build_sql(
-                "(
-                case when ",
-                !!n,
-                "= 1 then add_months(trunc(",
-                !!x,
-                ", 'MM'), 1)
-                else add_months(trunc(",
-                !!x,
-                ", 'YYYY'), ceil(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/",
-                n,
-                ")*",
-                n,
-                ")end)"
-                )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), ", n, "))")
-            }
+            build_sql(
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/", !!n,
+              ")*", !!n,
+              "))"
+            )
           },
           year = {
             # TODO
           },
           # TODO check all these below actually work for n =1 and n >1
           bimonth = {
-            if (n < 6) {
-              build_sql(
-                "add_months(trunc(",
-                !!x,
-                ", 'YYYY'), ceil(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*2))*(",
-                n,
-                "*2))"
-              )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), ", n, "))")
-            }
+            build_sql(
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*2))*", !!n,
+              "*2))"
+            )
           },
           quarter = {
-            if (n < 4) {
-              build_sql(
-                "add_months(trunc(",
-                !!x,
-                ", 'YYYY'), ceil(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*3))*(",
-                n,
-                "*3))"
-              )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), ", n, "))")
-            }
+            build_sql(
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*3))*", !!n,
+              "*3))"
+            )
           },
           halfyear = {
-            if (n < 2) {
-              build_sql(
-                "add_months(trunc(",
-                !!x,
-                ", 'YYYY'), ceil(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*6))*(",
-                n,
-                "*6))"
-              )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), ", n, "))")
-            }
+            build_sql(
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*6))*", !!n,
+              "*6))"
+            )
           },
           season = {
-            if (n < 4) {
-              build_sql(
-                "add_months(trunc(",
-                !!x,
-                ", 'YYYY'), -1 +  ceil(EXTRACT(month FROM add_months(",
-                !!x,
-                ",-1))/(",
-                n,
-                "*3))*(",
-                n,
-                "*3))"
-              )
-            }
-            else{
-              build_sql("(add_months(trunc(", !!x, ", 'yyyy'), ", n, "))")
-            }
+            build_sql(
+              "(add_months(trunc(", !!x,
+              ", 'yyyy'), -1 + ceil(months_between(", !!x,
+              ", trunc(", !!x,
+              ", 'yyyy'))/(", !!n,
+              "*3))*", !!n,
+              "*3))"
+            )
           },
           stop("Error: Failed to parse units.")
                 )
