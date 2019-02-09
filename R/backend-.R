@@ -2,6 +2,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
+#' @include translate-sql-string.R
 #' @include translate-sql-quantile.R
 #' @include escape.R
 #' @include sql.R
