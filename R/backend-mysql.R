@@ -21,7 +21,14 @@ sql_translate_env.MySQLConnection <- function(con) {
       },
       as.character = sql_cast("CHAR"),
       paste = sql_paste(" "),
-      paste0 = sql_paste("")
+      paste0 = sql_paste(""),
+      # https://dev.mysql.com/doc/refman/8.0/en/regexp.html
+      str_detect = function(string, pattern) {
+        build_sql(string, " REGEXP ", pattern)
+      },
+      str_locate = function(string, pattern) {
+        sql_expr(REGEXP_INSTR(!!string, !!pattern))
+      }
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
