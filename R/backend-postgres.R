@@ -57,12 +57,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       # https://www.postgresql.org/docs/9.1/functions-string.html
       # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       str_detect  = function(string, pattern) {
-        build_sql(
-          "(SELECT ",
-          sql("COUNT(*)"),
-          " > 0 FROM regexp_matches(",
-          string, ",", pattern, "))"
-          )
+        build_sql(string, " ~ ", pattern)
       },
       str_replace = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
