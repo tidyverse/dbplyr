@@ -107,12 +107,16 @@
       # potentially helpful in the future
       # https://stackoverflow.com/questions/38911588/replace-first-occurrence-of-substring-in-a-string-in-sql
       str_replace     = sql_not_supported("str_replace()"),
+
+      # mssql does not have support for REGEXP functions
       str_locate = function(string, pattern) {
         sql_not_supported("str_locate")
       },
+      # mssql does not have support for REGEXP functions
       str_detect = function(string, pattern) {
         sql_not_supported("str_detect")
       },
+
       str_sub         = function(string, start = 1L, end = -1L) {
                           start <- as.integer(start)
                           length <- pmax(as.integer(end) - start + 1L, 0L)
