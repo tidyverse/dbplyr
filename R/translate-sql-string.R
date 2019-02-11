@@ -11,6 +11,9 @@ sql_substr <- function(f = "SUBSTR") {
     sql_call2(f, x, start, length)
   }
 }
+
+# if no parameters are provided, str_sub returns the whole string
+# if just start is provided, str_sub returns the rest of the string (after start)
 #' @export
 #' @rdname sql_variant
 sql_str_sub <- function(f = "SUBSTR", full_length = "drop", compute_method = "LENGTH") {
