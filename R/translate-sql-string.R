@@ -13,14 +13,18 @@ sql_substr <- function(f = "SUBSTR") {
 }
 #' @export
 #' @rdname sql_variant
-sql_str_sub <- function(f = "SUBSTR") {
+sql_str_sub <- function(f = "SUBSTR", full_length = "drop", compute_method = "LENGTH") {
   function(string, start = 1L, end = -1L) {
     start <- as.integer(start)
-    if (end == -1L) {
-      return(sql_call2(f, string, start))
+    if (end == -1L && full_length == "drop") {
+      # drop the length parameter for full_length
+      sql_call2(f, string, start)
+    } else if (end == -1L && full_length == "compute") {
+      # compute the full_length using compute_method
+      sql_call2(f, string, start, sql_prefix(compute_method, n = 1)(string))
     } else {
       length <- pmax(as.integer(end) - start + 1L, 0L)
-      return(sql_call2(f, string, start, length))
+      sql_call2(f, string, start, length)
     }
   }
 }
