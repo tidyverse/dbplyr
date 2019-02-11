@@ -14,7 +14,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(atan2(x)),        sql("ATN2(`x`)"))
   expect_equal(trans(ceiling(x)),      sql("CEILING(`x`)"))
   expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
-  expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1.0, 2.0)"))
+  expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1, 2)"))
   expect_equal(trans(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
 
   expect_error(trans(bitwShiftL(x, 2L)), sql("not available"))
@@ -30,8 +30,6 @@ test_that("custom stringr functions translated correctly", {
   }
 
   expect_equal(trans(str_length(x)),         sql("LEN(`x`)"))
-  expect_equal(trans(str_locate(x, "find")), sql("CHARINDEX('find', `x`)"))
-  expect_equal(trans(str_detect(x, "find")), sql("CHARINDEX('find', `x`) > 0"))
 
 })
 
