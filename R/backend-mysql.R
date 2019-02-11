@@ -23,6 +23,11 @@ sql_translate_env.MySQLConnection <- function(con) {
       paste = sql_paste(" "),
       paste0 = sql_paste(""),
       # https://dev.mysql.com/doc/refman/8.0/en/regexp.html
+      # case insensitive by default...
+      # note REGEXP_LIKE in MySQL allows case sensitive matching
+      # but is not compatible with MariaDB
+      # further, this workaround is horrible:
+      # https://www.oreilly.com/library/view/mysql-cookbook/0596001452/ch04s11.html
       str_detect = sql_infix("REGEXP"),
       str_locate = function(string, pattern) {
         sql_expr(REGEXP_INSTR(!!string, !!pattern))
