@@ -11,6 +11,8 @@ db_desc.MySQLConnection <- function(x) {
 
 #' @export
 db_desc.MariaDBConnection <- db_desc.MySQLConnection
+#' @export
+db_desc.MySQL <- db_desc.MySQLConnection
 
 #' @export
 sql_translate_env.MySQLConnection <- function(con) {
@@ -46,6 +48,8 @@ sql_translate_env.MySQLConnection <- function(con) {
 
 #' @export
 sql_translate_env.MariaDBConnection <- sql_translate_env.MySQLConnection
+#' @export
+sql_translate_env.MySQL <- sql_translate_env.MySQLConnection
 
 # DBI methods ------------------------------------------------------------------
 
@@ -58,6 +62,8 @@ db_has_table.MySQLConnection <- function(con, table, ...) {
 
 #' @export
 db_has_table.MariaDBConnection <- db_has_table.MySQLConnection
+#' @export
+db_has_table.MySQL <- db_has_table.MySQLConnection
 
 #' @export
 db_data_type.MySQLConnection <- function(con, fields, ...) {
@@ -139,6 +145,8 @@ db_create_index.MySQLConnection <- function(con, table, columns, name = NULL,
 
 #' @export
 db_create_index.MariaDBConnection <- db_create_index.MySQLConnection
+#' @export
+db_create_index.MySQL <- db_create_index.MySQLConnection
 
 #' @export
 db_analyze.MySQLConnection <- function(con, table, ...) {
@@ -148,6 +156,8 @@ db_analyze.MySQLConnection <- function(con, table, ...) {
 
 #' @export
 db_analyze.MariaDBConnection <- db_analyze.MySQLConnection
+#' @export
+db_analyze.MySQL <- db_analyze.MySQLConnection
 
 # SQL methods -------------------------------------------------------------
 
