@@ -163,13 +163,6 @@ test_that("str_replace_all() translates correctly ", {
   )
 })
 
-test_that("str_detect() translates correctly ", {
-  expect_equal(
-    translate_sql(str_detect(x, "pattern")),
-    sql("INSTR(`x`, 'pattern') > 0")
-  )
-})
-
 test_that("str_trim() translates correctly ", {
   expect_equal(
     translate_sql(str_trim(x, "both")),
