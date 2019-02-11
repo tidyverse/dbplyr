@@ -50,10 +50,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         sql_expr(SUBSTRING(!!x, !!start, !!len))
       },
       # stringr functions
-      str_locate  = function(string, pattern) {
-        sql_expr(strpos(!!string, !!pattern))
-      },
-
       # https://www.postgresql.org/docs/9.1/functions-string.html
       # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       str_detect  = sql_infix("~"),
