@@ -208,9 +208,6 @@ base_scalar <- sql_translator(
   str_replace_all = function(string, pattern, replacement) {
     sql_expr(REPLACE(!!string, !!pattern, !!replacement))
   },
-  str_detect = function(string, pattern) {
-    sql_expr(INSTR(!!string, !!pattern) > 0L)
-  },
   str_trim = function(string, side = c("both", "left", "right")) {
     side <- match.arg(side)
     switch(side,
