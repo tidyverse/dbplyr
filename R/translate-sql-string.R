@@ -4,7 +4,7 @@
 #' @export
 #' @rdname sql_variant
 sql_substr <- function(f = "SUBSTR") {
-  function(x, start, end) {
+  function(x, start, stop) {
     start <- as.integer(start)
     length <- pmax(as.integer(stop) - start + 1L, 0L)
 
@@ -19,7 +19,7 @@ sql_str_sub <- function(f = "SUBSTR") {
     if (end == -1L) {
       return(sql_call2(f, string, start))
     } else {
-      length <- pmax(as.integer(stop) - start + 1L, 0L)
+      length <- pmax(as.integer(end) - start + 1L, 0L)
       return(sql_call2(f, string, start, length))
     }
   }
