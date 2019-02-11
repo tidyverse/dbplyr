@@ -193,6 +193,8 @@ base_scalar <- sql_translator(
 
   `%>%` = `%>%`,
 
+  substr = sql_substr("SUBSTR"),
+
   # stringr functions
   # SQL Syntax reference links:
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
@@ -216,9 +218,7 @@ base_scalar <- sql_translator(
       both = sql_expr(LTRIM(RTRIM(!!string))),
     )
    },
-  str_sub = function(string, start = 1L, end = -1L) {
-      sql_substr(x = string, start = start, stop = end)
-  },
+  str_sub = sql_str_sub("SUBSTR"),
   str_c = function (..., sep = "", collapse = NULL) sql_not_supported("str_c"),
   str_conv = function (string, encoding) sql_not_supported("str_conv"),
   str_count = function (string, pattern = "") sql_not_supported("str_count"),

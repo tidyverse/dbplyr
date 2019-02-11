@@ -82,10 +82,7 @@
       pmin          = sql_not_supported("pmin()"),
       pmax          = sql_not_supported("pmax()"),
 
-      substr        = function(x, start, stop) {
-                        len <- stop - start + 1
-                        sql_expr(SUBSTRING(!!x, !!start, !!len))
-                      },
+      substr = sql_substr("SUBSTRING"),
       is.null       = function(x) mssql_is_null(x, sql_current_context()),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
                       # TRIM is not supported on MS SQL versions under 2017
@@ -117,11 +114,7 @@
         sql_not_supported("str_detect")
       },
 
-      str_sub         = function(string, start = 1L, end = -1L) {
-                          start <- as.integer(start)
-                          length <- pmax(as.integer(end) - start + 1L, 0L)
-                          sql_expr(SUBSTRING(!!string, !!start, !!length))
-                        }
+      str_sub = sql_str_sub("SUBSTRING")
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
