@@ -114,7 +114,7 @@
         sql_not_supported("str_detect")
       },
 
-      str_sub = sql_str_sub("SUBSTRING")
+      str_sub = sql_str_sub("SUBSTRING", full_length = "compute", compute_method = "LEN")
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
