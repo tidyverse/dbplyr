@@ -14,9 +14,9 @@ src_memdb()
 }
 \arguments{
 \item{...}{A set of name-value pairs. Arguments are evaluated sequentially,
-so you can refer to previously created elements. These arguments are
-processed with \code{\link[rlang:quos]{rlang::quos()}} and support unquote via \code{\link{!!}} and
-unquote-splice via \code{\link{!!!}}. Use \code{:=} to create columns that start with a dot.}
+so you can refer to previously created variables.  These arguments are
+processed with \code{\link[rlang:quos]{rlang::quos()}} and support unquote via \code{!!} and
+unquote-splice via \code{!!!}.}
 
 \item{df}{Data frame to copy}
 
