@@ -26,6 +26,9 @@ sql_translate_env.MySQLConnection <- function(con) {
       str_detect = sql_infix("REGEXP"),
       str_locate = function(string, pattern) {
         sql_expr(REGEXP_INSTR(!!string, !!pattern))
+      },
+      str_replace = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
     sql_translator(.parent = base_agg,
