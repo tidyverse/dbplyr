@@ -6,9 +6,13 @@
 #' @section Implementation notes:
 #'
 #' Semi-joins are implemented using `WHERE EXISTS`, and anti-joins with
-#' `WHERE NOT EXISTS`. Support for semi-joins is somewhat partial: you
-#' can only create semi joins where the `x` and `y` columns are
-#' compared with `=` not with more general operators.
+#' `WHERE NOT EXISTS`.
+#'
+#' All joins use column equality by default.
+#' An arbitrary join predicate can be specified by passing
+#' an SQL expression to the `sql_on` argument.
+#' Use `LHS` and `RHS` to refer to the left-hand side or
+#' right-hand side table, respectively.
 #'
 #' @inheritParams dplyr::join
 #' @param copy If `x` and `y` are not from the same data source,
@@ -23,6 +27,9 @@
 #' @param auto_index if `copy` is `TRUE`, automatically create
 #'   indices for the variables in `by`. This may speed up the join if
 #'   there are matching indexes in `x`.
+#' @param sql_on A custom join predicate as an SQL expression. The SQL
+#'   can refer to the `LHS` and `RHS` aliases to disambiguate
+#'   column names.
 #' @examples
 #' \dontrun{
 #' library(dplyr)
@@ -75,6 +82,19 @@
 #'
 #' # batters without person covariates
 #' anti_join(batting, people)
+#'
+#' # Arbitrary predicates ------------------------------------------------------
+#'
+#' # Find all pairs of awards given to the same player
+#' # with at least 18 years between the awards:
+#' awards_players <- tbl(lahman_s, "AwardsPlayers")
+#' inner_join(
+#'   awards_players, awards_players,
+#'   sql_on = paste0(
+#'     "(LHS.playerID = RHS.playerID) AND ",
+#'     "(LHS.yearID < RHS.yearID - 18)"
+#'   )
+#' )
 #' }
 #' }
 #' @name join.tbl_sql
@@ -84,11 +104,14 @@ NULL
 #' @export
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
-                                auto_index = FALSE, ...) {
+                                auto_index = FALSE, ...,
+                                sql_on = NULL) {
+
   add_op_join(
     x, y,
     "inner",
     by = by,
+    sql_on = sql_on,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
@@ -100,11 +123,14 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
-                               auto_index = FALSE, ...) {
+                               auto_index = FALSE, ...,
+                               sql_on = NULL) {
+
   add_op_join(
     x, y,
     "left",
     by = by,
+    sql_on = sql_on,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
@@ -116,11 +142,14 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
-                                auto_index = FALSE, ...) {
+                                auto_index = FALSE, ...,
+                                sql_on = NULL) {
+
   add_op_join(
     x, y,
     "right",
     by = by,
+    sql_on = sql_on,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
@@ -132,11 +161,14 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
-                               auto_index = FALSE, ...) {
+                               auto_index = FALSE, ...,
+                               sql_on = NULL) {
+
   add_op_join(
     x, y,
     "full",
     by = by,
+    sql_on = sql_on,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
@@ -147,11 +179,14 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @rdname join.tbl_sql
 #' @export
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               auto_index = FALSE, ...) {
+                               auto_index = FALSE, ...,
+                               sql_on = NULL) {
+
   add_op_semi_join(
     x, y,
     anti = FALSE,
     by = by,
+    sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
     ...
@@ -161,11 +196,14 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @rdname join.tbl_sql
 #' @export
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               auto_index = FALSE, ...) {
+                               auto_index = FALSE, ...,
+                               sql_on = NULL) {
+
   add_op_semi_join(
     x, y,
     anti = TRUE,
     by = by,
+    sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
     ...
@@ -173,11 +211,13 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 
-add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
+add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
                         auto_index = FALSE, ...) {
 
-  if (identical(type, "full") && identical(by, character())) {
+  if (!is.null(sql_on)) {
+    by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else if (identical(type, "full") && identical(by, character())) {
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
@@ -201,9 +241,14 @@ add_op_join <- function(x, y, type, by = NULL, copy = FALSE,
   x
 }
 
-add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, copy = FALSE,
+add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, ...) {
-  by <- common_by(by, x, y)
+  if (!is.null(sql_on)) {
+    by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else {
+    by <- common_by(by, x, y)
+  }
+
   y <- auto_copy(
     x, y, copy,
     indexes = if (auto_index) list(by$y)

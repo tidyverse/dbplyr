@@ -27,6 +27,20 @@ test_that("join with both same and different vars", {
   expect_equal(names(j1), c("x", "y"))
 })
 
+test_that("joining over arbitrary predicates", {
+  j1 <- collect(left_join(df1, df2, sql_on = "LHS.x = RHS.b"))
+  j2 <- collect(left_join(df1, df2, by = c("x" = "b"))) %>% mutate(b = x)
+  expect_equal(j1, j2)
+
+  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.z"))
+  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x.x)
+  expect_equal(j1, j2)
+
+  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.x"))
+  j2 <- collect(left_join(df1, df3, by = "x")) %>% mutate(x.y = x) %>% rename(x.x = x)
+  expect_equal(j1, j2)
+})
+
 test_that("inner join doesn't result in duplicated columns ", {
   expect_equal(colnames(inner_join(df1, df1)), c("x", "y"))
 })

@@ -43,6 +43,9 @@
 
 * New `tbl_memdb()` for creating reprexes (to match `tbl_lazy()`)
 
+* All `..._join()` methods gain an `sql_on` argument that allows specifying
+  arbitrary join predicates in SQL code (#146, @krlmlr).
+
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
