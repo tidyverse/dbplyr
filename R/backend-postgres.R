@@ -57,6 +57,18 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         sql_expr(strpos(!!string, !!pattern) > 0L)
       },
       # lubridate functions
+      month = function(x, label = FALSE, abbr = TRUE) {
+        if (!label) {
+          sql_expr(extract(month %from% !!x))
+        } else {
+          if (abbr) {
+            sql_expr(TO_CHAR(!!x, "Mon"))
+          } else {
+            sql_expr(TO_CHAR(!!x, "Month"))
+          }
+        }
+
+      },
       wday <- function(
                  x,
                  label=FALSE,
