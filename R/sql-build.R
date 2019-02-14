@@ -34,37 +34,46 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
   sql_optimise(qry, con = con, ...)
 }
 
+#' @export
+sql_build.ident <- function(op, con = NULL, ...) {
+  op
+}
+
+
 # Render ------------------------------------------------------------------
 
 #' @export
 #' @rdname sql_build
-sql_render <- function(query, con = NULL, ...) {
+#' @param bare_identifier_ok Is it ok to return a bare table identifier.
+#'   Set to `TRUE` when generating queries to be nested within other
+#'   queries where a bare table name is ok.
+sql_render <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
   UseMethod("sql_render")
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ...) {
-  sql_render(query$ops, con = con, ...)
+sql_render.tbl_lazy <- function(query, con = query$src$con, ..., bare_identifier_ok = FALSE) {
+  sql_render(query$ops, con = con, ..., bare_identifier_ok = bare_identifier_ok)
 }
 
 #' @export
-sql_render.op <- function(query, con = NULL, ...) {
+sql_render.op <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
   qry <- sql_build(query, con = con, ...)
   qry <- sql_optimise(qry, con = con, ...)
-  sql_render(qry, con = con, ...)
+  sql_render(qry, con = con, ..., bare_identifier_ok = bare_identifier_ok)
 }
 
 #' @export
-sql_render.sql <- function(query, con = NULL, ...) {
+sql_render.sql <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
   query
 }
 
 #' @export
-sql_render.ident <- function(query, con = NULL, ..., root = TRUE) {
-  if (root) {
-    sql_select(con, sql("*"), query)
-  } else {
+sql_render.ident <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+  if (bare_identifier_ok) {
     query
+  } else {
+    sql_select(con, sql("*"), query)
   }
 }
 

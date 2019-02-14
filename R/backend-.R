@@ -2,6 +2,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
+#' @include translate-sql-quantile.R
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
@@ -83,6 +84,23 @@ base_scalar <- sql_translator(
   xor     = function(x, y) {
     sql_expr(!!x %OR% !!y %AND NOT% (!!x %AND% !!y))
   },
+
+  # bitwise operators
+  # SQL Syntax reference links:
+  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-ArithmeticOperators
+  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_bit_functions.html
+  #   PostgreSQL: https://www.postgresql.org/docs/7.4/functions-math.html
+  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/language-elements/bitwise-operators-transact-sql?view=sql-server-2017
+  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/bit-functions.html
+  #   Oracle: https://docs.oracle.com/cd/E19253-01/817-6223/chp-typeopexpr-7/index.html
+  #   SQLite: https://www.tutorialspoint.com/sqlite/sqlite_bitwise_operators.htm
+  #   Teradata: https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/h3CS4MuKL1LCMQmnubeSRQ
+  bitwNot    = function(x) sql_expr(~ ((!!x))),
+  bitwAnd    = sql_infix("&"),
+  bitwOr     = sql_infix("|"),
+  bitwXor    = sql_infix("^"),
+  bitwShiftL = sql_infix("<<"),
+  bitwShiftR = sql_infix(">>"),
 
   abs     = sql_prefix("ABS", 1),
   acos    = sql_prefix("ACOS", 1),
@@ -267,6 +285,10 @@ base_agg <- sql_translator(
   min        = sql_aggregate("MIN"),
   max        = sql_aggregate("MAX"),
 
+  # Ordered set functions
+  quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
+  median = sql_median("PERCENTILE_CONT", "ordered"),
+
   # first = sql_prefix("FIRST_VALUE", 1),
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
@@ -339,6 +361,12 @@ base_win <- sql_translator(
   sum   = win_aggregate("SUM"),
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
+
+  # Ordered set functions
+  quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),
+  median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
+
+  # Counts
   n     = function() {
     win_over(sql("COUNT(*)"), win_current_group())
   },
@@ -381,6 +409,8 @@ base_no_win <- sql_translator(
   sum          = win_absent("SUM"),
   min          = win_absent("MIN"),
   max          = win_absent("MAX"),
+  median       = win_absent("PERCENTILE_CONT"),
+  quantile    = win_absent("PERCENTILE_CONT"),
   n            = win_absent("N"),
   n_distinct   = win_absent("N_DISTINCT"),
   cummean      = win_absent("MEAN"),

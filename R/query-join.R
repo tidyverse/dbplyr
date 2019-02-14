@@ -15,19 +15,30 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
 
 #' @export
 print.join_query <- function(x, ...) {
-  cat("<SQL JOIN (", toupper(x$type), ")>\n", sep = "")
-  cat("By:   ", paste0(x$by$x, "-", x$by$y, collapse = ", "), "\n", sep = "")
+  cat_line("<SQL JOIN (", toupper(x$type), ")>")
 
-  cat(named_rule("X"), "\n", sep = "")
-  print(x$x$ops)
-  cat(named_rule("Y"), "\n", sep = "")
-  print(x$y$ops)
+  cat_line("By:")
+  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  cat_line("Y:")
+  cat_line(indent_print(sql_build(x$y)))
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., root = FALSE) {
-  from_x <- sql_subquery(con, sql_render(query$x, con, ..., root = root), name = "TBL_LEFT")
-  from_y <- sql_subquery(con, sql_render(query$y, con, ..., root = root), name = "TBL_RIGHT")
+sql_render.join_query <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+  from_x <- sql_subquery(
+    con,
+    sql_render(query$x, con, ..., bare_identifier_ok = TRUE),
+    name = "LHS"
+  )
+  from_y <- sql_subquery(
+    con,
+    sql_render(query$y, con, ..., bare_identifier_ok = TRUE),
+    name = "RHS"
+  )
 
   sql_join(con, from_x, from_y, vars = query$vars, type = query$type, by = query$by)
 }
@@ -52,9 +63,9 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
   # Wrap with SELECT since callers assume a valid query is returned
   build_sql(
     "SELECT ", select, "\n",
-    "  FROM ", x, "\n",
-    "  ", JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("  ON ", on, "\n", con = con) else NULL,
+    "FROM ", x, "\n",
+    JOIN, " ", y, "\n",
+    if (!is.null(on)) build_sql("ON ", on, "\n", con = con) else NULL,
     con = con
   )
 }
@@ -80,15 +91,15 @@ sql_join_var <- function(con, alias, x, y) {
   if (!is.na(x) & !is.na(y)) {
     sql_expr(
       COALESCE(
-        !!sql_table_prefix(con, x, table = "TBL_LEFT"),
-        !!sql_table_prefix(con, y, table = "TBL_RIGHT")
+        !!sql_table_prefix(con, x, table = "LHS"),
+        !!sql_table_prefix(con, y, table = "RHS")
       ),
       con = con
     )
   } else if (!is.na(x)) {
-    sql_table_prefix(con, x, table = "TBL_LEFT")
+    sql_table_prefix(con, x, table = "LHS")
   } else if (!is.na(y)) {
-    sql_table_prefix(con, y, table = "TBL_RIGHT")
+    sql_table_prefix(con, y, table = "RHS")
   } else {
     stop("No source for join column ", alias, call. = FALSE)
   }
@@ -99,14 +110,16 @@ sql_join_tbls <- function(con, by) {
   if (length(by$x) + length(by$y) > 0) {
     on <- sql_vector(
       paste0(
-        sql_table_prefix(con, by$x, "TBL_LEFT"),
+        sql_table_prefix(con, by$x, "LHS"),
         " = ",
-        sql_table_prefix(con, by$y, "TBL_RIGHT")
+        sql_table_prefix(con, by$y, "RHS")
       ),
       collapse = " AND ",
       parens = TRUE,
       con = con
     )
+  } else if (length(by$on) > 0) {
+    on <- build_sql("(", by$on, ")", con = con)
   }
 
   on

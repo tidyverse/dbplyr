@@ -1,3 +1,4 @@
 <SQL SELECT>
-From:     df
+From:
+  <IDENT> df
 Select:   *

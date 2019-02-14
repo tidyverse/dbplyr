@@ -1,0 +1,7 @@
+<SQL JOIN (LEFT)>
+By:
+  x-x
+X:
+  <IDENT> df
+Y:
+  <IDENT> df

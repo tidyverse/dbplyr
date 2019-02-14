@@ -144,7 +144,9 @@ translate_sql_ <- function(dots,
 
   variant <- sql_translate_env(con)
   pieces <- lapply(dots, function(x) {
-    if (is_atomic(get_expr(x))) {
+    if (is_null(get_expr(x))) {
+      NULL
+    } else if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {
       overscope <- sql_overscope(x, variant, con = con, window = window)

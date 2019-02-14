@@ -1,3 +1,4 @@
+# nocov start
 .onLoad <- function(...) {
   register_s3_method("dplyr", "union", "tbl_lazy")
   register_s3_method("dplyr", "intersect", "tbl_lazy")
@@ -37,4 +38,4 @@ register_s3_method <- function(pkg, generic, class, fun = NULL) {
     }
   )
 }
-
+# nocov end

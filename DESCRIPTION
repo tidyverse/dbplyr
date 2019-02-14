@@ -57,6 +57,7 @@ Collate:
     'utils.R'
     'sql.R'
     'escape.R'
+    'translate-sql-quantile.R'
     'translate-sql-paste.R'
     'translate-sql-helpers.R'
     'translate-sql-window.R'

@@ -27,6 +27,20 @@ test_that("join with both same and different vars", {
   expect_equal(names(j1), c("x", "y"))
 })
 
+test_that("joining over arbitrary predicates", {
+  j1 <- collect(left_join(df1, df2, sql_on = "LHS.x = RHS.b"))
+  j2 <- collect(left_join(df1, df2, by = c("x" = "b"))) %>% mutate(b = x)
+  expect_equal(j1, j2)
+
+  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.z"))
+  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x.x)
+  expect_equal(j1, j2)
+
+  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.x"))
+  j2 <- collect(left_join(df1, df3, by = "x")) %>% mutate(x.y = x) %>% rename(x.x = x)
+  expect_equal(j1, j2)
+})
+
 test_that("inner join doesn't result in duplicated columns ", {
   expect_equal(colnames(inner_join(df1, df1)), c("x", "y"))
 })
@@ -83,6 +97,39 @@ test_that("join functions error on column not found for SQL sources #1928", {
   )
 })
 
+test_that("join generates correct sql", {
+  lf1 <- memdb_frame(x = 1, y = 2)
+  lf2 <- memdb_frame(x = 1, z = 3)
+
+  out <- lf1 %>%
+    inner_join(lf2, by = "x") %>%
+    collect()
+
+  expect_equal(out, data.frame(x = 1, y = 2, z = 3))
+})
+
+test_that("semi join generates correct sql", {
+  lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- memdb_frame(x = 1)
+
+  lf3 <- inner_join(lf1, lf2, by = "x")
+  expect_equal(op_vars(lf3), c("x", "y"))
+
+  out <- collect(lf3)
+  expect_equal(out, data.frame(x = 1, y = 2))
+})
+
+
+test_that("set ops generates correct sql", {
+  lf1 <- memdb_frame(x = 1)
+  lf2 <- memdb_frame(x = c(1, 2))
+
+  out <- lf1 %>%
+    union(lf2) %>%
+    collect()
+
+  expect_equal(out, data.frame(x = c(1, 2)))
+})
 # All sources -------------------------------------------------------------
 
 test_that("sql generated correctly for all sources", {

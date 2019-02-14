@@ -1,0 +1,7 @@
+<SQL SEMI JOIN>
+By:
+  x-x
+X:
+  <IDENT> df
+Y:
+  <IDENT> df

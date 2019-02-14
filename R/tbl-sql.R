@@ -52,6 +52,12 @@ n_groups.tbl_sql <- function(x) {
 # Standard data frame methods --------------------------------------------------
 
 #' @export
+print.tbl_sql <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
+  cat_line(format(x, ..., n = n, width = width, n_extra = n_extra))
+  invisible(x)
+}
+
+#' @export
 as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
                                   ..., n = Inf) {
   as.data.frame(collect(x, n = n))

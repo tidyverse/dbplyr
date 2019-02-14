@@ -170,8 +170,9 @@ sql_prefix <- function(f, n = NULL) {
 sql_aggregate <- function(f, f_r = f) {
   assert_that(is_string(f))
 
+  warned <- FALSE
   function(x, na.rm = FALSE) {
-    check_na_rm(f_r, na.rm)
+    warned <<- check_na_rm(f_r, na.rm, warned)
     build_sql(sql(f), list(x))
   }
 }
@@ -197,17 +198,18 @@ sql_aggregate_win <- function(f) {
   }
 }
 
-
-check_na_rm <- function(f, na.rm) {
-  if (identical(na.rm, TRUE)) {
-    return()
+check_na_rm <- function(f, na.rm, warned) {
+  if (warned || identical(na.rm, TRUE)) {
+    return(warned)
   }
 
   warning(
     "Missing values are always removed in SQL.\n",
-    "Use `", f, "(x, na.rm = TRUE)` to silence this warning",
+    "Use `", f, "(x, na.rm = TRUE)` to silence this warning\n",
+    "This warning is displayed only once per session.",
     call. = FALSE
   )
+  TRUE
 }
 
 #' @rdname sql_variant

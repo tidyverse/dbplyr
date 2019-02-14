@@ -138,6 +138,8 @@ translate_sql(glob(x, y))
 translate_sql(x %like% "ab%")
 ```
 
+See `vignette("sql")` for more details.
+
 ## Window functions
 
 Things get a little trickier with window functions, because SQL's window functions are considerably more expressive than the specific variants provided by base R or dplyr. They have the form `[expression] OVER ([partition clause] [order clause] [frame_clause])`:

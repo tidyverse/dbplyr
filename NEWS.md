@@ -1,5 +1,47 @@
 # dbplyr (development version)
 
+* Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
+  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
+  functions, the translations do not coerce arguments to integers (@davidchall, #235).
+
+* `mutate(df, x = NULL)` now drops `x` from the output, like when working with
+  local data frames (#194).
+
+* `partial_eval()` processes inlined functions (including rlang lambda 
+  functions). This makes dbplyr work with more forms of scoped verbs like
+  `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
+
+* Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
+  more consistent with `dplyr`. It allows to sort by groups if desired. The default 
+  is `FALSE` (#115)
+
+* New translation for `median()` and `quantile()`. Works for ANSI compliant
+  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
+  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  (#169)
+
+* Joins and semi-joins no longer add an unneeded subquery (#236). This is
+  faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
+  the previous argument was called `root` and confused me.
+
+* Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
+  be collapsed into a single query, instead of always generate a subquery
+  (#213).
+
+* New vignette describing some advantages for dplyr of SQL (#205) and giving
+  some advice about writing SQL if needed (#196).
+
+* Aggregation functions only warn once per session about the use of 
+  `na.rm = TRUE` (#216).
+
+* New `vignette("reprex")` gives some hints on creeating reprexes that work 
+  anywhere (#117).
+
+* New `tbl_memdb()` for creating reprexes (to match `tbl_lazy()`)
+
+* All `..._join()` methods gain an `sql_on` argument that allows specifying
+  arbitrary join predicates in SQL code (#146, @krlmlr).
+
 * ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
@@ -54,7 +96,7 @@
   ODBC based translations).
 
 * `tbl_lazy()` (used for testing) now records class of src simulation, and 
-  gains informative print method (#111).
+  prints generated SQL (#111).
 
 * `sql_infix()` gains a `pad` argument for the occassional operator that 
   doesn't need to be surrounded by spaces.
