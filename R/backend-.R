@@ -222,12 +222,12 @@ base_scalar <- sql_translator(
   year = function(x) sql_expr(extract(year %from% !!x)),
   month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
     if (!label) {
-      return(sql_expr(extract(month %from% !!x)))
+      sql_expr(extract(month %from% !!x))
     } else {
       if (abbr) {
-        return(sql_expr(TO_CHAR(!!x, "Mon")))
+        sql_expr(TO_CHAR(!!x, "Mon"))
       } else {
-        return(sql_expr(TO_CHAR(!!x, "Month")))
+        sql_expr(TO_CHAR(!!x, "Month"))
       }
     }
 
