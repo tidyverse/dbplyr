@@ -56,33 +56,17 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         sql_expr(strpos(!!string, !!pattern) > 0L)
       },
       # lubridate functions
-      wday = function(x, label=FALSE, abbr = TRUE
-                      , week_start = getOption("lubridate.week.start",7)
-                      , locale = Sys.getlocale("LC_TIME")) {
+      wday <- function(
+                 x,
+                 label=FALSE,
+                 abbr = TRUE,
+                 week_start = getOption("lubridate.week.start", 7)) {
         if (!label) {
-          return(build_sql(
-            "EXTRACT('dow' FROM "
-            , "date("
-            , x
-            , ") + "
-            , as.integer(7 - week_start)
-            , ") + 1"
-          )
-          )
+          return(build_sql("EXTRACT('dow' FROM ", "date(", x, ") + ", as.integer(7 - week_start), ") + 1"))
         } else if (label && !abbr) {
-          return(build_sql(
-            "TO_CHAR("
-            , x
-            , ",'Day')"
-          ))
+          return(build_sql("TO_CHAR(", x, ",'Day')"))
         } else if (label && abbr) {
-          return(
-            build_sql(
-              "SUBSTR(TO_CHAR("
-              , x
-              , ",'Day'),1,3)"
-            )
-          )
+          return(build_sql("SUBSTR(TO_CHAR(", x, ",'Day'),1,3)"))
         } else {
           stop("Unrecognized arguments to `wday`")
         }
