@@ -24,7 +24,7 @@ sql_str_sub <- function(f = "SUBSTR", full_length = "drop", compute_method = "LE
       sql_call2(f, string, start)
     } else if (end == -1L && full_length == "compute") {
       # compute the full_length using compute_method
-      sql_call2(f, string, start, sql_prefix(compute_method, n = 1)(string))
+      sql_call2(f, string, start, build_sql(!!compute_method, "(", string, ") - ", start, " + 1"))
     } else {
       length <- pmax(as.integer(end) - start + 1L, 0L)
       sql_call2(f, string, start, length)
