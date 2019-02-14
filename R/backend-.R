@@ -161,6 +161,7 @@ base_scalar <- sql_translator(
   as.character = sql_cast("TEXT"),
   as.logical = sql_cast("BOOLEAN"),
   as.Date = sql_cast("DATE"),
+  as.POSIXct = sql_cast("TIMESTAMP"),
   # MS SQL - https://docs.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql
   # Hive - https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-IntegralTypes(TINYINT,SMALLINT,INT/INTEGER,BIGINT)
   # Postgres - https://www.postgresql.org/docs/8.4/static/datatype-numeric.html
