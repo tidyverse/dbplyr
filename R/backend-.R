@@ -238,18 +238,7 @@ base_scalar <- sql_translator(
   today = function() build_sql("CURRENT_DATE"),
   now = function() build_sql("CURRENT_TIMESTAMP"),
   year = function(x) sql_expr(extract(year %from% !!x)),
-  month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
-    if (!label) {
-      sql_expr(extract(month %from% !!x))
-    } else {
-      if (abbr) {
-        sql_expr(TO_CHAR(!!x, "Mon"))
-      } else {
-        sql_expr(TO_CHAR(!!x, "Month"))
-      }
-    }
-
-  },
+  month = function(x) sql_expr(extract(month %from% !!x)),
   day = function(x) sql_expr(extract(day %from% !!x)),
   hour = function(x) sql_expr(extract(hour %from% !!x)),
   minute = function(x) sql_expr(extract(minute %from% !!x)),
