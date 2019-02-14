@@ -217,8 +217,8 @@ base_scalar <- sql_translator(
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
-  today = function(tzone = "") build_sql("CURRENT_DATE"),
-  now = function(tzone = "") build_sql("CURRENT_TIMESTAMP"),
+  today = function() build_sql("CURRENT_DATE"),
+  now = function() build_sql("CURRENT_TIMESTAMP"),
   year = function(x) sql_expr(extract(year %from% !!x)),
   month = function(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")) {
     if (!label) {
