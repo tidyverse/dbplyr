@@ -238,7 +238,7 @@ base_scalar <- sql_translator(
   str_pad = sql_not_supported("str_pad()"),
   str_remove = sql_not_supported("str_remove()"),
   str_remove_all = sql_not_supported("str_remove_all()"),
-  str_replace = fsql_not_supported("str_replace()"),
+  str_replace = sql_not_supported("str_replace()"),
   str_replace_na = sql_not_supported("str_replace_na()"),
   str_sort = sql_not_supported("str_sort()"),
   str_split = sql_not_supported("str_split()"),
