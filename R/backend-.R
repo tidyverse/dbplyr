@@ -235,14 +235,14 @@ base_scalar <- sql_translator(
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
-  today = function() build_sql("CURRENT_DATE"),
-  now = function() build_sql("CURRENT_TIMESTAMP"),
-  year = function(x) sql_expr(extract(year %from% !!x)),
-  month = function(x) sql_expr(extract(month %from% !!x)),
-  day = function(x) sql_expr(extract(day %from% !!x)),
-  hour = function(x) sql_expr(extract(hour %from% !!x)),
-  minute = function(x) sql_expr(extract(minute %from% !!x)),
-  second = function(x) sql_expr(extract(second %from% !!x))
+  today = function() sql_expr(CURRENT_DATE),
+  now = function() sql_expr(CURRENT_TIMESTAMP),
+  year = function(x) sql_expr(EXTRACT(year %from% !!x)),
+  month = function(x) sql_expr(EXTRACT(month %from% !!x)),
+  day = function(x) sql_expr(EXTRACT(day %from% !!x)),
+  hour = function(x) sql_expr(EXTRACT(hour %from% !!x)),
+  minute = function(x) sql_expr(EXTRACT(minute %from% !!x)),
+  second = function(x) sql_expr(EXTRACT(second %from% !!x))
 )
 
 base_symbols <- sql_translator(
