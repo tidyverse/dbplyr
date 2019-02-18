@@ -233,13 +233,13 @@ sql_translate_env.Oracle <- function(con) {
       # TODO in week start support?
       wday = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          build_sql("(to_number(TO_CHAR(", x, ", 'D')))")
+          build_sql("(MOD(1 + TRUNC(", !!x, " + 6) - TRUNC(", !!x , " + 6, 'IW'),7) +1 )")
         }
         else if (abbr) {
-          build_sql("TO_CHAR(", x, ", 'DY')")
+          build_sql("TO_CHAR(", !!x, ", 'DY')")
         }
         else {
-          build_sql("TO_CHAR(", x, ", 'DAY')")
+          build_sql("TO_CHAR(", !!x, ", 'DAY')")
         }
       },
 
@@ -707,8 +707,8 @@ sql_translate_env.Oracle <- function(con) {
           month = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), ceil(months_between(", !!x,
-              ", trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(trunc(", !!x,
+              ", 'mm')+1, trunc(", !!x,
               ", 'yyyy'))/", !!n,
               ")*", !!n,
               "))"
@@ -721,8 +721,8 @@ sql_translate_env.Oracle <- function(con) {
           bimonth = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), ceil(months_between(", !!x,
-              ", trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(trunc(", !!x,
+              ", 'mm')+1, trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*2))*", !!n,
               "*2))"
@@ -731,8 +731,8 @@ sql_translate_env.Oracle <- function(con) {
           quarter = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), ceil(months_between(", !!x,
-              ", trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(trunc(", !!x,
+              ", 'mm')+1, trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*3))*", !!n,
               "*3))"
@@ -741,8 +741,8 @@ sql_translate_env.Oracle <- function(con) {
           halfyear = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), ceil(months_between(", !!x,
-              ", trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(trunc(", !!x,
+              ", 'mm')+1, trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*6))*", !!n,
               "*6))"
@@ -751,8 +751,8 @@ sql_translate_env.Oracle <- function(con) {
           season = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), -1 + ceil(months_between(", !!x,
-              ", trunc(", !!x,
+              ", 'yyyy'), ceil(months_between(trunc(", !!x,
+              ", 'mm')+1, trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*3))*", !!n,
               "*3))"
