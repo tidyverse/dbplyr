@@ -751,8 +751,8 @@ sql_translate_env.Oracle <- function(con) {
           season = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), -1  + ceil(months_between(add_months(", !!x,
-              ",1), trunc(", !!x,
+              ", 'yyyy'), -1  + ceil(months_between(add_months(trunc(", !!x,
+              ", 'mm')+1,1), trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*3))*", !!n,
               "*3))"
