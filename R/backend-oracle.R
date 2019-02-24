@@ -420,7 +420,7 @@ sql_translate_env.Oracle <- function(con) {
               "(
               case when ",
               !!n,
-              "= 1 then trunc(",
+              "= 1 then round(",
               !!x,
               ", 'YYYY')
               else add_months(round(",
