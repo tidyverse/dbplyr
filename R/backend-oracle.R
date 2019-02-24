@@ -715,7 +715,21 @@ sql_translate_env.Oracle <- function(con) {
             )
           },
           year = {
-            # TODO
+            build_sql(
+              "(
+              case when ",
+              !!n,
+              "= 1 then add_months(trunc(",
+              !!x,
+              ", 'YYYY'), 12)
+              else add_months(trunc(",
+              !!x,
+              ", 'YYYY'),  (", !!n, "-mod(extract(year from ",
+              !!x,
+              "), ",
+              !!n,
+              "))*12) end)"
+              )
           },
           # TODO check all these below actually work for n =1 and n >1
           bimonth = {
