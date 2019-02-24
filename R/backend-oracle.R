@@ -233,7 +233,7 @@ sql_translate_env.Oracle <- function(con) {
       # TODO in week start support?
       wday = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          build_sql("(MOD(1 + TRUNC(", !!x, " + 6) - TRUNC(", !!x , " + 6, 'IW'),7) +1 )")
+          build_sql("(MOD(1 + TRUNC(", !!x, ") - TRUNC(", !!x , ", 'IW'),7) +1 )")
         }
         else if (abbr) {
           build_sql("TO_CHAR(", !!x, ", 'DY')")
