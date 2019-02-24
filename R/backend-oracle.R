@@ -621,7 +621,7 @@ sql_translate_env.Oracle <- function(con) {
           season = {
             build_sql(
               "(add_months(trunc(", !!x,
-              ", 'yyyy'), case when extract(month from ", !!x, ")between 3 and 11 then -2 else -1 end +floor(months_between(add_months(", !!x,
+              ", 'yyyy'), -1  + floor(months_between(add_months(", !!x,
               ",1), trunc(", !!x,
               ", 'yyyy'))/(", !!n,
               "*3))*", !!n,
