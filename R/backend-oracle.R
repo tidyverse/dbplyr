@@ -323,162 +323,6 @@ sql_translate_env.Oracle <- function(con) {
       # tz() `tz<-`()
 
       # Other modification functions
-      round_date = function(x,
-                                  unit = "second",
-                                  week_start = getOption("lubridate.week.start", 7)) {
-        if (!length(x)) {
-          return(x)
-        }
-        parsed_unit <- parse_period_unit(unit)
-        n <- parsed_unit$n
-        unit <- standardise_period_names(parsed_unit$unit)
-        switch(
-          unit,
-          # second is more complicated due to the fact that trunc will implicetely convert timestamps to date
-          # and date does not have milliseconds
-          # TODO test seconds round work
-          second = {
-            if (n > 60) {
-              stop("Error: Rounding with with second > 60 is not supported")
-            }
-            build_sql(
-              "(trunc(", !!x,
-              ") + (round((", !!x,
-              "- trunc(", !!x,
-              ")) * 24 * 60 * (60/", !!n,
-              "))/ (24* 60 * (60/", !!n,
-              "))))"
-            )
-          },
-          # TODO test minutes work
-          minute = {
-            if (n > 60) {
-              stop("Error: Rounding with with minute > 60 is not supported")
-            }
-            build_sql(
-              "(trunc(", !!x,
-              ") + (round((", !!x,
-              "- trunc(", !!x,
-              ")) * 24 * (60/", !!n,
-              "))/ (24*(60/", !!n,
-              "))))"
-            )
-          },
-          # TODO test hours work
-          hour = {
-            if (n > 24) {
-              stop("Error: Rounding with with second > 24 is not supported")
-            }
-            build_sql(
-              "(trunc(", !!x,
-              ") + (round((", !!x,
-              "- trunc(", !!x,
-              ")) * 24/", !!n,
-              ")/ (24/", !!n,
-              ")))"
-            )
-          },
-          # TODO test day work
-          day = {
-            if (n > 31) {
-              stop("Error: Rounding with with day > 31 is not supported")
-            }
-            build_sql(
-              "(trunc(", !!x,
-              ", 'mm') + (round((", !!x,
-              "- trunc(", !!x,
-              ", 'mm')) * 1/", !!n,
-              ")/ (1/", !!n,
-              ")))"
-            )
-          },
-          # TODO make week work
-          #    week = {
-          #      if (n != 1)
-          #        warning('Multi-unit not supported for weeks. Ignoring.')
-          #      switch(week_start,
-          #             #
-          #             #
-          #             #
-          #             #
-          #             stop('week_start value must be 1-7 (Monday-Sunday)') #does a default value work with integer switch?)
-          #    },
-          # TODO test month work
-          month = {
-            build_sql(
-              "(add_months(trunc(", !!x,
-              ", 'yyyy'), round(months_between(", !!x,
-              ", trunc(", !!x,
-              ", 'yyyy'))/", !!n,
-              ")*", !!n,
-              "))"
-            )
-          },
-          # TODO test year work
-          year = {
-            build_sql(
-              "(
-              case when ",
-              !!n,
-              "= 1 then round(",
-              !!x,
-              ", 'YYYY')
-              else add_months(round(",
-              !!x,
-              ", 'YYYY'),  (-remainder(extract(year from round(",
-              !!x,
-              ", 'yyyy')), ",
-              !!n,
-              "))*12) end)"
-            )
-          },
-          # TODO test bimonth work
-          bimonth = {
-            build_sql(
-              "(add_months(trunc(", !!x,
-              ", 'yyyy'), round(months_between(", !!x,
-              ", trunc(", !!x,
-              ", 'yyyy'))/(", !!n,
-              "*2))*", !!n,
-              "*2))"
-            )
-          },
-          # TODO test quarter work
-          quarter = {
-            build_sql(
-              "(add_months(trunc(", !!x,
-              ", 'yyyy'), round(months_between(", !!x,
-              ", trunc(", !!x,
-              ", 'yyyy'))/(", !!n,
-              "*3))*", !!n,
-              "*3))"
-            )
-          },
-          # TODO test halfyear work
-          halfyear = {
-            build_sql(
-              "(add_months(trunc(", !!x,
-              ", 'yyyy'), round(months_between(", !!x,
-              ", trunc(", !!x,
-              ", 'yyyy'))/(", !!n,
-              "*6))*", !!n,
-              "*6))"
-            )
-          },
-          # TODO test season work
-          season = {
-            build_sql(
-              "(add_months(trunc(", !!x,
-              ", 'yyyy'), -1  + round(months_between(add_months(", !!x,
-              ",1), trunc(", !!x,
-              ", 'yyyy'))/(", !!n,
-              "*3))*", !!n,
-              "*3))"
-            )
-          },
-          stop("Error: Failed to parse units.")
-        )
-      },
       floor_date = function(x,
                                   unit = "second",
                                   week_start = getOption("lubridate.week.start", 7)) {
@@ -774,6 +618,24 @@ sql_translate_env.Oracle <- function(con) {
           },
           stop("Error: Failed to parse units.")
         )
+      },
+      round_date = function(x,
+                            unit = "second",
+                            week_start = getOption("lubridate.week.start", 7)) {
+        build_sql("(CASE WHEN ",
+                  ceiling_date(x, unit, week_start),
+                  " - ",
+                  !!x,
+                  " > ",
+                  !!x,
+                  " - ",
+                  floor_date(x, unit, week_start),
+                  " THEN ",
+                  floor_date(x, unit, week_start),
+                  " ELSE ",
+                  ceiling_date(x, unit, week_start),
+                  ")")
+
       },
       # Other date-time components
       # TODO make sure all these work
