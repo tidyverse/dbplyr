@@ -331,16 +331,17 @@ sql_translate_env.Oracle <- function(con) {
         unit <- standardise_period_names(parsed_unit$unit)
         switch(
           unit,
+          # Due to division accuracy seconds needs a slightly modified code compared to min/hour/day
           second = {
             if (n > 60) {
               stop("Error: Rounding with with second > 60 is not supported")
             }
             build_sql(
               "(TRUNC(", !!x,
-              ", 'mi') + (FLOOR((", !!x,
+              ", 'mi') + (FLOOR(ROUND((", !!x,
               "- TRUNC(", !!x,
               ", 'mi')) * 24 * 60 * (60/", !!n,
-              "))/ (24* 60 *(60/", !!n,
+              "), 20))/ (24* 60 *(60/", !!n,
               "))))"
             )
           },
@@ -486,10 +487,10 @@ sql_translate_env.Oracle <- function(con) {
           second = {
             build_sql(
               "(TRUNC(", !!x,
-              ", 'mi') + (CEIL((", !!x,
+              ", 'mi') + (CEIL(ROUND((", !!x,
               "- TRUNC(", !!x,
               ", 'mi')) * 24 * 60 * (60/", !!n,
-              "))/ (24 * 60 * (60/", !!n,
+              "),20))/ (24 * 60 * (60/", !!n,
               "))))"
             )
           },
