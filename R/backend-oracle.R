@@ -339,7 +339,7 @@ sql_translate_env.Oracle <- function(con) {
               "(TRUNC(", !!x,
               ", 'mi') + (FLOOR((", !!x,
               "- TRUNC(", !!x,
-              ")) * 24 * 60 * (60/", !!n,
+              ", 'mi')) * 24 * 60 * (60/", !!n,
               "))/ (24* 60 *(60/", !!n,
               "))))"
             )
