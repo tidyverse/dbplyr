@@ -68,9 +68,9 @@ sql_translate_env.Oracle <- function(con) {
         if (is.na(format) | format == "%F" | format == "%Y-%m-%d") {
           build_sql(sql("DATE "), x)
         }
-        else if (grepl(x, "%C") | grepl(x, "%e") | grepl(x, "%w") |
-          grepl(x, "%W") | grepl(x, "%U") | grepl(x, "%x") |
-          grepl(x, "%y") | grepl(x, "%z") | grepl(x, "%D")) {
+        else if (grepl("%C", x) | grepl("%e", x) | grepl("%w", x) |
+          grepl("%W", x) | grepl("%U", x) | grepl("%x", x) |
+          grepl("%y", x) | grepl("%z", x) | grepl("%D", x)) {
           stop(
             "Error: One or more of the format identifiers is not curerntly supported by dbplyr for Oracle SQL"
           )
