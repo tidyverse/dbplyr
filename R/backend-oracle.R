@@ -153,7 +153,7 @@ sql_translate_env.Oracle <- function(con) {
             "(TO_NUMBER(",
             sql_expr(extract(year %from% !!x)),
             "|| '.' ||TO_CHAR(ADD_MONTHS(",
-            x,
+            !!x,
             ", 13-",
             fiscal_start,
             "),'Q')))"
@@ -184,10 +184,11 @@ sql_translate_env.Oracle <- function(con) {
           sql_expr((TO_NUMBER(extract(month %from% !!x))))
         }
         else if (abbr) {
-          build_sql("TO_CHAR(", x, ", 'Mon')")
+          build_sql("TO_CHAR(", !!x, ", 'Mon')")
         }
         else {
-          build_sql("TO_CHAR(", x, ", 'Month')")
+          warning("Ordered factors do not exist in SQL, data will be character only.")
+          build_sql("TRIM(TO_CHAR(", !!x, ", 'Month'))")
         }
       },
       # https://asktom.oracle.com/pls/apex/asktom.search?tag=changing-a-year-within-a-date
@@ -216,11 +217,11 @@ sql_translate_env.Oracle <- function(con) {
         )
       },
       week = function(x) {
-        build_sql("(TO_NUMBER(TO_CHAR(", x, ", 'WW')))")
+        build_sql("(TO_NUMBER(TO_CHAR(", !!x, ", 'WW')))")
       },
       # `week<-`()
       isoweek = function(x) {
-        build_sql("(TO_NUMBER(TO_CHAR(", x, ", 'IW')))")
+        build_sql("(TO_NUMBER(TO_CHAR(", !!x, ", 'IW')))")
       },
       # epiweek() # needs to use next_date rounding probably
       day = function(x) {
@@ -241,9 +242,7 @@ sql_translate_env.Oracle <- function(con) {
           build_sql("TO_CHAR(", !!x, ", 'DAY')")
         }
       },
-
       # qday()
-
       yday = function(x) {
         sql_expr((TO_NUMBER(TO_CHAR(!!x, "DDD"))))
       },
@@ -265,7 +264,8 @@ sql_translate_env.Oracle <- function(con) {
           " -1)"
         )
       },
-      # `qday<-`() `wday<-`()
+      # `qday<-`()
+      # `wday<-`()
       `yday<-` = function(x, value) {
         build_sql(
           "(TO_DATE('001'||TO_CHAR(",
@@ -318,9 +318,7 @@ sql_translate_env.Oracle <- function(con) {
           "/60)/24/60)"
         )
       },
-
       # tz() `tz<-`()
-
       # Other modification functions
       floor_date = function(x,
                                   unit = "second",
@@ -333,16 +331,13 @@ sql_translate_env.Oracle <- function(con) {
         unit <- standardise_period_names(parsed_unit$unit)
         switch(
           unit,
-          # second is more complicated due to the fact that trunc will implicetely convert timestamps to date
-          # and date does not have milliseconds
-          # TODO make sure this works for non-interger seconds
           second = {
             if (n > 60) {
               stop("Error: Rounding with with second > 60 is not supported")
             }
             build_sql(
               "(TRUNC(", !!x,
-              ") + (FLOOR((", !!x,
+              ", 'mi') + (FLOOR((", !!x,
               "- TRUNC(", !!x,
               ")) * 24 * 60 * (60/", !!n,
               "))/ (24* 60 *(60/", !!n,
@@ -355,9 +350,9 @@ sql_translate_env.Oracle <- function(con) {
             }
             build_sql(
               "(TRUNC(", !!x,
-              ") + (FLOOR((", !!x,
+              ", 'hh') + (FLOOR((", !!x,
               "- TRUNC(", !!x,
-              ")) * 24 * (60/", !!n,
+              ", 'hh')) * 24 * (60/", !!n,
               "))/ (24*(60/", !!n,
               "))))"
             )
@@ -491,9 +486,9 @@ sql_translate_env.Oracle <- function(con) {
           second = {
             build_sql(
               "(TRUNC(", !!x,
-              ") + (CEIL((", !!x,
+              ", 'mi') + (CEIL((", !!x,
               "- TRUNC(", !!x,
-              ")) * 24 * 60 * (60/", !!n,
+              ", 'mi')) * 24 * 60 * (60/", !!n,
               "))/ (24 * 60 * (60/", !!n,
               "))))"
             )
@@ -501,9 +496,9 @@ sql_translate_env.Oracle <- function(con) {
           minute = {
             build_sql(
               "(TRUNC(", !!x,
-              ") + (CEIL((", !!x,
+              ", 'hh') + (CEIL((", !!x,
               "- TRUNC(", !!x,
-              ")) * 24 * (60/", !!n,
+              ", 'hh')) * 24 * (60/", !!n,
               "))/ (24*(60/", !!n,
               "))))"
             )
