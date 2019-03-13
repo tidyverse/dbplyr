@@ -3,7 +3,7 @@
 #' @export
 group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
   dots <- quos(...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
 
   if (length(dots) == 0) {
     return(.data)

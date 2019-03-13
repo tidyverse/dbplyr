@@ -3,6 +3,10 @@
 * Add translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
   `second()` (@colearendt)
+* SQL server gains custom translation for `as.logical(x)` to `CAST(x as BIT)`
+  (#250).
+
+* Fix translations for MySQL and MariaDB connections that use the odbc package (@colearendt, #238)
 
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R

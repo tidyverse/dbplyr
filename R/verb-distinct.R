@@ -1,7 +1,7 @@
 #' @export
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   dots <- quos(..., .named = TRUE)
-  dots <- partial_eval(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
   add_op_single("distinct", .data, dots = dots, args = list(.keep_all = .keep_all))
 }
 

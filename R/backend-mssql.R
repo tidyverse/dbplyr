@@ -69,6 +69,7 @@
       if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
 
+      as.logical    = sql_cast("BIT"),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),

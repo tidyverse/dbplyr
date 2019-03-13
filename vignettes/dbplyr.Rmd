@@ -38,7 +38,7 @@ Five commonly used backends are:
 *   [RMySQL](https://github.com/rstats-db/RMySQL#readme) 
     connects to MySQL and MariaDB
 
-*   [RPostgreSQL](https://CRAN.R-project.org/package=RPostgreSQL) 
+*   [RPostgres](https://CRAN.R-project.org/package=RPostgres) 
     connects to Postgres and Redshift.
 
 *   [RSQLite](https://github.com/rstats-db/RSQLite) embeds a SQLite database.
@@ -62,7 +62,7 @@ library(dplyr)
 con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 ```
 
-The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMySQL::MySQL()` for RMySQL, `RPostgreSQL::PostgreSQL()` for RPostgreSQL, `odbc::odbc()` for odbc, and `bigrquery::bigquery()` for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string `":memory:"` which causes SQLite to make a temporary in-memory database.
+The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMySQL::MySQL()` for RMySQL, `RPostgres::Postgres()` for RPostgreSQL, `odbc::odbc()` for odbc, and `bigrquery::bigquery()` for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string `":memory:"` which causes SQLite to make a temporary in-memory database.
 
 Most existing databases don't live in a file, but instead live on another server. That means in real-life that your code will look more like this:
 

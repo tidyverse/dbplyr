@@ -3,7 +3,7 @@
 #' @export
 mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   dots <- quos(..., .named = TRUE)
-  dots <- partial_eval(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
 
   nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
 }
@@ -13,7 +13,7 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
 #' @export
 transmute.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
-  dots <- partial_eval(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
 
   nest_vars(.data, dots, character())
 }
