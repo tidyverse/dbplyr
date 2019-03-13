@@ -40,13 +40,15 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       cot    = sql_cot(),
       round  = postgres_round,
       grepl  = postgres_grepl,
+
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
       # stringr functions
       # https://www.postgresql.org/docs/9.1/functions-string.html
       # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
-      str_detect  = sql_infix("~"),
-      str_replace = function(string, pattern, replacement){
+      str_c = sql_paste(""),
+      str_detect = sql_infix("~"),
+      str_replace_all = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),

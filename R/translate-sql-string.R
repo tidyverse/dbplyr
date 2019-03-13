@@ -31,3 +31,12 @@ sql_str_sub <- function(f = "SUBSTR", full_length = "drop", compute_method = "LE
     }
   }
 }
+
+sql_str_trim <- function(string, side = c("both", "left", "right")) {
+  side <- match.arg(side)
+  switch(side,
+    left = sql_expr(LTRIM(!!string)),
+    right = sql_expr(RTRIM(!!string)),
+    both = sql_expr(LTRIM(RTRIM(!!string))),
+  )
+}

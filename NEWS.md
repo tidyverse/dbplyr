@@ -1,8 +1,11 @@
 # dbplyr (development version)
 
-* Add translations for stringr functions: `str_sub()`, `str_length()`,
-  `str_to_upper()`, `str_to_lower()`, `str_to_title()`, `str_replace_all()`. Along with
-  `str_detect()` and `str_replace()` when supported (@colearendt, #168)
+* Added default translations for stringr functions: `str_c()`, `str_sub()`, 
+  `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
+  (@colearendt). Non-translated stringr functions throw a clear error.
+  
+* Added basic support for regular expressions via `str_detect()` and 
+  `str_replace_all()` for MySQL and Postgres backends (@colearendt, #168).
 
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R

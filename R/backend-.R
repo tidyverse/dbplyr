@@ -138,14 +138,6 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  tolower = sql_prefix("LOWER", 1),
-  toupper = sql_prefix("UPPER", 1),
-  trimws = sql_prefix("TRIM", 1),
-  nchar   = sql_prefix("LENGTH", 1),
-  substr = sql_substr,
-  paste = sql_paste(" "),
-  paste0 = sql_paste(""),
-
   `if` = sql_if,
   if_else = function(condition, true, false) sql_if(condition, true, false),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
@@ -193,9 +185,7 @@ base_scalar <- sql_translator(
 
   `%>%` = `%>%`,
 
-  substr = sql_substr("SUBSTR"),
-
-  # stringr functions
+  # String functions ------------------------------------------------------
   # SQL Syntax reference links:
   #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
   #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
@@ -203,26 +193,29 @@ base_scalar <- sql_translator(
   #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
   #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
   #   Oracle: https://docs.oracle.com/database/121/SQLRF/functions002.htm#SQLRF51180
-  str_length      = sql_prefix("LENGTH", 1),
-  str_to_upper    = sql_prefix("UPPER", 1),
-  str_to_lower    = sql_prefix("LOWER", 1),
-  str_to_title    = sql_prefix("INITCAP", 1),
-  str_replace_all = function(string, pattern, replacement) {
-    sql_expr(REPLACE(!!string, !!pattern, !!replacement))
-  },
-  str_trim = function(string, side = c("both", "left", "right")) {
-    side <- match.arg(side)
-    switch(side,
-      left = sql_expr(LTRIM(!!string)),
-      right = sql_expr(RTRIM(!!string)),
-      both = sql_expr(LTRIM(RTRIM(!!string))),
-    )
-   },
+
+  # base R
+  nchar = sql_prefix("LENGTH", 1),
+  tolower = sql_prefix("LOWER", 1),
+  toupper = sql_prefix("UPPER", 1),
+  trimws = function(x, which = "both") sql_str_trim(x, side = which),
+  paste = sql_paste(" "),
+  paste0 = sql_paste(""),
+  substr = sql_substr("SUBSTR"),
+
+  # stringr functions
+  str_length = sql_prefix("LENGTH", 1),
+  str_to_lower = sql_prefix("LOWER", 1),
+  str_to_upper = sql_prefix("UPPER", 1),
+  str_to_title = sql_prefix("INITCAP", 1),
+  str_trim = sql_str_trim,
+  str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
 
   str_c = sql_not_supported("str_c()"),
   str_conv = sql_not_supported("str_conv()"),
   str_count = sql_not_supported("str_count()"),
+  str_detect = sql_not_supported("str_detect()"),
   str_dup = sql_not_supported("str_dup()"),
   str_extract = sql_not_supported("str_extract()"),
   str_extract_all = sql_not_supported("str_extract_all()"),
@@ -239,6 +232,7 @@ base_scalar <- sql_translator(
   str_remove = sql_not_supported("str_remove()"),
   str_remove_all = sql_not_supported("str_remove_all()"),
   str_replace = sql_not_supported("str_replace()"),
+  str_replace_all = sql_not_supported("str_replace_all()"),
   str_replace_na = sql_not_supported("str_replace_na()"),
   str_sort = sql_not_supported("str_sort()"),
   str_split = sql_not_supported("str_split()"),

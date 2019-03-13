@@ -156,13 +156,6 @@ test_that("lower/upper translates correctly ", {
   expect_equal(translate_sql(str_to_lower(x)), sql("LOWER(`x`)"))
 })
 
-test_that("str_replace_all() translates correctly ", {
-  expect_equal(
-    translate_sql(str_replace_all(x, "pattern", "replacement")),
-    sql("REPLACE(`x`, 'pattern', 'replacement')")
-  )
-})
-
 test_that("str_trim() translates correctly ", {
   expect_equal(
     translate_sql(str_trim(x, "both")),

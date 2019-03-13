@@ -20,19 +20,22 @@ sql_translate_env.MySQLConnection <- function(con) {
         sql_expr(IF(x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
+
+      # string functions ------------------------------------------------
       paste = sql_paste(" "),
       paste0 = sql_paste(""),
+
+      # stringr
+      str_c = sql_paste(""),
       # https://dev.mysql.com/doc/refman/8.0/en/regexp.html
-      # case insensitive by default...
-      # note REGEXP_LIKE in MySQL allows case sensitive matching
-      # but is not compatible with MariaDB
-      # further, this workaround is horrible:
+      # NB: case insensitive by default; could use REGEXP_LIKE for MySQL,
+      # but available in MariaDB. A few more details at:
       # https://www.oreilly.com/library/view/mysql-cookbook/0596001452/ch04s11.html
       str_detect = sql_infix("REGEXP"),
       str_locate = function(string, pattern) {
         sql_expr(REGEXP_INSTR(!!string, !!pattern))
       },
-      str_replace = function(string, pattern, replacement){
+      str_replace_all = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
@@ -177,4 +180,4 @@ sql_join.MySQLConnection <- function(con, x, y, vars, type = "inner", by = NULL,
   NextMethod()
 }
 
-globalVariables(c("%separator%", "group_concat", "IF"))
+globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))

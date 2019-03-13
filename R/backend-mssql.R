@@ -73,7 +73,6 @@
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
-      nchar         = sql_prefix("LEN"),
       atan2         = sql_prefix("ATN2"),
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
@@ -82,38 +81,20 @@
       pmin          = sql_not_supported("pmin()"),
       pmax          = sql_not_supported("pmax()"),
 
-      substr = sql_substr("SUBSTRING"),
       is.null       = function(x) mssql_is_null(x, sql_current_context()),
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
-                      # TRIM is not supported on MS SQL versions under 2017
-                      # https://docs.microsoft.com/en-us/sql/t-sql/functions/trim-transact-sql
-                      # Best solution is to nest a left and right trims.
-      trimws        = function(x) {
-                        sql_expr(LTRIM(RTRIM(!!x)))
-                      },
-                      # MSSQL supports CONCAT_WS in the CTP version of 2016
-      paste         = sql_not_supported("paste()"),
+
+      # string functions ------------------------------------------------
+      # MSSQL supports CONCAT_WS in the CTP version of 2016
+      nchar = sql_prefix("LEN"),
+      paste = sql_not_supported("paste()"),
+      substr = sql_substr("SUBSTRING"),
 
       # stringr functions
-
-      str_length      = sql_prefix("LEN"),
-      # mssql does not support INITCAP, toTitle, toPropCase, etc.
-      # related SO post:
-      # https://stackoverflow.com/questions/230138/sql-server-make-all-upper-case-to-proper-case-title-case
-      str_to_title    = sql_not_supported("str_to_title()"),
-      # potentially helpful in the future
-      # https://stackoverflow.com/questions/38911588/replace-first-occurrence-of-substring-in-a-string-in-sql
-      str_replace     = sql_not_supported("str_replace()"),
-
-      # mssql does not have support for REGEXP functions
-      str_locate = function(string, pattern) {
-        sql_not_supported("str_locate")
-      },
-      # mssql does not have support for REGEXP functions
-      str_detect = function(string, pattern) {
-        sql_not_supported("str_detect")
-      },
-
+      str_length = sql_prefix("LEN"),
+      paste = sql_not_supported("str_c()"),
+      # no built in function: https://stackoverflow.com/questions/230138
+      str_to_title = sql_not_supported("str_to_title()"),
       str_sub = sql_str_sub("SUBSTRING", full_length = "compute", compute_method = "LEN")
     ),
     sql_translator(.parent = base_odbc_agg,
