@@ -55,36 +55,31 @@
 #' x <- 1
 #' partial_eval(quote(x ^ y))
 partial_eval <- function(call, vars = character(), env = caller_env()) {
-  switch_type(call,
-    "NULL" = NULL,
-    symbol = sym_partial_eval(call, vars, env),
-    language = lang_partial_eval(call, vars, env),
-    logical = ,
-    integer = ,
-    double = ,
-    complex = ,
-    string = ,
-    character = call,
-    formula = {
-      # This approach may be ill-founded: might be better to have a separate
-      # function for partially evaluating a list of quos/lazy_dots
-      f_rhs(call) <- partial_eval(f_rhs(call), vars, f_env(call) %||% env)
-      if (length(call) == 3) {
-        f_lhs(call) <- partial_eval(f_lhs(call), vars, f_env(call) %||% env)
-      }
-      call
-    },
-    list = {
-      if (inherits(call, "lazy_dots")) {
-        call <- dplyr:::compat_lazy_dots(call, env)
-      }
-      lapply(call, partial_eval, vars = vars, env = env)
-    },
+  if (is_null(call)) {
+    NULL
+  } else if (is_atomic(call)) {
+    call
+  } else if (is_symbol(call)) {
+    partial_eval_sym(call, vars, env)
+  } else if (is_call(call)) {
+    partial_eval_call(call, vars, env)
+  } else {
     abort(glue("Unknown input type: ", class(call)))
-  )
+  }
 }
 
-sym_partial_eval <- function(sym, vars, env) {
+partial_eval_dots <- function(dots, vars) {
+  stopifnot(inherits(dots, "quosures"))
+
+  lapply(dots, function(x) {
+    new_quosure(
+      partial_eval(get_expr(x), vars = vars, env = get_env(x)),
+      get_env(x)
+    )
+  })
+}
+
+partial_eval_sym <- function(sym, vars, env) {
   name <- as_string(sym)
   if (name %in% vars) {
     sym
@@ -103,7 +98,7 @@ is_tidy_pronoun <- function(call) {
   is_symbol(call[[1]], c("$", "[[")) && is_symbol(call[[2]], c(".data", ".env"))
 }
 
-lang_partial_eval <- function(call, vars, env) {
+partial_eval_call <- function(call, vars, env) {
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
