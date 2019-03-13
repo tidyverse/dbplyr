@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix translations for MySQL and MariaDB connections that use the odbc package (@colearendt, #238)
+
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
   functions, the translations do not coerce arguments to integers (@davidchall, #235).
