@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQL server gains custom translation for `as.logical(x)` to `CAST(x as BIT)`
+  (#250).
+
 * Fix translations for MySQL and MariaDB connections that use the odbc package (@colearendt, #238)
 
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
