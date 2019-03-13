@@ -1,43 +1,29 @@
 context("translate string helpers")
 
 test_that("sql_substr works as expected", {
-  setClass("DummyDBIConnectionSQLSubstr", representation("DBIConnection"))
+  old <- set_current_con(simulate_dbi())
+  on.exit(set_current_con(old))
+  x <- ident("x")
+  substr <- sql_substr("SUBSTR")
 
-  dummy_con <- new("DummyDBIConnectionSQLSubstr")
-  prev_con <- dbplyr:::set_current_con(dummy_con)
-
-  expect_error(sql_substr("SUBSTR")("test"), 'argument "start" is missing')
-  expect_error(sql_substr("SUBSTR")("test",0), 'argument "stop" is missing')
-  expect_equal(sql_substr("SUBSTR")("test",0,1), sql("SUBSTR('test', 0, 2)"))
-  expect_equal(sql_substr("SUBSTR")("test",3,2), sql("SUBSTR('test', 3, 0)"))
-  expect_equal(sql_substr("SUBSTR")("test",3,3), sql("SUBSTR('test', 3, 1)"))
-  expect_equal(sql_substr("SUBSTRING")("string", 4, 5), sql("SUBSTRING('string', 4, 2)"))
-
-  dbplyr:::set_current_con(prev_con)
+  expect_error(substr("test"), 'argument "start" is missing')
+  expect_error(substr("test", 0), 'argument "stop" is missing')
+  expect_equal(substr("test", 0, 1), sql("SUBSTR('test', 0, 2)"))
+  expect_equal(substr("test", 3, 2), sql("SUBSTR('test', 3, 0)"))
+  expect_equal(substr("test", 3, 3), sql("SUBSTR('test', 3, 1)"))
 })
 
 test_that("sql_str_sub works as expected", {
-  setClass("DummyDBIConnectionSQLStrSub", representation("DBIConnection"))
+  old <- set_current_con(simulate_dbi())
+  on.exit(set_current_con(old))
+  x <- ident("x")
+  substr <- sql_str_sub("SUBSTR")
 
-  dummy_con <- new("DummyDBIConnectionSQLStrSub")
-  prev_con <- dbplyr:::set_current_con(dummy_con)
-
-  expect_equal(sql_str_sub("SUBSTR")("string"), sql("SUBSTR('string', 1)"))
-  expect_equal(sql_str_sub("SUBSTRING")("string"), sql("SUBSTRING('string', 1)"))
-  expect_equal(sql_str_sub("SUBSTRING")("string", 4, 3), sql("SUBSTRING('string', 4, 0)"))
-  expect_equal(sql_str_sub("SUBSTRING")("string", 4, 5), sql("SUBSTRING('string', 4, 2)"))
-
-  # test that the "infinite length" default is respected
-  expect_equal(sql_str_sub("SUBSTRING")("string", 4), sql("SUBSTRING('string', 4)"))
-  expect_equal(
-    sql_str_sub("SUBSTRING", full_length = "compute")("string", 4),
-    sql("SUBSTRING('string', 4, LENGTH('string') - 4 + 1)")
-    )
-  expect_equal(
-    sql_str_sub("SUBSTRING", full_length = "compute", compute_method = "LEN")("string", 4),
-    sql("SUBSTRING('string', 4, LEN('string') - 4 + 1)")
-    )
-
-  dbplyr:::set_current_con(prev_con)
+  expect_equal(substr(x), sql("SUBSTR(`x`, 1)"))
+  expect_equal(substr(x, 1), sql("SUBSTR(`x`, 1)"))
+  expect_equal(substr(x, -1), sql("SUBSTR(`x`, -1)"))
+  expect_equal(substr(x, 2, 4), sql("SUBSTR(`x`, 2, 3)"))
+  expect_equal(substr(x, 2, 2), sql("SUBSTR(`x`, 2, 1)"))
+  expect_equal(substr(x, 1, -2), sql("SUBSTR(`x`, 1, LENGTH(`x`) - 1)"))
+  expect_equal(substr(x, -3, -3), sql("SUBSTR(`x`, -3, 1)"))
 })
-

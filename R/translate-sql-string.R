@@ -12,22 +12,29 @@ sql_substr <- function(f = "SUBSTR") {
   }
 }
 
-# if no parameters are provided, str_sub returns the whole string
-# if just start is provided, str_sub returns the rest of the string (after start)
+# str_sub(x, start, end) - start and end can be negative
+# SUBSTR(string, start, length) - start can be negative
+
 #' @export
 #' @rdname sql_variant
-sql_str_sub <- function(f = "SUBSTR", full_length = "drop", compute_method = "LENGTH") {
+sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
   function(string, start = 1L, end = -1L) {
+    stopifnot(length(start) == 1L, length(end) == 1L)
     start <- as.integer(start)
-    if (end == -1L && full_length == "drop") {
-      # drop the length parameter for full_length
-      sql_call2(f, string, start)
-    } else if (end == -1L && full_length == "compute") {
-      # compute the full_length using compute_method
-      sql_call2(f, string, start, build_sql(!!compute_method, "(", string, ") - ", start, " + 1"))
-    } else {
-      length <- pmax(as.integer(end) - start + 1L, 0L)
-      sql_call2(f, string, start, length)
+    end <- as.integer(end)
+
+    if (end == -1L) {
+      sql_call2(subset_f, string, start)
+    } else if (end <= 0) {
+      if (start < 0) {
+        length <- pmax(- start + end + 1L, 0L)
+      } else {
+        length <- sql_expr(!!sql_call2(length_f, string) - !!(abs(end) - 1L))
+      }
+      sql_call2(subset_f, string, start, length)
+    } else if (end > 0) {
+      length <- pmax(end - start + 1L, 0L)
+      sql_call2(subset_f, string, start, length)
     }
   }
 }
