@@ -224,22 +224,22 @@ base_scalar <- sql_translator(
                       )
                     },
 
-  # lubridate functions
-
-  # SQL syntax reference links
+  # lubridate ---------------------------------------------------------------
   # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
-
-  # SQLite - https://www.sqlite.org/lang_datefunc.html
-  #        - https://www.sqlite.org/datatype3.html
-  #
   as_date = sql_cast("DATE"),
   as_datetime = sql_cast("TIMESTAMP"),
 
   today = function() sql_expr(CURRENT_DATE),
   now = function() sql_expr(CURRENT_TIMESTAMP),
+
+  # https://modern-sql.com/feature/extract
   year = function(x) sql_expr(EXTRACT(year %from% !!x)),
   month = function(x) sql_expr(EXTRACT(month %from% !!x)),
   day = function(x) sql_expr(EXTRACT(day %from% !!x)),
+  mday = function(x) sql_expr(EXTRACT(day %from% !!x)),
+  yday = sql_not_supported("yday()"),
+  qday = sql_not_supported("qday()"),
+  wday = sql_not_supported("wday()"),
   hour = function(x) sql_expr(EXTRACT(hour %from% !!x)),
   minute = function(x) sql_expr(EXTRACT(minute %from% !!x)),
   second = function(x) sql_expr(EXTRACT(second %from% !!x))

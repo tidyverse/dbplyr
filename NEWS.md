@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Add translations for some lubridate functions: `today()`, `now()`, 
+  `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
+  `second()` (@colearendt)
+
 * Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
   functions, the translations do not coerce arguments to integers (@davidchall, #235).

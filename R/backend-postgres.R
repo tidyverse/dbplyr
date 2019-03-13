@@ -59,7 +59,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       # lubridate functions
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          sql_expr(extract(month %from% !!x))
+          sql_expr(EXTRACT(month %FROM% !!x))
         } else {
           if (abbr) {
             sql_expr(TO_CHAR(!!x, "Mon"))
@@ -67,21 +67,21 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
             sql_expr(TO_CHAR(!!x, "Month"))
           }
         }
-
       },
-      wday <- function(
-                 x,
-                 label=FALSE,
-                 abbr = TRUE,
-                 week_start = getOption("lubridate.week.start", 7)) {
+      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         if (!label) {
-          return(build_sql("EXTRACT('dow' FROM ", "date(", x, ") + ", as.integer(7 - week_start), ") + 1"))
+          # quiet R CMD check
+          date <- function(x) {}
+
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          sql_expr(EXTRACT("dow" %FROM% date(!!x) + !!offset) + 1)
         } else if (label && !abbr) {
-          return(build_sql("TO_CHAR(", x, ",'Day')"))
+          sql_expr(TO_CHAR(!!x, "Day"))
         } else if (label && abbr) {
-          return(build_sql("SUBSTR(TO_CHAR(", x, ",'Day'),1,3)"))
+          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
         } else {
-          stop("Unrecognized arguments to `wday`")
+          stop("Unrecognized arguments to `wday`", call. = FALSE)
         }
       }
     ),
@@ -194,4 +194,4 @@ db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
 #' @export
 db_explain.PqConnection <- db_explain.PostgreSQLConnection
 
-globalVariables(c("strpos", "%::%", "string_agg", "%~*%", "%~%"))
+globalVariables(c("strpos", "%::%", "%FROM%", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "month"))
