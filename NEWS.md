@@ -3,6 +3,7 @@
 * Add translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
   `second()` (@colearendt)
+
 * SQL server gains custom translation for `as.logical(x)` to `CAST(x as BIT)`
   (#250).
 
