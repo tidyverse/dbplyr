@@ -22,7 +22,7 @@
 #' @export
 window_order <- function(.data, ...) {
   dots <- quos(...)
-  dots <- partial_eval(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
   add_op_order(.data, dots)

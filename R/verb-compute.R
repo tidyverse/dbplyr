@@ -1,7 +1,7 @@
 #' Force computation of query
 #'
 #' `collapse()` creates a subquery; `compute()` stores the results in a
-#' remote table; `collect()` donwloads the results into the current
+#' remote table; `collect()` downloads the results into the current
 #' R session.
 #'
 #' @export

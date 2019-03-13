@@ -39,6 +39,6 @@ new table so that the query optimiser has useful information.}
 }
 \description{
 \code{collapse()} creates a subquery; \code{compute()} stores the results in a
-remote table; \code{collect()} donwloads the results into the current
+remote table; \code{collect()} downloads the results into the current
 R session.
 }
