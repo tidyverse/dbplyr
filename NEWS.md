@@ -2,7 +2,7 @@
 
 * Add translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
-  `second()` (@colearendt)
+  `second()` (@colearendt). Also add default translation for `as.POSIXct()`.
 
 * Added default translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
