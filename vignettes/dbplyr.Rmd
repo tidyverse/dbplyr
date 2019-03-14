@@ -35,7 +35,7 @@ You'll also need to install a DBI backend package. The DBI package provides a co
 
 Five commonly used backends are:
 
-*   [RMySQL](https://github.com/rstats-db/RMySQL#readme) 
+*   [RMariaDB](https://CRAN.R-project.org/package=RMariaDB) 
     connects to MySQL and MariaDB
 
 *   [RPostgres](https://CRAN.R-project.org/package=RPostgres) 
@@ -62,12 +62,12 @@ library(dplyr)
 con <- DBI::dbConnect(RSQLite::SQLite(), dbname = ":memory:")
 ```
 
-The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMySQL::MySQL()` for RMySQL, `RPostgres::Postgres()` for RPostgreSQL, `odbc::odbc()` for odbc, and `bigrquery::bigquery()` for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string `":memory:"` which causes SQLite to make a temporary in-memory database.
+The arguments to `DBI::dbConnect()` vary from database to database, but the first argument is always the database backend. It's `RSQLite::SQLite()` for RSQLite, `RMariaDB::MariaDB()` for RMariaDB, `RPostgres::Postgres()` for RPostgres, `odbc::odbc()` for odbc, and `bigrquery::bigquery()` for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string `":memory:"` which causes SQLite to make a temporary in-memory database.
 
 Most existing databases don't live in a file, but instead live on another server. That means in real-life that your code will look more like this:
 
 ```{r, eval = FALSE}
-con <- DBI::dbConnect(RMySQL::MySQL(), 
+con <- DBI::dbConnect(RMariaDB::MariaDB(), 
   host = "database.rstudio.com",
   user = "hadley",
   password = rstudioapi::askForPassword("Database password")
