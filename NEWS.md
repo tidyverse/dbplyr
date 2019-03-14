@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `copy_to()` method for SQL server applies temporary table name transformation
+  earlier so that you can now overwrite temporary tables (#258).
+
 * `db_write_table()` method for SQL server uses correct argument name for 
   passing along field types (#251).
 

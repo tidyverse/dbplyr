@@ -1,5 +1,5 @@
 #' @export
-`sql_select.Microsoft SQL Server`<- function(con, select, from, where = NULL,
+`sql_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
                                              order_by = NULL,
                                              limit = NULL,
@@ -123,6 +123,11 @@
   DBI::dbExecute(con, sql)
 }
 
+
+# Temporary tables --------------------------------------------------------
+# SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
+# temporary table names with #
+
 mssql_temp_name <- function(name, temporary){
   # check that name has prefixed '##' if temporary
   if (temporary && substr(name, 1, 1) != "#") {
@@ -133,33 +138,31 @@ mssql_temp_name <- function(name, temporary){
 }
 
 #' @export
+`db_copy_to.Microsoft SQL Server` <- function(con, table, values,
+                            overwrite = FALSE, types = NULL, temporary = TRUE,
+                            unique_indexes = NULL, indexes = NULL,
+                            analyze = TRUE, ...) {
+  NextMethod(
+    table = mssql_temp_name(table, temporary),
+    temporary = FALSE
+  )
+}
+
+#' @export
 `db_save_query.Microsoft SQL Server` <- function(con, sql, name,
                                                  temporary = TRUE, ...){
-  name <- mssql_temp_name(name, temporary)
-  tt_sql <- build_sql(
-    "SELECT * INTO ", as.sql(name), " FROM (", sql, ") ", as.sql(name),
-    con = con
+  NextMethod(
+    name = mssql_temp_name(name, temporary),
+    temporary = FALSE
   )
-  dbExecute(con, tt_sql)
-
-  name
 }
 
 #' @export
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
-
-  table <- mssql_temp_name(table, temporary)
-  dbWriteTable(
-    con,
-    name = table,
-    field.types = types,
-    value = values,
-    temporary = FALSE,
-    row.names = FALSE
+  NextMethod(
+    table = mssql_temp_name(table, temporary),
+    temporary = FALSE
   )
-
-  table
-
 }
 
 # `IS NULL` returns a boolean expression, so you can't use it in a result set
