@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `distinct()` now handles computed variables like `distinct(df, y = x + y)` 
+  (#154).
+
 * `copy_to()` method for SQL server applies temporary table name transformation
   earlier so that you can now overwrite temporary tables (#258).
 

@@ -41,11 +41,9 @@ test_that("distinct adds DISTINCT suffix", {
   expect_equal(out %>% collect(), tibble(x = 1))
 })
 
-test_that("distinct over columns uses GROUP BY", {
-  out <- memdb_frame(x = c(1, 2), y = c(1, 1)) %>% distinct(y)
-
-  expect_match(out %>% sql_render(), "SELECT `y`.*GROUP BY `y`")
-  expect_equal(out %>% collect(), tibble(y = 1))
+test_that("distinct can compute variables", {
+  out <- memdb_frame(x = c(2, 1), y = c(1, 2)) %>% distinct(z = x + y)
+  expect_equal(out %>% collect(), tibble(z = 3))
 })
 
 # sql_build ---------------------------------------------------------------
@@ -62,20 +60,18 @@ test_that("distinct sets flagged", {
   expect_true(out2$distinct)
 })
 
-
 # ops ---------------------------------------------------------------------
 
 test_that("distinct has complicated rules", {
   out <- lazy_frame(x = 1, y = 2) %>% distinct()
   expect_equal(op_vars(out), c("x", "y"))
 
-  out <- lazy_frame(x = 1, y = 2) %>% distinct(x, .keep_all = TRUE)
-  expect_equal(op_vars(out), c("x", "y"))
-
   out <- lazy_frame(x = 1, y = 2, z = 3) %>% distinct(x, y)
   expect_equal(op_vars(out), c("x", "y"))
+
+  out <- lazy_frame(x = 1, y = 2, z = 3) %>% distinct(a = x, b = y)
+  expect_equal(op_vars(out), c("a", "b"))
 
   out <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(x) %>% distinct(y)
   expect_equal(op_vars(out), c("x", "y"))
 })
-
