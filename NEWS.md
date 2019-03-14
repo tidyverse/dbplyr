@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `db_write_table()` method for SQL server uses correct argument name for 
+  passing along field types (#251).
+
 * Add translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
   `second()` (@colearendt). Also add default translation for `as.POSIXct()`.

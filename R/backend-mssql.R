@@ -152,7 +152,7 @@ mssql_temp_name <- function(name, temporary){
   dbWriteTable(
     con,
     name = table,
-    types = types,
+    field.types = types,
     value = values,
     temporary = FALSE,
     row.names = FALSE
