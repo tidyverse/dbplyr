@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create an sql translator — sql_paste • dbplyr</title>
+<title>Create an sql translator — sql_substr • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -31,7 +31,7 @@
 
 
 
-<meta property="og:title" content="Create an sql translator — sql_paste" />
+<meta property="og:title" content="Create an sql translator — sql_substr" />
 
 <meta property="og:description" content="When creating a package that maps to a new SQL based src, you'll often
 want to provide some additional mappings from common R commands to the
@@ -157,7 +157,7 @@ easy." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create an sql translator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-.R'><code>R/backend-.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-string.R'><code>R/translate-sql-string.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>sql_variant.Rd</code></div>
     </div>
 
@@ -170,7 +170,11 @@ easy.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
+    <pre class="usage"><span class='fu'>sql_substr</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>)
+
+<span class='fu'>sql_str_sub</span>(<span class='kw'>subset_f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>, <span class='kw'>length_f</span> <span class='kw'>=</span> <span class='st'>"LENGTH"</span>)
+
+<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
 
 <span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
 
