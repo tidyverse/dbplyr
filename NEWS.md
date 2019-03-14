@@ -2,8 +2,9 @@
 
 ## New features
 
-* `vignette("sql")` describes some advantages for dplyr of SQL (#205) and 
-  gives some advice about writing SQL inside of dplyr, when needed (#196).
+* `vignette("sql")` describes some advantages of dbplyr over SQL (#205) and 
+  gives some advice about writing how to write literal SQL inside of dplyr, 
+  when you you need to (#196).
 
 * `vignette("reprex")` gives some hints on creeating reprexes that work 
   anywhere (#117). This is supposrted by a new `tbl_memdb()` that 
@@ -12,126 +13,129 @@
 * All `..._join()` functions gain an `sql_on` argument that allows specifying
   arbitrary join predicates in SQL code (#146, @krlmlr).
 
+* MySQL/MariaDB translation gains support for window functions 
+  (https://mariadb.com/kb/en/library/window-functions/). They are available
+  in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
+  syntax error if you attempt to use with window functions (#191).
+
+* SQLite translation gains support for window functions   
+  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25 (#144).
+
+## Breaking changes
+
+* Subsetting (`[[`, `$`, and `[`) functions are no longer evaluated locally. 
+  This makes the translation more consistent and enables useful new idioms 
+  for modern databases (#200).
+
 ## SQL translations
+
+Overall, dplyr generates many fewer subqueries:
 
 * Joins and semi-joins no longer add an unneeded subquery (#236). This is
   faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
   the previous argument was called `root` and confused me.
 
-* `transmute()` now generates simpler SQL instead of being a `mutate()` + 
-   a `select()` (#193).
-
 * Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
   be collapsed into a single query, instead of always generating a subquery
   (#213).
 
-* SQL simulation has been overhauled. It's now better documented, and it always
-  uses `` ` `` for field names and `'` for string.
-
-### Function translation
-
 ### General
 
-* Add translations for some lubridate functions: `today()`, `now()`, 
+* New translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
   `second()` (@colearendt). Also add default translation for `as.POSIXct()`.
 
-* Added default translations for stringr functions: `str_c()`, `str_sub()`, 
+* New translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
   (@colearendt). Non-translated stringr functions throw a clear error.
 
-* Add translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
-  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Note that, unlike the base R
-  functions, the translations do not coerce arguments to integers (@davidchall, #235).
+* New translations for bitwise operations: `bitwNot()`, `bitwAnd()`, `bitwOr()`,
+  `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Unlike the base R functions, 
+  the translations do not coerce arguments to integers (@davidchall, #235).
 
-* New translation for `median()` and `quantile()`. Works for ANSI compliant
+* New translation for `median()` and `quantile()`. Works for all ANSI compliant
   databases (SQL Server, Postgres, MariaDB) and has custom translations for 
   Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
   (#169)
 
 * `switch()` is translated to the simple form of `SELECT CASE` (#192).
 
-* Functions that are only available in a windowed (`mutate()`) query now
-  throw an error when called in a aggregate (`summarise()`) query (#129)
-
 * `na_if()` is translated to `NULLIF()` for all databases (#211).
 
+* The `.data` and `.env` pronouns of tidy evaluation are correctly translated 
+  (#132).
 
-* SQL translation (via `partial_eval()`) now correctly interprets the 
-  `.data` and `.env` pronouns of tidy evaluation (#132).
-* Default translation for `pmin()` and `pmax()` becomes `LEAST()` and 
-  `GREATEST()` (#118). SQLite instead uses `MIN()` and `MAX()`, and MS SQL 
+* `pmin()` and `pmax()` are now translated to `LEAST()` and `GREATEST()` for 
+  ANSI compliant databases (#118), SQLite uses `MIN()` and `MAX()`, and MS SQL 
   throws an error.
 
-* Default translator gains translations for `paste()`, `paste0()`, 
-  and the hyperbolic functions (these previously were only available for 
-  ODBC based translations).
+* New translation for for `paste()`, `paste0()`, and the hyperbolic functions 
+  (these previously were only available for  ODBC based translations).
 
 * `x[y]` now translated to `CASE WHEN y THEN x END`. This enables 
-  `sum(x[y == 0])` to work as you expect from R (#202). `y` needs to be
+  `sum(a[b == 0])` to work as you expect from R (#202). `y` needs to be
   a logical expression; if not you will likely get a type error from your 
   database.
 
 * `x$y` and `x[["y"]]` are now translated to `x.y`, enabling you to index
   into nested fields in databases that provide them (#158).
 
-* (Breaking change) Subsetting (`[[`, `$`, and `[`) are no longer evaluated 
-  locally. This makes the translation more consistent enables useful new idioms
-  (#200).
+* Translation of `n_distinct()` now only supports a single argument 
+  (#101, #133).
 
+### Database specific improvements
 
+* MySQL/MariaDB
 
-### MySQL/MariaDB
+  * Translations also applied via connections to MySQL and MariaDB via the odbc 
+    package (@colearendt, #238)
+  
+  * Basic support for regular expressions via `str_detect()` and  
+    `str_replace_all()` (@colearendt, #168).
 
-* Basic support for regular expressions via `str_detect()` and  
-  `str_replace_all()` (@colearendt, #168).
+  * Improved translation for `as.logical(x)` to `IF(x, TRUE, FALSE)`.
 
-* Fix translations for MySQL and MariaDB connections that use the odbc package (@colearendt, #238)
+* Oracle
 
+  * New custom translation for `paste()` and `paste0()` (@cderv, #221)
 
-* MySQL/MariaDB gains an improved translation for `as.logical()`.
+* Postgres
 
-* table names generated by `random_table_name()` have the prefix 
-  "dbplyr_", which makes it easier to find them programmatically 
-  (@mattle24, #111)
+  * Basic support for regular expressions via `str_detect()` and  
+    `str_replace_all()` (@colearendt, #168).
 
+* SQLite
 
-* MySQL/MariaDB translation gains support for window functions 
-  (https://mariadb.com/kb/en/library/window-functions/). They are available
-  in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
-  syntax error if you attempt to use with window functions (#191).
+  * `explain()` translation now generates `EXPLAIN QUERY PLAN` which
+    generates a higher-level, more human friendly explanation.
 
+* SQL server
 
-### Oracle
+  * Improved translation for `as.logical(x)` to `CAST(x as BIT)` (#250).
 
+### SQL simulation
 
-* ORACLE: New custom translation for `paste()` and `paste0()` (@cderv, #221)
+* SQL simulation has been overhauled. It's now better documented, and it always
+  uses `` ` `` for field names and `'` for string.
 
+* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
+  shouldn't affect any downstream code unless you were previously working
+  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
 
-### Postgres
-
-* Basic support for regular expressions via `str_detect()` and  
-  `str_replace_all()` (@colearendt, #168).
-
-### SQLite
-
-* SQLite `explain()` translation now generates `EXPLAIN QUERY PLAN` which
-  generates a higher-level, more human friendly explanation.
-
-* SQLite translation gains support for window functions   
-  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25 (#144).
-
-
-
-### SQL server
-
-* SQL server gains custom translation for `as.logical(x)` to `CAST(x as BIT)`
-  (#250).
+* `tbl_lazy()` (used for testing) now records class of src simulation, and 
+  prints generated SQL (#111).
 
 ## Minor improvements and bug fixes
 
 * Aggregation functions only warn once per session about the use of 
   `na.rm = TRUE` (#216).
+
+* table names generated by `random_table_name()` have the prefix 
+  "dbplyr_", which makes it easier to find them programmatically 
+  (@mattle24, #111)
+
+* Functions that are only available in a windowed (`mutate()`) query now
+  throw an error when called in a aggregate (`summarise()`) query (#129)
 
 * Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
   more consistent with `dplyr`. It allows to sort by groups if desired. The default 
@@ -161,27 +165,18 @@
   functions). This makes dbplyr work with more forms of scoped verbs like
   `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
 
-* Translation of `n_distinct()` now only supports a single argument 
-  (#101, #133).
-
 * `sql_aggregate()` now takes an optional argument `f_r` for passing to
   `check_na_rm()`. "Missing values are always removed" warning for aggregate
   functions now shows the dplyr verb in the usage suggestion (@sverchkov, #153).
 
-* `sql_prefix()` no longer turns SQL functions into uppercase, allowing for correct translation of case-sensitive SQL functions (#181, @mtoto).
+* `sql_prefix()` no longer turns SQL functions into uppercase, allowing for 
+  correct translation of case-sensitive SQL functions (#181, @mtoto).
 
 * `sql_infix()` gains a `pad` argument for the occassional operator that 
   doesn't need to be surrounded by spaces.
 
 * `summarise()` gives a clear error message if you refer to a variable 
   created in that same `summarise()` (#114).
-
-* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
-  shouldn't affect any downstream code unless you were previously working
-  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
-
-* `tbl_lazy()` (used for testing) now records class of src simulation, and 
-  prints generated SQL (#111).
 
 * New `sql_call2()` which is to `rlang::call2()` as `sql_expr()` is to 
   `rlang::expr()`.
