@@ -69,12 +69,12 @@ groups.tbl_lazy <- function(x) {
   lapply(group_vars(x), as.name)
 }
 
-#' @export
+# Manually registered in zzz.R
 group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }
 
-# Manually registered in zzz.R
+#' @export
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$ops)
 }

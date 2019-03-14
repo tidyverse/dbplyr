@@ -7,7 +7,7 @@
   register_s3_method("dplyr", "setdiff", "OraConnection")
   register_s3_method("dplyr", "filter", "tbl_lazy")
 
-  if (packageVersion("dplyr") >= "0.8.0.9008") {
+  if (utils::packageVersion("dplyr") >= "0.8.0.9008") {
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
   }
 
