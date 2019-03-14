@@ -18,6 +18,14 @@ test_that("summarise performs partial evaluation", {
   expect_equal(mf2$y, 1)
 })
 
+test_that("can't refer to freshly created variables", {
+  mf1 <- lazy_frame(x = 1)
+  expect_error(
+    summarise(mf1, y = sum(x), z = sum(y)),
+    "refers to a variable"
+  )
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `summarise()` gives a clear error message if you refer to a variable 
+  created in that same `summarise()` (#114).
+
 * `distinct()` now handles computed variables like `distinct(df, y = x + y)` 
   (#154).
 

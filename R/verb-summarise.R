@@ -2,7 +2,25 @@
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  check_summarise_vars(dots)
   add_op_single("summarise", .data, dots = dots)
+}
+
+# For each expression, check if it uses any newly created variables
+check_summarise_vars <- function(dots) {
+  for (i in seq_along(dots)) {
+    used_vars <- all_names(get_expr(dots[[i]]))
+    cur_vars <- names(dots)[seq_len(i - 1)]
+
+    if (any(used_vars %in% cur_vars)) {
+      stop(
+        "`", names(dots)[[i]],
+        "` refers to a variable created earlier in this summarise().\n",
+        "Do you need an extra mutate() step?",
+        call. = FALSE
+      )
+    }
+  }
 }
 
 #' @export
