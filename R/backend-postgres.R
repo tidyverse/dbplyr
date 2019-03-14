@@ -40,21 +40,16 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       cot    = sql_cot(),
       round  = postgres_round,
       grepl  = postgres_grepl,
+
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
-      substr = function(x, start, stop) {
-        len <- stop - start + 1
-        start <- as.integer(start)
-        len <- as.integer(len)
-
-        sql_expr(SUBSTRING(!!x, !!start, !!len))
-      },
       # stringr functions
-      str_locate  = function(string, pattern) {
-        sql_expr(strpos(!!string, !!pattern))
-      },
-      str_detect  = function(string, pattern) {
-        sql_expr(strpos(!!string, !!pattern) > 0L)
+      # https://www.postgresql.org/docs/9.1/functions-string.html
+      # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
+      str_c = sql_paste(""),
+      str_detect = sql_infix("~"),
+      str_replace_all = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
     sql_translator(.parent = base_agg,

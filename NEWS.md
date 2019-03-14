@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* Added default translations for stringr functions: `str_c()`, `str_sub()`, 
+  `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
+  (@colearendt). Non-translated stringr functions throw a clear error.
+  
+* Added basic support for regular expressions via `str_detect()` and 
+  `str_replace_all()` for MySQL and Postgres backends (@colearendt, #168).
 * SQL server gains custom translation for `as.logical(x)` to `CAST(x as BIT)`
   (#250).
 

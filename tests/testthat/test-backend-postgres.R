@@ -14,7 +14,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
   expect_equal(trans(grepl("exp", x)),        sql("(`x`) ~ ('exp')"))
   expect_equal(trans(grepl("exp", x, TRUE)),  sql("(`x`) ~* ('exp')"))
-  expect_equal(trans(substr("test", 2 , 3)),  sql("SUBSTRING('test', 2, 2)"))
+  expect_equal(trans(substr("test", 2 , 3)),  sql("SUBSTR('test', 2, 2)"))
 })
 
 
@@ -23,10 +23,7 @@ test_that("custom stringr functions translated correctly", {
   trans <- function(x) {
     translate_sql(!!enquo(x), con = simulate_postgres())
   }
-
-  expect_equal(trans(str_locate(x, y)), sql("STRPOS(`x`, `y`)"))
-  expect_equal(trans(str_detect(x, y)), sql("STRPOS(`x`, `y`) > 0"))
-
+  expect_equal(trans(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
 })
 
 test_that("two variable aggregates are translated correctly", {
