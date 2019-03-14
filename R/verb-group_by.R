@@ -1,9 +1,13 @@
 # group_by ----------------------------------------------------------------
 
 #' @export
-group_by.tbl_lazy <- function(.data, ..., add = FALSE) {
+group_by.tbl_lazy <- function(.data, ..., add = FALSE, .drop = TRUE) {
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
+
+  if (!identical(.drop, TRUE)) {
+    stop("`.drop` is not supported with database backends", call. = FALSE)
+  }
 
   if (length(dots) == 0) {
     return(.data)

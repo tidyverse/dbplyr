@@ -2,6 +2,7 @@
 #' @include translate-sql-window.R
 #' @include translate-sql-helpers.R
 #' @include translate-sql-paste.R
+#' @include translate-sql-string.R
 #' @include translate-sql-quantile.R
 #' @include escape.R
 #' @include sql.R
@@ -137,19 +138,6 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  tolower = sql_prefix("LOWER", 1),
-  toupper = sql_prefix("UPPER", 1),
-  trimws = sql_prefix("TRIM", 1),
-  nchar   = sql_prefix("LENGTH", 1),
-  substr = function(x, start, stop) {
-    start <- as.integer(start)
-    length <- pmax(as.integer(stop) - start + 1L, 0L)
-
-    sql_expr(SUBSTR(!!x, !!start, !!length))
-  },
-  paste = sql_paste(" "),
-  paste0 = sql_paste(""),
-
   `if` = sql_if,
   if_else = function(condition, true, false) sql_if(condition, true, false),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
@@ -198,32 +186,6 @@ base_scalar <- sql_translator(
 
   `%>%` = `%>%`,
 
-  # stringr functions
-  # SQL Syntax reference links:
-  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
-  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
-  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
-  #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
-  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
-  #   Oracle: https://docs.oracle.com/middleware/bidv1221/desktop/BIDVD/GUID-BBA975C7-B2C5-4C94-A007-28775680F6A5.htm#BILUG685
-  str_length      = sql_prefix("LENGTH"),
-  str_to_upper    = sql_prefix("UPPER"),
-  str_to_lower    = sql_prefix("LOWER"),
-  str_replace_all = function(string, pattern, replacement) {
-                      sql_expr(REPLACE(!!string, !!pattern, !!replacement))
-                    },
-  str_detect      = function(string, pattern) {
-                      sql_expr(INSTR(!!string, !!pattern) > 0L)
-                    },
-  str_trim        = function(string, side = c("both", "left", "right")) {
-                      side <- match.arg(side)
-                      switch(side,
-                        left = sql_expr(LTRIM(!!string)),
-                        right = sql_expr(RTRIM(!!string)),
-                        both = sql_expr(LTRIM(RTRIM(!!string))),
-                      )
-                    },
-
   # lubridate ---------------------------------------------------------------
   # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
   as_date = sql_cast("DATE"),
@@ -242,7 +204,67 @@ base_scalar <- sql_translator(
   wday = sql_not_supported("wday()"),
   hour = function(x) sql_expr(EXTRACT(hour %from% !!x)),
   minute = function(x) sql_expr(EXTRACT(minute %from% !!x)),
-  second = function(x) sql_expr(EXTRACT(second %from% !!x))
+  second = function(x) sql_expr(EXTRACT(second %from% !!x)),
+
+  # String functions ------------------------------------------------------
+  # SQL Syntax reference links:
+  #   MySQL https://dev.mysql.com/doc/refman/5.7/en/string-functions.html
+  #   Hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-StringFunctions
+  #   Impala: https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_string_functions.html
+  #   PostgreSQL: https://www.postgresql.org/docs/9.1/static/functions-string.html
+  #   MS SQL: https://docs.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql
+  #   Oracle: https://docs.oracle.com/database/121/SQLRF/functions002.htm#SQLRF51180
+
+  # base R
+  nchar = sql_prefix("LENGTH", 1),
+  tolower = sql_prefix("LOWER", 1),
+  toupper = sql_prefix("UPPER", 1),
+  trimws = function(x, which = "both") sql_str_trim(x, side = which),
+  paste = sql_paste(" "),
+  paste0 = sql_paste(""),
+  substr = sql_substr("SUBSTR"),
+
+  # stringr functions
+  str_length = sql_prefix("LENGTH", 1),
+  str_to_lower = sql_prefix("LOWER", 1),
+  str_to_upper = sql_prefix("UPPER", 1),
+  str_to_title = sql_prefix("INITCAP", 1),
+  str_trim = sql_str_trim,
+  str_c = sql_paste(""),
+  str_sub = sql_str_sub("SUBSTR"),
+
+  str_c = sql_not_supported("str_c()"),
+  str_conv = sql_not_supported("str_conv()"),
+  str_count = sql_not_supported("str_count()"),
+  str_detect = sql_not_supported("str_detect()"),
+  str_dup = sql_not_supported("str_dup()"),
+  str_extract = sql_not_supported("str_extract()"),
+  str_extract_all = sql_not_supported("str_extract_all()"),
+  str_flatten = sql_not_supported("str_flatten()"),
+  str_glue = sql_not_supported("str_glue()"),
+  str_glue_data = sql_not_supported("str_glue_data()"),
+  str_interp = sql_not_supported("str_interp()"),
+  str_locate = sql_not_supported("str_locate()"),
+  str_locate_all = sql_not_supported("str_locate_all()"),
+  str_match = sql_not_supported("str_match()"),
+  str_match_all = sql_not_supported("str_match_all()"),
+  str_order = sql_not_supported("str_order()"),
+  str_pad = sql_not_supported("str_pad()"),
+  str_remove = sql_not_supported("str_remove()"),
+  str_remove_all = sql_not_supported("str_remove_all()"),
+  str_replace = sql_not_supported("str_replace()"),
+  str_replace_all = sql_not_supported("str_replace_all()"),
+  str_replace_na = sql_not_supported("str_replace_na()"),
+  str_sort = sql_not_supported("str_sort()"),
+  str_split = sql_not_supported("str_split()"),
+  str_split_fixed = sql_not_supported("str_split_fixed()"),
+  str_squish = sql_not_supported("str_squish()"),
+  str_subset = sql_not_supported("str_subset()"),
+  str_trunc = sql_not_supported("str_trunc()"),
+  str_view = sql_not_supported("str_view()"),
+  str_view_all = sql_not_supported("str_view_all()"),
+  str_which = sql_not_supported("str_which()"),
+  str_wrap = sql_not_supported("str_wrap()")
 )
 
 base_symbols <- sql_translator(
@@ -586,4 +608,3 @@ dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
 dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
 dbi_quote.sql <- function(x, con) DBI::SQL(x)
-

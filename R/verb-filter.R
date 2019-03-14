@@ -1,5 +1,9 @@
 # registered onLoad
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
+  if (!identical(.preserve, FALSE)) {
+    stop("`.preserve` is not supported on database backends", call. = FALSE)
+  }
+
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   add_op_single("filter", .data, dots = dots)
