@@ -74,7 +74,7 @@ group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }
 
-#' @export
+# Manually registered in zzz.R
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$ops)
 }

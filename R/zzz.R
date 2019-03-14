@@ -7,6 +7,10 @@
   register_s3_method("dplyr", "setdiff", "OraConnection")
   register_s3_method("dplyr", "filter", "tbl_lazy")
 
+  if (packageVersion("dplyr") >= "0.8.0.9008") {
+    register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
+  }
+
   # These are also currently defined in dplyr, and we want to avoid a warning
   # about double duplication. Conditional can be removed after update to
   # dplyr
