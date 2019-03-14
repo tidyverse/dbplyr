@@ -43,13 +43,49 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
 
       paste  = sql_paste(" "),
       paste0 = sql_paste(""),
+
       # stringr functions
       # https://www.postgresql.org/docs/9.1/functions-string.html
       # https://www.postgresql.org/docs/9.1/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       str_c = sql_paste(""),
-      str_detect = sql_infix("~"),
+
+      str_locate  = function(string, pattern) {
+        sql_expr(strpos(!!string, !!pattern))
+      },
+      str_detect  = function(string, pattern) {
+        sql_expr(strpos(!!string, !!pattern) > 0L)
+      },
       str_replace_all = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+      },
+
+      # lubridate functions
+      month = function(x, label = FALSE, abbr = TRUE) {
+        if (!label) {
+          sql_expr(EXTRACT(month %FROM% !!x))
+        } else {
+          if (abbr) {
+            sql_expr(TO_CHAR(!!x, "Mon"))
+          } else {
+            sql_expr(TO_CHAR(!!x, "Month"))
+          }
+        }
+      },
+      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        if (!label) {
+          # quiet R CMD check
+          date <- function(x) {}
+
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          sql_expr(EXTRACT("dow" %FROM% date(!!x) + !!offset) + 1)
+        } else if (label && !abbr) {
+          sql_expr(TO_CHAR(!!x, "Day"))
+        } else if (label && abbr) {
+          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
+        } else {
+          stop("Unrecognized arguments to `wday`", call. = FALSE)
+        }
       }
     ),
     sql_translator(.parent = base_agg,
@@ -161,4 +197,4 @@ db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
 #' @export
 db_explain.PqConnection <- db_explain.PostgreSQLConnection
 
-globalVariables(c("strpos", "%::%", "string_agg", "%~*%", "%~%"))
+globalVariables(c("strpos", "%::%", "%FROM%", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "month"))
