@@ -1,49 +1,51 @@
 # dbplyr (development version)
 
+## Breaking changes
+
+* ``Error: `con` must not be NULL``: If you see this error, it probably means 
+  that you have probably forgotten to pass `con` down to a dbplyr function. 
+  Previously, dbplyr defaulted to using `simulate_dbi()` which introduced
+  subtle escaping bugs. (It's also possible I have forgotten to pass it 
+  somewhere that the dbplyr tests don't pick up, so if you can't figure it 
+  out, please let me know).
+
+* Subsetting (`[[`, `$`, and `[`) functions are no longer evaluated locally. 
+  This makes the translation more consistent and enables useful new idioms 
+  for modern databases (#200).
+
 ## New features
 
-* `vignette("sql")` describes some advantages of dbplyr over SQL (#205) and 
+* MySQL/MariaDB (https://mariadb.com/kb/en/library/window-functions/) 
+  and SQLite (https://www.sqlite.org/windowfunctions.html) translations gain 
+  support for window functions, available in Maria DB 10.2, MySQL 8.0, and 
+  SQLite 3.25 (#191).
+
+* Overall, dplyr generates many fewer subqueries:
+
+  * Joins and semi-joins no longer add an unneeded subquery (#236). This is
+    faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
+    the previous argument was called `root` and confused me.
+  
+  * Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
+    be collapsed into a single query, instead of always generating a subquery
+    (#213).
+
+* New `vignette("sql")` describes some advantages of dbplyr over SQL (#205) and 
   gives some advice about writing how to write literal SQL inside of dplyr, 
   when you you need to (#196).
 
-* `vignette("reprex")` gives some hints on creeating reprexes that work 
+* New `vignette("reprex")` gives some hints on creating reprexes that work 
   anywhere (#117). This is supposrted by a new `tbl_memdb()` that 
   matches the existing `tbl_lazy()`.
 
 * All `..._join()` functions gain an `sql_on` argument that allows specifying
   arbitrary join predicates in SQL code (#146, @krlmlr).
 
-* MySQL/MariaDB translation gains support for window functions 
-  (https://mariadb.com/kb/en/library/window-functions/). They are available
-  in Maria DB 10.2 and MySQL 8.0. Earlier versions will throw an SQL
-  syntax error if you attempt to use with window functions (#191).
-
-* SQLite translation gains support for window functions   
-  (https://www.sqlite.org/windowfunctions.html) for SQLite >= 3.25 (#144).
-
-## Breaking changes
-
-* Subsetting (`[[`, `$`, and `[`) functions are no longer evaluated locally. 
-  This makes the translation more consistent and enables useful new idioms 
-  for modern databases (#200).
-
 ## SQL translations
-
-Overall, dplyr generates many fewer subqueries:
-
-* Joins and semi-joins no longer add an unneeded subquery (#236). This is
-  faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
-  the previous argument was called `root` and confused me.
-
-* Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
-  be collapsed into a single query, instead of always generating a subquery
-  (#213).
-
-### General
 
 * New translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
-  `second()` (@colearendt). Also add default translation for `as.POSIXct()`.
+  `second()` (@colearendt). Also added new translation for `as.POSIXct()`.
 
 * New translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
@@ -53,42 +55,55 @@ Overall, dplyr generates many fewer subqueries:
   `bitwXor()`, `bitwShiftL()`, and `bitwShiftR()`. Unlike the base R functions, 
   the translations do not coerce arguments to integers (@davidchall, #235).
 
-* New translation for `median()` and `quantile()`. Works for all ANSI compliant
-  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
-  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
-  (#169)
-
-* `switch()` is translated to the simple form of `SELECT CASE` (#192).
-
-* `na_if()` is translated to `NULLIF()` for all databases (#211).
-
-* The `.data` and `.env` pronouns of tidy evaluation are correctly translated 
-  (#132).
-
-* `pmin()` and `pmax()` are now translated to `LEAST()` and `GREATEST()` for 
-  ANSI compliant databases (#118), SQLite uses `MIN()` and `MAX()`, and MS SQL 
-  throws an error.
-
-* New translation for for `paste()`, `paste0()`, and the hyperbolic functions 
-  (these previously were only available for  ODBC based translations).
-
-* `x[y]` now translated to `CASE WHEN y THEN x END`. This enables 
+* New translation for `x[y]` to `CASE WHEN y THEN x END`. This enables 
   `sum(a[b == 0])` to work as you expect from R (#202). `y` needs to be
   a logical expression; if not you will likely get a type error from your 
   database.
 
-* `x$y` and `x[["y"]]` are now translated to `x.y`, enabling you to index
+* New translations for `x$y` and `x[["y"]]` to `x.y`, enabling you to index
   into nested fields in databases that provide them (#158).
 
-* Translation of `n_distinct()` now only supports a single argument 
+* The `.data` and `.env` pronouns of tidy evaluation are correctly translated 
+  (#132).
+
+* New translation for `median()` and `quantile()`. Works for all ANSI compliant
+  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
+  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  (#169)
+  
+* `na_if()` is correct translated to `NULLIF()` (rather than `NULL_IF`) (#211).
+
+* `n_distinct()` translation throws an error when given more than one argument.
   (#101, #133).
 
-### Database specific improvements
+* New default translations for `paste()`, `paste0()`, and the hyperbolic 
+  functions (these previously were only available for ODBC databases).
+
+* Corrected translations of `pmin()` and `pmax()` to `LEAST()` and `GREATEST()` 
+  for ANSI compliant databases (#118), to `MIN()` and `MAX()` for SQLite, and 
+  to an error for SQL server.
+
+* New translation for `switch()` to the simple form of `CASE WHEN` (#192).
+
+### SQL simulation
+
+SQL simulation makes it possible to see what dbplyr will translate SQL to, without having an active database connection, and is used for testing and genearting reprexes. 
+
+* SQL simulation has been overhauled. It's now better documented, and uses
+  ANSI escaping (i.e. `` ` `` for field names and `'` for strings).
+
+* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
+  shouldn't affect any downstream code unless you were previously working
+  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
+  It also includes the `src` class in its class, and when printed,
+  shows the generated SQL (#111).
+
+## Database specific improvements
 
 * MySQL/MariaDB
 
-  * Translations also applied via connections to MySQL and MariaDB via the odbc 
-    package (@colearendt, #238)
+  * Translations also applied to connections via the odbc package 
+    (@colearendt, #238)
   
   * Basic support for regular expressions via `str_detect()` and  
     `str_replace_all()` (@colearendt, #168).
@@ -113,17 +128,12 @@ Overall, dplyr generates many fewer subqueries:
 
   * Improved translation for `as.logical(x)` to `CAST(x as BIT)` (#250).
 
-### SQL simulation
+  * `copy_to()` method applies temporary table name transformation
+    earlier so that you can now overwrite temporary tables (#258).
 
-* SQL simulation has been overhauled. It's now better documented, and it always
-  uses `` ` `` for field names and `'` for string.
+  * `db_write_table()` method uses correct argument name for 
+    passing along field types (#251).
 
-* `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
-  shouldn't affect any downstream code unless you were previously working
-  around this weird difference between `tbl_lazy` and `tbl_sql` classes.
-
-* `tbl_lazy()` (used for testing) now records class of src simulation, and 
-  prints generated SQL (#111).
 
 ## Minor improvements and bug fixes
 
@@ -137,15 +147,8 @@ Overall, dplyr generates many fewer subqueries:
 * Functions that are only available in a windowed (`mutate()`) query now
   throw an error when called in a aggregate (`summarise()`) query (#129)
 
-* Adds support for the `.by_group` argument in `arrange()`. It makes `dbplyr` 
-  more consistent with `dplyr`. It allows to sort by groups if desired. The default 
-  is `FALSE` (#115)
-
-* `copy_to()` method for SQL server applies temporary table name transformation
-  earlier so that you can now overwrite temporary tables (#258).
-
-* `db_write_table()` method for SQL server uses correct argument name for 
-  passing along field types (#251).
+* `arrange()` understands the `.by_group` argument, making it possible
+  sort by groups if desired. The default is `FALSE` (#115)
 
 * `distinct()` now handles computed variables like `distinct(df, y = x + y)` 
   (#154).
@@ -153,12 +156,12 @@ Overall, dplyr generates many fewer subqueries:
 * `escape()`, `sql_expr()` and `build_sql()` no longer accept `con = NULL` as 
   a shortcut for `con = simulate_dbi()`. This made it too easy to forget to 
   pass `con` along, introducing extremely subtle escaping bugs. `win_over()`
-  gains a `con` argument.
+  gains a `con` argument for the same reason.
   
 * New `escape_ansi()` always uses ANSI SQL 92 standard escaping (for use 
   in examples and documentation).
 
-* `mutate(df, x = NULL)` now drops `x` from the output, like when working with
+* `mutate(df, x = NULL)` drops `x` from the output, just like when working with
   local data frames (#194).
 
 * `partial_eval()` processes inlined functions (including rlang lambda 
@@ -166,14 +169,14 @@ Overall, dplyr generates many fewer subqueries:
   `df %>% summarise_all(~ mean(.))`, `df %>% summarise_all(list(mean))` (#134).
 
 * `sql_aggregate()` now takes an optional argument `f_r` for passing to
-  `check_na_rm()`. "Missing values are always removed" warning for aggregate
-  functions now shows the dplyr verb in the usage suggestion (@sverchkov, #153).
+  `check_na_rm()`. This allows the warning to show the R function name rather 
+  than the SQL function name (@sverchkov, #153).
+
+* `sql_infix()` gains a `pad` argument for the rare operator that doesn't
+  need to be surrounded by spaces.
 
 * `sql_prefix()` no longer turns SQL functions into uppercase, allowing for 
   correct translation of case-sensitive SQL functions (#181, @mtoto).
-
-* `sql_infix()` gains a `pad` argument for the occassional operator that 
-  doesn't need to be surrounded by spaces.
 
 * `summarise()` gives a clear error message if you refer to a variable 
   created in that same `summarise()` (#114).
@@ -181,10 +184,10 @@ Overall, dplyr generates many fewer subqueries:
 * New `sql_call2()` which is to `rlang::call2()` as `sql_expr()` is to 
   `rlang::expr()`.
 
-* `show_query()` and `explain()` now use `cat()` rather than message.
+* `show_query()` and `explain()` use `cat()` rather than message.
 
 * `union()`, `union_all()`, `setdiff()` and `intersect()` do a better job
-  of matching columns across all backends (#183).
+  of matching columns across backends (#183).
 
 # dbplyr 1.3.0
 
