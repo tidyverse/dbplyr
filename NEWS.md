@@ -127,13 +127,14 @@ SQL simulation makes it possible to see what dbplyr will translate SQL to, witho
 * SQL server
 
   * Improved translation for `as.logical(x)` to `CAST(x as BIT)` (#250).
+    
+  * Translates `paste()`, `paste0()`, and `str_c()` to `+`.
 
   * `copy_to()` method applies temporary table name transformation
     earlier so that you can now overwrite temporary tables (#258).
 
   * `db_write_table()` method uses correct argument name for 
     passing along field types (#251).
-
 
 ## Minor improvements and bug fixes
 

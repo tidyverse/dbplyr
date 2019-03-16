@@ -86,14 +86,14 @@
       is.na         = function(x) mssql_is_null(x, sql_current_context()),
 
       # string functions ------------------------------------------------
-      # MSSQL supports CONCAT_WS in the CTP version of 2016
       nchar = sql_prefix("LEN"),
-      paste = sql_not_supported("paste()"),
+      paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
+      paste0 = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       substr = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),
-      paste = sql_not_supported("str_c()"),
+      str_c = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title()"),
       str_sub = sql_str_sub("SUBSTRING", "LEN")
