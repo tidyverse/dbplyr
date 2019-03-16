@@ -1,4 +1,8 @@
-release_date: Nov 13
-rel_release_date: 10 days
-my_news_url: https://github.com/tidyverse/dbplyr/blob/master/NEWS.md#dbplyr-1109000
-release_version: 1.2.0
+release_date: April 15
+rel_release_date: 1 month
+my_news_url: https://github.com/tidyverse/dbplyr/blob/master/NEWS.md#dbplyr-development-version
+release_version: 1.4.0
+release_details: >
+  This is a major release with a bunch of improvements to SQL generation,
+  so I'd really appreciate your help checking that I haven't broken
+  any existing translations.

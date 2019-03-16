@@ -1,5 +1,6 @@
 checks
 library
-data.sqlite
 checks.noindex
 library.noindex
+data.sqlite
+*.html
