@@ -211,7 +211,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/dbplyr/topics/memdb_frame'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_cvpeammhtu&gt; [?? x 1]
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_001&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: a
 #&gt;       a
@@ -222,7 +222,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; 4     4</div><div class='input'>
 <span class='co'># NA sorted first</span>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/dbplyr/topics/memdb_frame'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_weaikfkbkz&gt; [?? x 1]
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_002&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: a
 #&gt;       a
@@ -233,7 +233,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; 4     4</div><div class='input'>
 <span class='co'># override by sorting on is.na() first</span>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/dbplyr/topics/memdb_frame'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>a</span>), <span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_hrtfztbnsr&gt; [?? x 1]
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>a</span>), <span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_003&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: is.na(a), a
 #&gt;       a
