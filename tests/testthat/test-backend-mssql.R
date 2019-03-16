@@ -17,11 +17,10 @@ test_that("custom scalar translated correctly", {
   expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
   expect_equal(trans(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1, 2)"))
   expect_equal(trans(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
+  expect_equal(trans(paste(x, y)),     sql("`x` + ' ' + `y`"))
 
   expect_error(trans(bitwShiftL(x, 2L)), sql("not available"))
   expect_error(trans(bitwShiftR(x, 2L)), sql("not available"))
-  expect_error(trans(paste(x)),          sql("not available"))
-
 })
 
 test_that("custom stringr functions translated correctly", {
