@@ -87,10 +87,11 @@
 
 ### SQL simulation
 
-SQL simulation makes it possible to see what dbplyr will translate SQL to, without having an active database connection, and is used for testing and genearting reprexes. 
+SQL simulation makes it possible to see what dbplyr will translate SQL to, without having an active database connection, and is used for testing and generating reprexes. 
 
-* SQL simulation has been overhauled. It's now better documented, and uses
-  ANSI escaping (i.e. `` ` `` for field names and `'` for strings).
+* SQL simulation has been overhauled. It now works reliably, is better 
+  documented, and always uses ANSI escaping (i.e. `` ` `` for field 
+  names and `'` for strings).
 
 * `tbl_lazy()` now actually puts a `dbplyr::src` in the `$src` field. This
   shouldn't affect any downstream code unless you were previously working
