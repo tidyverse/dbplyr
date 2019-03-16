@@ -15,7 +15,7 @@ test_register_con(name, ...)
 
 src_test(name)
 
-test_load(df, name = random_table_name(), srcs = test_srcs$get(),
+test_load(df, name = unique_table_name(), srcs = test_srcs$get(),
   ignore = character())
 
 test_frame(..., srcs = test_srcs$get(), ignore = character())

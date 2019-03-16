@@ -78,7 +78,7 @@ sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
-    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
   }
 }
 

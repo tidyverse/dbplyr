@@ -23,7 +23,7 @@ sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
-    build_sql("(", from, ") ", ident(name %||% random_table_name()), con = con)
+    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
   }
 }
 
@@ -589,10 +589,14 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 
 # Utility functions ------------------------------------------------------------
 
-random_table_name <- function(n = 10) {
-  prefix <- "dbplyr_"
-  paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
-}
+unique_table_name <- local({
+  i <- 0
+
+  function() {
+    i <<- i + 1
+    sprintf("dbplyr_%03i", i)
+  }
+})
 
 res_warn_incomplete <- function(res, hint = "n = -1") {
   if (dbHasCompleted(res)) return()

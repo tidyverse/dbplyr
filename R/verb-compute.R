@@ -23,7 +23,7 @@ collapse.tbl_sql <- function(x, ...) {
 #' @inheritParams copy_to.src_sql
 #' @export
 compute.tbl_sql <- function(x,
-                            name = random_table_name(),
+                            name = unique_table_name(),
                             temporary = TRUE,
                             unique_indexes = list(),
                             indexes = list(),

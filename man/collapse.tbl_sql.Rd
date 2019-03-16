@@ -8,7 +8,7 @@
 \usage{
 \method{collapse}{tbl_sql}(x, ...)
 
-\method{compute}{tbl_sql}(x, name = random_table_name(),
+\method{compute}{tbl_sql}(x, name = unique_table_name(),
   temporary = TRUE, unique_indexes = list(), indexes = list(),
   analyze = TRUE, ...)
 

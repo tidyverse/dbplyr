@@ -6,7 +6,7 @@
 \alias{src_memdb}
 \title{Create a database table in temporary in-memory database.}
 \usage{
-memdb_frame(..., .name = random_table_name())
+memdb_frame(..., .name = unique_table_name())
 
 tbl_memdb(df, name = deparse(substitute(df)))
 

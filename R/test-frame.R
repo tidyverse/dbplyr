@@ -48,7 +48,7 @@ src_test <- function(name) {
 
 #' @export
 #' @rdname testing
-test_load <- function(df, name = random_table_name(), srcs = test_srcs$get(),
+test_load <- function(df, name = unique_table_name(), srcs = test_srcs$get(),
                       ignore = character()) {
   stopifnot(is.data.frame(df))
   stopifnot(is.character(ignore))

@@ -16,7 +16,7 @@
 #'
 #' mtcars_db <- tbl_memdb(mtcars)
 #' mtcars_db %>% count(cyl) %>% show_query()
-memdb_frame <- function(..., .name = random_table_name()) {
+memdb_frame <- function(..., .name = unique_table_name()) {
   x <- copy_to(src_memdb(), tibble(...), name = .name)
   x
 }

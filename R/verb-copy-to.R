@@ -81,7 +81,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
 
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
-  copy_to(x$src, as.data.frame(y), random_table_name(), ...)
+  copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
 }
 
 #' More db generics
