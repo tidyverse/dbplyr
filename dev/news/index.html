@@ -207,9 +207,9 @@
 </li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes" class="section level2">
+<div id="minor-improvements-and-bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> will only remove existing table when <code>overwrite = TRUE</code> and the table already exists, eliminating a confusing “NOTICE” from PostgreSQL (<a href='https://github.com/tidyverse/dbplyr/issues/3197'>#3197</a>).</p></li>
 <li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> handles unevaluated formulas (<a href='https://github.com/tidyverse/dbplyr/issues/184'>#184</a>).</p></li>
@@ -254,9 +254,9 @@
 <li><p>dbplyr now supplies appropriate translations for the RMariaDB and RPostgres packages (<a href='https://github.com/tidyverse/dbplyr/issues/3154'>#3154</a>). We generally recommend using these packages in favour of the older RMySQL and RPostgreSQL packages as they are fully DBI compliant and tested with DBItest.</p></li>
 </ul>
 </div>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>New features</h2>
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> can now “copy” tbl_sql in the same src, providing another way to cache a query into a temporary table (<a href='https://github.com/tidyverse/dbplyr/issues/3064'>#3064</a>). You can also <code>copy_to</code> tbl_sqls from another source, and <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> will automatically collect then copy.</p></li>
 <li><p>Initial support for stringr functions: <code>str_length()</code>, <code>str_to_upper()</code>, <code>str_to_lower()</code>, <code>str_replace_all()</code>, <code>str_detect()</code>, <code>str_trim()</code>. Regular expression support varies from database to database, but most simple regular expressions should be ok.</p></li>
@@ -273,9 +273,9 @@
 <li><p><code>db_write_table</code> now needs to return the table name</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-1" class="section level2">
+<div id="minor-improvements-and-bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-2" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p>Multiple <code><a href="https://www.rdocumentation.org/packages/utils/topics/head">head()</a></code> calls in a row now collapse to a single call. This avoids a printing problem with MS SQL (<a href='https://github.com/tidyverse/dbplyr/issues/3084'>#3084</a>).</p></li>
 <li><p><code><a href="../reference/escape.html">escape()</a></code> now works with integer64 values from the bit64 package (<a href='https://github.com/tidyverse/dbplyr/issues/3230'>#3230</a>)</p></li>
@@ -292,9 +292,9 @@
 <li><p><code>test_src()</code> makes it easier to access a single test source.</p></li>
 </ul>
 </div>
-<div id="database-specific-improvements" class="section level2">
+<div id="database-specific-improvements-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#database-specific-improvements" class="anchor"></a>Database specific improvements</h2>
+<a href="#database-specific-improvements-1" class="anchor"></a>Database specific improvements</h2>
 <ul>
 <li>
 <p>MS SQL</p>
@@ -315,9 +315,9 @@
 <h1 class="page-header">
 <a href="#dbplyr-1-1-0" class="anchor"></a>dbplyr 1.1.0<small> 2017-06-27 </small>
 </h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>New features</h2>
+<a href="#new-features-2" class="anchor"></a>New features</h2>
 <ul>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/join.html">full_join()</a></code> over non-overlapping columns <code>by = character()</code> translated to <code>CROSS JOIN</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2924'>#2924</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/case_when.html">case_when()</a></code> now translates to SQL “CASE WHEN” (<a href='https://github.com/tidyverse/dbplyr/issues/2894'>#2894</a>)</p></li>
@@ -326,9 +326,9 @@
 <li><p>Added SQL translations for Oracle (<a href='https://github.com/edgararuiz'>@edgararuiz</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-2" class="section level2">
+<div id="minor-improvements-and-bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-2" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-3" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p><code>x %in% c(1)</code> now generates the same SQL as <code>x %in% 1</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2898'>#2898</a>).</p></li>
 <li><p><code><a href="https://www.rdocumentation.org/packages/utils/topics/head">head(tbl, 0)</a></code> is now supported (<a href='https://github.com/tidyverse/dbplyr/issues/2863'>#2863</a>).</p></li>
@@ -346,9 +346,9 @@
 <h1 class="page-header">
 <a href="#dbplyr-1-0-0" class="anchor"></a>dbplyr 1.0.0<small> 2017-06-09 </small>
 </h1>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>New features</h2>
+<a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> now work directly with DBI connections (<a href='https://github.com/tidyverse/dbplyr/issues/2423'>#2423</a>, <a href='https://github.com/tidyverse/dbplyr/issues/2576'>#2576</a>), so there is no longer a need to generate a dplyr src.</p>
