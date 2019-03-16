@@ -26,71 +26,6 @@ Version: 1.1.0
       Execution halted
     ```
 
-# BiocFileCache
-
-Version: 1.6.0
-
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    ...
-    "/tmp/RtmpSwKDaY/BiocFileCache/b71744a77427_b71744a77427" 
-    > fl1 <- tempfile(); file.create(fl1)
-    [1] TRUE
-    > bfcadd(bfc0, "Test1", fl1)                 # copy
-                                                             BFC2 
-    "/tmp/RtmpSwKDaY/BiocFileCache/b717239704cf_fileb7174dbacfa7" 
-    > fl2 <- tempfile(); file.create(fl2)
-    [1] TRUE
-    > bfcadd(bfc0, "Test2", fl2, action="move")         # move
-                                                            BFC3 
-    "/tmp/RtmpSwKDaY/BiocFileCache/b71731fade58_fileb717fbcc44a" 
-    > fl3 <- tempfile(); file.create(fl3)
-    [1] TRUE
-    > add3 <- bfcadd(bfc0, "Test3", fl3, rtype="local", action="asis")  # reference
-    > rid3 <- names(add3)
-    > 
-    > bfc0
-    Error in partial_eval_dots(dots, vars = op_vars(.data)) : 
-      inherits(dots, "quosures") is not TRUE
-    Calls: <Anonymous> ... filter_ -> filter_.tbl_lazy -> partial_eval_dots -> stopifnot
-    Execution halted
-    ```
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 111 SKIPPED: 0 FAILED: 14
-      1. Error: bfcadd and bfcnew works (@test_BiocFileCache_class.R#20) 
-      2. Error: bfcnew() works for multiple inserts (@test_BiocFileCache_class.R#146) 
-      3. Error: bfcinfo works (@test_BiocFileCache_class.R#182) 
-      4. Error: bfcpath and bfcrpath works (@test_BiocFileCache_class.R#224) 
-      5. Error: bfcquery, bfcrpath allow regular expressions and exact matches (@test_BiocFileCache_class.R#242) 
-      6. Error: subsetting works (@test_BiocFileCache_class.R#289) 
-      7. Error: bfcupdate works (@test_BiocFileCache_class.R#322) 
-      8. Error: bfcmeta works (@test_BiocFileCache_class.R#339) 
-      9. Error: bfcquery and bfccount works (@test_BiocFileCache_class.R#405) 
-      1. ...
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Loading required package: dbplyr
-    Quitting from lines 86-87 (BiocFileCache.Rmd) 
-    Error: processing vignette 'BiocFileCache.Rmd' failed with diagnostics:
-    inherits(dots, "quosures") is not TRUE
-    Execution halted
-    ```
-
 # BiocOncoTK
 
 Version: 1.2.1
@@ -230,31 +165,21 @@ Version: 0.1.0
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-             ...)
-      29: sql_clause_select(select, con, distinct) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/query-select.R:123
-      30: abort("Query contains no columns") at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/translate-sql-clause.R:16
+      15: db_collect.DBIConnection(x$src$con, sql, n = n, warn_incomplete = warn_incomplete) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/verb-compute.R:114
+      16: dbSendQuery(con, sql) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/verb-compute.R:119
+      17: dbSendQuery(con, sql)
+      18: .local(conn, statement, ...)
+      19: new("SQLiteResult", sql = statement, ptr = result_create(conn@ptr, statement), conn = conn, bigint = conn@bigint)
+      20: initialize(value, ...)
+      21: initialize(value, ...)
+      22: result_create(conn@ptr, statement)
       
       ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 17 SKIPPED: 0 FAILED: 4
+      OK: 41 SKIPPED: 0 FAILED: 1
       1. Error: `aggregate` aggregates data (@test-aggregate.R#15) 
-      2. Error: cytominer can process dataset with a normalized schema (@test-cytominer.R#62) 
-      3. Error: `drop_na_rows` removes rows have only NAs (@test-drop_na_rows.R#22) 
-      4. Error: `normalize' normalizes data (@test-normalize.R#49) 
       
       Error: testthat unit tests failed
-      In addition: Warning message:
-      call dbDisconnect() when finished working with a connection 
       Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Quitting from lines 127-133 (cytominer-pipeline.Rmd) 
-    Error: processing vignette 'cytominer-pipeline.Rmd' failed with diagnostics:
-    inherits(dots, "quosures") is not TRUE
-    Execution halted
     ```
 
 # dlookr
@@ -287,35 +212,6 @@ Version: 0.8.0.1
 *   checking data for non-ASCII characters ... NOTE
     ```
       Note: found 4 marked UTF-8 strings
-    ```
-
-# etl
-
-Version: 0.3.7
-
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘etl-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: etl_init
-    > ### Title: Initialize a database using a defined schema
-    > ### Aliases: etl_init etl_init.default find_schema
-    > 
-    > ### ** Examples
-    > 
-    > cars <- etl("mtcars")
-    No database was specified so I created one for you at:
-    /tmp/RtmpvytPRJ/file11ecd58d3c967.sqlite3
-    > cars %>%
-    +   etl_init()
-    Running SQL script at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/etl/new/etl.Rcheck/etl/sql/init.sqlite
-    > cars %>%
-    +   etl_init(script = sql("CREATE TABLE IF NOT EXISTS mtcars_alt (id INTEGER);"))
-    Error: `con` must not be NULL
-    Execution halted
     ```
 
 # grasp2db
@@ -519,62 +415,6 @@ Version: 0.1.6
 
 Version: 2.2.3
 
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘metagenomeFeatures-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: annotateFeatures
-    > ### Title: Annotating metagenome data with taxonomic information
-    > ### Aliases: annotateFeatures annotateFeatures,MgDb-method
-    > 
-    > ### ** Examples
-    > 
-    > ## MgDb with mock community ids
-    > gg85 <- get_gg13.8_85MgDb()
-    > ## generating mgFeatures object
-    > data(mock_query_df)
-    > mock_mgF <- annotateFeatures(gg85, mock_query_df)
-    Error in partial_eval_dots(dots, vars = op_vars(.data)) : 
-      inherits(dots, "quosures") is not TRUE
-    Calls: annotateFeatures ... <Anonymous> -> filter_.tbl_lazy -> partial_eval_dots -> stopifnot
-    Execution halted
-    ```
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      OK: 41 SKIPPED: 0 FAILED: 9
-      1. Error: mgFeatures query types (@test_mdDb-annotateFeatures.R#27) 
-      2. Error: mgFeatures accessory (@test_mdDb-annotateFeatures.R#33) 
-      3. Error: MgDb-class taxa_keys at different taxonomic levels (@test_mgDb-class.R#55) 
-      4. Error: MgDb-class select return (@test_mgDb-select.R#19) 
-      5. Error: MgDb-class select taxa (@test_mgDb-select.R#38) 
-      6. Error: MgDb-class select seq (@test_mgDb-select.R#52) 
-      7. Error: MgDb-class select tree (@test_mgDb-select.R#68) 
-      8. Error: MgDb-class select all (@test_mgDb-select.R#85) 
-      9. Error: MgDb-class select equal entries (@test_mgDb-select.R#129) 
-      
-      Error: testthat unit tests failed
-      In addition: Warning message:
-      call dbDisconnect() when finished working with a connection 
-      Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Quitting from lines 58-63 (MgDb_and_mgFeatures_classes.Rmd) 
-    Error: processing vignette 'MgDb_and_mgFeatures_classes.Rmd' failed with diagnostics:
-    Query contains no columns
-    Execution halted
-    ```
-
 ## In both
 
 *   checking installed package size ... NOTE
@@ -619,8 +459,27 @@ Version: 0.6.0
 
 ## Newly broken
 
-*   R CMD check timed out
-    
+*   checking tests ...
+    ```
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+      8: dbplyr::sql(dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", 
+             as.integer(size))) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/new/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
+      9: c_character(...) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/sql.R:11
+      10: dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", as.integer(size)) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/new/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
+      11: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/build-sql.R:34
+      
+      [1] "E"
+      [1] "H"
+      [1] "M"
+      ══ testthat results  ═════════════════════════════════════════════════════════════════════════
+      OK: 308 SKIPPED: 13 FAILED: 1
+      1. Error: sample works (@test_04_dplyr.R#41) 
+      
+      Error: testthat unit tests failed
+      Execution halted
+    ```
 
 ## In both
 
@@ -642,9 +501,9 @@ Version: 1.0.5
      ERROR
     Running the tests in ‘tests/test-all.R’ failed.
     Last 13 lines of output:
-      37: purrr::map_chr(enexprs(...), escape_expr, con = con) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/build-sql.R:48
+      37: purrr::map_chr(enexprs(...), escape_expr, con = con) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/build-sql.R:48
       38: .f(.x[[i]], ...)
-      39: escape(val, con = con) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/build-sql.R:45
+      39: escape(val, con = con) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/build-sql.R:45
       
       OGR: Unsupported geometry type
       OGR: Unsupported geometry type
@@ -665,71 +524,34 @@ Version: 1.10.0
 
 ## Newly broken
 
-*   checking examples ... ERROR
-    ```
-    ...
-    > ###   exonsBy exonsBy_tbl fiveUTRsByTranscript fiveUTRsByTranscript_tbl
-    > ###   genes genes_tbl intronsByTranscript intronsByTranscript_tbl promoters
-    > ###   promoters_tbl threeUTRsByTranscript threeUTRsByTranscript_tbl
-    > ###   transcripts transcripts_tbl transcriptsBy transcriptsBy_tbl
-    > ###   promoters,src_organism-method intronsByTranscript,src_organism-method
-    > 
-    > ### ** Examples
-    > 
-    > ## Not run: src <- src_ucsc("human")
-    > src <- src_organism(dbpath=hg38light())
-    > 
-    > ## transcript coordinates with filter in tibble format
-    > filters <- AnnotationFilter(~symbol == c("A1BG", "CDH2"))
-    > transcripts_tbl(src, filters)
-    <SQL>
-    SELECT *
-    FROM `ranges_tx`
-    Error in partial_eval_dots(dots, vars = op_vars(.data)) : 
-      inherits(dots, "quosures") is not TRUE
-    Calls: transcripts_tbl ... filter_ -> filter_.tbl_lazy -> partial_eval_dots -> stopifnot
-    Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Quitting from lines 205-209 (Organism.dplyr.Rmd) 
-    Error: processing vignette 'Organism.dplyr.Rmd' failed with diagnostics:
-    inherits(dots, "quosures") is not TRUE
-    Execution halted
-    ```
-
-## In both
-
 *   checking tests ...
     ```
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      1: suppressPackageStartupMessages({
-             library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-         }) at testthat/test-src_organism-select.R:3
-      2: withCallingHandlers(expr, packageStartupMessage = function(c) invokeRestart("muffleMessage"))
-      3: library(TxDb.Hsapiens.UCSC.hg38.knownGene) at testthat/test-src_organism-select.R:4
-      4: stop(txt, domain = NA)
+      [32] 95456 - 95461 == -5
+      [33] 95456 - 95461 == -5
+      [34] 95456 - 95461 == -5
+      [35] 95456 - 95461 == -5
+      [47] 95461 - 95456 ==  5
+      ...
       
       ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 32 SKIPPED: 0 FAILED: 3
-      1. Error: (unknown) (@test-GenomicFeatures-extractors.R#3) 
-      2. Error: mouse (@test-src_organism-class.R#54) 
-      3. Error: (unknown) (@test-src_organism-select.R#3) 
+      OK: 200 SKIPPED: 0 FAILED: 1
+      1. Failure: select (@test-src_organism-select.R#44) 
       
       Error: testthat unit tests failed
+      In addition: Warning message:
+      call dbDisconnect() when finished working with a connection 
       Execution halted
     ```
+
+## In both
 
 *   checking package dependencies ... NOTE
     ```
     Packages suggested but not available for checking:
-      ‘org.Hs.eg.db’ ‘TxDb.Hsapiens.UCSC.hg38.knownGene’ ‘org.Mm.eg.db’
-      ‘TxDb.Mmusculus.UCSC.mm10.ensGene’
+      ‘org.Hs.eg.db’ ‘org.Mm.eg.db’
     ```
 
 *   checking dependencies in R code ... NOTE
@@ -768,56 +590,6 @@ Version: 1.10.0
 # parsemsf
 
 Version: 0.1.1
-
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘parsemsf-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: make_area_table
-    > ### Title: Make a table of peptide areas
-    > ### Aliases: make_area_table
-    > 
-    > ### ** Examples
-    > 
-    > make_area_table(parsemsf_example("test_db.msf"))
-    Error: Query contains no columns
-    Execution halted
-    ```
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-             ...)
-      25: sql_clause_select(select, con, distinct) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/query-select.R:123
-      26: abort("Query contains no columns") at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/translate-sql-clause.R:16
-      
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 0 SKIPPED: 0 FAILED: 4
-      1. Error: make_area_table creates a data frame with the correct column names (@test_make_area_table.R#16) 
-      2. Error: make_pep_table creates a data frame with the correct column names (@test_make_pep_table.R#13) 
-      3. Error: map_peptides creates a data frame with the correct column names (@test_map_peptides.R#16) 
-      4. Error: (unknown) (@test_quantitate.R#9) 
-      
-      Error: testthat unit tests failed
-      In addition: Warning message:
-      call dbDisconnect() when finished working with a connection 
-      Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error in re-building vignettes:
-      ...
-    Quitting from lines 48-53 (introduction.Rmd) 
-    Error: processing vignette 'introduction.Rmd' failed with diagnostics:
-    Query contains no columns
-    Execution halted
-    ```
 
 ## In both
 
@@ -867,12 +639,12 @@ Version: 18.4.17
       25: .abort(text)
       
       ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 62 SKIPPED: 1 FAILED: 8
+      OK: 65 SKIPPED: 1 FAILED: 8
       1. Error: PIVOT construction (@test-pivot.R#44) 
       2. Error: PIVOT warnings and errors (@test-pivot.R#71) 
       3. Error: spread.tbl_lazy (@test-tidyr.R#8) 
-      4. Error: UNPIVOT construction (@test-unpivot.R#42) 
-      5. Error: order_by (@test-unpivot.R#79) 
+      4. Failure: UNPIVOT construction (@test-unpivot.R#45) 
+      5. Failure: order_by (@test-unpivot.R#81) 
       6. Failure: find_connection (@test-utils.R#11) 
       7. Failure: find_connection (@test-utils.R#12) 
       8. Error: get_pivot_levels (@test-utils.R#29) 
@@ -927,105 +699,6 @@ Version: 0.1.4.2
     Execution halted
     ```
 
-# poplite
-
-Version: 0.99.21
-
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    ...
-    +       relationship(baseball.teams, from="team_franch", to="teams") <- franchID ~ franchID
-    +       
-    +       baseball.db <- Database(baseball.teams, tempfile())
-    +       
-    +       populate(baseball.db, teams=Teams, team_franch=TeamsFranchises)
-    +       
-    +       select(baseball.db, .tables="teams")
-    +       
-    +       select(baseball.db, .tables=c("teams", "team_franch"))
-    +       
-    +       select(baseball.db, yearID:WCWin, franchName)
-    +       
-    +       filter(baseball.db, active == "Y")
-    +       
-    +       select(filter(baseball.db, active == "Y" & W > 50 & teamID == "CAL"), active, W, teamID)
-    +   }
-    Loading required package: Lahman
-    Starting team_franch
-    Starting teams
-    Error: `by` can't contain join column `franchID` which is missing from LHS
-    Execution halted
-    ```
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      20: sql_select.DBIConnection(con, query$select, from, where = query$where, group_by = query$group_by, 
-             having = query$having, order_by = query$order_by, limit = query$limit, distinct = query$distinct, 
-             ...)
-      21: sql_clause_select(select, con, distinct) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/query-select.R:123
-      22: abort("Query contains no columns") at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/translate-sql-clause.R:16
-      
-      ══ testthat results  ═════════════════════════════════════════════════════════════════════════
-      OK: 128 SKIPPED: 0 FAILED: 2
-      1. Error: Querying with Database objects (@test-poplite.R#642) 
-      2. Error: oligoMask queries that break poplite (@test-poplite.R#869) 
-      
-      Error: testthat unit tests failed
-      In addition: Warning message:
-      call dbDisconnect() when finished working with a connection 
-      Execution halted
-    ```
-
-*   checking running R code from vignettes ...
-    ```
-       ‘poplite.Rnw’ using ‘UTF-8’ ... failed
-     ERROR
-    Errors in running code in vignettes:
-    when running code in ‘poplite.Rnw’
-      ...
-    [90m 8[39m       8         9     2 dna_9_2  113.  
-    [90m 9[39m       9        10     1 dna_10_1  46.2 
-    [90m10[39m      10        15     1 dna_15_1  41.0 
-    [90m# … with more rows[39m
-    
-    > select(sample.tracking.db, sample_id:lab_id, .tables = "dna")
-    
-      When sourcing ‘poplite.R’:
-    Error: Query contains no columns
-    Execution halted
-    ```
-
-*   checking re-building of vignette outputs ... NOTE
-    ```
-    ...
-    
-    Loading required package: DBI
-    
-    Attaching package: ‘poplite’
-    
-    The following object is masked from ‘package:dplyr’:
-    
-        select
-    
-    The following object is masked from ‘package:stats’:
-    
-        filter
-    
-    Error in makeSchemaFromData(dna, "dna") : 
-      ERROR: The names of the supplied data.frame need to be modified for the database see correct.df.names
-    Starting clinical
-    Starting samples
-    Starting dna
-    Error: processing vignette 'poplite.Rnw' failed with diagnostics:
-    Query contains no columns
-    Execution halted
-    ```
-
 # RPresto
 
 Version: 1.3.2
@@ -1037,7 +710,7 @@ Version: 1.3.2
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      7: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/build-sql.R:34
+      7: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/build-sql.R:34
       
       [31m--[39m [31m2. Failure: as() works (@test-translate_sql.R#26) [39m [31m----------------------------------------[39m
       translate_sql(pmax(x), con = s[["con"]]) not equal to dplyr::sql("GREATEST(\"x\")").
@@ -1102,7 +775,7 @@ Version: 0.1.3
              pieces <- purrr::map_chr(enexprs(...), escape_expr, con = con)
              sql(paste0(pieces, collapse = ""))
          })("\"quux\"", ".", "\"baz\"", ".", "\"foo bar\"")
-      4: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/Rtmp3b7dcu/R.INSTALL5d923c9e52e5/dbplyr/R/build-sql.R:34
+      4: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/RtmpDJWeoM/R.INSTALL150ff7d3d7092/dbplyr/R/build-sql.R:34
       
       ══ testthat results  ═════════════════════════════════════════════════════════════════════════
       OK: 80 SKIPPED: 0 FAILED: 4
