@@ -12,6 +12,7 @@ home:
 reference:
 - title: dplyr verbs
   contents:
+  - arrange.tbl_lazy
   - copy_to.src_sql
   - collapse.tbl_sql
   - do.tbl_sql
