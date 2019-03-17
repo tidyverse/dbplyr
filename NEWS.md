@@ -67,8 +67,8 @@
   (#132).
 
 * New translation for `median()` and `quantile()`. Works for all ANSI compliant
-  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
-  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  databases (SQL Server, Postgres, MariaDB, Teradata) and has custom 
+  translations for Hive. Thanks to @edavidaja for researching the SQL variants! 
   (#169)
   
 * `na_if()` is correct translated to `NULLIF()` (rather than `NULL_IF`) (#211).
