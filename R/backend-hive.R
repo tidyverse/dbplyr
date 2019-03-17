@@ -5,19 +5,24 @@ sql_translate_env.Hive <- function(con) {
       bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
       bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
 
-      var = sql_prefix("VARIANCE"),
       cot = function(x){
         sql_expr(1 / tan(!!x))
       },
-      quantile = sql_quantile("PERCENTILE"),
-      median = sql_median("PERCENTILE"),
 
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       }
     ),
-    base_odbc_agg,
-    base_odbc_win
+    sql_translator(.parent = base_odbc_agg,
+      var = sql_prefix("VARIANCE"),
+      quantile = sql_quantile("PERCENTILE"),
+      median = sql_median("PERCENTILE")
+    ),
+    sql_translator(.parent = base_odbc_agg,
+      var = win_aggregate("VARIANCE"),
+      quantile = sql_quantile("PERCENTILE", window = TRUE),
+      median = sql_median("PERCENTILE", window = TRUE)
+    )
   )
 }
 
