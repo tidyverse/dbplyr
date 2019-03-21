@@ -86,7 +86,8 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         } else {
           stop("Unrecognized arguments to `wday`", call. = FALSE)
         }
-      }
+      },
+      yday = function(x) sql_expr(EXTRACT(doy %FROM% !!x))
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),

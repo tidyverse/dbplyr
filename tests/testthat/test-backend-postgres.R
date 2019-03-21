@@ -56,3 +56,11 @@ test_that("postgres mimics two argument log", {
   expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
   expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
+
+test_that("custom lubridate functions translated correctly", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_postgres())
+  }
+
+  expect_equal(trans(yday('2019-03-18')), sql("EXTRACT(doy FROM '2019-03-18')"))
+})
