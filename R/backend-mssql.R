@@ -70,6 +70,10 @@
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
 
       as.logical    = sql_cast("BIT"),
+
+      # Using DATETIME2 as it complies with ANSI and ISO.
+      # MS recommends DATETIME2 for new work:
+      # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
       as.Date       = sql_cast("DATETIME2"),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
@@ -122,14 +126,13 @@
           if (!abbr) {
             sql_expr(DATENAME(month, !!x))
           } else {
-            stop("abbr not supported for month() on SQL Server", call. = FALSE)
-          }
+            stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          stop("fiscal_start parameter is not supported. Must be 1.", call. = FALSE)
+          stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
         }
 
         if (with_year != 1) {
