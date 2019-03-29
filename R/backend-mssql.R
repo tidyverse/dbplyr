@@ -71,10 +71,7 @@
 
       as.logical    = sql_cast("BIT"),
 
-      # Using DATETIME2 as it complies with ANSI and ISO.
-      # MS recommends DATETIME2 for new work:
-      # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
-      as.Date       = sql_cast("DATETIME2"),
+      as.Date       = sql_cast("DATE"),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -106,6 +103,10 @@
       # lubridate ---------------------------------------------------------------
       # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
       as_date = sql_cast("DATE"),
+
+      # Using DATETIME2 as it complies with ANSI and ISO.
+      # MS recommends DATETIME2 for new work:
+      # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
       as_datetime = sql_cast("DATETIME2"),
 
       today = function() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
@@ -135,7 +136,7 @@
           stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
         }
 
-        if (with_year != 1) {
+        if (with_year) {
           sql_expr((DATENAME(year, !!x) + '.' + DATENAME(quarter, !!x)))
         } else {
           sql_expr(DATEPART(quarter, !!x))
