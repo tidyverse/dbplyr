@@ -71,6 +71,18 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           }
         }
       },
+      quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        if (fiscal_start != 1) {
+          stop("`fiscal_start` is not supported in PostgreSQL translation. Must be 1.", call. = FALSE)
+        }
+
+        if (with_year) {
+          sql_expr((EXTRACT(year %FROM% !!x) || '.' || EXTRACT(quarter %FROM% !!x)))
+        } else {
+          sql_expr(EXTRACT(quarter %FROM% !!x))
+        }
+      },
+
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         if (!label) {
           # quiet R CMD check

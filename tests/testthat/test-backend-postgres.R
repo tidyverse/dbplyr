@@ -62,5 +62,10 @@ test_that("custom lubridate functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_postgres())
   }
 
-  expect_equal(trans(yday('2019-03-18')), sql("EXTRACT(doy FROM '2019-03-18')"))
+  expect_equal(trans(yday(x)),                      sql("EXTRACT(doy FROM `x`)"))
+
+  expect_equal(trans(quarter(x)),                   sql("EXTRACT(quarter FROM `x`)"))
+  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(year FROM `x`) || '.' || EXTRACT(quarter FROM `x`))"))
+
+  expect_error(trans(quarter(x, fiscal_start = 2)))
 })
