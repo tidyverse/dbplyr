@@ -158,17 +158,29 @@ mssql_temp_name <- function(name, temporary){
 #' @export
 `db_save_query.Microsoft SQL Server` <- function(con, sql, name,
                                                  temporary = TRUE, ...){
-  NextMethod(
-    name = mssql_temp_name(name, temporary),
-    temporary = FALSE
+  name <- mssql_temp_name(name, temporary)
+
+  tt_sql <- build_sql(
+    #"SELECT ", escape(ident(vars), collapse = ", ", con = con), " ",
+    "SELECT * ",
+    "INTO ", as.sql(name), " ",
+    "FROM (", sql, ") AS temp",
+    con = con
   )
+  dbExecute(con, tt_sql)
+  name
+
 }
 
 #' @export
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
-    temporary = FALSE
+    values = values,
+    overwrite = overwrite,
+    types = types,
+    temporary = FALSE,
+    ...
   )
 }
 
