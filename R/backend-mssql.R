@@ -144,7 +144,14 @@ mssql_temp_name <- function(name, temporary){
                             analyze = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
-    temporary = FALSE
+    values = values,
+    overwrite = overwrite,
+    types = types,
+    temporary = FALSE,
+    unique_indexes = unique_indexes,
+    indexes = indexes,
+    analyze = analyze,
+    ...
   )
 }
 
