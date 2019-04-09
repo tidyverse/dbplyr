@@ -161,7 +161,6 @@ mssql_temp_name <- function(name, temporary){
   name <- mssql_temp_name(name, temporary)
 
   tt_sql <- build_sql(
-    #"SELECT ", escape(ident(vars), collapse = ", ", con = con), " ",
     "SELECT * ",
     "INTO ", as.sql(name), " ",
     "FROM (", sql, ") AS temp",
