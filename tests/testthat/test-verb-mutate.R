@@ -75,10 +75,10 @@ test_that("mutate calls windowed versions of sql functions", {
 })
 
 test_that("recycled aggregates generate window function", {
-  dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = x > mean(x, na.rm = TRUE)))
+  dfs <- test_frame_windowed(x = as.numeric(1:4), g = rep(c(1, 2), each = 2))
+  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = x - mean(x, na.rm = TRUE)))
 
-  expect_equal(out$df$r, c(FALSE, TRUE, FALSE, TRUE))
+  expect_equal(out$df$r, c(-0.5, 0.5, -0.5, 0.5))
   expect_equal_tbls(out)
 })
 
