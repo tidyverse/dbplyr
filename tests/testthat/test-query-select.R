@@ -50,3 +50,17 @@ test_that("filter and rename are correctly composed", {
   # It surprises me that this SQL works!
   expect_equal(collect(lf), tibble(x = 2))
 })
+
+test_that("trivial subqueries are collapsed", {
+  lf <- memdb_frame(a = 1:3) %>%
+    mutate(b = a + 1) %>%
+    distinct() %>%
+    arrange()
+
+  qry <- lf %>% sql_build()
+  expect_is(qry$from, "ident")
+  expect_true(qry$distinct)
+
+  # And check that it returns the correct value
+  expect_equal(collect(lf), tibble(a = 1:3, b = a + 1.0))
+})
