@@ -166,7 +166,6 @@ test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
 
   expect_equal(
     mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render(),
-    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`
-x[1]: x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
+    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
   )
 })
