@@ -56,3 +56,17 @@ test_that("postgres mimics two argument log", {
   expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
   expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
+
+test_that("postgres can explain (#272)", {
+  skip_if_no_db("postgres")
+
+  df1 <- data.frame(x = 1:3)
+
+  expect_known_output(
+    src_test("postgres") %>%
+      copy_to(df1, unique_table_name()) %>%
+      mutate(y = x + 1) %>%
+      explain(),
+    "sql/postgres-explain.sql"
+  )
+})
