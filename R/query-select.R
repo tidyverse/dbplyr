@@ -103,7 +103,8 @@ sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE)
     con, query$select, from, where = query$where, group_by = query$group_by,
     having = query$having, order_by = query$order_by, limit = query$limit,
     distinct = query$distinct,
-    ...
+    ...,
+    bare_identifier_ok = bare_identifier_ok
   )
 }
 
