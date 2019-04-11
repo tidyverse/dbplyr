@@ -160,3 +160,12 @@ FROM `df`")
     sql("SELECT `x`, CASE\nWHEN (((`x`) IS NULL)) THEN (1.0)\nWHEN (NOT(((`x`) IS NULL))) THEN (2.0)\nELSE (3.0)\nEND AS `z`\nFROM `df`")
   )
 })
+
+test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
+  mf <- lazy_frame(x = 1:3, con = simulate_mssql())
+
+  expect_equal(
+    mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render(),
+    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`\nORDER BY `x`) `dbplyr_001`")
+  )
+})
