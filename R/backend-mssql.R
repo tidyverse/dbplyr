@@ -144,14 +144,9 @@ mssql_temp_name <- function(name, temporary){
                             analyze = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
-    values = values,
-    overwrite = overwrite,
     types = types,
-    temporary = FALSE,
-    unique_indexes = unique_indexes,
-    indexes = indexes,
-    analyze = analyze,
-    ...
+    values = values,
+    temporary = FALSE
   )
 }
 
@@ -176,11 +171,9 @@ mssql_temp_name <- function(name, temporary){
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
-    values = values,
-    overwrite = overwrite,
     types = types,
-    temporary = FALSE,
-    ...
+    values = values,
+    temporary = FALSE
   )
 }
 
