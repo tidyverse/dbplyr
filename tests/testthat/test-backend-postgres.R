@@ -62,11 +62,12 @@ test_that("postgres can explain (#272)", {
 
   df1 <- data.frame(x = 1:3)
 
-  expect_known_output(
+  expect_output(
     src_test("postgres") %>%
       copy_to(df1, unique_table_name()) %>%
       mutate(y = x + 1) %>%
       explain(),
-    "sql/postgres-explain.sql"
+    "<PLAN>",
+    fixed = TRUE
   )
 })
