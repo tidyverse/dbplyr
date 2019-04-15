@@ -60,8 +60,8 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
       ...
     )
   } else {
-    df <- collect(df)
-    class(df) <- "data.frame" # avoid S4 dispatch problem in dbSendPreparedQuery
+    # avoid S4 dispatch problem in dbSendPreparedQuery
+    df <- as.data.frame(collect(df))
 
     name <- db_copy_to(dest$con, name, df,
       overwrite = overwrite,
