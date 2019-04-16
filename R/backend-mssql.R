@@ -112,20 +112,20 @@
       today = function() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
 
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/datepart-transact-sql?view=sql-server-2017
-      year = function(x) sql_expr(DATEPART(year, !!x)),
-      day = function(x) sql_expr(DATEPART(day, !!x)),
-      mday = function(x) sql_expr(DATEPART(day, !!x)),
-      yday = function(x) sql_expr(DATEPART(dayofyear, !!x)),
-      hour = function(x) sql_expr(DATEPART(hour, !!x)),
-      minute = function(x) sql_expr(DATEPART(minute, !!x)),
-      second = function(x) sql_expr(DATEPART(second, !!x)),
+      year = function(x) sql_expr(DATEPART(YEAR, !!x)),
+      day = function(x) sql_expr(DATEPART(DAY, !!x)),
+      mday = function(x) sql_expr(DATEPART(DAY, !!x)),
+      yday = function(x) sql_expr(DATEPART(DAYOFYEAR, !!x)),
+      hour = function(x) sql_expr(DATEPART(HOUR, !!x)),
+      minute = function(x) sql_expr(DATEPART(MINUTE, !!x)),
+      second = function(x) sql_expr(DATEPART(SECOND, !!x)),
 
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          sql_expr(DATEPART(month, !!x))
+          sql_expr(DATEPART(MONTH, !!x))
         } else {
           if (!abbr) {
-            sql_expr(DATENAME(month, !!x))
+            sql_expr(DATENAME(MONTH, !!x))
           } else {
             stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
         }
@@ -137,9 +137,9 @@
         }
 
         if (with_year) {
-          sql_expr((DATENAME(year, !!x) + '.' + DATENAME(quarter, !!x)))
+          sql_expr((DATENAME(YEAR, !!x) + '.' + DATENAME(QUARTER, !!x)))
         } else {
-          sql_expr(DATEPART(quarter, !!x))
+          sql_expr(DATEPART(QUARTER, !!x))
         }
       },
 
@@ -261,4 +261,4 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL) {
   sql_if(cond, if_true, if_false)
 }
 
-globalVariables(c("BIT", "%is%", "convert", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX"))
+globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))

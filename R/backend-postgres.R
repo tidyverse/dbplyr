@@ -62,7 +62,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       # lubridate functions
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
-          sql_expr(EXTRACT(month %FROM% !!x))
+          sql_expr(EXTRACT(MONTH %FROM% !!x))
         } else {
           if (abbr) {
             sql_expr(TO_CHAR(!!x, "Mon"))
@@ -77,20 +77,17 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         }
 
         if (with_year) {
-          sql_expr((EXTRACT(year %FROM% !!x) || '.' || EXTRACT(quarter %FROM% !!x)))
+          sql_expr((EXTRACT(YEAR %FROM% !!x) || '.' || EXTRACT(QUARTER %FROM% !!x)))
         } else {
-          sql_expr(EXTRACT(quarter %FROM% !!x))
+          sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
       },
 
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         if (!label) {
-          # quiet R CMD check
-          date <- function(x) {}
-
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
           offset <- as.integer(7 - week_start)
-          sql_expr(EXTRACT("dow" %FROM% date(!!x) + !!offset) + 1)
+          sql_expr(EXTRACT("dow" %FROM% DATE(!!x) + !!offset) + 1)
         } else if (label && !abbr) {
           sql_expr(TO_CHAR(!!x, "Day"))
         } else if (label && abbr) {
@@ -99,7 +96,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           stop("Unrecognized arguments to `wday`", call. = FALSE)
         }
       },
-      yday = function(x) sql_expr(EXTRACT(doy %FROM% !!x))
+      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x))
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
@@ -211,4 +208,4 @@ db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
 #' @export
 db_explain.PqConnection <- db_explain.PostgreSQLConnection
 
-globalVariables(c("strpos", "%::%", "%FROM%", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "month"))
+globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY"))

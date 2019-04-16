@@ -62,10 +62,10 @@ test_that("custom lubridate functions translated correctly", {
     translate_sql(!!enquo(x), con = simulate_postgres())
   }
 
-  expect_equal(trans(yday(x)),                      sql("EXTRACT(doy FROM `x`)"))
+  expect_equal(trans(yday(x)),                      sql("EXTRACT(DOY FROM `x`)"))
 
-  expect_equal(trans(quarter(x)),                   sql("EXTRACT(quarter FROM `x`)"))
-  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(year FROM `x`) || '.' || EXTRACT(quarter FROM `x`))"))
+  expect_equal(trans(quarter(x)),                   sql("EXTRACT(QUARTER FROM `x`)"))
+  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
 
   expect_error(trans(quarter(x, fiscal_start = 2)))
 })
@@ -75,11 +75,11 @@ test_that("postgres can explain (#272)", {
 
   df1 <- data.frame(x = 1:3)
 
-  expect_error(
+  expect_output(expect_error(
     src_test("postgres") %>%
       copy_to(df1, unique_table_name()) %>%
       mutate(y = x + 1) %>%
       explain(),
     NA
-  )
+  ))
 })
