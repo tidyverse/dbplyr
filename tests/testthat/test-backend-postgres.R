@@ -56,3 +56,30 @@ test_that("postgres mimics two argument log", {
   expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
   expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
+
+test_that("custom lubridate functions translated correctly", {
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_postgres())
+  }
+
+  expect_equal(trans(yday(x)),                      sql("EXTRACT(doy FROM `x`)"))
+
+  expect_equal(trans(quarter(x)),                   sql("EXTRACT(quarter FROM `x`)"))
+  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(year FROM `x`) || '.' || EXTRACT(quarter FROM `x`))"))
+
+  expect_error(trans(quarter(x, fiscal_start = 2)))
+})
+
+test_that("postgres can explain (#272)", {
+  skip_if_no_db("postgres")
+
+  df1 <- data.frame(x = 1:3)
+
+  expect_error(
+    src_test("postgres") %>%
+      copy_to(df1, unique_table_name()) %>%
+      mutate(y = x + 1) %>%
+      explain(),
+    NA
+  )
+})
