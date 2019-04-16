@@ -196,8 +196,9 @@ db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
 
   exsql <- build_sql(
     "EXPLAIN ",
-    if (!is.null(format)) build_sql("(FORMAT ", sql(format), ") "),
-    sql
+    if (!is.null(format)) sql(paste0("(FORMAT ", format, ") ")),
+    sql,
+    con = con
   )
   expl <- dbGetQuery(con, exsql)
 

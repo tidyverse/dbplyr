@@ -160,3 +160,30 @@ FROM `df`")
     sql("SELECT `x`, CASE\nWHEN (((`x`) IS NULL)) THEN (1.0)\nWHEN (NOT(((`x`) IS NULL))) THEN (2.0)\nELSE (3.0)\nEND AS `z`\nFROM `df`")
   )
 })
+
+test_that("custom lubridate functions translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_mssql())
+  }
+
+  expect_equal(trans(as_date(x)),     sql("CAST(`x` AS DATE)"))
+  expect_equal(trans(as_datetime(x)), sql("CAST(`x` AS DATETIME2)"))
+
+  expect_equal(trans(today()),   sql("CAST(SYSDATETIME() AS DATE)"))
+  expect_equal(trans(year(x)),   sql("DATEPART(year, `x`)"))
+  expect_equal(trans(day(x)),    sql("DATEPART(day, `x`)"))
+  expect_equal(trans(mday(x)),   sql("DATEPART(day, `x`)"))
+  expect_equal(trans(yday(x)),   sql("DATEPART(dayofyear, `x`)"))
+  expect_equal(trans(hour(x)),   sql("DATEPART(hour, `x`)"))
+  expect_equal(trans(minute(x)), sql("DATEPART(minute, `x`)"))
+  expect_equal(trans(second(x)), sql("DATEPART(second, `x`)"))
+
+  expect_equal(trans(month(x)), sql("DATEPART(month, `x`)"))
+  expect_equal(trans(month(x, label = TRUE, abbr = FALSE)), sql("DATENAME(month, `x`)"))
+  expect_error(trans(month(x, abbr = TRUE, abbr = TRUE)))
+
+  expect_equal(trans(quarter(x)), sql("DATEPART(quarter, `x`)"))
+  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(DATENAME(year, `x`) + '.' + DATENAME(quarter, `x`))"))
+  expect_error(trans(quarter(x, fiscal_start = 5)))
+})

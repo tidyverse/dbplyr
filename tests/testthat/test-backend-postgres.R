@@ -69,3 +69,17 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_error(trans(quarter(x, fiscal_start = 2)))
 })
+
+test_that("postgres can explain (#272)", {
+  skip_if_no_db("postgres")
+
+  df1 <- data.frame(x = 1:3)
+
+  expect_error(
+    src_test("postgres") %>%
+      copy_to(df1, unique_table_name()) %>%
+      mutate(y = x + 1) %>%
+      explain(),
+    NA
+  )
+})

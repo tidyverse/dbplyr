@@ -44,8 +44,8 @@
 ## SQL translations
 
 * New translations for some lubridate functions: `today()`, `now()`, 
-  `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
-  `second()` (@colearendt). Also added new translation for `as.POSIXct()`.
+  `year()`, `month()`, `day()`, `hour()`, `minute()`,
+  `second()`, `quarter()`, ``yday()` (@colearendt, @derekmorr). Also added new translation for `as.POSIXct()`.
 
 * New translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
@@ -261,7 +261,7 @@ SQL simulation makes it possible to see what dbplyr will translate SQL to, witho
 ## New top-level translations
 
 * New translations for 
-    
+  
     * MS Access (#2946) (@DavisVaughan)
     * Oracle, via odbc or ROracle (#2928, #2732, @edgararuiz)
     * Teradata. 
