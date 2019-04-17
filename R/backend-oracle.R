@@ -47,7 +47,7 @@ sql_translate_env.Oracle <- function(con) {
       as.double     = sql_cast("NUMBER"),
       #as.Date = sql_cast("DATE"),
       # Oracle date casting is NLS dependant, the following will work for the default YYYY-MM-DD
-      as.Date = function(x) sql_expr("DATE " !!x),
+      as.Date = function(x) build_sql("DATE ", x),
 
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
@@ -61,10 +61,10 @@ sql_translate_env.Oracle <- function(con) {
 
       # https://modern-sql.com/feature/extract
       yday = function(x) sql_expr((TO_NUMBER(TO_CHAR(!!x, "DDD")))),
-      wday = function(x) build_sql("(MOD(1 + TRUNC(", !!x, ") - TRUNC(", !!x, ", 'IW'),7) +1 )"),
-      hour = function(x) build_sql("EXTRACT(HOUR FROM CASE(", !!x, " AS TIMESTAMP)"),
-      minute = function(x) build_sql("EXTRACT(MINUTE FROM CASE(", !!x, " AS TIMESTAMP)"),
-      second = function(x) build_sql("EXTRACT(SECOND FROM CASE(", !!x, " AS TIMESTAMP)")
+      wday = function(x) build_sql("(MOD(1 + TRUNC(", x, ") - TRUNC(", x, ", 'IW'),7) +1 )"),
+      hour = function(x) build_sql("EXTRACT(HOUR FROM CASE(", x, " AS TIMESTAMP)"),
+      minute = function(x) build_sql("EXTRACT(MINUTE FROM CASE(", x, " AS TIMESTAMP)"),
+      second = function(x) build_sql("EXTRACT(SECOND FROM CASE(", x, " AS TIMESTAMP)")
     ),
     base_odbc_agg,
     base_odbc_win
