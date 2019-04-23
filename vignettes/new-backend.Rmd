@@ -22,7 +22,7 @@ This document describes how to add a new SQL backend to dbplyr. To begin:
   [familiar with the basics](http://adv-r.had.co.nz/OO-essentials.html#s3) 
   before you start.
  
-This document is still a work in progress, but it will hopefully get you started. I'd also strongly recommend reading the bundled source code for [SQLite](https://github.com/tidyverse/dbplyr/blob/master/R/db-sqlite.r), [MySQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-mysql.r), and [PostgreSQL](https://github.com/tidyverse/dbplyr/blob/master/R/db-postgres.r).
+This document is still a work in progress, but it will hopefully get you started. I'd also strongly recommend reading the bundled source code for [SQLite](https://github.com/tidyverse/dbplyr/blob/master/R/backend-sqlite.R), [MySQL](https://github.com/tidyverse/dbplyr/blob/master/R/backend-mysql.R), and [PostgreSQL](https://github.com/tidyverse/dbplyr/blob/master/R/backend-postgres.R).
 
 ## First steps
 

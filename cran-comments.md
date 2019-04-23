@@ -1,3 +1,7 @@
+This is resubmission fixing three broken urls
+
+---
+
 ## Test environments
 
 * local: darwin15.6.0-3.5.1
