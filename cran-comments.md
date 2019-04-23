@@ -39,6 +39,8 @@ Issues with CRAN packages are summarised below.
 
 * RPresto
   checking tests ...
+  
+These are legitimate failures due to deliberate interface changes (in order to uncover bugs), or fragile unit tests. All maintainers were informed about the release one week and one month ago.
 
 ### Failed to check
 

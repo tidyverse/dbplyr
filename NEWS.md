@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 1.4.0
 
 ## Breaking changes
 
