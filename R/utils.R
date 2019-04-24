@@ -14,7 +14,7 @@ deparse_all <- function(x) {
   purrr::map_chr(x, expr_text, width = 500L)
 }
 
-#' Provides comma-separated string out ot the parameters
+#' Provides comma-separated string out of the parameters
 #' @export
 #' @keywords internal
 #' @param ... Arguments to be constructed into the string

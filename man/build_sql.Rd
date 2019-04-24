@@ -11,7 +11,7 @@ build_sql(..., .env = parent.frame(), con = sql_current_con())
 user input as is (dangerous), and \code{\link[=ident]{ident()}} to label user
 input as sql identifiers (safe)}
 
-\item{.env}{the environment in which to evalute the arguments. Should not
+\item{.env}{the environment in which to evaluate the arguments. Should not
 be needed in typical use.}
 
 \item{con}{database connection; used to select correct quoting characters.}
@@ -25,7 +25,7 @@ attack, but should make it unlikely that you produce invalid sql.
 }
 \details{
 This function should be used only when generating \code{SELECT} clauses,
-other high level queries, or for other syntax that has no R equivalnt.
+other high level queries, or for other syntax that has no R equivalent.
 For individual function translations, prefer \code{\link[=sql_expr]{sql_expr()}}.
 }
 \examples{

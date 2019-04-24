@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{named_commas}
 \alias{named_commas}
-\title{Provides comma-separated string out ot the parameters}
+\title{Provides comma-separated string out of the parameters}
 \usage{
 named_commas(...)
 }
@@ -10,6 +10,6 @@ named_commas(...)
 \item{...}{Arguments to be constructed into the string}
 }
 \description{
-Provides comma-separated string out ot the parameters
+Provides comma-separated string out of the parameters
 }
 \keyword{internal}

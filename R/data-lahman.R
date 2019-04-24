@@ -5,10 +5,10 @@
 #' \url{http://www.seanlahman.com/baseball-archive/statistics/}, and
 #' made easily available in R through the \pkg{Lahman} package by
 #' Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
-#' for that package for documentation of the inidividual tables.
+#' for that package for documentation of the individual tables.
 #'
 #' @param ... Other arguments passed to `src` on first
-#'   load. For mysql and postgresql, the defaults assume you have a local
+#'   load. For MySQL and PostgreSQL, the defaults assume you have a local
 #'   server with `lahman` database already created.
 #'   For `lahman_srcs()`, character vector of names giving srcs to generate.
 #' @param quiet if `TRUE`, suppress messages about databases failing to

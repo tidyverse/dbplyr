@@ -10,7 +10,7 @@ NULL
 
 #' @export
 #' @rdname nycflights13
-#' @param path location of sqlite database file
+#' @param path location of SQLite database file
 nycflights13_sqlite <- function(path = NULL) {
   cache_computation("nycflights_sqlite", {
     path <- db_location(path, "nycflights13.sqlite")

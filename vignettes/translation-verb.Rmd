@@ -8,7 +8,7 @@ vignette: >
 ---
 
 
-There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; `vignette("translate-function")` descibes how individual expressions within those verbs are translated.
+There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; `vignette("translate-function")` describes how individual expressions within those verbs are translated.
 
 All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
 

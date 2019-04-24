@@ -3,7 +3,7 @@
 ## Breaking changes
 
 * ``Error: `con` must not be NULL``: If you see this error, it probably means 
-  that you have probably forgotten to pass `con` down to a dbplyr function. 
+  that you have forgotten to pass `con` down to a dbplyr function. 
   Previously, dbplyr defaulted to using `simulate_dbi()` which introduced
   subtle escaping bugs. (It's also possible I have forgotten to pass it 
   somewhere that the dbplyr tests don't pick up, so if you can't figure it 
@@ -23,7 +23,7 @@
 * Overall, dplyr generates many fewer subqueries:
 
   * Joins and semi-joins no longer add an unneeded subquery (#236). This is
-    faciliated by the new `bare_identifier_ok` argument to `sql_render()`;
+    facilitated by the new `bare_identifier_ok` argument to `sql_render()`;
     the previous argument was called `root` and confused me.
   
   * Many sequences of `select()`, `rename()`, `mutate()`, and `transmute()` can
@@ -31,12 +31,12 @@
     (#213).
 
 * New `vignette("sql")` describes some advantages of dbplyr over SQL (#205) and 
-  gives some advice about writing how to write literal SQL inside of dplyr, 
-  when you you need to (#196).
+  gives some advice about writing literal SQL inside of dplyr, when you need 
+  to (#196).
 
 * New `vignette("reprex")` gives some hints on creating reprexes that work 
-  anywhere (#117). This is supposrted by a new `tbl_memdb()` that 
-  matches the existing `tbl_lazy()`.
+  anywhere (#117). This is supported by a new `tbl_memdb()` that matches the 
+  existing `tbl_lazy()`.
 
 * All `..._join()` functions gain an `sql_on` argument that allows specifying
   arbitrary join predicates in SQL code (#146, @krlmlr).
@@ -45,7 +45,8 @@
 
 * New translations for some lubridate functions: `today()`, `now()`, 
   `year()`, `month()`, `day()`, `hour()`, `minute()`,
-  `second()`, `quarter()`, ``yday()` (@colearendt, @derekmorr). Also added new translation for `as.POSIXct()`.
+  `second()`, `quarter()`, `yday()` (@colearendt, @derekmorr). Also added new 
+  translation for `as.POSIXct()`.
 
 * New translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
@@ -87,7 +88,9 @@
 
 ### SQL simulation
 
-SQL simulation makes it possible to see what dbplyr will translate SQL to, without having an active database connection, and is used for testing and generating reprexes. 
+SQL simulation makes it possible to see what dbplyr will translate SQL to,
+without having an active database connection, and is used for testing and
+generating reprexes.
 
 * SQL simulation has been overhauled. It now works reliably, is better 
   documented, and always uses ANSI escaping (i.e. `` ` `` for field 
@@ -505,7 +508,7 @@ SQL simulation makes it possible to see what dbplyr will translate SQL to, witho
 
 * New `as.sql()` safely coerces an input to SQL.
 
-* More tranlators for `as.character()`, `as.integer()` and `as.double()` 
+* More translators for `as.character()`, `as.integer()` and `as.double()` 
   (#2775).
 
 * New `ident_q()` makes it possible to specifier identifiers that do not
@@ -599,7 +602,7 @@ SQL simulation makes it possible to see what dbplyr will translate SQL to, witho
 * `common_by()` gets a better error message for unexpected inputs (#2091)
 
 * `copy_to()` no longer checks that the table doesn't exist before creation,
-  intead preferring to fall back on the database for error messages. This
+  instead preferring to fall back on the database for error messages. This
   should reduce both false positives and false negative (#1470)
 
 * `copy_to()` now succeeds for MySQL if a character column contains `NA` 

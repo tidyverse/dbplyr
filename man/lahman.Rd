@@ -27,7 +27,7 @@ lahman_srcs(..., quiet = NULL)
 }
 \arguments{
 \item{...}{Other arguments passed to \code{src} on first
-load. For mysql and postgresql, the defaults assume you have a local
+load. For MySQL and PostgreSQL, the defaults assume you have a local
 server with \code{lahman} database already created.
 For \code{lahman_srcs()}, character vector of names giving srcs to generate.}
 
@@ -42,7 +42,7 @@ data source, provided by Sean Lahman at
 \url{http://www.seanlahman.com/baseball-archive/statistics/}, and
 made easily available in R through the \pkg{Lahman} package by
 Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
-for that package for documentation of the inidividual tables.
+for that package for documentation of the individual tables.
 }
 \examples{
 # Connect to a local sqlite database, if already created

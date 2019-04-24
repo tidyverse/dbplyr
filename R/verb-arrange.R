@@ -3,7 +3,7 @@
 #' Order rows of database tables by an expression involving its variables.
 #'
 #' @section Missing values:
-#' Compared to its sorting behavior on local data, the [arrange()] method for
+#' Compared to its sorting behaviour on local data, the [arrange()] method for
 #' most database tables sorts NA at the beginning unless wrapped with [desc()].
 #' Users can override this behaviour by explicitly sorting on `is.na(x)`.
 #'

@@ -113,7 +113,7 @@ Note that, by default, `translate()` assumes that the call is inside a `mutate()
 translate_sql(mean(x, na.rm = TRUE), window = FALSE)
 ```
 
-### Conditional evauation
+### Conditional evaluation
 
 `if` and `switch()` are translate to `CASE WHEN`:
 
@@ -167,7 +167,7 @@ Things get a little trickier with window functions, because SQL's window functio
   to the window function, describing which rows (relative to the current row)
   should be included. The frame clause provides two offsets which determine
   the start and end of frame. There are three special values: -Inf means
-  to include all preceeding rows (in SQL, "unbounded preceding"), 0 means the
+  to include all preceding rows (in SQL, "unbounded preceding"), 0 means the
   current row ("current row"), and Inf means all following rows ("unbounded
   following)". The complete set of options is comprehensive, but fairly 
   confusing, and is summarised visually below.
