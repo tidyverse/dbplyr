@@ -42,7 +42,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.3.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.0.9000</span>
         </div>
       </div>
     </div>
@@ -136,15 +136,15 @@
 <li><p>Use <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code>/<code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code> to simulate SQL generation of dplyr pipelines.</p></li>
 <li><p>Use <code><a href="../reference/translate_sql.html">translate_sql()</a></code> to simulate SQL generation of columnar expression.</p></li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dbplyr)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dbplyr)</a></code></pre></div>
 <div id="using-memdb_frame" class="section level2">
 <h2 class="hasAnchor">
 <a href="#using-memdb_frame" class="anchor"></a>Using <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>
 </h2>
 <p>The first place to start is with SQLite. SQLite is particularly appealing because it’s completely embedded instead an R package so doesn’t have any external dependencies. SQLite is designed to be small and simple, so it can’t demonstrate all problems, but it’s easy to try out and a great place to start.</p>
 <p>You can easily create a SQLite in-memory database table using <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">mf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/memdb_frame.html">memdb_frame</a></span>(<span class="dt">g =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">1</span>)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">mf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/memdb_frame.html">memdb_frame</a></span>(<span class="dt">g =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="dt">x =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dt">y =</span> <span class="dv">5</span><span class="op">:</span><span class="dv">1</span>)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">mf</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; # Source:   table&lt;dbplyr_001&gt; [?? x 3]</span></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
@@ -179,10 +179,10 @@
 <h2 class="hasAnchor">
 <a href="#translating-verbs" class="anchor"></a>Translating verbs</h2>
 <p>Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it’s possible to generate SQL without a database using <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an <code>con</code> argument which takes a database “simulator” like <code><a href="../reference/simulate_dbi.html">simulate_postgres()</a></code>, <code><a href="../reference/simulate_dbi.html">simulate_sqlite()</a></code>, etc.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span>)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(<span class="dt">x =</span> x, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_postgres</a></span>()) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; SELECT *</span></a>
@@ -190,7 +190,7 @@
 <a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; LIMIT 5</span></a>
 <a class="sourceLine" id="cb4-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="kw"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(<span class="dt">x =</span> x, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_mssql</a></span>()) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="dv">5</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
 <a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt; &lt;SQL&gt;</span></a>
 <a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt; SELECT TOP(5) *</span></a>
@@ -201,9 +201,9 @@
 <h2 class="hasAnchor">
 <a href="#translating-individual-expressions" class="anchor"></a>Translating individual expressions</h2>
 <p>In some cases, you might be able to track the problem down to incorrect translation for a single column expression. In that case, you can make your reprex even simpler with <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr</a></span>(x, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_postgres</a></span>())</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(x, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_postgres</a></span>())</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr</a></span>(x, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(x, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())</a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span></a></code></pre></div>
 </div>
   </div>

@@ -42,7 +42,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.3.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.0.9000</span>
         </div>
       </div>
     </div>
@@ -134,16 +134,16 @@
 <li><p>Ensure that you have a DBI compliant database backend. If not, you’ll need to first create it by following the instructions in <code><a href="https://cran.rstudio.com/web/packages/DBI/vignettes/backend.html">vignette("backend", package = "DBI")</a></code>.</p></li>
 <li><p>You’ll need a working knowledge of S3. Make sure that you’re <a href="http://adv-r.had.co.nz/OO-essentials.html#s3">familiar with the basics</a> before you start.</p></li>
 </ul>
-<p>This document is still a work in progress, but it will hopefully get you started. I’d also strongly recommend reading the bundled source code for <a href="https://github.com/tidyverse/dbplyr/blob/master/R/db-sqlite.r">SQLite</a>, <a href="https://github.com/tidyverse/dbplyr/blob/master/R/db-mysql.r">MySQL</a>, and <a href="https://github.com/tidyverse/dbplyr/blob/master/R/db-postgres.r">PostgreSQL</a>.</p>
+<p>This document is still a work in progress, but it will hopefully get you started. I’d also strongly recommend reading the bundled source code for <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-sqlite.R">SQLite</a>, <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-mysql.R">MySQL</a>, and <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-postgres.R">PostgreSQL</a>.</p>
 <div id="first-steps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#first-steps" class="anchor"></a>First steps</h2>
 <p>For interactive exploitation, attach dplyr and DBI. If you’re creating a package, you’ll need to import dplyr and DBI.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(DBI)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DBI)</a></code></pre></div>
 <p>Check that you can create a tbl from a connection, like:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="dt">path =</span> <span class="st">":memory:"</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbWriteTable">dbWriteTable</a></span>(con, <span class="st">"mtcars"</span>, mtcars)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/RSQLite/man/SQLite.html">SQLite</a></span>(), <span class="dt">path =</span> <span class="st">":memory:"</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">DBI<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbWriteTable.html">dbWriteTable</a></span>(con, <span class="st">"mtcars"</span>, mtcars)</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(con, <span class="st">"mtcars"</span>)</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]</span></a>
@@ -156,13 +156,13 @@
 <a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt; 4  21.4     6   258   110  3.08  3.22  19.4     1     0     3     1</span></a>
 <a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>If you can’t, this likely indicates some problem with the DBI methods. Use <a href="https://github.com/rstats-db/DBItest">DBItest</a> to narrow down the problem.</p>
-<p>Now is a good time to implement a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_desc()</a></code>. This should briefly describe the connection, typically formatting the information returned from <code><a href="https://www.rdocumentation.org/packages/DBI/topics/dbGetInfo">dbGetInfo()</a></code>. This is what dbplyr does for Postgres connections:</p>
+<p>Now is a good time to implement a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_desc()</a></code>. This should briefly describe the connection, typically formatting the information returned from <code><a href="https://rdrr.io/pkg/DBI/man/dbGetInfo.html">dbGetInfo()</a></code>. This is what dbplyr does for Postgres connections:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co">#' @export</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">db_desc.PostgreSQLConnection &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">  info &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbGetInfo">dbGetInfo</a></span>(x)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">  info &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbGetInfo.html">dbGetInfo</a></span>(x)</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">  host &lt;-<span class="st"> </span><span class="cf">if</span> (info<span class="op">$</span>host <span class="op">==</span><span class="st"> ""</span>) <span class="st">"localhost"</span> <span class="cf">else</span> info<span class="op">$</span>host</a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"postgres "</span>, info<span class="op">$</span>serverVersion, <span class="st">" ["</span>, info<span class="op">$</span>user, <span class="st">"@"</span>,</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"postgres "</span>, info<span class="op">$</span>serverVersion, <span class="st">" ["</span>, info<span class="op">$</span>user, <span class="st">"@"</span>,</a>
 <a class="sourceLine" id="cb3-7" data-line-number="7">    host, <span class="st">":"</span>, info<span class="op">$</span>port, <span class="st">"/"</span>, info<span class="op">$</span>dbname, <span class="st">"]"</span>)</a>
 <a class="sourceLine" id="cb3-8" data-line-number="8">}</a></code></pre></div>
 </div>

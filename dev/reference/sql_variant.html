@@ -79,7 +79,7 @@ easy." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.3.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.0.9000</span>
         </div>
       </div>
     </div>
@@ -181,8 +181,8 @@ easy.</p>
 <span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
   <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>())
 
-<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>emptyenv</a></span>()))
+<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
 
 <span class='fu'>sql_infix</span>(<span class='no'>f</span>, <span class='kw'>pad</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
@@ -289,7 +289,7 @@ conversion function.</p></div>
   )
 }
 
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/cor'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/sd'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/cor.html'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
 <span class='co'># Any functions not explicitly listed in the converter will be translated</span>
 <span class='co'># to sql as is, so you don't need to convert all functions.</span>
 <span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; regr_intercept(`y`, `x`)</div></pre>

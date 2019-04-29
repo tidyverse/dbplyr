@@ -42,7 +42,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.3.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.0.9000</span>
         </div>
       </div>
     </div>
@@ -130,8 +130,8 @@
     
     
 <p>There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; <code>vignette("translate-verb")</code> describes how entire verbs are translated.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dbplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dbplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a></code></pre></div>
 <p><code><a href="../reference/translate_sql.html">dbplyr::translate_sql()</a></code> powers translation of individual function calls, and I’ll use it extensively in this vignette to show what’s happening. You shouldn’t need to use it ordinary code as dbplyr takes care of the translation automatically.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>((x <span class="op">+</span><span class="st"> </span>y) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></a></code></pre></div>
@@ -142,7 +142,7 @@
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_access</a></span>())</a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span></a></code></pre></div>
-<p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code> loops through the data twice. R’s <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide.</p>
+<p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> loops through the data twice. R’s <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide.</p>
 <p>If you’re interested in how <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is implemented, the basic techniques that underlie the implementation of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> are described in <a href="http://adv-r.hadley.nz/translation.html">“Advanced R”</a>.</p>
 <div id="basic-differences" class="section level2">
 <h2 class="hasAnchor">
@@ -160,9 +160,9 @@
 </li>
 <li>
 <p>And some functions have different argument orders:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/substr">substr</a></span>(x, <span class="dv">5</span>, <span class="dv">10</span>))</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(x, <span class="dv">5</span>, <span class="dv">10</span>))</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 5, 6)</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Log">log</a></span>(x, <span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(x, <span class="dv">10</span>))</a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; LOG(10.0, `x`)</span></a></code></pre></div>
 </li>
 <li>
@@ -183,13 +183,13 @@
 <ul>
 <li>basic math operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>
 </li>
-<li>trigonometry: <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">acos()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">asin()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">atan()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">atan2()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">cos()</a></code>, <code>cot()</code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">tan()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Trig">sin()</a></code>
+<li>trigonometry: <code><a href="https://rdrr.io/r/base/Trig.html">acos()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">asin()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">atan()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">atan2()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">cos()</a></code>, <code>cot()</code>, <code><a href="https://rdrr.io/r/base/Trig.html">tan()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">sin()</a></code>
 </li>
-<li>hypergeometric: <code><a href="https://www.rdocumentation.org/packages/base/topics/Hyperbolic">cosh()</a></code>, <code>coth()</code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Hyperbolic">sinh()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Hyperbolic">tanh()</a></code>
+<li>hypergeometric: <code><a href="https://rdrr.io/r/base/Hyperbolic.html">cosh()</a></code>, <code>coth()</code>, <code><a href="https://rdrr.io/r/base/Hyperbolic.html">sinh()</a></code>, <code><a href="https://rdrr.io/r/base/Hyperbolic.html">tanh()</a></code>
 </li>
-<li>logarithmic: <code><a href="https://www.rdocumentation.org/packages/base/topics/Log">log()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Log">log10()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Log">exp()</a></code>
+<li>logarithmic: <code><a href="https://rdrr.io/r/base/Log.html">log()</a></code>, <code><a href="https://rdrr.io/r/base/Log.html">log10()</a></code>, <code><a href="https://rdrr.io/r/base/Log.html">exp()</a></code>
 </li>
-<li>misc: <code><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">abs()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Round">ceiling()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/MathFun">sqrt()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/sign">sign()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Round">round()</a></code>
+<li>misc: <code><a href="https://rdrr.io/r/base/MathFun.html">abs()</a></code>, <code><a href="https://rdrr.io/r/base/Round.html">ceiling()</a></code>, <code><a href="https://rdrr.io/r/base/MathFun.html">sqrt()</a></code>, <code><a href="https://rdrr.io/r/base/sign.html">sign()</a></code>, <code><a href="https://rdrr.io/r/base/Round.html">round()</a></code>
 </li>
 </ul>
 </div>
@@ -199,8 +199,8 @@
 <a href="#modulo-arithmetic" class="anchor"></a>Modulo arithmetic</h2>
 <p>dbplyr translates <code>%%</code> and <code>%/%</code> to their SQL equivalents but note that they are not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(10L, 10L, <span class="op">-</span>10L, <span class="op">-</span>10L), </a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="dt">y =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(3L, <span class="op">-</span>3L, 3L, <span class="op">-</span>3L)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(10L, 10L, <span class="op">-</span>10L, <span class="op">-</span>10L), </a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="dt">y =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(3L, <span class="op">-</span>3L, 3L, <span class="op">-</span>3L)</a>
 <a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
 <a class="sourceLine" id="cb7-5" data-line-number="5">mf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/memdb_frame.html">src_memdb</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(df, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"></a>
@@ -228,29 +228,29 @@
 <ul>
 <li>logical comparisons: <code>&lt;</code>, <code>&lt;=</code>, <code>!=</code>, <code>&gt;=</code>, <code>&gt;</code>, <code>==</code>, <code>%in%</code>
 </li>
-<li>boolean operations: <code>&amp;</code>, <code>&amp;&amp;</code>, <code>|</code>, <code>||</code>, <code>!</code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Logic">xor()</a></code>
+<li>boolean operations: <code>&amp;</code>, <code>&amp;&amp;</code>, <code>|</code>, <code>||</code>, <code>!</code>, <code><a href="https://rdrr.io/r/base/Logic.html">xor()</a></code>
 </li>
 </ul>
 </div>
 <div id="aggregation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#aggregation" class="anchor"></a>Aggregation</h3>
-<p>All database provide translation for the basic aggregations: <code><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">min()</a></code>, <code><a href="https://www.rdocumentation.org/packages/base/topics/Extremes">max()</a></code>, <code><a href="https://www.rdocumentation.org/packages/stats/topics/sd">sd()</a></code>, <code><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var()</a></code>. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x))</a>
+<p>All database provide translation for the basic aggregations: <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">max()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code>, <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code>. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x))</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
 <a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
 <a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
 <a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a></code></pre></div>
 <p>Note that, by default, <code>translate()</code> assumes that the call is inside a <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> and generates a window translation. If you want to see the equivalent <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>/aggregation translation, use <code>window = FALSE</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></a></code></pre></div>
 </div>
 <div id="conditional-evauation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conditional-evauation" class="anchor"></a>Conditional evauation</h3>
-<p><code>if</code> and <code><a href="https://www.rdocumentation.org/packages/base/topics/switch">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
+<p><code>if</code> and <code><a href="https://rdrr.io/r/base/switch.html">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">if</span> (x <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> <span class="cf">else</span> <span class="st">"small"</span>)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">switch</span>(x, <span class="dt">a =</span> 1L, <span class="dt">b =</span> 2L, 3L))</a>
@@ -302,9 +302,9 @@
 </li>
 </ul>
 <p>To see how individual window functions are translated to SQL, we can again use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(G))</a>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(G))</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(G))</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(G))</a>
 <a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (ORDER BY `G`)</span></a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></a>
@@ -313,18 +313,18 @@
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
 <a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></a></code></pre></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
-<li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://www.rdocumentation.org/packages/base/topics/rank">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
+<li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://rdrr.io/r/base/rank.html">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
 <li><p>Accumulating aggregates only take a single argument (the vector to aggregate). To control ordering, use <code><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by()</a></code>.</p></li>
 <li><p>Aggregates implemented in dplyr (<code>lead</code>, <code>lag</code>, <code>nth_value</code>, <code>first_value</code>, <code>last_value</code>) have an <code>order_by</code> argument. Supply it to override the default ordering.</p></li>
 </ul>
 <p>The three options are illustrated in the snippet below:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(players,</a>
 <a class="sourceLine" id="cb14-2" data-line-number="2">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">min_rank</a></span>(yearID),</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(yearID, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cumsum">cumsum</a></span>(G)),</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(yearID, <span class="kw"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span>(G)),</a>
 <a class="sourceLine" id="cb14-4" data-line-number="4">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lead</a></span>(G, <span class="dt">order_by =</span> yearID)</a>
 <a class="sourceLine" id="cb14-5" data-line-number="5">)</a></code></pre></div>
 <p>Currently there is no way to order by multiple variables, except by setting the default ordering with <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>. This will be added in a future release.</p>

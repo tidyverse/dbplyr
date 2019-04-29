@@ -78,7 +78,7 @@ use test_frame()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.3.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.0.9000</span>
         </div>
       </div>
     </div>
@@ -174,15 +174,15 @@ use <code>test_frame()</code>.</p>
 
 <span class='fu'>src_test</span>(<span class='no'>name</span>)
 
-<span class='fu'>test_load</span>(<span class='no'>df</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'>unique_table_name</span>(), <span class='kw'>srcs</span> <span class='kw'>=</span> <span class='no'>test_srcs</span>$<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/get'>get</a></span>(),
-  <span class='kw'>ignore</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>())
+<span class='fu'>test_load</span>(<span class='no'>df</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'>unique_table_name</span>(), <span class='kw'>srcs</span> <span class='kw'>=</span> <span class='no'>test_srcs</span>$<span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(),
+  <span class='kw'>ignore</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
 
-<span class='fu'>test_frame</span>(<span class='no'>...</span>, <span class='kw'>srcs</span> <span class='kw'>=</span> <span class='no'>test_srcs</span>$<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/get'>get</a></span>(), <span class='kw'>ignore</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>())</pre>
+<span class='fu'>test_frame</span>(<span class='no'>...</span>, <span class='kw'>srcs</span> <span class='kw'>=</span> <span class='no'>test_srcs</span>$<span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(), <span class='kw'>ignore</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())</pre>
         
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>test_register_src</span>(<span class='st'>"df"</span>, <span class='fu'>src_df</span>(<span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>new.env</a></span>()))
+<span class='fu'>test_register_src</span>(<span class='st'>"df"</span>, <span class='fu'>src_df</span>(<span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>()))
 <span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, <span class='fu'>src_sqlite</span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
 
 <span class='fu'>test_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>:<span class='fl'>1</span>)
