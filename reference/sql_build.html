@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build and render SQL from a sequence of lazy operations — sql_build • dbplyr</title>
+<title>Build and render SQL from a sequence of lazy operations — join_query • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -19,7 +19,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- sticky kit -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
@@ -29,12 +29,15 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
-<meta property="og:title" content="Build and render SQL from a sequence of lazy operations — sql_build" />
+
+
+<meta property="og:title" content="Build and render SQL from a sequence of lazy operations — join_query" />
 
 <meta property="og:description" content="sql_build() creates a select_query S3 object, that is rendered
 to a SQL string by sql_render(). The output from sql_build() is
 designed to be easy to test, as it's database agnostic, and has
-a hierarchical structure." />
+a hierarchical structure. Outside of testing, however, you should
+always call sql_render()." />
 
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -77,17 +80,17 @@ a hierarchical structure." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
         </div>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
-  <a href="../articles/dbplyr.html">Intro</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -97,19 +100,48 @@ a hierarchical structure." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/sql-translation.html">SQL translation</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/sql.html">Writing SQL with dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/">Version 1.3.0</a>
+    </li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/">Version 1.2.0</a>
+    </li>
+    <li>
+      <a href="https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/">Version 1.1.0</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -126,7 +158,7 @@ a hierarchical structure." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Build and render SQL from a sequence of lazy operations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/sql-build.R'><code>R/sql-build.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/sql-optimise.R'><code>R/sql-optimise.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/sql-query.R'><code>R/sql-query.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-join.R'><code>R/query-join.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-select.R'><code>R/query-select.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-semi-join.R'><code>R/query-semi-join.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>sql_build.Rd</code></div>
     </div>
 
@@ -135,26 +167,27 @@ a hierarchical structure." />
     <p><code>sql_build()</code> creates a <code>select_query</code> S3 object, that is rendered
 to a SQL string by <code>sql_render()</code>. The output from <code>sql_build()</code> is
 designed to be easy to test, as it's database agnostic, and has
-a hierarchical structure.</p>
+a hierarchical structure. Outside of testing, however, you should
+always call <code>sql_render()</code>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sql_build</span>(<span class='no'>op</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
-
-<span class='fu'>sql_optimise</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
-
-<span class='fu'>select_query</span>(<span class='no'>from</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>), <span class='kw'>where</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(),
-  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(), <span class='kw'>having</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(),
-  <span class='kw'>order_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/character'>character</a></span>(), <span class='kw'>limit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>distinct</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='fu'>join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>vars</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>".x"</span>,
+    <pre class="usage"><span class='fu'>join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>vars</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>,
   <span class='st'>".y"</span>))
+
+<span class='fu'>select_query</span>(<span class='no'>from</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>), <span class='kw'>where</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>having</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>order_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>limit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>distinct</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='fu'>semi_join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>anti</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>set_op_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='no'>type</span>)
 
-<span class='fu'>sql_render</span>(<span class='no'>query</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>sql_build</span>(<span class='no'>op</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+
+<span class='fu'>sql_render</span>(<span class='no'>query</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>bare_identifier_ok</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>sql_optimise</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,6 +205,12 @@ without an active database connection.</p></td>
     <tr>
       <th>...</th>
       <td><p>Other arguments passed on to the methods. Not currently used.</p></td>
+    </tr>
+    <tr>
+      <th>bare_identifier_ok</th>
+      <td><p>Is it ok to return a bare table identifier.
+Set to <code>TRUE</code> when generating queries to be nested within other
+queries where a bare table name is ok.</p></td>
     </tr>
     </table>
     

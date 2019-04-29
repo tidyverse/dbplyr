@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create an sql translator — sql_variant • dbplyr</title>
+<title>Create an sql translator — sql_substr • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -19,7 +19,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- sticky kit -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
@@ -29,7 +29,9 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
-<meta property="og:title" content="Create an sql translator — sql_variant" />
+
+
+<meta property="og:title" content="Create an sql translator — sql_substr" />
 
 <meta property="og:description" content="When creating a package that maps to a new SQL based src, you'll often
 want to provide some additional mappings from common R commands to the
@@ -77,17 +79,17 @@ easy." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
         </div>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
-  <a href="../articles/dbplyr.html">Intro</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -97,19 +99,48 @@ easy." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/sql-translation.html">SQL translation</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/sql.html">Writing SQL with dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/">Version 1.3.0</a>
+    </li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/">Version 1.2.0</a>
+    </li>
+    <li>
+      <a href="https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/">Version 1.1.0</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -126,7 +157,7 @@ easy." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create an sql translator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.r'><code>R/translate-sql-helpers.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-base.r'><code>R/translate-sql-base.r</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-odbc.R'><code>R/translate-sql-odbc.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-string.R'><code>R/translate-sql-string.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>sql_variant.Rd</code></div>
     </div>
 
@@ -139,17 +170,25 @@ easy.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
+    <pre class="usage"><span class='fu'>sql_substr</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>)
+
+<span class='fu'>sql_str_sub</span>(<span class='kw'>subset_f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>, <span class='kw'>length_f</span> <span class='kw'>=</span> <span class='st'>"LENGTH"</span>)
+
+<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
+
+<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
+
+<span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
   <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>())
 
-<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/environment'>emptyenv</a></span>()))
+<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
 
-<span class='fu'>sql_infix</span>(<span class='no'>f</span>)
+<span class='fu'>sql_infix</span>(<span class='no'>f</span>, <span class='kw'>pad</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>sql_prefix</span>(<span class='no'>f</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
-<span class='fu'>sql_aggregate</span>(<span class='no'>f</span>)
+<span class='fu'>sql_aggregate</span>(<span class='no'>f</span>, <span class='kw'>f_r</span> <span class='kw'>=</span> <span class='no'>f</span>)
 
 <span class='fu'>sql_aggregate_2</span>(<span class='no'>f</span>)
 
@@ -173,15 +212,15 @@ easy.</p>
 
 <span class='no'>base_odbc_agg</span>
 
-<span class='no'>base_odbc_win</span>
-
-<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
-
-<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)</pre>
+<span class='no'>base_odbc_win</span></pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>f</th>
+      <td><p>the name of the sql function as a string</p></td>
+    </tr>
     <tr>
       <th>scalar, aggregate, window</th>
       <td><p>The three families of functions than an
@@ -200,13 +239,17 @@ Defaults to <code>base_agg</code> which provides a standard set of
 mappings for the most common operators and functions.</p></td>
     </tr>
     <tr>
-      <th>f</th>
-      <td><p>the name of the sql function as a string</p></td>
+      <th>pad</th>
+      <td><p>If <code>TRUE</code>, the default, pad the infix operator with spaces.</p></td>
     </tr>
     <tr>
       <th>n</th>
       <td><p>for <code>sql_infix()</code>, an optional number of arguments to expect.
 Will signal error if not correct.</p></td>
+    </tr>
+    <tr>
+      <th>f_r</th>
+      <td><p>the name of the r function being translated as a string</p></td>
     </tr>
     </table>
     
@@ -230,28 +273,26 @@ conversion function.</p></div>
 <span class='co'># postgresql provides: http://bit.ly/K5EdTn</span>
 
 <span class='no'>postgres_agg</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_translator</span>(<span class='kw'>.parent</span> <span class='kw'>=</span> <span class='no'>base_agg</span>,
-  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"corr"</span>),
-  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"covar_samp"</span>),
-  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"stddev_samp"</span>),
-  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"var_samp"</span>)
-)
-<span class='no'>postgres_var</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_variant</span>(
-  <span class='no'>base_scalar</span>,
-  <span class='no'>postgres_agg</span>,
-  <span class='no'>base_no_win</span>
+  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"CORR"</span>),
+  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"COVAR_SAMP"</span>),
+  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"STDDEV_SAMP"</span>, <span class='st'>"sd"</span>),
+  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"VAR_SAMP"</span>, <span class='st'>"var"</span>)
 )
 
 <span class='co'># Next we have to simulate a connection that uses this variant</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/structure'>structure</a></span>(
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"TestCon"</span>, <span class='st'>"DBITestConnection"</span>, <span class='st'>"DBIConnection"</span>)
-)
-<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>postgres_var</span>
+<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>(<span class='st'>"TestCon"</span>)
+<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) {
+  <span class='fu'>sql_variant</span>(
+    <span class='no'>base_scalar</span>,
+    <span class='no'>postgres_agg</span>,
+    <span class='no'>base_no_win</span>
+  )
+}
 
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/cor'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; COR(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/sd'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SD(`income` / `years`)</div><div class='input'>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/cor.html'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
 <span class='co'># Any functions not explicitly listed in the converter will be translated</span>
 <span class='co'># to sql as is, so you don't need to convert all functions.</span>
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; REGR_INTERCEPT(`y`, `x`)</div></pre>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; regr_intercept(`y`, `x`)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

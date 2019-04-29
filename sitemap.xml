@@ -4,7 +4,13 @@
     <loc>https://dbplyr.tidyverse.org/index.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/arrange.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/build_sql.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/collapse.tbl_sql.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/copy_to.src_sql.html</loc>
@@ -50,6 +56,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/remote_name.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/simulate_dbi.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql.html</loc>
@@ -100,12 +109,15 @@
     <loc>https://dbplyr.tidyverse.org/articles/new-backend.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/articles/notes/mysql-setup.html</loc>
+    <loc>https://dbplyr.tidyverse.org/articles/reprex.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/articles/notes/postgres-setup.html</loc>
+    <loc>https://dbplyr.tidyverse.org/articles/sql.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/articles/sql-translation.html</loc>
+    <loc>https://dbplyr.tidyverse.org/articles/translation-function.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/articles/translation-verb.html</loc>
   </url>
 </urlset>

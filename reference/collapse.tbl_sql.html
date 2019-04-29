@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Flag a character vector as SQL identifiers — ident • dbplyr</title>
+<title>Force computation of query — collapse.tbl_sql • dbplyr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -31,12 +31,11 @@
 
 
 
-<meta property="og:title" content="Flag a character vector as SQL identifiers — ident" />
+<meta property="og:title" content="Force computation of query — collapse.tbl_sql" />
 
-<meta property="og:description" content="ident() takes unquoted strings and flags them as identifiers.
-ident_q() assumes its input has already been quoted, and ensures
-it does not get quoted again. This is currently used only for
-for schema.table." />
+<meta property="og:description" content="collapse() creates a subquery; compute() stores the results in a
+remote table; collect() downloads the results into the current
+R session." />
 
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -156,57 +155,82 @@ for schema.table." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Flag a character vector as SQL identifiers</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/ident.R'><code>R/ident.R</code></a></small>
-    <div class="hidden name"><code>ident.Rd</code></div>
+    <h1>Force computation of query</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-compute.R'><code>R/verb-compute.R</code></a></small>
+    <div class="hidden name"><code>collapse.tbl_sql.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>ident()</code> takes unquoted strings and flags them as identifiers.
-<code>ident_q()</code> assumes its input has already been quoted, and ensures
-it does not get quoted again. This is currently used only for
-for <code>schema.table</code>.</p>
+    <p><code>collapse()</code> creates a subquery; <code>compute()</code> stores the results in a
+remote table; <code>collect()</code> downloads the results into the current
+R session.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>ident</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='co'># S3 method for tbl_sql</span>
+<span class='fu'>collapse</span>(<span class='no'>x</span>, <span class='no'>...</span>)
 
-<span class='fu'>ident_q</span>(<span class='no'>...</span>)
+<span class='co'># S3 method for tbl_sql</span>
+<span class='fu'>compute</span>(<span class='no'>x</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'>unique_table_name</span>(),
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
-<span class='fu'>is.ident</span>(<span class='no'>x</span>)</pre>
+<span class='co'># S3 method for tbl_sql</span>
+<span class='fu'>collect</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>Inf</span>, <span class='kw'>warn_incomplete</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>A character vector, or name-value pairs</p></td>
+      <th>x</th>
+      <td><p>A <code>tbl_sql</code></p></td>
     </tr>
     <tr>
-      <th>x</th>
-      <td><p>An object</p></td>
+      <th>...</th>
+      <td><p>other parameters passed to methods.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>Table name in remote database.</p></td>
+    </tr>
+    <tr>
+      <th>temporary</th>
+      <td><p>Should the table be temporary (<code>TRUE</code>, the default<code>) or persistent (</code>FALSE`)?</p></td>
+    </tr>
+    <tr>
+      <th>unique_indexes</th>
+      <td><p>a list of character vectors. Each element of the list
+will create a new unique index over the specified column(s). Duplicate rows
+will result in failure.</p></td>
+    </tr>
+    <tr>
+      <th>indexes</th>
+      <td><p>a list of character vectors. Each element of the list
+will create a new index.</p></td>
+    </tr>
+    <tr>
+      <th>analyze</th>
+      <td><p>if <code>TRUE</code> (the default), will automatically ANALYZE the
+new table so that the query optimiser has useful information.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>Number of rows to fetch. Defaults to <code>Inf</code>, meaning all rows.</p></td>
+    </tr>
+    <tr>
+      <th>warn_incomplete</th>
+      <td><p>Warn if <code>n</code> is less than the number of result rows?</p></td>
     </tr>
     </table>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># SQL92 quotes strings with '</span>
-<span class='fu'><a href='escape.html'>escape_ansi</a></span>(<span class='st'>"x"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'x'</div><div class='input'>
-<span class='co'># And identifiers with "</span>
-<span class='fu'>ident</span>(<span class='st'>"x"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x</div><div class='input'><span class='fu'><a href='escape.html'>escape_ansi</a></span>(<span class='fu'>ident</span>(<span class='st'>"x"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; `x`</div><div class='input'>
-<span class='co'># You can supply multiple inputs</span>
-<span class='fu'>ident</span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"x"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'>ident_q</span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"x"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-            
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+                </ul>
 
   </div>
 </div>

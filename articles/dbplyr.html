@@ -8,7 +8,7 @@
 <title>Introduction to dbplyr • dbplyr</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
 <meta property="og:title" content="Introduction to dbplyr">
 <meta property="og:description" content="">
@@ -41,17 +41,17 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
         </div>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
-  <a href="../articles/dbplyr.html">Intro</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -61,19 +61,48 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/sql-translation.html">SQL translation</a>
+      <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
-      <a href="../articles/new-backend.html">Creating new backends</a>
+      <a href="../articles/reprex.html">Reprexes for dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/sql.html">Writing SQL with dbplyr</a>
+    </li>
+    <li>
+      <a href="../articles/translation-function.html">Function translation</a>
+    </li>
+    <li>
+      <a href="../articles/translation-verb.html">Verb translation</a>
     </li>
   </ul>
 </li>
-<li>
-  <a href="../news/index.html">News</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/">Version 1.3.0</a>
+    </li>
+    <li>
+      <a href="https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/">Version 1.2.0</a>
+    </li>
+    <li>
+      <a href="https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/">Version 1.1.0</a>
+    </li>
+    <li class="divider">
+    <li>
+      <a href="../news/index.html">Change log</a>
+    </li>
+  </ul>
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -110,12 +139,12 @@
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
 <p>To use databases with dplyr you need to first install dbplyr:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"dbplyr"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"dbplyr"</span>)</a></code></pre></div>
 <p>You’ll also need to install a DBI backend package. The DBI package provides a common interface that allows dplyr to work with many different databases using the same code. DBI is automatically installed with dbplyr, but you need to install a specific backend for the database that you want to connect to.</p>
 <p>Five commonly used backends are:</p>
 <ul>
-<li><p><a href="https://github.com/rstats-db/RMySQL#readme">RMySQL</a> connects to MySQL and MariaDB</p></li>
-<li><p><a href="https://CRAN.R-project.org/package=RPostgreSQL">RPostgreSQL</a> connects to Postgres and Redshift.</p></li>
+<li><p><a href="https://CRAN.R-project.org/package=RMariaDB">RMariaDB</a> connects to MySQL and MariaDB</p></li>
+<li><p><a href="https://CRAN.R-project.org/package=RPostgres">RPostgres</a> connects to Postgres and Redshift.</p></li>
 <li><p><a href="https://github.com/rstats-db/RSQLite">RSQLite</a> embeds a SQLite database.</p></li>
 <li><p><a href="https://github.com/rstats-db/odbc#odbc">odbc</a> connects to many commercial databases via the open database connectivity protocol.</p></li>
 <li><p><a href="https://github.com/rstats-db/bigrquery">bigrquery</a> connects to Google’s BigQuery.</p></li>
@@ -126,22 +155,22 @@
 <div id="connecting-to-the-database" class="section level2">
 <h2 class="hasAnchor">
 <a href="#connecting-to-the-database" class="anchor"></a>Connecting to the database</h2>
-<p>To work with a database in dplyr, you must first connect to it, using <code><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">DBI::dbConnect()</a></code>. We’re not going to go into the details of the DBI package here, but it’s the foundation upon which dbplyr is built. You’ll need to learn more about if you need to do things to the database that are beyond the scope of dplyr.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">SQLite</a></span>(), <span class="dt">dbname =</span> <span class="st">":memory:"</span>)</a></code></pre></div>
-<p>The arguments to <code><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">DBI::dbConnect()</a></code> vary from database to database, but the first argument is always the database backend. It’s <code><a href="https://www.rdocumentation.org/packages/RSQLite/topics/SQLite">RSQLite::SQLite()</a></code> for RSQLite, <code><a href="https://www.rdocumentation.org/packages/RMySQL/topics/MySQLDriver-class">RMySQL::MySQL()</a></code> for RMySQL, <code><a href="https://www.rdocumentation.org/packages/RPostgreSQL/topics/PostgreSQL">RPostgreSQL::PostgreSQL()</a></code> for RPostgreSQL, <code>odbc::odbc()</code> for odbc, and <code>bigrquery::bigquery()</code> for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string <code>":memory:"</code> which causes SQLite to make a temporary in-memory database.</p>
+<p>To work with a database in dplyr, you must first connect to it, using <code><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">DBI::dbConnect()</a></code>. We’re not going to go into the details of the DBI package here, but it’s the foundation upon which dbplyr is built. You’ll need to learn more about if you need to do things to the database that are beyond the scope of dplyr.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/RSQLite/man/SQLite.html">SQLite</a></span>(), <span class="dt">dbname =</span> <span class="st">":memory:"</span>)</a></code></pre></div>
+<p>The arguments to <code><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">DBI::dbConnect()</a></code> vary from database to database, but the first argument is always the database backend. It’s <code><a href="https://rdrr.io/pkg/RSQLite/man/SQLite.html">RSQLite::SQLite()</a></code> for RSQLite, <code><a href="https://rdrr.io/pkg/RMariaDB/man/dbConnect-MariaDBDriver-method.html">RMariaDB::MariaDB()</a></code> for RMariaDB, <code>RPostgres::Postgres()</code> for RPostgres, <code>odbc::odbc()</code> for odbc, and <code>bigrquery::bigquery()</code> for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string <code>":memory:"</code> which causes SQLite to make a temporary in-memory database.</p>
 <p>Most existing databases don’t live in a file, but instead live on another server. That means in real-life that your code will look more like this:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/DBI/topics/dbConnect">dbConnect</a></span>(RMySQL<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/RMySQL/topics/MySQLDriver-class">MySQL</a></span>(), </a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">dbConnect</a></span>(RMariaDB<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/RMariaDB/man/dbConnect-MariaDBDriver-method.html">MariaDB</a></span>(), </a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">  <span class="dt">host =</span> <span class="st">"database.rstudio.com"</span>,</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="dt">user =</span> <span class="st">"hadley"</span>,</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">password =</span> rstudioapi<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/rstudioapi/topics/askForPassword">askForPassword</a></span>(<span class="st">"Database password"</span>)</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">password =</span> rstudioapi<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/rstudioapi/man/askForPassword.html">askForPassword</a></span>(<span class="st">"Database password"</span>)</a>
 <a class="sourceLine" id="cb3-5" data-line-number="5">)</a></code></pre></div>
 <p>(If you’re not using RStudio, you’ll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console. <a href="https://db.rstudio.com/best-practices/managing-credentials">Securing Credentials</a> provides some best practices.)</p>
-<p>Our temporary database has no data in it, so we’ll start by copying over <code><a href="https://www.rdocumentation.org/packages/nycflights13/topics/flights">nycflights13::flights</a></code> using the convenient <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.</p>
+<p>Our temporary database has no data in it, so we’ll start by copying over <code><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">nycflights13::flights</a></code> using the convenient <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, nycflights13<span class="op">::</span>flights, <span class="st">"flights"</span>,</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">  <span class="dt">temporary =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">indexes =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"year"</span>, <span class="st">"month"</span>, <span class="st">"day"</span>), </a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">indexes =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">    <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"year"</span>, <span class="st">"month"</span>, <span class="st">"day"</span>), </a>
 <a class="sourceLine" id="cb4-5" data-line-number="5">    <span class="st">"carrier"</span>, </a>
 <a class="sourceLine" id="cb4-6" data-line-number="6">    <span class="st">"tailnum"</span>,</a>
 <a class="sourceLine" id="cb4-7" data-line-number="7">    <span class="st">"dest"</span></a>
@@ -204,20 +233,21 @@
 <a class="sourceLine" id="cb7-29" data-line-number="29"></a>
 <a class="sourceLine" id="cb7-30" data-line-number="30">flights_db <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(dest) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-32" data-line-number="32"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(dep_time))</a>
+<a class="sourceLine" id="cb7-32" data-line-number="32"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(dep_time))</a>
 <a class="sourceLine" id="cb7-33" data-line-number="33"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
-<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt;   dest  delay</span></a>
-<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt; 1 ABQ   2006.</span></a>
-<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 2 ACK   1033.</span></a>
-<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 3 ALB   1627.</span></a>
-<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 4 ANC   1635.</span></a>
-<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 5 ATL   1293.</span></a>
-<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 6 AUS   1521.</span></a>
-<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
+<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
+<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
+<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   dest  delay</span></a>
+<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 1 ABQ   2006.</span></a>
+<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 2 ACK   1033.</span></a>
+<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 3 ALB   1627.</span></a>
+<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 4 ANC   1635.</span></a>
+<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 5 ATL   1293.</span></a>
+<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; 6 AUS   1521.</span></a>
+<a class="sourceLine" id="cb7-46" data-line-number="46"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="http://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
@@ -228,76 +258,70 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">tailnum_delay_db &lt;-<span class="st"> </span>flights_db <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(tailnum) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4">    <span class="dt">delay =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(arr_delay),</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">    <span class="dt">delay =</span> <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(arr_delay),</a>
 <a class="sourceLine" id="cb8-5" data-line-number="5">    <span class="dt">n =</span> <span class="kw"><a href="https://dplyr.tidyverse.org/reference/n.html">n</a></span>()</a>
 <a class="sourceLine" id="cb8-6" data-line-number="6">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(delay)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb8-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)</a></code></pre></div>
 <p>Suprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tailnum_delay_db</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; # Ordered by: desc(delay)</span></a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt;   tailnum delay     n</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # Ordered by: desc(delay)</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   tailnum delay     n</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt;</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; SELECT *</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; FROM (SELECT *</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; FROM `flights`</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; GROUP BY `tailnum`)</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; ORDER BY `delay` DESC)</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></a></code></pre></div>
-<p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/sql-translation.html">vignette("sql-translation")</a></code>.</p>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt;</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; SELECT *</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; FROM (SELECT *</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; FROM `flights`</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; GROUP BY `tailnum`)</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; ORDER BY `delay` DESC)</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></a></code></pre></div>
+<p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> to pull all the data down into a local tibble:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">tailnum_delay &lt;-<span class="st"> </span>tailnum_delay_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span>()</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4">tailnum_delay</a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; # A tibble: 1,201 x 3</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt;   tailnum delay     n</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
-<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; # … with 1,195 more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-2" data-line-number="2">tailnum_delay</a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; # A tibble: 1,201 x 3</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt;   tailnum delay     n</span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 1 N11119   30.3   148</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 2 N16919   29.9   251</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 3 N14998   27.9   230</span></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; 4 N15910   27.6   280</span></a>
+<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; 5 N13123   26.0   121</span></a>
+<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; 6 N11192   25.9   154</span></a>
+<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; # … with 1,195 more rows</span></a></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> requires that database does some work, so it may take a long time to complete. Otherwise, dplyr tries to prevent you from accidentally performing expensive query operations:</p>
 <ul>
-<li><p>Because there’s generally no way to determine how many rows a query will return unless you actually run it, <code><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow()</a></code> is always <code>NA</code>.</p></li>
-<li><p>Because you can’t find the last few rows without executing the whole query, you can’t use <code><a href="https://www.rdocumentation.org/packages/utils/topics/head">tail()</a></code>.</p></li>
+<li><p>Because there’s generally no way to determine how many rows a query will return unless you actually run it, <code><a href="https://rdrr.io/r/base/nrow.html">nrow()</a></code> is always <code>NA</code>.</p></li>
+<li><p>Because you can’t find the last few rows without executing the whole query, you can’t use <code><a href="https://rdrr.io/r/utils/head.html">tail()</a></code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(tailnum_delay_db)</a>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(tailnum_delay_db)</a>
 <a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; [1] NA</span></a>
 <a class="sourceLine" id="cb12-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">tail</a></span>(tailnum_delay_db)</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(tailnum_delay_db)</a>
 <a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; Error: tail() is not supported by sql sources</span></a></code></pre></div>
 <p>You can also ask the database how it plans to execute the query with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">explain()</a></code>. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute the query efficiently, or if you need to create new indices.</p>
 </div>
 <div id="creating-your-own-database" class="section level2">
 <h2 class="hasAnchor">
 <a href="#creating-your-own-database" class="anchor"></a>Creating your own database</h2>
-<p>If you don’t already have a database, here’s some advice from my experiences setting up and running all of them. SQLite is by far the easiest to get started with, but the lack of window functions makes it limited for data analysis. PostgreSQL is not too much harder to use and has a wide range of built-in functions. In my opinion, you shouldn’t bother with MySQL/MariaDB: it’s a pain to set up, the documentation is subpar, and it’s less featureful than Postgres. Google BigQuery might be a good fit if you have very large data, or if you’re willing to pay (a small amount of) money to someone who’ll look after your database.</p>
+<p>If you don’t already have a database, here’s some advice from my experiences setting up and running all of them. SQLite is by far the easiest to get started with. PostgreSQL is not too much harder to use and has a wide range of built-in functions. In my opinion, you shouldn’t bother with MySQL/MariaDB: it’s a pain to set up, the documentation is subpar, and it’s less featureful than Postgres. Google BigQuery might be a good fit if you have very large data, or if you’re willing to pay (a small amount of) money to someone who’ll look after your database.</p>
 <p>All of these databases follow a client-server model - a computer that connects to the database and the computer that is running the database (the two may be one and the same but usually isn’t). Getting one of these databases up and running is beyond the scope of this article, but there are plenty of tutorials available on the web.</p>
 <div id="mysqlmariadb" class="section level3">
 <h3 class="hasAnchor">
 <a href="#mysqlmariadb" class="anchor"></a>MySQL/MariaDB</h3>
-<p>In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. It provides a wider range of <a href="http://dev.mysql.com/doc/refman/5.0/en/functions.html">built-in functions</a>, but it does not support window functions (so you can’t do grouped mutates and filters).</p>
+<p>In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. It provides a wider range of <a href="http://dev.mysql.com/doc/refman/5.0/en/functions.html">built-in functions</a>. It gained support for window functions in 2018.</p>
 </div>
 <div id="postgresql" class="section level3">
 <h3 class="hasAnchor">
