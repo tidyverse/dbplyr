@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Window functions are now translated correctly for Hive (#293, @cderv).
+
 # dbplyr 1.4.0
 
 ## Breaking changes

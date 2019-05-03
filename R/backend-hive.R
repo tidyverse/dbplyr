@@ -18,7 +18,7 @@ sql_translate_env.Hive <- function(con) {
       quantile = sql_quantile("PERCENTILE"),
       median = sql_median("PERCENTILE")
     ),
-    sql_translator(.parent = base_odbc_agg,
+    sql_translator(.parent = base_odbc_win,
       var = win_aggregate("VARIANCE"),
       quantile = sql_quantile("PERCENTILE", window = TRUE),
       median = sql_median("PERCENTILE", window = TRUE)
