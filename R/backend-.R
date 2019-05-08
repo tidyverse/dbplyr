@@ -483,7 +483,7 @@ db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
   dbWriteTable(
     con,
-    name = dbi_quote(as.sql(table), con),
+    name = SQL(sql_escape_ident(con, as.sql(table))),
     value = values,
     field.types = types,
     temporary = temporary,
@@ -605,10 +605,3 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
   warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
     call. = FALSE)
 }
-
-
-dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
-dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(x)
