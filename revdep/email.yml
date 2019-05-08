@@ -1,5 +1,5 @@
-release_date: April 15
-rel_release_date: 1 month
+release_date: April 22
+rel_release_date: 1 week
 my_news_url: https://github.com/tidyverse/dbplyr/blob/master/NEWS.md#dbplyr-development-version
 release_version: 1.4.0
 release_details: >

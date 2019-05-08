@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Window functions are now translated correctly for Hive (#293, @cderv).
+
+# dbplyr 1.4.0
+
 ## Breaking changes
 
 * ``Error: `con` must not be NULL``: If you see this error, it probably means 
@@ -44,8 +48,8 @@
 ## SQL translations
 
 * New translations for some lubridate functions: `today()`, `now()`, 
-  `year()`, `month()` (numeric value only), `day()`, `hour()`, `minute()`,
-  `second()` (@colearendt). Also added new translation for `as.POSIXct()`.
+  `year()`, `month()`, `day()`, `hour()`, `minute()`,
+  `second()`, `quarter()`, ``yday()` (@colearendt, @derekmorr). Also added new translation for `as.POSIXct()`.
 
 * New translations for stringr functions: `str_c()`, `str_sub()`, 
   `str_length()`, `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
@@ -67,8 +71,8 @@
   (#132).
 
 * New translation for `median()` and `quantile()`. Works for all ANSI compliant
-  databases (SQL Server, Postgres, MariaDB) and has custom translations for 
-  Hive and Teradata. Thanks to @edavidaja for researching the SQL variants! 
+  databases (SQL Server, Postgres, MariaDB, Teradata) and has custom 
+  translations for Hive. Thanks to @edavidaja for researching the SQL variants! 
   (#169)
   
 * `na_if()` is correct translated to `NULLIF()` (rather than `NULL_IF`) (#211).
@@ -261,7 +265,7 @@ SQL simulation makes it possible to see what dbplyr will translate SQL to, witho
 ## New top-level translations
 
 * New translations for 
-    
+  
     * MS Access (#2946) (@DavisVaughan)
     * Oracle, via odbc or ROracle (#2928, #2732, @edgararuiz)
     * Teradata. 

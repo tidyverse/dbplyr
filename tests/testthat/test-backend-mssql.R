@@ -169,3 +169,30 @@ test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
     sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
   )
 })
+
+test_that("custom lubridate functions translated correctly", {
+
+  trans <- function(x) {
+    translate_sql(!!enquo(x), con = simulate_mssql())
+  }
+
+  expect_equal(trans(as_date(x)),     sql("CAST(`x` AS DATE)"))
+  expect_equal(trans(as_datetime(x)), sql("CAST(`x` AS DATETIME2)"))
+
+  expect_equal(trans(today()),   sql("CAST(SYSDATETIME() AS DATE)"))
+  expect_equal(trans(year(x)),   sql("DATEPART(YEAR, `x`)"))
+  expect_equal(trans(day(x)),    sql("DATEPART(DAY, `x`)"))
+  expect_equal(trans(mday(x)),   sql("DATEPART(DAY, `x`)"))
+  expect_equal(trans(yday(x)),   sql("DATEPART(DAYOFYEAR, `x`)"))
+  expect_equal(trans(hour(x)),   sql("DATEPART(HOUR, `x`)"))
+  expect_equal(trans(minute(x)), sql("DATEPART(MINUTE, `x`)"))
+  expect_equal(trans(second(x)), sql("DATEPART(SECOND, `x`)"))
+
+  expect_equal(trans(month(x)), sql("DATEPART(MONTH, `x`)"))
+  expect_equal(trans(month(x, label = TRUE, abbr = FALSE)), sql("DATENAME(MONTH, `x`)"))
+  expect_error(trans(month(x, abbr = TRUE, abbr = TRUE)))
+
+  expect_equal(trans(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
+  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
+  expect_error(trans(quarter(x, fiscal_start = 5)))
+})

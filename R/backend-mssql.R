@@ -78,6 +78,8 @@
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
 
       as.logical    = sql_cast("BIT"),
+
+      as.Date       = sql_cast("DATE"),
       as.numeric    = sql_cast("NUMERIC"),
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
@@ -104,7 +106,51 @@
       str_c = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title()"),
-      str_sub = sql_str_sub("SUBSTRING", "LEN")
+      str_sub = sql_str_sub("SUBSTRING", "LEN"),
+
+      # lubridate ---------------------------------------------------------------
+      # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
+      as_date = sql_cast("DATE"),
+
+      # Using DATETIME2 as it complies with ANSI and ISO.
+      # MS recommends DATETIME2 for new work:
+      # https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql?view=sql-server-2017
+      as_datetime = sql_cast("DATETIME2"),
+
+      today = function() sql_expr(CAST(SYSDATETIME() %AS% DATE)),
+
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/datepart-transact-sql?view=sql-server-2017
+      year = function(x) sql_expr(DATEPART(YEAR, !!x)),
+      day = function(x) sql_expr(DATEPART(DAY, !!x)),
+      mday = function(x) sql_expr(DATEPART(DAY, !!x)),
+      yday = function(x) sql_expr(DATEPART(DAYOFYEAR, !!x)),
+      hour = function(x) sql_expr(DATEPART(HOUR, !!x)),
+      minute = function(x) sql_expr(DATEPART(MINUTE, !!x)),
+      second = function(x) sql_expr(DATEPART(SECOND, !!x)),
+
+      month = function(x, label = FALSE, abbr = TRUE) {
+        if (!label) {
+          sql_expr(DATEPART(MONTH, !!x))
+        } else {
+          if (!abbr) {
+            sql_expr(DATENAME(MONTH, !!x))
+          } else {
+            stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
+        }
+      },
+
+      quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        if (fiscal_start != 1) {
+          stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
+        }
+
+        if (with_year) {
+          sql_expr((DATENAME(YEAR, !!x) + '.' + DATENAME(QUARTER, !!x)))
+        } else {
+          sql_expr(DATEPART(QUARTER, !!x))
+        }
+      },
+
     ),
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
@@ -152,6 +198,8 @@ mssql_temp_name <- function(name, temporary){
                             analyze = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
+    types = types,
+    values = values,
     temporary = FALSE
   )
 }
@@ -159,16 +207,26 @@ mssql_temp_name <- function(name, temporary){
 #' @export
 `db_save_query.Microsoft SQL Server` <- function(con, sql, name,
                                                  temporary = TRUE, ...){
-  NextMethod(
-    name = mssql_temp_name(name, temporary),
-    temporary = FALSE
+  name <- mssql_temp_name(name, temporary)
+
+  # Different syntax for MSSQL: https://stackoverflow.com/q/16683758/946850
+  tt_sql <- build_sql(
+    "SELECT * ",
+    "INTO ", as.sql(name), " ",
+    "FROM (", sql, ") AS temp",
+    con = con
   )
+  dbExecute(con, tt_sql)
+  name
+
 }
 
 #' @export
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
+    types = types,
+    values = values,
     temporary = FALSE
   )
 }
@@ -211,4 +269,4 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL) {
   sql_if(cond, if_true, if_false)
 }
 
-globalVariables(c("BIT", "%is%", "convert", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX"))
+globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))
