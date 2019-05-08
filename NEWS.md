@@ -2,6 +2,8 @@
 
 * Window functions are now translated correctly for Hive (#293, @cderv).
 
+* Use `TOP 100 PERCENT` as stop-gap to allow subqueries with `ORDER BY` (#277).
+
 # dbplyr 1.4.0
 
 ## Breaking changes
