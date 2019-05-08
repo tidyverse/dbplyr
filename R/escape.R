@@ -152,12 +152,19 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
 }
 
 names_to_as <- function(x, names = names2(x), con = NULL) {
+  nonempty <- which(names != "")
+  x[nonempty] <- names_to_as_imp(x[nonempty], names[nonempty], con)
+  as.character(x)
+}
+
+names_to_as_imp <- function(x, names, con) {
+  # Avoid calls to dbQuoteIdentifier() if not needed, to unclutter logs
   if (length(x) == 0) {
     return(character())
   }
 
   names_esc <- sql_escape_ident(con, names)
-  as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
+  as <- ifelse(names_esc == x, "", paste0(" AS ", names_esc))
 
   paste0(x, as)
 }
