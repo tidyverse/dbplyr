@@ -213,7 +213,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'>
-<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dbplyr/man/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
+<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbplyr.tidyverse.org/reference/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_001&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: a
@@ -224,7 +224,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; 3     3
 #&gt; 4     4</div><div class='input'>
 <span class='co'># NA sorted first</span>
-<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dbplyr/man/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
+<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbplyr.tidyverse.org/reference/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_002&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: a
@@ -235,7 +235,7 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; 3     3
 #&gt; 4     4</div><div class='input'>
 <span class='co'># override by sorting on is.na() first</span>
-<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/dbplyr/man/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
+<span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbplyr.tidyverse.org/reference/memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='no'>a</span>), <span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_003&gt; [?? x 1]
 #&gt; # Database:   sqlite 3.22.0 [:memory:]
 #&gt; # Ordered by: is.na(a), a

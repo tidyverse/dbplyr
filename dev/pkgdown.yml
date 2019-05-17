@@ -1,6 +1,6 @@
 pandoc: '2.2'
 pkgdown: 1.3.0.9000
-pkgdown_sha: 83f2afb5d2ec85abe29bfd8d67408cdf2bb55f03
+pkgdown_sha: 4b0db186f3d083c7d638b3a6ded67894c76dfd5d
 articles:
   dbplyr: dbplyr.html
   new-backend: new-backend.html
