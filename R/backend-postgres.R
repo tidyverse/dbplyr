@@ -199,7 +199,6 @@ db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
     sql,
     con = con
   )
-  print(exsql)
   expl <- dbGetQuery(con, exsql)
 
   paste(expl[[1]], collapse = "\n")
