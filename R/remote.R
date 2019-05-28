@@ -48,6 +48,6 @@ remote_query <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query_plan <- function(x) {
-  db_explain(remote_con(x), db_sql_render(remote_con(x), x$ops))
+remote_query_plan <- function(x, ...) {
+  db_explain(remote_con(x), db_sql_render(remote_con(x), x$ops), ...)
 }

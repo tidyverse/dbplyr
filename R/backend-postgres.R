@@ -189,7 +189,9 @@ db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
 db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
-  format <- match.arg(format, c("text", "json", "yaml", "xml"))
+  if (!is.null(format)){
+    format <- match.arg(format, c("text", "json", "yaml", "xml"))
+  }
 
   exsql <- build_sql(
     "EXPLAIN ",
@@ -197,6 +199,7 @@ db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
     sql,
     con = con
   )
+  print(exsql)
   expl <- dbGetQuery(con, exsql)
 
   paste(expl[[1]], collapse = "\n")
