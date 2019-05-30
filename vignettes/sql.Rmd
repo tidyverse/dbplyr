@@ -36,7 +36,7 @@ mf %>%
   show_query()
 ```
 
-In general, it's much easier to work iterately in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It's also easy to chain `count()` to the end of any query to check the results are about what you expect.
+In general, it's much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It's also easy to chain `count()` to the end of any query to check the results are about what you expect.
 
 ## What happens when dbplyr fails?
 
@@ -44,7 +44,7 @@ dbplyr aims to translate the most common R functions to their SQL equivalents, a
 
 ### Prefix functions
 
-Any function that dbplyr doens't know about will be left as is:
+Any function that dbplyr doesn't know about will be left as is:
 
 ```{r}
 mf %>% 

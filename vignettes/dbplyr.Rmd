@@ -21,7 +21,7 @@ As well as working with local in-memory data stored in data frames, dplyr also w
   
 (If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating.)
 
-This vignette focusses on the first scenario because it's the most common. If you're using R to do data analysis inside a company, most of the data you need probably already lives in a database (it's just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr's database tools. At  the end, I'll also give you a few pointers if you do need to set up your own database.
+This vignette focuses on the first scenario because it's the most common. If you're using R to do data analysis inside a company, most of the data you need probably already lives in a database (it's just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr's database tools. At  the end, I'll also give you a few pointers if you do need to set up your own database.
 
 ## Getting started
 
@@ -144,7 +144,7 @@ tailnum_delay_db <- flights_db %>%
   filter(n > 100)
 ```
 
-Suprisingly, this sequence of operations never touches the database. It's not until you ask for the data (e.g. by printing `tailnum_delay`) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.
+Surprisingly, this sequence of operations never touches the database. It's not until you ask for the data (e.g. by printing `tailnum_delay`) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.
 
 ```{r}
 tailnum_delay_db

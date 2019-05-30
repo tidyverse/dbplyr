@@ -17,7 +17,7 @@ has_nycflights13(type = c("sqlite", "postgresql"), ...)
 copy_nycflights13(src, ...)
 }
 \arguments{
-\item{path}{location of sqlite database file}
+\item{path}{location of SQLite database file}
 
 \item{dbname, ...}{Arguments passed on to \code{\link[=src_postgres]{src_postgres()}}}
 }

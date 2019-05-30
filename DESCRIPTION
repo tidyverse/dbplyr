@@ -50,6 +50,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
+Language: en-gb
 LazyData: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

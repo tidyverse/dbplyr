@@ -17,7 +17,7 @@ partial_eval(call, vars = character(), env = caller_env())
 This function partially evaluates an expression, using information from
 the tbl to determine whether names refer to local expressions
 or remote variables. This simplifies SQL translation because expressions
-don't need to carry around their environment - all revelant information
+don't need to carry around their environment - all relevant information
 is incorporated into the expression.
 }
 \section{Symbol substitution}{

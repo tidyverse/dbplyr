@@ -3,11 +3,11 @@
 %\VignetteIndexEntry{PostgreSQL setup}
 -->
 
-# Setting up Postgresql
+# Setting up PostgreSQL
 
 ## Install
 
-First install postgresql, create a data directory, and create a default database.
+First install PostgreSQL, create a data directory, and create a default database.
 
 ```
 brew install postgresql
