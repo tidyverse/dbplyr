@@ -193,11 +193,7 @@ In terms of functionality, MySQL lies somewhere between SQLite and PostgreSQL. I
 
 ### PostgreSQL
 
-PostgreSQL is a considerably more powerful database than SQLite. It has:
-
-* a much wider range of [built-in functions](http://www.postgresql.org/docs/current/static/functions.html), and
-
-* support for [window functions](http://www.postgresql.org/docs/current/static/tutorial-window.html), which allow grouped subset and mutates to work.
+PostgreSQL is a considerably more powerful database than SQLite. It has a much wider range of [built-in functions](http://www.postgresql.org/docs/current/static/functions.html), and is generally a more featureful database.
 
 ### BigQuery
 
