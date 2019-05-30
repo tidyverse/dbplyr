@@ -138,7 +138,7 @@
 <li><p>You have so much data that it does not all fit into memory simultaneously and you need to use some external storage engine.</p></li>
 </ul>
 <p>(If your data fits in memory there is no advantage to putting it in a database: it will only be slower and more frustrating.)</p>
-<p>This vignette focusses on the first scenario because it’s the most common. If you’re using R to do data analysis inside a company, most of the data you need probably already lives in a database (it’s just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr’s database tools. At the end, I’ll also give you a few pointers if you do need to set up your own database.</p>
+<p>This vignette focuses on the first scenario because it’s the most common. If you’re using R to do data analysis inside a company, most of the data you need probably already lives in a database (it’s just a matter of figuring out which one!). However, you will learn how to load data in to a local database in order to demonstrate dplyr’s database tools. At the end, I’ll also give you a few pointers if you do need to set up your own database.</p>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
@@ -267,7 +267,7 @@
 <a class="sourceLine" id="cb8-6" data-line-number="6">  ) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(delay)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb8-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)</a></code></pre></div>
-<p>Suprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
+<p>Surprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tailnum_delay_db</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>

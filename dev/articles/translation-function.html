@@ -250,9 +250,9 @@
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></a></code></pre></div>
 </div>
-<div id="conditional-evauation" class="section level3">
+<div id="conditional-evaluation" class="section level3">
 <h3 class="hasAnchor">
-<a href="#conditional-evauation" class="anchor"></a>Conditional evauation</h3>
+<a href="#conditional-evaluation" class="anchor"></a>Conditional evaluation</h3>
 <p><code>if</code> and <code><a href="https://rdrr.io/r/base/switch.html">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">if</span> (x <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> <span class="cf">else</span> <span class="st">"small"</span>)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
@@ -293,7 +293,7 @@
 <li><p>The <strong>partition clause</strong> specifies how the window function is broken down over groups. It plays an analogous role to <code>GROUP BY</code> for aggregate functions, and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> in dplyr. It is possible for different window functions to be partitioned into different groups, but not all databases support it, and neither does dplyr.</p></li>
 <li><p>The <strong>order clause</strong> controls the ordering (when it makes a difference). This is important for the ranking functions since it specifies which variables to rank by, but it’s also needed for cumulative functions and lead. Whenever you’re thinking about before and after in SQL, you must always tell it which variable defines the order. If the order clause is missing when needed, some databases fail with an error message while others return non-deterministic results.</p></li>
 <li>
-<p>The <strong>frame clause</strong> defines which rows, or <strong>frame</strong>, that are passed to the window function, describing which rows (relative to the current row) should be included. The frame clause provides two offsets which determine the start and end of frame. There are three special values: -Inf means to include all preceeding rows (in SQL, “unbounded preceding”), 0 means the current row (“current row”), and Inf means all following rows (“unbounded following)”. The complete set of options is comprehensive, but fairly confusing, and is summarised visually below.</p>
+<p>The <strong>frame clause</strong> defines which rows, or <strong>frame</strong>, that are passed to the window function, describing which rows (relative to the current row) should be included. The frame clause provides two offsets which determine the start and end of frame. There are three special values: -Inf means to include all preceding rows (in SQL, “unbounded preceding”), 0 means the current row (“current row”), and Inf means all following rows (“unbounded following)”. The complete set of options is comprehensive, but fairly confusing, and is summarised visually below.</p>
 <p><img src="windows.png" width="100%"></p>
 <p>Of the many possible specifications, there are only three that commonly used. They select between aggregation variants:</p>
 <ul>
