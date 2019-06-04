@@ -239,8 +239,11 @@ mssql_temp_name <- function(name, temporary){
 # be specified as the data type of  a table column or variable, and cannot be returned in a result set.
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
 
-mssql_is_null <- function(x, context) {
-  if (context$clause %in% c("SELECT", "ORDER")) {
+mssql_is_null <- function(x, context = NULL) {
+  needs_bit <- is.list(context) && !is.null(context$clause) &&
+    context$clause %in% c("SELECT", "ORDER")
+
+  if (needs_bit) {
     sql_expr(convert(BIT, iif(!!x %is% NULL, 1L, 0L)))
   } else {
     sql_is_null(x)
