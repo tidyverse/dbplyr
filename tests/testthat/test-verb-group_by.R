@@ -51,7 +51,7 @@ test_that("ungroup drops PARTITION BY", {
 # ops ---------------------------------------------------------------------
 
 test_that("group_by overrides existing groups", {
-  df <- data_frame(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy()
+  df <- tibble(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy()
 
   out1 <- df %>% group_by(g1)
   expect_equal(op_grps(out1), "g1")
@@ -61,7 +61,7 @@ test_that("group_by overrides existing groups", {
 })
 
 test_that("group_by increases grouping if add = TRUE", {
-  df <- data_frame(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy()
+  df <- tibble(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy()
 
   out <- df %>% group_by(g1) %>% group_by(g2, add = TRUE)
   expect_equal(op_grps(out), c("g1", "g2"))

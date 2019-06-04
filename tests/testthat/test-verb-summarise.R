@@ -50,7 +50,7 @@ test_that("summarise generates group_by and select", {
 # ops ---------------------------------------------------------------------
 
 test_that("summarise replaces existing", {
-  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% summarise(z = 1)
+  out <- tibble(x = 1, y = 2) %>% tbl_lazy() %>% summarise(z = 1)
   expect_equal(op_vars(out), "z")
 })
 
@@ -62,7 +62,7 @@ test_that("summarised vars are always named", {
 })
 
 test_that("grouped summary keeps groups", {
-  out <- data_frame(g = 1, x = 1) %>%
+  out <- tibble(g = 1, x = 1) %>%
     tbl_lazy() %>%
     group_by(g) %>%
     summarise(y = 1)
@@ -70,7 +70,7 @@ test_that("grouped summary keeps groups", {
 })
 
 test_that("summarise drops one grouping level", {
-  df <- data_frame(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy() %>% group_by(g1, g2)
+  df <- tibble(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy() %>% group_by(g1, g2)
   out1 <- df %>% summarise(y = 1)
   out2 <- out1 %>% summarise(y = 2)
 

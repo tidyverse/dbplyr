@@ -142,7 +142,7 @@ test_that("select reduces variables", {
 })
 
 test_that("rename preserves existing", {
-  out <- data_frame(x = 1, y = 2) %>% tbl_lazy() %>% rename(z = y)
+  out <- tibble(x = 1, y = 2) %>% tbl_lazy() %>% rename(z = y)
   expect_equal(op_vars(out), c("x", "z"))
 })
 

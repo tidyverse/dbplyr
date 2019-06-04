@@ -180,7 +180,7 @@ test_that("mutate all generates correct sql", {
 # ops ---------------------------------------------------------------------
 
 test_that("mutate adds new", {
-  out <- data_frame(x = 1) %>% tbl_lazy() %>% mutate(y = x + 1, z = y + 1)
+  out <- tibble(x = 1) %>% tbl_lazy() %>% mutate(y = x + 1, z = y + 1)
   expect_equal(op_vars(out), c("x", "y", "z"))
 })
 
