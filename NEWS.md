@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQL generation works better with scoped verbs (`mutate_all()`, 
+  `summarise_if()`, `filter_at()` etc) (#306)
+
 * Window functions are now translated correctly for Hive (#293, @cderv).
 
 * Use `TOP 100 PERCENT` as stop-gap to allow subqueries with `ORDER BY` (#277).

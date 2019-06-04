@@ -163,6 +163,20 @@ test_that("mutate can drop variables with NULL", {
   expect_named(out$select, "x")
 })
 
+test_that("mutate all generates correct sql", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    mutate_all(~ . + 1L) %>%
+    sql_build()
+
+  expect_equal(out$select, sql(x = '`x` + 1', y = '`y` + 1'))
+
+  out <- lazy_frame(x = 1) %>%
+    mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
+    sql_build()
+  expect_equal(out$select, sql(`x` = '`x`', one = '`x` + 1', two = '`x` + 2'))
+})
+
+
 # ops ---------------------------------------------------------------------
 
 test_that("mutate adds new", {

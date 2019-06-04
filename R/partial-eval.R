@@ -102,7 +102,10 @@ partial_eval_call <- function(call, vars, env) {
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
-  if (is.function(fun)) {
+  if (inherits(fun, "inline_colwise_function")) {
+    dot_var <- vars[[attr(call, "position")]]
+    call <- replace_dot(attr(fun, "formula")[[2]], dot_var)
+  } else if (is.function(fun)) {
     fun_name <- find_fun(fun)
     if (is.null(fun_name)) {
       # This probably won't work, but it seems like it's worth a shot.
@@ -184,4 +187,15 @@ fun_name <- function(fun) {
   }
 
   NULL
+}
+
+replace_dot <- function(call, var) {
+  if (is_symbol(call, ".")) {
+    sym(var)
+  } else if (is_call(call)) {
+    call[] <- lapply(call, replace_dot, var = var)
+    call
+  } else {
+    call
+  }
 }
