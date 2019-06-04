@@ -61,6 +61,8 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
     call
   } else if (is_symbol(call)) {
     partial_eval_sym(call, vars, env)
+  } else if (is_quosure(call)) {
+    partial_eval_call(get_expr(call), vars, get_env(call))
   } else if (is_call(call)) {
     partial_eval_call(call, vars, env)
   } else {
@@ -105,6 +107,7 @@ partial_eval_call <- function(call, vars, env) {
   if (inherits(fun, "inline_colwise_function")) {
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_dot(attr(fun, "formula")[[2]], dot_var)
+    env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)
     if (is.null(fun_name)) {

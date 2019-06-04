@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
 * SQL generation works better with scoped verbs (`mutate_all()`, 
-  `summarise_if()`, `filter_at()` etc) (#306)
+  `summarise_if()`, `filter_at()` etc) (#296, #306).
 
 * Window functions are now translated correctly for Hive (#293, @cderv).
 
