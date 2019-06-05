@@ -49,7 +49,7 @@ sql_call2 <- function(.fn, ..., con = sql_current_con()) {
 
 replace_expr <- function(x, con) {
   if (is.atomic(x)) {
-    as.character(escape(x, con = con))
+    as.character(escape(unname(x), con = con))
   } else if (is.name(x)) {
     as.character(x)
   # } else if (is.call(x) && identical(x[[1]], quote(I))) {

@@ -33,6 +33,11 @@ test_that("%in% translation parenthesises when needed", {
   expect_equal(translate_sql(x %in% y), sql("`x` IN `y`"))
 })
 
+test_that("%in% strips vector names", {
+  expect_equal(translate_sql(x %in% c(a = 1L)), sql("`x` IN (1)"))
+  expect_equal(translate_sql(x %in% !!c(a = 1L)), sql("`x` IN (1)"))
+})
+
 test_that("%in% with empty vector", {
   expect_equal(translate_sql(x %in% !!integer()), sql("FALSE"))
 })

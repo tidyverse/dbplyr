@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `x %in% y` strips names of `y` (#269).
+
 * SQL generation works better with scoped verbs (`mutate_all()`, 
   `summarise_if()`, `filter_at()` etc) (#296, #306).
 
