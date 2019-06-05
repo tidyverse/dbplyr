@@ -127,6 +127,19 @@ escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+  message <- paste0(
+    "Cannot embed a data frame in a SQL query.\n\n",
+    "If you are seeing this error in code that used to work, the most likely ",
+    "cause is a change dbplyr 1.4.0. Previously `df$x` or `df[[y]]` implied ",
+    "that `df` was a local variable, but  now you must make that explict ",
+    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]))"
+  )
+
+  abort(paste(strwrap(message), collapse = "\n"))
+}
+
+#' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
