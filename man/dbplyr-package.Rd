@@ -17,6 +17,7 @@ A 'dplyr' back end for databases that allows you to
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://dbplyr.tidyverse.org/}
   \item \url{https://github.com/tidyverse/dbplyr}
   \item Report bugs at \url{https://github.com/tidyverse/dbplyr/issues}
 }
