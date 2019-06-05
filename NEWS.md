@@ -1,13 +1,16 @@
 # dbplyr (development version)
 
+Minor improvements to SQL generation
+
 * `x %in% y` strips names of `y` (#269).
 
-* SQL generation works better with scoped verbs (`mutate_all()`, 
-  `summarise_if()`, `filter_at()` etc) (#296, #306).
+* Enhancements for scoped verbs (`mutate_all()`, `summarise_if()`,
+  `filter_at()` etc) (#296, #306).
 
-* Window functions are now translated correctly for Hive (#293, @cderv).
+* MS SQL use `TOP 100 PERCENT` as stop-gap to allow subqueries with 
+  `ORDER BY` (#277).
 
-* Use `TOP 100 PERCENT` as stop-gap to allow subqueries with `ORDER BY` (#277).
+* Window functions now translated correctly for Hive (#293, @cderv).
 
 # dbplyr 1.4.0
 
