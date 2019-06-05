@@ -7,10 +7,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 notes
-
-* Missing or unexported object: 'dplyr::group_rows'
-  This is only used for dplyr > 0.7.9, where it exists.
+0 errors | 0 warnings | 0 notes
 
 ## revdepcheck results
 
