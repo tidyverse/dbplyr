@@ -1,7 +1,3 @@
-This is resubmission fixing three broken urls
-
----
-
 ## Test environments
 
 * local: darwin15.6.0-3.5.1
@@ -20,34 +16,11 @@ This is resubmission fixing three broken urls
 
 We checked 47 reverse dependencies (42 from CRAN + 5 from BioConductor), comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 5 new problems
- * We failed to check 3 packages
+ * We saw 0 new problems
+ * We failed to check 1 packages
 
 Issues with CRAN packages are summarised below.
 
-### New problems
-(This reports the first line of each new failure)
-
-* cytominer
-  checking tests ...
-
-* dplyr.teradata
-  checking tests ...
-
-* MonetDBLite
-  checking tests ...
-
-* pivot
-  checking examples ... ERROR
-  checking tests ...
-
-* RPresto
-  checking tests ...
-  
-These are legitimate failures due to deliberate interface changes (in order to uncover bugs), or fragile unit tests. All maintainers were informed about the release one week and one month ago.
-
 ### Failed to check
 
-* arkdb
-* dlookr
-* dplyr 
+* MonetDBLite (NA)
