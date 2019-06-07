@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Fix bug when partially evaluating unquoting quosure containing a single 
+  symbol (#317)
+
 # dbplyr 1.4.1
 
 Minor improvements to SQL generation

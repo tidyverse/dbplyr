@@ -62,7 +62,7 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
   } else if (is_symbol(call)) {
     partial_eval_sym(call, vars, env)
   } else if (is_quosure(call)) {
-    partial_eval_call(get_expr(call), vars, get_env(call))
+    partial_eval(get_expr(call), vars, get_env(call))
   } else if (is_call(call)) {
     partial_eval_call(call, vars, env)
   } else {
