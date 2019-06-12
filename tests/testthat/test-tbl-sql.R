@@ -54,8 +54,8 @@ test_that("can refer to default schema explicitly", {
   on.exit(DBI::dbDisconnect(con))
   DBI::dbExecute(con, "CREATE TABLE t1 (x)")
 
-  expect_equal(tbl_vars(tbl(con, "t1")), "x")
-  expect_equal(tbl_vars(tbl(con, in_schema("main", "t1"))), "x")
+  expect_equal(as.character(tbl_vars(tbl(con, "t1"))), "x")
+  expect_equal(as.character(tbl_vars(tbl(con, in_schema("main", "t1")))), "x")
 })
 
 test_that("can distinguish 'schema.table' from 'schema'.'table'", {
@@ -64,8 +64,8 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
   DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
 
-  expect_equal(tbl_vars(tbl(con, in_schema("aux", "t1"))), c("x", "y", "z"))
-  expect_equal(tbl_vars(tbl(con, ident("aux.t1"))), c("a", "b", "c"))
+  expect_equal(as.character(tbl_vars(tbl(con, in_schema("aux", "t1")))), c("x", "y", "z"))
+  expect_equal(as.character(tbl_vars(tbl(con, ident("aux.t1")))), c("a", "b", "c"))
 })
 
 # n_groups ----------------------------------------------------------------
