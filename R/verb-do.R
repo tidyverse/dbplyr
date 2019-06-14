@@ -46,10 +46,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   # Assumes `chunk` to be ordered with group columns first
   gvars <- seq_along(groups_sym)
 
-  # Create the dynamic scope for tidy evaluation
-  env <- child_env(NULL)
-  overscope <- new_overscope(env)
-  on.exit(overscope_clean(overscope))
+  # Initialise a data mask for tidy evaluation
+  env <- env(empty_env())
+  mask <- new_data_mask(env)
 
   query$fetch_paged(.chunk_size, function(chunk) {
     if (!is_null(last_group)) {
@@ -73,10 +72,13 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 
     for (j in seq_len(n - 1)) {
       cur_chunk <- chunk[index[[j]], , drop = FALSE]
-      # Update pronouns within the overscope
-      env$. <- env$.data <- cur_chunk
+
+      # Update pronouns within the data mask
+      env$. <- cur_chunk
+      env$.data <- cur_chunk
+
       for (k in seq_len(m)) {
-        out[[k]][i + j] <<- list(overscope_eval_next(overscope, args[[k]]))
+        out[[k]][[i + j]] <<- eval_tidy(args[[k]], mask)
         p$tick()$print()
       }
     }
@@ -85,9 +87,10 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 
   # Process last group
   if (!is_null(last_group)) {
-    env$. <- env$.data <- last_group
+    env$. <- last_group
+    last_group <- env$.data
     for (k in seq_len(m)) {
-      out[[k]][i + 1] <- list(overscope_eval_next(overscope, args[[k]]))
+      out[[k]][[i + 1]] <- eval_tidy(args[[k]], mask)
       p$tick()$print()
     }
   }

@@ -149,16 +149,15 @@ translate_sql_ <- function(dots,
     } else if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {
-      overscope <- sql_overscope(x, variant, con = con, window = window)
-      on.exit(overscope_clean(overscope))
-      escape(overscope_eval_next(overscope, x), con = con)
+      mask <- sql_data_mask(x, variant, con = con, window = window)
+      escape(eval_tidy(x, mask), con = con)
     }
   })
 
   sql(unlist(pieces))
 }
 
-sql_overscope <- function(expr, variant, con, window = FALSE,
+sql_data_mask <- function(expr, variant, con, window = FALSE,
                           strict = getOption("dplyr.strict_sql", FALSE)) {
   stopifnot(is.sql_variant(variant))
 
