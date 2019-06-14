@@ -212,6 +212,7 @@ default_op <- function(x) {
 
 
 all_calls <- function(x) {
+  if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
   fname <- as.character(x[[1]])
@@ -220,6 +221,7 @@ all_calls <- function(x) {
 
 all_names <- function(x) {
   if (is.name(x)) return(as.character(x))
+  if (is_quosure(x)) return(all_names(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
