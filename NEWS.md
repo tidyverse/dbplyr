@@ -1,3 +1,5 @@
+# dbplyr (development version)
+
 # dbplyr 1.4.2
 
 * Fix bug when partially evaluating unquoting quosure containing a single 
