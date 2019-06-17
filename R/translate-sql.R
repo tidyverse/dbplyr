@@ -149,16 +149,15 @@ translate_sql_ <- function(dots,
     } else if (is_atomic(get_expr(x))) {
       escape(get_expr(x), con = con)
     } else {
-      overscope <- sql_overscope(x, variant, con = con, window = window)
-      on.exit(overscope_clean(overscope))
-      escape(overscope_eval_next(overscope, x), con = con)
+      mask <- sql_data_mask(x, variant, con = con, window = window)
+      escape(eval_tidy(x, mask), con = con)
     }
   })
 
   sql(unlist(pieces))
 }
 
-sql_overscope <- function(expr, variant, con, window = FALSE,
+sql_data_mask <- function(expr, variant, con, window = FALSE,
                           strict = getOption("dplyr.strict_sql", FALSE)) {
   stopifnot(is.sql_variant(variant))
 
@@ -213,6 +212,7 @@ default_op <- function(x) {
 
 
 all_calls <- function(x) {
+  if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
   fname <- as.character(x[[1]])
@@ -221,6 +221,7 @@ all_calls <- function(x) {
 
 all_names <- function(x) {
   if (is.name(x)) return(as.character(x))
+  if (is_quosure(x)) return(all_names(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
   unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
