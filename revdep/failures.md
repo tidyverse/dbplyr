@@ -1,3 +1,29 @@
+# dlookr
+
+<details>
+
+* Version: 0.3.9
+* Source code: https://github.com/cran/dlookr
+* BugReports: https://github.com/choonghyunryu/dlookr/issues
+* Date/Publication: 2019-03-16 06:00:06 UTC
+* Number of recursive dependencies: 164
+
+Run `revdep_details(,"dlookr")` for more info
+
+</details>
+
+## In both
+
+*   R CMD check timed out
+    
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is  5.2Mb
+      sub-directories of 1Mb or more:
+        doc   4.1Mb
+    ```
+
 # grasp2db
 
 <details>
@@ -74,58 +100,5 @@ Run `revdep_details(,"grasp2db")` for more info
       (/Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/grasp2db/new/grasp2db.Rcheck/00_pkg_src/grasp2db/R/doanti.R:7)
     Undefined global functions or variables:
       chr_hg19 gwrngs19 outputFile
-    ```
-
-# MonetDBLite
-
-<details>
-
-* Version: 0.6.0
-* Source code: https://github.com/cran/MonetDBLite
-* URL: https://github.com/hannesmuehleisen/MonetDBLite-R
-* BugReports: https://github.com/hannesmuehleisen/MonetDBLite-R/issues
-* Date/Publication: 2018-07-27 09:40:03 UTC
-* Number of recursive dependencies: 75
-
-Run `revdep_details(,"MonetDBLite")` for more info
-
-</details>
-
-## Newly broken
-
-*   R CMD check timed out
-    
-
-## Newly fixed
-
-*   checking tests ...
-    ```
-     ERROR
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      8: dbplyr::sql(dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", 
-             as.integer(size))) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/old/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
-      9: c_character(...)
-      10: dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", as.integer(size)) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/old/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
-      11: stop("`con` must not be NULL", call. = FALSE)
-      
-      [1] "E"
-      [1] "H"
-      [1] "M"
-      ══ testthat results  ════════════════════════════════════════════════════════════════════════
-      OK: 297 SKIPPED: 13 WARNINGS: 11 FAILED: 1
-      1. Error: sample works (@test_04_dplyr.R#41) 
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
-## In both
-
-*   checking installed package size ... NOTE
-    ```
-      installed size is  6.1Mb
-      sub-directories of 1Mb or more:
-        libs   5.4Mb
     ```
 
