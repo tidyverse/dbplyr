@@ -96,7 +96,14 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           stop("Unrecognized arguments to `wday`", call. = FALSE)
         }
       },
-      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x))
+      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
+      floor_date = function(x, unit = "seconds", week_start = NULL) {
+        if (is.null(week_start)) {
+          sql_expr(DATE_TRUNC(!!unit, !!x))
+        } else {
+          stop("`week_start` is not supported in PostgreSQL translation. Must be NULL.")
+        }
+      },
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),
