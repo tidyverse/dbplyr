@@ -25,15 +25,18 @@ sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
 
     if (end == -1L) {
       sql_call2(subset_f, string, start)
-    } else if (end <= 0) {
+    } else if (end < 0) {
       if (start < 0) {
         length <- pmax(- start + end + 1L, 0L)
       } else {
-        length <- sql_expr(!!sql_call2(length_f, string) - !!(abs(end) - 1L))
+        length <- sql_expr(!!sql_call2(length_f, string) - !!(start + abs(end) - 2L))
       }
       sql_call2(subset_f, string, start, length)
     } else if (end > 0) {
       length <- pmax(end - start + 1L, 0L)
+      sql_call2(subset_f, string, start, length)
+    } else if (end == 0) {
+      length <- 0L
       sql_call2(subset_f, string, start, length)
     }
   }
