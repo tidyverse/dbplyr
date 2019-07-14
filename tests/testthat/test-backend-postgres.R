@@ -66,10 +66,11 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_equal(trans(quarter(x)),                   sql("EXTRACT(QUARTER FROM `x`)"))
   expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
-  expect_equal(trans(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
-  expect_equal(trans(floor_date(x, 'week')), sql("DATE_TRUNC('week', `x`)"))
-  expect_error(trans(floor_date(x, 'week', 1)))
   expect_error(trans(quarter(x, fiscal_start = 2)))
+  expect_equal(trans(floor_date(x, 'month')),       sql("DATE_TRUNC('month', `x`)"))
+  expect_equal(trans(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
+  expect_equal(trans(floor_date(x, 'week', 7)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('0 days' AS INTERVAL))) - CAST('0 days' AS INTERVAL)"))
+  expect_equal(trans(floor_date(x, 'week', 6)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('1 days' AS INTERVAL))) - CAST('1 days' AS INTERVAL)"))
 })
 
 test_that("postgres can explain (#272)", {

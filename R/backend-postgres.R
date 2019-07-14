@@ -98,10 +98,13 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
       floor_date = function(x, unit = "seconds", week_start = NULL) {
-        if (is.null(week_start)) {
-          sql_expr(DATE_TRUNC(!!unit, !!x))
+        if (unit == "week" & !is.null(week_start)) {
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          interval <- paste(offset, "days")
+          sql_expr(DATE(DATE_TRUNC(!!unit, !!x + CAST(!!interval %AS% INTERVAL))) - CAST(!!interval %AS% INTERVAL))
         } else {
-          stop("`week_start` is not supported in PostgreSQL translation. Must be NULL.")
+          sql_expr(DATE_TRUNC(!!unit, !!x))
         }
       },
     ),
