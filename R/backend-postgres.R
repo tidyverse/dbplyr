@@ -127,7 +127,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       floor_date = function(x, unit = "seconds", week_start = NULL) {
         if (unit == "week" & !is.null(week_start)) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
-          offset <- as.integer(7 - week_start)
+          offset <- as.integer(7 - week_start + 1)
           interval <- paste(offset, "days")
           sql_expr(DATE(DATE_TRUNC(!!unit, !!x + CAST(!!interval %AS% INTERVAL))) - CAST(!!interval %AS% INTERVAL))
         } else {

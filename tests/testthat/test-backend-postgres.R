@@ -76,8 +76,8 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(trans(years(x)),                     sql("CAST('`x` years' AS INTERVAL)"))
   expect_equal(trans(floor_date(x, 'month')),       sql("DATE_TRUNC('month', `x`)"))
   expect_equal(trans(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
-  expect_equal(trans(floor_date(x, 'week', 7)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('0 days' AS INTERVAL))) - CAST('0 days' AS INTERVAL)"))
-  expect_equal(trans(floor_date(x, 'week', 6)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('1 days' AS INTERVAL))) - CAST('1 days' AS INTERVAL)"))
+  expect_equal(trans(floor_date(x, 'week', 7)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('1 days' AS INTERVAL))) - CAST('1 days' AS INTERVAL)"))
+  expect_equal(trans(floor_date(x, 'week', 6)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('2 days' AS INTERVAL))) - CAST('2 days' AS INTERVAL)"))
 })
 
 test_that("postgres can explain (#272)", {
