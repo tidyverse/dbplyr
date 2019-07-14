@@ -82,7 +82,34 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
       },
-
+      seconds = function(x) {
+        interval <- paste(x, "seconds")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      minutes = function(x) {
+        interval <- paste(x, "minutes")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      hours = function(x) {
+        interval <- paste(x, "hours")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      days = function(x) {
+        interval <- paste(x, "days")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      weeks = function(x) {
+        interval <- paste(x, "weeks")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      months = function(x) {
+        interval <- paste(x, "months")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
+      years = function(x) {
+        interval <- paste(x, "years")
+        sql_expr(CAST(!!interval %as% INTERVAL))
+      },
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         if (!label) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
