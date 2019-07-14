@@ -78,6 +78,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(trans(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
   expect_equal(trans(floor_date(x, 'week', 7)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('1 days' AS INTERVAL))) - CAST('1 days' AS INTERVAL)"))
   expect_equal(trans(floor_date(x, 'week', 6)),     sql("DATE(DATE_TRUNC('week', `x` + CAST('2 days' AS INTERVAL))) - CAST('2 days' AS INTERVAL)"))
+  expect_error(trans(floor_date(x, 'invalid_period')))
 })
 
 test_that("postgres can explain (#272)", {

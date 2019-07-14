@@ -125,6 +125,13 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
       floor_date = function(x, unit = "seconds", week_start = NULL) {
+        supported_intervals <- c("second", "minute", "hour", "day", "week",
+                                 "month", "quarter", "year")
+
+        if (!unit %in% supported_intervals) {
+          stop(paste("Error: Invalid period name:", unit))
+        }
+
         if (unit == "week" & !is.null(week_start)) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
           offset <- as.integer(7 - week_start + 1)
