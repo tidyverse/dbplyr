@@ -164,9 +164,30 @@ FROM `df`")
 test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
   mf <- lazy_frame(x = 1:3, con = simulate_mssql())
 
-  expect_equal(
-    mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render(),
-    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
+  rendered_query <-
+    mf %>%
+    mutate(x = -x) %>%
+    arrange(x) %>%
+    mutate(x = -x) %>%
+    sql_render()
+
+  expect_match(
+    as.character(rendered_query),
+    "SELECT -`x` AS `x`\\nFROM \\(SELECT TOP 100 PERCENT \\*\\nFROM \\(SELECT -`x` AS `x`\\nFROM `df`\\) `dbplyr_[0-9]{3}`\\nORDER BY `x`\\) `dbplyr_[0-9]{3}`"
+  )
+})
+
+test_that("Subqueries without ORDER BY do not use TOP 100 PERCENT", {
+  mf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  rendered_query <-
+    mf %>%
+    mutate(x = -x) %>%
+    mutate(x = -x) %>%
+    sql_render()
+
+  expect_match(
+    as.character(rendered_query),
+    "SELECT -`x` AS `x`\\nFROM \\(SELECT -`x` AS `x`\\nFROM `df`\\) `dbplyr_[0-9]{3}`"
   )
 })
 

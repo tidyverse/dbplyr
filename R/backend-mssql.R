@@ -22,7 +22,7 @@
       # e.g: SELECT TOP 100 * FROM my_table
       assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
       build_sql("TOP(", as.integer(limit), ") ", con = con)
-    } else if (!is.null(order_by) && bare_identifier_ok) {
+    } else if (length(order_by) > 0 && bare_identifier_ok) {
       # Stop-gap measure so that a wider range of queries is supported (#276).
       # MS SQL doesn't allow ORDER BY in subqueries,
       # unless also TOP (or FOR XML) is specified.
