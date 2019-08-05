@@ -33,6 +33,7 @@ Imports:
     rlang (>= 0.2.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
+    stringi,
     utils
 Suggests:
     bit64,
@@ -45,7 +46,7 @@ Suggests:
     RMySQL (>= 0.10.11),
     RPostgreSQL (>= 0.4.1),
     RSQLite (>= 2.1.0),
-    testthat (>= 2.0.0),
+    testthat (>= 2.1.0),
     withr (>= 2.1.2)
 VignetteBuilder: 
     knitr
@@ -101,6 +102,7 @@ Collate:
     'tbl-sql.R'
     'test-frame.R'
     'testthat.R'
+    'tidyr-pivot.R'
     'translate-sql-clause.R'
     'translate-sql.R'
     'utils-format.R'
