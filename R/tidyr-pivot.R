@@ -21,18 +21,18 @@ db_pivot_longer <- function(data, cols,
   kp <- cn[!(cn %in% pl)]
   grps <- summarise(group_by(data, !!!parse_exprs(kp)))
   ugrps <- ungroup(grps)
+  jdata <- inner_join(ugrps, data, by = kp)
   jtb <- purrr::map(
     pl,
     ~ {
-      xs <- select(data, c(kp, .x))
+      xs <- select(jdata, c(kp, .x))
       xr <- rename(xs, !!values_to := .x)
-      xj <- inner_join(ugrps, xr, by = kp)
       if (is.null(names_prefix)) {
         cl <- .x
       } else {
         cl <- stringi::stri_replace_all_regex(.x, paste0("^", names_prefix), "")
       }
-      xm <- mutate(xj, !!names_to := cl)
+      xm <- mutate(xr, !!names_to := cl)
       select(xm, kp, !!names_to, !!values_to)
     }
   )
