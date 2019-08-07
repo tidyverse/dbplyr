@@ -1,3 +1,7 @@
+# dbplyr (dev)
+
+* Adds `db_pivot_wider()` generic. It aligns with `tidyr::pivot_wider()` (#252)
+
 # dbplyr 1.4.2
 
 * Fix bug when partially evaluating unquoting quosure containing a single 
