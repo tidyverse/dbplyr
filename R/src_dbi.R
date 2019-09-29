@@ -92,6 +92,9 @@
 #'   show_query()
 #' }
 src_dbi <- function(con, auto_disconnect = FALSE) {
+  # Avoid registering disconnector if con can't be evaluated
+  force(con)
+
   # stopifnot(is(con, "DBIConnection"))
   if (is_false(auto_disconnect)) {
     disco <- NULL
