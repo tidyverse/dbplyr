@@ -84,47 +84,47 @@ group_vars.tbl_lazy <- function(x) {
 # nocov start
 #' @export
 filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   filter(.data, !!!dots)
 }
 #' @export
 arrange_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   arrange(.data, !!!dots)
 }
 #' @export
 select_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   select(.data, !!!dots)
 }
 #' @export
 rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   rename(.data, !!!dots)
 }
 #' @export
 summarise_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   summarise(.data, !!!dots)
 }
 #' @export
 mutate_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   mutate(.data, !!!dots)
 }
 #' @export
 group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   group_by(.data, !!!dots, add = add)
 }
 #' @export
 distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   distinct(.data, !!! dots, .keep_all = .keep_all)
 }
 #' @export
 do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
+  dots <- compat_lazy_dots(.dots, caller_env(), ...)
   do(.data, !!! dots, .chunk_size = .chunk_size)
 }
 # nocov end
