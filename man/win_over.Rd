@@ -2,6 +2,7 @@
 % Please edit documentation in R/translate-sql-window.R
 \name{win_over}
 \alias{win_over}
+\alias{win_over_listagg}
 \alias{win_rank}
 \alias{win_aggregate}
 \alias{win_aggregate_2}
@@ -14,6 +15,9 @@
 \title{Generate SQL expression for window functions}
 \usage{
 win_over(expr, partition = NULL, order = NULL, frame = NULL,
+  con = sql_current_con())
+
+win_over_listagg(expr, partition = NULL, order = NULL,
   con = sql_current_con())
 
 win_rank(f)

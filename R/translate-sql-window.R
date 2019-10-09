@@ -70,6 +70,53 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
   sql
 }
 
+#' @rdname win_over
+win_over_listagg <- function(expr, partition = NULL, order = NULL, con = sql_current_con()) {
+  if (length(partition) > 0) {
+    partition <- as.sql(partition)
+
+    partition <- build_sql(
+      "PARTITION BY ",
+      sql_vector(
+        escape(partition, con = con),
+        collapse = ", ",
+        parens = FALSE,
+        con = con
+      ),
+      con = con
+    )
+  }
+
+  if (length(order) > 0) {
+    order <- as.sql(order)
+
+    order <- build_sql(
+      "ORDER BY ",
+      sql_vector(
+        escape(order, con = con),
+        collapse = ", ",
+        parens = FALSE,
+        con = con
+      ),
+      con = con
+    )
+  }
+
+
+  sql <- build_sql(expr,
+            " WITHIN GROUP ",
+            sql_vector(order, parens = T, con = con),
+            " OVER ",
+            sql_vector(partition, parens = T, con = con),
+            con = con)
+
+
+  sql
+
+
+
+}
+
 rows <- function(from = -Inf, to = 0) {
   if (from >= to) stop("from must be less than to", call. = FALSE)
 

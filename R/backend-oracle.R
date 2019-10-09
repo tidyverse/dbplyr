@@ -49,8 +49,25 @@ sql_translate_env.Oracle <- function(con) {
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
     ),
-    base_odbc_agg,
-    base_odbc_win
+    sql_translator(.parent = base_odbc_agg,
+                   # str_flatten = function(x, collapse) sql_expr(listagg(!!x, !!collapse))
+                   str_flatten = function(x, collapse) {
+                     win_over_listagg(
+                       sql_expr(listagg(!!x, !!collapse)),
+                       partition = win_current_group(),
+                       order = win_current_order()
+                     )
+                   }
+    ),
+    sql_translator(.parent = base_odbc_win,
+                   str_flatten = function(x, collapse) {
+                     win_over_listagg(
+                       sql_expr(listagg(!!x, !!collapse)),
+                       partition = win_current_group(),
+                       order = win_current_order()
+                     )
+                   }
+    )
   )
 }
 
