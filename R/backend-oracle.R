@@ -50,7 +50,6 @@ sql_translate_env.Oracle <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
     ),
     sql_translator(.parent = base_odbc_agg,
-                   # str_flatten = function(x, collapse) sql_expr(listagg(!!x, !!collapse))
                    str_flatten = function(x, collapse) {
                      win_over_listagg(
                        sql_expr(listagg(!!x, !!collapse)),
