@@ -58,9 +58,18 @@ test_that("ntile always casts to integer", {
 })
 
 test_that("first, last, and nth translated to _value", {
-  expect_equal(translate_sql(first(x)), sql("FIRST_VALUE(`x`) OVER ()"))
-  expect_equal(translate_sql(last(x)), sql("LAST_VALUE(`x`) OVER ()"))
-  expect_equal(translate_sql(nth(x, 1)), sql("NTH_VALUE(`x`, 1) OVER ()"))
+  expect_equal(
+    translate_sql(first(x)),
+    sql("FIRST_VALUE(`x`) OVER ()")
+  )
+  expect_equal(
+    translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
+    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)")
+  )
+  expect_equal(
+    translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
+    sql("NTH_VALUE(`x`, 3) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
+  )
 })
 
 test_that("can override frame of recycled functions", {
