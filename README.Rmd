@@ -76,3 +76,6 @@ summary %>% show_query()
 summary %>% collect()
 ```
 
+## Code of Conduct
+
+Please note that the dbplyr project is released with a [Contributor Code of Conduct](https://dbplyr.tidyverse.org/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

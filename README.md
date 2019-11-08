@@ -106,3 +106,9 @@ summary %>% collect()
 #> 2     6  19.7
 #> 3     8  15.1
 ```
+
+## Code of Conduct
+
+Please note that the dbplyr project is released with a [Contributor Code
+of Conduct](https://dbplyr.tidyverse.org/CODE_OF_CONDUCT.html). By
+contributing to this project, you agree to abide by its terms.
