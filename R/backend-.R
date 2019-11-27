@@ -304,9 +304,23 @@ base_agg <- sql_translator(
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
 
+  # translate weighted.mean
+  weighted.mean = function(x, w, na.rm = FALSE) {
+    if(! na.rm) {
+      build_sql(
+        "SUM(", x, " * ", w, ") / SUM(", w, ")"
+      )
+    } else {
+      build_sql(
+        "SUM( ", x, " * ", w, ") / SUM(CASE WHEN ", x, " IS NOT NULL THEN ", w, " ELSE 0 END)"
+      )
+    }
+  },
+
   n_distinct = function(x) {
     build_sql("COUNT(DISTINCT ", x, ")")
   }
+
 )
 
 #' @export
@@ -372,6 +386,31 @@ base_win <- sql_translator(
   sum   = win_aggregate("SUM"),
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
+
+  # translate weighted.mean
+  weighted.mean = function(x, w, na.rm = FALSE) {
+    if(! na.rm) {
+      build_sql(
+         win_over(
+          build_sql("SUM(", x, " * ", w, ")"), win_current_group()
+        ), " / ",
+        win_over(
+          build_sql("SUM(", w, ")"), win_current_group()
+        )
+      )
+    } else {
+      build_sql(
+        win_over(
+          build_sql("SUM(", x, " * ", w, ")"), win_current_group()
+        ), " / ",
+        win_over(
+          build_sql("SUM(CASE WHEN ", x, " IS NOT NULL THEN ", w, " ELSE 0 END)"),
+          win_current_group()
+        ), ")"
+      )
+    }
+  },
+
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),

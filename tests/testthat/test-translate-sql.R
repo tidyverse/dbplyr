@@ -54,6 +54,17 @@ test_that("n_distinct(x) translated to COUNT(distinct, x)", {
   expect_error(translate_sql(n_distinct(x, y), window = FALSE), "unused argument")
 })
 
+test_that("weighted.mean(x, w) is equivalent to sum(x * w)/sum(w)", {
+  expect_equal(
+    translate_sql(sum(x * w, na.rm = TRUE)/sum(w, na.rm = TRUE), window = FALSE),
+    translate_sql(weighted.mean(x, w), window = FALSE)
+  )
+  expect_equal(
+    translate_sql(sum(x * w, na.rm = TRUE)/sum(w, na.rm = TRUE), window = TRUE),
+    translate_sql(weighted.mean(x, w), window = TRUE)
+  )
+})
+
 test_that("na_if is translated to NULLIF (#211)", {
   expect_equal(translate_sql(na_if(x, 0L)), sql("NULLIF(`x`, 0)"))
 })
