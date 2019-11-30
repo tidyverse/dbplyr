@@ -81,7 +81,7 @@
 
       as.Date       = sql_cast("DATE"),
       as.numeric    = sql_cast("NUMERIC"),
-      as.double     = sql_cast("NUMERIC"),
+      as.double     = sql_cast("FLOAT"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
       atan2         = sql_prefix("ATN2"),
