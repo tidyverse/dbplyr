@@ -13,7 +13,7 @@ group_by.tbl_lazy <- function(.data, ..., add = FALSE, .drop = TRUE) {
     return(.data)
   }
 
-  groups <- group_by_prepare(.data, .dots = dots, add = add)
+  groups <- group_by_prepare(.data, !!!dots, add = add)
   names <- purrr::map_chr(groups$groups, as_string)
 
   add_op_single("group_by",
