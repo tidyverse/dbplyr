@@ -218,27 +218,21 @@ sql_quote <- function(x, quote) {
 
 
 
-#' More SQL generics
+#' SQL escaping generics
 #'
+#' These generics provide ways for backends to override escaping on a
+#' variable-by-variable basis, if
 #' These are new, so not included in dplyr for backward compatibility
 #' purposes.
 #'
 #' @keywords internal
+#' @name sql_escape
+NULL
+
+#' @rdname sql_escape
 #' @export
 sql_escape_logical <- function(con, x) {
   UseMethod("sql_escape_logical")
-}
-
-# DBIConnection methods --------------------------------------------------------
-
-#' @export
-sql_escape_string.DBIConnection <- function(con, x) {
-  dbQuoteString(con, x)
-}
-
-#' @export
-sql_escape_ident.DBIConnection <- function(con, x) {
-  dbQuoteIdentifier(con, x)
 }
 
 #' @export
@@ -249,4 +243,20 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y
 }
 
+#' @rdname sql_escape
+#' @export
+sql_escape_string <- function(con, x) UseMethod("sql_escape_string")
 
+#' @export
+sql_escape_string.DBIConnection <- function(con, x) {
+  dbQuoteString(con, x)
+}
+
+#' @rdname sql_escape
+#' @export
+sql_escape_ident <- function(con, x) UseMethod("sql_escape_ident")
+
+#' @export
+sql_escape_ident.DBIConnection <- function(con, x) {
+  dbQuoteIdentifier(con, x)
+}

@@ -174,11 +174,3 @@ sql_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
 sql_set_op <- function(con, x, y, method) {
   UseMethod("sql_set_op")
 }
-
-#' @rdname backend_dbplyr
-#' @export
-sql_escape_string <- function(con, x) UseMethod("sql_escape_string")
-
-#' @rdname backend_dbplyr
-#' @export
-sql_escape_ident <- function(con, x) UseMethod("sql_escape_ident")

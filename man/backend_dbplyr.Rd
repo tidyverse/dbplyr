@@ -26,8 +26,6 @@
 \alias{sql_join}
 \alias{sql_semi_join}
 \alias{sql_set_op}
-\alias{sql_escape_string}
-\alias{sql_escape_ident}
 \title{Database and SQL generics.}
 \usage{
 db_desc(x)
@@ -88,10 +86,6 @@ sql_join(con, x, y, vars, type = "inner", by = NULL, ...)
 sql_semi_join(con, x, y, anti = FALSE, by = NULL, ...)
 
 sql_set_op(con, x, y, method)
-
-sql_escape_string(con, x)
-
-sql_escape_ident(con, x)
 }
 \arguments{
 \item{con}{A database connection.}
