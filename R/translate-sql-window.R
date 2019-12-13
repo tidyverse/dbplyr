@@ -268,7 +268,7 @@ common_window_funs <- function() {
 #' translate_window_where(quote(n() > 10))
 #' translate_window_where(quote(rank() > cumsum(AB)))
 translate_window_where <- function(expr, window_funs = common_window_funs()) {
-  switch_type(expr,
+  switch(typeof(expr),
     formula = translate_window_where(f_rhs(expr), window_funs),
     logical = ,
     integer = ,
@@ -283,7 +283,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
         window_where(sym(name), set_names(list(expr), name))
       } else {
         args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)
-        expr <- lang(node_car(expr), splice(lapply(args, "[[", "expr")))
+        expr <- call2(node_car(expr), splice(lapply(args, "[[", "expr")))
 
         window_where(
           expr = expr,
