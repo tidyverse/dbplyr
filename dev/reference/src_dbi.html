@@ -8,21 +8,31 @@
 
 <title>dplyr backend for any DBI-compatible database — src_dbi • dbplyr</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
-<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
 <!-- Bootstrap -->
 <link href="../tidyverse.css" rel="stylesheet">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -32,35 +42,36 @@
 
 
 <meta property="og:title" content="dplyr backend for any DBI-compatible database — src_dbi" />
-
 <meta property="og:description" content="src_dbi() is a general dplyr backend that connects to any
 DBI driver. src_memdb() connects to a temporary in-memory SQLite
 database, that's useful for testing and experimenting.
 You can generate a tbl() directly from the DBI connection, or
 go via src_dbi()." />
-
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 <meta name="robots" content="noindex">
 
 <!-- mathjax -->
-<script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
 
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
-<!-- google analytics -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script>
 <script>
- window.dataLayer = window.dataLayer || [];
- function gtag(){dataLayer.push(arguments);}
- gtag('js', new Date());
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
- gtag('config', 'UA-115082821-1');
+  gtag('config', 'UA-115082821-1');
 </script>
+
   </head>
 
   <body>
@@ -80,7 +91,7 @@ go via src_dbi()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.1.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.2.9000</span>
         </div>
       </div>
     </div>
@@ -155,6 +166,7 @@ go via src_dbi()." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -166,20 +178,18 @@ go via src_dbi()." />
     </div>
 
     <div class="ref-description">
-    
     <p><code>src_dbi()</code> is a general dplyr backend that connects to any
 DBI driver. <code><a href='memdb_frame.html'>src_memdb()</a></code> connects to a temporary in-memory SQLite
 database, that's useful for testing and experimenting.</p>
 <p>You can generate a <code>tbl()</code> directly from the DBI connection, or
 go via <code>src_dbi()</code>.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S3 method for src_dbi</span>
 <span class='fu'>tbl</span>(<span class='no'>src</span>, <span class='no'>from</span>, <span class='no'>...</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -208,11 +218,10 @@ when this happens.</p></td>
       <td><p>Needed for compatibility with generic; currently ignored.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object with class <code>src_dbi</code>, <code>src_sql</code>, <code>src</code>.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>All data manipulation on SQL tbls are lazy: they will not actually
@@ -225,7 +234,6 @@ that you are grouping by. Use <code><a href='https://dplyr.tidyverse.org/referen
 the indexes that you expect.</p>
 <p>There is one exception: <code><a href='https://dplyr.tidyverse.org/reference/do.html'>do()</a></code> is not lazy since it must pull the data
 into R.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Basic connection using DBI -------------------------------------------</span>
@@ -236,11 +244,11 @@ into R.</p>
 
 <span class='co'># Add some data</span>
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>src</span>, <span class='no'>mtcars</span>)
-<span class='no'>src</span></div><div class='output co'>#&gt; src:  sqlite 3.22.0 [:memory:]
+<span class='no'>src</span></div><div class='output co'>#&gt; src:  sqlite 3.29.0 [:memory:]
 #&gt; tbls: mtcars, sqlite_stat1, sqlite_stat4</div><div class='input'><span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/DBI/man/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"</div><div class='input'>
 <span class='co'># To retrieve a single table from a source, use `tbl()`</span>
 <span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]
-#&gt; # Database: sqlite 3.22.0 [:memory:]
+#&gt; # Database: sqlite 3.29.0 [:memory:]
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt;  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
@@ -256,7 +264,7 @@ into R.</p>
 #&gt; # … with more rows</div><div class='input'>
 <span class='co'># You can also use pass raw SQL if you want a more sophisticated query</span>
 <span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; # Source:   SQL [?? x 11]
-#&gt; # Database: sqlite 3.22.0 [:memory:]
+#&gt; # Database: sqlite 3.29.0 [:memory:]
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 #&gt;  1  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
@@ -318,20 +326,18 @@ into R.</p>
 #&gt; WHERE (`G` &gt; 0.0)
 #&gt; GROUP BY `playerID`</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="tidyverse">
@@ -344,11 +350,14 @@ into R.</p>
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

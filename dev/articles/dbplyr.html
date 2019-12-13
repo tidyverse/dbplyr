@@ -6,24 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Introduction to dbplyr • dbplyr</title>
-<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
 <meta property="og:title" content="Introduction to dbplyr">
 <meta property="og:description" content="">
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
 <meta name="twitter:card" content="summary">
 <meta name="robots" content="noindex">
-<!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><!-- google analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script><script>
- window.dataLayer = window.dataLayer || [];
- function gtag(){dataLayer.push(arguments);}
- gtag('js', new Date());
+<![endif]--><!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
- gtag('config', 'UA-115082821-1');
+  gtag('config', 'UA-115082821-1');
 </script>
 </head>
 <body>
@@ -42,7 +49,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.1.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.2.9000</span>
         </div>
       </div>
     </div>
@@ -119,6 +126,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -186,19 +194,18 @@
 <p>When you print it out, you’ll notice that it mostly looks like a regular tibble:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">flights_db </a>
 <a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 1  2013     1     1      517            515         2      830</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 2  2013     1     1      533            529         4      850</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 3  2013     1     1      542            540         2      923</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; 4  2013     1     1      544            545        -1     1004</span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; 5  2013     1     1      554            600        -6      812</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; 6  2013     1     1      554            558        -4      740</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; # … with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; # Database: sqlite 3.29.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 1  2013     1     1      517            515         2      830            819</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 2  2013     1     1      533            529         4      850            830</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 3  2013     1     1      542            540         2      923            850</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; 4  2013     1     1      544            545        -1     1004           1022</span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt; 5  2013     1     1      554            600        -6      812            837</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt; 6  2013     1     1      554            558        -4      740            728</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt; # … with more rows, and 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; #   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></a></code></pre></div>
 <p>The main difference is that you can see that it’s a remote source in a SQLite database.</p>
 </div>
 <div id="generating-queries" class="section level2">
@@ -208,7 +215,7 @@
 <p>Most of the time you don’t need to know anything about SQL, and you can continue to use the dplyr verbs that you’re already familiar with:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">flights_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(year<span class="op">:</span>day, dep_delay, arr_delay)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; # Source:   lazy query [?? x 5]</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; # Database: sqlite 3.29.0 [:memory:]</span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;    year month   day dep_delay arr_delay</span></a>
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 1  2013     1     1         2        11</span></a>
@@ -221,37 +228,36 @@
 <a class="sourceLine" id="cb7-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb7-14" data-line-number="14">flights_db <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(dep_delay <span class="op">&gt;</span><span class="st"> </span><span class="dv">240</span>)</a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"><span class="co">#&gt; # Source:   lazy query [?? x 19]</span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; 1  2013     1     1      848           1835       853     1001</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; 2  2013     1     1     1815           1325       290     2120</span></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; 3  2013     1     1     1842           1422       260     1958</span></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; 4  2013     1     1     2115           1700       255     2330</span></a>
-<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; 5  2013     1     1     2205           1720       285       46</span></a>
-<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; 6  2013     1     1     2343           1724       379      314</span></a>
-<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co">#&gt; # … with more rows, and 12 more variables: sched_arr_time &lt;int&gt;,</span></a>
-<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#&gt; #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co">#&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,</span></a>
-<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="co">#&gt; #   minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-29" data-line-number="29"></a>
-<a class="sourceLine" id="cb7-30" data-line-number="30">flights_db <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(dest) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-32" data-line-number="32"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(dep_time))</a>
-<a class="sourceLine" id="cb7-33" data-line-number="33"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
-<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
-<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt; # Database: sqlite 3.22.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   dest  delay</span></a>
-<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 1 ABQ   2006.</span></a>
-<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 2 ACK   1033.</span></a>
-<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 3 ALB   1627.</span></a>
-<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 4 ANC   1635.</span></a>
-<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 5 ATL   1293.</span></a>
-<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; 6 AUS   1521.</span></a>
-<a class="sourceLine" id="cb7-46" data-line-number="46"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="co">#&gt; # Database: sqlite 3.29.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time</span></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt; 1  2013     1     1      848           1835       853     1001           1950</span></a>
+<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt; 2  2013     1     1     1815           1325       290     2120           1542</span></a>
+<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; 3  2013     1     1     1842           1422       260     1958           1535</span></a>
+<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; 4  2013     1     1     2115           1700       255     2330           1920</span></a>
+<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; 5  2013     1     1     2205           1720       285       46           2040</span></a>
+<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; 6  2013     1     1     2343           1724       379      314           1938</span></a>
+<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="co">#&gt; # … with more rows, and 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="co">#&gt; #   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,</span></a>
+<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="co">#&gt; #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb7-29" data-line-number="29">flights_db <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-30" data-line-number="30"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(dest) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">delay =</span> <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(dep_time))</a>
+<a class="sourceLine" id="cb7-32" data-line-number="32"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
+<a class="sourceLine" id="cb7-33" data-line-number="33"><span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span></a>
+<a class="sourceLine" id="cb7-34" data-line-number="34"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
+<a class="sourceLine" id="cb7-35" data-line-number="35"><span class="co">#&gt; # Source:   lazy query [?? x 2]</span></a>
+<a class="sourceLine" id="cb7-36" data-line-number="36"><span class="co">#&gt; # Database: sqlite 3.29.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb7-37" data-line-number="37"><span class="co">#&gt;   dest  delay</span></a>
+<a class="sourceLine" id="cb7-38" data-line-number="38"><span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-39" data-line-number="39"><span class="co">#&gt; 1 ABQ   2006.</span></a>
+<a class="sourceLine" id="cb7-40" data-line-number="40"><span class="co">#&gt; 2 ACK   1033.</span></a>
+<a class="sourceLine" id="cb7-41" data-line-number="41"><span class="co">#&gt; 3 ALB   1627.</span></a>
+<a class="sourceLine" id="cb7-42" data-line-number="42"><span class="co">#&gt; 4 ANC   1635.</span></a>
+<a class="sourceLine" id="cb7-43" data-line-number="43"><span class="co">#&gt; 5 ATL   1293.</span></a>
+<a class="sourceLine" id="cb7-44" data-line-number="44"><span class="co">#&gt; 6 AUS   1521.</span></a>
+<a class="sourceLine" id="cb7-45" data-line-number="45"><span class="co">#&gt; # … with more rows</span></a></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="http://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
@@ -270,7 +276,7 @@
 <p>Surprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">tailnum_delay_db</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # Source:     lazy query [?? x 3]</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # Database:   sqlite 3.22.0 [:memory:]</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; # Database:   sqlite 3.29.0 [:memory:]</span></a>
 <a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; # Ordered by: desc(delay)</span></a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   tailnum delay     n</span></a>
 <a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span></a>
@@ -341,7 +347,8 @@
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -357,6 +364,7 @@
 </div>
 
 
+
       <footer><div class="tidyverse">
   <p>dbplyr is a part of the <strong>tidyverse</strong>, an ecosystem of packages designed with common APIs and a shared philosophy. Learn more at <a href="https://tidyverse.org">tidyverse.org</a>.</p>
 </div>
@@ -367,10 +375,12 @@
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
