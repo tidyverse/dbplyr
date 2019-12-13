@@ -10,23 +10,69 @@
 \alias{anti_join.tbl_lazy}
 \title{Join sql tbls.}
 \usage{
-\method{inner_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
+\method{inner_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 
-\method{left_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
+\method{left_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 
-\method{right_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
+\method{right_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 
-\method{full_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  suffix = c(".x", ".y"), auto_index = FALSE, ..., sql_on = NULL)
+\method{full_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 
-\method{semi_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  auto_index = FALSE, ..., sql_on = NULL)
+\method{semi_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 
-\method{anti_join}{tbl_lazy}(x, y, by = NULL, copy = FALSE,
-  auto_index = FALSE, ..., sql_on = NULL)
+\method{anti_join}{tbl_lazy}(
+  x,
+  y,
+  by = NULL,
+  copy = FALSE,
+  auto_index = FALSE,
+  ...,
+  sql_on = NULL
+)
 }
 \arguments{
 \item{x}{tbls to join}
@@ -45,7 +91,7 @@ For example, \code{by = c("a" = "b")} will match \code{x.a} to
 
 \item{copy}{If \code{x} and \code{y} are not from the same data source,
 and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
-temporary table in same database as \code{x}. \code{*_join()} will automatically
+temporary table in same database as \code{x}. \verb{*_join()} will automatically
 run \code{ANALYZE} on the created table in the hope that this will make
 you queries as efficient as possible by giving more data to the query
 planner.
@@ -62,7 +108,7 @@ indices for the variables in \code{by}. This may speed up the join if
 there are matching indexes in \code{x}.}
 
 \item{...}{other parameters passed onto methods, for instance, \code{na_matches}
-to control how \code{NA} values are matched.  See \link{join.tbl_df} for more.}
+to control how \code{NA} values are matched.  See \link[dplyr]{join.tbl_df} for more.}
 
 \item{sql_on}{A custom join predicate as an SQL expression. The SQL
 can refer to the \code{LHS} and \code{RHS} aliases to disambiguate
@@ -75,8 +121,8 @@ functions.
 \section{Implementation notes}{
 
 
-Semi-joins are implemented using \code{WHERE EXISTS}, and anti-joins with
-\code{WHERE NOT EXISTS}.
+Semi-joins are implemented using \verb{WHERE EXISTS}, and anti-joins with
+\verb{WHERE NOT EXISTS}.
 
 All joins use column equality by default.
 An arbitrary join predicate can be specified by passing
