@@ -159,7 +159,7 @@ test_that("consistent result of left join on key column with same name in both t
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_x)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_x)
 })
 
 test_that("consistent result of inner join on key column with same name in both tables", {
@@ -173,7 +173,7 @@ test_that("consistent result of inner join on key column with same name in both 
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_x)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_x)
 })
 
 test_that("consistent result of right join on key column with same name in both tables", {
@@ -188,7 +188,7 @@ test_that("consistent result of right join on key column with same name in both 
   tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_x)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_x)
 })
 
 test_that("consistent result of full join on key column with same name in both tables", {
@@ -203,7 +203,7 @@ test_that("consistent result of full join on key column with same name in both t
   tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_x)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_x)
 })
 
 test_that("consistent result of left join on key column with different names", {
@@ -217,7 +217,7 @@ test_that("consistent result of left join on key column with different names", {
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_xl_xr)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_xl_xr)
 })
 
 test_that("consistent result of inner join on key column with different names", {
@@ -231,7 +231,7 @@ test_that("consistent result of inner join on key column with different names", 
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_xl_xr)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_xl_xr)
 })
 
 test_that("consistent result of right join on key column with different names", {
@@ -246,7 +246,7 @@ test_that("consistent result of right join on key column with different names", 
   tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_xl_xr)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_xl_xr)
 })
 
 test_that("consistent result of full join on key column with different names", {
@@ -261,7 +261,7 @@ test_that("consistent result of full join on key column with different names", {
   tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_xl_xr)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_xl_xr)
 })
 
 test_that("consistent result of left natural join", {
@@ -275,7 +275,7 @@ test_that("consistent result of left natural join", {
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_l_j)
 })
 
 test_that("consistent result of inner natural join", {
@@ -289,7 +289,7 @@ test_that("consistent result of inner natural join", {
   tbls_left <- test_load(tbl_left)
   tbls_right <- test_load(tbl_right)
 
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_i_j)
 })
 
 test_that("consistent result of right natural join", {
@@ -304,7 +304,7 @@ test_that("consistent result of right natural join", {
   tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_r_j)
 })
 
 test_that("consistent result of full natural join", {
@@ -319,7 +319,7 @@ test_that("consistent result of full natural join", {
   tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
   tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
 
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j)
+  dplyr::compare_tbls2(tbls_left, tbls_right, op = test_f_j)
 })
 
 

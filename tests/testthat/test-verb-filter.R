@@ -49,7 +49,7 @@ test_that("filter calls windowed versions of sql functions", {
   )
 
   dfs %>%
-    lapply(. %>% group_by(g) %>% filter(row_number(x) < 3)) %>%
+    lapply(. %>% group_by(g) %>% filter(dplyr::row_number(x) < 3)) %>%
     expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(1L, 2L, 6L, 7L)))
 })
 

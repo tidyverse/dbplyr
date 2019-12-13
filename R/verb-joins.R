@@ -101,6 +101,7 @@
 NULL
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr inner_join
 #' @export
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
@@ -120,6 +121,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr left_join
 #' @export
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
@@ -139,6 +141,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr right_join
 #' @export
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
@@ -158,6 +161,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr full_join
 #' @export
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
@@ -177,6 +181,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr semi_join
 #' @export
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
@@ -194,6 +199,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 #' @rdname join.tbl_sql
+#' @importFrom dplyr anti_join
 #' @export
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
@@ -221,7 +227,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(
@@ -246,7 +252,7 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(

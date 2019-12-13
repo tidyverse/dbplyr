@@ -68,3 +68,7 @@ c_character <- function(...) {
 }
 
 cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
+
+random_table_name <- function(n = 10) {
+  paste0(sample(letters, n, replace = TRUE), collapse = "")
+}

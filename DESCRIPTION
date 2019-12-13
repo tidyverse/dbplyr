@@ -80,6 +80,7 @@ Collate:
     'data-lahman.R'
     'data-nycflights13.R'
     'dbplyr.R'
+    'dplyr.R'
     'explain.R'
     'ident.R'
     'lazy-ops.R'

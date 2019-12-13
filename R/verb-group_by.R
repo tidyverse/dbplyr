@@ -1,5 +1,6 @@
 # group_by ----------------------------------------------------------------
 
+#' @importFrom dplyr group_by
 #' @export
 group_by.tbl_lazy <- function(.data, ..., add = FALSE, .drop = TRUE) {
   dots <- quos(...)
@@ -13,7 +14,7 @@ group_by.tbl_lazy <- function(.data, ..., add = FALSE, .drop = TRUE) {
     return(.data)
   }
 
-  groups <- group_by_prepare(.data, !!!dots, add = add)
+  groups <- dplyr::group_by_prepare(.data, !!!dots, add = add)
   names <- purrr::map_chr(groups$groups, as_string)
 
   add_op_single("group_by",
@@ -45,6 +46,7 @@ sql_build.op_group_by <- function(op, con, ...) {
 # ungroup -----------------------------------------------------------------
 
 #' @export
+#' @importFrom dplyr ungroup
 ungroup.tbl_lazy <- function(x, ...) {
   add_op_single("ungroup", x)
 }

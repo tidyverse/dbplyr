@@ -4,9 +4,9 @@
 #' @importFrom utils head tail
 #' @importFrom glue glue
 #' @importFrom methods setOldClass
-#' @import dplyr
 #' @import rlang
 #' @import DBI
+#' @importFrom dplyr n
 #' @import tibble
 #' @keywords internal
 "_PACKAGE"

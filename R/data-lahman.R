@@ -37,27 +37,27 @@ NULL
 #' @rdname lahman
 lahman_sqlite <- function(path = NULL) {
   path <- db_location(path, "lahman.sqlite")
-  copy_lahman(src_sqlite(path = path, create = TRUE))
+  copy_lahman(dplyr::src_sqlite(path = path, create = TRUE))
 }
 
 #' @export
 #' @rdname lahman
 lahman_postgres <- function(dbname = "lahman", host = "localhost", ...) {
-  src <- src_postgres(dbname, host = host, ...)
+  src <- dplyr::src_postgres(dbname, host = host, ...)
   copy_lahman(src)
 }
 
 #' @export
 #' @rdname lahman
 lahman_mysql <- function(dbname = "lahman", ...) {
-  src <- src_mysql(dbname, ...)
+  src <- dplyr::src_mysql(dbname, ...)
   copy_lahman(src)
 }
 
 #' @export
 #' @rdname lahman
 lahman_df <- function() {
-  src_df("Lahman")
+  dplyr::src_df("Lahman")
 }
 
 #' @rdname lahman
@@ -98,7 +98,7 @@ lahman_srcs <- function(..., quiet = NULL) {
 
 lahman <- function(type, ...) {
   if (missing(type)) {
-    src_df("Lahman")
+    dplyr::src_df("Lahman")
   } else {
     f <- match.fun(paste0("lahman_", type))
     f(...)

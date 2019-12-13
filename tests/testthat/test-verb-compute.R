@@ -58,7 +58,7 @@ test_that("unique index fails if values are duplicated", {
 test_that("compute creates correct column names", {
   out <- memdb_frame(x = 1) %>%
     group_by(x) %>%
-    summarize(n = n()) %>%
+    summarise(n = n()) %>%
     compute() %>%
     collect()
 

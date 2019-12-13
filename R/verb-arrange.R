@@ -23,6 +23,7 @@
 #' dbplyr::memdb_frame(a = c(3, 4, NA, 2)) %>%
 #'   arrange(is.na(a), a)
 #'
+#' @importFrom dplyr arrange
 #' @export
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- quos(...)

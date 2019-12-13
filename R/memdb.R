@@ -30,5 +30,5 @@ tbl_memdb <- function(df, name = deparse(substitute(df))) {
 #' @rdname memdb_frame
 #' @export
 src_memdb <- function() {
-  cache_computation("src_memdb", src_sqlite(":memory:", TRUE))
+  cache_computation("src_memdb", dplyr::src_sqlite(":memory:", TRUE))
 }

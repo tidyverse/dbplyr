@@ -5,6 +5,7 @@
 #'   too big, the process will be slow because R has to allocate and free a lot
 #'   of memory. If it's too small, it will be slow, because of the overhead of
 #'   talking to the database.
+#' @importFrom dplyr do
 #' @export
 do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   groups_sym <- groups(.data)
@@ -30,7 +31,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 
   out <- replicate(m, vector("list", n), simplify = FALSE)
   names(out) <- names(args)
-  p <- progress_estimated(n * m, min_time = 2)
+  p <- dplyr::progress_estimated(n * m, min_time = 2)
 
   # Create ungrouped data frame suitable for chunked retrieval
   query <- Query$new(con, db_sql_render(con, ungroup(.data)), op_vars(.data))
@@ -115,7 +116,7 @@ label_output_dataframe <- function(labels, out, groups) {
   }
 
   rows <- vapply(out[[1]], nrow, numeric(1))
-  out <- bind_rows(out[[1]])
+  out <- dplyr::bind_rows(out[[1]])
 
   if (!is.null(labels)) {
     # Remove any common columns from labels
@@ -125,20 +126,20 @@ label_output_dataframe <- function(labels, out, groups) {
     labels <- labels[rep(seq_len(nrow(labels)), rows), , drop = FALSE]
     rownames(labels) <- NULL
 
-    grouped_df(bind_cols(labels, out), groups)
+    dplyr::grouped_df(dplyr::bind_cols(labels, out), groups)
   } else {
-    rowwise(out)
+    dplyr::rowwise(out)
   }
 }
 
 label_output_list <- function(labels, out, groups) {
   if (!is.null(labels)) {
     labels[names(out)] <- out
-    rowwise(labels)
+    dplyr::rowwise(labels)
   } else {
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
-    rowwise(out)
+    dplyr::rowwise(out)
   }
 }
 

@@ -112,6 +112,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 
 setOldClass(c("src_dbi", "src_sql", "src"))
 
+#' @importFrom dplyr tbl
 #' @export
 #' @aliases tbl_dbi
 #' @rdname src_dbi

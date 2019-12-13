@@ -1,3 +1,4 @@
+#' @importFrom dplyr filter
 # registered onLoad
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {

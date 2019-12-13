@@ -1,5 +1,3 @@
-context("mutate")
-
 test_that("mutate computed before summarise", {
   mf <- memdb_frame(x = c(1, 2, 3), y = c(9, 8, 7))
 
@@ -68,7 +66,7 @@ test_that("supports overwriting variables (#3222)", {
 
 test_that("mutate calls windowed versions of sql functions", {
   dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = as.numeric(row_number(x))))
+  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = as.numeric(dplyr::row_number(x))))
 
   expect_equal(out$df$r, c(1, 2, 1, 2))
   expect_equal_tbls(out)
@@ -165,13 +163,13 @@ test_that("mutate can drop variables with NULL", {
 
 test_that("mutate_all generates correct sql", {
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate_all(~ . + 1L) %>%
+    dplyr::mutate_all(~ . + 1L) %>%
     sql_build()
 
   expect_equal(out$select, sql(x = '`x` + 1', y = '`y` + 1'))
 
   out <- lazy_frame(x = 1) %>%
-    mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
+    dplyr::mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
     sql_build()
   expect_equal(out$select, sql(`x` = '`x`', one = '`x` + 1', two = '`x` + 2'))
 })
@@ -179,7 +177,7 @@ test_that("mutate_all generates correct sql", {
 test_that("mutate_all scopes nested quosures correctly", {
   num <- 10L
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate_all(~ . + num) %>%
+    dplyr::mutate_all(~ . + num) %>%
     sql_build()
 
   expect_equal(out$select, sql(x = '`x` + 10', y = '`y` + 10'))
@@ -199,4 +197,3 @@ test_that("mutated vars are always named", {
   out2 <- mf %>% mutate(1) %>% op_vars()
   expect_equal(out2, c("a", "1"))
 })
-

@@ -5,6 +5,7 @@
 #' and joins. By default, it creates temporary tables which are typically
 #' only visible to the current connection to the database.
 #'
+#' @importFrom dplyr copy_to
 #' @export
 #' @param df A local data frame, a `tbl_sql` from same source, or a `tbl_sql`
 #'   from another source. If from another source, all data must transition
@@ -79,6 +80,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   invisible(out)
 }
 
+#' @importFrom dplyr auto_copy
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
   copy_to(x$src, as.data.frame(y), unique_table_name(), ...)

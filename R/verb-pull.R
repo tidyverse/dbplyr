@@ -1,3 +1,4 @@
+#' @importFrom dplyr pull
 #' @export
 pull.tbl_sql <- function(.data, var = -1) {
   expr <- enquo(var)
