@@ -185,8 +185,13 @@ provide helpers for constructing common types of window functions.
 the grouping and order context set up by <code>group_by()</code> and <code>arrange()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>win_over</span>(<span class='no'>expr</span>, <span class='kw'>partition</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())
+    <pre class="usage"><span class='fu'>win_over</span>(
+  <span class='no'>expr</span>,
+  <span class='kw'>partition</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>()
+)
 
 <span class='fu'>win_rank</span>(<span class='no'>f</span>)
 

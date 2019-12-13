@@ -185,12 +185,18 @@ a hierarchical structure. Outside of testing, however, you should
 always call <code>sql_render()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>vars</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>,
-  <span class='st'>".y"</span>))
+    <pre class="usage"><span class='fu'>join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>vars</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>, <span class='st'>".y"</span>))
 
-<span class='fu'>select_query</span>(<span class='no'>from</span>, <span class='kw'>select</span> <span class='kw'>=</span> <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>), <span class='kw'>where</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>having</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>order_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>limit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>distinct</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>select_query</span>(
+  <span class='no'>from</span>,
+  <span class='kw'>select</span> <span class='kw'>=</span> <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>),
+  <span class='kw'>where</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>having</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>order_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>limit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>distinct</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='fu'>semi_join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>anti</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 

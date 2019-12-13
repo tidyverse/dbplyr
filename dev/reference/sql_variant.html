@@ -191,11 +191,13 @@ easy.</p>
 
 <span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
 
-<span class='fu'>sql_variant</span>(<span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(), <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
-  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>())
+<span class='fu'>sql_variant</span>(
+  <span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
+  <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
+  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>()
+)
 
-<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
+<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
 
 <span class='fu'>sql_infix</span>(<span class='no'>f</span>, <span class='kw'>pad</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 

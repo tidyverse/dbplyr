@@ -177,13 +177,25 @@
     <p>Translate an expression to sql.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>translate_sql</span>(<span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>(), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+    <pre class="usage"><span class='fu'>translate_sql</span>(
+  <span class='no'>...</span>,
+  <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>(),
+  <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
-<span class='fu'>translate_sql_</span>(<span class='no'>dots</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>context</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())</pre>
+<span class='fu'>translate_sql_</span>(
+  <span class='no'>dots</span>,
+  <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>vars_group</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>vars_order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>vars_frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>context</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>()
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

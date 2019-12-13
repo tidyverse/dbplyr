@@ -179,16 +179,33 @@ purposes." />
 purposes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>db_compute</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>sql</span>, <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>db_compute</span>(
+  <span class='no'>con</span>,
+  <span class='no'>table</span>,
+  <span class='no'>sql</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)
 
 <span class='fu'>db_collect</span>(<span class='no'>con</span>, <span class='no'>sql</span>, <span class='kw'>n</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>warn_incomplete</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='fu'>db_sql_render</span>(<span class='no'>con</span>, <span class='no'>sql</span>, <span class='no'>...</span>)
 
-<span class='fu'>db_copy_to</span>(<span class='no'>con</span>, <span class='no'>table</span>, <span class='no'>values</span>, <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>db_copy_to</span>(
+  <span class='no'>con</span>,
+  <span class='no'>table</span>,
+  <span class='no'>values</span>,
+  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='no'>...</span>
+)</pre>
 
 
 
