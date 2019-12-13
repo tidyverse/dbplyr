@@ -269,7 +269,6 @@ common_window_funs <- function() {
 #' translate_window_where(quote(rank() > cumsum(AB)))
 translate_window_where <- function(expr, window_funs = common_window_funs()) {
   switch(typeof(expr),
-    formula = translate_window_where(f_rhs(expr), window_funs),
     logical = ,
     integer = ,
     double = ,
@@ -278,7 +277,9 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
     string = ,
     symbol = window_where(expr, list()),
     language = {
-      if (lang_name(expr) %in% window_funs) {
+      if (is_formula(expr)) {
+        translate_window_where(f_rhs(expr), window_funs)
+      } else if (is_call(expr, name = window_funs)) {
         name <- unique_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
