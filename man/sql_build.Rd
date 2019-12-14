@@ -11,12 +11,18 @@
 \alias{sql_optimise}
 \title{Build and render SQL from a sequence of lazy operations}
 \usage{
-join_query(x, y, vars, type = "inner", by = NULL, suffix = c(".x",
-  ".y"))
+join_query(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"))
 
-select_query(from, select = sql("*"), where = character(),
-  group_by = character(), having = character(),
-  order_by = character(), limit = NULL, distinct = FALSE)
+select_query(
+  from,
+  select = sql("*"),
+  where = character(),
+  group_by = character(),
+  having = character(),
+  order_by = character(),
+  limit = NULL,
+  distinct = FALSE
+)
 
 semi_join_query(x, y, anti = FALSE, by = NULL)
 
