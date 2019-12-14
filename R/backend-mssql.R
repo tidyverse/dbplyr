@@ -231,6 +231,16 @@ mssql_temp_name <- function(name, temporary){
   )
 }
 
+#' @export
+`sql_cast.Microsoft SQL Server` <- function(type) {
+  type <- sql(type)
+  function(x) {
+    sql_expr(try_cast(!!x %as% !!type))
+    # 'try_cast', unlike 'cast' fails gracefully in many circumstances
+    # (returning NA, instead of error, e.g. if alphabet is in a numeric cast)
+  }
+}
+
 # `IS NULL` returns a boolean expression, so you can't use it in a result set
 # the approach using casting return a bit, so you can use in a result set, but not in where.
 # Microsoft documentation:  The result of a comparison operator has the Boolean data type.
