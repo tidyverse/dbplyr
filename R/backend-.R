@@ -423,7 +423,7 @@ base_no_win <- sql_translator(
 )
 
 
-#' @name backend_dbplyr
+#' @rdname generic-db
 #' @export
 sql_translate_env <- function(con) UseMethod("sql_translate_env")
 #' @export
@@ -437,18 +437,99 @@ sql_translate_env.DBIConnection <- function(con) {
 
 # db_ methods -------------------------------------------------------------
 
+#' Database generics.
+#'
+#' The `db_` generics execute actions on the database.
+#'
+#' @details
+#' There are three families for three main purposes:
+#'
+#' *  To to shim over inconsistencies in the implementation of DBI generics.
+#'    This includes `db_list_tables()`, `db_has_table()`, `db_begin()`,
+#'    `db_commit()`, `db_rollback()`, `db_write_table()`, and `db_insert_into()`.
+#'    These exist mainly for historical reasons as they were written before much
+#'    standardisation occurred in the DBI ecosystem. Today, you should avoid
+#'    implementing methods for these generics, and instead implement the
+#'    underlying DBI S4 method.
+#'
+#' *  To perform actions that require SQL generation, and don't have an exiting
+#'    DBI generic. This includes the following functions that build and
+#'    execute a SQL command
+#'
+#'     * `db_save_query()`: `CREATE [TEMPORARY] TABLE <table> ...`
+#'     * `db_create_index()`: `CREATE INDEX <name> ON <table>`
+#'     * `db_drop_table()`: `DROP TABLE [IF EXISTS]  <table>`
+#'     * `db_analyze()`: `ANALYZE <table>`
+#'     * `db_explain()`: `EXPLAIN <table>`#'
+#'     * `db_query_field()`: computes 0-row subset of a query (to determine field types)
+#'     * `db_query_rows()`: computes number of rows that will be returned by a query.
+#'
+#' *  To perform other database actions. This inclues:
+#'
+#'     * `db_data_type()`: Calls [DBI::dbDataType()] for every column in
+#'       a data frame field and returns a vector of corresponding SQL data
+#'       types
+#'     * `db_create_indexes()` calls `call_create_index()` for each element
+#'       in a named list.
+#'     * `sql_translate_env()` which returns [sql_variant()].
+#'
+#' @details
+#' Currently, [copy_to()] is the only user of `db_begin()`, `db_commit()`,
+#' `db_rollback()`, `db_write_table()`, `db_create_indexes()`, `db_drop_table()`
+#' and `db_analyze()`. If you find yourself overriding many of these
+#' functions it may suggest that you should just override `copy_to()`
+#' instead.
+#'
+#' `db_create_table()` and `db_insert_into()` should not be used in new methods.
+#' Instead call a DBI generic directly.
+#'
+#' @return Usually a logical value indicating success. Most failures should generate
+#'  an error. However, `db_has_table()` should return `NA` if
+#'  temporary tables cannot be listed with [DBI::dbListTables()] (due to backend
+#'  API limitations for example). As a result, your methods will rely on the
+#'  backend to throw an error if a table exists when it shouldn't.
+#' @name generic-db
+#' @param con A database connection.
+#' @keywords internal
+NULL
 
+
+#' @rdname generic-db
+#' @export
+db_desc <- function(x) UseMethod("db_desc")
+#' @export
+db_desc.DBIConnection <- function(x) {
+  class(x)[[1]]
+}
+
+#' @rdname generic-db
+#' @export
+db_list_tables <- function(con) UseMethod("db_list_tables")
 #' @export
 db_list_tables.DBIConnection <- function(con) dbListTables(con)
 
+#' @rdname generic-db
+#' @export
+#' @param table A string, the table name.
+db_has_table <- function(con, table) UseMethod("db_has_table")
 #' @export
 db_has_table.DBIConnection <- function(con, table) dbExistsTable(con, table)
 
+#' @rdname generic-db
+#' @export
+#' @param fields A list of fields, as in a data frame.
+db_data_type <- function(con, fields) UseMethod("db_data_type")
+#' @export
 #' @export
 db_data_type.DBIConnection <- function(con, fields) {
   vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
 }
 
+#' @rdname generic-db
+#' @export
+db_save_query <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("db_save_query")
+}
 #' @export
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
                                         ...) {
@@ -461,17 +542,31 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
   name
 }
 
+#' @rdname generic-db
+#' @export
+db_begin <- function(con, ...) UseMethod("db_begin")
 #' @export
 db_begin.DBIConnection <- function(con, ...) {
   dbBegin(con)
 }
 
+#' @rdname generic-db
+#' @export
+db_commit <- function(con, ...) UseMethod("db_commit")
 #' @export
 db_commit.DBIConnection <- function(con, ...) dbCommit(con)
 
+#' @rdname generic-db
+#' @export
+db_rollback <- function(con, ...) UseMethod("db_rollback")
 #' @export
 db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 
+#' @rdname generic-db
+#' @export
+db_write_table <- function(con, table, types, values, temporary = FALSE, ...) {
+  UseMethod("db_write_table")
+}
 #' @export
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
   dbWriteTable(
@@ -486,6 +581,11 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
   table
 }
 
+#' @rdname generic-db
+#' @export
+db_create_table <- function(con, table, types, temporary = FALSE, ...) {
+  UseMethod("db_create_table")
+}
 #' @export
 db_create_table.DBIConnection <- function(con, table, types,
                                           temporary = TRUE, ...) {
@@ -507,11 +607,21 @@ db_create_table.DBIConnection <- function(con, table, types,
   dbExecute(con, sql)
 }
 
+#' @rdname generic-db
+#' @export
+db_insert_into <- function(con, table, values, ...) {
+  UseMethod("db_insert_into")
+}
 #' @export
 db_insert_into.DBIConnection <- function(con, table, values, ...) {
   dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
 }
 
+#' @rdname generic-db
+#' @export
+db_create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
+  UseMethod("db_create_indexes")
+}
 #' @export
 db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
                                             unique = FALSE, ...) {
@@ -523,6 +633,12 @@ db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
   }
 }
 
+#' @rdname generic-db
+#' @export
+db_create_index <- function(con, table, columns, name = NULL, unique = FALSE,
+                            ...) {
+  UseMethod("db_create_index")
+}
 #' @export
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
@@ -538,6 +654,11 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
   dbExecute(con, sql)
 }
 
+#' @rdname generic-db
+#' @export
+db_drop_table <- function(con, table, force = FALSE, ...) {
+  UseMethod("db_drop_table")
+}
 #' @export
 db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
   sql <- build_sql(
@@ -547,12 +668,20 @@ db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
   dbExecute(con, sql)
 }
 
+#' @rdname generic-db
+#' @export
+db_analyze <- function(con, table, ...) UseMethod("db_analyze")
 #' @export
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- build_sql("ANALYZE ", as.sql(table), con = con)
   dbExecute(con, sql)
 }
 
+#' @export
+#' @rdname generic-db
+db_explain <- function(con, sql, ...) {
+  UseMethod("db_explain")
+}
 #' @export
 db_explain.DBIConnection <- function(con, sql, ...) {
   exsql <- build_sql("EXPLAIN ", sql, con = con)
@@ -562,6 +691,11 @@ db_explain.DBIConnection <- function(con, sql, ...) {
   paste(out, collapse = "\n")
 }
 
+#' @rdname generic-db
+#' @export
+db_query_fields <- function(con, sql, ...) {
+  UseMethod("db_query_fields")
+}
 #' @export
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
@@ -572,6 +706,11 @@ db_query_fields.DBIConnection <- function(con, sql, ...) {
   names(res)
 }
 
+#' @rdname generic-db
+#' @export
+db_query_rows <- function(con, sql, ...) {
+  UseMethod("db_query_rows")
+}
 #' @export
 db_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- sql_subquery(con, sql, "master")
