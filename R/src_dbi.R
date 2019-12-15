@@ -35,24 +35,15 @@
 #' library(dplyr)
 #'
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-#' src <- src_dbi(con, auto_disconnect = TRUE)
-#'
 #' # Add some data
-#' copy_to(src, mtcars)
-#' src
+#' copy_to(con, mtcars)
 #' DBI::dbListTables(con)
 #'
 #' # To retrieve a single table from a source, use `tbl()`
-#' src %>% tbl("mtcars")
+#' con %>% tbl("mtcars")
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
-#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
-#'
-#' # Alternatively, you can use the `src_sqlite()` helper
-#' src2 <- src_sqlite(":memory:", create = TRUE)
-#'
-#' # If you just want a temporary in-memory database, use src_memdb()
-#' src3 <- src_memdb()
+#' con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #'
 #' # To show off the full features of dplyr's database integration,
 #' # we'll use the Lahman database. lahman_sqlite() takes care of

@@ -28,6 +28,11 @@ src_tbls.src_sql <- function(x, ...) {
 }
 
 #' @export
+src_tbls.DBIConnection <- function(x, ...) {
+  db_list_tables(x)
+}
+
+#' @export
 format.src_sql <- function(x, ...) {
   paste0(
     "src:  ", db_desc(x$con), "\n",

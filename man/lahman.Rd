@@ -9,7 +9,7 @@
 \alias{copy_lahman}
 \alias{has_lahman}
 \alias{lahman_srcs}
-\title{Cache and retrieve an \code{src_sqlite} of the Lahman baseball database.}
+\title{Cache the Lahman baseball database in various RDBMSs}
 \usage{
 lahman_sqlite(path = NULL)
 
@@ -26,7 +26,7 @@ has_lahman(type, ...)
 lahman_srcs(..., quiet = NULL)
 }
 \arguments{
-\item{...}{Other arguments passed to \code{src} on first
+\item{...}{Other arguments passed to \code{DBI::dbConnect()} on first
 load. For MySQL and PostgreSQL, the defaults assume you have a local
 server with \code{lahman} database already created.
 For \code{lahman_srcs()}, character vector of names giving srcs to generate.}
@@ -35,6 +35,9 @@ For \code{lahman_srcs()}, character vector of names giving srcs to generate.}
 
 \item{quiet}{if \code{TRUE}, suppress messages about databases failing to
 connect.}
+}
+\value{
+A \code{DBIConnection}
 }
 \description{
 This creates an interesting database using data from the Lahman baseball
@@ -47,6 +50,8 @@ for that package for documentation of the individual tables.
 \examples{
 # Connect to a local sqlite database, if already created
 \donttest{
+library(dplyr)
+
 if (has_lahman("sqlite")) {
   lahman_sqlite()
   batting <- tbl(lahman_sqlite(), "Batting")

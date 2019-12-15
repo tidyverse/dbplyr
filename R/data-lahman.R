@@ -1,4 +1,4 @@
-#' Cache and retrieve an `src_sqlite` of the Lahman baseball database.
+#' Cache the Lahman baseball database in various RDBMSs
 #'
 #' This creates an interesting database using data from the Lahman baseball
 #' data source, provided by Sean Lahman at
@@ -7,17 +7,20 @@
 #' Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
 #' for that package for documentation of the individual tables.
 #'
-#' @param ... Other arguments passed to `src` on first
+#' @param ... Other arguments passed to `DBI::dbConnect()` on first
 #'   load. For MySQL and PostgreSQL, the defaults assume you have a local
 #'   server with `lahman` database already created.
 #'   For `lahman_srcs()`, character vector of names giving srcs to generate.
 #' @param quiet if `TRUE`, suppress messages about databases failing to
 #'   connect.
+#' @return A `DBIConnection`
 #' @param type src type.
 #' @keywords internal
 #' @examples
 #' # Connect to a local sqlite database, if already created
 #' \donttest{
+#' library(dplyr)
+#'
 #' if (has_lahman("sqlite")) {
 #'   lahman_sqlite()
 #'   batting <- tbl(lahman_sqlite(), "Batting")
@@ -37,21 +40,22 @@ NULL
 #' @rdname lahman
 lahman_sqlite <- function(path = NULL) {
   path <- db_location(path, "lahman.sqlite")
-  copy_lahman(dplyr::src_sqlite(path = path, create = TRUE))
+  con <- DBI::dbConnect(RSQLite::SQLite(), path, create = TRUE)
+  copy_lahman(con)
 }
 
 #' @export
 #' @rdname lahman
 lahman_postgres <- function(dbname = "lahman", host = "localhost", ...) {
-  src <- dplyr::src_postgres(dbname, host = host, ...)
-  copy_lahman(src)
+  con <- DBI::dbConnect(RPostgreSQL::PostgreSQL(), dbname = dbname, host = host, ...)
+  copy_lahman(con)
 }
 
 #' @export
 #' @rdname lahman
 lahman_mysql <- function(dbname = "lahman", ...) {
-  src <- dplyr::src_mysql(dbname, ...)
-  copy_lahman(src)
+  con <- DBI::dbConnect(RMySQL::MySQL(), dbname = dbname, ...)
+  copy_lahman(con)
 }
 
 #' @export

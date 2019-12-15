@@ -8,7 +8,9 @@
 #' @examples
 #' \dontrun{
 #' test_register_src("df", src_df(env = new.env()))
-#' test_register_src("sqlite", src_sqlite(":memory:", create = TRUE))
+#'
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+#' test_register_src("sqlite", con)
 #'
 #' test_frame(x = 1:3, y = 3:1)
 #' test_load(mtcars)

@@ -15,18 +15,19 @@ nycflights13_sqlite <- function(path = NULL) {
   cache_computation("nycflights_sqlite", {
     path <- db_location(path, "nycflights13.sqlite")
     message("Caching nycflights db at ", path)
-    src <- dplyr::src_sqlite(path, create = TRUE)
-    copy_nycflights13(src)
+    con <- DBI::dbConnect(RSQLite::SQLite(), path, create = TRUE)
+    copy_nycflights13(con)
   })
 }
 
 #' @export
 #' @rdname nycflights13
-#' @param dbname,... Arguments passed on to [src_postgres()]
+#' @param dbname,... Arguments passed on to [DBI::dbConnect()]
 nycflights13_postgres <- function(dbname = "nycflights13", ...) {
   cache_computation("nycflights_postgres", {
     message("Caching nycflights db in postgresql db ", dbname)
-    copy_nycflights13(dplyr::src_postgres(dbname, ...))
+    con <- DBI::dbConnect(RPostgreSQL::PostgreSQL(), dbname = dbname, ...)
+    copy_nycflights13(con)
   })
 }
 

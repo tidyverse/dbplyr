@@ -27,8 +27,8 @@ test_that("head/print respects n" ,{
 })
 
 test_that("same_src distinguishes srcs", {
-  src1 <- dplyr::src_sqlite(":memory:", create = TRUE)
-  src2 <- dplyr::src_sqlite(":memory:", create = TRUE)
+  src1 <- src_dbi(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
+  src2 <- src_dbi(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
   expect_true(same_src(src1, src1))
   expect_false(same_src(src1, src2))
 

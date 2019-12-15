@@ -15,7 +15,7 @@ export PGDATA=~/db/postgres-9.5 # set this globally somewhere
 initdb -E utf8
 createdb
 createdb lahman
-createdb nycflightd13
+createdb nycflights13
 ```
 
 ## Start
