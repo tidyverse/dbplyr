@@ -11,6 +11,8 @@
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
   }
 
+  forward_old_dplyr_generics()
+
   # These are also currently defined in dplyr, and we want to avoid a warning
   # about double duplication. Conditional can be removed after update to
   # dplyr
