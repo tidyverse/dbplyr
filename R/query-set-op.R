@@ -32,8 +32,14 @@ sql_render.set_op_query <- function(query, con = NULL, ..., bare_identifier_ok =
 
 # SQL generation ----------------------------------------------------------
 
+#' @rdname generic-query
 #' @export
-sql_set_op.default <- function(con, x, y, method) {
+sql_set_op <- function(con, x, y, method) {
+  UseMethod("sql_set_op")
+}
+
+#' @export
+sql_set_op.DBIConnection <- function(con, x, y, method) {
   build_sql(
     "(", x, ")",
     "\n", sql(method), "\n",

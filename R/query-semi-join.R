@@ -44,6 +44,12 @@ sql_render.semi_join_query <- function(query, con = NULL, ..., bare_identifier_o
 
 # SQL generation ----------------------------------------------------------
 
+#' @rdname generic-query
+#' @export
+sql_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+  UseMethod("sql_semi_join")
+}
+
 #' @export
 sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
   lhs <- escape(ident("LHS"), con = con)

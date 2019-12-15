@@ -1,7 +1,5 @@
 #' Database and SQL generics.
 #'
-#' The `sql_` generics are used to build the different types of SQL queries.
-#' The default implementations in dbplyr generates ANSI 92 compliant SQL.
 #' The `db_` generics execute actions on the database. The default
 #' implementations in dbplyr typically just call the standard DBI S4
 #' method.
@@ -46,10 +44,10 @@ NULL
 #' @name backend_dbplyr
 #' @export
 db_desc <- function(x) UseMethod("db_desc")
-
-#' @name backend_dbplyr
 #' @export
-sql_translate_env <- function(con) UseMethod("sql_translate_env")
+db_desc.DBIConnection <- function(x) {
+  class(x)[[1]]
+}
 
 #' @name backend_dbplyr
 #' @export
@@ -143,34 +141,3 @@ db_query_rows <- function(con, sql, ...) {
   UseMethod("db_query_rows")
 }
 
-#' @rdname backend_dbplyr
-#' @export
-sql_select <- function(con, select, from, where = NULL, group_by = NULL,
-                       having = NULL, order_by = NULL, limit = NULL,
-                       distinct = FALSE, ...) {
-  UseMethod("sql_select")
-}
-
-#' @export
-#' @rdname backend_dbplyr
-sql_subquery <- function(con, from, name = random_table_name(), ...) {
-  UseMethod("sql_subquery")
-}
-
-#' @rdname backend_dbplyr
-#' @export
-sql_join <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
-  UseMethod("sql_join")
-}
-
-#' @rdname backend_dbplyr
-#' @export
-sql_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  UseMethod("sql_semi_join")
-}
-
-#' @rdname backend_dbplyr
-#' @export
-sql_set_op <- function(con, x, y, method) {
-  UseMethod("sql_set_op")
-}

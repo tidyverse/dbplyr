@@ -113,6 +113,14 @@ sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE)
 
 # SQL generation ----------------------------------------------------------
 
+#' @rdname generic-query
+#' @export
+sql_select <- function(con, select, from, where = NULL, group_by = NULL,
+                       having = NULL, order_by = NULL, limit = NULL,
+                       distinct = FALSE, ...) {
+  UseMethod("sql_select")
+}
+
 #' @export
 sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                group_by = NULL, having = NULL,
@@ -133,5 +141,19 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
   out$limit     <- sql_clause_limit(limit, con)
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+}
+
+#' @export
+#' @rdname generic-query
+sql_subquery <- function(con, from, name = random_table_name(), ...) {
+  UseMethod("sql_subquery")
+}
+#' @export
+sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
+  }
 }
 

@@ -9,23 +9,7 @@
 #' @include utils.R
 NULL
 
-#' @export
-sql_translate_env.DBIConnection <- function(con) {
-  sql_variant(
-    base_scalar,
-    base_agg,
-    base_win
-  )
-}
 
-#' @export
-sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
-  }
-}
 
 #' @export
 #' @rdname sql_variant
@@ -438,12 +422,21 @@ base_no_win <- sql_translator(
   count        = win_absent("COUNT")
 )
 
+
+#' @name backend_dbplyr
+#' @export
+sql_translate_env <- function(con) UseMethod("sql_translate_env")
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
+  sql_variant(
+    base_scalar,
+    base_agg,
+    base_win
+  )
+}
+
 # db_ methods -------------------------------------------------------------
 
-#' @export
-db_desc.DBIConnection <- function(x) {
-  class(x)[[1]]
-}
 
 #' @export
 db_list_tables.DBIConnection <- function(con) dbListTables(con)

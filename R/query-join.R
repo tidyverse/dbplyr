@@ -45,6 +45,12 @@ sql_render.join_query <- function(query, con = NULL, ..., bare_identifier_ok = F
 
 # SQL generation ----------------------------------------------------------
 
+#' @rdname generic-query
+#' @export
+sql_join <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+  UseMethod("sql_join")
+}
+
 #' @export
 sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   JOIN <- switch(
