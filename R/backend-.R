@@ -406,7 +406,7 @@ base_win <- sql_translator(
         win_over(
           build_sql("SUM(CASE WHEN ", x, " IS NOT NULL THEN ", w, " ELSE 0 END)"),
           win_current_group()
-        ), ")"
+        )
       )
     }
   },

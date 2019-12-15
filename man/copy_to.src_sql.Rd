@@ -4,9 +4,18 @@
 \alias{copy_to.src_sql}
 \title{Copy a local data frame to a DBI backend.}
 \usage{
-\method{copy_to}{src_sql}(dest, df, name = deparse(substitute(df)),
-  overwrite = FALSE, types = NULL, temporary = TRUE,
-  unique_indexes = NULL, indexes = NULL, analyze = TRUE, ...)
+\method{copy_to}{src_sql}(
+  dest,
+  df,
+  name = deparse(substitute(df)),
+  overwrite = FALSE,
+  types = NULL,
+  temporary = TRUE,
+  unique_indexes = NULL,
+  indexes = NULL,
+  analyze = TRUE,
+  ...
+)
 }
 \arguments{
 \item{dest}{remote data source}
