@@ -307,13 +307,15 @@ base_agg <- sql_translator(
   # translate weighted.mean
   weighted.mean = function(x, w, na.rm = FALSE) {
     if(! na.rm) {
-      build_sql(
-        "SUM(", x, " * ", w, ") / SUM(", w, ")"
+      translate_sql(
+        sum(!! x * !! w, na.rm = TRUE)/
+          sum(!! w, na.rm = TRUE), window = F
       )
-    } else {
-      build_sql(
-        "SUM( ", x, " * ", w, ") / SUM(CASE WHEN ", x, " IS NOT NULL THEN ", w, " ELSE 0 END)"
-      )
+    }
+    else {
+      translate_sql(sum(!! x * !! w)/sum(if_else(
+        is.na(!!x) | is.na(!! w), 0, !! w
+      ), na.rm = TRUE), window = F)
     }
   },
 
@@ -387,29 +389,20 @@ base_win <- sql_translator(
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
 
-  # translate weighted.mean
   weighted.mean = function(x, w, na.rm = FALSE) {
     if(! na.rm) {
-      build_sql(
-         win_over(
-          build_sql("SUM(", x, " * ", w, ")"), win_current_group()
-        ), " / ",
-        win_over(
-          build_sql("SUM(", w, ")"), win_current_group()
-        )
-      )
-    } else {
-      build_sql(
-        win_over(
-          build_sql("SUM(", x, " * ", w, ")"), win_current_group()
-        ), " / ",
-        win_over(
-          build_sql("SUM(CASE WHEN ", x, " IS NOT NULL THEN ", w, " ELSE 0 END)"),
-          win_current_group()
-        )
+      translate_sql(
+        sum(!! x * !! w, na.rm = TRUE) / sum(!! w, na.rm = TRUE),
+        window = TRUE, vars_group = win_current_group()
       )
     }
+    else {
+      translate_sql(sum(!! x * !! w, na.rm = TRUE)/sum(if_else(
+        is.na(!!x) | is.na(!! w), 0, !! w
+      ), na.rm = TRUE), window = TRUE, vars_group = win_current_group())
+    }
   },
+
 
 
   # Ordered set functions
