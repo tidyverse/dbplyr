@@ -74,6 +74,7 @@ Collate:
     'backend-odbc.R'
     'backend-oracle.R'
     'backend-postgres.R'
+    'backend-presto.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'
