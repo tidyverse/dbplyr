@@ -3,11 +3,19 @@ if (test_srcs$length() == 0) {
   test_register_src("df", dplyr::src_df(env = new.env(parent = emptyenv())))
   test_register_con("sqlite", RSQLite::SQLite(), ":memory:")
 
+  if (identical(Sys.getenv("GITHUB_ACTIONS"), "true")) {
+    test_register_con("postgres", RPostgreSQL::PostgreSQL(),
+      dbname = "test_db",
+      user = "postgres",
+      password = "password"
+    )
+  }
+
   if (identical(Sys.getenv("TRAVIS"), "true")) {
     test_register_con("postgres", RPostgreSQL::PostgreSQL(),
-      dbname = "test",
-      user = "travis",
-      password = ""
+                      dbname = "test",
+                      user = "travis",
+                      password = ""
     )
   } else {
     test_register_con("mysql", RMySQL::MySQL(),
