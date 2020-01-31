@@ -55,8 +55,8 @@ jobs:
         run: Rscript -e "install.packages('rcmdcheck')" -e "remotes::install_deps(dependencies = TRUE)"
 
       - name: Install github dplyr
-        if: matrix.config.dplyr_version == "github"
-        run: Rscript -e "install.packages('remotes')" -e "remotes::install_github('dplyr')"
+        if: matrix.config.dplyr_version == 'github'
+        run: Rscript -e "install.packages('remotes')" -e "remotes::install_github('tidyverse/dplyr')"
 
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'error')"
