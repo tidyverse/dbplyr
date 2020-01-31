@@ -6,17 +6,17 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }}/ dplyr version: ${{ matrix.config.dplyr_version }})
 
     strategy:
       fail-fast: false
       matrix:
         config:
-        - { os: ubuntu-16.04, r: '3.2'}
-        - { os: ubuntu-16.04, r: '3.3'}
-        - { os: ubuntu-16.04, r: '3.4'}
-        - { os: ubuntu-16.04, r: '3.5'}
-        - { os: ubuntu-16.04, r: '3.6'}
+        - { os: ubuntu-16.04, r: '3.2', dplyr_version: 'cran'}
+        - { os: ubuntu-16.04, r: '3.3', dplyr_version: 'cran'}
+        - { os: ubuntu-16.04, r: '3.4', dplyr_version: 'cran'}
+        - { os: ubuntu-16.04, r: '3.5', dplyr_version: 'cran'}
+        - { os: ubuntu-16.04, r: '3.6', dplyr_version: 'github'}
         - { os: ubuntu-16.04, r: '3.2', dplyr_version: 'github'}
         - { os: ubuntu-16.04, r: '3.3', dplyr_version: 'github'}
         - { os: ubuntu-16.04, r: '3.4', dplyr_version: 'github'}
