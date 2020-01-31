@@ -31,6 +31,7 @@ jobs:
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      _R_CHECK_FORCE_SUGGESTS_: false
       CRAN: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"
 
     steps:
