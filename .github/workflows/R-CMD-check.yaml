@@ -17,6 +17,11 @@ jobs:
         - { os: ubuntu-16.04, r: '3.4'}
         - { os: ubuntu-16.04, r: '3.5'}
         - { os: ubuntu-16.04, r: '3.6'}
+        - { os: ubuntu-16.04, r: '3.2', dplyr_version: 'github'}
+        - { os: ubuntu-16.04, r: '3.3', dplyr_version: 'github'}
+        - { os: ubuntu-16.04, r: '3.4', dplyr_version: 'github'}
+        - { os: ubuntu-16.04, r: '3.5', dplyr_version: 'github'}
+        - { os: ubuntu-16.04, r: '3.6', dplyr_version: 'github'}
 
     services:
       postgres:
@@ -39,7 +44,6 @@ jobs:
       - uses: r-lib/actions/setup-r@master
 
       - name: Install system dependencies
-        if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |
@@ -48,7 +52,11 @@ jobs:
           sudo -s eval "$sysreqs"
 
       - name: Install dependencies
-        run: Rscript -e "install.packages(c('remotes', 'rcmdcheck'))" -e "remotes::install_deps(dependencies = TRUE)"
+        run: Rscript -e "install.packages('rcmdcheck')" -e "remotes::install_deps(dependencies = TRUE)"
+
+      - name: Install github dplyr
+        if: matrix.config.dplyr_version == "github"
+        run: Rscript -e "install.packages('remotes')" -e "remotes::install_github('dplyr')"
 
       - name: Check
         run: Rscript -e "rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'error')"
