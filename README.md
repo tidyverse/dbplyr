@@ -11,6 +11,8 @@ status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travi
 status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
 [![Codecov test
 coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/master/graph/badge.svg)](https://codecov.io/gh/tidyverse/dbplyr?branch=master)
+[![R build
+status](https://github.com/tidyverse/dbplyr/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverse/dbplyr)
 <!-- badges: end -->
 
 ## Overview
@@ -63,7 +65,7 @@ details). Printing it just retrieves the first few rows:
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<mtcars> [?? x 11]
-#> # Database: sqlite 3.25.3 [:memory:]
+#> # Database: sqlite 3.30.1 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
@@ -76,7 +78,7 @@ mtcars2
 #>  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
 #>  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
 #> 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#> # … with more rows
+#> # ... with more rows
 ```
 
 All dplyr calls are evaluated lazily, generating SQL that is only sent

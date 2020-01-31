@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 [![Travis build status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr)
 [![CRAN status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
 [![Codecov test coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/master/graph/badge.svg)](https://codecov.io/gh/tidyverse/dbplyr?branch=master)
+[![R build status](https://github.com/tidyverse/dbplyr/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverse/dbplyr)
 <!-- badges: end -->
 
 ## Overview
