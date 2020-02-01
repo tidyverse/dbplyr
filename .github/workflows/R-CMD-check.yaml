@@ -16,7 +16,7 @@ jobs:
         - { os: ubuntu-16.04, r: '3.3', dplyr_version: 'cran dplyr'}
         - { os: ubuntu-16.04, r: '3.4', dplyr_version: 'cran dplyr'}
         - { os: ubuntu-16.04, r: '3.5', dplyr_version: 'cran dplyr'}
-        - { os: ubuntu-16.04, r: '3.6', dplyr_version: 'github dplyr'}
+        - { os: ubuntu-16.04, r: '3.6', dplyr_version: 'cran dplyr'}
         - { os: ubuntu-16.04, r: '3.2', dplyr_version: 'github dplyr'}
         - { os: ubuntu-16.04, r: '3.3', dplyr_version: 'github dplyr'}
         - { os: ubuntu-16.04, r: '3.4', dplyr_version: 'github dplyr'}
