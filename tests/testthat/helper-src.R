@@ -13,12 +13,12 @@ if (test_srcs$length() == 0) {
     test_register_con("mysql", RMySQL::MySQL(),
       dbname = "test",
       host = "localhost",
-      user = Sys.getenv("USER")
+      username = Sys.getenv("USER")
     )
     test_register_con("MariaDB", RMariaDB::MariaDB(),
       dbname = "test",
       host = "localhost",
-      user = Sys.getenv("USER")
+      username = Sys.getenv("USER")
     )
     test_register_con("postgres", RPostgreSQL::PostgreSQL(),
       dbname = "test",
