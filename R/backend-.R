@@ -313,7 +313,7 @@ base_agg <- sql_translator(
       )
     }
     else {
-      translate_sql(sum(!! x * !! w)/sum(if_else(
+      translate_sql(sum(!! x * !! w, na.rm = TRUE)/sum(if_else(
         is.na(!!x) | is.na(!! w), 0, !! w
       ), na.rm = TRUE), window = F)
     }
@@ -391,15 +391,38 @@ base_win <- sql_translator(
 
   weighted.mean = function(x, w, na.rm = FALSE) {
     if(! na.rm) {
-      translate_sql(
-        sum(!! x * !! w, na.rm = TRUE) / sum(!! w, na.rm = TRUE),
-        window = TRUE, vars_group = win_current_group()
+      build_sql(
+        win_over(
+          translate_sql(
+            sum(!! x * !! w, na.rm = TRUE),
+            window = FALSE
+          ), win_current_group()
+        ), " / ",
+        win_over(
+          translate_sql(
+            sum(!! w, na.rm = TRUE),
+            window = FALSE
+          ), win_current_group()
+        )
       )
     }
     else {
-      translate_sql(sum(!! x * !! w, na.rm = TRUE)/sum(if_else(
-        is.na(!!x) | is.na(!! w), 0, !! w
-      ), na.rm = TRUE), window = TRUE, vars_group = win_current_group())
+      build_sql(
+        win_over(
+          translate_sql(
+            sum(!! x * !! w, na.rm = TRUE),
+            window = FALSE
+          ), win_current_group()
+        ), " / ",
+        win_over(
+          translate_sql(
+            sum(if_else(
+              is.na(!! x) | is.na(!! w), 0, !! w
+            ), na.rm = TRUE),
+            window = FALSE
+          ), win_current_group()
+        )
+      )
     }
   },
 
