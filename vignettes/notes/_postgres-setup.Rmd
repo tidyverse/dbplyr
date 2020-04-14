@@ -17,7 +17,7 @@ createdb
 createdb hadley
 createdb test
 createdb lahman
-createdb nycflightd13
+createdb nycflights13
 ```
 
 ## Start
