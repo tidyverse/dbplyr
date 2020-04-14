@@ -40,5 +40,5 @@ df \%>\% arrange(x)
 df \%>\% arrange(x) \%>\% show_query()
 
 mtcars_db <- tbl_memdb(mtcars)
-mtcars_db \%>\% count(cyl) \%>\% show_query()
+mtcars_db \%>\% group_by(cyl) \%>\% summarise(n = n()) \%>\% show_query()
 }
