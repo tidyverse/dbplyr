@@ -85,6 +85,7 @@ Collate:
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.R'
+    'progress.R'
     'query-join.R'
     'query-select.R'
     'query-semi-join.R'
