@@ -590,10 +590,9 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 # Utility functions ------------------------------------------------------------
 
 unique_table_name <- local({
-  i <- 0
-
   function() {
-    i <<- i + 1
+    i <- getOption("dbplyr_table_num", 0) + 1
+    options(dbplyr_table_num = i)
     sprintf("dbplyr_%03i", i)
   }
 })
