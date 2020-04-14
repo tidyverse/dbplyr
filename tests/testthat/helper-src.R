@@ -9,7 +9,9 @@ if (test_srcs$length() == 0) {
       user = "postgres",
       password = "password"
     )
-  } else {
+  } else if (identical(Sys.getenv("GITHUB_ACTIONS"), "true")) {
+    # Only test with sqlite
+  } else  {
     test_register_con("mysql", RMySQL::MySQL(),
       dbname = "test",
       host = "localhost",
