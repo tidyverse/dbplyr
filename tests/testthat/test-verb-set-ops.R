@@ -18,6 +18,17 @@ test_that("missing columns filled with NULL", {
 
 # SQL generation ----------------------------------------------------------
 
+test_that("set ops generates correct sql", {
+  lf1 <- memdb_frame(x = 1)
+  lf2 <- memdb_frame(x = c(1, 2))
+
+  out <- lf1 %>%
+    union(lf2) %>%
+    collect()
+
+  expect_equal(out, tibble(x = c(1, 2)))
+})
+
 test_that("union and union all work for all backends", {
   df <- tibble(x = 1:10, y = x %% 2)
 
