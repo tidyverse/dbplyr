@@ -608,7 +608,7 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 
 
 dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
+dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))
+dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(x)
+dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))
