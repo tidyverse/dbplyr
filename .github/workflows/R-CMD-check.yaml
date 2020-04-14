@@ -28,15 +28,15 @@ jobs:
           - {os: ubuntu-16.04, r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
 
     services:
-       postgres:
-         image: postgres
-         ports:
-         - 5432:5432
-         env:
-           POSTGRES_USER: postgres
-           POSTGRES_PASSWORD: password
-           POSTGRES_DB: test
-         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      postgres:
+        image: postgres
+        ports:
+        - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
