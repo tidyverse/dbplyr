@@ -10,10 +10,10 @@ test_that("column order is matched", {
 
 test_that("missing columns filled with NULL", {
   df1 <- memdb_frame(x = 1)
-  df2 <- memdb_frame(y = 1)
+  df2 <- memdb_frame(y = 2)
 
-  out <- collect(union(df1, df2))
-  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 1)))
+  out <- collect(union_all(df1, df2))
+  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
 })
 
 # SQL generation ----------------------------------------------------------

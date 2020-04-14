@@ -37,7 +37,9 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.x"))
-  j2 <- collect(left_join(df1, df3, by = "x")) %>% mutate(x.y = x) %>% rename(x.x = x)
+  j2 <- collect(left_join(df1, df3, by = "x")) %>%
+    mutate(x.y = x) %>%
+    select(x.x = x, y, x.y, z)
   expect_equal(j1, j2)
 })
 
@@ -105,7 +107,7 @@ test_that("join generates correct sql", {
     inner_join(lf2, by = "x") %>%
     collect()
 
-  expect_equal(out, data.frame(x = 1, y = 2, z = 3))
+  expect_equal(out, tibble(x = 1, y = 2, z = 3))
 })
 
 test_that("semi join generates correct sql", {
@@ -116,7 +118,7 @@ test_that("semi join generates correct sql", {
   expect_equal(op_vars(lf3), c("x", "y"))
 
   out <- collect(lf3)
-  expect_equal(out, data.frame(x = 1, y = 2))
+  expect_equal(out, tibble(x = 1, y = 2))
 })
 
 
@@ -128,7 +130,7 @@ test_that("set ops generates correct sql", {
     union(lf2) %>%
     collect()
 
-  expect_equal(out, data.frame(x = c(1, 2)))
+  expect_equal(out, tibble(x = c(1, 2)))
 })
 # All sources -------------------------------------------------------------
 
@@ -356,7 +358,6 @@ test_that("set ops captures both tables", {
   out <- union(lf1, lf2) %>% sql_build()
   expect_equal(out$type, "UNION")
 })
-
 
 # ops ---------------------------------------------------------------------
 
