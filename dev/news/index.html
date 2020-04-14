@@ -17,22 +17,26 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
 <!-- Bootstrap -->
 <link href="../tidyverse.css" rel="stylesheet">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -69,7 +73,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -84,7 +88,7 @@
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.2.9000</span>
         </div>
@@ -149,7 +153,7 @@
   </ul>
 </li>
         <li>
-  <a href="https://github.com/tidyverse/dbplyr">
+  <a href="https://github.com/tidyverse/dbplyr/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -167,17 +171,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Changelog <small></small></h1>
+      <h1 data-toc-skip>Changelog <small></small></h1>
       <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
     <div id="dbplyr-development-version" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="development version">
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 </div>
     <div id="dbplyr-1-4-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.2">
 <a href="#dbplyr-1-4-2" class="anchor"></a>dbplyr 1.4.2<small> 2019-06-17 </small>
 </h1>
 <ul>
@@ -186,7 +190,7 @@
 </ul>
 </div>
     <div id="dbplyr-1-4-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.1">
 <a href="#dbplyr-1-4-1" class="anchor"></a>dbplyr 1.4.1<small> 2019-06-05 </small>
 </h1>
 <p>Minor improvements to SQL generation</p>
@@ -198,7 +202,7 @@
 </ul>
 </div>
     <div id="dbplyr-1-4-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.4.0">
 <a href="#dbplyr-1-4-0" class="anchor"></a>dbplyr 1.4.0<small> 2019-04-23 </small>
 </h1>
 <div id="breaking-changes" class="section level2">
@@ -319,7 +323,7 @@
 </div>
 </div>
     <div id="dbplyr-1-3-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.3.0">
 <a href="#dbplyr-1-3-0" class="anchor"></a>dbplyr 1.3.0<small> 2019-01-09 </small>
 </h1>
 <ul>
@@ -382,7 +386,7 @@
 </div>
 </div>
     <div id="dbplyr-1-2-2" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.2.2">
 <a href="#dbplyr-1-2-2" class="anchor"></a>dbplyr 1.2.2<small> 2018-07-25 </small>
 </h1>
 <ul>
@@ -390,7 +394,7 @@
 </ul>
 </div>
     <div id="dbplyr-1-2-1" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.2.1">
 <a href="#dbplyr-1-2-1" class="anchor"></a>dbplyr 1.2.1<small> 2018-02-19 </small>
 </h1>
 <ul>
@@ -398,7 +402,7 @@
 </ul>
 </div>
     <div id="dbplyr-1-2-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.2.0">
 <a href="#dbplyr-1-2-0" class="anchor"></a>dbplyr 1.2.0<small> 2018-01-03 </small>
 </h1>
 <div id="new-top-level-translations" class="section level2">
@@ -475,7 +479,7 @@
 </div>
 </div>
     <div id="dbplyr-1-1-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.1.0">
 <a href="#dbplyr-1-1-0" class="anchor"></a>dbplyr 1.1.0<small> 2017-06-27 </small>
 </h1>
 <div id="new-features-2" class="section level2">
@@ -506,7 +510,7 @@
 </div>
 </div>
     <div id="dbplyr-1-0-0" class="section level1">
-<h1 class="page-header">
+<h1 class="page-header" data-toc-text="1.0.0">
 <a href="#dbplyr-1-0-0" class="anchor"></a>dbplyr 1.0.0<small> 2017-06-09 </small>
 </h1>
 <div id="new-features-3" class="section level2">
@@ -515,13 +519,13 @@
 <ul>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> now work directly with DBI connections (<a href='https://github.com/tidyverse/dbplyr/issues/2423'>#2423</a>, <a href='https://github.com/tidyverse/dbplyr/issues/2576'>#2576</a>), so there is no longer a need to generate a dplyr src.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">con &lt;-<span class="st"> </span>DBI<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/DBI/man/dbConnect.html">dbConnect</a></span>(RSQLite<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/RSQLite/man/SQLite.html">SQLite</a></span>(), <span class="st">":memory:"</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(con, mtcars)</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">mtcars2 &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(con, <span class="st">"mtcars"</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7">mtcars2</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+
+<span class="no">con</span> <span class="kw">&lt;-</span> <span class="kw pkg">DBI</span><span class="kw ns">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="kw pkg">RSQLite</span><span class="kw ns">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="st">":memory:"</span>)
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="no">con</span>, <span class="no">mtcars</span>)
+
+<span class="no">mtcars2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(<span class="no">con</span>, <span class="st">"mtcars"</span>)
+<span class="no">mtcars2</span></pre></div>
 </li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/reexports.html">glimpse()</a></code> now works with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2665'>#2665</a>)</p></li>
 <li><p>dplyr has gained a basic SQL optimiser, which collapses certain nested SELECT queries into a single query (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). This will improve query execution performance for databases with less sophisticated query optimisers, and fixes certain problems with ordering and limits in subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). A big thanks goes to <a href='https://github.com/hhoeflin'>@hhoeflin</a> for figuring out this optimisation.</p></li>
@@ -578,7 +582,7 @@
 <li><p>Logical values are now translated differently depending on the backend. The default is to use “true” and “false” which is the SQL-99 standard, but not widely support. SQLite translates to “0” and “1” (<a href='https://github.com/tidyverse/dbplyr/issues/2052'>#2052</a>).</p></li>
 <li><p><code>Inf</code> and <code>-Inf</code> are correctly escaped</p></li>
 <li><p>Better test for whether or not a double is similar to an integer and hence needs a trailing 0.0 added (<a href='https://github.com/tidyverse/dbplyr/issues/2004'>#2004</a>).</p></li>
-<li><p>Quoting defaults to <code>DBI::dbEscapeString()</code> and <code><a href="https://rdrr.io/pkg/DBI/man/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> respectively.</p></li>
+<li><p>Quoting defaults to <code>DBI::dbEscapeString()</code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> respectively.</p></li>
 </ul>
 </li>
 <li><p><code>::</code> and <code>:::</code> are handled correctly (<a href='https://github.com/tidyverse/dbplyr/issues/2321'>#2321</a>)</p></li>
@@ -621,7 +625,7 @@
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> now returns it’s output invisibly (since you’re often just calling for the side-effect).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct()</a></code> reports improved variable information for SQL backends. This means that it is more likely to work in the middle of a pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/2359'>#2359</a>).</p></li>
 <li><p>Ungrouped <code><a href="https://dplyr.tidyverse.org/reference/do.html">do()</a></code> on database backends now collects all data locally first (<a href='https://github.com/tidyverse/dbplyr/issues/2392'>#2392</a>).</p></li>
-<li><p>Call <code>dbFetch()</code> instead of the deprecated <code>fetch()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2134'>#2134</a>). Use <code><a href="https://rdrr.io/pkg/DBI/man/dbExecute.html">DBI::dbExecute()</a></code> for non-query SQL commands (<a href='https://github.com/tidyverse/dbplyr/issues/1912'>#1912</a>)</p></li>
+<li><p>Call <code>dbFetch()</code> instead of the deprecated <code>fetch()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2134'>#2134</a>). Use <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html">DBI::dbExecute()</a></code> for non-query SQL commands (<a href='https://github.com/tidyverse/dbplyr/issues/1912'>#1912</a>)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/explain.html">explain()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code> now invisibly return the first argument, making them easier to use inside a pipeline.</p></li>
 <li><p><code>print.tbl_sql()</code> displays ordering (<a href='https://github.com/tidyverse/dbplyr/issues/2287'>#2287</a>) and prints table name, if known.</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/print.html">print(df, n = Inf)</a></code> and <code><a href="https://rdrr.io/r/utils/head.html">head(df, n = Inf)</a></code> now work with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2580'>#2580</a>).</p></li>
@@ -650,21 +654,9 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div id="tocnav">
-      <h2>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-        <li><a href="#dbplyr-development-version">development version</a></li>
-        <li><a href="#dbplyr-1-4-2">1.4.2</a></li>
-        <li><a href="#dbplyr-1-4-1">1.4.1</a></li>
-        <li><a href="#dbplyr-1-4-0">1.4.0</a></li>
-        <li><a href="#dbplyr-1-3-0">1.3.0</a></li>
-        <li><a href="#dbplyr-1-2-2">1.2.2</a></li>
-        <li><a href="#dbplyr-1-2-1">1.2.1</a></li>
-        <li><a href="#dbplyr-1-2-0">1.2.0</a></li>
-        <li><a href="#dbplyr-1-1-0">1.1.0</a></li>
-        <li><a href="#dbplyr-1-0-0">1.0.0</a></li>
-      </ul>
-    </div>
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>

@@ -12,13 +12,14 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
 <meta property="og:title" content="Function translation">
-<meta property="og:description" content="">
+<meta property="og:description" content="dbplyr">
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
 <meta name="twitter:card" content="summary">
 <meta name="robots" content="noindex">
@@ -33,7 +34,7 @@
   gtag('config', 'UA-115082821-1');
 </script>
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -47,7 +48,7 @@
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.2.9000</span>
         </div>
@@ -112,7 +113,7 @@
   </ul>
 </li>
         <li>
-  <a href="https://github.com/tidyverse/dbplyr">
+  <a href="https://github.com/tidyverse/dbplyr/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -130,7 +131,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Function translation</h1>
+      <h1 data-toc-skip>Function translation</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/master/vignettes/translation-function.Rmd"><code>vignettes/translation-function.Rmd</code></a></small>
@@ -141,18 +142,18 @@
     
     
 <p>There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; <code>vignette("translate-verb")</code> describes how entire verbs are translated.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dbplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dbplyr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)</pre></body></html></div>
 <p><code><a href="../reference/translate_sql.html">dbplyr::translate_sql()</a></code> powers translation of individual function calls, and I’ll use it extensively in this vignette to show what’s happening. You shouldn’t need to use it ordinary code as dbplyr takes care of the translation automatically.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>((x <span class="op">+</span><span class="st"> </span>y) <span class="op">/</span><span class="st"> </span><span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>((<span class="no">x</span> + <span class="no">y</span>) / <span class="fl">2</span>)
+<span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></pre></body></html></div>
 <p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details. You can use the various simulate helpers to see the translations used by different backends:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">^</span><span class="st"> </span>2L, <span class="dt">con =</span> <span class="kw"><a href="../reference/simulate_dbi.html">simulate_access</a></span>())</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="no">x</span> ^ <span class="fl">2L</span>)
+<span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="no">x</span> ^ <span class="fl">2L</span>, <span class="kw">con</span> <span class="kw">=</span> <span class="fu"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())
+<span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="no">x</span> ^ <span class="fl">2L</span>, <span class="kw">con</span> <span class="kw">=</span> <span class="fu"><a href="../reference/simulate_dbi.html">simulate_access</a></span>())
+<span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span></pre></body></html></div>
 <p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> loops through the data twice. R’s <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide.</p>
 <p>If you’re interested in how <code><a href="../reference/translate_sql.html">translate_sql()</a></code> is implemented, the basic techniques that underlie the implementation of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> are described in <a href="http://adv-r.hadley.nz/translation.html">“Advanced R”</a>.</p>
 <div id="basic-differences" class="section level2">
@@ -162,26 +163,26 @@
 <ul>
 <li>
 <p><code>"</code> and <code>'</code> mean different things</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># In SQLite variable names are escaped by double quotes:</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; &lt;SQL&gt; `x`</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># And strings are escaped by single quotes</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="st">"x"</span>)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; 'x'</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># In SQLite variable names are escaped by double quotes:</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="no">x</span>)
+<span class="co">#&gt; &lt;SQL&gt; `x`</span>
+<span class="co"># And strings are escaped by single quotes</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="st">"x"</span>)
+<span class="co">#&gt; &lt;SQL&gt; 'x'</span></pre></body></html></div>
 </li>
 <li>
 <p>And some functions have different argument orders:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(x, <span class="dv">5</span>, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 5, 6)</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(x, <span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; LOG(10.0, `x`)</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="no">x</span>, <span class="fl">5</span>, <span class="fl">10</span>))
+<span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 5, 6)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="no">x</span>, <span class="fl">10</span>))
+<span class="co">#&gt; &lt;SQL&gt; LOG(10.0, `x`)</span></pre></body></html></div>
 </li>
 <li>
 <p>R and SQL have different defaults for integers and reals. In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; 1.0</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(1L)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; 1</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fl">1</span>)
+<span class="co">#&gt; &lt;SQL&gt; 1.0</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fl">1L</span>)
+<span class="co">#&gt; &lt;SQL&gt; 1</span></pre></body></html></div>
 </li>
 </ul>
 </div>
@@ -209,30 +210,30 @@
 <h2 class="hasAnchor">
 <a href="#modulo-arithmetic" class="anchor"></a>Modulo arithmetic</h2>
 <p>dbplyr translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> and <code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> to their SQL equivalents but note that they are not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">  <span class="dt">x =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(10L, 10L, <span class="op">-</span>10L, <span class="op">-</span>10L), </a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">  <span class="dt">y =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(3L, <span class="op">-</span>3L, 3L, <span class="op">-</span>3L)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">)</a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">mf &lt;-<span class="st"> </span><span class="kw"><a href="../reference/memdb_frame.html">src_memdb</a></span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(df, <span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(x <span class="op">%%</span><span class="st"> </span>y, x <span class="op">%/%</span><span class="st"> </span>y)</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; # A tibble: 4 x 4</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt;       x     y `x%%y` `x%/%y`</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 1    10     3      1       3</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 2    10    -3     -2      -4</span></a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; 3   -10     3      2      -4</span></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">#&gt; 4   -10    -3     -1       3</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16">mf <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(x <span class="op">%%</span><span class="st"> </span>y, x <span class="op">%/%</span><span class="st"> </span>y)</a>
-<a class="sourceLine" id="cb7-17" data-line-number="17"><span class="co">#&gt; # Source:   lazy query [?? x 4]</span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co">#&gt; # Database: sqlite 3.29.0 [:memory:]</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="co">#&gt;       x     y `x%%y` `x%/%y`</span></a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"><span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co">#&gt; 1    10     3      1       3</span></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="co">#&gt; 2    10    -3      1      -3</span></a>
-<a class="sourceLine" id="cb7-23" data-line-number="23"><span class="co">#&gt; 3   -10     3     -1      -3</span></a>
-<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="co">#&gt; 4   -10    -3     -1       3</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">df</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(
+  <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">10L</span>, <span class="fl">10L</span>, -<span class="fl">10L</span>, -<span class="fl">10L</span>),
+  <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3L</span>, -<span class="fl">3L</span>, <span class="fl">3L</span>, -<span class="fl">3L</span>)
+)
+<span class="no">mf</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">src_memdb</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="no">df</span>, <span class="kw">overwrite</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+
+<span class="no">df</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="no">x</span> <span class="kw">%%</span> <span class="no">y</span>, <span class="no">x</span> <span class="kw">%/%</span> <span class="no">y</span>)
+<span class="co">#&gt; # A tibble: 4 x 4</span>
+<span class="co">#&gt;       x     y `x%%y` `x%/%y`</span>
+<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span>
+<span class="co">#&gt; 1    10     3      1       3</span>
+<span class="co">#&gt; 2    10    -3     -2      -4</span>
+<span class="co">#&gt; 3   -10     3      2      -4</span>
+<span class="co">#&gt; 4   -10    -3     -1       3</span>
+
+<span class="no">mf</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="no">x</span> <span class="kw">%%</span> <span class="no">y</span>, <span class="no">x</span> <span class="kw">%/%</span> <span class="no">y</span>)
+<span class="co">#&gt; # Source:   lazy query [?? x 4]</span>
+<span class="co">#&gt; # Database: sqlite 3.30.1 [:memory:]</span>
+<span class="co">#&gt;       x     y `x%%y` `x%/%y`</span>
+<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span>
+<span class="co">#&gt; 1    10     3      1       3</span>
+<span class="co">#&gt; 2    10    -3      1      -3</span>
+<span class="co">#&gt; 3   -10     3     -1      -3</span>
+<span class="co">#&gt; 4   -10    -3     -1       3</span></pre></body></html></div>
 <div id="logical-comparisons" class="section level3">
 <h3 class="hasAnchor">
 <a href="#logical-comparisons" class="anchor"></a>Logical comparisons</h3>
@@ -247,25 +248,25 @@
 <h3 class="hasAnchor">
 <a href="#aggregation" class="anchor"></a>Aggregation</h3>
 <p>All database provide translation for the basic aggregations: <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">max()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code>, <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code>. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x))</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; Warning: Missing values are always removed in SQL.</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; This warning is displayed only once per session.</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">x</span>))
+<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
+<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class="co">#&gt; This warning is displayed only once per session.</span>
+<span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">x</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>))
+<span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></pre></body></html></div>
 <p>Note that, by default, <code>translate()</code> assumes that the call is inside a <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> and generates a window translation. If you want to see the equivalent <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>/aggregation translation, use <code>window = FALSE</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dt">window =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">x</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>), <span class="kw">window</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
+<span class="co">#&gt; &lt;SQL&gt; AVG(`x`)</span></pre></body></html></div>
 </div>
 <div id="conditional-evaluation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#conditional-evaluation" class="anchor"></a>Conditional evaluation</h3>
 <p><code>if</code> and <code><a href="https://rdrr.io/r/base/switch.html">switch()</a></code> are translate to <code>CASE WHEN</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">if</span> (x <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>) <span class="st">"big"</span> <span class="cf">else</span> <span class="st">"small"</span>)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') </span><span class="re">END</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="cf">switch</span>(x, <span class="dt">a =</span> 1L, <span class="dt">b =</span> 2L, 3L))</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) </span><span class="re">END</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">if</span> (<span class="no">x</span> <span class="kw">&gt;</span> <span class="fl">5</span>) <span class="st">"big"</span> <span class="kw">else</span> <span class="st">"small"</span>)
+<span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') END</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/switch.html">switch</a></span>(<span class="no">x</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1L</span>, <span class="kw">b</span> <span class="kw">=</span> <span class="fl">2L</span>, <span class="fl">3L</span>))
+<span class="co">#&gt; &lt;SQL&gt; CASE `x` WHEN ('a') THEN (1) WHEN ('b') THEN (2) ELSE (3) END</span></pre></body></html></div>
 </div>
 <div id="string-manipulation" class="section level3">
 <h3 class="hasAnchor">
@@ -286,10 +287,10 @@
 <h2 class="hasAnchor">
 <a href="#unknown-functions" class="anchor"></a>Unknown functions</h2>
 <p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="http://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">glob</span>(x, y))</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(x <span class="op">%like%</span><span class="st"> "ab%"</span>)</a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; `x` like 'ab%'</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu">glob</span>(<span class="no">x</span>, <span class="no">y</span>))
+<span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="no">x</span> <span class="kw">%like%</span> <span class="st">"ab%"</span>)
+<span class="co">#&gt; &lt;SQL&gt; `x` like 'ab%'</span></pre></body></html></div>
 <p>See <code><a href="../articles/sql.html">vignette("sql")</a></code> for more details.</p>
 </div>
 <div id="window-functions" class="section level2">
@@ -313,19 +314,19 @@
 </li>
 </ul>
 <p>To see how individual window functions are translated to SQL, we can again use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(G))</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(G))</a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (ORDER BY `G`)</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(G, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(G))</a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">G</span>))
+<span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(<span class="no">G</span>))
+<span class="co">#&gt; &lt;SQL&gt; RANK() OVER (ORDER BY `G`)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile</a></span>(<span class="no">G</span>, <span class="fl">2</span>))
+<span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag</a></span>(<span class="no">G</span>))
+<span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></pre></body></html></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(G), <span class="dt">vars_order =</span> <span class="st">"year"</span>)</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(), <span class="dt">vars_group =</span> <span class="st">"ID"</span>)</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></a></code></pre></div>
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean</a></span>(<span class="no">G</span>), <span class="kw">vars_order</span> <span class="kw">=</span> <span class="st">"year"</span>)
+<span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rank.html">rank</a></span>(), <span class="kw">vars_group</span> <span class="kw">=</span> <span class="st">"ID"</span>)
+<span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></pre></body></html></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
 <li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://rdrr.io/r/base/rank.html">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
@@ -333,29 +334,20 @@
 <li><p>Aggregates implemented in dplyr (<code>lead</code>, <code>lag</code>, <code>nth_value</code>, <code>first_value</code>, <code>last_value</code>) have an <code>order_by</code> argument. Supply it to override the default ordering.</p></li>
 </ul>
 <p>The three options are illustrated in the snippet below:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(players,</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/ranking.html">min_rank</a></span>(yearID),</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(yearID, <span class="kw"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span>(G)),</a>
-<a class="sourceLine" id="cb14-4" data-line-number="4">  <span class="kw"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lead</a></span>(G, <span class="dt">order_by =</span> yearID)</a>
-<a class="sourceLine" id="cb14-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="no">players</span>,
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html">min_rank</a></span>(<span class="no">yearID</span>),
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by</a></span>(<span class="no">yearID</span>, <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html">cumsum</a></span>(<span class="no">G</span>)),
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lead</a></span>(<span class="no">G</span>, <span class="kw">order_by</span> <span class="kw">=</span> <span class="no">yearID</span>)
+)</pre></body></html></div>
 <p>Currently there is no way to order by multiple variables, except by setting the default ordering with <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>. This will be added in a future release.</p>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#basic-differences">Basic differences</a></li>
-      <li><a href="#known-functions">Known functions</a></li>
-      <li><a href="#modulo-arithmetic">Modulo arithmetic</a></li>
-      <li><a href="#unknown-functions">Unknown functions</a></li>
-      <li><a href="#window-functions">Window functions</a></li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
 
