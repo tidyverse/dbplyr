@@ -26,7 +26,7 @@ nycflights13_sqlite <- function(path = NULL) {
 nycflights13_postgres <- function(dbname = "nycflights13", ...) {
   cache_computation("nycflights_postgres", {
     message("Caching nycflights db in postgresql db ", dbname)
-    con <- DBI::dbConnect(RPostgres::Postgres(), dbname = dbname, ...)
+    con <- DBI::dbConnect(RPostgreSQL::PostgreSQL(), dbname = dbname, ...)
     copy_nycflights13(con)
   })
 }
