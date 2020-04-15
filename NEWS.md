@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
+  RMySQL) for its internal tests and data functions (#427).
+
 * `str_detect()`, `str_replace()` and `str_replace_all()` are now correct for postgres backends (@shosaco, #362).
 
 # dbplyr 1.4.2
