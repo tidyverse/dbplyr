@@ -23,7 +23,9 @@ test_that("custom stringr functions translated correctly", {
   trans <- function(x) {
     translate_sql(!!enquo(x), con = simulate_postgres())
   }
-  expect_equal(trans(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(trans(str_detect(x, y)), sql("`x` ~ `y`"))
+  expect_equal(trans(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(trans(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 'g')"))
 })
 
 test_that("two variable aggregates are translated correctly", {
@@ -83,3 +85,4 @@ test_that("postgres can explain (#272)", {
     NA
   ))
 })
+
