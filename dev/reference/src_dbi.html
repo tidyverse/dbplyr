@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>dplyr backend for any DBI-compatible database — src_dbi • dbplyr</title>
+<title>Database src — src_dbi • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -45,10 +45,9 @@
 
 
 
-<meta property="og:title" content="dplyr backend for any DBI-compatible database — src_dbi" />
-<meta property="og:description" content="src_dbi() is a general dplyr backend that connects to any
-DBI driver. src_memdb() connects to a temporary in-memory SQLite
-database, that's useful for testing and experimenting.
+<meta property="og:title" content="Database src — src_dbi" />
+<meta property="og:description" content="
+
 Since can generate a tbl() directly from a DBI connection we no longer
 recommend using src_dbi()." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
@@ -176,23 +175,19 @@ recommend using src_dbi()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>dplyr backend for any DBI-compatible database</h1>
+    <h1>Database src</h1>
     <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/src_dbi.R'><code>R/src_dbi.R</code></a></small>
     <div class="hidden name"><code>src_dbi.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>src_dbi()</code> is a general dplyr backend that connects to any
-DBI driver. <code><a href='memdb_frame.html'>src_memdb()</a></code> connects to a temporary in-memory SQLite
-database, that's useful for testing and experimenting.</p>
-<p>Since can generate a <code>tbl()</code> directly from a DBI connection we no longer
+    <p><a href='https://www.tidyverse.org/lifecycle/#superseded'><img src='figures/lifecycle-superseded.svg' alt='Superseded lifecycle'></a>
+
+Since can generate a <code>tbl()</code> directly from a DBI connection we no longer
 recommend using <code>src_dbi()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='co'># S3 method for src_dbi</span>
-<span class='fu'>tbl</span>(<span class='no'>src</span>, <span class='no'>from</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,121 +204,12 @@ the src is deleted? Set to <code>TRUE</code> if you initialize the connection
 the call to <code>src_dbi()</code>. Pass <code>NA</code> to auto-disconnect but print a message
 when this happens.</p></td>
     </tr>
-    <tr>
-      <th>src</th>
-      <td><p>Either a <code>src_dbi</code> or <code>DBIConnection</code></p></td>
-    </tr>
-    <tr>
-      <th>from</th>
-      <td><p>Either a string (giving a table name) or literal <code><a href='sql.html'>sql()</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Needed for compatibility with generic; currently ignored.</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An S3 object with class <code>src_dbi</code>, <code>src_sql</code>, <code>src</code>.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>All data manipulation on SQL tbls are lazy: they will not actually
-run the query or retrieve the data unless you ask for it: they all return
-a new <code>tbl_dbi</code> object. Use <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>compute()</a></code> to run the query and save the
-results in a temporary in the database, or use <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect()</a></code> to retrieve the
-results to R. You can see the query with <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code>.</p>
-<p>For best performance, the database should have an index on the variables
-that you are grouping by. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain()</a></code> to check that the database is using
-the indexes that you expect.</p>
-<p>There is one exception: <code><a href='https://dplyr.tidyverse.org/reference/do.html'>do()</a></code> is not lazy since it must pull the data
-into R.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Basic connection using DBI -------------------------------------------</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)
-
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
-
-<span class='co'># Add some data</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>con</span>, <span class='no'>mtcars</span>)
-<span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"</div><div class='input'>
-<span class='co'># To retrieve a single table from a source, use `tbl()`</span>
-<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   table&lt;mtcars&gt; [?? x 11]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4
-#&gt; </span><span style='color: #555555;'> 2</span><span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4
-#&gt; </span><span style='color: #555555;'> 3</span><span>  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
-#&gt; </span><span style='color: #555555;'> 4</span><span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
-#&gt; </span><span style='color: #555555;'> 5</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#&gt; </span><span style='color: #555555;'> 6</span><span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
-#&gt; </span><span style='color: #555555;'> 7</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#&gt; </span><span style='color: #555555;'> 8</span><span>  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
-#&gt; </span><span style='color: #555555;'> 9</span><span>  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
-#&gt; </span><span style='color: #555555;'>10</span><span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'>
-<span class='co'># You can also use pass raw SQL if you want a more sophisticated query</span>
-<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   SQL [?? x 11]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#&gt; </span><span style='color: #555555;'> 2</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#&gt; </span><span style='color: #555555;'> 3</span><span>  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3
-#&gt; </span><span style='color: #555555;'> 4</span><span>  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3
-#&gt; </span><span style='color: #555555;'> 5</span><span>  15.2     8  276.   180  3.07  3.78  18       0     0     3     3
-#&gt; </span><span style='color: #555555;'> 6</span><span>  10.4     8  472    205  2.93  5.25  18.0     0     0     3     4
-#&gt; </span><span style='color: #555555;'> 7</span><span>  10.4     8  460    215  3     5.42  17.8     0     0     3     4
-#&gt; </span><span style='color: #555555;'> 8</span><span>  14.7     8  440    230  3.23  5.34  17.4     0     0     3     4
-#&gt; </span><span style='color: #555555;'> 9</span><span>  15.5     8  318    150  2.76  3.52  16.9     0     0     3     2
-#&gt; </span><span style='color: #555555;'>10</span><span>  15.2     8  304    150  3.15  3.44  17.3     0     0     3     2
-#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'>
-<span class='co'># If you just want a temporary in-memory database, use src_memdb()</span>
-<span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>()
-
-<span class='co'># To show off the full features of dplyr's database integration,</span>
-<span class='co'># we'll use the Lahman database. lahman_sqlite() takes care of</span>
-<span class='co'># creating the database.</span>
-
-<span class='kw'>if</span> (<span class='fu'><a href='lahman.html'>has_lahman</a></span>(<span class='st'>"sqlite"</span>)) {
-<span class='no'>lahman_p</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='lahman.html'>lahman_sqlite</a></span>()
-<span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='no'>lahman_p</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"Batting"</span>)
-<span class='no'>batting</span>
-
-<span class='co'># Basic data manipulation verbs work in the same way as with a tibble</span>
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2005</span>, <span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>130</span>)
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>)
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>playerID</span>, <span class='fu'><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc</a></span>(<span class='no'>yearID</span>))
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>G</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>G</span>), <span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>())
-
-<span class='co'># There are a few exceptions. For example, databases give integer results</span>
-<span class='co'># when dividing one integer by another. Multiply by 1 to fix the problem</span>
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='no'>playerID</span>:<span class='no'>lgID</span>, <span class='no'>AB</span>, <span class='no'>R</span>, <span class='no'>G</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(
-   <span class='kw'>R_per_game1</span> <span class='kw'>=</span> <span class='no'>R</span> / <span class='no'>G</span>,
-   <span class='kw'>R_per_game2</span> <span class='kw'>=</span> <span class='no'>R</span> * <span class='fl'>1.0</span> / <span class='no'>G</span>
- )
-
-<span class='co'># All operations are lazy: they don't do anything until you request the</span>
-<span class='co'># data, either by `print()`ing it (which shows the first ten rows),</span>
-<span class='co'># or by `collect()`ing the results locally.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span>(<span class='no'>recent</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>yearID</span> <span class='kw'>&gt;</span> <span class='fl'>2010</span>))
-<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect</a></span>(<span class='no'>recent</span>))
-
-<span class='co'># You can see the query that dplyr creates with show_query()</span>
-<span class='no'>batting</span> <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>G</span> <span class='kw'>&gt;</span> <span class='fl'>0</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>playerID</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>()) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
-}</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `playerID`, COUNT() AS `n`
-#&gt; FROM `Batting`
-#&gt; WHERE (`G` &gt; 0.0)
-#&gt; GROUP BY `playerID`</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

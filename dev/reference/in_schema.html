@@ -197,7 +197,6 @@
     <pre class="examples"><div class='input'><span class='fu'>in_schema</span>(<span class='st'>"my_schema"</span>, <span class='st'>"my_table"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; my_schema.my_table</div><div class='input'>
 <span class='co'># Example using schemas with SQLite</span>
 <span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
-<span class='no'>src</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='src_dbi.html'>src_dbi</a></span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># Add auxilary schema</span>
 <span class='no'>tmp</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>()
