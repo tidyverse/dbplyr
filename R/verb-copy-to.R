@@ -40,6 +40,7 @@
 #' # in the join functions
 #' df <- tibble(cyl = c(6, 8))
 #' mtcars2 %>% semi_join(df, copy = TRUE)
+#' @importFrom dplyr copy_to
 copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
@@ -79,6 +80,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   invisible(out)
 }
 
+#' @importFrom dplyr auto_copy
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
   copy_to(x$src, as.data.frame(y), unique_table_name(), ...)

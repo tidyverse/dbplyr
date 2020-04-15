@@ -26,6 +26,7 @@
 #'   arrange(is.na(a), a)
 #'
 #' @export
+#' @importFrom dplyr arrange
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))

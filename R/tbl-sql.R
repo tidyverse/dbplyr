@@ -19,9 +19,10 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   vars <- vars %||% db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
 
-  make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
+  dplyr::make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
 }
 
+#' @importFrom dplyr same_src
 #' @export
 same_src.tbl_sql <- function(x, y) {
   inherits(y, "tbl_sql") && same_src(x$src, y$src)
@@ -29,6 +30,7 @@ same_src.tbl_sql <- function(x, y) {
 
 # Grouping methods -------------------------------------------------------------
 
+#' @importFrom dplyr group_size
 #' @export
 group_size.tbl_sql <- function(x) {
   df <- x %>%
@@ -37,6 +39,7 @@ group_size.tbl_sql <- function(x) {
   df$n
 }
 
+#' @importFrom dplyr n_groups
 #' @export
 n_groups.tbl_sql <- function(x) {
   if (length(groups(x)) == 0) return(1L)

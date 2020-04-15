@@ -1,4 +1,5 @@
 # registered onLoad
+#' @importFrom dplyr filter
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {
     stop("`.preserve` is not supported on database backends", call. = FALSE)

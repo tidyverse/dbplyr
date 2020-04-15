@@ -37,7 +37,7 @@ test_that("each argument gets implicit parens", {
 test_that("filter calls windowed versions of sql functions", {
   df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 
-  out <- df1 %>% group_by(g) %>% filter(row_number(x) < 3) %>% collect()
+  out <- df1 %>% group_by(g) %>% filter(dplyr::row_number(x) < 3) %>% collect()
   expect_equal(out$x, c(1L, 2L, 6L, 7L))
 })
 
