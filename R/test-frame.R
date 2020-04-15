@@ -7,8 +7,9 @@
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' test_register_src("df", src_df(env = new.env()))
-#' test_register_src("sqlite", src_sqlite(":memory:", create = TRUE))
+#' test_register_src("sqlite", {
+#'   DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+#' })
 #'
 #' test_frame(x = 1:3, y = 3:1)
 #' test_load(mtcars)
@@ -62,11 +63,6 @@ test_load <- function(df, name = unique_table_name(), srcs = test_srcs$get(),
 test_frame <- function(..., srcs = test_srcs$get(), ignore = character()) {
   df <- tibble(...)
   test_load(df, srcs = srcs, ignore = ignore)
-}
-
-test_frame_windowed <- function(...) {
-  # SQLite and MySQL don't support window functions
-  test_frame(..., ignore = c("sqlite", "mysql", "MariaDB"))
 }
 
 # Manage cache of testing srcs

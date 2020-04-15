@@ -7,16 +7,33 @@
 \alias{db_copy_to}
 \title{More db generics}
 \usage{
-db_compute(con, table, sql, temporary = TRUE, unique_indexes = list(),
-  indexes = list(), analyze = TRUE, ...)
+db_compute(
+  con,
+  table,
+  sql,
+  temporary = TRUE,
+  unique_indexes = list(),
+  indexes = list(),
+  analyze = TRUE,
+  ...
+)
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
 db_sql_render(con, sql, ...)
 
-db_copy_to(con, table, values, overwrite = FALSE, types = NULL,
-  temporary = TRUE, unique_indexes = NULL, indexes = NULL,
-  analyze = TRUE, ...)
+db_copy_to(
+  con,
+  table,
+  values,
+  overwrite = FALSE,
+  types = NULL,
+  temporary = TRUE,
+  unique_indexes = NULL,
+  indexes = NULL,
+  analyze = TRUE,
+  ...
+)
 }
 \description{
 These are new, so not included in dplyr for backward compatibility

@@ -5,13 +5,25 @@
 \alias{translate_sql_}
 \title{Translate an expression to sql.}
 \usage{
-translate_sql(..., con = simulate_dbi(), vars = character(),
-  vars_group = NULL, vars_order = NULL, vars_frame = NULL,
-  window = TRUE)
+translate_sql(
+  ...,
+  con = simulate_dbi(),
+  vars = character(),
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE
+)
 
-translate_sql_(dots, con = NULL, vars_group = NULL,
-  vars_order = NULL, vars_frame = NULL, window = TRUE,
-  context = list())
+translate_sql_(
+  dots,
+  con = NULL,
+  vars_group = NULL,
+  vars_order = NULL,
+  vars_frame = NULL,
+  window = TRUE,
+  context = list()
+)
 }
 \arguments{
 \item{..., dots}{Expressions to translate. \code{translate_sql()}
@@ -40,7 +52,7 @@ Translate an expression to sql.
 The base translator, \code{base_sql},
 provides custom mappings for \code{!} (to NOT), \code{&&} and \code{&} to
 \code{AND}, \code{||} and \code{|} to \code{OR}, \code{^} to \code{POWER},
-\code{\%>\%} to \code{\%}, \code{ceiling} to \code{CEIL}, \code{mean} to
+\verb{\%>\%} to \verb{\%}, \code{ceiling} to \code{CEIL}, \code{mean} to
 \code{AVG}, \code{var} to \code{VARIANCE}, \code{tolower} to \code{LOWER},
 \code{toupper} to \code{UPPER} and \code{nchar} to \code{LENGTH}.
 
@@ -48,9 +60,9 @@ provides custom mappings for \code{!} (to NOT), \code{&&} and \code{&} to
 vectors that are passed to sql.
 
 All other functions will be preserved as is. R's infix functions
-(e.g. \code{\%like\%}) will be converted to their SQL equivalents
+(e.g. \verb{\%like\%}) will be converted to their SQL equivalents
 (e.g. \code{LIKE}). You can use this to access SQL string concatenation:
-\code{||} is mapped to \code{OR}, but \code{\%||\%} is mapped to \code{||}.
+\code{||} is mapped to \code{OR}, but \verb{\%||\%} is mapped to \code{||}.
 To suppress this behaviour, and force errors immediately when dplyr doesn't
 know how to translate a function it encounters, using set the
 \code{dplyr.strict_sql} option to \code{TRUE}.

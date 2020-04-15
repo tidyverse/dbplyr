@@ -35,11 +35,13 @@ sql_paste(default_sep, f = "CONCAT_WS")
 
 sql_paste_infix(default_sep, op, cast)
 
-sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
-  window = sql_translator())
+sql_variant(
+  scalar = sql_translator(),
+  aggregate = sql_translator(),
+  window = sql_translator()
+)
 
-sql_translator(..., .funs = list(), .parent = new.env(parent =
-  emptyenv()))
+sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
 
 sql_infix(f, pad = TRUE)
 

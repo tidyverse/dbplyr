@@ -12,11 +12,10 @@ test_that("two arranges equivalent to one", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
-  out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y)
+  out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y) %>% ungroup()
   expect_match(out %>% sql_render, "^SELECT [*]\nFROM `[^`]*`\nORDER BY `y`$")
   expect_equal(out %>% collect, tibble(x = 1, y = 2))
 })
-
 
 # sql_build ---------------------------------------------------------------
 
@@ -59,13 +58,15 @@ test_that("grouped arrange order by groups when .by_group  is set to TRUE", {
 test_that("arranges captures DESC", {
   out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(desc(x))
 
-  expect_equal(op_sort(out), list(~desc(x)))
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(desc(x))))
 })
 
 test_that("multiple arranges combine", {
   out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
   out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
 
-  expect_equal(op_sort(out), list(~x, ~y))
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(x), quote(y)))
 })
 
