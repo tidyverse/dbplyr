@@ -10,7 +10,7 @@ articles:
   sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2020-04-15T17:44Z
+last_built: 2020-04-15T18:10Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles
