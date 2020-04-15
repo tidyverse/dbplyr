@@ -5,8 +5,8 @@
 #' DBI driver. `src_memdb()` connects to a temporary in-memory SQLite
 #' database, that's useful for testing and experimenting.
 #'
-#' You can generate a `tbl()` directly from the DBI connection, or
-#' go via `src_dbi()`.
+#' Since can generate a `tbl()` directly from a DBI connection we no longer
+#' recommend using `src_dbi()`.
 #'
 #' @details
 #' All data manipulation on SQL tbls are lazy: they will not actually
@@ -29,30 +29,26 @@
 #'   the call to `src_dbi()`. Pass `NA` to auto-disconnect but print a message
 #'   when this happens.
 #' @return An S3 object with class `src_dbi`, `src_sql`, `src`.
+#' @keywords internal
 #' @export
 #' @examples
 #' # Basic connection using DBI -------------------------------------------
 #' library(dplyr)
 #'
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-#' src <- src_dbi(con, auto_disconnect = TRUE)
 #'
 #' # Add some data
-#' copy_to(src, mtcars)
-#' src
+#' copy_to(con, mtcars)
 #' DBI::dbListTables(con)
 #'
 #' # To retrieve a single table from a source, use `tbl()`
-#' src %>% tbl("mtcars")
+#' con %>% tbl("mtcars")
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
-#' src %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
-#'
-#' # Alternatively, you can use the `src_sqlite()` helper
-#' src2 <- src_sqlite(":memory:", create = TRUE)
+#' con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 #'
 #' # If you just want a temporary in-memory database, use src_memdb()
-#' src3 <- src_memdb()
+#' src2 <- src_memdb()
 #'
 #' # To show off the full features of dplyr's database integration,
 #' # we'll use the Lahman database. lahman_sqlite() takes care of
@@ -92,6 +88,9 @@
 #'   show_query()
 #' }
 src_dbi <- function(con, auto_disconnect = FALSE) {
+  # Avoid registering disconnector if con can't be evaluated
+  force(con)
+
   # stopifnot(is(con, "DBIConnection"))
   if (is_false(auto_disconnect)) {
     disco <- NULL
@@ -112,6 +111,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 
 setOldClass(c("src_dbi", "src_sql", "src"))
 
+#' @importFrom dplyr tbl
 #' @export
 #' @aliases tbl_dbi
 #' @rdname src_dbi

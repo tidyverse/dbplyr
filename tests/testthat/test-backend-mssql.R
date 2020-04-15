@@ -7,8 +7,8 @@ test_that("custom scalar translated correctly", {
   }
 
   expect_equal(trans(as.logical(x)),   sql("CAST(`x` AS BIT)"))
-  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS FLOAT)"))
+  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS FLOAT)"))
   expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(trans(log(x)),          sql("LOG(`x`)"))
   expect_equal(trans(nchar(x)),        sql("LEN(`x`)"))

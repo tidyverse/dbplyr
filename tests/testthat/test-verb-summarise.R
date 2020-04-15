@@ -29,7 +29,7 @@ test_that("can't refer to freshly created variables", {
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- memdb_frame(x = 1) %>% group_by(x) %>% summarize(n = n())
+  out <- memdb_frame(x = 1) %>% group_by(x) %>% summarise(n = n())
   expect_match(out %>% sql_render, "^SELECT `x`, COUNT[(][)] AS `n`\nFROM `[^`]*`\nGROUP BY `x`$")
   expect_equal(out %>% collect, tibble(x = 1, n = 1L))
 })
