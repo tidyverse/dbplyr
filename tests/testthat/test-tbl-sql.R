@@ -81,7 +81,7 @@ test_that("ungrouped data has 1 group, with group size = nrow()", {
 })
 
 test_that("rowwise data has one group for each group", {
-  rw <- rowwise(df)
+  rw <- dplyr::rowwise(df)
   expect_equal(n_groups(rw), 30)
   expect_equal(group_size(rw), rep(1, 30))
 })
