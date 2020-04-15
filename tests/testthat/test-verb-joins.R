@@ -1,4 +1,34 @@
-context("test-joins.R")
+test_that("complete join pipeline works with SQLite", {
+  df1 <- memdb_frame(x = 1:5)
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+
+  out <- collect(left_join(df1, df2))
+  expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+})
+
+test_that("complete semi join works with SQLite", {
+  lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- memdb_frame(x = 1)
+
+  lf3 <- inner_join(lf1, lf2, by = "x")
+  expect_equal(op_vars(lf3), c("x", "y"))
+
+  out <- collect(lf3)
+  expect_equal(out, tibble(x = 1, y = 2))
+})
+
+test_that("joins with non by variables gives cross join", {
+  df1 <- memdb_frame(x = 1:5)
+  df2 <- memdb_frame(y = 1:5)
+
+  out <- collect(inner_join(df1, df2, by = character()))
+  expect_equal(nrow(out), 25)
+
+  # full_join() goes through a slightly different path and
+  # generates CROSS JOIN for reasons I don't fully understand
+  out <- collect(full_join(df1, df2, by = character()))
+  expect_equal(nrow(out), 25)
+})
 
 df1 <- memdb_frame(x = 1:5, y = 1:5)
 df2 <- memdb_frame(a = 5:1, b = 1:5)
@@ -37,7 +67,9 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.x"))
-  j2 <- collect(left_join(df1, df3, by = "x")) %>% mutate(x.y = x) %>% rename(x.x = x)
+  j2 <- collect(left_join(df1, df3, by = "x")) %>%
+    mutate(x.y = x) %>%
+    select(x.x = x, y, x.y, z)
   expect_equal(j1, j2)
 })
 
@@ -77,7 +109,7 @@ test_that("join variables always disambiguated (#2823)", {
   df1 <- dbplyr::memdb_frame(a = 1, b.x = 1, b = 1)
   df2 <- dbplyr::memdb_frame(a = 1, b = 1)
 
-  both <- collect(dplyr::left_join(df1, df2, by = "a"))
+  both <- collect(left_join(df1, df2, by = "a"))
   expect_named(both, c("a", "b.x", "b.x.x", "b.y"))
 })
 
@@ -97,234 +129,36 @@ test_that("join functions error on column not found for SQL sources #1928", {
   )
 })
 
-test_that("join generates correct sql", {
-  lf1 <- memdb_frame(x = 1, y = 2)
-  lf2 <- memdb_frame(x = 1, z = 3)
-
-  out <- lf1 %>%
-    inner_join(lf2, by = "x") %>%
-    collect()
-
-  expect_equal(out, data.frame(x = 1, y = 2, z = 3))
-})
-
-test_that("semi join generates correct sql", {
-  lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
-  lf2 <- memdb_frame(x = 1)
-
-  lf3 <- inner_join(lf1, lf2, by = "x")
-  expect_equal(op_vars(lf3), c("x", "y"))
-
-  out <- collect(lf3)
-  expect_equal(out, data.frame(x = 1, y = 2))
-})
-
-
-test_that("set ops generates correct sql", {
-  lf1 <- memdb_frame(x = 1)
-  lf2 <- memdb_frame(x = c(1, 2))
-
-  out <- lf1 %>%
-    union(lf2) %>%
-    collect()
-
-  expect_equal(out, data.frame(x = c(1, 2)))
-})
-# All sources -------------------------------------------------------------
-
-test_that("sql generated correctly for all sources", {
-  x <- test_frame(a = letters[1:7], c = 2:8)
-  y <- test_frame(a = letters[1:4], b = c(1, 2, 3, NA))
-  xy <- purrr::map2(x, y, left_join)
-
-  expect_equal_tbls(xy)
-})
-
-test_that("full join is promoted to cross join for no overlapping variables", {
-  result <- df1 %>% full_join(df2, by = character()) %>% collect()
-  expect_equal(nrow(result), 25)
-})
-
-
-# Consistency of results --------------------------------------------------
-
-test_that("consistent result of left join on key column with same name in both tables", {
-  test_l_j_by_x <- function(tbl_left, tbl_right) {
-    left_join(tbl_left, tbl_right, by = "x") %>% arrange(x, y, z)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_x)
-})
-
-test_that("consistent result of inner join on key column with same name in both tables", {
-  test_i_j_by_x <- function(tbl_left, tbl_right) {
-    inner_join(tbl_left, tbl_right, by = "x") %>% arrange(x, y, z)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_x)
-})
-
-test_that("consistent result of right join on key column with same name in both tables", {
-  test_r_j_by_x <- function(tbl_left, tbl_right) {
-    right_join(tbl_left, tbl_right, by = "x") %>% arrange(x, y, z)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), z = 1L:4L)
-
-  # SQLite does not support right joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_x)
-})
-
-test_that("consistent result of full join on key column with same name in both tables", {
-  test_f_j_by_x <- function(tbl_left, tbl_right) {
-    full_join(tbl_left, tbl_right, by = "x") %>% arrange(x, y, z)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), z = 1L:4L)
-
-  # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_x)
-})
-
-test_that("consistent result of left join on key column with different names", {
-  test_l_j_by_xl_xr <- function(tbl_left, tbl_right) {
-    left_join(tbl_left, tbl_right, by = c("xl" = "xr")) %>% arrange(xl, y, z)
-  }
-
-  tbl_left <- tibble(xl = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(xr = c(1L:3L, 5L), z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j_by_xl_xr)
-})
-
-test_that("consistent result of inner join on key column with different names", {
-  test_i_j_by_xl_xr <- function(tbl_left, tbl_right) {
-    inner_join(tbl_left, tbl_right, by = c("xl" = "xr")) %>% arrange(xl, y, z)
-  }
-
-  tbl_left <- tibble(xl = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(xr = c(1L:3L, 5L), z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j_by_xl_xr)
-})
-
-test_that("consistent result of right join on key column with different names", {
-  test_r_j_by_xl_xr <- function(tbl_left, tbl_right) {
-    right_join(tbl_left, tbl_right, by = c("xl" = "xr")) %>% arrange(xl, y, z)
-  }
-
-  tbl_left <- tibble(xl = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(xr = c(1L:3L, 5L), z = 1L:4L)
-
-  # SQLite does not support right joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j_by_xl_xr)
-})
-
-test_that("consistent result of full join on key column with different names", {
-  test_f_j_by_xl_xr <- function(tbl_left, tbl_right) {
-    full_join(tbl_left, tbl_right, by = c("xl" = "xr")) %>% arrange(xl, y, z)
-  }
-
-  tbl_left <- tibble(xl = 1L:4L, y = 1L:4L)
-  tbl_right <- tibble(xr = c(1L:3L, 5L), z = 1L:4L)
-
-  # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j_by_xl_xr)
-})
-
-test_that("consistent result of left natural join", {
-  test_l_j <- function(tbl_left, tbl_right) {
-    left_join(tbl_left, tbl_right) %>% arrange(x, y, z, w)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L, w = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_l_j)
-})
-
-test_that("consistent result of inner natural join", {
-  test_i_j <- function(tbl_left, tbl_right) {
-    inner_join(tbl_left, tbl_right) %>% arrange(x, y, z, w)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L, w = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
-
-  tbls_left <- test_load(tbl_left)
-  tbls_right <- test_load(tbl_right)
-
-  compare_tbls2(tbls_left, tbls_right, op = test_i_j)
-})
-
-test_that("consistent result of right natural join", {
-  test_r_j <- function(tbl_left, tbl_right) {
-    right_join(tbl_left, tbl_right) %>% arrange(x, y, z, w)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L, w = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
-
-  # SQLite does not support right joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_r_j)
-})
-
-test_that("consistent result of full natural join", {
-  test_f_j <- function(tbl_left, tbl_right) {
-    full_join(tbl_left, tbl_right) %>% arrange(x, y, z, w)
-  }
-
-  tbl_left <- tibble(x = 1L:4L, y = 1L:4L, w = 1L:4L)
-  tbl_right <- tibble(x = c(1L:3L, 5L), y = 1L:4L, z = 1L:4L)
-
-  # SQLite and MySQL do not support full joins
-  tbls_left <- test_load(tbl_left, ignore = c("sqlite", "mysql", "MariaDB"))
-  tbls_right <- test_load(tbl_right, ignore = c("sqlite", "mysql", "MariaDB"))
-
-  compare_tbls2(tbls_left, tbls_right, op = test_f_j)
-})
-
-
 # sql_build ---------------------------------------------------------------
 
+test_that("join verbs generate expected ops", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  ji <- inner_join(lf1, lf2)
+  expect_s3_class(ji$ops, "op_join")
+  expect_equal(ji$ops$args$type, "inner")
+
+  jl <- left_join(lf1, lf2)
+  expect_s3_class(jl$ops, "op_join")
+  expect_equal(jl$ops$args$type, "left")
+
+  jr <- right_join(lf1, lf2)
+  expect_s3_class(jr$ops, "op_join")
+  expect_equal(jr$ops$args$type, "right")
+
+  jf <- full_join(lf1, lf2)
+  expect_s3_class(jf$ops, "op_join")
+  expect_equal(jf$ops$args$type, "full")
+
+  js <- semi_join(lf1, lf2)
+  expect_s3_class(js$ops, "op_semi_join")
+  expect_equal(js$ops$args$anti, FALSE)
+
+  ja <- anti_join(lf1, lf2)
+  expect_s3_class(ja$ops, "op_semi_join")
+  expect_equal(ja$ops$args$anti, TRUE)
+})
 
 test_that("join captures both tables", {
   lf1 <- lazy_frame(x = 1, y = 2)
@@ -356,7 +190,6 @@ test_that("set ops captures both tables", {
   out <- union(lf1, lf2) %>% sql_build()
   expect_equal(out$type, "UNION")
 })
-
 
 # ops ---------------------------------------------------------------------
 

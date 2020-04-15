@@ -34,7 +34,7 @@ ident_q <- function(...) {
   x <- c_character(...)
   structure(x, class = c("ident_q", "ident", "character"))
 }
-setOldClass(c("ident_q", "ident", "character"), ident_q())
+# setOldClass(c("ident_q", "ident", "character"), ident_q())
 
 #' @export
 print.ident <- function(x, ...) cat(format(x, ...), sep = "\n")

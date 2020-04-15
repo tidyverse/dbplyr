@@ -50,7 +50,8 @@ Reprexes are easiest to understand if you create very small custom data, but if 
 ```{r}
 mtcars_db <- tbl_memdb(mtcars)
 mtcars_db %>% 
-  count(cyl) %>% 
+  group_by(cyl) %>% 
+  summarise(n = n()) %>% 
   show_query()
 ```
 
