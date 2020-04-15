@@ -96,9 +96,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   }
 
   if (!named) {
-    label_output_dataframe(labels, out, groups(.data))
+    label_output_dataframe(labels, out, group_vars(.data))
   } else {
-    label_output_list(labels, out, groups(.data))
+    label_output_list(labels, out, group_vars(.data))
   }
 }
 

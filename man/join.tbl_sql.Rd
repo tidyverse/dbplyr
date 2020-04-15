@@ -75,19 +75,31 @@
 )
 }
 \arguments{
-\item{x}{tbls to join}
+\item{x}{A pair of data frames, data frame extensions (e.g. a tibble), or
+lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
+more details.}
 
-\item{y}{tbls to join}
+\item{y}{A pair of data frames, data frame extensions (e.g. a tibble), or
+lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
+more details.}
 
-\item{by}{a character vector of variables to join by.  If \code{NULL}, the
-default, \code{*_join()} will do a natural join, using all variables with
-common names across the two tables. A message lists the variables so
-that you can check they're right (to suppress the message, simply
-explicitly list the variables that you want to join).
+\item{by}{A character vector of variables to join by.
 
-To join by different variables on x and y use a named vector.
-For example, \code{by = c("a" = "b")} will match \code{x.a} to
-\code{y.b}.}
+If \code{NULL}, the default, \verb{*_join()} will perform a natural join, using all
+variables in common across \code{x} and \code{y}. A message lists the variables so that you
+can check they're correct; suppress the message by supplying \code{by} explicitly.
+
+To join by different variables on \code{x} and \code{y}, use a named vector.
+For example, \code{by = c("a" = "b")} will match \code{x$a} to \code{y$b}.
+
+To join by multiple variables, use a vector with length > 1.
+For example, \code{by = c("a", "b")} will match \code{x$a} to \code{y$a} and \code{x$b} to
+\code{y$b}. Use a named vector to match different variables in \code{x} and \code{y}.
+For example, \code{by = c("a" = "b", "c" = "d")} will match \code{x$a} to \code{y$b} and
+\code{x$c} to \code{y$d}.
+
+To perform a cross-join, generating all combinations of \code{x} and \code{y},
+use \code{by = character()}.}
 
 \item{copy}{If \code{x} and \code{y} are not from the same data source,
 and \code{copy} is \code{TRUE}, then \code{y} will be copied into a
@@ -107,8 +119,7 @@ Should be a character vector of length 2.}
 indices for the variables in \code{by}. This may speed up the join if
 there are matching indexes in \code{x}.}
 
-\item{...}{other parameters passed onto methods, for instance, \code{na_matches}
-to control how \code{NA} values are matched.  See \link[dplyr]{join.tbl_df} for more.}
+\item{...}{Other parameters passed onto methods.}
 
 \item{sql_on}{A custom join predicate as an SQL expression. The SQL
 can refer to the \code{LHS} and \code{RHS} aliases to disambiguate
@@ -163,7 +174,7 @@ explain(top4b)
 
 people <- tbl(lahman_s, "Master")
 
-# All people in half of fame
+# All people in hall of fame
 hof <- tbl(lahman_s, "HallOfFame")
 semi_join(people, hof)
 

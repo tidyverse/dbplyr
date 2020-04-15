@@ -85,7 +85,7 @@ df <- tibble(
   x = c(10L, 10L, -10L, -10L), 
   y = c(3L, -3L, 3L, -3L)
 )
-mf <- src_memdb() %>% copy_to(df, overwrite = TRUE)
+mf <- tbl_memdb(df)
 
 df %>% mutate(x %% y, x %/% y)
 

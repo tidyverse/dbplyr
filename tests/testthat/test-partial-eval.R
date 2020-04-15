@@ -11,7 +11,7 @@ test_that("namespaced calls to dplyr functions are stripped", {
 
 test_that("use quosure environment for unevaluted formulas", {
   x <- 1
-  expect_equal(partial_eval(expr(~x)), ~1)
+  expect_equal(partial_eval(expr(~x)), quote(~1))
 })
 
 test_that("can look up inlined function", {

@@ -2,7 +2,7 @@ context("test-copy-to")
 
 
 test_that("can copy to from remote sources", {
-  df <- data.frame(x = 1:10)
+  df <- tibble(x = 1:10)
   con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con1), add = TRUE)
   df_1 <- copy_to(con1, df, "df1")

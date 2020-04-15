@@ -5,10 +5,10 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
+[![R build
+status](https://github.com/tidyverse/dbplyr/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverse/dbplyr/actions)
 [![Codecov test
 coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/master/graph/badge.svg)](https://codecov.io/gh/tidyverse/dbplyr?branch=master)
 <!-- badges: end -->
@@ -63,7 +63,7 @@ details). Printing it just retrieves the first few rows:
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<mtcars> [?? x 11]
-#> # Database: sqlite 3.25.3 [:memory:]
+#> # Database: sqlite 3.30.1 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4

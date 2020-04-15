@@ -14,7 +14,7 @@ nycflights13_postgres(dbname = "nycflights13", ...)
 
 has_nycflights13(type = c("sqlite", "postgresql"), ...)
 
-copy_nycflights13(src, ...)
+copy_nycflights13(con, ...)
 }
 \arguments{
 \item{path}{location of SQLite database file}
