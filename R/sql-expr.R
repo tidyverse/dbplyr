@@ -15,7 +15,6 @@
 #' @param .fn Function name (as string, call, or symbol)
 #' @param ... Arguments to function
 #' @keywords internal
-#' @inheritParams translate_sql
 #' @export
 #' @examples
 #' con <- simulate_dbi() # not necessary when writing translations

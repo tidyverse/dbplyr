@@ -7,11 +7,12 @@
 \method{arrange}{tbl_lazy}(.data, ..., .by_group = FALSE)
 }
 \arguments{
-\item{.data}{A tbl. All main verbs are S3 generics and provide methods
-for \code{\link[=tbl_df]{tbl_df()}}, \code{\link[dtplyr:tbl_dt]{dtplyr::tbl_dt()}} and \code{\link[dbplyr:tbl_dbi]{dbplyr::tbl_dbi()}}.}
+\item{.data}{A data frame, data frame extension (e.g. a tibble), or a
+lazy data frame (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
+more details.}
 
-\item{...}{Comma separated list of unquoted variable names, or expressions
-involving variable names. Use \code{\link[=desc]{desc()}} to sort a variable in descending order.}
+\item{...}{Variables, or functions or variables. Use desc() to sort a
+variable in descending order.}
 
 \item{.by_group}{If \code{TRUE}, will sort first by grouping variable. Applies to
 grouped data frames only.}

@@ -1,3 +1,4 @@
+#' @importFrom dplyr summarise
 #' @export
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)

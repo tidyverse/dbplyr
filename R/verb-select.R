@@ -1,5 +1,6 @@
 # select and rename -----------------------------------------------------------
 
+#' @importFrom dplyr select
 #' @export
 select.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
@@ -11,6 +12,7 @@ select.tbl_lazy <- function(.data, ...) {
   .data
 }
 
+#' @importFrom dplyr rename
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)

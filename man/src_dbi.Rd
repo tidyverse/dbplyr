@@ -33,8 +33,8 @@ An S3 object with class \code{src_dbi}, \code{src_sql}, \code{src}.
 DBI driver. \code{src_memdb()} connects to a temporary in-memory SQLite
 database, that's useful for testing and experimenting.
 
-You can generate a \code{tbl()} directly from the DBI connection, or
-go via \code{src_dbi()}.
+Since can generate a \code{tbl()} directly from a DBI connection we no longer
+recommend using \code{src_dbi()}.
 }
 \details{
 All data manipulation on SQL tbls are lazy: they will not actually
@@ -55,24 +55,19 @@ into R.
 library(dplyr)
 
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-src <- src_dbi(con, auto_disconnect = TRUE)
 
 # Add some data
-copy_to(src, mtcars)
-src
+copy_to(con, mtcars)
 DBI::dbListTables(con)
 
 # To retrieve a single table from a source, use `tbl()`
-src \%>\% tbl("mtcars")
+con \%>\% tbl("mtcars")
 
 # You can also use pass raw SQL if you want a more sophisticated query
-src \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
-
-# Alternatively, you can use the `src_sqlite()` helper
-src2 <- src_sqlite(":memory:", create = TRUE)
+con \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
 
 # If you just want a temporary in-memory database, use src_memdb()
-src3 <- src_memdb()
+src2 <- src_memdb()
 
 # To show off the full features of dplyr's database integration,
 # we'll use the Lahman database. lahman_sqlite() takes care of
@@ -112,3 +107,4 @@ batting \%>\%
   show_query()
 }
 }
+\keyword{internal}

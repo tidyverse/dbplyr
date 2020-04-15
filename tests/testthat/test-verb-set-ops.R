@@ -10,13 +10,24 @@ test_that("column order is matched", {
 
 test_that("missing columns filled with NULL", {
   df1 <- memdb_frame(x = 1)
-  df2 <- memdb_frame(y = 1)
+  df2 <- memdb_frame(y = 2)
 
-  out <- collect(union(df1, df2))
-  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 1)))
+  out <- collect(union_all(df1, df2))
+  expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
 })
 
 # SQL generation ----------------------------------------------------------
+
+test_that("set ops generates correct sql", {
+  lf1 <- memdb_frame(x = 1)
+  lf2 <- memdb_frame(x = c(1, 2))
+
+  out <- lf1 %>%
+    union(lf2) %>%
+    collect()
+
+  expect_equal(out, tibble(x = c(1, 2)))
+})
 
 test_that("union and union all work for all backends", {
   df <- tibble(x = 1:10, y = x %% 2)

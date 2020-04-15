@@ -13,10 +13,16 @@ tbl_memdb(df, name = deparse(substitute(df)))
 src_memdb()
 }
 \arguments{
-\item{...}{A set of name-value pairs. Arguments are evaluated sequentially,
-so you can refer to previously created elements. These arguments are
+\item{...}{<\code{\link[rlang:dyn-dots]{dynamic-dots}}>
+A set of name-value pairs. These arguments are
 processed with \code{\link[rlang:quos]{rlang::quos()}} and support unquote via \code{\link{!!}} and
-unquote-splice via \code{\link{!!!}}. Use \code{:=} to create columns that start with a dot.}
+unquote-splice via \code{\link{!!!}}. Use \verb{:=} to create columns that start with a dot.
+
+Arguments are evaluated sequentially.
+You can refer to previously created elements directly or using the \link{.data}
+pronoun.
+An existing \code{.data} pronoun, provided e.g. inside \code{\link[dplyr:mutate]{dplyr::mutate()}},
+is not available.}
 
 \item{df}{Data frame to copy}
 
@@ -34,5 +40,5 @@ df \%>\% arrange(x)
 df \%>\% arrange(x) \%>\% show_query()
 
 mtcars_db <- tbl_memdb(mtcars)
-mtcars_db \%>\% count(cyl) \%>\% show_query()
+mtcars_db \%>\% group_by(cyl) \%>\% summarise(n = n()) \%>\% show_query()
 }

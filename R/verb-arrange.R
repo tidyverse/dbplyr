@@ -8,6 +8,8 @@
 #' Users can override this behaviour by explicitly sorting on `is.na(x)`.
 #'
 #' @inheritParams dplyr::arrange
+#' @param ... Variables, or functions or variables. Use desc() to sort a
+#'   variable in descending order.
 #' @return An object of the same class as `.data`.
 #' @examples
 #' library(dplyr)
@@ -24,6 +26,7 @@
 #'   arrange(is.na(a), a)
 #'
 #' @export
+#' @importFrom dplyr arrange
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
