@@ -181,11 +181,12 @@
 # Temporary tables --------------------------------------------------------
 # SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
+# <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 
-mssql_temp_name <- function(name, temporary){
-  # check that name has prefixed '##' if temporary
+
+mssql_temp_name <- function(name, temporary) {
   if (temporary && substr(name, 1, 1) != "#") {
-    name <- paste0("##", name)
+    name <- paste0("#", name)
     message("Created a temporary table named: ", name)
   }
   name
