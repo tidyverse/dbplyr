@@ -174,7 +174,7 @@ explain(top4b)
 
 people <- tbl(lahman_s, "Master")
 
-# All people in half of fame
+# All people in hall of fame
 hof <- tbl(lahman_s, "HallOfFame")
 semi_join(people, hof)
 
