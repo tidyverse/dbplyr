@@ -11,8 +11,8 @@
 lazy data frame (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
 more details.}
 
-\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
-variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+\item{...}{Variables, or functions or variables. Use desc() to sort a
+variable in descending order.}
 
 \item{.by_group}{If \code{TRUE}, will sort first by grouping variable. Applies to
 grouped data frames only.}
