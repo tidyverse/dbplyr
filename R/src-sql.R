@@ -1,6 +1,6 @@
 #' Create a "sql src" object
 #'
-#' Deprecated: please use [src_dbi] instead.
+#' Deprecated: please use directly use a `DBIConnection` object instead.
 #'
 #' @keywords internal
 #' @export

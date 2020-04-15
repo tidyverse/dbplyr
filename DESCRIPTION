@@ -27,6 +27,7 @@ Imports:
     DBI (>= 1.0.0),
     dplyr (>= 0.8.0),
     glue (>= 1.2.0),
+    lifecycle,
     methods,
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
@@ -122,3 +123,4 @@ Collate:
     'verb-summarise.R'
     'verb-window.R'
     'zzz.R'
+RdMacros: lifecycle
