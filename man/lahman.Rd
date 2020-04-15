@@ -5,7 +5,6 @@
 \alias{lahman_sqlite}
 \alias{lahman_postgres}
 \alias{lahman_mysql}
-\alias{lahman_df}
 \alias{copy_lahman}
 \alias{has_lahman}
 \alias{lahman_srcs}
@@ -17,9 +16,7 @@ lahman_postgres(dbname = "lahman", host = "localhost", ...)
 
 lahman_mysql(dbname = "lahman", ...)
 
-lahman_df()
-
-copy_lahman(src, ...)
+copy_lahman(con, ...)
 
 has_lahman(type, ...)
 
@@ -47,6 +44,8 @@ for that package for documentation of the individual tables.
 \examples{
 # Connect to a local sqlite database, if already created
 \donttest{
+library(dplyr)
+
 if (has_lahman("sqlite")) {
   lahman_sqlite()
   batting <- tbl(lahman_sqlite(), "Batting")

@@ -4,7 +4,7 @@
 #' @importFrom utils head tail
 #' @importFrom glue glue
 #' @importFrom methods setOldClass
-#' @rawNamespace import(dplyr, except = c(.__C__tbl, .__C__tbl_df))
+#' @import dplyr
 #' @import rlang
 #' @import DBI
 #' @import tibble
