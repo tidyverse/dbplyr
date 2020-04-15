@@ -34,7 +34,7 @@ test_that("as.numeric()/as.double() get custom translation", {
 
 test_that("sqlite mimics two argument log", {
   translate_sqlite <- function(...) {
-    translate_sql(..., con = src_memdb()$con)
+    translate_sql(..., con = src_memdb())
   }
 
   expect_equal(translate_sqlite(log(x)), sql('LOG(`x`)'))

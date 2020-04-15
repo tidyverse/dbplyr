@@ -8,6 +8,8 @@
 #' Users can override this behaviour by explicitly sorting on `is.na(x)`.
 #'
 #' @inheritParams dplyr::arrange
+#' @param ... Variables, or functions or variables. Use desc() to sort a
+#'   variable in descending order.
 #' @return An object of the same class as `.data`.
 #' @examples
 #' library(dplyr)

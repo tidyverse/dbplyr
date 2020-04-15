@@ -1,9 +1,5 @@
 context("select")
 
-df <- as.data.frame(as.list(setNames(1:26, letters)))
-tbls <- test_load(df)
-
-
 test_that("select quotes correctly", {
   out <- memdb_frame(x = 1, y = 1) %>%
     select(x) %>%
