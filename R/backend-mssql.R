@@ -158,8 +158,8 @@
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()"),
-      str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
-      
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+
     ),
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
@@ -167,7 +167,7 @@
       # MSSQL does not have function for: cor and cov
       cor           = win_absent("cor"),
       cov           = win_absent("cov"),
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
