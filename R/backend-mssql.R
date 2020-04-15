@@ -20,7 +20,7 @@
       # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
       # TOP is expected after DISTINCT and not at the end of the query
       # e.g: SELECT TOP 100 * FROM my_table
-      assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
+      assert_that(is.numeric(limit), length(limit) == 1L, limit >= 0)
       build_sql("TOP(", as.integer(limit), ") ", con = con)
     } else if (!is.null(order_by) && bare_identifier_ok) {
       # Stop-gap measure so that a wider range of queries is supported (#276).
