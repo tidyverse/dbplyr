@@ -3,13 +3,15 @@ if (test_srcs$length() == 0) {
   test_register_src("df", dplyr::src_df(env = new.env(parent = emptyenv())))
   test_register_con("sqlite", RSQLite::SQLite(), ":memory:")
 
-  if (identical(Sys.getenv("TRAVIS"), "true")) {
+  if (identical(Sys.getenv("GITHUB_POSTGRES"), "true")) {
     test_register_con("postgres", RPostgreSQL::PostgreSQL(),
       dbname = "test",
-      user = "travis",
-      password = ""
+      user = "postgres",
+      password = "password"
     )
-  } else {
+  } else if (identical(Sys.getenv("GITHUB_ACTIONS"), "true")) {
+    # Only test with sqlite
+  } else  {
     test_register_con("mysql", RMySQL::MySQL(),
       dbname = "test",
       host = "localhost",
