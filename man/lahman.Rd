@@ -44,6 +44,8 @@ for that package for documentation of the individual tables.
 \examples{
 # Connect to a local sqlite database, if already created
 \donttest{
+library(dplyr)
+
 if (has_lahman("sqlite")) {
   lahman_sqlite()
   batting <- tbl(lahman_sqlite(), "Batting")
