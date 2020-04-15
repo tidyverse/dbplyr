@@ -204,8 +204,9 @@ use <code>test_frame()</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>test_register_src</span>(<span class='st'>"df"</span>, <span class='fu'>src_df</span>(<span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>()))
-<span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, <span class='fu'>src_sqlite</span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
+<span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, {
+  <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+})
 
 <span class='fu'>test_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>3</span>:<span class='fl'>1</span>)
 <span class='fu'>test_load</span>(<span class='no'>mtcars</span>)

@@ -189,13 +189,14 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.data</th>
-      <td><p>A tbl. All main verbs are S3 generics and provide methods
-for <code><a href='https://dplyr.tidyverse.org/reference/tbl_df.html'>tbl_df()</a></code>, <code>dtplyr::tbl_dt()</code> and <code><a href='src_dbi.html'>dbplyr::tbl_dbi()</a></code>.</p></td>
+      <td><p>A data frame, data frame extension (e.g. a tibble), or a
+lazy data frame (e.g. from dbplyr or dtplyr). See <em>Methods</em>, below, for
+more details.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Comma separated list of unquoted variable names, or expressions
-involving variable names. Use <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc()</a></code> to sort a variable in descending order.</p></td>
+      <td><p>Variables, or functions or variables. Use desc() to sort a
+variable in descending order.</p></td>
     </tr>
     <tr>
       <th>.by_group</th>
@@ -225,38 +226,38 @@ Users can override this behaviour by explicitly sorting on <code><a href='https:
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_001&gt; [?? x 1]
-#&gt; # Database:   sqlite 3.30.1 [:memory:]
-#&gt; # Ordered by: a
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 1]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Ordered by: a</span><span>
 #&gt;       a
-#&gt;   &lt;dbl&gt;
-#&gt; 1     1
-#&gt; 2     2
-#&gt; 3     3
-#&gt; 4     4</div><div class='input'>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1
+#&gt; </span><span style='color: #555555;'>2</span><span>     2
+#&gt; </span><span style='color: #555555;'>3</span><span>     3
+#&gt; </span><span style='color: #555555;'>4</span><span>     4</div><div class='input'>
 <span class='co'># NA sorted first</span>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_002&gt; [?? x 1]
-#&gt; # Database:   sqlite 3.30.1 [:memory:]
-#&gt; # Ordered by: a
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>a</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_002&gt; [?? x 1]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Ordered by: a</span><span>
 #&gt;       a
-#&gt;   &lt;dbl&gt;
-#&gt; 1    NA
-#&gt; 2     2
-#&gt; 3     3
-#&gt; 4     4</div><div class='input'>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>     2
+#&gt; </span><span style='color: #555555;'>3</span><span>     3
+#&gt; </span><span style='color: #555555;'>4</span><span>     4</div><div class='input'>
 <span class='co'># override by sorting on is.na() first</span>
 <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='no'>a</span>), <span class='no'>a</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_003&gt; [?? x 1]
-#&gt; # Database:   sqlite 3.30.1 [:memory:]
-#&gt; # Ordered by: is.na(a), a
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='no'>a</span>), <span class='no'>a</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_003&gt; [?? x 1]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Ordered by: is.na(a), a</span><span>
 #&gt;       a
-#&gt;   &lt;dbl&gt;
-#&gt; 1     2
-#&gt; 2     3
-#&gt; 3     4
-#&gt; 4    NA</div><div class='input'>
-</div></pre>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     2
+#&gt; </span><span style='color: #555555;'>2</span><span>     3
+#&gt; </span><span style='color: #555555;'>3</span><span>     4
+#&gt; </span><span style='color: #555555;'>4</span><span>    </span><span style='color: #BB0000;'>NA</span><span></div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -180,18 +180,18 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 </div>
-    <div id="dbplyr-1-4-2" class="section level1">
+    <div id="dbplyr-142" class="section level1">
 <h1 class="page-header" data-toc-text="1.4.2">
-<a href="#dbplyr-1-4-2" class="anchor"></a>dbplyr 1.4.2<small> 2019-06-17 </small>
+<a href="#dbplyr-142" class="anchor"></a>dbplyr 1.4.2<small> 2019-06-17 </small>
 </h1>
 <ul>
 <li><p>Fix bug when partially evaluating unquoting quosure containing a single symbol (<a href='https://github.com/tidyverse/dbplyr/issues/317'>#317</a>)</p></li>
 <li><p>Fixes for rlang and dpylr compatibility.</p></li>
 </ul>
 </div>
-    <div id="dbplyr-1-4-1" class="section level1">
+    <div id="dbplyr-141" class="section level1">
 <h1 class="page-header" data-toc-text="1.4.1">
-<a href="#dbplyr-1-4-1" class="anchor"></a>dbplyr 1.4.1<small> 2019-06-05 </small>
+<a href="#dbplyr-141" class="anchor"></a>dbplyr 1.4.1<small> 2019-06-05 </small>
 </h1>
 <p>Minor improvements to SQL generation</p>
 <ul>
@@ -201,9 +201,9 @@
 <li><p>Window functions now translated correctly for Hive (<a href='https://github.com/tidyverse/dbplyr/issues/293'>#293</a>, <a href='https://github.com/cderv'>@cderv</a>).</p></li>
 </ul>
 </div>
-    <div id="dbplyr-1-4-0" class="section level1">
+    <div id="dbplyr-140" class="section level1">
 <h1 class="page-header" data-toc-text="1.4.0">
-<a href="#dbplyr-1-4-0" class="anchor"></a>dbplyr 1.4.0<small> 2019-04-23 </small>
+<a href="#dbplyr-140" class="anchor"></a>dbplyr 1.4.0<small> 2019-04-23 </small>
 </h1>
 <div id="breaking-changes" class="section level2">
 <h2 class="hasAnchor">
@@ -252,7 +252,7 @@
 <a href="#sql-simulation" class="anchor"></a>SQL simulation</h3>
 <p>SQL simulation makes it possible to see what dbplyr will translate SQL to, without having an active database connection, and is used for testing and generating reprexes.</p>
 <ul>
-<li><p>SQL simulation has been overhauled. It now works reliably, is better documented, and always uses ANSI escaping (i.e. <code>`</code> for field names and <code>'</code> for strings).</p></li>
+<li><p>SQL simulation has been overhauled. It now works reliably, is better documented, and always uses ANSI escaping (i.e. <code>`</code> for field names and <code>'</code> for strings).</p></li>
 <li><p><code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code> now actually puts a <code><a href="https://dplyr.tidyverse.org/reference/src.html">dbplyr::src</a></code> in the <code>$src</code> field. This shouldn’t affect any downstream code unless you were previously working around this weird difference between <code>tbl_lazy</code> and <code>tbl_sql</code> classes. It also includes the <code>src</code> class in its class, and when printed, shows the generated SQL (<a href='https://github.com/tidyverse/dbplyr/issues/111'>#111</a>).</p></li>
 </ul>
 </div>
@@ -322,9 +322,9 @@
 </ul>
 </div>
 </div>
-    <div id="dbplyr-1-3-0" class="section level1">
+    <div id="dbplyr-130" class="section level1">
 <h1 class="page-header" data-toc-text="1.3.0">
-<a href="#dbplyr-1-3-0" class="anchor"></a>dbplyr 1.3.0<small> 2019-01-09 </small>
+<a href="#dbplyr-130" class="anchor"></a>dbplyr 1.3.0<small> 2019-01-09 </small>
 </h1>
 <ul>
 <li>Now supports for dplyr 0.8.0 (<a href='https://github.com/tidyverse/dbplyr/issues/190'>#190</a>) and R 3.1.0</li>
@@ -347,26 +347,30 @@
 <li><p><code>case_when</code> now translates with a ELSE clause if a formula of the form <code>TRUE~&lt;RHS&gt;</code> is provided . (<a href='https://github.com/cderv'>@cderv</a>, <a href='https://github.com/tidyverse/dbplyr/issues/112'>#112</a>)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/cumall.html">cummean()</a></code> now generates <code>AVG()</code> not <code>MEAN()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</p></li>
 <li><p><code>str_detect()</code> now uses correct parameter order (<a href='https://github.com/tidyverse/dbplyr/issues/3397'>#3397</a>)</p></li>
-<li>MS SQL
+<li>
+<p>MS SQL</p>
 <ul>
 <li>Cumulative summary functions now work (<a href='https://github.com/tidyverse/dbplyr/issues/157'>#157</a>)</li>
 <li>
 <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code> uses <code>CASE WHEN</code> instead of <code>IIF</code>; this allows more complex operations, such as <code><a href="https://rdrr.io/r/base/match.html">%in%</a></code>, to work properly (<a href='https://github.com/tidyverse/dbplyr/issues/93'>#93</a>)</li>
 </ul>
 </li>
-<li>Oracle
+<li>
+<p>Oracle</p>
 <ul>
 <li>Custom <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> now only drops tables if they exist (<a href='https://github.com/tidyverse/dbplyr/issues/3306'>#3306</a>)</li>
 <li>Custom <code><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3493'>#3493</a>)</li>
 <li>Custom <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3471'>#3471</a>)</li>
 </ul>
 </li>
-<li>SQLite
+<li>
+<p>SQLite</p>
 <ul>
 <li>Correct translation for <code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code>/<code><a href="https://rdrr.io/r/base/double.html">as.double()</a></code> (<a href='https://github.com/chris-park'>@chris-park</a>, <a href='https://github.com/tidyverse/dbplyr/issues/171'>#171</a>).</li>
 </ul>
 </li>
-<li>Redshift
+<li>
+<p>Redshift</p>
 <ul>
 <li>
 <code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> translation improved (<a href='https://github.com/tidyverse/dbplyr/issues/3339'>#3339</a>)</li>
@@ -385,25 +389,25 @@
 </ul>
 </div>
 </div>
-    <div id="dbplyr-1-2-2" class="section level1">
+    <div id="dbplyr-122" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.2">
-<a href="#dbplyr-1-2-2" class="anchor"></a>dbplyr 1.2.2<small> 2018-07-25 </small>
+<a href="#dbplyr-122" class="anchor"></a>dbplyr 1.2.2<small> 2018-07-25 </small>
 </h1>
 <ul>
 <li>R CMD check fixes</li>
 </ul>
 </div>
-    <div id="dbplyr-1-2-1" class="section level1">
+    <div id="dbplyr-121" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.1">
-<a href="#dbplyr-1-2-1" class="anchor"></a>dbplyr 1.2.1<small> 2018-02-19 </small>
+<a href="#dbplyr-121" class="anchor"></a>dbplyr 1.2.1<small> 2018-02-19 </small>
 </h1>
 <ul>
 <li>Forward compatibility fixes for rlang 0.2.0</li>
 </ul>
 </div>
-    <div id="dbplyr-1-2-0" class="section level1">
+    <div id="dbplyr-120" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.0">
-<a href="#dbplyr-1-2-0" class="anchor"></a>dbplyr 1.2.0<small> 2018-01-03 </small>
+<a href="#dbplyr-120" class="anchor"></a>dbplyr 1.2.0<small> 2018-01-03 </small>
 </h1>
 <div id="new-top-level-translations" class="section level2">
 <h2 class="hasAnchor">
@@ -478,9 +482,9 @@
 </ul>
 </div>
 </div>
-    <div id="dbplyr-1-1-0" class="section level1">
+    <div id="dbplyr-110" class="section level1">
 <h1 class="page-header" data-toc-text="1.1.0">
-<a href="#dbplyr-1-1-0" class="anchor"></a>dbplyr 1.1.0<small> 2017-06-27 </small>
+<a href="#dbplyr-110" class="anchor"></a>dbplyr 1.1.0<small> 2017-06-27 </small>
 </h1>
 <div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
@@ -504,14 +508,14 @@
 <li><p>PostgreSQL gains a better translation for <code><a href="https://rdrr.io/r/base/Round.html">round()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/60'>#60</a>).</p></li>
 <li><p>Added custom <code>db_analyze_table()</code> for MS SQL, Oracle, Hive and Impala (<a href='https://github.com/edgararuiz'>@edgararuiz</a>)</p></li>
 <li><p>Added support for <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> for aggregate and window functions (<a href='https://github.com/tidyverse/dbplyr/issues/2887'>#2887</a>) (<a href='https://github.com/edgararuiz'>@edgararuiz</a>)</p></li>
-<li><p>You can now use the magrittr pipe within expressions, e.g. <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(mtcars, cyl %&gt;% as.character())</a></code>.</p></li>
+<li><p>You can now use the magrittr pipe within expressions, e.g. <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(mtcars, cyl %&gt;% as.character())</a></code>.</p></li>
 <li><p>If a translation was supplied for a summarise function, but not for the equivalent windowed variant, the expression would be translated to <code>NULL</code> with a warning. Now <code><a href="../reference/sql_variant.html">sql_variant()</a></code> checks that all aggregate functions have matching window functions so that correct translations or clean errors will be generated (<a href='https://github.com/tidyverse/dbplyr/issues/2887'>#2887</a>)</p></li>
 </ul>
 </div>
 </div>
-    <div id="dbplyr-1-0-0" class="section level1">
+    <div id="dbplyr-100" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.0">
-<a href="#dbplyr-1-0-0" class="anchor"></a>dbplyr 1.0.0<small> 2017-06-09 </small>
+<a href="#dbplyr-100" class="anchor"></a>dbplyr 1.0.0<small> 2017-06-09 </small>
 </h1>
 <div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">

@@ -194,10 +194,15 @@ data frame in R, it creates a table in <code>src_memdb()</code>.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>...</th>
-      <td><p>A set of name-value pairs. Arguments are evaluated sequentially,
-so you can refer to previously created elements. These arguments are
+      <td><p>&lt;<code><a href='https://rlang.r-lib.org/reference/dyn-dots.html'>dynamic-dots</a></code>&gt;
+A set of name-value pairs. These arguments are
 processed with <code><a href='https://rlang.r-lib.org/reference/nse-defuse.html'>rlang::quos()</a></code> and support unquote via <code>!!</code> and
-unquote-splice via <code>!!!</code>. Use <code>:=</code> to create columns that start with a dot.</p></td>
+unquote-splice via <code>!!!</code>. Use <code>:=</code> to create columns that start with a dot.</p>
+<p>Arguments are evaluated sequentially.
+You can refer to previously created elements directly or using the .data
+pronoun.
+An existing <code>.data</code> pronoun, provided e.g. inside <code><a href='https://dplyr.tidyverse.org/reference/mutate.html'>dplyr::mutate()</a></code>,
+is not available.</p></td>
     </tr>
     <tr>
       <th>df</th>
@@ -214,26 +219,26 @@ unlikely to conflict with an existing table.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>memdb_frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
-<span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; # Source:     table&lt;dbplyr_005&gt; [?? x 2]
-#&gt; # Database:   sqlite 3.30.1 [:memory:]
-#&gt; # Ordered by: x
+<span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_005&gt; [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
 #&gt;          x       y
-#&gt;      &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 0.00740 0.418  
-#&gt;  2 0.0201  0.751  
-#&gt;  3 0.0280  0.383  
-#&gt;  4 0.0281  0.00450
-#&gt;  5 0.0312  0.165  
-#&gt;  6 0.0342  0.0115 
-#&gt;  7 0.0514  0.403  
-#&gt;  8 0.0586  0.164  
-#&gt;  9 0.0637  0.775  
-#&gt; 10 0.0652  0.464  
-#&gt; # … with more rows</div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.007</span><span style='text-decoration: underline;'>40</span><span> 0.418  
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.020</span><span style='text-decoration: underline;'>1</span><span>  0.751  
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.028</span><span style='text-decoration: underline;'>0</span><span>  0.383  
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.028</span><span style='text-decoration: underline;'>1</span><span>  0.004</span><span style='text-decoration: underline;'>50</span><span>
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.031</span><span style='text-decoration: underline;'>2</span><span>  0.165  
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.034</span><span style='text-decoration: underline;'>2</span><span>  0.011</span><span style='text-decoration: underline;'>5</span><span> 
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.051</span><span style='text-decoration: underline;'>4</span><span>  0.403  
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.058</span><span style='text-decoration: underline;'>6</span><span>  0.164  
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.063</span><span style='text-decoration: underline;'>7</span><span>  0.775  
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.065</span><span style='text-decoration: underline;'>2</span><span>  0.464  
+#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'><span class='no'>df</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='no'>x</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *
 #&gt; FROM `dbplyr_005`
 #&gt; ORDER BY `x`</div><div class='input'>
-<span class='no'>mtcars_db</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl_memdb</span>(<span class='no'>mtcars</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Table `mtcars` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='no'>mtcars_db</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tally.html'>count</a></span>(<span class='no'>cyl</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'mtcars_db' not found</span></div></pre>
+<span class='no'>mtcars_db</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl_memdb</span>(<span class='no'>mtcars</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Table `mtcars` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='no'>mtcars_db</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>cyl</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>()) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'mtcars_db' not found</span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

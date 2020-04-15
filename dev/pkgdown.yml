@@ -1,4 +1,4 @@
-pandoc: '2.2'
+pandoc: 2.7.3
 pkgdown: 1.5.1.9000
 pkgdown_sha: fcc120d996055519db89f37f0097af7ce25d6641
 articles:
@@ -10,7 +10,7 @@ articles:
   sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2020-04-14T22:33Z
+last_built: 2020-04-15T13:45Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles

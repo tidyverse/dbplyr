@@ -214,7 +214,7 @@
   <span class="kw">x</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">10L</span>, <span class="fl">10L</span>, -<span class="fl">10L</span>, -<span class="fl">10L</span>),
   <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">3L</span>, -<span class="fl">3L</span>, <span class="fl">3L</span>, -<span class="fl">3L</span>)
 )
-<span class="no">mf</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">src_memdb</a></span>() <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="no">df</span>, <span class="kw">overwrite</span> <span class="kw">=</span> <span class="fl">TRUE</span>)
+<span class="no">mf</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span>(<span class="no">df</span>)
 
 <span class="no">df</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="no">x</span> <span class="kw">%%</span> <span class="no">y</span>, <span class="no">x</span> <span class="kw">%/%</span> <span class="no">y</span>)
 <span class="co">#&gt; # A tibble: 4 x 4</span>

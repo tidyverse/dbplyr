@@ -49,8 +49,8 @@
 <meta property="og:description" content="src_dbi() is a general dplyr backend that connects to any
 DBI driver. src_memdb() connects to a temporary in-memory SQLite
 database, that's useful for testing and experimenting.
-You can generate a tbl() directly from the DBI connection, or
-go via src_dbi()." />
+Since can generate a tbl() directly from a DBI connection we no longer
+recommend using src_dbi()." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -185,8 +185,8 @@ go via src_dbi()." />
     <p><code>src_dbi()</code> is a general dplyr backend that connects to any
 DBI driver. <code><a href='memdb_frame.html'>src_memdb()</a></code> connects to a temporary in-memory SQLite
 database, that's useful for testing and experimenting.</p>
-<p>You can generate a <code>tbl()</code> directly from the DBI connection, or
-go via <code>src_dbi()</code>.</p>
+<p>Since can generate a <code>tbl()</code> directly from a DBI connection we no longer
+recommend using <code>src_dbi()</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
@@ -244,49 +244,44 @@ into R.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)
 
 <span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw pkg'>RSQLite</span><span class='kw ns'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
-<span class='no'>src</span> <span class='kw'>&lt;-</span> <span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># Add some data</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>src</span>, <span class='no'>mtcars</span>)
-<span class='no'>src</span></div><div class='output co'>#&gt; src:  sqlite 3.30.1 [:memory:]
-#&gt; tbls: mtcars, sqlite_stat1, sqlite_stat4</div><div class='input'><span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"</div><div class='input'>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>con</span>, <span class='no'>mtcars</span>)
+<span class='kw pkg'>DBI</span><span class='kw ns'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbListTables.html'>dbListTables</a></span>(<span class='no'>con</span>)</div><div class='output co'>#&gt; [1] "mtcars"       "sqlite_stat1" "sqlite_stat4"</div><div class='input'>
 <span class='co'># To retrieve a single table from a source, use `tbl()`</span>
-<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]
-#&gt; # Database: sqlite 3.30.1 [:memory:]
+<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='st'>"mtcars"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   table&lt;mtcars&gt; [?? x 11]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4
-#&gt;  2  21       6  160    110  3.9   2.88  17.0     0     1     4     4
-#&gt;  3  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
-#&gt;  4  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
-#&gt;  5  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#&gt;  6  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
-#&gt;  7  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#&gt;  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
-#&gt;  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
-#&gt; 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#&gt; # … with more rows</div><div class='input'>
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4
+#&gt; </span><span style='color: #555555;'> 2</span><span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4
+#&gt; </span><span style='color: #555555;'> 3</span><span>  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
+#&gt; </span><span style='color: #555555;'> 4</span><span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
+#&gt; </span><span style='color: #555555;'> 5</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
+#&gt; </span><span style='color: #555555;'> 6</span><span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
+#&gt; </span><span style='color: #555555;'> 7</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
+#&gt; </span><span style='color: #555555;'> 8</span><span>  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
+#&gt; </span><span style='color: #555555;'> 9</span><span>  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
+#&gt; </span><span style='color: #555555;'>10</span><span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
+#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'>
 <span class='co'># You can also use pass raw SQL if you want a more sophisticated query</span>
-<span class='no'>src</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; # Source:   SQL [?? x 11]
-#&gt; # Database: sqlite 3.30.1 [:memory:]
+<span class='no'>con</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"SELECT * FROM mtcars WHERE cyl = 8"</span>))</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   SQL [?? x 11]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt;  1  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#&gt;  2  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#&gt;  3  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3
-#&gt;  4  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3
-#&gt;  5  15.2     8  276.   180  3.07  3.78  18       0     0     3     3
-#&gt;  6  10.4     8  472    205  2.93  5.25  18.0     0     0     3     4
-#&gt;  7  10.4     8  460    215  3     5.42  17.8     0     0     3     4
-#&gt;  8  14.7     8  440    230  3.23  5.34  17.4     0     0     3     4
-#&gt;  9  15.5     8  318    150  2.76  3.52  16.9     0     0     3     2
-#&gt; 10  15.2     8  304    150  3.15  3.44  17.3     0     0     3     2
-#&gt; # … with more rows</div><div class='input'>
-<span class='co'># Alternatively, you can use the `src_sqlite()` helper</span>
-<span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/src_dbi.html'>src_sqlite</a></span>(<span class='st'>":memory:"</span>, <span class='kw'>create</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
+#&gt; </span><span style='color: #555555;'> 2</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
+#&gt; </span><span style='color: #555555;'> 3</span><span>  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3
+#&gt; </span><span style='color: #555555;'> 4</span><span>  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3
+#&gt; </span><span style='color: #555555;'> 5</span><span>  15.2     8  276.   180  3.07  3.78  18       0     0     3     3
+#&gt; </span><span style='color: #555555;'> 6</span><span>  10.4     8  472    205  2.93  5.25  18.0     0     0     3     4
+#&gt; </span><span style='color: #555555;'> 7</span><span>  10.4     8  460    215  3     5.42  17.8     0     0     3     4
+#&gt; </span><span style='color: #555555;'> 8</span><span>  14.7     8  440    230  3.23  5.34  17.4     0     0     3     4
+#&gt; </span><span style='color: #555555;'> 9</span><span>  15.5     8  318    150  2.76  3.52  16.9     0     0     3     2
+#&gt; </span><span style='color: #555555;'>10</span><span>  15.2     8  304    150  3.15  3.44  17.3     0     0     3     2
+#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'>
 <span class='co'># If you just want a temporary in-memory database, use src_memdb()</span>
-<span class='no'>src3</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>()
+<span class='no'>src2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>()
 
 <span class='co'># To show off the full features of dplyr's database integration,</span>
 <span class='co'># we'll use the Lahman database. lahman_sqlite() takes care of</span>
@@ -328,7 +323,7 @@ into R.</p>
 #&gt; SELECT `playerID`, COUNT() AS `n`
 #&gt; FROM `Batting`
 #&gt; WHERE (`G` &gt; 0.0)
-#&gt; GROUP BY `playerID`</div></pre>
+#&gt; GROUP BY `playerID`</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

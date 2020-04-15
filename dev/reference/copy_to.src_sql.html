@@ -269,32 +269,32 @@ new table so that the query optimiser has useful information.</p></td>
 <span class='no'>mtcars</span>$<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span>(<span class='no'>mtcars</span>)
 <span class='no'>mtcars2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>() <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>mtcars</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"model"</span>), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"Hornet 4 Drive"</span>)</div><div class='output co'>#&gt; # Source:   lazy query [?? x 12]
-#&gt; # Database: sqlite 3.30.1 [:memory:]
+<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"Hornet 4 Drive"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 12]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
 #&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb model       
-#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       
-#&gt; 1  21.4     6   258   110  3.08  3.22  19.4     1     0     3     1 Hornet 4 Dr…</div><div class='input'>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       
+#&gt; </span><span style='color: #555555;'>1</span><span>  21.4     6   258   110  3.08  3.22  19.4     1     0     3     1 Hornet 4 Dr…</div><div class='input'>
 <span class='no'>cyl8</span> <span class='kw'>&lt;-</span> <span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>cyl</span> <span class='kw'>==</span> <span class='fl'>8</span>)
 <span class='no'>cyl8_cached</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>(), <span class='no'>cyl8</span>)
 
 <span class='co'># copy_to is called automatically if you set copy = TRUE</span>
 <span class='co'># in the join functions</span>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tibble</a></span>(<span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>8</span>))
-<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>df</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='message'>Joining, by = "cyl"</span></div><div class='output co'>#&gt; # Source:   lazy query [?? x 12]
-#&gt; # Database: sqlite 3.30.1 [:memory:]
+<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>df</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='message'>Joining, by = "cyl"</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 12]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb model      
-#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
-#&gt;  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4 Mazda RX4  
-#&gt;  2  21       6  160    110  3.9   2.88  17.0     0     1     4     4 Mazda RX4 …
-#&gt;  3  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1 Hornet 4 D…
-#&gt;  4  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2 Hornet Spo…
-#&gt;  5  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1 Valiant    
-#&gt;  6  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4 Duster 360 
-#&gt;  7  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4 Merc 280   
-#&gt;  8  17.8     6  168.   123  3.92  3.44  18.9     1     0     4     4 Merc 280C  
-#&gt;  9  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3 Merc 450SE 
-#&gt; 10  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3 Merc 450SL 
-#&gt; # … with more rows</div></pre>
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      
+#&gt; </span><span style='color: #555555;'> 1</span><span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4 Mazda RX4  
+#&gt; </span><span style='color: #555555;'> 2</span><span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4 Mazda RX4 …
+#&gt; </span><span style='color: #555555;'> 3</span><span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1 Hornet 4 D…
+#&gt; </span><span style='color: #555555;'> 4</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2 Hornet Spo…
+#&gt; </span><span style='color: #555555;'> 5</span><span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1 Valiant    
+#&gt; </span><span style='color: #555555;'> 6</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4 Duster 360 
+#&gt; </span><span style='color: #555555;'> 7</span><span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4 Merc 280   
+#&gt; </span><span style='color: #555555;'> 8</span><span>  17.8     6  168.   123  3.92  3.44  18.9     1     0     4     4 Merc 280C  
+#&gt; </span><span style='color: #555555;'> 9</span><span>  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3 Merc 450SE 
+#&gt; </span><span style='color: #555555;'>10</span><span>  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3 Merc 450SL 
+#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
