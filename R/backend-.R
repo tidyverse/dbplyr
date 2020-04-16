@@ -333,21 +333,24 @@ base_win <- sql_translator(
     win_over(
       sql_expr(FIRST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   last = function(x, order_by = NULL) {
     win_over(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   nth = function(x, n, order_by = NULL) {
     win_over(
       sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
 
@@ -355,14 +358,16 @@ base_win <- sql_translator(
     win_over(
       sql_expr(LEAD(!!x, !!n, !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       sql_expr(LAG(!!x, !!as.integer(n), !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   # Recycled aggregate fuctions take single argument, don't need order and

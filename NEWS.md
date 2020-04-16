@@ -6,6 +6,10 @@
 
 * `str_detect()`, `str_replace()` and `str_replace_all()` are now correct for postgres backends (@shosaco, #362).
 
+* `last()` is now correct (@krlmlr, #366).
+
+* `first()`, `last()`, `nth()`, `lead()` and `lag()` now respect the `window_frame()` (@krlmlr, #366).
+
 # dbplyr 1.4.2
 
 * Fix bug when partially evaluating unquoting quosure containing a single 
