@@ -44,6 +44,8 @@ test_that("custom aggregators translated correctly", {
 
   expect_error(trans(cor(x)), "not available")
   expect_error(trans(cov(x)), "not available")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '')"))
 })
 
 test_that("custom window functions translated correctly", {
@@ -57,6 +59,8 @@ test_that("custom window functions translated correctly", {
 
   expect_error(trans(cor(x)), "not supported")
   expect_error(trans(cov(x)), "not supported")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
 
 test_that("filter and mutate translate is.na correctly", {

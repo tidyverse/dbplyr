@@ -3,6 +3,10 @@
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
   RMySQL) for its internal tests and data functions (#427).
 
+* SQL server gains support for translation `str_flatten()` (@PauloJhonny, #405).
+
+* Temporary datasets in SQL server are now session-local, not global (#401).
+
 * `str_detect()`, `str_replace()` and `str_replace_all()` are now correct for postgres backends (@shosaco, #362).
 
 # dbplyr 1.4.2
