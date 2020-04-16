@@ -180,6 +180,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p>The Date and POSIXt methods for <code><a href="../reference/escape.html">escape()</a></code> now use exported <code><a href="../reference/sql_escape_logical.html">sql_escape_date()</a></code> and <code><a href="../reference/sql_escape_logical.html">sql_escape_datetime()</a></code> generics to allow backend specific formatting of date and datetime literals. These are used to provide methods for Athena and Presto backends (<a href='https://github.com/OssiLehtinen'>@OssiLehtinen</a>, <a href='https://github.com/tidyverse/dbplyr/issues/384'>#384</a>, <a href='https://github.com/tidyverse/dbplyr/issues/391'>#391</a>).</p></li>
 <li><p>dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of RMySQL) for its internal tests and data functions (<a href='https://github.com/tidyverse/dbplyr/issues/427'>#427</a>).</p></li>
 <li><p>SQL server gains support for translation <code>str_flatten()</code> (<a href='https://github.com/PauloJhonny'>@PauloJhonny</a>, <a href='https://github.com/tidyverse/dbplyr/issues/405'>#405</a>).</p></li>
 <li><p>Temporary datasets in SQL server are now session-local, not global (<a href='https://github.com/tidyverse/dbplyr/issues/401'>#401</a>).</p></li>
