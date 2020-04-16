@@ -27,8 +27,9 @@ test_that("head/print respects n" ,{
 })
 
 test_that("same_src distinguishes srcs", {
-  con1 <- withr::local_db_connection(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
-  con2 <- withr::local_db_connection(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
+  con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+  con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+  on.exit({dbDisconnect(con1); dbDisconnect(con2)}, add = TRUE)
 
   db1 <- copy_to(con1, iris[1:3, ], 'data1', temporary = FALSE)
   db2 <- copy_to(con2, iris[1:3, ], 'data2', temporary = FALSE)
