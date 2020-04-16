@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* The Date and POSIXt methods for `escape()` now use exported 
+  `sql_escape_date()` and `sql_escape_datetime()` generics to allow backend
+  specific formatting of date and datetime literals. These are used to
+  provide methods for Athena and Presto backends (@OssiLehtinen, #384, #391).
+
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
   RMySQL) for its internal tests and data functions (#427).
 
@@ -23,9 +28,6 @@
 # dbplyr 1.4.1
 
 Minor improvements to SQL generation
-
-* `escape.Date()` and `escape.POSIXt` use exported `sql_escape_date` and `sql_escape_datetime` to allow backend specific formatting of date and datetime literals. Methods for Athena and Presto 
-  backends added to pass dates as, e.g.,  "date '2020-04-16'" and datetimes as, e.g., "timestamp '2020-04-16 07:44:28 UTC'" (@OssiLehtinen, #384, #391).
 
 * `x %in% y` strips names of `y` (#269).
 
