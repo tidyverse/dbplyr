@@ -1,16 +1,20 @@
 # registered onLoad
+#' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "INTERSECT", copy = copy, ...)
 }
 # registered onLoad
+#' @importFrom dplyr union
 union.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "UNION", copy = copy, ...)
 }
 #' @export
+#' @importFrom dplyr union_all
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "UNION ALL", copy = copy, ...)
 }
 # registered onLoad
+#' @importFrom dplyr setdiff
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "EXCEPT", copy = copy, ...)
 }

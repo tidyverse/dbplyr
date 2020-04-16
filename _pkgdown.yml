@@ -12,12 +12,12 @@ home:
 reference:
 - title: dplyr verbs
   contents:
+  - tbl.src_dbi
   - arrange.tbl_lazy
   - copy_to.src_sql
   - collapse.tbl_sql
   - do.tbl_sql
   - inner_join.tbl_lazy
-  - src_dbi
 
 - title: Database connection
   contents:

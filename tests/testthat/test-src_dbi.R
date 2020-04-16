@@ -1,5 +1,3 @@
-context("test-src_dbi.R")
-
 test_that("tbl and src classes include connection class", {
 
   mf <- memdb_frame(x = 1, y = 2)

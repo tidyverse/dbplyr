@@ -6,6 +6,7 @@
 #'
 #' @export
 #' @param x A `tbl_sql`
+#' @importFrom dplyr collapse
 collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 
@@ -22,6 +23,7 @@ collapse.tbl_sql <- function(x, ...) {
 #'   persistent (`FALSE`)?
 #' @inheritParams copy_to.src_sql
 #' @export
+#' @importFrom dplyr compute
 compute.tbl_sql <- function(x,
                             name = unique_table_name(),
                             temporary = TRUE,
@@ -92,6 +94,7 @@ db_compute.DBIConnection <- function(con,
 #' @rdname collapse.tbl_sql
 #' @param n Number of rows to fetch. Defaults to `Inf`, meaning all rows.
 #' @param warn_incomplete Warn if `n` is less than the number of result rows?
+#' @importFrom dplyr collect
 #' @export
 collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   if (identical(n, Inf)) {
@@ -104,7 +107,7 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
 
   sql <- db_sql_render(x$src$con, x)
   out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete)
-  grouped_df(out, intersect(op_grps(x), names(out)))
+  dplyr::grouped_df(out, intersect(op_grps(x), names(out)))
 }
 
 #' @export
