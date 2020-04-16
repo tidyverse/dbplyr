@@ -11,6 +11,9 @@
 
 Minor improvements to SQL generation
 
+* `escape.Date()` and `escape.POSIXt` use exported `sql_escape_date` and `sql_escape_datetime` to allow backend specific formatting of date and datetime literals. Methods for Athena and Presto 
+  backends added to pass dates as, e.g.,  "date '2020-04-16'" and datetimes as, e.g., "timestamp '2020-04-16 07:44:28 UTC'" (@OssiLehtinen, #384, #391).
+
 * `x %in% y` strips names of `y` (#269).
 
 * Enhancements for scoped verbs (`mutate_all()`, `summarise_if()`,
