@@ -20,7 +20,6 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
   if (!is.null(limit) && !identical(limit, Inf)) {
     out <- escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
-    assertthat::assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
     out <- build_sql(
       "SELECT * FROM ", sql_subquery(con, out), " WHERE ROWNUM <= ", limit,
       con = con)

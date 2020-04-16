@@ -7,25 +7,6 @@ test_that("tbl_sql() works with string argument", {
   expect_equal(collect(tbl_sql("sqlite", df$src, name)), collect(df))
 })
 
-test_that("head/print respects n" ,{
-  df2 <- memdb_frame(x = 1:5)
-
-  out <- df2 %>% head(n = Inf) %>% collect()
-  expect_equal(nrow(out), 5)
-  expect_output(print(df2, n = Inf))
-
-  out <- df2 %>% head(n = 1) %>% collect()
-  expect_equal(nrow(out), 1)
-
-  out <- df2 %>% head(n = 0) %>% collect()
-  expect_equal(nrow(out), 0)
-
-  expect_error(
-    df2 %>% head(n = -1) %>% collect(),
-    "not greater than or equal to 0"
-  )
-})
-
 test_that("same_src distinguishes srcs", {
   con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
   con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)

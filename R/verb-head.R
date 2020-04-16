@@ -1,5 +1,10 @@
 #' @export
 head.tbl_lazy <- function(x, n = 6L, ...) {
+  if (!is.numeric(n) || length(n) != 1L || n < 0) {
+    abort("`n` must be a non-negative integer")
+  }
+  n <- trunc(n)
+
   if (inherits(x$ops, "op_head")) {
     x$ops$args$n <- min(x$ops$args$n, n)
   } else {
@@ -9,7 +14,7 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
 }
 
 #' @export
-tail.tbl_sql <- function(x, n = 6L, ...) {
+tail.tbl_lazy <- function(x, n = 6L, ...) {
   stop("tail() is not supported by sql sources", call. = FALSE)
 }
 
