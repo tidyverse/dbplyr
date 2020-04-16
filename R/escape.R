@@ -229,6 +229,7 @@ sql_escape_logical <- function(con, x) {
 
 #' @keywords internal
 #' @export
+#' @rdname sql_escape_logical
 sql_escape_date <- function(con, x) {
   UseMethod("sql_escape_date")
 }
@@ -236,6 +237,7 @@ sql_escape_date <- function(con, x) {
 
 #' @keywords internal
 #' @export
+#' @rdname sql_escape_logical
 sql_escape_datetime <- function(con, x) {
   UseMethod("sql_escape_datetime")
 }
