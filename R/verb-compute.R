@@ -94,8 +94,7 @@ db_compute.DBIConnection <- function(con,
 #' @param warn_incomplete Warn if `n` is less than the number of result rows?
 #' @export
 collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
-  assert_that(length(n) == 1, n >= 0L)
-  if (n == Inf) {
+  if (identical(n, Inf)) {
     n <- -1
   } else {
     # Gives the query planner information that it might be able to take
