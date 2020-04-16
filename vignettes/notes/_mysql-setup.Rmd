@@ -28,11 +28,9 @@ mysqld --datadir='/Users/hadley/db/mysql'
 ## Connect
 
 ```{r, eval = FALSE}
-install.packages("RMySQL")
-library(RMySQL)
+install.packages("RMariaDB")
 
-drv <- dbDriver("MySQL")
-con <- dbConnect(drv, dbname = "lahman", username = "root", password = "")
+con <- dbConnect(RMariaDB::MariaDB(), dbname = "lahman", username = "root", password = "")
 dbListTables(con)
 ```
 

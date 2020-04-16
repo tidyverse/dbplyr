@@ -46,7 +46,7 @@ lahman_sqlite <- function(path = NULL) {
 #' @export
 #' @rdname lahman
 lahman_postgres <- function(dbname = "lahman", host = "localhost", ...) {
-  con <- DBI::dbConnect(RPostgreSQL::PostgreSQL(), dbname = dbname, host = host, ...)
+  con <- DBI::dbConnect(RPostgres::Postgres(), dbname = dbname, host = host, ...)
   copy_lahman(con)
 }
 

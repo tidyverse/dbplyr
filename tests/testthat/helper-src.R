@@ -4,7 +4,7 @@ if (test_srcs$length() == 0) {
   test_register_con("sqlite", RSQLite::SQLite(), ":memory:")
 
   if (identical(Sys.getenv("GITHUB_POSTGRES"), "true")) {
-    test_register_con("postgres", RPostgreSQL::PostgreSQL(),
+    test_register_con("postgres", RPostgres::Postgres(),
       dbname = "test",
       user = "postgres",
       password = "password"
@@ -12,17 +12,12 @@ if (test_srcs$length() == 0) {
   } else if (identical(Sys.getenv("GITHUB_ACTIONS"), "true")) {
     # Only test with sqlite
   } else  {
-    test_register_con("mysql", RMySQL::MySQL(),
-      dbname = "test",
-      host = "localhost",
-      username = Sys.getenv("USER")
-    )
     test_register_con("MariaDB", RMariaDB::MariaDB(),
       dbname = "test",
       host = "localhost",
       username = Sys.getenv("USER")
     )
-    test_register_con("postgres", RPostgreSQL::PostgreSQL(),
+    test_register_con("postgres", RPostgres::Postgres(),
       dbname = "test",
       host = "localhost",
       user = ""
