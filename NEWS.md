@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* The Date and POSIXt methods for `escape()` now use exported 
+  `sql_escape_date()` and `sql_escape_datetime()` generics to allow backend
+  specific formatting of date and datetime literals. These are used to
+  provide methods for Athena and Presto backends (@OssiLehtinen, #384, #391).
+
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
   RMySQL) for its internal tests and data functions (#427).
 
