@@ -1,6 +1,7 @@
 # mutate ------------------------------------------------------------------
 
 #' @export
+#' @importFrom dplyr mutate
 mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
@@ -11,6 +12,7 @@ mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
 # transmute ---------------------------------------------------------------
 
 #' @export
+#' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))

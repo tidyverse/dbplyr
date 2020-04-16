@@ -1,6 +1,6 @@
 #' Create a "sql src" object
 #'
-#' Deprecated: please use [src_dbi] instead.
+#' Deprecated: please use directly use a `DBIConnection` object instead.
 #'
 #' @keywords internal
 #' @export
@@ -14,12 +14,15 @@ src_sql <- function(subclass, con, ...) {
   structure(list(con = con, ...), class = c(subclass, "src_sql", "src"))
 }
 
+
+#' @importFrom dplyr same_src
 #' @export
 same_src.src_sql <- function(x, y) {
   if (!inherits(y, "src_sql")) return(FALSE)
   identical(x$con, y$con)
 }
 
+#' @importFrom dplyr src_tbls
 #' @export
 src_tbls.src_sql <- function(x, ...) {
   db_list_tables(x$con)

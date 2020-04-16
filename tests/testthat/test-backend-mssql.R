@@ -7,8 +7,8 @@ test_that("custom scalar translated correctly", {
   }
 
   expect_equal(trans(as.logical(x)),   sql("CAST(`x` AS BIT)"))
-  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS FLOAT)"))
+  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS FLOAT)"))
   expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(trans(log(x)),          sql("LOG(`x`)"))
   expect_equal(trans(nchar(x)),        sql("LEN(`x`)"))
@@ -44,6 +44,8 @@ test_that("custom aggregators translated correctly", {
 
   expect_error(trans(cor(x)), "not available")
   expect_error(trans(cov(x)), "not available")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '')"))
 })
 
 test_that("custom window functions translated correctly", {
@@ -57,6 +59,8 @@ test_that("custom window functions translated correctly", {
 
   expect_error(trans(cor(x)), "not supported")
   expect_error(trans(cov(x)), "not supported")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
 
 test_that("filter and mutate translate is.na correctly", {

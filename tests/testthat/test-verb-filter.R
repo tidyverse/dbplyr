@@ -34,49 +34,32 @@ test_that("each argument gets implicit parens", {
 
 # SQL generation --------------------------------------------------------
 
-test_that("basic filter works across all backends", {
-  dfs <- test_frame(x = 1:5, y = 5:1)
-
-  dfs %>%
-    lapply(. %>% filter(x > 3)) %>%
-    expect_equal_tbls()
-})
-
 test_that("filter calls windowed versions of sql functions", {
-  dfs <- test_frame_windowed(
-    x = 1:10,
-    g = rep(c(1, 2), each = 5)
-  )
+  df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 
-  dfs %>%
-    lapply(. %>% group_by(g) %>% filter(row_number(x) < 3)) %>%
-    expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(1L, 2L, 6L, 7L)))
+  out <- df1 %>% group_by(g) %>% filter(dplyr::row_number(x) < 3) %>% collect()
+  expect_equal(out$x, c(1L, 2L, 6L, 7L))
 })
 
 test_that("recycled aggregates generate window function", {
-  dfs <- test_frame_windowed(
-    x = 1:10,
-    g = rep(c(1, 2), each = 5)
-  )
+  df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 
-  dfs %>%
-    lapply(. %>% group_by(g) %>% filter(x > mean(x, na.rm = TRUE))) %>%
-    expect_equal_tbls(tibble(g = c(1, 1, 2, 2), x = c(4L, 5L, 9L, 10L)))
+  out <- df1 %>%
+    group_by(g) %>%
+    filter(x > mean(x, na.rm = TRUE)) %>%
+    collect()
+  expect_equal(out$x, c(4L, 5L, 9L, 10L))
 })
 
 test_that("cumulative aggregates generate window function", {
-  dfs <- test_frame_windowed(
-    x = c(1:3, 2:4),
-    g = rep(c(1, 2), each = 3)
-  )
+  df1 <- memdb_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
+  out <- df1 %>%
+    group_by(g) %>%
+    arrange(x) %>%
+    filter(cumsum(x) > 3) %>%
+    collect()
 
-  dfs %>%
-    lapply(. %>%
-      group_by(g) %>%
-      arrange(x) %>%
-      filter(cumsum(x) > 3)
-    ) %>%
-    expect_equal_tbls(tibble(g = c(1, 2, 2), x = c(3L, 3L, 4L)))
+  expect_equal(out$x, c(3L, 3L, 4L))
 })
 
 # sql_build ---------------------------------------------------------------

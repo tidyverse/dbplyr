@@ -80,8 +80,8 @@
       as.logical    = sql_cast("BIT"),
 
       as.Date       = sql_cast("DATE"),
-      as.numeric    = sql_cast("NUMERIC"),
-      as.double     = sql_cast("NUMERIC"),
+      as.numeric    = sql_cast("FLOAT"),
+      as.double     = sql_cast("FLOAT"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
       atan2         = sql_prefix("ATN2"),
@@ -157,14 +157,23 @@
       var           = sql_aggregate("VAR", "var"),
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()")
+      cov           = sql_not_supported("cov()"),
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+
     ),
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
       # MSSQL does not have function for: cor and cov
       cor           = win_absent("cor"),
-      cov           = win_absent("cov")
+      cov           = win_absent("cov"),
+      str_flatten = function(x, collapse = "") {
+        win_over(
+          sql_expr(string_agg(!!x, !!collapse)),
+          partition = win_current_group(),
+          order = win_current_order()
+        )
+      }
     )
 
   )}
@@ -181,11 +190,12 @@
 # Temporary tables --------------------------------------------------------
 # SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
+# <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 
-mssql_temp_name <- function(name, temporary){
-  # check that name has prefixed '##' if temporary
+
+mssql_temp_name <- function(name, temporary) {
   if (temporary && substr(name, 1, 1) != "#") {
-    name <- paste0("##", name)
+    name <- paste0("#", name)
     message("Created a temporary table named: ", name)
   }
   name
