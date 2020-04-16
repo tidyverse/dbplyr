@@ -69,13 +69,12 @@ escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x = as.character(x)
-  sql_vector(sql_escape_Date(con, x), parens, collapse, con = con)
+  sql_vector(sql_escape_date(con, x), parens, collapse, con = con)
 }
 
 #' @export
 escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  sql_vector(sql_escape_POSIXt(con, x), parens, collapse, con = con)
+  sql_vector(sql_escape_datetime(con, x), parens, collapse, con = con)
 }
 
 #' @export
@@ -230,15 +229,15 @@ sql_escape_logical <- function(con, x) {
 
 #' @keywords internal
 #' @export
-sql_escape_Date <- function(con, x) {
-  UseMethod("sql_escape_Date")
+sql_escape_date <- function(con, x) {
+  UseMethod("sql_escape_date")
 }
 
 
 #' @keywords internal
 #' @export
-sql_escape_POSIXt <- function(con, x) {
-  UseMethod("sql_escape_POSIXt")
+sql_escape_datetime <- function(con, x) {
+  UseMethod("sql_escape_datetime")
 }
 
 # DBIConnection methods --------------------------------------------------------
@@ -249,12 +248,12 @@ sql_escape_string.DBIConnection <- function(con, x) {
 }
 
 #' @export
-sql_escape_Date.DBIConnection <- function(con, x) {
-  dbQuoteString(con, x)
+sql_escape_date.DBIConnection <- function(con, x) {
+  dbQuoteString(con, as.character(x))
 }
 
 #' @export
-sql_escape_POSIXt.DBIConnection <- function(con, x) {
+sql_escape_datetime.DBIConnection <- function(con, x) {
   x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
   dbQuoteString(con, x)
 }
