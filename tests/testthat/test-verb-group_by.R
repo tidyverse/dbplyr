@@ -1,13 +1,23 @@
 context("group_by")
 
-test_that("group_by with add = TRUE adds groups", {
+test_that("group_by with .add = TRUE adds groups", {
   mf <- memdb_frame(x = 1:3, y = 1:3)
   gf1 <- mf %>% group_by(x, y)
-  gf2 <- mf %>% group_by(x) %>% group_by(y, add = TRUE)
+  gf2 <- mf %>% group_by(x) %>% group_by(y, .add = TRUE)
 
   expect_equal(group_vars(gf1), c("x", "y"))
   expect_equal(group_vars(gf2), c("x", "y"))
 })
+
+test_that("warns about add argument ", {
+  mf <- memdb_frame(x = 1:3, y = 1:3)
+  expect_warning(
+    gf <- mf %>% group_by(x) %>% group_by(y, add = TRUE),
+    "deprecated"
+  )
+  expect_equal(group_vars(gf), c("x", "y"))
+})
+
 
 test_that("collect, collapse and compute preserve grouping", {
   g <- memdb_frame(x = 1:3, y = 1:3) %>% group_by(x, y)
@@ -63,7 +73,7 @@ test_that("group_by overrides existing groups", {
 test_that("group_by increases grouping if add = TRUE", {
   df <- tibble(g1 = 1, g2 = 2, x = 3) %>% tbl_lazy()
 
-  out <- df %>% group_by(g1) %>% group_by(g2, add = TRUE)
+  out <- df %>% group_by(g1) %>% group_by(g2, .add = TRUE)
   expect_equal(op_grps(out), c("g1", "g2"))
 })
 
