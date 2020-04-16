@@ -249,13 +249,13 @@ sql_escape_string.DBIConnection <- function(con, x) {
 
 #' @export
 sql_escape_date.DBIConnection <- function(con, x) {
-  dbQuoteString(con, as.character(x))
+  sql_escape_string(con, as.character(x))
 }
 
 #' @export
 sql_escape_datetime.DBIConnection <- function(con, x) {
   x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
-  dbQuoteString(con, x)
+  sql_escape_string(con, x)
 }
 
 #' @export
