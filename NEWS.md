@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 1.4.3
 
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
   RMySQL) for its internal tests and data functions (#427).
