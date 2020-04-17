@@ -85,6 +85,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/src_sql.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/tbl.src_dbi.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/tbl_lazy.html</loc>
   </url>
   <url>
