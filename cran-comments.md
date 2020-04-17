@@ -1,3 +1,7 @@
+This is a resubmission; I have tried to ensure that unnecessary tests are no longer run on the CRAN check machine.
+
+---
+
 ## Test environments
 
 * local: darwin15.6.0-3.5.1

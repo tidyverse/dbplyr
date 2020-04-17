@@ -1,3 +1,6 @@
+on_gha <- function() identical(Sys.getenv("GITHUB_ACTIONS"), "true")
+on_cran <- function() !identical(Sys.getenv("NOT_CRAN"), "true")
+
 if (test_srcs$length() == 0) {
 
   # test_register_src("df", dplyr::src_df(env = new.env(parent = emptyenv())))
@@ -9,7 +12,7 @@ if (test_srcs$length() == 0) {
       user = "postgres",
       password = "password"
     )
-  } else if (identical(Sys.getenv("GITHUB_ACTIONS"), "true")) {
+  } else if (on_gha() || on_cran()) {
     # Only test with sqlite
   } else  {
     test_register_con("MariaDB", RMariaDB::MariaDB(),
@@ -24,6 +27,7 @@ if (test_srcs$length() == 0) {
     )
   }
 }
+
 
 skip_if_no_db <- function(db) {
   if (!test_srcs$has(db))
