@@ -31,6 +31,6 @@ tbl_memdb <- function(df, name = deparse(substitute(df))) {
 #' @export
 src_memdb <- function() {
   cache_computation("src_memdb", {
-    DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+    src_dbi(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
   })
 }

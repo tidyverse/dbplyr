@@ -74,5 +74,5 @@ copy_nycflights13 <- function(con, ...) {
       temporary = FALSE
     )
   }
-  con
+  src_dbi(con)
 }
