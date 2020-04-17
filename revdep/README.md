@@ -59,10 +59,9 @@
 |taxizedb                           |0.1.4   |1      |        |     |
 |valr                               |0.5.0   |1      |        |     |
 
-## New problems (2)
+## New problems (1)
 
-|package                    |version |error  |warning |note |
-|:--------------------------|:-------|:------|:-------|:----|
-|[arkdb](problems.md#arkdb) |0.0.5   |__+1__ |        |1    |
-|[dm](problems.md#dm)       |0.1.1   |__+1__ |        |1    |
+|package              |version |error  |warning |note |
+|:--------------------|:-------|:------|:-------|:----|
+|[dm](problems.md#dm) |0.1.1   |__+1__ |        |1    |
 
