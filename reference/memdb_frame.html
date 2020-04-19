@@ -90,7 +90,7 @@ data frame in R, it creates a table in src_memdb()." />
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
         </div>
@@ -238,7 +238,7 @@ unlikely to conflict with an existing table.</p></td>
 #&gt; SELECT *
 #&gt; FROM `dbplyr_005`
 #&gt; ORDER BY `x`</div><div class='input'>
-<span class='no'>mtcars_db</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl_memdb</span>(<span class='no'>mtcars</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Table `mtcars` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='no'>mtcars_db</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>cyl</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span>()) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'mtcars_db' not found</span></div></span></pre>
+<span class='no'>mtcars_db</span> <span class='kw'>&lt;-</span> <span class='fu'>tbl_memdb</span>(<span class='no'>mtcars</span>)</div><div class='output co'>#&gt; <span class='error'>Error: Table `mtcars` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='no'>mtcars_db</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='no'>cyl</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='kw'>n</span> <span class='kw'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/n.html'>n</a></span>()) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()</div><div class='output co'>#&gt; <span class='error'>Error in eval(lhs, parent, parent): object 'mtcars_db' not found</span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

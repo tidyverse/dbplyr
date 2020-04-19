@@ -47,7 +47,7 @@
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
         </div>
@@ -159,7 +159,7 @@
 <span class="co">#&gt; SELECT `x`, `y`, `a`, POWER(`a`, 2.0) AS `b`</span>
 <span class="co">#&gt; FROM (SELECT `x`, `y`, `y` * `x` AS `a`</span>
 <span class="co">#&gt; FROM `dbplyr_001`)</span></pre></body></html></div>
-<p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> to the end of any query to check the results are about what you expect.</p>
+<p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/tally.html">count()</a></code> to the end of any query to check the results are about what you expect.</p>
 </div>
 <div id="what-happens-when-dbplyr-fails" class="section level2">
 <h2 class="hasAnchor">

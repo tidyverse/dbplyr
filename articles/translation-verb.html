@@ -47,7 +47,7 @@
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
         </div>
@@ -218,44 +218,44 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">inner_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join()</a></code></td>
 <td><code>SELECT * FROM x JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">left_join()</a></code></td>
 <td><code>SELECT * FROM x LEFT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">right_join()</a></code></td>
 <td><code>SELECT * FROM x RIGHT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">full_join()</a></code></td>
 <td><code>SELECT * FROM x FULL JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">anti_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/reexports.html">intersect(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">intersect(x, y)</a></code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/reexports.html">union(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">union(x, y)</a></code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/reexports.html">setdiff(x, y)</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff(x, y)</a></code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
+<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set <code>auto_index = TRUE</code>. That will automatically add an index on the join variables to the temporary table.</p>
 </div>
 <div id="behind-the-scenes" class="section level2">

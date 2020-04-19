@@ -90,7 +90,7 @@ functions." />
 
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">dbplyr</a>
-        <div class="info">
+        <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
           <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
         </div>
@@ -344,7 +344,7 @@ right-hand side table, respectively.</p>
 
 <span class='co'># Combine player and whole team statistics</span>
 <span class='no'>first_stint</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>batting</span>, <span class='no'>stint</span> <span class='kw'>==</span> <span class='fl'>1</span>), <span class='no'>playerID</span>:<span class='no'>H</span>)
-<span class='no'>both</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='no'>first_stint</span>, <span class='no'>team_info</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"yearID"</span>, <span class='st'>"teamID"</span>, <span class='st'>"lgID"</span>))
+<span class='no'>both</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>first_stint</span>, <span class='no'>team_info</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"yearID"</span>, <span class='st'>"teamID"</span>, <span class='st'>"lgID"</span>))
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>both</span>)
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>both</span>)
 
@@ -352,12 +352,12 @@ right-hand side table, respectively.</p>
 <span class='no'>grid</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/expand.grid.html'>expand.grid</a></span>(
   <span class='kw'>teamID</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"WAS"</span>, <span class='st'>"ATL"</span>, <span class='st'>"PHI"</span>, <span class='st'>"NYA"</span>),
   <span class='kw'>yearID</span> <span class='kw'>=</span> <span class='fl'>2010</span>:<span class='fl'>2012</span>)
-<span class='no'>top4a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>top4a</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4a</span>)
 
 <span class='co'># Indices don't really help here because there's no matching index on</span>
 <span class='co'># batting</span>
-<span class='no'>top4b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>top4b</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>left_join</a></span>(<span class='no'>batting</span>, <span class='no'>grid</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>auto_index</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>top4b</span>)
 
 <span class='co'># Semi-joins ----------------------------------------------------------------</span>
@@ -366,31 +366,31 @@ right-hand side table, respectively.</p>
 
 <span class='co'># All people in hall of fame</span>
 <span class='no'>hof</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"HallOfFame"</span>)
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
 
 <span class='co'># All people not in the hall of fame</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>anti_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>people</span>, <span class='no'>hof</span>)
 
 <span class='co'># Find all managers</span>
 <span class='no'>manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"Managers"</span>)
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>)
 
 <span class='co'># Find all managers in hall of fame</span>
-<span class='no'>famous_manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>semi_join</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>), <span class='no'>hof</span>)
+<span class='no'>famous_manager</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>people</span>, <span class='no'>manager</span>), <span class='no'>hof</span>)
 <span class='no'>famous_manager</span>
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>explain</a></span>(<span class='no'>famous_manager</span>)
 
 <span class='co'># Anti-joins ----------------------------------------------------------------</span>
 
 <span class='co'># batters without person covariates</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>anti_join</a></span>(<span class='no'>batting</span>, <span class='no'>people</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>anti_join</a></span>(<span class='no'>batting</span>, <span class='no'>people</span>)
 
 <span class='co'># Arbitrary predicates ------------------------------------------------------</span>
 
 <span class='co'># Find all pairs of awards given to the same player</span>
 <span class='co'># with at least 18 years between the awards:</span>
 <span class='no'>awards_players</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='no'>lahman_s</span>, <span class='st'>"AwardsPlayers"</span>)
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>inner_join</a></span>(
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>inner_join</a></span>(
   <span class='no'>awards_players</span>, <span class='no'>awards_players</span>,
   <span class='kw'>sql_on</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(
     <span class='st'>"(LHS.playerID = RHS.playerID) AND "</span>,
