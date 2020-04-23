@@ -257,7 +257,7 @@ sql_escape_datetime <- function(con, x) {
 
 #' @keywords internal
 #' @export
-#' @rdname sql_escape_raw
+#' @rdname sql_escape_logical
 sql_escape_raw <- function(con, x) {
   UseMethod("sql_escape_raw")
 }

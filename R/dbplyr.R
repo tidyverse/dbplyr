@@ -4,6 +4,7 @@
 #' @importFrom utils head tail
 #' @importFrom glue glue
 #' @importFrom methods setOldClass
+#' @importFrom magrittr %>%
 #' @importFrom dplyr n
 #' @import rlang
 #' @import DBI

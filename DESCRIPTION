@@ -25,6 +25,7 @@ Depends:
 Imports: 
     assertthat (>= 0.2.0),
     DBI (>= 1.0.0),
+    magrittr,
     dplyr (>= 0.8.0),
     glue (>= 1.2.0),
     lifecycle,
