@@ -178,6 +178,11 @@
   )}
 
 #' @export
+`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+  paste0("0x", sql_raw_to_hex(x))
+}
+
+#' @export
 `db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql

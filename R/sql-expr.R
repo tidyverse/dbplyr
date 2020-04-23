@@ -47,7 +47,7 @@ sql_call2 <- function(.fn, ..., con = sql_current_con()) {
 
 
 replace_expr <- function(x, con) {
-  if (is.atomic(x)) {
+  if (is.atomic(x) || is_raw_list(x)) {
     as.character(escape(unname(x), con = con))
   } else if (is.name(x)) {
     as.character(x)
@@ -76,4 +76,9 @@ replace_expr <- function(x, con) {
     x
   }
 
+}
+
+# copied from DBI
+is_raw_list <- function(x) {
+  is.list(x) && all(vapply(x, is.raw, logical(1)))
 }

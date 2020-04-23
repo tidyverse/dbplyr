@@ -109,6 +109,11 @@ escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.raw <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  sql_vector(sql_escape_raw(con, x), parens, collapse, con = con)
+}
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
@@ -192,7 +197,6 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' If the quote character is present in the string, it will be doubled.
 #' `NA`s will be replaced with NULL.
 #'
-#' @export
 #' @param x Character vector to escape.
 #' @param quote Single quoting character.
 #' @export
@@ -214,7 +218,16 @@ sql_quote <- function(x, quote) {
   y
 }
 
-
+#' Helper function to convert raw vector to hex string
+#'
+#' @param x Raw vector
+#' @export
+#' @keywords internal
+#' @examples
+#' sql_raw_to_hex(charToRaw("abc"))
+sql_raw_to_hex <- function(x) {
+  paste(sprintf("%02X", as.integer(x)), collapse = "")
+}
 
 #' More SQL generics
 #'
@@ -240,6 +253,13 @@ sql_escape_date <- function(con, x) {
 #' @rdname sql_escape_logical
 sql_escape_datetime <- function(con, x) {
   UseMethod("sql_escape_datetime")
+}
+
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_raw
+sql_escape_raw <- function(con, x) {
+  UseMethod("sql_escape_raw")
 }
 
 # DBIConnection methods --------------------------------------------------------
@@ -273,4 +293,6 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y
 }
 
-
+sql_escape_raw.DBIConnection <- function(con, x) {
+  paste0("X'", sql_raw_to_hex(x), "'")
+}

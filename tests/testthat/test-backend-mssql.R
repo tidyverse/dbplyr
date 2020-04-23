@@ -200,3 +200,23 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(trans(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
   expect_error(trans(quarter(x, fiscal_start = 5)))
 })
+
+test_that("custom escapes translated correctly", {
+
+  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+
+  a <- charToRaw("abc")
+  b <- as.raw(c(0x01, 0x02))
+
+  expect_equal(
+    mf %>% filter(x == a) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
+  )
+
+  L <- list(a, b)
+  expect_equal(
+    mf %>% filter(x %in% L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
+  )
+})
+
