@@ -34,7 +34,8 @@ Imports:
     rlang (>= 0.2.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
-    utils
+    utils,
+    magrittr
 Suggests:
     bit64,
     covr,
@@ -106,6 +107,7 @@ Collate:
     'translate-sql-clause.R'
     'translate-sql.R'
     'utils-format.R'
+    'utils-pipe.R'
     'verb-arrange.R'
     'verb-compute.R'
     'verb-copy-to.R'
