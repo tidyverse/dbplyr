@@ -516,7 +516,7 @@ db_create_table.DBIConnection <- function(con, table, types,
     con = con
   )
 
-  dbExecute(con, sql)
+  dbExecute(con, sql, immediate = TRUE)
 }
 
 #' @export
