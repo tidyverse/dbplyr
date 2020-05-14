@@ -1,3 +1,5 @@
+setOldClass(c("ident", "sql", "character"))
+
 #' @include utils.R
 NULL
 

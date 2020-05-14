@@ -1,3 +1,5 @@
+setOldClass(c("sql", "character"))
+
 #' SQL escaping.
 #'
 #' These functions are critical when writing functions that translate R
