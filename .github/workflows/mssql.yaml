@@ -6,26 +6,24 @@ on:
     branches:
       - master
 
-name: postgres
+name: mssql
 
 jobs:
-  postgres:
+  mssql:
     runs-on: ubuntu-16.04
 
     services:
-      postgres:
-        image: postgres
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
         ports:
-        - 5432:5432
+        - 1433:1433
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: test
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          ACCEPT_EULA: Y
+          SA_PASSWORD: Password12
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      GITHUB_POSTGRES: true
+      GITHUB_MSSQL: true
       RSPM: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"
 
     steps:
@@ -63,6 +61,14 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
+
+      - name: Install SQL Server Driver
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          apt-get update
+          ACCEPT_EULA=Y apt-get install -y msodbcsql17
+        shell: sudo bash {0}
 
       - name: Check
         env:
