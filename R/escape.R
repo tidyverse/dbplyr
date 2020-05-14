@@ -226,7 +226,7 @@ sql_quote <- function(x, quote) {
 #' @examples
 #' sql_raw_to_hex(charToRaw("abc"))
 sql_raw_to_hex <- function(x) {
-  paste(sprintf("%02X", as.integer(x)), collapse = "")
+  paste(format(x), collapse = "")
 }
 
 #' More SQL generics
