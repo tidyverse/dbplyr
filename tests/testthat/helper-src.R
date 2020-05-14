@@ -12,6 +12,12 @@ if (test_srcs$length() == 0) {
       user = "postgres",
       password = "password"
     )
+  } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
+    test_register_con("mssql", odbc::odbc(),
+      dsn = "MicrosoftSQLServer",
+      uid = "sa",
+      pwd = "Password12"
+    )
   } else if (on_gha() || on_cran()) {
     # Only test with sqlite
   } else  {
