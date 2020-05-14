@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `compute()` no longer attaches an ordering to the result (@krlmlr, #356).
+
 # dbplyr 1.4.3
 
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
