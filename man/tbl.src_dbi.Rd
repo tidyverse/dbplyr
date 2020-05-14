@@ -10,7 +10,10 @@
 \arguments{
 \item{src}{A \code{DBIConnection} object produced by \code{DBI::dbConnect()}.}
 
-\item{from}{Either a string (giving a table name) or literal \code{\link[=sql]{sql()}} string.}
+\item{from}{Either a string (giving a table name),
+a fully qualified table name created by \code{\link[=in_schema]{in_schema()}}
+or wrapped by \code{\link[=ident_q]{ident_q()}},
+or a literal \code{\link[=sql]{sql()}} string.}
 
 \item{...}{Needed for compatibility with generic; currently ignored.}
 }
@@ -41,6 +44,10 @@ DBI::dbListTables(con)
 
 # To retrieve a single table from a source, use `tbl()`
 con \%>\% tbl("mtcars")
+
+# Use `in_schema()` or `ident_q()` for fully qualified table names
+con \%>\% tbl(in_schema("temp", "mtcars")) \%>\% head(1)
+con \%>\% tbl(ident_q("temp.mtcars")) \%>\% head(1)
 
 # You can also use pass raw SQL if you want a more sophisticated query
 con \%>\% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))
