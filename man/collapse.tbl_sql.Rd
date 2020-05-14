@@ -8,9 +8,15 @@
 \usage{
 \method{collapse}{tbl_sql}(x, ...)
 
-\method{compute}{tbl_sql}(x, name = unique_table_name(),
-  temporary = TRUE, unique_indexes = list(), indexes = list(),
-  analyze = TRUE, ...)
+\method{compute}{tbl_sql}(
+  x,
+  name = unique_table_name(),
+  temporary = TRUE,
+  unique_indexes = list(),
+  indexes = list(),
+  analyze = TRUE,
+  ...
+)
 
 \method{collect}{tbl_sql}(x, ..., n = Inf, warn_incomplete = TRUE)
 }
@@ -21,7 +27,7 @@
 
 \item{name}{Table name in remote database.}
 
-\item{temporary}{Should the table be temporary (\code{TRUE}, the default\code{) or persistent (}FALSE`)?}
+\item{temporary}{Should the table be temporary (\code{TRUE}, the default\verb{) or persistent (}FALSE`)?}
 
 \item{unique_indexes}{a list of character vectors. Each element of the list
 will create a new unique index over the specified column(s). Duplicate rows

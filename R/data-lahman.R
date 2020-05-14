@@ -18,6 +18,8 @@
 #' @examples
 #' # Connect to a local sqlite database, if already created
 #' \donttest{
+#' library(dplyr)
+#'
 #' if (has_lahman("sqlite")) {
 #'   lahman_sqlite()
 #'   batting <- tbl(lahman_sqlite(), "Batting")
@@ -37,43 +39,38 @@ NULL
 #' @rdname lahman
 lahman_sqlite <- function(path = NULL) {
   path <- db_location(path, "lahman.sqlite")
-  copy_lahman(src_sqlite(path = path, create = TRUE))
+  con <- DBI::dbConnect(RSQLite::SQLite(), dbname = path)
+  copy_lahman(con)
 }
 
 #' @export
 #' @rdname lahman
 lahman_postgres <- function(dbname = "lahman", host = "localhost", ...) {
-  src <- src_postgres(dbname, host = host, ...)
-  copy_lahman(src)
+  con <- DBI::dbConnect(RPostgres::Postgres(), dbname = dbname, host = host, ...)
+  copy_lahman(con)
 }
 
 #' @export
 #' @rdname lahman
 lahman_mysql <- function(dbname = "lahman", ...) {
-  src <- src_mysql(dbname, ...)
-  copy_lahman(src)
-}
-
-#' @export
-#' @rdname lahman
-lahman_df <- function() {
-  src_df("Lahman")
+  con <- DBI::dbConnect(RMariaDB::MariaDB(), dbname = dbname, ...)
+  copy_lahman(con)
 }
 
 #' @rdname lahman
 #' @export
-copy_lahman <- function(src, ...) {
+copy_lahman <- function(con, ...) {
   # Create missing tables
-  tables <- setdiff(lahman_tables(), src_tbls(src))
+  tables <- setdiff(lahman_tables(), DBI::dbListTables(con))
   for (table in tables) {
     df <- getExportedValue("Lahman", table)
     message("Creating table: ", table)
 
     ids <- as.list(names(df)[grepl("ID$", names(df))])
-    copy_to(src, df, table, indexes = ids, temporary = FALSE)
+    copy_to(con, df, table, indexes = ids, temporary = FALSE)
   }
 
-  src
+  src_dbi(con)
 }
 # Get list of all non-label data frames in package
 lahman_tables <- function() {
@@ -85,8 +82,6 @@ lahman_tables <- function() {
 #' @export
 has_lahman <- function(type, ...) {
   if (!requireNamespace("Lahman", quietly = TRUE)) return(FALSE)
-  if (missing(type)) return(TRUE)
-
   succeeds(lahman(type, ...), quiet = FALSE)
 }
 
@@ -97,10 +92,6 @@ lahman_srcs <- function(..., quiet = NULL) {
 }
 
 lahman <- function(type, ...) {
-  if (missing(type)) {
-    src_df("Lahman")
-  } else {
-    f <- match.fun(paste0("lahman_", type))
-    f(...)
-  }
+  f <- match.fun(paste0("lahman_", type))
+  f(...)
 }

@@ -1,9 +1,5 @@
 context("select")
 
-df <- as.data.frame(as.list(setNames(1:26, letters)))
-tbls <- test_load(df)
-
-
 test_that("select quotes correctly", {
   out <- memdb_frame(x = 1, y = 1) %>%
     select(x) %>%
@@ -119,7 +115,7 @@ test_that("select renames variables", {
 test_that("select can refer to variables in local env", {
   vars <- c("x", "y")
   out <- lazy_frame(x = 1, y = 1) %>%
-    select(one_of(vars)) %>%
+    select(dplyr::one_of(vars)) %>%
     sql_build()
 
   expect_equal(out$select, sql("x" = "`x`", "y" = "`y`"))

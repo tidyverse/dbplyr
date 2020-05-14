@@ -1,15 +1,13 @@
-# MonetDBLite
+# dm
 
 <details>
 
-* Version: 0.6.0
-* Source code: https://github.com/cran/MonetDBLite
-* URL: https://github.com/hannesmuehleisen/MonetDBLite-R
-* BugReports: https://github.com/hannesmuehleisen/MonetDBLite-R/issues
-* Date/Publication: 2018-07-27 09:40:03 UTC
-* Number of recursive dependencies: 75
+* Version: 0.1.1
+* Source code: https://github.com/cran/dm
+* Date/Publication: 2020-03-12 17:30:02 UTC
+* Number of recursive dependencies: 116
 
-Run `revdep_details(,"MonetDBLite")` for more info
+Run `revdep_details(,"dm")` for more info
 
 </details>
 
@@ -20,34 +18,47 @@ Run `revdep_details(,"MonetDBLite")` for more info
      ERROR
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      8: dbplyr::sql(dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", 
-             as.integer(size))) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/new/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
-      9: c_character(...) at /private/tmp/RtmpuqofJs/R.INSTALL38a48127a87/dbplyr/R/sql.R:11
-      10: dbplyr::build_sql("SELECT * FROM (", dbplyr::sql_render(x, x$src$con), ") AS s SAMPLE ", as.integer(size)) at /Users/hadley/Documents/dplyr/dbplyr/revdep/checks.noindex/MonetDBLite/new/MonetDBLite.Rcheck/00_pkg_src/MonetDBLite/R/dplyr.R:48
-      11: stop("`con` must not be NULL", call. = FALSE) at /private/tmp/RtmpuqofJs/R.INSTALL38a48127a87/dbplyr/R/build-sql.R:34
+      Evaluating t1_src
+      Evaluating t3_src
+      [31m──[39m [31m1. Failure: check_cardinality_...() functions are checking the cardinality corre[39m
+      `map2(...)` produced warnings.
       
-      [1] "E"
-      [1] "H"
-      [1] "M"
-      ══ testthat results  ════════════════════════════════════════════════════════════════════════
-      OK: 297 SKIPPED: 13 WARNINGS: 11 FAILED: 1
-      1. Error: sample works (@test_04_dplyr.R#41) 
+      <unknown>:1753848: Invalid asm.js: Function definition doesn't match use
+      ══ testthat results  ══════════════════════════════════════════════════════════════
+      [ OK: 739 | SKIPPED: 42 | WARNINGS: 0 | FAILED: 1 ]
+      1. Failure: check_cardinality_...() functions are checking the cardinality correctly? (@test-check-cardinalities.R#7) 
       
       Error: testthat unit tests failed
+      In addition: Warning message:
+      In file(filename, "r", encoding = encoding) :
+        cannot open file '/Users/tobiasschieferdecker/git/cynkra/dm/.Rprofile': No such file or directory
       Execution halted
     ```
 
-## Newly fixed
+## In both
+
+*   checking dependencies in R code ... NOTE
+    ```
+    Namespace in Imports field not imported from: ‘DT’
+      All declared Imports should be used.
+    ```
+
+# resourcer
+
+<details>
+
+* Version: 1.0.0
+* Source code: https://github.com/cran/resourcer
+* BugReports: https://github.com/obiba/resourcer
+* Date/Publication: 2020-04-02 15:50:02 UTC
+* Number of recursive dependencies: 85
+
+Run `revdep_details(,"resourcer")` for more info
+
+</details>
+
+## Newly broken
 
 *   R CMD check timed out
     
-
-## In both
-
-*   checking installed package size ... NOTE
-    ```
-      installed size is  6.1Mb
-      sub-directories of 1Mb or more:
-        libs   5.4Mb
-    ```
 

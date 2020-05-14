@@ -333,21 +333,24 @@ base_win <- sql_translator(
     win_over(
       sql_expr(FIRST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   last = function(x, order_by = NULL) {
     win_over(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   nth = function(x, n, order_by = NULL) {
     win_over(
       sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
 
@@ -355,14 +358,16 @@ base_win <- sql_translator(
     win_over(
       sql_expr(LEAD(!!x, !!n, !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       sql_expr(LAG(!!x, !!as.integer(n), !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   # Recycled aggregate fuctions take single argument, don't need order and
@@ -590,10 +595,9 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 # Utility functions ------------------------------------------------------------
 
 unique_table_name <- local({
-  i <- 0
-
   function() {
-    i <<- i + 1
+    i <- getOption("dbplyr_table_num", 0) + 1
+    options(dbplyr_table_num = i)
     sprintf("dbplyr_%03i", i)
   }
 })
@@ -608,7 +612,7 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 
 
 dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
+dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))
+dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(x)
+dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))

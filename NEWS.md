@@ -1,3 +1,25 @@
+# dbplyr (development version)
+
+# dbplyr 1.4.3
+
+* dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
+  RMySQL) for its internal tests and data functions (#427).
+
+* The Date and POSIXt methods for `escape()` now use exported 
+  `sql_escape_date()` and `sql_escape_datetime()` generics to allow backend
+  specific formatting of date and datetime literals. These are used to
+  provide methods for Athena and Presto backends (@OssiLehtinen, #384, #391).
+
+* `first()`, `last()`, `nth()`, `lead()` and `lag()` now respect the
+  `window_frame()` (@krlmlr, #366).
+
+* SQL server: new translations for `str_flatten()` (@PauloJhonny, #405).
+
+* SQL server: temporary datasets are now session-local, not global (#401).
+
+* Postgres: correct `str_detect()`, `str_replace()` and `str_replace_all()` 
+  translation (@shosaco, #362).
+
 # dbplyr 1.4.2
 
 * Fix bug when partially evaluating unquoting quosure containing a single 

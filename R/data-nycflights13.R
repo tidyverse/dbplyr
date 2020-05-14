@@ -15,8 +15,8 @@ nycflights13_sqlite <- function(path = NULL) {
   cache_computation("nycflights_sqlite", {
     path <- db_location(path, "nycflights13.sqlite")
     message("Caching nycflights db at ", path)
-    src <- src_sqlite(path, create = TRUE)
-    copy_nycflights13(src)
+    con <- DBI::dbConnect(RSQLite::SQLite(), dbname = path, create = TRUE)
+    copy_nycflights13(con)
   })
 }
 
@@ -26,7 +26,8 @@ nycflights13_sqlite <- function(path = NULL) {
 nycflights13_postgres <- function(dbname = "nycflights13", ...) {
   cache_computation("nycflights_postgres", {
     message("Caching nycflights db in postgresql db ", dbname)
-    copy_nycflights13(src_postgres(dbname, ...))
+    con <- DBI::dbConnect(RPostgres::Postgres(), dbname = dbname, ...)
+    copy_nycflights13(con)
   })
 }
 
@@ -39,15 +40,15 @@ has_nycflights13 <- function(type = c("sqlite", "postgresql"), ...) {
 
   succeeds(switch(
     type,
-    sqlite = nycflights13_sqlite(...), quiet = TRUE,
-    postgres = nycflights13_postgres(...), quiet = TRUE
-  ))
+    sqlite = nycflights13_sqlite(...),
+    postgres = nycflights13_postgres(...)
+  ), quiet = TRUE)
 }
 
 
 #' @export
 #' @rdname nycflights13
-copy_nycflights13 <- function(src, ...) {
+copy_nycflights13 <- function(con, ...) {
   all <- utils::data(package = "nycflights13")$results[, 3]
   unique_index <- list(
     airlines = list("carrier"),
@@ -59,7 +60,7 @@ copy_nycflights13 <- function(src, ...) {
     weather =  list(c("year", "month", "day"), "origin")
   )
 
-  tables <- setdiff(all, src_tbls(src))
+  tables <- setdiff(all, DBI::dbListTables(con))
 
   # Create missing tables
   for (table in tables) {
@@ -67,11 +68,11 @@ copy_nycflights13 <- function(src, ...) {
     message("Creating table: ", table)
 
     copy_to(
-      src, df, table,
+      con, df, table,
       unique_indexes = unique_index[[table]],
       indexes = index[[table]],
       temporary = FALSE
     )
   }
-  src
+  src_dbi(con)
 }

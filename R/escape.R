@@ -69,14 +69,12 @@ escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x <- as.character(x)
-  escape.character(x, parens = parens, collapse = collapse, con = con)
+  sql_vector(sql_escape_date(con, x), parens, collapse, con = con)
 }
 
 #' @export
 escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
-  escape.character(x, parens = parens, collapse = collapse, con = con)
+  sql_vector(sql_escape_datetime(con, x), parens, collapse, con = con)
 }
 
 #' @export
@@ -133,7 +131,7 @@ escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
     "If you are seeing this error in code that used to work, the most likely ",
     "cause is a change dbplyr 1.4.0. Previously `df$x` or `df[[y]]` implied ",
     "that `df` was a local variable, but  now you must make that explict ",
-    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]))"
+    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]])"
   )
 
   abort(paste(strwrap(message), collapse = "\n"))
@@ -146,7 +144,7 @@ escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL)
     "If you are seeing this error in code that used to work, the most likely ",
     "cause is a change dbplyr 1.4.0. Previously `df$x` or `df[[y]]` implied ",
     "that `df` was a local variable, but  now you must make that explict ",
-    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]))"
+    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]])"
   )
 
   abort(paste(strwrap(message), collapse = "\n"))
@@ -229,11 +227,37 @@ sql_escape_logical <- function(con, x) {
   UseMethod("sql_escape_logical")
 }
 
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_date <- function(con, x) {
+  UseMethod("sql_escape_date")
+}
+
+
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_datetime <- function(con, x) {
+  UseMethod("sql_escape_datetime")
+}
+
 # DBIConnection methods --------------------------------------------------------
 
 #' @export
 sql_escape_string.DBIConnection <- function(con, x) {
   dbQuoteString(con, x)
+}
+
+#' @export
+sql_escape_date.DBIConnection <- function(con, x) {
+  sql_escape_string(con, as.character(x))
+}
+
+#' @export
+sql_escape_datetime.DBIConnection <- function(con, x) {
+  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
+  sql_escape_string(con, x)
 }
 
 #' @export

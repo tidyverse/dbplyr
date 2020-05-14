@@ -1,6 +1,6 @@
 cache <- function() {
   if (!is_attached("dbplyr_cache")) {
-    get("attach")(new_environment(), name = "dbplyr_cache")
+    get("attach")(new_environment(), name = "dbplyr_cache", pos = length(search()) - 1)
   }
   search_env("dbplyr_cache")
 }

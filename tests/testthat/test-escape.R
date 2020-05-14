@@ -78,10 +78,12 @@ test_that("logical is SQL-99 compatible (by default)", {
 
 # Date-time ---------------------------------------------------------------
 
-test_that("date-times are converted to ISO 8601", {
+test_that("date and date-times are converted to ISO 8601", {
   con <- simulate_dbi()
-  x <- ISOdatetime(2000, 1, 2, 3, 4, 5, tz = "US/Central")
-  expect_equal(escape(x, con = con), sql("'2000-01-02T09:04:05Z'"))
+  x1 <- ISOdatetime(2000, 1, 2, 3, 4, 5, tz = "US/Central")
+  x2 <- as.Date(x1)
+  expect_equal(escape(x1, con = con), sql("'2000-01-02T09:04:05Z'"))
+  expect_equal(escape(x2, con = con), sql("'2000-01-02'"))
 })
 
 # names_to_as() -----------------------------------------------------------

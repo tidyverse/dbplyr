@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom dplyr distinct
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   if (dots_n(...) > 0) {
     if (.keep_all) {

@@ -85,7 +85,7 @@ df <- tibble(
   x = c(10L, 10L, -10L, -10L), 
   y = c(3L, -3L, 3L, -3L)
 )
-mf <- src_memdb() %>% copy_to(df, overwrite = TRUE)
+mf <- tbl_memdb(df)
 
 df %>% mutate(x %% y, x %/% y)
 
@@ -169,7 +169,7 @@ Things get a little trickier with window functions, because SQL's window functio
   the start and end of frame. There are three special values: -Inf means
   to include all preceding rows (in SQL, "unbounded preceding"), 0 means the
   current row ("current row"), and Inf means all following rows ("unbounded
-  following)". The complete set of options is comprehensive, but fairly 
+  following"). The complete set of options is comprehensive, but fairly 
   confusing, and is summarised visually below.
 
     ```{r echo = FALSE, out.width = "100%"}

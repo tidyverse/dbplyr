@@ -62,7 +62,7 @@
 #'
 #' people <- tbl(lahman_s, "Master")
 #'
-#' # All people in half of fame
+#' # All people in hall of fame
 #' hof <- tbl(lahman_s, "HallOfFame")
 #' semi_join(people, hof)
 #'
@@ -102,6 +102,7 @@ NULL
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr inner_join
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
                                 auto_index = FALSE, ...,
@@ -121,6 +122,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr left_join
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
                                auto_index = FALSE, ...,
@@ -140,6 +142,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr right_join
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = c(".x", ".y"),
                                 auto_index = FALSE, ...,
@@ -159,6 +162,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr full_join
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = c(".x", ".y"),
                                auto_index = FALSE, ...,
@@ -178,6 +182,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr semi_join
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL) {
@@ -195,6 +200,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr anti_join
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL) {
@@ -221,7 +227,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(
@@ -246,7 +252,7 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(

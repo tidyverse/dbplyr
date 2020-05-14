@@ -6,6 +6,7 @@
 #'   of memory. If it's too small, it will be slow, because of the overhead of
 #'   talking to the database.
 #' @export
+#' @importFrom dplyr do
 do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   groups_sym <- groups(.data)
 
@@ -56,7 +57,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     }
 
     # Create an id for each group
-    grouped <- chunk %>% group_by(!!! syms(names(chunk)[gvars]))
+    grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
 
     if (utils::packageVersion("dplyr") < "0.7.9") {
       index <- attr(grouped, "indices")
@@ -96,9 +97,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
   }
 
   if (!named) {
-    label_output_dataframe(labels, out, groups(.data))
+    label_output_dataframe(labels, out, group_vars(.data))
   } else {
-    label_output_list(labels, out, groups(.data))
+    label_output_list(labels, out, group_vars(.data))
   }
 }
 
@@ -115,7 +116,7 @@ label_output_dataframe <- function(labels, out, groups) {
   }
 
   rows <- vapply(out[[1]], nrow, numeric(1))
-  out <- bind_rows(out[[1]])
+  out <- dplyr::bind_rows(out[[1]])
 
   if (!is.null(labels)) {
     # Remove any common columns from labels
@@ -125,20 +126,20 @@ label_output_dataframe <- function(labels, out, groups) {
     labels <- labels[rep(seq_len(nrow(labels)), rows), , drop = FALSE]
     rownames(labels) <- NULL
 
-    grouped_df(bind_cols(labels, out), groups)
+    dplyr::grouped_df(dplyr::bind_cols(labels, out), groups)
   } else {
-    rowwise(out)
+    dplyr::rowwise(out)
   }
 }
 
 label_output_list <- function(labels, out, groups) {
   if (!is.null(labels)) {
     labels[names(out)] <- out
-    rowwise(labels)
+    dplyr::rowwise(labels)
   } else {
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
-    rowwise(out)
+    dplyr::rowwise(out)
   }
 }
 

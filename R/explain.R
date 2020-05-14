@@ -1,3 +1,4 @@
+#' @importFrom dplyr show_query
 #' @export
 show_query.tbl_lazy <- function(x, ...) {
   cat_line("<SQL>")
@@ -5,6 +6,7 @@ show_query.tbl_lazy <- function(x, ...) {
   invisible(x)
 }
 
+#' @importFrom dplyr explain
 #' @export
 explain.tbl_sql <- function(x, ...) {
   force(x)
