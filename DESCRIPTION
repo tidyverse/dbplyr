@@ -48,6 +48,8 @@ Suggests:
     testthat (>= 2.0.0)
 VignetteBuilder: 
     knitr
+Remotes: 
+    r-dbi/odbc
 Encoding: UTF-8
 Language: en-gb
 LazyData: yes
