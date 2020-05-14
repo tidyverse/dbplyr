@@ -21,7 +21,7 @@ jobs:
       - name: Query dependencies
         run: |
           install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE, type = "binary"), ".github/depends.Rds", version = 2)
         shell: Rscript {0}
 
       - name: Cache R packages
@@ -34,8 +34,8 @@ jobs:
       - name: Install dependencies
         run: |
           install.packages(c("remotes"))
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("covr")
+          remotes::install_deps(dependencies = TRUE, type = "binary")
+          remotes::install_cran("covr", type = "binary")
         shell: Rscript {0}
 
       - name: Test coverage
