@@ -35,7 +35,7 @@ $semi
 SELECT * FROM `df` AS `LHS`
 WHERE EXISTS (
   SELECT 1 FROM `df` AS `RHS`
-  WHERE (`LHS`. = `RHS`.)
+  WHERE (LHS.y < RHS.z)
 )
 
 $anti
@@ -43,6 +43,6 @@ $anti
 SELECT * FROM `df` AS `LHS`
 WHERE NOT EXISTS (
   SELECT 1 FROM `df` AS `RHS`
-  WHERE (`LHS`. = `RHS`.)
+  WHERE (LHS.y < RHS.z)
 )
 
