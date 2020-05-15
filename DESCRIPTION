@@ -28,6 +28,7 @@ Imports:
     dplyr (>= 0.8.0),
     glue (>= 1.2.0),
     lifecycle,
+    magrittr,
     methods,
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
@@ -92,6 +93,7 @@ Collate:
     'query-semi-join.R'
     'query-set-op.R'
     'query.R'
+    'reexport.R'
     'remote.R'
     'schema.R'
     'simulate.R'
