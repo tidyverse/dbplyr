@@ -17,6 +17,14 @@
   if (!methods::isClass("sql")) {
     setOldClass(c("sql", "character"), sql())
   }
+
+  if (!methods::isClass("ident")) {
+    setOldClass(c("ident", "sql", "character"), ident())
+  }
+
+  if (!methods::isClass("ident_q")) {
+    setOldClass(c("ident_q", "ident", "sql", "character"), ident_q())
+  }
 }
 
 register_s3_method <- function(pkg, generic, class, fun = NULL) {
