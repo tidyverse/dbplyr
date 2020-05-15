@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `str_detect()` translation for Postgres uses same argument names as stringr,
+  and gains a `negate` argument (#444).
+
 # dbplyr 1.4.3
 
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
