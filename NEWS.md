@@ -6,6 +6,13 @@
   (see https://github.com/r-dbi/DBI/issues/215#issuecomment-356376133). 
   (@okhoma, #433)
 
+* Added `setOldClass()` calls for `"ident"` and `"ident_q"` classes for compatibility with dplyr 1.0.0 (#448, @krlmlr).
+
+* `str_detect()` translation for Postgres uses same argument names as stringr,
+  and gains a `negate` argument (#444).
+
+* `semi_join()` and `anti_join()` now correctly support the `sql_on` argument (#443, @krlmlr).
+
 # dbplyr 1.4.3
 
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 

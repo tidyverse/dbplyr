@@ -52,7 +52,13 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_locate  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
-      str_detect = sql_infix("~"),
+      str_detect = function(string, pattern, negate = FALSE) {
+        if (isTRUE(negate)) {
+          sql_expr(!(!!string ~ !!pattern))
+        } else {
+          sql_expr(!!string ~ !!pattern)
+        }
+      },
       str_replace = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },

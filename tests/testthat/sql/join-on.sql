@@ -30,3 +30,19 @@ FULL JOIN `df` AS `RHS`
 ON (LHS.y < RHS.z)
 
 
+$semi
+<SQL>
+SELECT * FROM `df` AS `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (LHS.y < RHS.z)
+)
+
+$anti
+<SQL>
+SELECT * FROM `df` AS `LHS`
+WHERE NOT EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (LHS.y < RHS.z)
+)
+

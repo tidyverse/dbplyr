@@ -26,7 +26,9 @@ test_that("sql_on query doesn't change unexpectedly", {
     inner = inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
     left = left_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
     right = right_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
-    full = full_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
+    full = full_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
+    semi = semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
+    anti = anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
   )
   expect_known_output(print(reg), test_path("sql/join-on.sql"))
 })
