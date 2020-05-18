@@ -11,10 +11,14 @@ tbl_sql(subclass, src, from, ..., vars = NULL)
 
 \item{...}{needed for agreement with generic. Not otherwise used.}
 
-\item{vars}{DEPRECATED}
+\item{vars}{Provide column names as a character vector
+to avoid retrieving them from the database.
+Mainly useful for better performance when creating
+multiple \code{tbl} objects.}
 }
 \description{
 Generally, you should no longer need to provide a custom \code{tbl()}
-method you you can default \code{tbl.DBIConnect} method.
+method.
+The default \code{tbl.DBIConnect} method should work in most cases.
 }
 \keyword{internal}
