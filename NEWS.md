@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* `escape()` now support `raw` and `blob` vectors using new `sql_escape_raw()` 
+  generic. It eables using [blob](https://blob.tidyverse.org/) variables in 
+  dplyr verbs, for example to filter nvarchar values by UTF-16 blobs
+  (see https://github.com/r-dbi/DBI/issues/215#issuecomment-356376133). 
+  (@okhoma, #433)
+
 # dbplyr 1.4.3
 
 * dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
