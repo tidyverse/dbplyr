@@ -114,6 +114,12 @@ escape.raw <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.blob <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+  pieces <- vapply(x, escape, character(1), con = con)
+  sql_vector(pieces, parens, collapse, con = con)
+}
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
@@ -218,17 +224,6 @@ sql_quote <- function(x, quote) {
   y
 }
 
-#' Helper function to convert raw vector to hex string
-#'
-#' @param x Raw vector
-#' @export
-#' @keywords internal
-#' @examples
-#' sql_raw_to_hex(charToRaw("abc"))
-sql_raw_to_hex <- function(x) {
-  paste(sprintf("%02X", as.integer(x)), collapse = "")
-}
-
 #' More SQL generics
 #'
 #' These are new, so not included in dplyr for backward compatibility
@@ -293,6 +288,9 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y
 }
 
+#' @export
 sql_escape_raw.DBIConnection <- function(con, x) {
-  paste0("X'", sql_raw_to_hex(x), "'")
+  # SQL-99 standard for BLOB literals
+  # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
+  paste0(c("X'", format(x), "'"), collapse = "")
 }

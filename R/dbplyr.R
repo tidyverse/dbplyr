@@ -6,6 +6,7 @@
 #' @importFrom methods setOldClass
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n
+#' @importFrom blob is_blob as_blob
 #' @import rlang
 #' @import DBI
 #' @import tibble

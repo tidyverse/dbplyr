@@ -35,6 +35,7 @@ Imports:
     rlang (>= 0.2.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
+    blob (>= 1.2.0),
     utils
 Suggests:
     bit64,

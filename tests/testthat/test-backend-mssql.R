@@ -205,15 +205,15 @@ test_that("custom escapes translated correctly", {
 
   mf <- lazy_frame(x = "abc", con = simulate_mssql())
 
-  a <- charToRaw("abc")
-  b <- as.raw(c(0x01, 0x02))
+  a <- as_blob("abc")
+  b <- as_blob(as.raw(c(0x01, 0x02)))
 
   expect_equal(
     mf %>% filter(x == a) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = (0x616263))")
   )
 
-  L <- list(a, b)
+  L <- c(a, b)
   expect_equal(
     mf %>% filter(x %in% L) %>% sql_render(),
     sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")

@@ -92,6 +92,7 @@ test_that("raw is SQL-99 compatible (by default)", {
   con <- simulate_dbi()
   expect_equal(escape(raw(0), con = con), sql("X''"))
   expect_equal(escape(as.raw(c(0x01, 0x02, 0x03)), con = con), sql("X'010203'"))
+  expect_equal(escape(as.raw(c(0x00, 0xff)), con = con), sql("X'00ff'"))
 })
 
 # names_to_as() -----------------------------------------------------------
