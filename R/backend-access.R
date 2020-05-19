@@ -21,7 +21,7 @@ sql_select.ACCESS <- function(con, select, from,
     # Access uses the TOP statement instead of LIMIT which is what SQL92 uses
     # TOP is expected after DISTINCT and not at the end of the query
     # e.g: SELECT TOP 100 * FROM my_table
-    if (!is.null(limit) && !identical(limit, Inf)) {
+    if (sql_has_limit(limit)) {
       build_sql("TOP ", as.integer(limit), " ", con = con)
     },
 
