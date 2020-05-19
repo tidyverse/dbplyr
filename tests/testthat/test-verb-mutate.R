@@ -140,7 +140,7 @@ test_that("mutate generates subqueries as needed", {
     increment = lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
   )
 
-  expect_known_output(print(reg), test_path("sql/mutate-subqueries.sql"))
+  expect_known_output(print(reg), test_path("sql/mutate-subqueries.txt"))
 })
 
 test_that("mutate collapses over nested select", {
@@ -151,7 +151,7 @@ test_that("mutate collapses over nested select", {
     yx = lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2)
   )
 
-  expect_known_output(print(reg), test_path("sql/mutate-select-collapse.sql"))
+  expect_known_output(print(reg), test_path("sql/mutate-select-collapse.txt"))
 })
 
 # sql_build ---------------------------------------------------------------

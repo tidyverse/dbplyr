@@ -8,7 +8,7 @@ test_that("quantile and median don't change without warning", {
     median_win = translate_sql(median(x), vars_group = "g")
   )
 
-  expect_known_output(print(reg), test_path("sql/backend-quantile.sql"))
+  expect_known_output(print(reg), test_path("sql/backend-quantile.txt"))
 })
 
 test_that("checks for invalid probs", {

@@ -14,5 +14,5 @@ test_that("generated sql doesn't change unexpectedly", {
     semi = semi_join(lf, lf),
     anti = anti_join(lf, lf)
   )
-  expect_known_output(print(reg), test_path("sql/semi-join.sql"))
+  expect_known_output(print(reg), test_path("sql/semi-join.txt"))
 })

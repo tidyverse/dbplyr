@@ -15,5 +15,5 @@ test_that("generated sql doesn't change unexpectedly", {
     setdiff = setdiff(lf, lf),
     intersect = intersect(lf, lf)
   )
-  expect_known_output(print(reg), test_path("sql/setop.sql"))
+  expect_known_output(print(reg), test_path("sql/setop.txt"))
 })

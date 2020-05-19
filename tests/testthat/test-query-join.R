@@ -16,7 +16,7 @@ test_that("generated sql doesn't change unexpectedly", {
     right = right_join(lf, lf),
     full = full_join(lf, lf)
   )
-  expect_known_output(print(reg), test_path("sql/join.sql"))
+  expect_known_output(print(reg), test_path("sql/join.txt"))
 })
 
 test_that("sql_on query doesn't change unexpectedly", {
@@ -30,5 +30,5 @@ test_that("sql_on query doesn't change unexpectedly", {
     semi = semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z"),
     anti = anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
   )
-  expect_known_output(print(reg), test_path("sql/join-on.sql"))
+  expect_known_output(print(reg), test_path("sql/join-on.txt"))
 })
