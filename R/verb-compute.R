@@ -8,7 +8,7 @@
 #' @param x A `tbl_sql`
 #' @importFrom dplyr collapse
 collapse.tbl_sql <- function(x, ...) {
-  sql <- db_sql_render(x$src$con, x)
+  sql <- db_sql_render(x$src$con, x, order_by = "ignore")
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%
@@ -36,8 +36,7 @@ compute.tbl_sql <- function(x,
   assert_that(all(unlist(indexes) %in% vars))
   assert_that(all(unlist(unique_indexes) %in% vars))
 
-  x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$src$con, x_aliased$ops)
+  sql <- db_sql_render(x$src$con, x$ops, order_by = "emit")
 
   name <- db_compute(x$src$con, name, sql,
     temporary = temporary,

@@ -51,14 +51,29 @@ print.select_query <- function(x, ...) {
 }
 
 #' @export
-sql_optimise.select_query <- function(x, con = NULL, ...) {
+sql_optimise.select_query <- function(x, con = NULL, ..., order_by) {
+  squashed <- squash_select_query(x, order_by)
+  elide_order_by(squashed, order_by)
+}
+
+squash_select_query <- function(x, order_by) {
   if (!inherits(x$from, "select_query")) {
     return(x)
   }
 
   # Update x$from with the optimised version
   # before deciding whether to squash or return
-  x$from <- sql_optimise(x$from)
+  if (sql_has_limit(x$limit)) {
+    order_by <- "emit"
+  } else {
+    if (length(x$order_by) > 0) {
+      order_by <- "override"
+    } else if (order_by == "emit") {
+      order_by <- "erase"
+    }
+    # otherwise leave order_by unchanged from caller's value
+  }
+  x$from <- sql_optimise(x$from, order_by = order_by)
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
@@ -93,8 +108,32 @@ select_query_clauses <- function(x) {
   ordered(names(present)[present], levels = names(present))
 }
 
+elide_order_by <- function(query, order_by) {
+  # ORDER BY always permitted in top-level queries
+  if (order_by == "emit") {
+    return(query)
+  }
+
+  # Otherwise, ORDER BY permitted only if limit given
+  if (!sql_has_limit(query$limit)) {
+    if (length(query$order_by) > 0) {
+      if (order_by == "override") {
+        warn("Overriding sort order.\nHint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.")
+      } else if (order_by == "erase") {
+        warn("Ignoring sort order.\nHint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.")
+      }
+    }
+
+    query$order_by <- NULL
+  }
+
+  query
+}
+
 #' @export
-sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE) {
+sql_render.select_query <- function(query, con, ...,
+                                    bare_identifier_ok = FALSE) {
+
   from <- sql_subquery(con,
     sql_render(query$from, con, ..., bare_identifier_ok = TRUE),
     name = NULL

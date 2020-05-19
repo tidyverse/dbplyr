@@ -13,21 +13,25 @@ ORDER BY `a`
 
 > lf %>% arrange(a) %>% union_all(rf)
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 (SELECT `a`, `b`, NULL AS `c`
-FROM (SELECT *
-FROM `df`
-ORDER BY `a`) `dbplyr_002`)
+FROM `df`)
 UNION ALL
 (SELECT `a`, NULL AS `b`, `c`
 FROM `df`)
 
 > lf %>% union_all(rf %>% arrange(a))
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 (SELECT `a`, `b`, NULL AS `c`
 FROM `df`)
 UNION ALL
 (SELECT `a`, NULL AS `b`, `c`
-FROM (SELECT *
-FROM `df`
-ORDER BY `a`) `dbplyr_003`)
+FROM `df`)
 

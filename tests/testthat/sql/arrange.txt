@@ -13,47 +13,60 @@ ORDER BY `a`
 > # double arrange
 > lf %>% arrange(a) %>% arrange(b)
 <SQL>
+
+Warning: Overriding sort order.
+Hint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.
+
 SELECT *
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_001`
 ORDER BY `b`
 
 > # remove ordered by
 > lf %>% arrange(a) %>% select(-a)
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_002`
 
 > lf %>% arrange(a) %>% select(-a) %>% arrange(b)
 <SQL>
+
+Warning: Overriding sort order.
+Hint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.
+
 SELECT `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_003`
 ORDER BY `b`
 
 > # un-arrange
 > lf %>% arrange(a) %>% arrange()
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT *
 FROM `df`
-ORDER BY `a`
 
 > lf %>% arrange(a) %>% select(-a) %>% arrange()
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_004`
 
 > # use order
 > lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_005`
 

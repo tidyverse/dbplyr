@@ -5,10 +5,13 @@
 Message: Joining, by = "a"
 
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
 FROM (SELECT *
-FROM `df`
-ORDER BY `a`) `LHS`
+FROM `df`) `LHS`
 LEFT JOIN `df` AS `RHS`
 ON (`LHS`.`a` = `RHS`.`a`)
 
@@ -17,10 +20,13 @@ ON (`LHS`.`a` = `RHS`.`a`)
 Message: Joining, by = "a"
 
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
 FROM (SELECT *
-FROM `df`
-ORDER BY `b`) `LHS`
+FROM `df`) `LHS`
 LEFT JOIN `df` AS `RHS`
 ON (`LHS`.`a` = `RHS`.`a`)
 
@@ -53,11 +59,14 @@ ORDER BY `b`
 Message: Joining, by = "a"
 
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
 FROM `df` AS `LHS`
 LEFT JOIN (SELECT *
-FROM `df`
-ORDER BY `a`) `RHS`
+FROM `df`) `RHS`
 ON (`LHS`.`a` = `RHS`.`a`)
 
 
@@ -65,11 +74,14 @@ ON (`LHS`.`a` = `RHS`.`a`)
 Message: Joining, by = "a"
 
 <SQL>
+
+Warning: Ignoring sort order.
+Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+
 SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
 FROM `df` AS `LHS`
 LEFT JOIN (SELECT *
-FROM `df`
-ORDER BY `c`) `RHS`
+FROM `df`) `RHS`
 ON (`LHS`.`a` = `RHS`.`a`)
 
 

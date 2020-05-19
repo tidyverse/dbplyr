@@ -30,12 +30,12 @@ print.semi_join_query <- function(x, ...) {
 sql_render.semi_join_query <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
   from_x <- sql_subquery(
     con,
-    sql_render(query$x, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$x, con, ..., bare_identifier_ok = TRUE, order_by = "erase"),
     name = "LHS"
   )
   from_y <- sql_subquery(
     con,
-    sql_render(query$y, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$y, con, ..., bare_identifier_ok = TRUE, order_by = "erase"),
     name = "RHS"
   )
 

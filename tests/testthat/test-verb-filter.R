@@ -55,7 +55,7 @@ test_that("cumulative aggregates generate window function", {
   df1 <- memdb_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
   out <- df1 %>%
     group_by(g) %>%
-    arrange(x) %>%
+    window_order(x) %>%
     filter(cumsum(x) > 3) %>%
     collect()
 

@@ -8,7 +8,33 @@ test_that("quoting for rendering ordered grouped table", {
 
 # sql_build ---------------------------------------------------------------
 
-test_that("arrange generates order_by", {
+test_that("arrange skips order_by with order_by override or ignore, with warning", {
+  lf <-
+    lazy_frame(x = 1, y = 1) %>%
+    arrange(x)
+
+  expect_warning(
+    out <- sql_build(lf, order_by = "override")
+  )
+  expect_null(out$order_by)
+
+  expect_warning(
+    out <- sql_build(lf, order_by = "erase")
+  )
+  expect_null(out$order_by)
+})
+
+test_that("arrange skips order_by with order_by ignore, silently", {
+  lf <-
+    lazy_frame(x = 1, y = 1) %>%
+    arrange(x)
+
+  out <- sql_build(lf, order_by = "ignore")
+
+  expect_null(out$order_by)
+})
+
+test_that("arrange generates order_by by default", {
   out <- lazy_frame(x = 1, y = 1) %>%
     arrange(x) %>%
     sql_build()

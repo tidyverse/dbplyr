@@ -28,10 +28,10 @@ sql_build <- function(op, con = NULL, ...) {
 }
 
 #' @export
-sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
+sql_build.tbl_lazy <- function(op, con = op$src$con, ..., order_by = "emit") {
   # only used for testing
   qry <- sql_build(op$ops, con = con, ...)
-  sql_optimise(qry, con = con, ...)
+  sql_optimise(qry, con = con, ..., order_by = order_by)
 }
 
 #' @export
@@ -52,14 +52,18 @@ sql_render <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ..., bare_identifier_ok = FALSE) {
-  sql_render(query$ops, con = con, ..., bare_identifier_ok = bare_identifier_ok)
+sql_render.tbl_lazy <- function(query, con = query$src$con, ...,
+                                bare_identifier_ok = FALSE, order_by = "emit") {
+
+  sql_render(query$ops, con = con, ..., bare_identifier_ok = bare_identifier_ok, order_by = order_by)
 }
 
 #' @export
-sql_render.op <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+sql_render.op <- function(query, con = NULL, ...,
+                          bare_identifier_ok = FALSE, order_by = "emit") {
+
   qry <- sql_build(query, con = con, ...)
-  qry <- sql_optimise(qry, con = con, ...)
+  qry <- sql_optimise(qry, con = con, ..., order_by = order_by)
   sql_render(qry, con = con, ..., bare_identifier_ok = bare_identifier_ok)
 }
 
