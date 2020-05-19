@@ -69,27 +69,29 @@ test_that("select preserves grouping vars", {
 
 # sql_render --------------------------------------------------------------
 
-test_that("multiple selects are collapsed", {
+verify_lazy_output("sql/select-collapse.sql", {
+  "# multiple selects are collapsed"
   lf <- lazy_frame(x = 1, y = 2)
 
-  reg <- list(
-    flip2 = lf %>% select(2:1) %>% select(2:1),
-    flip3 = lf %>% select(2:1) %>% select(2:1) %>% select(2:1),
-    rename = lf %>% select(x1 = x) %>% select(x2 = x1)
-  )
+  "flip two times"
+  lf %>% select(2:1) %>% select(2:1)
 
-  expect_known_output(print(reg), test_path("sql/select-collapse.sql"))
+  "flip three times"
+  lf %>% select(2:1) %>% select(2:1) %>% select(2:1)
+
+  "rename"
+  lf %>% select(x1 = x) %>% select(x2 = x1)
 })
 
-test_that("mutate collapses over nested select", {
+verify_lazy_output("sql/select-mutate-collapse.sql", {
+  "# mutate collapses over nested select"
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
-  reg <- list(
-    a = lf %>% mutate(a = 1, b = 2) %>% select(a),
-    x = lf %>% mutate(a = 1, b = 2) %>% select(x)
-  )
+  "a"
+  lf %>% mutate(a = 1, b = 2) %>% select(a)
 
-  expect_known_output(print(reg), test_path("sql/select-mutate-collapse.sql"))
+  "x"
+  lf %>% mutate(a = 1, b = 2) %>% select(x)
 })
 
 

@@ -63,117 +63,6 @@ test_that("custom window functions translated correctly", {
   expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
 
-test_that("filter and mutate translate is.na correctly", {
-  mf <- lazy_frame(x = 1, con = simulate_mssql())
-
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT TOP(6) *\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(z = is.na(x)) %>% sql_render(),
-    sql("SELECT `x`, CONVERT(BIT, IIF(`x` IS NULL, 1, 0)) AS `z`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(z = !is.na(x)) %>% sql_render(),
-    sql("SELECT `x`, ~(CONVERT(BIT, IIF(`x` IS NULL, 1, 0))) AS `z`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(is.na(x)) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x == 1) %>% sql_render(),
-    sql("SELECT `x` = 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x != 1) %>% sql_render(),
-    sql("SELECT `x` != 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 1) %>% sql_render(),
-    sql("SELECT `x` > 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x >= 1) %>% sql_render(),
-    sql("SELECT `x` >= 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x == 1)) %>% sql_render(),
-    sql("SELECT ~((`x` = 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x != 1)) %>% sql_render(),
-    sql("SELECT ~((`x` != 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x > 1)) %>% sql_render(),
-    sql("SELECT ~((`x` > 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x >= 1)) %>% sql_render(),
-    sql("SELECT ~((`x` >= 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 4 & x < 5) %>% sql_render(),
-    sql("SELECT `x` > 4.0 & `x` < 5.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(x > 4 & x < 5) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 AND `x` < 5.0)")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 4 | x < 5) %>% sql_render(),
-    sql("SELECT `x` > 4.0 | `x` < 5.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(x > 4 | x < 5) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 OR `x` < 5.0)")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = ifelse(x == 0, 0 ,1)) %>% sql_render(),
-    sql("SELECT CASE WHEN (`x` = 0.0) THEN (0.0) WHEN NOT(`x` = 0.0) THEN (1.0) END AS `x`\nFROM `df`")
-  )
-})
-
-test_that("Special ifelse and case_when cases return the correct queries", {
-  mf <- lazy_frame(x = 1, con = simulate_mssql())
-  expect_equal(
-    mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)) %>% sql_render(),
-    sql("SELECT `x`, CASE WHEN (`x` IN (1.0, 2.0)) THEN (0.0) WHEN NOT(`x` IN (1.0, 2.0)) THEN (1.0) END AS `z`
-FROM `df`")
-  )
-  expect_equal(
-    mf %>% mutate(z = case_when(is.na(x) ~ 1, !is.na(x) ~ 2, TRUE ~ 3)) %>% sql_render(),
-    sql("SELECT `x`, CASE\nWHEN (((`x`) IS NULL)) THEN (1.0)\nWHEN (NOT(((`x`) IS NULL))) THEN (2.0)\nELSE (3.0)\nEND AS `z`\nFROM `df`")
-  )
-})
-
-test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
-  mf <- lazy_frame(x = 1:3, con = simulate_mssql())
-
-  expect_equal(
-    mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render(),
-    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
-  )
-})
-
 test_that("custom lubridate functions translated correctly", {
 
   trans <- function(x) {
@@ -199,4 +88,53 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(trans(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
   expect_equal(trans(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
   expect_error(trans(quarter(x, fiscal_start = 5)))
+})
+
+verify_lazy_output("sql/mssql.sql", {
+  mf <- lazy_frame(x = 1:3, con = simulate_mssql())
+
+  "# filter and mutate translate is.na correctly"
+  mf %>% head()
+
+  mf %>% mutate(z = is.na(x))
+
+  mf %>% mutate(z = !is.na(x))
+
+  mf %>% filter(is.na(x))
+
+  "Invalid, can we reliably detect that the return value is logical?"
+  mf %>% mutate(x = x == 1)
+
+  mf %>% mutate(x = x != 1)
+
+  mf %>% mutate(x = x > 1)
+
+  mf %>% mutate(x = x >= 1)
+
+  mf %>% mutate(x = !(x == 1))
+
+  mf %>% mutate(x = !(x != 1))
+
+  mf %>% mutate(x = !(x > 1))
+
+  mf %>% mutate(x = !(x >= 1))
+
+  mf %>% mutate(x = x > 4 & x < 5)
+
+  mf %>% filter(x > 4 & x < 5)
+
+  mf %>% mutate(x = x > 4 | x < 5)
+
+  mf %>% filter(x > 4 | x < 5)
+
+  "Work around with explicit ifelse()"
+  mf %>% mutate(x = ifelse(x == 0, 0, 1))
+
+  "# Special ifelse and case_when cases return the correct queries"
+  mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1))
+
+  mf %>% mutate(z = case_when(is.na(x) ~ 1, !is.na(x) ~ 2, TRUE ~ 3))
+
+  "# ORDER BY in subqueries uses TOP 100 PERCENT (#175)"
+  mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x)
 })
