@@ -69,7 +69,7 @@ test_that("select preserves grouping vars", {
 
 # sql_render --------------------------------------------------------------
 
-verify_lazy_output("sql/select-collapse.txt", {
+with_options(dbplyr_table_num = 0, verify_output("sql/select-collapse.txt", {
   "# multiple selects are collapsed"
   lf <- lazy_frame(x = 1, y = 2)
 
@@ -81,9 +81,9 @@ verify_lazy_output("sql/select-collapse.txt", {
 
   "rename"
   lf %>% select(x1 = x) %>% select(x2 = x1)
-})
+}))
 
-verify_lazy_output("sql/select-mutate-collapse.txt", {
+with_options(dbplyr_table_num = 0, verify_output("sql/select-mutate-collapse.txt", {
   "# mutate collapses over nested select"
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
@@ -92,9 +92,9 @@ verify_lazy_output("sql/select-mutate-collapse.txt", {
 
   "x"
   lf %>% mutate(a = 1, b = 2) %>% select(x)
-})
+}))
 
-verify_lazy_output("sql/arrange.txt", {
+with_options(dbplyr_table_num = 0, verify_output("sql/arrange.txt", {
   "# arrange renders correctly"
   lf <- lazy_frame(a = 1:3, b = 3:1)
 
@@ -141,7 +141,7 @@ verify_lazy_output("sql/arrange.txt", {
   lf %>% arrange(b) %>% semi_join(rf)
   lf %>% semi_join(rf %>% arrange(a))
   lf %>% semi_join(rf %>% arrange(c))
-})
+}))
 
 
 

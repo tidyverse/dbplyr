@@ -90,7 +90,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(trans(quarter(x, fiscal_start = 5)))
 })
 
-verify_lazy_output("sql/mssql.txt", {
+with_options(dbplyr_table_num = 0, verify_output("sql/mssql.txt", {
   mf <- lazy_frame(x = 1:3, con = simulate_mssql())
 
   "# filter and mutate translate is.na correctly"
@@ -137,4 +137,4 @@ verify_lazy_output("sql/mssql.txt", {
 
   "# ORDER BY in subqueries uses TOP 100 PERCENT (#175)"
   mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x)
-})
+}))
