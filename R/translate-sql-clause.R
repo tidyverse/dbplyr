@@ -35,8 +35,12 @@ sql_clause_where <- function(where, con){
   }
 }
 
+sql_has_limit <- function(limit) {
+  !is.null(limit) && !identical(limit, Inf)
+}
+
 sql_clause_limit <- function(limit, con){
-  if (!is.null(limit) && !identical(limit, Inf)) {
+  if (sql_has_limit(limit)) {
     build_sql(
       "LIMIT ", sql(format(limit, scientific = FALSE)),
       con = con

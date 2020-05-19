@@ -18,7 +18,7 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
 
   # Processing limit via ROWNUM in a WHERE clause, thie method
   # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
-  if (!is.null(limit) && !identical(limit, Inf)) {
+  if (sql_has_limit(limit)) {
     out <- escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
     out <- build_sql(
       "SELECT * FROM ", sql_subquery(con, out), " WHERE ROWNUM <= ", limit,
