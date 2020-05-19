@@ -109,14 +109,9 @@ escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
-escape.raw <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  sql_vector(sql_escape_raw(con, x), parens, collapse, con = con)
-}
-
-#' @export
-escape.blob <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
-  pieces <- vapply(x, escape, character(1), con = con)
-  sql_vector(pieces, parens, collapse, con = con)
+escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  pieces <- vapply(x, sql_escape_raw, character(1), con = con)
+  sql_vector(pieces, isTRUE(parens) || length(pieces) > 1, collapse, con = con)
 }
 
 #' @export

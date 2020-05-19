@@ -210,7 +210,7 @@ test_that("custom escapes translated correctly", {
 
   expect_equal(
     mf %>% filter(x == a) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` = (0x616263))")
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
   )
 
   L <- c(a, b)

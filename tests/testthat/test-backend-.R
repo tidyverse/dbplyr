@@ -80,7 +80,7 @@ test_that("default raw escapes translated correctly", {
 
   expect_equal(
     mf %>% filter(x == a) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` = (X'616263'))")
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = X'616263')")
   )
 
   L <- c(a, b)
