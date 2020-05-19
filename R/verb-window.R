@@ -25,6 +25,10 @@ window_order <- function(.data, ...) {
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
+  if (length(dots) > 0 && length(op_sort(.data$ops)) > 0) {
+    warn("Overriding previously set sort order")
+  }
+
   add_op_order(.data, dots)
 }
 
@@ -41,7 +45,7 @@ add_op_order <- function(.data, dots = list()) {
 }
 #' @export
 op_sort.op_order <- function(op) {
-  c(op_sort(op$x), op$dots)
+  op$dots
 }
 
 #' @export

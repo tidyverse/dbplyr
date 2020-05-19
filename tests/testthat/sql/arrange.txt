@@ -12,6 +12,8 @@ ORDER BY `a`
 
 > # double arrange
 > lf %>% arrange(a) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT *
 FROM (SELECT *
@@ -28,6 +30,8 @@ FROM `df`
 ORDER BY `a`) `dbplyr_002`
 
 > lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT `b`
 FROM (SELECT *

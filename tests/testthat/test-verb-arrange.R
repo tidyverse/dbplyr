@@ -1,10 +1,13 @@
 context("arrange")
 
-test_that("two arranges equivalent to one", {
+test_that("second arrange overrides first", {
   mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
-  mf1 <- mf %>% arrange(x, y)
-  mf2 <- mf %>% arrange(y) %>% arrange(x)
+  mf1 <- mf %>% arrange(x)
+
+  expect_warning(
+    mf2 <- mf %>% arrange(y) %>% arrange(x)
+  )
 
   expect_equal_tbl(mf1, mf2)
 })
@@ -62,11 +65,28 @@ test_that("arranges captures DESC", {
   expect_equal(sort, list(quote(desc(x))))
 })
 
-test_that("multiple arranges combine", {
-  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
-  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
-
+test_that("multiple arranges don't combine (#373)", {
+  expect_warning(
+    out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+  )
   sort <- lapply(op_sort(out), get_expr)
-  expect_equal(sort, list(quote(x), quote(y)))
-})
+  expect_equal(sort, list(quote(y)))
 
+  expect_warning(
+    out <- arrange(window_order(lazy_frame(x = 1:3, y = 3:1), x), y)
+  )
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+
+  expect_warning(
+    out <- window_order(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+  )
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+
+  expect_warning(
+    out <- window_order(window_order(lazy_frame(x = 1:3, y = 3:1), x), y)
+  )
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+})

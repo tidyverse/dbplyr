@@ -16,6 +16,8 @@ ORDER BY `a`
 LIMIT 1
 
 > lf %>% arrange(a) %>% head(1) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT *
 FROM (SELECT *
@@ -34,6 +36,8 @@ ORDER BY `a`
 
 > # complex mutate
 > lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT `b` AS `a`, `b`
 FROM (SELECT *
@@ -42,6 +46,8 @@ ORDER BY `a`) `dbplyr_004`
 ORDER BY `a`
 
 > lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT 1.0 AS `a`, `b`
 FROM (SELECT *
@@ -50,6 +56,8 @@ ORDER BY `a`) `dbplyr_005`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT `a`, `a` AS `b`
 FROM (SELECT *
@@ -58,6 +66,8 @@ ORDER BY `a`) `dbplyr_006`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
+Warning: Overriding previously set sort order
+
 <SQL>
 SELECT `a`, 1.0 AS `b`
 FROM (SELECT *
