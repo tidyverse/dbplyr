@@ -19,10 +19,9 @@ LIMIT 1
 <SQL>
 SELECT *
 FROM (SELECT *
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_002`
-LIMIT 1) `dbplyr_003`
+ORDER BY `a`
+LIMIT 1) `dbplyr_002`
 ORDER BY `b`
 
 > # mutate
@@ -38,7 +37,7 @@ ORDER BY `a`
 SELECT `b` AS `a`, `b`
 FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_004`
+ORDER BY `a`) `dbplyr_003`
 ORDER BY `a`
 
 > lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
@@ -46,7 +45,7 @@ ORDER BY `a`
 SELECT 1.0 AS `a`, `b`
 FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_005`
+ORDER BY `a`) `dbplyr_004`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
@@ -54,7 +53,7 @@ ORDER BY `b`
 SELECT `a`, `a` AS `b`
 FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_006`
+ORDER BY `a`) `dbplyr_005`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
@@ -62,14 +61,13 @@ ORDER BY `b`
 SELECT `a`, 1.0 AS `b`
 FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_007`
+ORDER BY `a`) `dbplyr_006`
 ORDER BY `b`
 
 > lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
 <SQL>
 SELECT -`a` AS `a`, `b`
-FROM (SELECT *
 FROM (SELECT -`a` AS `a`, `b`
-FROM `df`) `dbplyr_008`
-ORDER BY `a`) `dbplyr_009`
+FROM `df`
+ORDER BY `a`) `dbplyr_007`
 
