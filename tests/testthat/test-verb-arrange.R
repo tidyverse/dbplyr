@@ -1,14 +1,3 @@
-context("arrange")
-
-test_that("two arranges equivalent to one", {
-  mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
-
-  mf1 <- mf %>% arrange(x, y)
-  mf2 <- mf %>% arrange(y) %>% arrange(x)
-
-  expect_equal_tbl(mf1, mf2)
-})
-
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
@@ -62,11 +51,56 @@ test_that("arranges captures DESC", {
   expect_equal(sort, list(quote(desc(x))))
 })
 
-test_that("multiple arranges combine", {
-  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
+test_that("multiple arranges don't combine, sometimes with warning (#373)", {
   out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
-
   sort <- lapply(op_sort(out), get_expr)
-  expect_equal(sort, list(quote(x), quote(y)))
+  expect_equal(sort, list(quote(y)))
+  expect_warning(sql_render(out))
+
+  out <- arrange(window_order(lazy_frame(x = 1:3, y = 3:1), x), y)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+  expect_warning(sql_render(out), NA)
+
+  out <- window_order(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+  expect_warning(sql_render(out), NA)
+
+  out <- window_order(window_order(lazy_frame(x = 1:3, y = 3:1), x), y)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+  expect_warning(sql_render(out), NA)
 })
 
+test_that("order is retained after head() (#373)", {
+  mf <- lazy_frame(x = c(2, 2, 1), y = c(1, -1, 1))
+
+  out <- mf %>% arrange(y) %>% head(1)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(y)))
+})
+
+test_that("order is lost after verbs, with warning (#373)", {
+  mf <- lazy_frame(x = c(2, 2, 1), y = c(1, -1, 1))
+
+  out <- mf %>% arrange(y) %>% select(-y)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list())
+  expect_warning(sql_render(out))
+
+  out <- mf %>% arrange(y) %>% mutate(y = 1)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list())
+  expect_warning(sql_render(out))
+
+  out <- mf %>% arrange(y) %>% summarise(x = sum(x))
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list())
+  expect_warning(sql_render(out))
+
+  out <- mf %>% arrange(y) %>% filter(x < 1)
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list())
+  expect_warning(sql_render(out))
+})

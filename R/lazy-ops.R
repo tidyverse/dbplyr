@@ -147,9 +147,9 @@ op_sort <- function(op) UseMethod("op_sort")
 #' @export
 op_sort.op_base <- function(op) NULL
 #' @export
-op_sort.op_single <- function(op) op_sort(op$x)
+op_sort.op_single <- function(op) NULL
 #' @export
-op_sort.op_double <- function(op) op_sort(op$x)
+op_sort.op_double <- function(op) NULL
 #' @export
 op_sort.tbl_lazy <- function(op) op_sort(op$ops)
 

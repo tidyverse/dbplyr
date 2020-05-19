@@ -84,7 +84,7 @@ sql_build.op_select <- function(op, con, ...) {
   new_vars <- translate_sql_(
     op$args$vars, con,
     vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
+    vars_order = translate_sql_(op_sort(op$x), con, context = list(clause = "ORDER")),
     vars_frame = op_frame(op),
     context = list(clause = "SELECT")
   )

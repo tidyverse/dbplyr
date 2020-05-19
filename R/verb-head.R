@@ -19,6 +19,11 @@ tail.tbl_lazy <- function(x, n = 6L, ...) {
 }
 
 #' @export
+op_sort.op_head <- function(op) {
+  op_sort(op$x)
+}
+
+#' @export
 sql_build.op_head <- function(op, con, ...) {
   select_query(sql_build(op$x, con), limit = op$args$n)
 }
