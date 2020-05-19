@@ -94,6 +94,55 @@ verify_lazy_output("sql/select-mutate-collapse.sql", {
   lf %>% mutate(a = 1, b = 2) %>% select(x)
 })
 
+verify_lazy_output("sql/arrange.sql", {
+  "# arrange renders correctly"
+  lf <- lazy_frame(a = 1:3, b = 3:1)
+
+  "basic"
+  lf %>% arrange(a)
+
+  "double arrange"
+  lf %>% arrange(a) %>% arrange(b)
+
+  "remove ordered by"
+  lf %>% arrange(a) %>% select(-a)
+  lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+
+  "un-arrange"
+  lf %>% arrange(a) %>% arrange()
+  lf %>% arrange(a) %>% select(-a) %>% arrange()
+
+  "use order"
+  lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
+
+  "head"
+  lf %>% head(1) %>% arrange(a)
+  lf %>% arrange(a) %>% head(1)
+  lf %>% arrange(a) %>% head(1) %>% arrange(b)
+
+  "mutate"
+  lf %>% mutate(a = b) %>% arrange(a)
+
+  "complex mutate"
+  lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
+  lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+  lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
+  lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
+  lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
+
+  "join"
+  rf <- lazy_frame(a = 1:3, c = 4:6)
+
+  lf %>% arrange(a) %>% left_join(rf)
+  lf %>% arrange(b) %>% left_join(rf)
+  lf %>% left_join(rf %>% arrange(a))
+  lf %>% left_join(rf %>% arrange(c))
+  lf %>% arrange(a) %>% semi_join(rf)
+  lf %>% arrange(b) %>% semi_join(rf)
+  lf %>% semi_join(rf %>% arrange(a))
+  lf %>% semi_join(rf %>% arrange(c))
+})
+
 
 
 # sql_build -------------------------------------------------------------
