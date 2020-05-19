@@ -56,21 +56,23 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
     return(x)
   }
 
-  from <- sql_optimise(x$from)
+  # Update x$from with the optimised version
+  # before deciding whether to squash or return
+  x$from <- sql_optimise(x$from)
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
   outer <- select_query_clauses(x)
-  inner <- select_query_clauses(from)
+  inner <- select_query_clauses(x$from)
 
   can_squash <- length(outer) == 0 || length(inner) == 0 || min(outer) > max(inner)
 
-  if (can_squash) {
-    from[as.character(outer)] <- x[as.character(outer)]
-    from
-  } else {
-    x
+  if (!can_squash) {
+    return(x)
   }
+
+  x$from[as.character(outer)] <- x[as.character(outer)]
+  x$from
 }
 
 # List clauses used by a query, in the order they are executed
