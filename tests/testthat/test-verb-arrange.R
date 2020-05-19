@@ -19,6 +19,14 @@ test_that("quoting for rendering ordered grouped table", {
 
 # sql_build ---------------------------------------------------------------
 
+test_that("arrange skips order_by with order_by_ok = FALSE", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    arrange(x) %>%
+    sql_build(order_by_ok = FALSE)
+
+  expect_null(out$order_by)
+})
+
 test_that("arrange generates order_by", {
   out <- lazy_frame(x = 1, y = 1) %>%
     arrange(x) %>%

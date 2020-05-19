@@ -14,9 +14,7 @@ ORDER BY `a`
 > lf %>% arrange(a) %>% union_all(rf)
 <SQL>
 (SELECT `a`, `b`, NULL AS `c`
-FROM (SELECT *
-FROM `df`
-ORDER BY `a`) `dbplyr_002`)
+FROM `df`)
 UNION ALL
 (SELECT `a`, NULL AS `b`, `c`
 FROM `df`)
@@ -27,7 +25,5 @@ FROM `df`)
 FROM `df`)
 UNION ALL
 (SELECT `a`, NULL AS `b`, `c`
-FROM (SELECT *
-FROM `df`
-ORDER BY `a`) `dbplyr_003`)
+FROM `df`)
 

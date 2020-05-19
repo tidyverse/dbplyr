@@ -35,39 +35,30 @@ ORDER BY `a`
 > lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
 <SQL>
 SELECT `b` AS `a`, `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_003`
 ORDER BY `a`
 
 > lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
 <SQL>
 SELECT 1.0 AS `a`, `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_004`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
 <SQL>
 SELECT `a`, `a` AS `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_005`
 ORDER BY `b`
 
 > lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
 <SQL>
 SELECT `a`, 1.0 AS `b`
-FROM (SELECT *
 FROM `df`
-ORDER BY `a`) `dbplyr_006`
 ORDER BY `b`
 
 > lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
 <SQL>
 SELECT -`a` AS `a`, `b`
 FROM (SELECT -`a` AS `a`, `b`
-FROM `df`
-ORDER BY `a`) `dbplyr_007`
+FROM `df`) `dbplyr_003`
 

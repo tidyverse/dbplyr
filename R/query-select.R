@@ -51,14 +51,19 @@ print.select_query <- function(x, ...) {
 }
 
 #' @export
-sql_optimise.select_query <- function(x, con = NULL, ...) {
+sql_optimise.select_query <- function(x, con = NULL, ..., order_by_ok = FALSE) {
+  squashed <- squash_select_query(x)
+  elide_order_by(squashed, order_by_ok)
+}
+
+squash_select_query <- function(x) {
   if (!inherits(x$from, "select_query")) {
     return(x)
   }
 
   # Update x$from with the optimised version
   # before deciding whether to squash or return
-  x$from <- sql_optimise(x$from)
+  x$from <- sql_optimise(x$from, order_by_ok = sql_has_limit(x$limit))
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
@@ -93,8 +98,24 @@ select_query_clauses <- function(x) {
   ordered(names(present)[present], levels = names(present))
 }
 
+elide_order_by <- function(query, order_by_ok) {
+  # ORDER BY always permitted in top-level queries
+  if (order_by_ok) {
+    return(query)
+  }
+
+  # Otherwise, ORDER BY permitted only if limit given
+  if (!sql_has_limit(query$limit)) {
+    query$order_by <- NULL
+  }
+
+  query
+}
+
 #' @export
-sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE) {
+sql_render.select_query <- function(query, con, ...,
+                                    bare_identifier_ok = FALSE) {
+
   from <- sql_subquery(con,
     sql_render(query$from, con, ..., bare_identifier_ok = TRUE),
     name = NULL

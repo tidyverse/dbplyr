@@ -8,7 +8,7 @@
 #' @param x A `tbl_sql`
 #' @importFrom dplyr collapse
 collapse.tbl_sql <- function(x, ...) {
-  sql <- db_sql_render(x$src$con, x)
+  sql <- db_sql_render(x$src$con, x, order_by_ok = FALSE)
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%

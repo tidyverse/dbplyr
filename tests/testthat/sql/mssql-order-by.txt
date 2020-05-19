@@ -1,7 +1,6 @@
 > mf <- lazy_frame(x = 1:3, con = simulate_mssql())
 > mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render()
 <SQL> SELECT -`x` AS `x`
-FROM (SELECT TOP 100 PERCENT -`x` AS `x`
-FROM `df`
-ORDER BY `x`) `dbplyr_001`
+FROM (SELECT -`x` AS `x`
+FROM `df`) `dbplyr_001`
 
