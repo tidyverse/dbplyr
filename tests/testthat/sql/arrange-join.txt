@@ -1,0 +1,75 @@
+> lf <- lazy_frame(a = 1:3, b = 3:1)
+> rf <- lazy_frame(a = 1:3, c = 4:6)
+> # join
+> lf %>% arrange(a) %>% left_join(rf)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `LHS`
+LEFT JOIN `df` AS `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+
+
+> lf %>% arrange(b) %>% left_join(rf)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM (SELECT *
+FROM `df`
+ORDER BY `b`) `LHS`
+LEFT JOIN `df` AS `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+
+
+> lf %>% left_join(rf) %>% arrange(a)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT *
+FROM (SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM `df` AS `LHS`
+LEFT JOIN `df` AS `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+) `dbplyr_001`
+ORDER BY `a`
+
+> lf %>% left_join(rf) %>% arrange(b)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT *
+FROM (SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM `df` AS `LHS`
+LEFT JOIN `df` AS `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+) `dbplyr_002`
+ORDER BY `b`
+
+> lf %>% left_join(rf %>% arrange(a))
+Message: Joining, by = "a"
+
+<SQL>
+SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM `df` AS `LHS`
+LEFT JOIN (SELECT *
+FROM `df`
+ORDER BY `a`) `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+
+
+> lf %>% left_join(rf %>% arrange(c))
+Message: Joining, by = "a"
+
+<SQL>
+SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+FROM `df` AS `LHS`
+LEFT JOIN (SELECT *
+FROM `df`
+ORDER BY `c`) `RHS`
+ON (`LHS`.`a` = `RHS`.`a`)
+
+
