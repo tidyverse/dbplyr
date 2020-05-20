@@ -92,6 +92,98 @@ test_that("mutate collapses over nested select", {
   expect_known_output(print(reg), test_path("sql/select-mutate-collapse.sql"))
 })
 
+test_that("arrange renders correctly (#373)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output(test_path("sql/arrange.txt"), {
+    "# arrange renders correctly"
+    lf <- lazy_frame(a = 1:3, b = 3:1)
+
+    "basic"
+    lf %>% arrange(a)
+
+    "double arrange"
+    lf %>% arrange(a) %>% arrange(b)
+
+    "remove ordered by"
+    lf %>% arrange(a) %>% select(-a)
+    lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+
+    "un-arrange"
+    lf %>% arrange(a) %>% arrange()
+    lf %>% arrange(a) %>% select(-a) %>% arrange()
+
+    "use order"
+    lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
+  })
+})
+
+test_that("arrange renders correctly for single-table verbs (#373)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output(test_path("sql/arrange-single.txt"), {
+    lf <- lazy_frame(a = 1:3, b = 3:1)
+
+    "head"
+    lf %>% head(1) %>% arrange(a)
+    lf %>% arrange(a) %>% head(1)
+    lf %>% arrange(a) %>% head(1) %>% arrange(b)
+
+    "mutate"
+    lf %>% mutate(a = b) %>% arrange(a)
+
+    "complex mutate"
+    lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
+    lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+    lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
+    lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
+    lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
+  })
+})
+
+test_that("arrange renders correctly for joins (#373)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output(test_path("sql/arrange-join.txt"), {
+    lf <- lazy_frame(a = 1:3, b = 3:1)
+    rf <- lazy_frame(a = 1:3, c = 4:6)
+
+    "join"
+    lf %>% arrange(a) %>% left_join(rf)
+    lf %>% arrange(b) %>% left_join(rf)
+    lf %>% left_join(rf) %>% arrange(a)
+    lf %>% left_join(rf) %>% arrange(b)
+    lf %>% left_join(rf %>% arrange(a))
+    lf %>% left_join(rf %>% arrange(c))
+  })
+})
+
+test_that("arrange renders correctly for semi-joins (#373)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output(test_path("sql/arrange-semi-join.txt"), {
+    lf <- lazy_frame(a = 1:3, b = 3:1)
+    rf <- lazy_frame(a = 1:3, c = 4:6)
+
+    "semi_join"
+    lf %>% arrange(a) %>% semi_join(rf)
+    lf %>% arrange(b) %>% semi_join(rf)
+    lf %>% semi_join(rf) %>% arrange(a)
+    lf %>% semi_join(rf) %>% arrange(b)
+    lf %>% semi_join(rf %>% arrange(a))
+    lf %>% semi_join(rf %>% arrange(c))
+  })
+})
+
+test_that("arrange renders correctly for set operations (#373)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output(test_path("sql/arrange-setop.txt"), {
+    lf <- lazy_frame(a = 1:3, b = 3:1)
+    rf <- lazy_frame(a = 1:3, c = 4:6)
+
+    "setop"
+    lf %>% union_all(rf) %>% arrange(a)
+    lf %>% arrange(a) %>% union_all(rf)
+    lf %>% union_all(rf %>% arrange(a))
+  })
+})
+
 
 
 # sql_build -------------------------------------------------------------

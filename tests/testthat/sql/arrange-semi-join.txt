@@ -1,0 +1,75 @@
+> lf <- lazy_frame(a = 1:3, b = 3:1)
+> rf <- lazy_frame(a = 1:3, c = 4:6)
+> # semi_join
+> lf %>% arrange(a) %>% semi_join(rf)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT * FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)
+
+> lf %>% arrange(b) %>% semi_join(rf)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT * FROM (SELECT *
+FROM `df`
+ORDER BY `b`) `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)
+
+> lf %>% semi_join(rf) %>% arrange(a)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT *
+FROM (SELECT * FROM `df` AS `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)) `dbplyr_001`
+ORDER BY `a`
+
+> lf %>% semi_join(rf) %>% arrange(b)
+Message: Joining, by = "a"
+
+<SQL>
+SELECT *
+FROM (SELECT * FROM `df` AS `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM `df` AS `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)) `dbplyr_002`
+ORDER BY `b`
+
+> lf %>% semi_join(rf %>% arrange(a))
+Message: Joining, by = "a"
+
+<SQL>
+SELECT * FROM `df` AS `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)
+
+> lf %>% semi_join(rf %>% arrange(c))
+Message: Joining, by = "a"
+
+<SQL>
+SELECT * FROM `df` AS `LHS`
+WHERE EXISTS (
+  SELECT 1 FROM (SELECT *
+FROM `df`
+ORDER BY `c`) `RHS`
+  WHERE (`LHS`.`a` = `RHS`.`a`)
+)
+

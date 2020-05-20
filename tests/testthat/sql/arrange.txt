@@ -1,0 +1,59 @@
+
+arrange renders correctly
+=========================
+
+> lf <- lazy_frame(a = 1:3, b = 3:1)
+> # basic
+> lf %>% arrange(a)
+<SQL>
+SELECT *
+FROM `df`
+ORDER BY `a`
+
+> # double arrange
+> lf %>% arrange(a) %>% arrange(b)
+<SQL>
+SELECT *
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `dbplyr_001`
+ORDER BY `b`
+
+> # remove ordered by
+> lf %>% arrange(a) %>% select(-a)
+<SQL>
+SELECT `b`
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `dbplyr_002`
+
+> lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+<SQL>
+SELECT `b`
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `dbplyr_003`
+ORDER BY `b`
+
+> # un-arrange
+> lf %>% arrange(a) %>% arrange()
+<SQL>
+SELECT *
+FROM `df`
+ORDER BY `a`
+
+> lf %>% arrange(a) %>% select(-a) %>% arrange()
+<SQL>
+SELECT `b`
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `dbplyr_004`
+
+> # use order
+> lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
+<SQL>
+SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
+FROM (SELECT *
+FROM `df`
+ORDER BY `a`) `dbplyr_005`
+
