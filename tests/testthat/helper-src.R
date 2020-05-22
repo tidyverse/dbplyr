@@ -15,7 +15,9 @@ if (test_srcs$length() == 0) {
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
     if (packageVersion("odbc") >= "1.2.2.9000") {
       test_register_con("mssql", odbc::odbc(),
-                        dsn = "mssql-test-ms", UID="kirill", PWD=keyring::key_get("mssql", "kirill")
+        dsn = "mssql-test-ms",
+        UID = "kirill",
+        PWD = "Password12"
       )
     }
   } else if (on_gha() || on_cran()) {
