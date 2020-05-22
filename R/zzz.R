@@ -10,9 +10,9 @@
   if (utils::packageVersion("dplyr") >= "0.8.99") {
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
 
-    setOldClass(c("sql", "character"), sql())
+    setOldClass(c("ident_q", "ident", "character"), ident_q())
     setOldClass(c("ident", "character"), ident())
-    # setOldClass(c("ident_q", "ident", "character"), ident_q())
+    setOldClass(c("sql", "character"), sql())
   }
 }
 
