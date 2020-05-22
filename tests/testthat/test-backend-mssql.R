@@ -201,6 +201,28 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(trans(quarter(x, fiscal_start = 5)))
 })
 
+
+test_that("custom escapes translated correctly", {
+
+  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+
+  a <- as_blob("abc")
+  b <- as_blob(as.raw(c(0x01, 0x02)))
+
+  expect_equal(
+    mf %>% filter(x == a) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
+  )
+
+  L <- c(a, b)
+  expect_equal(
+    mf %>% filter(x %in% L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
+  )
+})
+
+# Live database -----------------------------------------------------------
+
 test_that("mssql can copy_to() with temporary tables (#272)", {
   skip_if_no_db("mssql")
 

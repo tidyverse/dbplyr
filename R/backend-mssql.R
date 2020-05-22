@@ -178,6 +178,13 @@
   )}
 
 #' @export
+`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+  # SQL Server binary constants should be prefixed with 0x
+  # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
+  paste0(c("0x", format(x)), collapse = "")
+}
+
+#' @export
 `db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
@@ -195,7 +202,9 @@
 mssql_temp_name <- function(name, temporary) {
   if (temporary && substr(name, 1, 1) != "#") {
     name <- paste0("#", name)
-    message("Created a temporary table named: ", name)
+    inform(paste0("Created a temporary table named: ", name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
   }
   name
 }

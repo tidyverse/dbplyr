@@ -1,20 +1,20 @@
 #' Create an SQL tbl (abstract)
 #'
 #' Generally, you should no longer need to provide a custom `tbl()`
-#' method you you can default `tbl.DBIConnect` method.
+#' method.
+#' The default `tbl.DBIConnect` method should work in most cases.
 #'
 #' @keywords internal
 #' @export
 #' @param subclass name of subclass
 #' @param ... needed for agreement with generic. Not otherwise used.
-#' @param vars DEPRECATED
+#' @param vars Provide column names as a character vector
+#'   to avoid retrieving them from the database.
+#'   Mainly useful for better performance when creating
+#'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
   from <- as.sql(from)
-
-  if (!missing(vars)) {
-    warning("`vars` argument is deprecated as it is no longer needed", call. = FALSE)
-  }
 
   vars <- vars %||% db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
