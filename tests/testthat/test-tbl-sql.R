@@ -7,33 +7,13 @@ test_that("tbl_sql() works with string argument", {
   expect_equal(collect(tbl_sql("sqlite", df$src, name)), collect(df))
 })
 
-test_that("head/print respects n" ,{
-  df2 <- memdb_frame(x = 1:5)
-
-  out <- df2 %>% head(n = Inf) %>% collect()
-  expect_equal(nrow(out), 5)
-  expect_output(print(df2, n = Inf))
-
-  out <- df2 %>% head(n = 1) %>% collect()
-  expect_equal(nrow(out), 1)
-
-  out <- df2 %>% head(n = 0) %>% collect()
-  expect_equal(nrow(out), 0)
-
-  expect_error(
-    df2 %>% head(n = -1) %>% collect(),
-    "not greater than or equal to 0"
-  )
-})
-
 test_that("same_src distinguishes srcs", {
-  src1 <- src_sqlite(":memory:", create = TRUE)
-  src2 <- src_sqlite(":memory:", create = TRUE)
-  expect_true(same_src(src1, src1))
-  expect_false(same_src(src1, src2))
+  con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+  con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+  on.exit({dbDisconnect(con1); dbDisconnect(con2)}, add = TRUE)
 
-  db1 <- copy_to(src1, iris, 'data1', temporary = FALSE)
-  db2 <- copy_to(src2, iris, 'data2', temporary = FALSE)
+  db1 <- copy_to(con1, iris[1:3, ], 'data1', temporary = FALSE)
+  db2 <- copy_to(con2, iris[1:3, ], 'data2', temporary = FALSE)
   expect_true(same_src(db1, db1))
   expect_false(same_src(db1, db2))
 
@@ -70,30 +50,14 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
 
 # n_groups ----------------------------------------------------------------
 
-# Data for the first three test_that groups below
-df <- data.frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
-# MariaDB returns bit64 instead of int, which makes testing hard
-tbls <- test_load(df, ignore = "MariaDB")
+test_that("check basic group size implementation", {
+  db <- memdb_frame(x = rep(1:3, each = 10), y = rep(1:6, each = 5))
+  expect_equal(n_groups(db), 1L)
+  expect_equal(group_size(db), 30)
 
-test_that("ungrouped data has 1 group, with group size = nrow()", {
-  for (tbl in tbls) {
-    expect_equal(n_groups(tbl), 1L)
-    expect_equal(group_size(tbl), 30)
-  }
-})
-
-test_that("rowwise data has one group for each group", {
-  rw <- rowwise(df)
-  expect_equal(n_groups(rw), 30)
-  expect_equal(group_size(rw), rep(1, 30))
-})
-
-test_that("group_size correct for grouped data", {
-  for (tbl in tbls) {
-    grp <- group_by(tbl, x)
-    expect_equal(n_groups(grp), 3L)
-    expect_equal(group_size(grp), rep(10, 3))
-  }
+  gb <- group_by(db, x)
+  expect_equal(n_groups(gb), 3L)
+  expect_equal(group_size(gb), rep(10, 3))
 })
 
 # tbl_sum -------------------------------------------------------------------

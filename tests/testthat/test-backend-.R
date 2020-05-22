@@ -70,3 +70,23 @@ test_that("bitwise operations", {
   expect_equal(translate_sql(bitwShiftL(x, 2L)), sql("`x` << 2"))
   expect_equal(translate_sql(bitwShiftR(x, 2L)), sql("`x` >> 2"))
 })
+
+test_that("default raw escapes translated correctly", {
+
+  mf <- lazy_frame(x = "abc", con = simulate_sqlite())
+
+  a <- as_blob("abc")
+  b <- as_blob(as.raw(c(0x01, 0x02)))
+
+  expect_equal(
+    mf %>% filter(x == a) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = X'616263')")
+  )
+
+  L <- c(a, b)
+  expect_equal(
+    mf %>% filter(x %in% L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (X'616263', X'0102'))")
+  )
+})
+

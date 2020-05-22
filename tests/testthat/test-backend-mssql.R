@@ -7,8 +7,8 @@ test_that("custom scalar translated correctly", {
   }
 
   expect_equal(trans(as.logical(x)),   sql("CAST(`x` AS BIT)"))
-  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS FLOAT)"))
+  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS FLOAT)"))
   expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(trans(log(x)),          sql("LOG(`x`)"))
   expect_equal(trans(nchar(x)),        sql("LEN(`x`)"))
@@ -44,6 +44,8 @@ test_that("custom aggregators translated correctly", {
 
   expect_error(trans(cor(x)), "not available")
   expect_error(trans(cov(x)), "not available")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '')"))
 })
 
 test_that("custom window functions translated correctly", {
@@ -57,6 +59,8 @@ test_that("custom window functions translated correctly", {
 
   expect_error(trans(cor(x)), "not supported")
   expect_error(trans(cov(x)), "not supported")
+
+  expect_equal(trans(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
 
 test_that("filter and mutate translate is.na correctly", {
@@ -194,4 +198,55 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(trans(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
   expect_equal(trans(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
   expect_error(trans(quarter(x, fiscal_start = 5)))
+})
+
+
+test_that("custom escapes translated correctly", {
+
+  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+
+  a <- as_blob("abc")
+  b <- as_blob(as.raw(c(0x01, 0x02)))
+
+  expect_equal(
+    mf %>% filter(x == a) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
+  )
+
+  L <- c(a, b)
+  expect_equal(
+    mf %>% filter(x %in% L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
+  )
+})
+
+# Live database -----------------------------------------------------------
+
+test_that("mssql can copy_to() with temporary tables (#272)", {
+  skip_if_no_db("mssql")
+
+  df1 <- tibble(x = 1:3)
+
+  expect_equal(
+    src_test("mssql") %>%
+      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
+      collect(),
+    df1
+  )
+})
+
+test_that("mssql can compute() with temporary tables (#272)", {
+  skip_if_no_db("mssql")
+
+  df1 <- tibble(x = 1:3)
+
+  expect_equal(
+    src_test("mssql") %>%
+      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
+      mutate(x = x + 1L) %>%
+      compute(temporary = TRUE) %>%
+      collect(),
+    df1 %>%
+      mutate(x = x + 1L)
+  )
 })

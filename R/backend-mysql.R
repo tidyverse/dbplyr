@@ -166,7 +166,7 @@ db_create_index.MySQL <- db_create_index.MySQLConnection
 
 #' @export
 db_analyze.MySQLConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE TABLE", as.sql(table), con = con)
+  sql <- build_sql("ANALYZE TABLE ", as.sql(table), con = con)
   dbExecute(con, sql)
 }
 

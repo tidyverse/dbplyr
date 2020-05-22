@@ -20,7 +20,6 @@
       # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
       # TOP is expected after DISTINCT and not at the end of the query
       # e.g: SELECT TOP 100 * FROM my_table
-      assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
       build_sql("TOP(", as.integer(limit), ") ", con = con)
     } else if (length(order_by) > 0 && bare_identifier_ok) {
       # Stop-gap measure so that a wider range of queries is supported (#276).
@@ -81,8 +80,8 @@
       as.logical    = sql_cast("BIT"),
 
       as.Date       = sql_cast("DATE"),
-      as.numeric    = sql_cast("NUMERIC"),
-      as.double     = sql_cast("NUMERIC"),
+      as.numeric    = sql_cast("FLOAT"),
+      as.double     = sql_cast("FLOAT"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
       atan2         = sql_prefix("ATN2"),
@@ -158,36 +157,55 @@
       var           = sql_aggregate("VAR", "var"),
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()")
+      cov           = sql_not_supported("cov()"),
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+
     ),
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
       # MSSQL does not have function for: cor and cov
       cor           = win_absent("cor"),
-      cov           = win_absent("cov")
+      cov           = win_absent("cov"),
+      str_flatten = function(x, collapse = "") {
+        win_over(
+          sql_expr(string_agg(!!x, !!collapse)),
+          partition = win_current_group(),
+          order = win_current_order()
+        )
+      }
     )
 
   )}
+
+#' @export
+`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+  # SQL Server binary constants should be prefixed with 0x
+  # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
+  paste0(c("0x", format(x)), collapse = "")
+}
 
 #' @export
 `db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   sql <- build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
-  DBI::dbExecute(con, sql)
+  DBI::dbExecute(con, sql, immediate = TRUE)
 }
 
 
 # Temporary tables --------------------------------------------------------
 # SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
+# <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 
-mssql_temp_name <- function(name, temporary){
-  # check that name has prefixed '##' if temporary
+
+mssql_temp_name <- function(name, temporary) {
   if (temporary && substr(name, 1, 1) != "#") {
-    name <- paste0("##", name)
-    message("Created a temporary table named: ", name)
+    name <- paste0("#", name)
+    inform(paste0("Created a temporary table named: ", name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
   }
   name
 }
@@ -217,7 +235,7 @@ mssql_temp_name <- function(name, temporary){
     "FROM (", sql, ") AS temp",
     con = con
   )
-  dbExecute(con, tt_sql)
+  dbExecute(con, tt_sql, immediate = TRUE)
   name
 
 }

@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.4.2
+Version: 1.4.3.9000
 Authors@R: 
     c(person(given = "Hadley",
              family = "Wickham",
@@ -27,12 +27,15 @@ Imports:
     DBI (>= 1.0.0),
     dplyr (>= 0.8.0),
     glue (>= 1.2.0),
+    lifecycle,
+    magrittr,
     methods,
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
     rlang (>= 0.2.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
+    blob (>= 1.2.0),
     utils
 Suggests:
     bit64,
@@ -40,20 +43,19 @@ Suggests:
     knitr,
     Lahman,
     nycflights13,
+    odbc,
     RMariaDB (>= 1.0.2),
     rmarkdown,
-    RMySQL (>= 0.10.11),
-    RPostgreSQL (>= 0.4.1),
+    RPostgres (>= 1.1.3),
     RSQLite (>= 2.1.0),
-    testthat (>= 2.0.0),
-    withr (>= 2.1.2)
+    testthat (>= 2.0.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 Language: en-gb
 LazyData: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Collate: 
     'utils.R'
     'sql.R'
@@ -66,6 +68,7 @@ Collate:
     'translate-sql-conditional.R'
     'backend-.R'
     'backend-access.R'
+    'backend-athena.R'
     'backend-hive.R'
     'backend-impala.R'
     'backend-mssql.R'
@@ -73,6 +76,7 @@ Collate:
     'backend-odbc.R'
     'backend-oracle.R'
     'backend-postgres.R'
+    'backend-presto.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'
@@ -85,11 +89,13 @@ Collate:
     'lazy-ops.R'
     'memdb.R'
     'partial-eval.R'
+    'progress.R'
     'query-join.R'
     'query-select.R'
     'query-semi-join.R'
     'query-set-op.R'
     'query.R'
+    'reexport.R'
     'remote.R'
     'schema.R'
     'simulate.R'
@@ -121,3 +127,4 @@ Collate:
     'verb-summarise.R'
     'verb-window.R'
     'zzz.R'
+RdMacros: lifecycle

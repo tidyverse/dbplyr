@@ -48,15 +48,8 @@ sql_render.semi_join_query <- function(query, con = NULL, ..., bare_identifier_o
 sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
   lhs <- escape(ident("LHS"), con = con)
   rhs <- escape(ident("RHS"), con = con)
-  on <- sql_vector(
-    paste0(
-      lhs,  ".", sql_escape_ident(con, by$x), " = ",
-      rhs, ".", sql_escape_ident(con, by$y)
-    ),
-    collapse = " AND ",
-    parens = TRUE,
-    con = con
-  )
+
+  on <- sql_join_tbls(con, by)
 
   build_sql(
     "SELECT * FROM ", x, "\n",

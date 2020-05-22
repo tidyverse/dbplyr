@@ -22,11 +22,11 @@ called from a function translation.}
 \description{
 Low-level building block for generating SQL from R expressions.
 Strings are escaped; names become bare SQL identifiers. User infix
-functions have \code{\%} stripped.
+functions have \verb{\%} stripped.
 }
 \details{
 Using \code{sql_expr()} in package will require use of \code{\link[=globalVariables]{globalVariables()}}
-to avoid \code{R CMD check} NOTES. This is a small amount of additional pain,
+to avoid \verb{R CMD check} NOTES. This is a small amount of additional pain,
 which I think is worthwhile because it leads to more readable translation
 code.
 }

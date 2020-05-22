@@ -16,6 +16,6 @@ class name}
 \item{...}{fields used by object}
 }
 \description{
-Deprecated: please use \link{src_dbi} instead.
+Deprecated: please use directly use a \code{DBIConnection} object instead.
 }
 \keyword{internal}

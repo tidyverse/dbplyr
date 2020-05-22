@@ -69,14 +69,12 @@ escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x <- as.character(x)
-  escape.character(x, parens = parens, collapse = collapse, con = con)
+  sql_vector(sql_escape_date(con, x), parens, collapse, con = con)
 }
 
 #' @export
 escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
-  escape.character(x, parens = parens, collapse = collapse, con = con)
+  sql_vector(sql_escape_datetime(con, x), parens, collapse, con = con)
 }
 
 #' @export
@@ -111,6 +109,12 @@ escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  pieces <- vapply(x, sql_escape_raw, character(1), con = con)
+  sql_vector(pieces, isTRUE(parens) || length(pieces) > 1, collapse, con = con)
+}
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
@@ -133,7 +137,7 @@ escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
     "If you are seeing this error in code that used to work, the most likely ",
     "cause is a change dbplyr 1.4.0. Previously `df$x` or `df[[y]]` implied ",
     "that `df` was a local variable, but  now you must make that explict ",
-    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]))"
+    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]])"
   )
 
   abort(paste(strwrap(message), collapse = "\n"))
@@ -146,7 +150,7 @@ escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL)
     "If you are seeing this error in code that used to work, the most likely ",
     "cause is a change dbplyr 1.4.0. Previously `df$x` or `df[[y]]` implied ",
     "that `df` was a local variable, but  now you must make that explict ",
-    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]))"
+    " with `!!` or `local()`, e.g.,  `!!df$x` or `local(df[[\"y\"]])"
   )
 
   abort(paste(strwrap(message), collapse = "\n"))
@@ -194,7 +198,6 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' If the quote character is present in the string, it will be doubled.
 #' `NA`s will be replaced with NULL.
 #'
-#' @export
 #' @param x Character vector to escape.
 #' @param quote Single quoting character.
 #' @export
@@ -216,8 +219,6 @@ sql_quote <- function(x, quote) {
   y
 }
 
-
-
 #' More SQL generics
 #'
 #' These are new, so not included in dplyr for backward compatibility
@@ -229,11 +230,44 @@ sql_escape_logical <- function(con, x) {
   UseMethod("sql_escape_logical")
 }
 
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_date <- function(con, x) {
+  UseMethod("sql_escape_date")
+}
+
+
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_datetime <- function(con, x) {
+  UseMethod("sql_escape_datetime")
+}
+
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_raw <- function(con, x) {
+  UseMethod("sql_escape_raw")
+}
+
 # DBIConnection methods --------------------------------------------------------
 
 #' @export
 sql_escape_string.DBIConnection <- function(con, x) {
   dbQuoteString(con, x)
+}
+
+#' @export
+sql_escape_date.DBIConnection <- function(con, x) {
+  sql_escape_string(con, as.character(x))
+}
+
+#' @export
+sql_escape_datetime.DBIConnection <- function(con, x) {
+  x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
+  sql_escape_string(con, x)
 }
 
 #' @export
@@ -249,4 +283,9 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y
 }
 
-
+#' @export
+sql_escape_raw.DBIConnection <- function(con, x) {
+  # SQL-99 standard for BLOB literals
+  # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
+  paste0(c("X'", format(x), "'"), collapse = "")
+}

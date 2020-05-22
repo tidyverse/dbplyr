@@ -1,3 +1,7 @@
+This is a resubmission; I have tried to ensure that unnecessary tests are no longer run on the CRAN check machine.
+
+---
+
 ## Test environments
 
 * local: darwin15.6.0-3.5.1
@@ -11,21 +15,28 @@
 
 ## revdepcheck results
 
-We checked 47 reverse dependencies (42 from CRAN + 5 from BioConductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 58 reverse dependencies (51 from CRAN + 7 from BioConductor), comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 1 new problems
- * We failed to check 1 packages
+ * We failed to check 8 packages
 
 Issues with CRAN packages are summarised below.
 
 ### New problems
 (This reports the first line of each new failure)
 
-* MonetDBLite
+* dm
   checking tests ...
   
-  This package has now been archived.
+  The author is aware of the issue and is working on a fix.
 
 ### Failed to check
 
-* dlookr (NA)
+* bigrquery   (NA)
+* bigsnpr     (NA)
+* dplyr       (NA)
+* pleiades    (NA)
+* RClickhouse (NA)
+* resourcer   (NA)
+* taxizedb    (NA)
+* valr        (NA)

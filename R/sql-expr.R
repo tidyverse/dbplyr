@@ -15,7 +15,6 @@
 #' @param .fn Function name (as string, call, or symbol)
 #' @param ... Arguments to function
 #' @keywords internal
-#' @inheritParams translate_sql
 #' @export
 #' @examples
 #' con <- simulate_dbi() # not necessary when writing translations
@@ -48,7 +47,7 @@ sql_call2 <- function(.fn, ..., con = sql_current_con()) {
 
 
 replace_expr <- function(x, con) {
-  if (is.atomic(x)) {
+  if (is.atomic(x) || is_blob(x)) {
     as.character(escape(unname(x), con = con))
   } else if (is.name(x)) {
     as.character(x)
@@ -78,3 +77,4 @@ replace_expr <- function(x, con) {
   }
 
 }
+

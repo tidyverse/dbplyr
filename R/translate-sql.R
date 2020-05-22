@@ -4,7 +4,7 @@
 #' The base translator, `base_sql`,
 #' provides custom mappings for `!` (to NOT), `&&` and `&` to
 #' `AND`, `||` and `|` to `OR`, `^` to `POWER`,
-#' \code{\%>\%} to \code{\%}, `ceiling` to `CEIL`, `mean` to
+#' `%>%` to `%`, `ceiling` to `CEIL`, `mean` to
 #' `AVG`, `var` to `VARIANCE`, `tolower` to `LOWER`,
 #' `toupper` to `UPPER` and `nchar` to `LENGTH`.
 #'
@@ -12,9 +12,9 @@
 #' vectors that are passed to sql.
 #'
 #' All other functions will be preserved as is. R's infix functions
-#' (e.g. \code{\%like\%}) will be converted to their SQL equivalents
+#' (e.g. `%like%`) will be converted to their SQL equivalents
 #' (e.g. `LIKE`). You can use this to access SQL string concatenation:
-#' `||` is mapped to `OR`, but \code{\%||\%} is mapped to `||`.
+#' `||` is mapped to `OR`, but `%||%` is mapped to `||`.
 #' To suppress this behaviour, and force errors immediately when dplyr doesn't
 #' know how to translate a function it encounters, using set the
 #' `dplyr.strict_sql` option to `TRUE`.
