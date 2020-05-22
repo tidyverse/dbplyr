@@ -109,6 +109,12 @@ escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
 }
 
 #' @export
+escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  pieces <- vapply(x, sql_escape_raw, character(1), con = con)
+  sql_vector(pieces, isTRUE(parens) || length(pieces) > 1, collapse, con = con)
+}
+
+#' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
@@ -192,7 +198,6 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
 #' If the quote character is present in the string, it will be doubled.
 #' `NA`s will be replaced with NULL.
 #'
-#' @export
 #' @param x Character vector to escape.
 #' @param quote Single quoting character.
 #' @export
@@ -213,8 +218,6 @@ sql_quote <- function(x, quote) {
 
   y
 }
-
-
 
 #' More SQL generics
 #'
@@ -240,6 +243,13 @@ sql_escape_date <- function(con, x) {
 #' @rdname sql_escape_logical
 sql_escape_datetime <- function(con, x) {
   UseMethod("sql_escape_datetime")
+}
+
+#' @keywords internal
+#' @export
+#' @rdname sql_escape_logical
+sql_escape_raw <- function(con, x) {
+  UseMethod("sql_escape_raw")
 }
 
 # DBIConnection methods --------------------------------------------------------
@@ -273,4 +283,9 @@ sql_escape_logical.DBIConnection <- function(con, x) {
   y
 }
 
-
+#' @export
+sql_escape_raw.DBIConnection <- function(con, x) {
+  # SQL-99 standard for BLOB literals
+  # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
+  paste0(c("X'", format(x), "'"), collapse = "")
+}

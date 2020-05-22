@@ -5,6 +5,7 @@
 #' @importFrom glue glue
 #' @importFrom methods setOldClass
 #' @importFrom dplyr n
+#' @importFrom blob is_blob as_blob
 #' @import rlang
 #' @import DBI
 #' @import tibble

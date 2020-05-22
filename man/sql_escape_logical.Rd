@@ -4,6 +4,7 @@
 \alias{sql_escape_logical}
 \alias{sql_escape_date}
 \alias{sql_escape_datetime}
+\alias{sql_escape_raw}
 \title{More SQL generics}
 \usage{
 sql_escape_logical(con, x)
@@ -11,6 +12,8 @@ sql_escape_logical(con, x)
 sql_escape_date(con, x)
 
 sql_escape_datetime(con, x)
+
+sql_escape_raw(con, x)
 }
 \description{
 These are new, so not included in dplyr for backward compatibility
