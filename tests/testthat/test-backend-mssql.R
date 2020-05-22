@@ -165,13 +165,11 @@ FROM `df`")
   )
 })
 
-test_that("ORDER BY in subqueries uses TOP 100 PERCENT (#175)", {
-  mf <- lazy_frame(x = 1:3, con = simulate_mssql())
-
-  expect_equal(
-    mf %>% mutate(x = -x) %>% arrange(x) %>% mutate(x = -x) %>% sql_render(),
-    sql("SELECT -`x` AS `x`\nFROM (SELECT TOP 100 PERCENT *\nFROM (SELECT TOP 100 PERCENT -`x` AS `x`\nFROM `df`) `dbplyr_001`\nORDER BY `x`) `dbplyr_002`")
-  )
+test_that("ORDER BY in subqueries uses TOP 9223372036854775807 (#337)", {
+  local_options(dbplyr_table_num = 0)
+  verify_output("sql/mssql-order-by.txt", {
+    sql_select(simulate_mssql(), "x", "y", order_by = "z", bare_identifier_ok = TRUE)
+  })
 })
 
 test_that("custom lubridate functions translated correctly", {
