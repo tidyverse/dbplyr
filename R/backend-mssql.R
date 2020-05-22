@@ -189,7 +189,7 @@
   # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   sql <- build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
-  DBI::dbExecute(con, sql)
+  DBI::dbExecute(con, sql, immediate = TRUE)
 }
 
 
@@ -234,7 +234,7 @@ mssql_temp_name <- function(name, temporary) {
     "FROM (", sql, ") AS temp",
     con = con
   )
-  dbExecute(con, tt_sql)
+  dbExecute(con, tt_sql, immediate = TRUE)
   name
 
 }

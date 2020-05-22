@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
+  support for session-scoped temporary tables in MS SQL (@krlmlr, #438).
+
 * `escape()` now support `blob` vectors using new `sql_escape_raw()` 
   generic. It enables using [blob](https://blob.tidyverse.org/) variables in 
   dplyr verbs, for example to filter nvarchar values by UTF-16 blobs

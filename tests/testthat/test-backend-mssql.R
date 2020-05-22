@@ -201,6 +201,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(trans(quarter(x, fiscal_start = 5)))
 })
 
+
 test_that("custom escapes translated correctly", {
 
   mf <- lazy_frame(x = "abc", con = simulate_mssql())
@@ -220,3 +221,33 @@ test_that("custom escapes translated correctly", {
   )
 })
 
+# Live database -----------------------------------------------------------
+
+test_that("mssql can copy_to() with temporary tables (#272)", {
+  skip_if_no_db("mssql")
+
+  df1 <- tibble(x = 1:3)
+
+  expect_equal(
+    src_test("mssql") %>%
+      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
+      collect(),
+    df1
+  )
+})
+
+test_that("mssql can compute() with temporary tables (#272)", {
+  skip_if_no_db("mssql")
+
+  df1 <- tibble(x = 1:3)
+
+  expect_equal(
+    src_test("mssql") %>%
+      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
+      mutate(x = x + 1L) %>%
+      compute(temporary = TRUE) %>%
+      collect(),
+    df1 %>%
+      mutate(x = x + 1L)
+  )
+})

@@ -469,7 +469,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
     "TABLE ", as.sql(name), " AS ", sql,
     con = con
   )
-  dbExecute(con, tt_sql)
+  dbExecute(con, tt_sql, immediate = TRUE)
   name
 }
 
@@ -516,7 +516,7 @@ db_create_table.DBIConnection <- function(con, table, types,
     con = con
   )
 
-  dbExecute(con, sql)
+  dbExecute(con, sql, immediate = TRUE)
 }
 
 #' @export

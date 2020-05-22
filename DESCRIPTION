@@ -43,6 +43,7 @@ Suggests:
     knitr,
     Lahman,
     nycflights13,
+    odbc,
     RMariaDB (>= 1.0.2),
     rmarkdown,
     RPostgres (>= 1.1.3),
