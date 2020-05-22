@@ -9,21 +9,10 @@
 
   if (utils::packageVersion("dplyr") >= "0.8.0.9008") {
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
-  }
 
-  # These are also currently defined in dplyr, and we want to avoid a warning
-  # about double duplication. Conditional can be removed after update to
-  # dplyr
-  if (!methods::isClass("sql")) {
     setOldClass(c("sql", "character"), sql())
-  }
-
-  if (!methods::isClass("ident")) {
-    setOldClass(c("ident", "sql", "character"), ident())
-  }
-
-  if (!methods::isClass("ident_q")) {
-    setOldClass(c("ident_q", "ident", "sql", "character"), ident_q())
+    setOldClass(c("ident", "character"), ident())
+    # setOldClass(c("ident_q", "ident", "character"), ident_q())
   }
 }
 
