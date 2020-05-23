@@ -1,5 +1,24 @@
 #' Override window order and frame
 #'
+#' @description
+#' `window_order()` sets the order for subsequent invocations
+#' of window functions on a lazy table.
+#' The order is active only for the next verb.
+#'
+#' Window functions like [first()] and [lag()] require an explicit order
+#' when computed on the database.
+#' Many window functions offer an `order_by` argument that allows overriding
+#' the order.
+#'
+#' The window order does not affect the order in which the rows are returned
+#' with [collect()] or when printing, use [arrange()] to specify
+#' the output order.
+#'
+#' @details
+#' `window_order()` translates to `OVER(... ORDER BY ...)`.
+#'
+#' @inheritSection arrange.tbl_lazy dbplyr 1.4.3 and earlier
+#'
 #' @param .data A remote tibble
 #' @param ... Name-value pairs of expressions.
 #' @param from,to Bounds of the frame.
@@ -51,6 +70,15 @@ sql_build.op_order <- function(op, con, ...) {
 
 # Frame -------------------------------------------------------------------
 
+#' @description
+#' `window_frame()` defines the frame, or context, in which a window function
+#' operates, in terms of number of rows before and after the current row.
+#'
+#' @details
+#' `window_frame()` translates to
+#' `OVER(... ROWS BETWEEN ...PRECEDING AND ... FOLLOWING)`.
+#' See <https://mjk.space/advances-sql-window-frames/> for an introduction.
+#'
 #' @export
 #' @rdname window_order
 window_frame <- function(.data, from = -Inf, to = Inf) {

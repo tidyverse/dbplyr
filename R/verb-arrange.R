@@ -1,6 +1,35 @@
 #' Arrange rows by variables in a remote database table
 #'
 #' Order rows of database tables by an expression involving its variables.
+#' Use [window_order()] instead to define the sort order for window functions
+#' without affecting the resulting order.
+#' The order is active only for the next verb.
+#'
+#' @details
+#' Order is mostly irrelevant in relational databases, except for the following
+#' cases:
+#'
+#' - Returning results with [collect()],
+#' - Populating a table with [compute()],
+#' - Processing the first few rows with [head()],
+#' - Evaluating window functions, see [window_order()].
+#'
+#' In particular, subqueries never need to specify an order,
+#' except when the number of rows returned from the subquery is limited.
+#' Therefore, `arrange()` should only be used as the last step in a pipe,
+#' or immediately before `head()`.
+#' An empty `arrange()` call resets the sort order.
+#' This may be useful if the lazy table is created outside of your control.
+#'
+#' @section dbplyr 1.4.3 and earlier:
+#' In dbplyr 1.4.3 and earlier, the `arrange()` and `window_order()` verbs
+#' incorrectly added columns to the existing order.
+#' Pipes with multiple such verbs led to SQL code
+#' that was inconsistent with the intent, and sometimes erroneous.
+#' The current version warns if multiple calls to `arrange()`
+#' or `window_order()` are used in a pipe.
+#' If necessary, add an empty `arrange()` or `window_order()` call
+#' to silence this warning.
 #'
 #' @section Missing values:
 #' Compared to its sorting behaviour on local data, the [arrange()] method for

@@ -17,8 +17,41 @@ window_frame(.data, from = -Inf, to = Inf)
 \item{from, to}{Bounds of the frame.}
 }
 \description{
-Override window order and frame
+\code{window_order()} sets the order for subsequent invocations
+of window functions on a lazy table.
+The order is active only for the next verb.
+
+Window functions like \code{\link[=first]{first()}} and \code{\link[=lag]{lag()}} require an explicit order
+when computed on the database.
+Many window functions offer an \code{order_by} argument that allows overriding
+the order.
+
+The window order does not affect the order in which the rows are returned
+with \code{\link[=collect]{collect()}} or when printing, use \code{\link[=arrange]{arrange()}} to specify
+the output order.
+
+\code{window_frame()} defines the frame, or context, in which a window function
+operates, in terms of number of rows before and after the current row.
 }
+\details{
+\code{window_order()} translates to \verb{OVER(... ORDER BY ...)}.
+
+\code{window_frame()} translates to
+\verb{OVER(... ROWS BETWEEN ...PRECEDING AND ... FOLLOWING)}.
+See \url{https://mjk.space/advances-sql-window-frames/} for an introduction.
+}
+\section{dbplyr 1.4.3 and earlier}{
+
+In dbplyr 1.4.3 and earlier, the \code{arrange()} and \code{window_order()} verbs
+incorrectly added columns to the existing order.
+Pipes with multiple such verbs led to SQL code
+that was inconsistent with the intent, and sometimes erroneous.
+The current version warns if multiple calls to \code{arrange()}
+or \code{window_order()} are used in a pipe.
+If necessary, add an empty \code{arrange()} or \code{window_order()} call
+to silence this warning.
+}
+
 \examples{
 library(dplyr)
 df <- lazy_frame(g = rep(1:2, each = 5), y = runif(10), z = 1:10)

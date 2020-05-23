@@ -22,7 +22,39 @@ An object of the same class as \code{.data}.
 }
 \description{
 Order rows of database tables by an expression involving its variables.
+Use \code{\link[=window_order]{window_order()}} instead to define the sort order for window functions
+without affecting the resulting order.
+The order is active only for the next verb.
 }
+\details{
+Order is mostly irrelevant in relational databases, except for the following
+cases:
+\itemize{
+\item Returning results with \code{\link[=collect]{collect()}},
+\item Populating a table with \code{\link[=compute]{compute()}},
+\item Processing the first few rows with \code{\link[=head]{head()}},
+\item Evaluating window functions, see \code{\link[=window_order]{window_order()}}.
+}
+
+In particular, subqueries never need to specify an order,
+except when the number of rows returned from the subquery is limited.
+Therefore, \code{arrange()} should only be used as the last step in a pipe,
+or immediately before \code{head()}.
+An empty \code{arrange()} call resets the sort order.
+This may be useful if the lazy table is created outside of your control.
+}
+\section{dbplyr 1.4.3 and earlier}{
+
+In dbplyr 1.4.3 and earlier, the \code{arrange()} and \code{window_order()} verbs
+incorrectly added columns to the existing order.
+Pipes with multiple such verbs led to SQL code
+that was inconsistent with the intent, and sometimes erroneous.
+The current version warns if multiple calls to \code{arrange()}
+or \code{window_order()} are used in a pipe.
+If necessary, add an empty \code{arrange()} or \code{window_order()} call
+to silence this warning.
+}
+
 \section{Missing values}{
 
 Compared to its sorting behaviour on local data, the \code{\link[=arrange]{arrange()}} method for
