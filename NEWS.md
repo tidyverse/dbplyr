@@ -13,6 +13,9 @@
 * [blob](https://blob.tidyverse.org/) vectors can now be used with `!!` and `!!!` operators, for example in `filter()` (@okhoma, #433)
 
 # dbplyr 1.4.4
+* Breaking: `arrange()` can now only be used at the end of a pipe or followed by `head()`, otherwise it has no effect and raises a warning. `window_order()` can be used repeatedly but only affects the verb that follows immediately.  All other verbs reset the sort order. An empty `arrange()` can be used to undo the effects of the last `arrange()`. This change leads to fewer subqueries and fewer redundant `ORDER BY` clauses. The documentation for `arrange()` and `window_order()` has been expanded (#276, #373, @krlmlr).
+
+* Subqueries with `ORDER BY` use `TOP 9223372036854775807` instead of `TOP 100 PERCENT` on SQL Server for compatibility with Azure Data Warehouse (#337, @alexkyllo).
 
 * Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
   support for session-scoped temporary tables in MS SQL (@krlmlr, #438).
