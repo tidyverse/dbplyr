@@ -88,7 +88,7 @@ sql_join_vars <- function(con, vars) {
 }
 
 sql_join_var <- function(con, alias, x, y) {
-  if (!is.na(x) & !is.na(y)) {
+  if (!is.na(x) && !is.na(y)) {
     sql_expr(
       COALESCE(
         !!sql_table_prefix(con, x, table = "LHS"),
