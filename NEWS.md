@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Subqueries with `ORDER BY` use `TOP 9223372036854775807` instead of `TOP 100 PERCENT` on SQL Server for compatibility with Azure Data Warehouse (#337, @alexkyllo).
+
 * Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
   support for session-scoped temporary tables in MS SQL (@krlmlr, #438).
 
