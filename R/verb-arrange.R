@@ -18,6 +18,7 @@
 #' except when the number of rows returned from the subquery is limited.
 #' Therefore, `arrange()` should only be used as the last step in a pipe,
 #' or immediately before `head()`.
+#'
 #' An empty `arrange()` call resets the sort order.
 #' This may be useful if the lazy table is created outside of your control.
 #'
@@ -60,6 +61,12 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
+
+  # Special case for empty arrange() after existing arrange():
+  if (length(dots) == 0 && !.by_group && inherits(.data$ops, "op_arrange")) {
+    .data$ops <- .data$ops$x
+    return(.data)
+  }
 
   add_op_single(
     "arrange",
