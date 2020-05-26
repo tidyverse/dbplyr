@@ -120,7 +120,7 @@ elide_order_by <- function(query, order_by) {
       if (order_by == "override") {
         warn("Overriding sort order.\nHint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.")
       } else if (order_by == "erase") {
-        warn("Ignoring sort order.\nHint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.")
+        warn("Ignoring sort order.\nHint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.")
       }
     }
 

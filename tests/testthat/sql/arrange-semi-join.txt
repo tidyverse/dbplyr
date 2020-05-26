@@ -7,7 +7,7 @@ Message: Joining, by = "a"
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT * FROM (SELECT *
 FROM `df`) `LHS`
@@ -22,7 +22,7 @@ Message: Joining, by = "a"
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT * FROM (SELECT *
 FROM `df`) `LHS`
@@ -61,7 +61,7 @@ Message: Joining, by = "a"
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT * FROM `df` AS `LHS`
 WHERE EXISTS (
@@ -76,7 +76,7 @@ Message: Joining, by = "a"
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT * FROM `df` AS `LHS`
 WHERE EXISTS (

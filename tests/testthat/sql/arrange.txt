@@ -26,7 +26,7 @@ ORDER BY `b`
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT `b`
 FROM `df`
@@ -51,7 +51,7 @@ FROM `df`
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT `b`
 FROM `df`
@@ -61,7 +61,7 @@ FROM `df`
 <SQL>
 
 Warning: Ignoring sort order.
-Hint: `arrange()` only has an effect if used at the end of a pipe or after `head()`. See `?arrange.tbl_lazy` for details.
+Hint: `arrange()` only has an effect if used at the end of a pipe or immediately before `head()`. See `?arrange.tbl_lazy` for details.
 
 SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
 FROM `df`
