@@ -2,7 +2,7 @@
 #' @export
 pull.tbl_sql <- function(.data, var = -1) {
   expr <- enquo(var)
-  var <- dplyr:::find_var(expr, tbl_vars(.data))
+  var <- tidyselect::vars_pull(tbl_vars(.data), {{ var }})
 
   .data <- ungroup(.data)
   .data <- select(.data, !! sym(var))
