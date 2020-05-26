@@ -15,28 +15,7 @@ This is a resubmission; I have tried to ensure that unnecessary tests are no lon
 
 ## revdepcheck results
 
-We checked 58 reverse dependencies (51 from CRAN + 7 from BioConductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 51 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 1 new problems
- * We failed to check 8 packages
-
-Issues with CRAN packages are summarised below.
-
-### New problems
-(This reports the first line of each new failure)
-
-* dm
-  checking tests ...
-  
-  The author is aware of the issue and is working on a fix.
-
-### Failed to check
-
-* bigrquery   (NA)
-* bigsnpr     (NA)
-* dplyr       (NA)
-* pleiades    (NA)
-* RClickhouse (NA)
-* resourcer   (NA)
-* taxizedb    (NA)
-* valr        (NA)
+ * We saw 0 new problems
+ * We failed to check 0 packages
