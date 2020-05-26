@@ -11,11 +11,18 @@
 #' the order.
 #'
 #' The window order does not affect the order in which the rows are returned
-#' with [collect()] or when printing, use [arrange()] to specify
+#' with [collect()] or when printing, use [arrange.tbl_lazy()] to specify
 #' the output order.
+#'
+#' `window_frame()` defines the frame, or context, in which a window function
+#' operates, in terms of number of rows before and after the current row.
 #'
 #' @details
 #' `window_order()` translates to `OVER(... ORDER BY ...)`.
+#'
+#' `window_frame()` translates to
+#' `OVER(... ROWS BETWEEN ...PRECEDING AND ... FOLLOWING)`.
+#' See <https://mjk.space/advances-sql-window-frames/> for an introduction.
 #'
 #' @inheritSection arrange.tbl_lazy dbplyr 1.4.3 and earlier
 #'
@@ -70,15 +77,6 @@ sql_build.op_order <- function(op, con, ...) {
 
 # Frame -------------------------------------------------------------------
 
-#' @description
-#' `window_frame()` defines the frame, or context, in which a window function
-#' operates, in terms of number of rows before and after the current row.
-#'
-#' @details
-#' `window_frame()` translates to
-#' `OVER(... ROWS BETWEEN ...PRECEDING AND ... FOLLOWING)`.
-#' See <https://mjk.space/advances-sql-window-frames/> for an introduction.
-#'
 #' @export
 #' @rdname window_order
 window_frame <- function(.data, from = -Inf, to = Inf) {

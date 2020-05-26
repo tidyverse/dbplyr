@@ -27,7 +27,7 @@ Many window functions offer an \code{order_by} argument that allows overriding
 the order.
 
 The window order does not affect the order in which the rows are returned
-with \code{\link[=collect]{collect()}} or when printing, use \code{\link[=arrange]{arrange()}} to specify
+with \code{\link[=collect]{collect()}} or when printing, use \code{\link[=arrange.tbl_lazy]{arrange.tbl_lazy()}} to specify
 the output order.
 
 \code{window_frame()} defines the frame, or context, in which a window function
