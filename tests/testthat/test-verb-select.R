@@ -132,9 +132,7 @@ test_that("arrange renders correctly for single-table verbs (#373)", {
 
     "complex mutate"
     lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
-    lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
     lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
-    lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
     lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
   })
 })

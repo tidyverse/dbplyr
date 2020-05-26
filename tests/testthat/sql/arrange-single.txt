@@ -42,16 +42,6 @@ SELECT `b` AS `a`, `b`
 FROM `df`
 ORDER BY `a`
 
-> lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-<SQL>
-
-Warning: Overriding sort order.
-Hint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.
-
-SELECT 1.0 AS `a`, `b`
-FROM `df`
-ORDER BY `b`
-
 > lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
 <SQL>
 
@@ -59,16 +49,6 @@ Warning: Overriding sort order.
 Hint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.
 
 SELECT `a`, `a` AS `b`
-FROM `df`
-ORDER BY `b`
-
-> lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
-<SQL>
-
-Warning: Overriding sort order.
-Hint: Did you want to use `window_order()` instead of `arrange()`? See `?window_order` and `?arrange.tbl_lazy` for details.
-
-SELECT `a`, 1.0 AS `b`
 FROM `df`
 ORDER BY `b`
 
