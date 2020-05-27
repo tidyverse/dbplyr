@@ -47,7 +47,8 @@
 
 <meta property="og:title" content="Create an SQL tbl (abstract) — tbl_sql" />
 <meta property="og:description" content="Generally, you should no longer need to provide a custom tbl()
-method you you can default tbl.DBIConnect method." />
+method.
+The default tbl.DBIConnect method should work in most cases." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -92,7 +93,7 @@ method you you can default tbl.DBIConnect method." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
         </div>
       </div>
     </div>
@@ -180,7 +181,8 @@ method you you can default tbl.DBIConnect method." />
 
     <div class="ref-description">
     <p>Generally, you should no longer need to provide a custom <code>tbl()</code>
-method you you can default <code>tbl.DBIConnect</code> method.</p>
+method.
+The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
     </div>
 
     <pre class="usage"><span class='fu'>tbl_sql</span>(<span class='no'>subclass</span>, <span class='no'>src</span>, <span class='no'>from</span>, <span class='no'>...</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
@@ -198,7 +200,10 @@ method you you can default <code>tbl.DBIConnect</code> method.</p>
     </tr>
     <tr>
       <th>vars</th>
-      <td><p>DEPRECATED</p></td>
+      <td><p>Provide column names as a character vector
+to avoid retrieving them from the database.
+Mainly useful for better performance when creating
+multiple <code>tbl</code> objects.</p></td>
     </tr>
     </table>
 

@@ -90,7 +90,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.3</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
         </div>
       </div>
     </div>
@@ -175,6 +175,19 @@
       <small>Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="dbplyr-144" class="section level1">
+<h1 class="page-header" data-toc-text="1.4.4">
+<a href="#dbplyr-144" class="anchor"></a>dbplyr 1.4.4<small> 2020-05-27 </small>
+</h1>
+<ul>
+<li><p>Internally <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html">DBI::dbExecute()</a></code> now uses <code>immediate = TRUE</code>; this improves support for session-scoped temporary tables in MS SQL (<a href='https://github.com/krlmlr'>@krlmlr</a>, <a href='https://github.com/tidyverse/dbplyr/issues/438'>#438</a>).</p></li>
+<li><p>Subqueries with <code>ORDER BY</code> use <code>TOP 9223372036854775807</code> instead of <code>TOP 100 PERCENT</code> on SQL Server for compatibility with Azure Data Warehouse (<a href='https://github.com/tidyverse/dbplyr/issues/337'>#337</a>, <a href='https://github.com/alexkyllo'>@alexkyllo</a>).</p></li>
+<li><p><code><a href="../reference/escape.html">escape()</a></code> now supports <code>blob</code> vectors using new <code><a href="../reference/sql_escape_logical.html">sql_escape_raw()</a></code> generic. It enables using <a href="https://blob.tidyverse.org/">blob</a> variables in dplyr verbs, for example to filter nvarchar values by UTF-16 blobs (see <a href="https://github.com/r-dbi/DBI/issues/215#issuecomment-356376133" class="uri">https://github.com/r-dbi/DBI/issues/215#issuecomment-356376133</a>). (<a href='https://github.com/okhoma'>@okhoma</a>, <a href='https://github.com/tidyverse/dbplyr/issues/433'>#433</a>)</p></li>
+<li><p>Added <code>setOldClass()</code> calls for <code>"ident"</code> and <code>"ident_q"</code> classes for compatibility with dplyr 1.0.0 (<a href='https://github.com/tidyverse/dbplyr/issues/448'>#448</a>, <a href='https://github.com/krlmlr'>@krlmlr</a>).</p></li>
+<li><p>Postgres <code>str_detect()</code> translation uses same argument names as stringr, and gains a <code>negate</code> argument (<a href='https://github.com/tidyverse/dbplyr/issues/444'>#444</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code> now correctly support the <code>sql_on</code> argument (<a href='https://github.com/tidyverse/dbplyr/issues/443'>#443</a>, <a href='https://github.com/krlmlr'>@krlmlr</a>).</p></li>
+</ul>
+</div>
     <div id="dbplyr-143" class="section level1">
 <h1 class="page-header" data-toc-text="1.4.3">
 <a href="#dbplyr-143" class="anchor"></a>dbplyr 1.4.3<small> 2020-04-19 </small>

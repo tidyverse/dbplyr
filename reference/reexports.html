@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Perform arbitrary computation on remote backend — do.tbl_sql • dbplyr</title>
+<title>Objects exported from other packages — reexports • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -45,8 +45,13 @@
 
 
 
-<meta property="og:title" content="Perform arbitrary computation on remote backend — do.tbl_sql" />
-<meta property="og:description" content="Perform arbitrary computation on remote backend" />
+<meta property="og:title" content="Objects exported from other packages — reexports" />
+<meta property="og:description" content="These objects are imported from other packages. Follow the links
+below to see their documentation.
+
+  magrittr%&amp;gt;%
+
+" />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -172,40 +177,21 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Perform arbitrary computation on remote backend</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-do.R'><code>R/verb-do.R</code></a></small>
-    <div class="hidden name"><code>do.tbl_sql.Rd</code></div>
+    <h1>Objects exported from other packages</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/reexport.R'><code>R/reexport.R</code></a></small>
+    <div class="hidden name"><code>reexports.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Perform arbitrary computation on remote backend</p>
+    <p>These objects are imported from other packages. Follow the links
+below to see their documentation.</p>
+<dl>
+  <dt>magrittr</dt><dd><p><code>%&gt;%</code></p></dd>
+
+</dl>
     </div>
 
-    <pre class="usage"><span class='co'># S3 method for tbl_sql</span>
-<span class='fu'>do</span>(<span class='no'>.data</span>, <span class='no'>...</span>, <span class='kw'>.chunk_size</span> <span class='kw'>=</span> <span class='fl'>10000L</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>.data</th>
-      <td><p>a tbl</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Expressions to apply to each group. If named, results will be
-stored in a new column. If unnamed, should return a data frame. You can
-use <code>.</code> to refer to the current group. You can not mix named and
-unnamed arguments.</p></td>
-    </tr>
-    <tr>
-      <th>.chunk_size</th>
-      <td><p>The size of each chunk to pull into R. If this number is
-too big, the process will be slow because R has to allocate and free a lot
-of memory. If it's too small, it will be slow, because of the overhead of
-talking to the database.</p></td>
-    </tr>
-    </table>
 
 
   </div>
