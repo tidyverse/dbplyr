@@ -3,7 +3,7 @@
 #' @description
 #' `window_order()` sets the order for subsequent invocations
 #' of window functions on a lazy table.
-#' The order is active only for the next verb.
+#' The order is active only for the next verb except `window_frame()`.
 #'
 #' Window functions like [first()] and [lag()] require an explicit order
 #' when computed on the database.
