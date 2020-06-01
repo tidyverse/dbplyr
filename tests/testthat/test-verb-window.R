@@ -44,7 +44,7 @@ test_that("order is lost after verbs, without warning (#373)", {
   expect_equal(sort, list())
   expect_warning(sql_render(out), NA)
 
-  out <- mf %>% window_order(y) %>% summarise(x = sum(x))
+  out <- mf %>% window_order(y) %>% summarise(x = sum(x, na.rm = TRUE))
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list())
   expect_warning(sql_render(out), NA)
