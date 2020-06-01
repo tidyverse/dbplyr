@@ -65,6 +65,7 @@ add_op_order <- function(.data, dots = list()) {
   .data$ops <- op_single("order", x = .data$ops, dots = dots)
   .data
 }
+
 #' @export
 op_sort.op_order <- function(op) {
   op$dots
@@ -84,6 +85,11 @@ window_frame <- function(.data, from = -Inf, to = Inf) {
   stopifnot(is.numeric(to), length(to) == 1)
 
   add_op_single("frame", .data, args = list(range = c(from, to)))
+}
+
+#' @export
+op_sort.op_frame <- function(op) {
+  op_sort(op$x)
 }
 
 #' @export

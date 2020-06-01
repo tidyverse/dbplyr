@@ -92,11 +92,6 @@ test_that("multiple arranges don't combine, sometimes with warning (#373)", {
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list(quote(y)))
   expect_warning(sql_render(out), NA)
-
-  out <- window_order(window_order(lazy_frame(x = 1:3, y = 3:1), x), y)
-  sort <- lapply(op_sort(out), get_expr)
-  expect_equal(sort, list(quote(y)))
-  expect_warning(sql_render(out), NA)
 })
 
 test_that("order is retained after head() (#373)", {
