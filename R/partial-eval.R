@@ -57,7 +57,7 @@
 partial_eval <- function(call, vars = character(), env = caller_env()) {
   if (is_null(call)) {
     NULL
-  } else if (is_atomic(call)) {
+  } else if (is_atomic(call) || is_blob(call)) {
     call
   } else if (is_symbol(call)) {
     partial_eval_sym(call, vars, env)
