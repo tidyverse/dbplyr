@@ -27,6 +27,9 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(trans(str_detect(x, y, negate = TRUE)), sql("!(`x` ~ `y`)"))
   expect_equal(trans(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
   expect_equal(trans(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 'g')"))
+  expect_equal(trans(str_squish(x)), sql("LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"))
+  expect_equal(trans(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '')"))
+  expect_equal(trans(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 'g')"))
 })
 
 test_that("two variable aggregates are translated correctly", {

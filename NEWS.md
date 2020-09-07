@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Postgres: New translations for stringr functions: `str_squish()`, 
+  `str_remove()`, `str_remove_all()` (@shosaco).
+
 # dbplyr 1.4.4
 
 * Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
