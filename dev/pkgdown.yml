@@ -1,6 +1,6 @@
 pandoc: 2.7.3
-pkgdown: 1.6.1.9000
-pkgdown_sha: cc9c7b1be8573f8af3453f6e5d0422d86c916701
+pkgdown: 1.6.1
+pkgdown_sha: ~
 articles:
   dbplyr: dbplyr.html
   new-backend: new-backend.html
@@ -8,7 +8,7 @@ articles:
   sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2020-09-16T19:52Z
+last_built: 2020-09-16T20:05Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles
