@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Partially evaluate an expression. — partial_eval" />
@@ -189,7 +193,7 @@ don't need to carry around their environment - all relevant information
 is incorporated into the expression.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>partial_eval</span>(<span class='no'>call</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>env</span> <span class='kw'>=</span> <span class='fu'>caller_env</span>())</pre>
+    <pre class="usage"><span class='fu'>partial_eval</span>(<span class='kw'>call</span>, vars = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), env = <span class='fu'>caller_env</span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -227,23 +231,33 @@ variable, then remote.</p></li>
 computation, or by using the <code>.data</code> and <code>.env</code> pronouns of tidy evaluation.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>vars</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"year"</span>, <span class='st'>"id"</span>)
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='fl'>1980</span>), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'>
-<span class='no'>ids</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ansonca01"</span>, <span class='st'>"forceda01"</span>, <span class='st'>"mathebo01"</span>)
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>id</span> <span class='kw'>%in%</span> <span class='no'>ids</span>), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; id %in% c("ansonca01", "forceda01", "mathebo01")</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>vars</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"year"</span>, <span class='st'>"id"</span>)
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='fl'>1980</span>), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'>
+<span class='kw'>ids</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ansonca01"</span>, <span class='st'>"forceda01"</span>, <span class='st'>"mathebo01"</span>)
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>id</span> <span class='op'>%in%</span> <span class='kw'>ids</span>), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; id %in% c("ansonca01", "forceda01", "mathebo01")</div><div class='input'>
 <span class='co'># cf.</span>
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>id</span> <span class='kw'>==</span> <span class='no'>.data</span>$<span class='no'>ids</span>), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; id == ids</div><div class='input'>
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>id</span> <span class='op'>==</span> <span class='kw'>.data</span><span class='op'>$</span><span class='kw'>ids</span>), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; id == ids</div><div class='input'>
 <span class='co'># You can use local() or .env to disambiguate between local and remote</span>
 <span class='co'># variables: otherwise remote is always preferred</span>
-<span class='no'>year</span> <span class='kw'>&lt;-</span> <span class='fl'>1980</span>
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='no'>year</span>), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; year</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span>(<span class='no'>year</span>)), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='no'>.env</span>$<span class='no'>year</span>), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'>
+<span class='kw'>year</span> <span class='op'>&lt;-</span> <span class='fl'>1980</span>
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='kw'>year</span>), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; year</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span>(<span class='kw'>year</span>)), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='kw'>.env</span><span class='op'>$</span><span class='kw'>year</span>), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; 1980</div><div class='input'>
 <span class='co'># Functions are always assumed to be remote. Use local to force evaluation</span>
 <span class='co'># in R.</span>
-<span class='no'>f</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> + <span class='fl'>1</span>
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='fu'>f</span>(<span class='fl'>1980</span>)), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; f(1980)</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>year</span> <span class='kw'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span>(<span class='fu'>f</span>(<span class='fl'>1980</span>))), <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>)</div><div class='output co'>#&gt; year &gt; 1981</div><div class='input'>
+<span class='kw'>f</span> <span class='op'>&lt;-</span> <span class='fu'>function</span>(<span class='kw'>x</span>) <span class='kw'>x</span> <span class='op'>+</span> <span class='fl'>1</span>
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='fu'>f</span>(<span class='fl'>1980</span>)), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; f(1980)</div><div class='input'><span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>year</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/eval.html'>local</a></span>(<span class='fu'>f</span>(<span class='fl'>1980</span>))), vars = <span class='kw'>vars</span>)
+</div><div class='output co'>#&gt; year &gt; 1981</div><div class='input'>
 <span class='co'># For testing you can also use it with the tbl omitted</span>
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='fl'>1</span> + <span class='fl'>2</span> * <span class='fl'>3</span>))</div><div class='output co'>#&gt; 1 + 2 * 3</div><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>1</span>
-<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>x</span> ^ <span class='no'>y</span>))</div><div class='output co'>#&gt; 1^y</div></pre>
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='fl'>1</span> <span class='op'>+</span> <span class='fl'>2</span> <span class='op'>*</span> <span class='fl'>3</span>))
+</div><div class='output co'>#&gt; 1 + 2 * 3</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
+<span class='fu'>partial_eval</span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>x</span> <span class='op'>^</span> <span class='kw'>y</span>))
+</div><div class='output co'>#&gt; 1^y</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

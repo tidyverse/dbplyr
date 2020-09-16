@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Generate SQL from R expressions — sql_expr" />
@@ -185,9 +189,9 @@ Strings are escaped; names become bare SQL identifiers. User infix
 functions have <code>%</code> stripped.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sql_expr</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())
+    <pre class="usage"><span class='fu'>sql_expr</span>(<span class='kw'>x</span>, con = <span class='fu'>sql_current_con</span>())
 
-<span class='fu'>sql_call2</span>(<span class='no'>.fn</span>, <span class='no'>...</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())</pre>
+<span class='fu'>sql_call2</span>(<span class='kw'>.fn</span>, <span class='kw'>...</span>, con = <span class='fu'>sql_current_con</span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -219,13 +223,21 @@ which I think is worthwhile because it leads to more readable translation
 code.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>() <span class='co'># not necessary when writing translations</span>
+    <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>() <span class='co'># not necessary when writing translations</span>
 
-<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span> + <span class='fl'>1</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; F(x + 1.0)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; F('x', 'y')</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; F(x, y)</div><div class='input'>
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"x"</span>)
-<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(!!<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; F(`x`, y)</div><div class='input'>
-<span class='fu'>sql_expr</span>(<span class='fu'>cast</span>(<span class='st'>"x"</span> <span class='kw'>%as%</span> <span class='no'>DECIMAL</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; CAST('x' AS DECIMAL)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='no'>x</span>) <span class='kw'>%::%</span> <span class='no'>numeric</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; ROUND(x) :: numeric</div><div class='input'>
-<span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='no'>x</span>), <span class='fl'>1</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; x + 1.0</div><div class='input'><span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='st'>"x"</span>, <span class='fl'>1</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'x' + 1.0</div></pre>
+<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='kw'>x</span> <span class='op'>+</span> <span class='fl'>1</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; F(x + 1.0)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; F('x', 'y')</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='kw'>x</span>, <span class='kw'>y</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; F(x, y)</div><div class='input'>
+<span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"x"</span>)
+<span class='fu'>sql_expr</span>(<span class='fu'>f</span>(<span class='op'>!</span><span class='op'>!</span><span class='kw'>x</span>, <span class='kw'>y</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; F(`x`, y)</div><div class='input'>
+<span class='fu'>sql_expr</span>(<span class='fu'>cast</span>(<span class='st'>"x"</span> <span class='op'>%as%</span> <span class='kw'>DECIMAL</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; CAST('x' AS DECIMAL)</div><div class='input'><span class='fu'>sql_expr</span>(<span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span>(<span class='kw'>x</span>) <span class='op'>%::%</span> <span class='kw'>numeric</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; ROUND(x) :: numeric</div><div class='input'>
+<span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>x</span>), <span class='fl'>1</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; x + 1.0</div><div class='input'><span class='fu'>sql_call2</span>(<span class='st'>"+"</span>, <span class='st'>"x"</span>, <span class='fl'>1</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'x' + 1.0</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

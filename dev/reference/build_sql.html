@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Build a SQL string. — build_sql" />
@@ -189,7 +193,7 @@ treating bare strings as sql. This is unlikely to prevent any serious
 attack, but should make it unlikely that you produce invalid sql.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>build_sql</span>(<span class='no'>...</span>, <span class='kw'>.env</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(), <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>())</pre>
+    <pre class="usage"><span class='fu'>build_sql</span>(<span class='kw'>...</span>, .env = <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>(), con = <span class='fu'>sql_current_con</span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -218,12 +222,17 @@ other high level queries, or for other syntax that has no R equivalent.
 For individual function translations, prefer <code><a href='sql_expr.html'>sql_expr()</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>()
-<span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM TABLE"</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM TABLE</div><div class='input'><span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='st'>"TABLE"</span>
-<span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM 'TABLE'</div><div class='input'><span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='fu'><a href='ident.html'>ident</a></span>(<span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM `TABLE`</div><div class='input'><span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='fu'><a href='sql.html'>sql</a></span>(<span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM TABLE</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>()
+<span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM TABLE"</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM TABLE</div><div class='input'><span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='st'>"TABLE"</span>
+<span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='kw'>x</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM 'TABLE'</div><div class='input'><span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='fu'><a href='ident.html'>ident</a></span>(<span class='kw'>x</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM `TABLE`</div><div class='input'><span class='fu'>build_sql</span>(<span class='st'>"SELECT * FROM "</span>, <span class='fu'><a href='sql.html'>sql</a></span>(<span class='kw'>x</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; SELECT * FROM TABLE</div><div class='input'>
 <span class='co'># http://xkcd.com/327/</span>
-<span class='no'>name</span> <span class='kw'>&lt;-</span> <span class='st'>"Robert'); DROP TABLE Students;--"</span>
-<span class='fu'>build_sql</span>(<span class='st'>"INSERT INTO Students (Name) VALUES ("</span>, <span class='no'>name</span>, <span class='st'>")"</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; INSERT INTO Students (Name) VALUES ('Robert''); DROP TABLE Students;--')</div></pre>
+<span class='kw'>name</span> <span class='op'>&lt;-</span> <span class='st'>"Robert'); DROP TABLE Students;--"</span>
+<span class='fu'>build_sql</span>(<span class='st'>"INSERT INTO Students (Name) VALUES ("</span>, <span class='kw'>name</span>, <span class='st'>")"</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; INSERT INTO Students (Name) VALUES ('Robert''); DROP TABLE Students;--')</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

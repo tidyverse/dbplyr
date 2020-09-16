@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Build and render SQL from a sequence of lazy operations — join_query" />
@@ -189,28 +193,28 @@ a hierarchical structure. Outside of testing, however, you should
 always call <code>sql_render()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>vars</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"inner"</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>suffix</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>, <span class='st'>".y"</span>))
+    <pre class="usage"><span class='fu'>join_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, <span class='kw'>vars</span>, type = <span class='st'>"inner"</span>, by = <span class='kw'>NULL</span>, suffix = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>, <span class='st'>".y"</span>))
 
 <span class='fu'>select_query</span>(
-  <span class='no'>from</span>,
-  <span class='kw'>select</span> <span class='kw'>=</span> <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>),
-  <span class='kw'>where</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>group_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>having</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>order_by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  <span class='kw'>limit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>distinct</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>from</span>,
+  select = <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>),
+  where = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  group_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  having = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  order_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
+  limit = <span class='kw'>NULL</span>,
+  distinct = <span class='fl'>FALSE</span>
 )
 
-<span class='fu'>semi_join_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>anti</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>semi_join_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, anti = <span class='fl'>FALSE</span>, by = <span class='kw'>NULL</span>)
 
-<span class='fu'>set_op_query</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='no'>type</span>)
+<span class='fu'>set_op_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, type = <span class='kw'>type</span>)
 
-<span class='fu'>sql_build</span>(<span class='no'>op</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>sql_build</span>(<span class='kw'>op</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
 
-<span class='fu'>sql_render</span>(<span class='no'>query</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>, <span class='kw'>bare_identifier_ok</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>sql_render</span>(<span class='kw'>query</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>, bare_identifier_ok = <span class='fl'>FALSE</span>)
 
-<span class='fu'>sql_optimise</span>(<span class='no'>x</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>sql_optimise</span>(<span class='kw'>x</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -244,7 +248,7 @@ and generates an S3 object that represents the query. <code>sql_render()</code>
 takes a query object and then calls a function that is generic
 over the database. For example, <code>sql_build.op_mutate()</code> generates
 a <code>select_query</code>, and <code>sql_render.select_query()</code> calls
-<code>sql_select()</code>, which has different methods for different databases.
+<code><a href='https://dplyr.tidyverse.org/reference/backend_dbplyr.html'>sql_select()</a></code>, which has different methods for different databases.
 The default methods should generate ANSI 92 SQL where possible, so you
 backends only need to override the methods if the backend is not ANSI
 compliant.</p>

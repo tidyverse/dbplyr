@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Escape/quote a string. — escape" />
@@ -183,11 +187,11 @@ details of escaping. escape_ansi() uses the SQL 92 ANSI standard." />
 details of escaping. <code>escape_ansi()</code> uses the SQL 92 ANSI standard.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>escape</span>(<span class='no'>x</span>, <span class='kw'>parens</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>collapse</span> <span class='kw'>=</span> <span class='st'>" "</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>escape</span>(<span class='kw'>x</span>, parens = <span class='fl'>NA</span>, collapse = <span class='st'>" "</span>, con = <span class='kw'>NULL</span>)
 
-<span class='fu'>escape_ansi</span>(<span class='no'>x</span>, <span class='kw'>parens</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>collapse</span> <span class='kw'>=</span> <span class='st'>""</span>)
+<span class='fu'>escape_ansi</span>(<span class='kw'>x</span>, parens = <span class='fl'>NA</span>, collapse = <span class='st'>""</span>)
 
-<span class='fu'>sql_vector</span>(<span class='no'>x</span>, <span class='kw'>parens</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>collapse</span> <span class='kw'>=</span> <span class='st'>" "</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>sql_vector</span>(<span class='kw'>x</span>, parens = <span class='fl'>NA</span>, collapse = <span class='st'>" "</span>, con = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -217,11 +221,19 @@ atomic vectors are separated by spaces and wrapped in parens if needed.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Doubles vs. integers</span>
-<span class='fu'>escape_ansi</span>(<span class='fl'>1</span>:<span class='fl'>5</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; (12345)</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>5.4</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; (1.05.4)</div><div class='input'>
+<span class='fu'>escape_ansi</span>(<span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; (12345)</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>5.4</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt; (1.05.4)</div><div class='input'>
 <span class='co'># String vs known sql vs. sql identifier</span>
-<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; X</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; `X`</div><div class='input'>
+<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"X"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt; X</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'><a href='ident.html'>ident</a></span>(<span class='st'>"X"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt; `X`</div><div class='input'>
 <span class='co'># Escaping is idempotent</span>
-<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)))</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div></pre>
+<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div><div class='input'><span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='fu'>escape_ansi</span>(<span class='st'>"X"</span>)))
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'X'</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

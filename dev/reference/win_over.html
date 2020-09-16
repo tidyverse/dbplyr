@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Generate SQL expression for window functions — win_over" />
@@ -186,26 +190,26 @@ the grouping and order context set up by group_by() and arrange()." />
 <code>win_absent()</code>, <code>win_rank()</code>, <code>win_aggregate()</code>, and <code>win_cumulative()</code>
 provide helpers for constructing common types of window functions.
 <code>win_current_group()</code> and <code>win_current_order()</code> allow you to access
-the grouping and order context set up by <code>group_by()</code> and <code>arrange()</code>.</p>
+the grouping and order context set up by <code><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by()</a></code> and <code><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange()</a></code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>win_over</span>(
-  <span class='no'>expr</span>,
-  <span class='kw'>partition</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>order</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>frame</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>con</span> <span class='kw'>=</span> <span class='fu'>sql_current_con</span>()
+  <span class='kw'>expr</span>,
+  partition = <span class='kw'>NULL</span>,
+  order = <span class='kw'>NULL</span>,
+  frame = <span class='kw'>NULL</span>,
+  con = <span class='fu'>sql_current_con</span>()
 )
 
-<span class='fu'>win_rank</span>(<span class='no'>f</span>)
+<span class='fu'>win_rank</span>(<span class='kw'>f</span>)
 
-<span class='fu'>win_aggregate</span>(<span class='no'>f</span>)
+<span class='fu'>win_aggregate</span>(<span class='kw'>f</span>)
 
-<span class='fu'>win_aggregate_2</span>(<span class='no'>f</span>)
+<span class='fu'>win_aggregate_2</span>(<span class='kw'>f</span>)
 
-<span class='fu'>win_cumulative</span>(<span class='no'>f</span>)
+<span class='fu'>win_cumulative</span>(<span class='kw'>f</span>)
 
-<span class='fu'>win_absent</span>(<span class='no'>f</span>)
+<span class='fu'>win_absent</span>(<span class='kw'>f</span>)
 
 <span class='fu'>win_current_group</span>()
 
@@ -240,9 +244,14 @@ the grouping and order context set up by <code>group_by()</code> and <code>arran
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>()
+    <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>()
 
-<span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER ()</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='st'>"y"</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (PARTITION BY `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='kw'>order</span> <span class='kw'>=</span> <span class='st'>"y"</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='kw'>order</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `x`, `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='kw'>frame</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>Inf</span>, <span class='fl'>0</span>), <span class='kw'>order</span> <span class='kw'>=</span> <span class='st'>"y"</span>, <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)</div></pre>
+<span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER ()</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='st'>"y"</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (PARTITION BY `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), order = <span class='st'>"y"</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), order = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"x"</span>, <span class='st'>"y"</span>), con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `x`, `y`)</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), frame = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='op'>-</span><span class='fl'>Inf</span>, <span class='fl'>0</span>), order = <span class='st'>"y"</span>, con = <span class='kw'>con</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

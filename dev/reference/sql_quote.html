@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Helper function for quoting sql elements. — sql_quote" />
@@ -183,7 +187,7 @@ NAs will be replaced with NULL." />
 <code>NA</code>s will be replaced with NULL.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sql_quote</span>(<span class='no'>x</span>, <span class='no'>quote</span>)</pre>
+    <pre class="usage"><span class='fu'>sql_quote</span>(<span class='kw'>x</span>, <span class='kw'>quote</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -200,7 +204,10 @@ NAs will be replaced with NULL." />
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>sql_quote</span>(<span class='st'>"abc"</span>, <span class='st'>"'"</span>)</div><div class='output co'>#&gt; [1] "'abc'"</div><div class='input'><span class='fu'>sql_quote</span>(<span class='st'>"I've had a good day"</span>, <span class='st'>"'"</span>)</div><div class='output co'>#&gt; [1] "'I''ve had a good day'"</div><div class='input'><span class='fu'>sql_quote</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"abc"</span>, <span class='fl'>NA</span>), <span class='st'>"'"</span>)</div><div class='output co'>#&gt; [1] "'abc'" "NULL" </div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>sql_quote</span>(<span class='st'>"abc"</span>, <span class='st'>"'"</span>)
+</div><div class='output co'>#&gt; [1] "'abc'"</div><div class='input'><span class='fu'>sql_quote</span>(<span class='st'>"I've had a good day"</span>, <span class='st'>"'"</span>)
+</div><div class='output co'>#&gt; [1] "'I''ve had a good day'"</div><div class='input'><span class='fu'>sql_quote</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"abc"</span>, <span class='fl'>NA</span>), <span class='st'>"'"</span>)
+</div><div class='output co'>#&gt; [1] "'abc'" "NULL" </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

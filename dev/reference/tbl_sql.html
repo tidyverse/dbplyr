@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Create an SQL tbl (abstract) — tbl_sql" />
@@ -180,12 +184,12 @@ The default tbl.DBIConnect method should work in most cases." />
     </div>
 
     <div class="ref-description">
-    <p>Generally, you should no longer need to provide a custom <code>tbl()</code>
+    <p>Generally, you should no longer need to provide a custom <code><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl()</a></code>
 method.
 The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tbl_sql</span>(<span class='no'>subclass</span>, <span class='no'>src</span>, <span class='no'>from</span>, <span class='no'>...</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>tbl_sql</span>(<span class='kw'>subclass</span>, <span class='kw'>src</span>, <span class='kw'>from</span>, <span class='kw'>...</span>, vars = <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
