@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
 * All old lazy eval shims have been removed. 
-* `median()` now takes a new argument `na.rm` for consistency with `median()`,
+* `median()` now takes a new argument `na.rm` for consistency with `mean()`,
   but still does always remove any missing values (@lorenzwalthert, #483).
 
 # dbplyr 1.4.4
