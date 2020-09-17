@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* All old lazy eval shims have been removed. 
+
 # dbplyr 1.4.4
 
 * Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
