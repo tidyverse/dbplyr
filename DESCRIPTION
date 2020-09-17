@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 1.4.3.9000
+Version: 1.4.4.9000
 Authors@R: 
     c(person(given = "Hadley",
              family = "Wickham",
@@ -55,7 +55,7 @@ Encoding: UTF-8
 Language: en-gb
 LazyData: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Collate: 
     'utils.R'
     'sql.R'

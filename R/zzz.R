@@ -10,11 +10,21 @@
   if (utils::packageVersion("dplyr") >= "0.8.99") {
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
 
-    setOldClass(c("ident_q", "ident", "character"), ident_q())
-    setOldClass(c("ident", "character"), ident())
-    setOldClass(c("sql", "character"), sql())
+    methods::setOldClass(c("ident_q", "ident", "character"), ident_q())
+    methods::setOldClass(c("ident", "character"), ident())
+    methods::setOldClass(c("sql", "character"), sql())
   }
 }
+
+# Silence R CMD check note:
+# ** checking whether the namespace can be loaded with stated dependencies ... NOTE
+# Warning in .undefineMethod("initialize", Class, classWhere) :
+#   no generic function 'initialize' found
+#
+# I'm not sure why this is necessary, but I suspect it's due to the use of
+# setOldClass onLoad
+#' @importFrom methods initialize
+NULL
 
 register_s3_method <- function(pkg, generic, class, fun = NULL) {
   stopifnot(is.character(pkg), length(pkg) == 1)
