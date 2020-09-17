@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* All old lazy eval shims have been removed. 
+
 * Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
   support for session-scoped temporary tables in MS SQL (@krlmlr, #438).
 
