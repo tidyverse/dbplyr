@@ -152,7 +152,7 @@
       },
     )
 
-  if (sub("0.*", "", DBI::dbGetInfo(con)$db.version) >= 11) {
+  if (sub("0.*", "", dbGetInfo(con)$db.version) >= 11) {
     # version 11 equates to MSSQL 2012
     # if MSSQL 2012+, use sql_try_cast, allows more graceful return of invalid values
     mssql_scalar <- sql_translator(.parent = mssql_scalar,
