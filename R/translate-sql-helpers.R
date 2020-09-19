@@ -233,6 +233,16 @@ sql_cast <- function(type) {
 
 #' @rdname sql_variant
 #' @export
+sql_try_cast <- function(type) {
+  type <- sql(type)
+  function(x) {
+    sql_expr(try_cast(!!x %as% !!type))
+    # try_cast available in MSSQL 2012+
+  }
+}
+
+#' @rdname sql_variant
+#' @export
 sql_log <- function() {
   function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
