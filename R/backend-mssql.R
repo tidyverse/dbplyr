@@ -152,9 +152,10 @@
       },
     )
 
-  if (sub("\\..*", "", dbGetInfo(con)$db.version) >= 11) {
+  if (!is(con, "DBIObject") || sub("\\..*", "", DBI::dbGetInfo(con)$db.version) >= 11) {
     # version 11 equates to MSSQL 2012
     # if MSSQL 2012+, use sql_try_cast, allows more graceful return of invalid values
+    # also if 'con' is not a valid DBIObject, e.g. called by 'testthat'
     mssql_scalar <- sql_translator(.parent = mssql_scalar,
                                    as.logical    = sql_try_cast("BIT"),
 
