@@ -1,8 +1,11 @@
 # dbplyr (development version)
 
 * All old lazy eval shims have been removed. 
+
 * `median()` now takes a new argument `na.rm` for consistency with `mean()`,
   but still does always remove any missing values (@lorenzwalthert, #483).
+
+* [blob](https://blob.tidyverse.org/) vectors can now be used with `!!` and `!!!` operators, for example in `filter()` (@okhoma, #433)
 
 # dbplyr 1.4.4
 
