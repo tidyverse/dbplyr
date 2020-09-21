@@ -49,7 +49,9 @@ Suggests:
     rmarkdown,
     RPostgres (>= 1.1.3),
     RSQLite (>= 2.1.0),
-    testthat (>= 2.0.0)
+    testthat (>= 2.99.0)
+Remotes: r-lib/testthat
+Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

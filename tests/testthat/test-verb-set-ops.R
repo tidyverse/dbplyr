@@ -1,5 +1,3 @@
-context("sets")
-
 test_that("column order is matched", {
   df1 <- memdb_frame(x = 1, y = 2)
   df2 <- memdb_frame(y = 1, x = 2)

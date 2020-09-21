@@ -1,5 +1,3 @@
-context("test-backend-access.R")
-
 test_that("custom scalar translated correctly", {
   local_con(simulate_access())
 
@@ -51,9 +49,5 @@ test_that("custom aggregators translated correctly", {
 
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_access())
-
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT TOP 6 *\nFROM `df`")
-  )
+  expect_snapshot(mf %>% head())
 })

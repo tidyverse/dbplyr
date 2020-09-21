@@ -1,4 +1,0 @@
-<SQL SELECT>
-From:
-  <IDENT> df
-Select:   *

@@ -1,5 +1,3 @@
-context("distinct")
-
 df <- tibble(
   x = c(1, 1, 1, 1),
   y = c(1, 1, 2, 2),
@@ -25,12 +23,8 @@ test_that("distinct for single column equivalent to local unique (#1937)", {
 
 test_that("distinct throws error if column is specified and .keep_all is TRUE", {
   mf <- memdb_frame(x = 1:10)
-  expect_error(
-    mf %>% distinct(x, .keep_all = TRUE) %>% collect(),
-    "specified columns.*[.]keep_all"
-  )
+  expect_snapshot_error(mf %>% distinct(x, .keep_all = TRUE) %>% collect())
 })
-
 
 # sql-render --------------------------------------------------------------
 

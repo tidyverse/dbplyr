@@ -1,5 +1,3 @@
-context("translate")
-
 test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
   old <- options(dplyr.strict_sql = TRUE)
   on.exit(options(old))

@@ -135,23 +135,15 @@ test_that("quoting for rendering mutated grouped table", {
 test_that("mutate generates subqueries as needed", {
   lf <- lazy_frame(x = 1, con = simulate_sqlite())
 
-  reg <- list(
-    inplace = lf %>% mutate(x = x + 1, x = x + 1),
-    increment = lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
-  )
-
-  expect_known_output(print(reg), test_path("sql/mutate-subqueries.sql"))
+  expect_snapshot(lf %>% mutate(x = x + 1, x = x + 1))
+  expect_snapshot(lf %>% mutate(x1 = x + 1, x2 = x1 + 1))
 })
 
 test_that("mutate collapses over nested select", {
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
-  reg <- list(
-    xy = lf %>% select(x:y) %>% mutate(x = x * 2, y = y * 2),
-    yx = lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2)
-  )
-
-  expect_known_output(print(reg), test_path("sql/mutate-select-collapse.sql"))
+  expect_snapshot(lf %>% select(x:y) %>% mutate(x = x * 2, y = y * 2))
+  expect_snapshot(lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2))
 })
 
 # sql_build ---------------------------------------------------------------

@@ -1,5 +1,3 @@
-context("test-verb-compute")
-
 test_that("collect equivalent to as.data.frame/as_tibble", {
   mf <- memdb_frame(letters)
 

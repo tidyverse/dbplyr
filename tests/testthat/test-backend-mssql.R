@@ -1,6 +1,3 @@
-context("test-backend-mssql.R")
-
-
 # function translation ----------------------------------------------------
 
 test_that("custom scalar translated correctly", {
@@ -79,134 +76,54 @@ test_that("custom lubridate functions translated correctly", {
 test_that("filter and mutate translate is.na correctly", {
   mf <- lazy_frame(x = 1, con = simulate_mssql())
 
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT TOP(6) *\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(z = is.na(x)) %>% sql_render(),
-    sql("SELECT `x`, CONVERT(BIT, IIF(`x` IS NULL, 1, 0)) AS `z`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(z = !is.na(x)) %>% sql_render(),
-    sql("SELECT `x`, ~(CONVERT(BIT, IIF(`x` IS NULL, 1, 0))) AS `z`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(is.na(x)) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (((`x`) IS NULL))")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x == 1) %>% sql_render(),
-    sql("SELECT `x` = 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x != 1) %>% sql_render(),
-    sql("SELECT `x` != 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 1) %>% sql_render(),
-    sql("SELECT `x` > 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x >= 1) %>% sql_render(),
-    sql("SELECT `x` >= 1.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x == 1)) %>% sql_render(),
-    sql("SELECT ~((`x` = 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x != 1)) %>% sql_render(),
-    sql("SELECT ~((`x` != 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x > 1)) %>% sql_render(),
-    sql("SELECT ~((`x` > 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = !(x >= 1)) %>% sql_render(),
-    sql("SELECT ~((`x` >= 1.0)) AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 4 & x < 5) %>% sql_render(),
-    sql("SELECT `x` > 4.0 & `x` < 5.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(x > 4 & x < 5) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 AND `x` < 5.0)")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = x > 4 | x < 5) %>% sql_render(),
-    sql("SELECT `x` > 4.0 | `x` < 5.0 AS `x`\nFROM `df`")
-  )
-
-  expect_equal(
-    mf %>% filter(x > 4 | x < 5) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` > 4.0 OR `x` < 5.0)")
-  )
-
-  expect_equal(
-    mf %>% mutate(x = ifelse(x == 0, 0 ,1)) %>% sql_render(),
-    sql("SELECT CASE WHEN (`x` = 0.0) THEN (0.0) WHEN NOT(`x` = 0.0) THEN (1.0) END AS `x`\nFROM `df`")
-  )
+  expect_snapshot(mf %>% mutate(z = is.na(x)))
+  expect_snapshot(mf %>% mutate(z = !is.na(x)))
+  expect_snapshot(mf %>% filter(is.na(x)))
+  expect_snapshot(mf %>% mutate(x = x == 1))
+  expect_snapshot(mf %>% mutate(x = x != 1))
+  expect_snapshot(mf %>% mutate(x = x > 1))
+  expect_snapshot(mf %>% mutate(x = x >= 1))
+  expect_snapshot(mf %>% mutate(x = !(x == 1)))
+  expect_snapshot(mf %>% mutate(x = !(x != 1)))
+  expect_snapshot(mf %>% mutate(x = !(x > 1)))
+  expect_snapshot(mf %>% mutate(x = !(x >= 1)))
+  expect_snapshot(mf %>% mutate(x = x > 4 & x < 5))
+  expect_snapshot(mf %>% filter(x > 4 & x < 5))
+  expect_snapshot(mf %>% mutate(x = x > 4 | x < 5))
+  expect_snapshot(mf %>% filter(x > 4 | x < 5))
+  expect_snapshot(mf %>% mutate(x = ifelse(x == 0, 0, 1)))
 })
 
 test_that("Special ifelse and case_when cases return the correct queries", {
   mf <- lazy_frame(x = 1, con = simulate_mssql())
-  expect_equal(
-    mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)) %>% sql_render(),
-    sql("SELECT `x`, CASE WHEN (`x` IN (1.0, 2.0)) THEN (0.0) WHEN NOT(`x` IN (1.0, 2.0)) THEN (1.0) END AS `z`
-FROM `df`")
-  )
-  expect_equal(
-    mf %>% mutate(z = case_when(is.na(x) ~ 1, !is.na(x) ~ 2, TRUE ~ 3)) %>% sql_render(),
-    sql("SELECT `x`, CASE\nWHEN (((`x`) IS NULL)) THEN (1.0)\nWHEN (NOT(((`x`) IS NULL))) THEN (2.0)\nELSE (3.0)\nEND AS `z`\nFROM `df`")
-  )
+  expect_snapshot(mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)))
+  expect_snapshot(mf %>% mutate(z = case_when(
+    is.na(x) ~ 1,
+    !is.na(x) ~ 2,
+    TRUE ~ 3
+  )))
 })
 
 test_that("ORDER BY in subqueries uses TOP 9223372036854775807 (#337)", {
   local_options(dbplyr_table_num = 0)
-  verify_output("sql/mssql-order-by.txt", {
+  expect_snapshot(
     sql_select(simulate_mssql(), "x", "y", order_by = "z", bare_identifier_ok = TRUE)
-  })
+  )
 })
 
 test_that("custom escapes translated correctly", {
-
   mf <- lazy_frame(x = "abc", con = simulate_mssql())
 
   a <- as_blob("abc")
   b <- as_blob(as.raw(c(0x01, 0x02)))
-
-  expect_equal(
-    mf %>% filter(x == a) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` = 0x616263)")
-  )
-
   L <- c(a, b)
-  expect_equal(
-    mf %>% filter(x %in% L) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
-  )
 
-  expect_equal(
-    mf %>% filter(x %in% !!L) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
-  )
+  expect_snapshot(mf %>% filter(x == a))
+  expect_snapshot(mf %>% filter(x %in% L))
+
+  # expect_snapshot() also uses !!
+  qry <- mf %>% filter(x %in% !!L)
+  expect_snapshot(qry)
 })
 
 # Live database -----------------------------------------------------------

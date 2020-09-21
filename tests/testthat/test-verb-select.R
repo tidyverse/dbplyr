@@ -1,5 +1,3 @@
-context("select")
-
 test_that("select quotes correctly", {
   out <- memdb_frame(x = 1, y = 1) %>%
     select(x) %>%
@@ -72,29 +70,21 @@ test_that("select preserves grouping vars", {
 test_that("multiple selects are collapsed", {
   lf <- lazy_frame(x = 1, y = 2)
 
-  reg <- list(
-    flip2 = lf %>% select(2:1) %>% select(2:1),
-    flip3 = lf %>% select(2:1) %>% select(2:1) %>% select(2:1),
-    rename = lf %>% select(x1 = x) %>% select(x2 = x1)
-  )
-
-  expect_known_output(print(reg), test_path("sql/select-collapse.sql"))
+  expect_snapshot(lf %>% select(2:1) %>% select(2:1))
+  expect_snapshot(lf %>% select(2:1) %>% select(2:1) %>% select(2:1))
+  expect_snapshot(lf %>% select(x1 = x) %>% select(x2 = x1))
 })
 
 test_that("mutate collapses over nested select", {
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
-  reg <- list(
-    a = lf %>% mutate(a = 1, b = 2) %>% select(a),
-    x = lf %>% mutate(a = 1, b = 2) %>% select(x)
-  )
-
-  expect_known_output(print(reg), test_path("sql/select-mutate-collapse.sql"))
+  expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(a))
+  expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(x))
 })
 
 test_that("arrange renders correctly (#373)", {
   local_options(dbplyr_table_num = 0)
-  verify_output(test_path("sql/arrange.txt"), {
+  expect_snapshot({
     "# arrange renders correctly"
     lf <- lazy_frame(a = 1:3, b = 3:1)
 
@@ -119,7 +109,7 @@ test_that("arrange renders correctly (#373)", {
 
 test_that("arrange renders correctly for single-table verbs (#373)", {
   local_options(dbplyr_table_num = 0)
-  verify_output(test_path("sql/arrange-single.txt"), {
+  expect_snapshot({
     lf <- lazy_frame(a = 1:3, b = 3:1)
 
     "head"
@@ -141,7 +131,7 @@ test_that("arrange renders correctly for single-table verbs (#373)", {
 
 test_that("arrange renders correctly for joins (#373)", {
   local_options(dbplyr_table_num = 0)
-  verify_output(test_path("sql/arrange-join.txt"), {
+  expect_snapshot({
     lf <- lazy_frame(a = 1:3, b = 3:1)
     rf <- lazy_frame(a = 1:3, c = 4:6)
 
@@ -157,7 +147,7 @@ test_that("arrange renders correctly for joins (#373)", {
 
 test_that("arrange renders correctly for semi-joins (#373)", {
   local_options(dbplyr_table_num = 0)
-  verify_output(test_path("sql/arrange-semi-join.txt"), {
+  expect_snapshot({
     lf <- lazy_frame(a = 1:3, b = 3:1)
     rf <- lazy_frame(a = 1:3, c = 4:6)
 
@@ -173,7 +163,7 @@ test_that("arrange renders correctly for semi-joins (#373)", {
 
 test_that("arrange renders correctly for set operations (#373)", {
   local_options(dbplyr_table_num = 0)
-  verify_output(test_path("sql/arrange-setop.txt"), {
+  expect_snapshot({
     lf <- lazy_frame(a = 1:3, b = 3:1)
     rf <- lazy_frame(a = 1:3, c = 4:6)
 
@@ -183,8 +173,6 @@ test_that("arrange renders correctly for set operations (#373)", {
     lf %>% union_all(rf %>% arrange(a))
   })
 })
-
-
 
 # sql_build -------------------------------------------------------------
 

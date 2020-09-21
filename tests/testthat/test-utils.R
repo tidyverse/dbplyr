@@ -1,5 +1,3 @@
-context("utils")
-
 test_that("deparse_trunc() expression to text", {
   expect_equal(
     deparse_trunc(expr(test)),
@@ -21,7 +19,7 @@ test_that("Says 1.1 is not a whole number", {
 
 test_that("Succesful and not-sucessful commands are identified", {
   expect_true(succeeds("success"))
-  expect_false(succeeds(x - 1))
+  expect_false(succeeds(x - 1, quiet = TRUE))
 })
 
 test_that("Dots are collapsed into a single variable", {

@@ -1,5 +1,3 @@
-context("test-backend-mysql.R")
-
 test_that("use CHAR type for as.character", {
   local_con(simulate_mysql())
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))

@@ -1,5 +1,3 @@
-context("test-backend-impala.R")
-
 test_that("custom scalar functions translated correctly", {
   local_con(simulate_impala())
 
