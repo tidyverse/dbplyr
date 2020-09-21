@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `db_drop_table()` now works for Oracle (#353).
+
 * The default translation for `n()` is now `count(*)` (#343). 
 
 * odbc no longer translates `count()`.

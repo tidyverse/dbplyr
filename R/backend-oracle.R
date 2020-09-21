@@ -93,7 +93,7 @@ db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
       con = con
     )
   } else {
-    sql <- build_sql("DROP TABLE ", ident(table))
+    sql <- build_sql("DROP TABLE ", ident(table), con = con)
   }
   DBI::dbExecute(con, sql)
 }
