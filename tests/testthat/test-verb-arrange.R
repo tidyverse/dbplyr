@@ -10,7 +10,8 @@ test_that("two arranges equivalent to one", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
-  out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y) %>% ungroup()
+  db <- memdb_frame(x = 1, y = 2, .name = "test-verb-arrange")
+  out <- db %>% group_by(x) %>% arrange(y) %>% ungroup()
   expect_snapshot(sql_render(out))
   expect_equal(collect(out), tibble(x = 1, y = 2))
 })
