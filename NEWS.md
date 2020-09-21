@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* The default translation for `n()` is now `count(*)` (#343). 
+
+* odbc no longer translates `count()`.
+
 * Subquery names are now scoped within the query. This means that query text 
   should now be deterministic which helps some query optimisers/cachers (#336).
 

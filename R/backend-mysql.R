@@ -42,7 +42,6 @@ sql_translate_env.MySQLConnection <- function(con) {
       }
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("COUNT(*)"),
       sd =  sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
       str_flatten = function(x, collapse) {
@@ -50,9 +49,6 @@ sql_translate_env.MySQLConnection <- function(con) {
       }
     ),
     sql_translator(.parent = base_win,
-      n = function() {
-        win_over(sql("COUNT(*)"), partition = win_current_group())
-      },
       sd = win_aggregate("STDDEV_SAMP"),
       var = win_aggregate("VAR_SAMP"),
       # GROUP_CONCAT not currently available as window function

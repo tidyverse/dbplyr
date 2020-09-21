@@ -289,7 +289,7 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = function() sql("COUNT()"),
+  n          = function() sql("COUNT(*)"),
   mean       = sql_aggregate("AVG", "mean"),
   var        = sql_aggregate("VARIANCE", "var"),
   sum        = sql_aggregate("SUM"),

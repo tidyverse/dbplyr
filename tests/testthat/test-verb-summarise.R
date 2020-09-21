@@ -27,8 +27,10 @@ test_that("can't refer to freshly created variables", {
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- memdb_frame(x = 1) %>% group_by(x) %>% summarise(n = n())
-  expect_match(out %>% sql_render, "^SELECT `x`, COUNT[(][)] AS `n`\nFROM `[^`]*`\nGROUP BY `x`$")
+  out <- memdb_frame(x = 1, .name = "verb-summarise") %>%
+    group_by(x) %>%
+    summarise(n = n())
+  expect_snapshot(out %>% sql_render)
   expect_equal(out %>% collect, tibble(x = 1, n = 1L))
 })
 
@@ -41,7 +43,7 @@ test_that("summarise generates group_by and select", {
     sql_build()
 
   expect_equal(out$group_by, sql('`g`'))
-  expect_equal(out$select, sql('`g`', 'COUNT() AS `n`'))
+  expect_equal(out$select, sql('`g`', 'COUNT(*) AS `n`'))
 })
 
 

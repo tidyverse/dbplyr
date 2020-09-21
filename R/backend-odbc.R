@@ -29,8 +29,6 @@ base_odbc_scalar <- sql_translator(
 #' @format NULL
 base_odbc_agg <- sql_translator(
   .parent = base_agg,
-  n = function() sql("COUNT(*)"),
-  count = function() sql("COUNT(*)"),
   sd = sql_prefix("STDDEV_SAMP")
 )
 
@@ -40,8 +38,6 @@ base_odbc_agg <- sql_translator(
 base_odbc_win <- sql_translator(
   .parent = base_win,
   sd = win_aggregate("STDDEV_SAMP"),
-  n = function() win_over(sql("COUNT(*)"), win_current_group()),
-  count = function() win_over(sql("COUNT(*)"), win_current_group())
 )
 
 #' @export

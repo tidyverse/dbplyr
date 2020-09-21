@@ -115,7 +115,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x))
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("COUNT(*)"),
       cor = sql_aggregate_2("CORR"),
       cov = sql_aggregate_2("COVAR_SAMP"),
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
@@ -125,9 +124,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
     ),
     sql_translator(.parent = base_win,
-      n = function() {
-        win_over(sql("COUNT(*)"), partition = win_current_group())
-      },
       cor = win_aggregate_2("CORR"),
       cov = win_aggregate_2("COVAR_SAMP"),
       sd =  win_aggregate("STDDEV_SAMP"),
