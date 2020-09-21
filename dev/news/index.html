@@ -184,6 +184,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> now works for Oracle (<a href='https://github.com/tidyverse/dbplyr/issues/353'>#353</a>).</p></li>
 <li><p>The default translation for <code><a href="https://dplyr.tidyverse.org/reference/context.html">n()</a></code> is now <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/343'>#343</a>).</p></li>
 <li><p>odbc no longer translates <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code>.</p></li>
 <li><p>Subquery names are now scoped within the query. This means that query text should now be deterministic which helps some query optimisers/cachers (<a href='https://github.com/tidyverse/dbplyr/issues/336'>#336</a>).</p></li>
