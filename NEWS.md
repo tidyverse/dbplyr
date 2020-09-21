@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `sub_str()` translation is more consistent in edge cases (@ianmcook).
+
 * Postgres: New translations for stringr functions: `str_squish()`, 
   `str_remove()`, `str_remove_all()` (@shosaco).
 
