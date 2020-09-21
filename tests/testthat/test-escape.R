@@ -1,5 +1,3 @@
-context("test-escape.R")
-
 # Identifiers ------------------------------------------------------------------
 
 ei <- function(...) unclass(escape(ident(c(...)), con = simulate_dbi()))

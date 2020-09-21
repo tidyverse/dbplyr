@@ -1,8 +1,5 @@
-context("translate string helpers")
-
 test_that("sql_substr works as expected", {
-  old <- set_current_con(simulate_dbi())
-  on.exit(set_current_con(old))
+  local_con(simulate_dbi())
   x <- ident("x")
   substr <- sql_substr("SUBSTR")
 
@@ -14,8 +11,7 @@ test_that("sql_substr works as expected", {
 })
 
 test_that("sql_str_sub works as expected", {
-  old <- set_current_con(simulate_dbi())
-  on.exit(set_current_con(old))
+  local_con(simulate_dbi())
   x <- ident("x")
   str_sub <- sql_str_sub("SUBSTR")
 

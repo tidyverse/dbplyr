@@ -1,5 +1,3 @@
-context("Summarise")
-
 test_that("summarise peels off a single layer of grouping", {
   mf1 <- memdb_frame(x = 1, y = 1, z = 2) %>% group_by(x, y)
   mf2 <- mf1 %>% summarise(n = n())

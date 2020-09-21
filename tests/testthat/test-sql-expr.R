@@ -1,5 +1,3 @@
-context("test-sql-expr.R")
-
 test_that("atomic vectors are escaped", {
   con <- simulate_dbi()
 

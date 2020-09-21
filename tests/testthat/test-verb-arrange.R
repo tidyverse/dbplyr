@@ -1,5 +1,3 @@
-context("arrange")
-
 test_that("two arranges equivalent to one", {
   mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
@@ -13,8 +11,8 @@ test_that("two arranges equivalent to one", {
 
 test_that("quoting for rendering ordered grouped table", {
   out <- memdb_frame(x = 1, y = 2) %>% group_by(x) %>% arrange(y) %>% ungroup()
-  expect_match(out %>% sql_render, "^SELECT [*]\nFROM `[^`]*`\nORDER BY `y`$")
-  expect_equal(out %>% collect, tibble(x = 1, y = 2))
+  expect_snapshot(sql_render(out))
+  expect_equal(collect(out), tibble(x = 1, y = 2))
 })
 
 # sql_build ---------------------------------------------------------------

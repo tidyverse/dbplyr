@@ -1,5 +1,3 @@
-context("translate-math")
-
 test_that("db_write_table calls dbQuoteIdentifier on table name" ,{
   idents <- character()
 
@@ -18,7 +16,6 @@ test_that("db_write_table calls dbQuoteIdentifier on table name" ,{
   db_write_table(dummy_con, "somecrazytablename", NA, NA)
   expect_true("somecrazytablename" %in% idents)
 })
-
 
 # basic arithmetic --------------------------------------------------------
 
@@ -72,26 +69,15 @@ test_that("bitwise operations", {
 })
 
 test_that("default raw escapes translated correctly", {
-
   mf <- lazy_frame(x = "abc", con = simulate_sqlite())
 
   a <- as_blob("abc")
   b <- as_blob(as.raw(c(0x01, 0x02)))
-
-  expect_equal(
-    mf %>% filter(x == a) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` = X'616263')")
-  )
-
   L <- c(a, b)
-  expect_equal(
-    mf %>% filter(x %in% L) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (X'616263', X'0102'))")
-  )
 
-  expect_equal(
-    mf %>% filter(x %in% !!L) %>% sql_render(),
-    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (X'616263', X'0102'))")
-  )
+  expect_snapshot(mf %>% filter(x == a))
+  expect_snapshot(mf %>% filter(x %in% L))
+
+  qry <- mf %>% filter(x %in% !!L)
+  expect_snapshot(qry)
 })
-

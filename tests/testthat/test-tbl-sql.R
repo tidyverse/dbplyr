@@ -1,5 +1,3 @@
-context("test-tbl_sql.R")
-
 test_that("tbl_sql() works with string argument", {
   name <- unclass(unique_table_name())
   df <- memdb_frame(a = 1, .name = name)

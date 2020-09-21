@@ -1,5 +1,3 @@
-context("test-do.R")
-
 test_that("ungrouped data collected first", {
   out <- memdb_frame(x = 1:2) %>% do(head(.))
   expect_equal(out, tibble(x = 1:2))

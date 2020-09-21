@@ -1,5 +1,3 @@
-context("test-backend-odbc.R")
-
 test_that("custom scalar translated correctly", {
   local_con(simulate_odbc())
 

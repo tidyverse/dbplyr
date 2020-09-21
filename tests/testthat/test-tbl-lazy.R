@@ -1,16 +1,10 @@
-context("test-tbl-lazy.R")
-
 test_that("adds src class", {
   tb <- tbl_lazy(mtcars, con = simulate_sqlite())
   expect_s3_class(tb, "tbl_SQLiteConnection")
 })
 
 test_that("has print method", {
-  expect_known_output(
-    tbl_lazy(mtcars),
-    test_path("test-tbl-lazy-print.txt"),
-    print = TRUE
-  )
+  expect_snapshot(tbl_lazy(mtcars))
 })
 
 test_that("support colwise variants", {

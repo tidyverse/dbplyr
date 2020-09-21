@@ -1,5 +1,3 @@
-context("test-backend-hive.R")
-
 test_that("custom scalar & string functions translated correctly", {
   local_con(simulate_hive())
 

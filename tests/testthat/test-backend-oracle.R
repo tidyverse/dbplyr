@@ -1,5 +1,3 @@
-context("test-backend-oracle.R")
-
 test_that("custom scalar functions translated correctly", {
   local_con(simulate_oracle())
 
@@ -15,12 +13,7 @@ test_that("paste and paste0 translate correctly", {
   expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
 })
 
-
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
-
-  expect_match(
-    mf %>% head() %>% sql_render(simulate_oracle()),
-    sql("^SELECT [*] FROM [(]SELECT [*]\nFROM [(]`df`[)] [)] `[^`]*` WHERE ROWNUM [<][=] 6")
-  )
+  expect_snapshot(mf %>% head())
 })

@@ -1,5 +1,3 @@
-context("group_by")
-
 test_that("group_by with .add = TRUE adds groups", {
   mf <- memdb_frame(x = 1:3, y = 1:3)
   gf1 <- mf %>% group_by(x, y)

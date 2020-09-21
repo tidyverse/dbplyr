@@ -2,7 +2,7 @@ test_that("complete join pipeline works with SQLite", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
 
-  out <- collect(left_join(df1, df2))
+  out <- collect(left_join(df1, df2, by = "x"))
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 })
 
@@ -74,7 +74,7 @@ test_that("joining over arbitrary predicates", {
 })
 
 test_that("inner join doesn't result in duplicated columns ", {
-  expect_equal(colnames(inner_join(df1, df1)), c("x", "y"))
+  expect_equal(colnames(inner_join(df1, df1, by = c("x", "y"))), c("x", "y"))
 })
 
 test_that("self-joins allowed with named by", {
@@ -135,27 +135,27 @@ test_that("join verbs generate expected ops", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
-  ji <- inner_join(lf1, lf2)
+  ji <- inner_join(lf1, lf2, by = "x")
   expect_s3_class(ji$ops, "op_join")
   expect_equal(ji$ops$args$type, "inner")
 
-  jl <- left_join(lf1, lf2)
+  jl <- left_join(lf1, lf2, by = "x")
   expect_s3_class(jl$ops, "op_join")
   expect_equal(jl$ops$args$type, "left")
 
-  jr <- right_join(lf1, lf2)
+  jr <- right_join(lf1, lf2, by = "x")
   expect_s3_class(jr$ops, "op_join")
   expect_equal(jr$ops$args$type, "right")
 
-  jf <- full_join(lf1, lf2)
+  jf <- full_join(lf1, lf2, by = "x")
   expect_s3_class(jf$ops, "op_join")
   expect_equal(jf$ops$args$type, "full")
 
-  js <- semi_join(lf1, lf2)
+  js <- semi_join(lf1, lf2, by = "x")
   expect_s3_class(js$ops, "op_semi_join")
   expect_equal(js$ops$args$anti, FALSE)
 
-  ja <- anti_join(lf1, lf2)
+  ja <- anti_join(lf1, lf2, by = "x")
   expect_s3_class(ja$ops, "op_semi_join")
   expect_equal(ja$ops$args$anti, TRUE)
 })
@@ -164,7 +164,7 @@ test_that("join captures both tables", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
-  out <- inner_join(lf1, lf2) %>% sql_build()
+  out <- inner_join(lf1, lf2, by = "x") %>% sql_build()
 
   expect_s3_class(out, "join_query")
   expect_equal(op_vars(out$x), c("x", "y"))
@@ -176,7 +176,7 @@ test_that("semi join captures both tables", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
-  out <- semi_join(lf1, lf2) %>% sql_build()
+  out <- semi_join(lf1, lf2, by = "x") %>% sql_build()
 
   expect_equal(op_vars(out$x), c("x", "y"))
   expect_equal(op_vars(out$y), c("x", "z"))
