@@ -321,7 +321,7 @@ the data into R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 }
 </div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `playerID`, COUNT() AS `n`
+#&gt; SELECT `playerID`, COUNT(*) AS `n`
 #&gt; FROM `Batting`
 #&gt; WHERE (`G` &gt; 0.0)
 #&gt; GROUP BY `playerID`</div></span></pre>

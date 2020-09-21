@@ -313,7 +313,7 @@
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT *</span>
 <span class="co">#&gt; FROM (SELECT *</span>
-<span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT() AS `n`</span>
+<span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`</span>
 <span class="co">#&gt; FROM `flights`</span>
 <span class="co">#&gt; GROUP BY `tailnum`)</span>
 <span class="co">#&gt; ORDER BY `delay` DESC)</span>

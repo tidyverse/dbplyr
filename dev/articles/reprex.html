@@ -190,7 +190,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(n = <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span>()) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT `cyl`, COUNT() AS `n`</span>
+<span class="co">#&gt; SELECT `cyl`, COUNT(*) AS `n`</span>
 <span class="co">#&gt; FROM `mtcars`</span>
 <span class="co">#&gt; GROUP BY `cyl`</span>
 </pre></div>
