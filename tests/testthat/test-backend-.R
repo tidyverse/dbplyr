@@ -88,5 +88,10 @@ test_that("default raw escapes translated correctly", {
     mf %>% filter(x %in% L) %>% sql_render(),
     sql("SELECT *\nFROM `df`\nWHERE (`x` IN (X'616263', X'0102'))")
   )
+
+  expect_equal(
+    mf %>% filter(x %in% !!L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (X'616263', X'0102'))")
+  )
 })
 

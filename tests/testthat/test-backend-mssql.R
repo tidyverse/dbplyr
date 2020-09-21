@@ -217,6 +217,11 @@ test_that("custom escapes translated correctly", {
     mf %>% filter(x %in% L) %>% sql_render(),
     sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
   )
+
+  expect_equal(
+    mf %>% filter(x %in% !!L) %>% sql_render(),
+    sql("SELECT *\nFROM `df`\nWHERE (`x` IN (0x616263, 0x0102))")
+  )
 })
 
 # Live database -----------------------------------------------------------

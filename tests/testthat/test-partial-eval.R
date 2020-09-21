@@ -38,3 +38,8 @@ test_that("respects tidy evaluation pronouns", {
   expect_equal(partial_eval(expr(.env[["x"]])), "X")
   expect_equal(partial_eval(expr(.env[[x]])), "XX")
 })
+
+test_that("fails with multi-classes", {
+  x <- structure(list(), class = c('a', 'b'))
+  expect_error(partial_eval(x), "Unknown input type", fixed = TRUE)
+})
