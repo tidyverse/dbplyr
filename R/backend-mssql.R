@@ -153,24 +153,8 @@
     )
 
   if (!is(con, "DBIObject") || sub("\\..*", "", DBI::dbGetInfo(con)$db.version) >= 11) {
-    # version 11 equates to MSSQL 2012
-    # if MSSQL 2012+, use sql_try_cast, allows more graceful return of invalid values
-    # also if 'con' is not a valid DBIObject, e.g. called by 'testthat'
-    mssql_scalar <- sql_translator(.parent = mssql_scalar,
-                                   as.logical    = sql_try_cast("BIT"),
-
-                                   as.Date       = sql_try_cast("DATE"),
-                                   as.POSIXct    = sql_try_cast("TIMESTAMP"),
-                                   as.numeric    = sql_try_cast("FLOAT"),
-                                   as.double     = sql_try_cast("FLOAT"),
-                                   as.integer    = sql_try_cast("NUMERIC"),
-                                   # in MSSQL, NUMERIC converts to integer
-                                   as.integer64  = sql_try_cast("BIGINT"),
-                                   as.character  = sql_try_cast("VARCHAR(MAX)"),
-
-                                   as_date = sql_try_cast("DATE"),
-                                   as_datetime = sql_try_cast("DATETIME2")
-    )
+    # version 11 equates to MSSQL 2012. 'con' is not a DBIObject if called by 'testthat'
+    mssql_scalar <- mssql_use_try_cast(.parent = mssql_scalar)
   }
 
   sql_variant(
@@ -200,6 +184,28 @@
     )
 
   )}
+
+mssql_use_try_cast <- function(.parent) {
+  # replace the 'try_cast' in the .parent scalar with 'sql_try_cast'
+  # if MSSQL 2012+, the use of sql_try_cast allows a more
+  # graceful return of 'NA', rather than raising an error
+  scalar <- sql_translator(.parent = .parent,
+                           as.logical    = sql_try_cast("BIT"),
+
+                           as.Date       = sql_try_cast("DATE"),
+                           as.POSIXct    = sql_try_cast("TIMESTAMP"),
+                           as.numeric    = sql_try_cast("FLOAT"),
+                           as.double     = sql_try_cast("FLOAT"),
+                           as.integer    = sql_try_cast("NUMERIC"),
+                           # in MSSQL, NUMERIC converts to integer
+                           as.integer64  = sql_try_cast("BIGINT"),
+                           as.character  = sql_try_cast("VARCHAR(MAX)"),
+
+                           as_date = sql_try_cast("DATE"),
+                           as_datetime = sql_try_cast("DATETIME2")
+  )
+  return(scalar)
+}
 
 #' @export
 `sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
