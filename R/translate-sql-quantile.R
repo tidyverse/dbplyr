@@ -32,7 +32,7 @@ sql_median <- function(f,
   warned <- FALSE
   quantile <- sql_quantile(f, style = style, window = window)
   function(x, na.rm = FALSE) {
-    warned <<- check_na_rm(f, na.rm, warned)
+    warned <<- check_na_rm("median", na.rm, warned)
     quantile(x, 0.5)
   }
 }
