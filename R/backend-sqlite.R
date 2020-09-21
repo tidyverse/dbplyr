@@ -64,7 +64,7 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_subquery.SQLiteConnection <- function(con, from, name = unique_name(), ...) {
+sql_subquery.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {

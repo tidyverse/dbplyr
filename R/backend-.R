@@ -19,11 +19,11 @@ sql_translate_env.DBIConnection <- function(con) {
 }
 
 #' @export
-sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
-    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
+    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 
@@ -593,14 +593,6 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 }
 
 # Utility functions ------------------------------------------------------------
-
-unique_table_name <- local({
-  function() {
-    i <- getOption("dbplyr_table_num", 0) + 1
-    options(dbplyr_table_num = i)
-    sprintf("dbplyr_%03i", i)
-  }
-})
 
 res_warn_incomplete <- function(res, hint = "n = -1") {
   if (dbHasCompleted(res)) return()

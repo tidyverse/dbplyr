@@ -24,6 +24,7 @@
 #'   without an active database connection.
 #' @param ... Other arguments passed on to the methods. Not currently used.
 sql_build <- function(op, con = NULL, ...) {
+  unique_subquery_name_reset()
   UseMethod("sql_build")
 }
 
