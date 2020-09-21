@@ -5,5 +5,5 @@
     Output
       <SQL>
       SELECT * FROM (SELECT *
-      FROM (`df`) ) `zzz2` WHERE ROWNUM <= 6.0
+      FROM (`df`) ) `q01` WHERE ROWNUM <= 6.0
 

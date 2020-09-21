@@ -72,12 +72,12 @@ db_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_subquery.Oracle <- function(con, from, name = unique_name(), ...) {
+sql_subquery.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
-    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
+    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 

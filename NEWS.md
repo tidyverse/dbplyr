@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Subquery names are now scoped within the query. This means that query text 
+  should now be deterministic which helps some query optimisers/cachers (#336).
+
 * `sub_str()` translation is more consistent in edge cases (@ianmcook).
 
 * Postgres: New translations for stringr functions: `str_squish()`, 

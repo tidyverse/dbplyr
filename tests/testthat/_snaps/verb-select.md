@@ -67,7 +67,7 @@
       SELECT *
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_001`
+      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       # remove ordered by
@@ -78,7 +78,7 @@
       SELECT `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_002`
+      ORDER BY `a`) `q01`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
     Output
@@ -86,7 +86,7 @@
       SELECT `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_003`
+      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       # un-arrange
@@ -104,7 +104,7 @@
       SELECT `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_004`
+      ORDER BY `a`) `q01`
     Code
       # use order
     Code
@@ -114,7 +114,7 @@
       SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_005`
+      ORDER BY `a`) `q01`
 
 # arrange renders correctly for single-table verbs (#373)
 
@@ -129,7 +129,7 @@
       SELECT *
       FROM (SELECT *
       FROM `df`
-      LIMIT 1) `dbplyr_001`
+      LIMIT 1) `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% head(1)
@@ -147,8 +147,8 @@
       FROM (SELECT *
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_002`
-      LIMIT 1) `dbplyr_003`
+      ORDER BY `a`) `q01`
+      LIMIT 1) `q02`
       ORDER BY `b`
     Code
       # mutate
@@ -168,7 +168,7 @@
       SELECT `b` AS `a`, `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_004`
+      ORDER BY `a`) `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
@@ -177,7 +177,7 @@
       SELECT 1.0 AS `a`, `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_005`
+      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
@@ -186,7 +186,7 @@
       SELECT `a`, `a` AS `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_006`
+      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
@@ -195,7 +195,7 @@
       SELECT `a`, 1.0 AS `b`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_007`
+      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
@@ -204,8 +204,8 @@
       SELECT -`a` AS `a`, `b`
       FROM (SELECT *
       FROM (SELECT -`a` AS `a`, `b`
-      FROM `df`) `dbplyr_008`
-      ORDER BY `a`) `dbplyr_009`
+      FROM `df`) `q01`
+      ORDER BY `a`) `q02`
 
 # arrange renders correctly for joins (#373)
 
@@ -252,7 +252,7 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
-      ) `dbplyr_001`
+      ) `q01`
       ORDER BY `a`
     Code
       lf %>% left_join(rf) %>% arrange(b)
@@ -265,7 +265,7 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
-      ) `dbplyr_002`
+      ) `q01`
       ORDER BY `b`
     Code
       lf %>% left_join(rf %>% arrange(a))
@@ -339,7 +339,7 @@
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
-      )) `dbplyr_001`
+      )) `q01`
       ORDER BY `a`
     Code
       lf %>% semi_join(rf) %>% arrange(b)
@@ -352,7 +352,7 @@
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
-      )) `dbplyr_002`
+      )) `q01`
       ORDER BY `b`
     Code
       lf %>% semi_join(rf %>% arrange(a))
@@ -398,7 +398,7 @@
       FROM `df`)
       UNION ALL
       (SELECT `a`, NULL AS `b`, `c`
-      FROM `df`)) `dbplyr_001`
+      FROM `df`)) `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% union_all(rf)
@@ -407,7 +407,7 @@
       (SELECT `a`, `b`, NULL AS `c`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_002`)
+      ORDER BY `a`) `q01`)
       UNION ALL
       (SELECT `a`, NULL AS `b`, `c`
       FROM `df`)
@@ -421,5 +421,5 @@
       (SELECT `a`, NULL AS `b`, `c`
       FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `dbplyr_003`)
+      ORDER BY `a`) `q01`)
 

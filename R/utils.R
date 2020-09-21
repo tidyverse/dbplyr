@@ -31,14 +31,21 @@ commas <- function(...) paste0(..., collapse = ", ")
 
 in_travis <- function() identical(Sys.getenv("TRAVIS"), "true")
 
-unique_name <- local({
+unique_table_name <- local({
   i <- 0
-
   function() {
     i <<- i + 1
-    paste0("zzz", i)
+    sprintf("dbplyr_%03i", i)
   }
 })
+unique_subquery_name <- function() {
+  i <- getOption("dbplyr_subquery_name", 0) + 1
+  options(dbplyr_subquery_name = i)
+  sprintf("q%02i", i)
+}
+unique_subquery_name_reset <- function() {
+  options(dbplyr_subquery_name = 0)
+}
 
 succeeds <- function(x, quiet = FALSE) {
   tryCatch(
