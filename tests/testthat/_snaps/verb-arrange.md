@@ -4,6 +4,6 @@
       sql_render(out)
     Output
       <SQL> SELECT *
-      FROM `dbplyr_016`
+      FROM `test-verb-arrange`
       ORDER BY `y`
 
