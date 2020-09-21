@@ -7,7 +7,7 @@
 \usage{
 translate_sql(
   ...,
-  con = simulate_dbi(),
+  con = NULL,
   vars = character(),
   vars_group = NULL,
   vars_order = NULL,

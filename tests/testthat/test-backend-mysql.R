@@ -1,10 +1,8 @@
 context("test-backend-mysql.R")
 
 test_that("use CHAR type for as.character", {
-  expect_equivalent(
-    translate_sql(as.character(x), con = simulate_mysql()),
-    sql("CAST(`x` AS CHAR)")
-  )
+  local_con(simulate_mysql())
+  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
 })
 
 test_that("logicals converted to integer correctly", {

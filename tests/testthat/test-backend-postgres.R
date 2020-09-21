@@ -1,79 +1,63 @@
 context("test-backend-postgres.R")
 
 test_that("custom scalar translated correctly", {
+  local_con(simulate_postgres())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_postgres())
-  }
-
-  expect_equal(trans(bitwXor(x, 128L)),       sql("`x` # 128"))
-  expect_equal(trans(log10(x)),               sql("LOG(`x`)"))
-  expect_equal(trans(log(x)),                 sql("LN(`x`)"))
-  expect_equal(trans(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
-  expect_equal(trans(cot(x)),                 sql("1 / TAN(`x`)"))
-  expect_equal(trans(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
-  expect_equal(trans(grepl("exp", x)),        sql("(`x`) ~ ('exp')"))
-  expect_equal(trans(grepl("exp", x, TRUE)),  sql("(`x`) ~* ('exp')"))
-  expect_equal(trans(substr("test", 2 , 3)),  sql("SUBSTR('test', 2, 2)"))
+  expect_equal(translate_sql(bitwXor(x, 128L)),       sql("`x` # 128"))
+  expect_equal(translate_sql(log10(x)),               sql("LOG(`x`)"))
+  expect_equal(translate_sql(log(x)),                 sql("LN(`x`)"))
+  expect_equal(translate_sql(log(x, 2)),              sql("LOG(`x`) / LOG(2.0)"))
+  expect_equal(translate_sql(cot(x)),                 sql("1 / TAN(`x`)"))
+  expect_equal(translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: numeric, 1)"))
+  expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) ~ ('exp')"))
+  expect_equal(translate_sql(grepl("exp", x, TRUE)),  sql("(`x`) ~* ('exp')"))
+  expect_equal(translate_sql(substr("test", 2 , 3)),  sql("SUBSTR('test', 2, 2)"))
 })
 
-
 test_that("custom stringr functions translated correctly", {
+  local_con(simulate_postgres())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_postgres())
-  }
-  expect_equal(trans(str_detect(x, y)), sql("`x` ~ `y`"))
-  expect_equal(trans(str_detect(x, y, negate = TRUE)), sql("!(`x` ~ `y`)"))
-  expect_equal(trans(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
-  expect_equal(trans(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 'g')"))
-  expect_equal(trans(str_squish(x)), sql("LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"))
-  expect_equal(trans(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '')"))
-  expect_equal(trans(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 'g')"))
+  expect_equal(translate_sql(str_detect(x, y)), sql("`x` ~ `y`"))
+  expect_equal(translate_sql(str_detect(x, y, negate = TRUE)), sql("!(`x` ~ `y`)"))
+  expect_equal(translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 'g')"))
+  expect_equal(translate_sql(str_squish(x)), sql("LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"))
+  expect_equal(translate_sql(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '')"))
+  expect_equal(translate_sql(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 'g')"))
 })
 
 test_that("two variable aggregates are translated correctly", {
-  trans <- function(x, window) {
-    translate_sql(!!enquo(x), window = window, con = simulate_postgres())
-  }
+  local_con(simulate_postgres())
 
-  expect_equal(trans(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
-  expect_equal(trans(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
-
+  expect_equal(translate_sql(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
+  expect_equal(translate_sql(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
 })
 
 test_that("pasting translated correctly", {
-  trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_postgres())
-  }
+  local_con(simulate_postgres())
 
-  expect_equal(trans(paste(x, y)),  sql("CONCAT_WS(' ', `x`, `y`)"))
-  expect_equal(trans(paste0(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(translate_sql(paste(x, y), window = FALSE),  sql("CONCAT_WS(' ', `x`, `y`)"))
+  expect_equal(translate_sql(paste0(x, y), window = FALSE), sql("CONCAT_WS('', `x`, `y`)"))
 
-  expect_error(trans(paste0(x, collapse = "")), "`collapse` not supported")
+  expect_error(translate_sql(paste0(x, collapse = ""), window = FALSE), "`collapse` not supported")
 })
 
 test_that("postgres mimics two argument log", {
-  trans <- function(...) {
-    translate_sql(..., con = simulate_postgres())
-  }
+  local_con(simulate_postgres())
 
-  expect_equal(trans(log(x)), sql('LN(`x`)'))
-  expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
-  expect_equal(trans(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
+  expect_equal(translate_sql(log(x)), sql('LN(`x`)'))
+  expect_equal(translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+  expect_equal(translate_sql(log(x, 10L)), sql('LOG(`x`) / LOG(10)'))
 })
 
 test_that("custom lubridate functions translated correctly", {
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_postgres())
-  }
+  local_con(simulate_postgres())
 
-  expect_equal(trans(yday(x)),                      sql("EXTRACT(DOY FROM `x`)"))
+  expect_equal(translate_sql(yday(x)),                      sql("EXTRACT(DOY FROM `x`)"))
+  expect_equal(translate_sql(quarter(x)),                   sql("EXTRACT(QUARTER FROM `x`)"))
+  expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
 
-  expect_equal(trans(quarter(x)),                   sql("EXTRACT(QUARTER FROM `x`)"))
-  expect_equal(trans(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
-
-  expect_error(trans(quarter(x, fiscal_start = 2)))
+  expect_error(translate_sql(quarter(x, fiscal_start = 2)))
 })
 
 test_that("postgres can explain (#272)", {

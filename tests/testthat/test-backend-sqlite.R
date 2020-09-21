@@ -7,22 +7,27 @@ test_that("logicals translated to integers", {
 })
 
 test_that("vectorised translations", {
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_sqlite(), window = FALSE)
-  }
+  local_con(simulate_sqlite())
 
-  expect_equal(trans(paste(x, y)), sql("`x` || ' ' || `y`"))
-  expect_equal(trans(paste0(x, y)), sql("`x` || `y`"))
+  expect_equal(translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
+  expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
 })
 
 test_that("pmin and max become MIN and MAX", {
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_sqlite(), window = FALSE)
-  }
+  local_con(simulate_sqlite())
 
-  expect_equal(trans(pmin(x, y)), sql('MIN(`x`, `y`)'))
-  expect_equal(trans(pmax(x, y)), sql('MAX(`x`, `y`)'))
+  expect_equal(translate_sql(pmin(x, y)), sql('MIN(`x`, `y`)'))
+  expect_equal(translate_sql(pmax(x, y)), sql('MAX(`x`, `y`)'))
 })
+
+test_that("sqlite mimics two argument log", {
+  local_con(simulate_sqlite())
+
+  expect_equal(translate_sql(log(x)), sql('LOG(`x`)'))
+  expect_equal(translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+})
+
+# live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {
   mf <- dbplyr::memdb_frame(x = 1L)
@@ -31,13 +36,3 @@ test_that("as.numeric()/as.double() get custom translation", {
   expect_type(out$x1, "double")
   expect_type(out$x2, "double")
 })
-
-test_that("sqlite mimics two argument log", {
-  trans <- function(...) {
-    translate_sql(..., con = simulate_sqlite())
-  }
-
-  expect_equal(trans(log(x)), sql('LOG(`x`)'))
-  expect_equal(trans(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
-})
-

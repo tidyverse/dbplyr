@@ -12,12 +12,13 @@
 #'
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
 #' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
-tbl_lazy <- function(df, con = simulate_dbi(), src = NULL) {
+tbl_lazy <- function(df, con = NULL, src = NULL) {
 
   if (!is.null(src)) {
     warn("`src` is deprecated; please use `con` instead")
     con <- src
   }
+  con <- con %||% sql_current_con() %||% simulate_dbi()
   subclass <- class(con)[[1]]
 
   dplyr::make_tbl(
@@ -30,7 +31,8 @@ setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy
-lazy_frame <- function(..., con = simulate_dbi(), src = NULL) {
+lazy_frame <- function(..., con = NULL, src = NULL) {
+  con <- con %||% sql_current_con() %||% simulate_dbi()
   tbl_lazy(tibble(...), con = con, src = src)
 }
 

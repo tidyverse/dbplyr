@@ -82,7 +82,7 @@
 #' translate_sql(cumsum(mpg))
 #' translate_sql(cumsum(mpg), vars_order = "mpg")
 translate_sql <- function(...,
-                          con = simulate_dbi(),
+                          con = NULL,
                           vars = character(),
                           vars_group = NULL,
                           vars_order = NULL,
@@ -92,6 +92,8 @@ translate_sql <- function(...,
   if (!missing(vars)) {
     abort("`vars` is deprecated. Please use partial_eval() directly.")
   }
+
+  con <- con %||% sql_current_con() %||% simulate_dbi()
 
   translate_sql_(
     quos(...),
