@@ -1,6 +1,10 @@
 # dbplyr (development version)
 
+* Postgres: New translations for stringr functions: `str_squish()`, 
+  `str_remove()`, `str_remove_all()` (@shosaco).
+
 * All old lazy eval shims have been removed. 
+
 * `median()` now takes a new argument `na.rm` for consistency with `mean()`,
   but still does always remove any missing values (@lorenzwalthert, #483).
 

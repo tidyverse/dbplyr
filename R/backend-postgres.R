@@ -65,6 +65,15 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_replace_all = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 'g'))
       },
+      str_squish = function(string){
+        sql_expr(ltrim(rtrim(regexp_replace(!!string, '\\s+', ' ', 'g'))))
+      },
+      str_remove = function(string, pattern){
+        sql_expr(regexp_replace(!!string, !!pattern, ''))
+      },
+      str_remove_all = function(string, pattern){
+        sql_expr(regexp_replace(!!string, !!pattern, '', 'g'))
+      },
 
       # lubridate functions
       month = function(x, label = FALSE, abbr = TRUE) {
