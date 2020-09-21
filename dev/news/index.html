@@ -184,6 +184,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p>Subquery names are now scoped within the query. This means that query text should now be deterministic which helps some query optimisers/cachers (<a href='https://github.com/tidyverse/dbplyr/issues/336'>#336</a>).</p></li>
 <li><p><code>sub_str()</code> translation is more consistent in edge cases (<a href='https://github.com/ianmcook'>@ianmcook</a>).</p></li>
 <li><p>Postgres: New translations for stringr functions: <code>str_squish()</code>, <code>str_remove()</code>, <code>str_remove_all()</code> (<a href='https://github.com/shosaco'>@shosaco</a>).</p></li>
 <li><p>All old lazy eval shims have been removed.</p></li>
