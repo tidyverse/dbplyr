@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
+  and friends now return DBI connections rather than the now deprecated 
+  `src_dbi()` (#440).
+
 * `db_drop_table()` now works for Oracle (#353).
 
 * The default translation for `n()` is now `count(*)` (#343). 

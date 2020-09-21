@@ -70,7 +70,7 @@ copy_lahman <- function(con, ...) {
     copy_to(con, df, table, indexes = ids, temporary = FALSE)
   }
 
-  src_dbi(con)
+  con
 }
 # Get list of all non-label data frames in package
 lahman_tables <- function() {
