@@ -41,8 +41,9 @@ sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
 sql_str_trim <- function(string, side = c("both", "left", "right")) {
   side <- match.arg(side)
   switch(side,
-    left = sql_expr(LTRIM(!!string)),
-    right = sql_expr(RTRIM(!!string)),
-    both = sql_expr(LTRIM(RTRIM(!!string))),
+    left = sql_expr(ltrim(!!string)),
+    right = sql_expr(rtrim(!!string)),
+    both = sql_expr(ltrim(rtrim(!!string))),
   )
 }
+globalVariables(c("ltrim", "rtrim"))
