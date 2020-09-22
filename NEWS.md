@@ -3,6 +3,8 @@
 * New RedShift translations when used with `RPostgres::Redshift()`.
   * `str_replace()` errors since there's no Redshift translation, 
      and `str_replace_all()` uses `REGEXP_REPLACE()` (#446).
+     
+  * `paste()` and `paste0()` use `||` (#458).
 
 * `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
   of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
