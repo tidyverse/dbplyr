@@ -13,3 +13,10 @@ test_that("string translations", {
   expect_equal(translate_sql(paste0("x", "y")), sql("'x' || 'y'"))
   expect_equal(translate_sql(str_c("x", "y")), sql("'x' || 'y'"))
 })
+
+test_that("numeric translations", {
+  local_con(simulate_redshift())
+
+  expect_equal(translate_sql(as.numeric(x)), sql("CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
+})

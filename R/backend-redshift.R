@@ -5,6 +5,10 @@ sql_translate_env.RedshiftConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = postgres$scalar,
 
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_Numeric_types201.html#r_Numeric_types201-floating-point-types
+      as.numeric = sql_cast("FLOAT"),
+      as.double = sql_cast("FLOAT"),
+
       # https://stackoverflow.com/questions/56708136
       paste  = sql_paste_redshift(" "),
       paste0 = sql_paste_redshift(""),
