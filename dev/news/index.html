@@ -184,7 +184,15 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
-<li><p>New RedShift translations when used with <code>RPostgres::Redshift()</code>.</p></li>
+<li>
+<p>New RedShift translations when used with <code>RPostgres::Redshift()</code>.</p>
+<ul>
+<li><p><code>str_replace()</code> errors since there’s no Redshift translation, and <code>str_replace_all()</code> uses <code>REGEXP_REPLACE()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/446'>#446</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html">paste0()</a></code> use <code><a href="https://rdrr.io/r/base/Logic.html">||</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/458'>#458</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> and <code><a href="https://rdrr.io/r/base/double.html">as.double()</a></code> cast to <code>FLOAT</code> (<a href='https://github.com/tidyverse/dbplyr/issues/408'>#408</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> and <code>str_sub()</code> use <code>SUBSTRING()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/327'>#327</a>).</p></li>
+</ul>
+</li>
 <li><p><code>sql_translate_env.Microsoft SQL Server()</code> now uses <code><a href="../reference/sql_substr.html">sql_try_cast()</a></code> instead of <code><a href="../reference/sql_substr.html">sql_cast()</a></code> for MSSQL version 11+ (2012+) (<a href='https://github.com/DavidPatShuiFong'>@DavidPatShuiFong</a>, <a href='https://github.com/tidyverse/dbplyr/issues/380'>#380</a>).</p></li>
 <li><p>SQLite gets correct translation for <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/357'>#357</a>).</p></li>
 <li><p><code><a href="../reference/lahman.html">copy_lahman()</a></code> and <code><a href="../reference/nycflights13.html">copy_nycflights13()</a></code> (and hence <code><a href="../reference/nycflights13.html">nycflights13_sqlite()</a></code>) and friends now return DBI connections rather than the now deprecated <code><a href="../reference/src_dbi.html">src_dbi()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/440'>#440</a>).</p></li>
