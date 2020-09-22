@@ -171,13 +171,28 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     top_env <- child_env(NULL)
   }
 
-
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
   if (!window) {
     special_calls2 <- copy_env(variant$aggregate, parent = special_calls)
   } else {
     special_calls2 <- copy_env(variant$window, parent = special_calls)
+  }
+  special_calls2$`::` <- function(pkg, name) {
+    pkg <- as.character(substitute(pkg))
+    name <- as.character(substitute(name))
+    if (!is_installed(pkg)) {
+      abort(glue("There is no package called '{pkg}'"))
+    }
+    if (!env_has(ns_env(pkg), name)) {
+      abort(glue("'{name}' is not an exported object from '{pkg}'"))
+    }
+
+    if (env_has(special_calls2, name) || env_has(special_calls, name)) {
+      env_get(special_calls2, name, inherit = TRUE)
+    } else {
+      abort(glue("No known translation for {pkg}::{name}()"))
+    }
   }
 
   # Existing symbols in expression

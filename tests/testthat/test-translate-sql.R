@@ -6,6 +6,15 @@ test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
   expect_error(translate_sql(blah(x)), "could not find function")
 })
 
+test_that("namespace calls are translated", {
+  expect_equal(translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
+  expect_equal(translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
+
+  expect_snapshot_error(translate_sql(NOSUCHPACKAGE::foo()))
+  expect_snapshot_error(translate_sql(dbplyr::NOSUCHFUNCTION()))
+  expect_snapshot_error(translate_sql(base::abbreviate(x)))
+})
+
 test_that("Wrong number of arguments raises error", {
   expect_error(translate_sql(mean(1, 2, na.rm = TRUE), window = FALSE), "unused argument")
 })

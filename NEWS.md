@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* You can now use `::` in translations, so that (e.g.) `dbplyr::n()` is
+  translated to `count(*)` (#207).
+
 * New RedShift translations when used with `RPostgres::Redshift()`.
   * `str_replace()` errors since there's no Redshift translation, 
      and `str_replace_all()` uses `REGEXP_REPLACE()` (#446).
