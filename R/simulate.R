@@ -11,9 +11,10 @@
 #'
 #' @keywords internal
 #' @export
-simulate_dbi <- function(class = character()) {
+simulate_dbi <- function(class = character(), ...) {
   structure(
     list(),
+    ...,
     class = c(class, "TestConnection", "DBIConnection")
   )
 }
@@ -46,7 +47,11 @@ simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_mssql <- function() simulate_dbi("Microsoft SQL Server")
+simulate_mssql <- function(version = "15.0") {
+  simulate_dbi("Microsoft SQL Server",
+    version = numeric_version(version)
+  )
+}
 
 #' @export
 #' @rdname simulate_dbi

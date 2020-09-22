@@ -152,12 +152,7 @@
       },
     )
 
-  if (any(
-    mssql_version(con)$ProductVersion_Major >= 11,
-    is.null(mssql_version(con)$ProductVersion_Major)
-  )) {
-    # version 11 equates to MSSQL 2012.
-    # mssql_version returns list of NULLs if con is defined by 'testthat'
+  if (mssql_version(con) >= "11.0") { # MSSQL 2012
     mssql_scalar <- sql_translator(
       .parent = mssql_scalar,
       as.logical = sql_try_cast("BIT"),
@@ -203,37 +198,11 @@
   )}
 
 mssql_version <- function(con) {
-  # returns list of MSSQL Server version numbers
-  # 'con' - DBIObject of MSSQL connection
-  if (!is(con, "DBIObject")) {
-    # this should not happen with normal usage
-    # during 'testthat', an invalid 'con' object is used
-    return(
-      list(
-        ProductVersion_Major = NULL,
-        ProductVersion_Minor = NULL,
-        ProductVersion_Revision = NULL
-      )
-    )
+  if (inherits(con, "TestConnection")) {
+    attr(con, "version")
   } else {
-    return(
-      mssql_interpret_version(DBI::dbGetInfo(con)$db.version)
-    )
+    numeric_version(DBI::dbGetInfo(con)$db.version)
   }
-}
-
-mssql_interpret_version <- function(db_version) {
-  # returns integer list of MSSQL Server version numbers
-  # 'db_version' - character string. version numbers separated by periods '.'
-  version_list <- unlist(strsplit(db_version, ".", fixed = TRUE))
-  server_version <- list(
-    ProductVersion_Major = as.integer(version_list[1]),
-    ProductVersion_Minor = as.integer(version_list[2]),
-    ProductVersion_Revision = as.integer(version_list[3])
-    # SQL Version 2008+ have a fourth number, 'Build'
-    # but currently DBI::dbGetInfo does not return the fourth number
-  )
-  return(server_version)
 }
 
 #' @export
