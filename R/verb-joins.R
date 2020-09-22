@@ -1,18 +1,27 @@
-#' Join sql tbls.
+#' Join SQL tables
 #'
-#' See [join] for a description of the general purpose of the
+#' @description
+#' These methods provide implementations of the generic join functions for
+#' remote database tables. See [join] for the overall details of the join
 #' functions.
+#'
+#' Basic translation:
+#' * `inner_join(x, y)`: `SELECT * FROM x JOIN y ON x.a = y.a`
+#' * `left_join(x, y)`:  `SELECT * FROM x LEFT JOIN y ON x.a = y.a`
+#' * `right_join(x, y)`: `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`
+#' * `full_join(x, y)`:  `SELECT * FROM x FULL JOIN y ON x.a = y.a`
+#' * `semi_join(x, y)`:  `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
+#' * `anti_join(x, y)`:  `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
 #'
 #' @section Implementation notes:
 #'
 #' Semi-joins are implemented using `WHERE EXISTS`, and anti-joins with
 #' `WHERE NOT EXISTS`.
 #'
-#' All joins use column equality by default.
-#' An arbitrary join predicate can be specified by passing
-#' an SQL expression to the `sql_on` argument.
-#' Use `LHS` and `RHS` to refer to the left-hand side or
-#' right-hand side table, respectively.
+#' AllAn arbitrary join predicate can
+#' be specified by passing an SQL expression to the `sql_on` argument.
+#' Use `LHS` and `RHS` to refer to the
+#' table, respectively.
 #'
 #' @inheritParams dplyr::join
 #' @param copy If `x` and `y` are not from the same data source,
@@ -27,76 +36,31 @@
 #' @param auto_index if `copy` is `TRUE`, automatically create
 #'   indices for the variables in `by`. This may speed up the join if
 #'   there are matching indexes in `x`.
-#' @param sql_on A custom join predicate as an SQL expression. The SQL
-#'   can refer to the `LHS` and `RHS` aliases to disambiguate
-#'   column names.
+#' @param sql_on A custom join predicate as an SQL expression.
+#'   Usually joins use column equality, but you can perform more complex
+#'   queries by suppliy `sql_on` which should be a SQL expression that
+#'   uses `LHS` and `RHS` aliases to refer to the left-hand side or
+#'   right-hand side of the join respectively.
 #' @examples
-#' \dontrun{
-#' library(dplyr)
-#' if (has_lahman("sqlite")) {
+#' library(dplyr, warn.conflicts = FALSE)
+#' # Create v simple "remote" database table
+#' band_db <- tbl_memdb(dplyr::band_members)
+#' instrument_db <- tbl_memdb(dplyr::band_instruments)
 #'
-#' # Left joins ----------------------------------------------------------------
-#' lahman_s <- lahman_sqlite()
-#' batting <- tbl(lahman_s, "Batting")
-#' team_info <- select(tbl(lahman_s, "Teams"), yearID, lgID, teamID, G, R:H)
+#' band_db %>% left_join(instrument_db) %>% show_query()
+#' band_db %>% left_join(instrument_db)
 #'
-#' # Combine player and whole team statistics
-#' first_stint <- select(filter(batting, stint == 1), playerID:H)
-#' both <- left_join(first_stint, team_info, type = "inner", by = c("yearID", "teamID", "lgID"))
-#' head(both)
-#' explain(both)
+#' # Can join with local data frames by setting copy = TRUE
+#' band_db %>%
+#'   left_join(dplyr::band_instruments, copy = TRUE)
 #'
-#' # Join with a local data frame
-#' grid <- expand.grid(
-#'   teamID = c("WAS", "ATL", "PHI", "NYA"),
-#'   yearID = 2010:2012)
-#' top4a <- left_join(batting, grid, copy = TRUE)
-#' explain(top4a)
+#' # By default, joins are equijoins, but you can use `sql_on` to
+#' # express richer relationships
 #'
-#' # Indices don't really help here because there's no matching index on
-#' # batting
-#' top4b <- left_join(batting, grid, copy = TRUE, auto_index = TRUE)
-#' explain(top4b)
-#'
-#' # Semi-joins ----------------------------------------------------------------
-#'
-#' people <- tbl(lahman_s, "Master")
-#'
-#' # All people in hall of fame
-#' hof <- tbl(lahman_s, "HallOfFame")
-#' semi_join(people, hof)
-#'
-#' # All people not in the hall of fame
-#' anti_join(people, hof)
-#'
-#' # Find all managers
-#' manager <- tbl(lahman_s, "Managers")
-#' semi_join(people, manager)
-#'
-#' # Find all managers in hall of fame
-#' famous_manager <- semi_join(semi_join(people, manager), hof)
-#' famous_manager
-#' explain(famous_manager)
-#'
-#' # Anti-joins ----------------------------------------------------------------
-#'
-#' # batters without person covariates
-#' anti_join(batting, people)
-#'
-#' # Arbitrary predicates ------------------------------------------------------
-#'
-#' # Find all pairs of awards given to the same player
-#' # with at least 18 years between the awards:
-#' awards_players <- tbl(lahman_s, "AwardsPlayers")
-#' inner_join(
-#'   awards_players, awards_players,
-#'   sql_on = paste0(
-#'     "(LHS.playerID = RHS.playerID) AND ",
-#'     "(LHS.yearID < RHS.yearID - 18)"
-#'   )
-#' )
-#' }
-#' }
+#' db1 <- memdb_frame(x = 1:5)
+#' db2 <- memdb_frame(x = 1:3, y = letters[1:3])
+#' db1 %>% left_join(db2)
+#' db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x")
 #' @name join.tbl_sql
 NULL
 
