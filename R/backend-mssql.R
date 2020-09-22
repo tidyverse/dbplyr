@@ -152,9 +152,25 @@
       },
     )
 
-  if (!is(con, "DBIObject") || sub("\\..*", "", DBI::dbGetInfo(con)$db.version) >= 11) {
-    # version 11 equates to MSSQL 2012. 'con' is not a DBIObject if called by 'testthat'
-    mssql_scalar <- mssql_use_try_cast(.parent = mssql_scalar)
+  if (any(mssql_version(con)$ProductVersion_Major >= 11,
+          is.null(mssql_version(con)$ProductVersion_Major))) {
+    # version 11 equates to MSSQL 2012.
+    # mssql_version returns list of NULLs if con is defined by 'testthat'
+    mssql_scalar <- sql_translator(.parent = mssql_scalar,
+                                   as.logical    = sql_try_cast("BIT"),
+
+                                   as.Date       = sql_try_cast("DATE"),
+                                   as.POSIXct    = sql_try_cast("TIMESTAMP"),
+                                   as.numeric    = sql_try_cast("FLOAT"),
+                                   as.double     = sql_try_cast("FLOAT"),
+                                   as.integer    = sql_try_cast("NUMERIC"),
+                                   # in MSSQL, NUMERIC converts to integer
+                                   as.integer64  = sql_try_cast("BIGINT"),
+                                   as.character  = sql_try_cast("VARCHAR(MAX)"),
+
+                                   as_date = sql_try_cast("DATE"),
+                                   as_datetime = sql_try_cast("DATETIME2")
+    )
   }
 
   sql_variant(
@@ -185,26 +201,41 @@
 
   )}
 
-mssql_use_try_cast <- function(.parent) {
-  # replace the 'try_cast' in the .parent scalar with 'sql_try_cast'
-  # if MSSQL 2012+, the use of sql_try_cast allows a more
-  # graceful return of 'NA', rather than raising an error
-  scalar <- sql_translator(.parent = .parent,
-                           as.logical    = sql_try_cast("BIT"),
+mssql_version <- function(con) {
+  # returns list of MSSQL Server version numbers
+  # 'con' - DBIObject of MSSQL connection
+  if (!is(con, "DBIObject")) {
+    # this should not happen with normal usage
+    # during 'testthat', an invalid 'con' object is used
+    return(
+      list(ProductVersion_Major = NULL,
+           ProductVersion_Minor = NULL,
+           ProductVersion_Revision = NULL,
+           ProductVersion_Build = NULL)
+    )
+  } else {
+    return(
+      mssql_interpret_version_string(DBI::dbGetInfo(con)$db.version)
+    )
+  }
+}
 
-                           as.Date       = sql_try_cast("DATE"),
-                           as.POSIXct    = sql_try_cast("TIMESTAMP"),
-                           as.numeric    = sql_try_cast("FLOAT"),
-                           as.double     = sql_try_cast("FLOAT"),
-                           as.integer    = sql_try_cast("NUMERIC"),
-                           # in MSSQL, NUMERIC converts to integer
-                           as.integer64  = sql_try_cast("BIGINT"),
-                           as.character  = sql_try_cast("VARCHAR(MAX)"),
-
-                           as_date = sql_try_cast("DATE"),
-                           as_datetime = sql_try_cast("DATETIME2")
+mssql_interpret_version_string <- function(db_version) {
+  # returns list of MSSQL Server version numbers
+  # 'db_version' - character string. version numbers separated by periods '.'
+  version_list <- unlist(strsplit(db_version, ".", fixed = TRUE))
+  server_version <- list(
+    ProductVersion_Major = version_list[1],
+    ProductVersion_Minor = version_list[2],
+    ProductVersion_Revision = version_list[3]
   )
-  return(scalar)
+  if (length(version) > 3) {
+    server_version$Build = version_list[4]
+  } else {
+    # SQL version 2000-2005 do not include Build numbers
+    server_version$Build = NULL
+  }
+  return(server_version)
 }
 
 #' @export

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
+  of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
+
 * `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
   and friends now return DBI connections rather than the now deprecated 
   `src_dbi()` (#440).
@@ -18,8 +21,6 @@
 * Postgres: New translations for stringr functions: `str_squish()`, 
   `str_remove()`, `str_remove_all()` (@shosaco).
 
-* `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
-  of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
 * All old lazy eval shims have been removed. 
 
 * `median()` now takes a new argument `na.rm` for consistency with `mean()`,
