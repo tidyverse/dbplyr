@@ -1,9 +1,3 @@
-#' @include translate-sql-window.R
-#' @include translate-sql-helpers.R
-#' @include translate-sql-paste.R
-#' @include escape.R
-NULL
-
 #' @export
 sql_translate_env.OdbcConnection <- function(con) {
   sql_variant(

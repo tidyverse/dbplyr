@@ -1,6 +1,3 @@
-#' @include utils.R
-NULL
-
 #' Flag a character vector as SQL identifiers
 #'
 #' `ident()` takes unquoted strings and flags them as identifiers.
