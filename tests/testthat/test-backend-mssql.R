@@ -160,8 +160,13 @@ test_that("bit conversion works for important cases", {
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
   db <- copy_to(src_test("mssql"), df, name = unique_table_name())
-  expect_equal(db %>% filter(x) %>% pull(), TRUE)
-  expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
-  expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
-  expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(TRUE, TRUE, TRUE))
+  expect_equal(db %>% filter(x == 1) %>% pull(), TRUE)
+  expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(1, 1, 1))
+
+  # Currently not supported: would need to determine that we have a bit
+  # vector in a boolean context, and convert to boolean with x == 1.
+  # expect_equal(db %>% mutate(z = x) %>% pull(), c(TRUE, FALSE, FALSE))
+  # expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
+  # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
+
 })

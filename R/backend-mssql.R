@@ -291,8 +291,8 @@ mssql_temp_name <- function(name, temporary) {
 # the data type of  a table column or variable, and cannot be returned in a
 # result set.
 #
-# This means that any top-level logical expressions need to be converted to
-# BIT in SELECT and ORDER clauses.
+# * bit -> boolean: x == 1
+# * boolean -> bit: CAST(IIF(x, 0, 1) AS BIT)
 
 mssql_needs_bit <- function() {
   context <- sql_current_context()
@@ -306,7 +306,7 @@ with_mssql_bool <- function(code) {
 
 mssql_as_bit <- function(x) {
   if (mssql_needs_bit()) {
-    sql_expr(iif(!!x, 1L, 0L))
+    sql_expr(cast(iif(!!x, 1L, 0L) %as% BIT))
   } else {
     x
   }
@@ -352,7 +352,7 @@ mssql_case_when <- function(...) {
 #' @export
 `sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
   if (mssql_needs_bit()) {
-    y <- ifelse(x, "0", "1")
+    y <- ifelse(x, "1", "0")
   } else {
     y <- as.character(x)
   }

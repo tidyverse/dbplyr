@@ -54,7 +54,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT `x`, IIF(~((`x`) IS NULL), 1, 0) AS `z`
+      SELECT `x`, CAST(IIF(~((`x`) IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -63,7 +63,7 @@
       mf %>% mutate(x = x == 1L)
     Output
       <SQL>
-      SELECT IIF(`x` = 1, 1, 0) AS `x`
+      SELECT CAST(IIF(`x` = 1, 1, 0) AS BIT) AS `x`
       FROM `df`
 
 ---
@@ -72,7 +72,7 @@
       mf %>% mutate(x = x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT IIF(`x` = 1 OR `x` = 2, 1, 0) AS `x`
+      SELECT CAST(IIF(`x` = 1 OR `x` = 2, 1, 0) AS BIT) AS `x`
       FROM `df`
 
 ---
@@ -81,7 +81,7 @@
       mf %>% mutate(x = x == 1L || x == 2L || x == 3L)
     Output
       <SQL>
-      SELECT IIF(`x` = 1 OR `x` = 2 OR `x` = 3, 1, 0) AS `x`
+      SELECT CAST(IIF(`x` = 1 OR `x` = 2 OR `x` = 3, 1, 0) AS BIT) AS `x`
       FROM `df`
 
 ---
@@ -90,7 +90,7 @@
       mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
-      SELECT IIF(~(`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS `x`
+      SELECT CAST(IIF(~(`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
       FROM `df`
 
 # ORDER BY in subqueries uses TOP 9223372036854775807 (#337)
@@ -148,6 +148,6 @@
       mf %>% mutate(x = TRUE)
     Output
       <SQL>
-      SELECT 0 AS `x`
+      SELECT 1 AS `x`
       FROM `df`
 
