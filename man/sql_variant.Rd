@@ -14,6 +14,7 @@
 \alias{sql_prefix}
 \alias{sql_aggregate}
 \alias{sql_aggregate_2}
+\alias{sql_aggregate_n}
 \alias{sql_not_supported}
 \alias{sql_cast}
 \alias{sql_try_cast}
@@ -51,6 +52,8 @@ sql_prefix(f, n = NULL)
 sql_aggregate(f, f_r = f)
 
 sql_aggregate_2(f)
+
+sql_aggregate_n(f, f_r = f)
 
 sql_not_supported(f)
 

@@ -14,8 +14,8 @@ test_that("vectorised translations", {
 test_that("pmin and max become MIN and MAX", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(pmin(x, y)), sql('MIN(`x`, `y`)'))
-  expect_equal(translate_sql(pmax(x, y)), sql('MAX(`x`, `y`)'))
+  expect_equal(translate_sql(pmin(x, y, na.rm = TRUE)), sql('MIN(`x`, `y`)'))
+  expect_equal(translate_sql(pmax(x, y, na.rm = TRUE)), sql('MAX(`x`, `y`)'))
 })
 
 test_that("sqlite mimics two argument log", {

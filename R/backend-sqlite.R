@@ -34,8 +34,8 @@ sql_translate_env.SQLiteConnection <- function(con) {
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
-      pmin = sql_prefix("MIN"),
-      pmax = sql_prefix("MAX"),
+      pmin = sql_aggregate_n("MIN", "pmin"),
+      pmax = sql_aggregate_n("MAX", "pmax"),
 
       # lubridate,
       today = function() {

@@ -23,7 +23,7 @@ base_odbc_scalar <- sql_translator(
 #' @format NULL
 base_odbc_agg <- sql_translator(
   .parent = base_agg,
-  sd = sql_prefix("STDDEV_SAMP")
+  sd = sql_aggregate("STDDEV_SAMP", "sd")
 )
 
 #' @export

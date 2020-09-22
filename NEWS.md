@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `pmin()` and `pmax()` translations now have `na.rm` arguments (#479).
+  All `sd()` and `var()` translations have `na.rm`. All warn on first
+  use for consistency with `mean()` and friends.
+  
 * `%/%` now generates a clear error message; previously it was translated to
   `/` which is not correct (#108).
 
