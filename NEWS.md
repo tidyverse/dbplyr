@@ -4,6 +4,9 @@
   (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
   simpler expressions.
 
+* The join functions now error when additional arguments are provided
+  (instead of silently swallowing them!) (#382).
+
 * `substring()` is now translated the same way as `substr()` (#378).
 
 * `pmin()` and `pmax()` translations now have `na.rm` arguments (#479).

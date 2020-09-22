@@ -183,7 +183,7 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         suffix = c(".x", ".y"),
-                        auto_index = FALSE, ...) {
+                        auto_index = FALSE) {
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -212,7 +212,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 }
 
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, ...) {
+                             auto_index = FALSE) {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {

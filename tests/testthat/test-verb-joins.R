@@ -191,6 +191,15 @@ test_that("set ops captures both tables", {
   expect_equal(out$type, "UNION")
 })
 
+test_that("extra args generates error", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  expect_error(
+    inner_join(lf1, lf2, by = "x", na_matches = "na"),
+    "unused argument"
+  )
+})
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {
