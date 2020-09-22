@@ -35,7 +35,24 @@ sql_translate_env.SQLiteConnection <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_prefix("MIN"),
-      pmax = sql_prefix("MAX")
+      pmax = sql_prefix("MAX"),
+
+      # lubridate,
+      today = function() {
+        date <- function(x) {} # suppress R CMD check note
+        sql_expr(date("now"))
+      },
+      now = function() sql_expr(datetime("now")),
+      # https://modern-sql.com/feature/extract#proprietary-strftime
+      year = function(x) sql_expr(cast(strftime("%Y", !!x) %as% NUMERIC)),
+      month = function(x) sql_expr(cast(strftime("%m", !!x) %as% NUMERIC)),
+      mday = function(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
+      day = function(x) sql_expr(cast(strftime("%d", !!x) %as% NUMERIC)),
+      hour = function(x) sql_expr(cast(strftime("%H", !!x) %as% NUMERIC)),
+      minute = function(x) sql_expr(cast(strftime("%M", !!x) %as% NUMERIC)),
+      second = function(x) sql_expr(cast(strftime("%f", !!x) %as% REAL)),
+      yday = function(x) sql_expr(cast(strftime("%j", !!x) %as% NUMERIC)),
+
     ),
     sql_translator(.parent = base_agg,
       sd = sql_aggregate("STDEV", "sd"),
@@ -76,3 +93,5 @@ sql_subquery.SQLiteConnection <- function(con, from, name = unique_subquery_name
     }
   }
 }
+
+globalVariables(c("datetime", "NUMERIC", "REAL"))

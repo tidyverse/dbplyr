@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* SQLite gains translations for lubridate functions `today()`, `now()`, 
+  `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`,`yday()`
+  (#262).
+
 * You can now use `::` in translations, so that (e.g.) `dbplyr::n()` is
   translated to `count(*)` (#207).
 

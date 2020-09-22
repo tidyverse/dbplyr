@@ -25,6 +25,13 @@ test_that("sqlite mimics two argument log", {
   expect_equal(translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
 })
 
+test_that("date-time", {
+  local_con(simulate_sqlite())
+
+  expect_equal(translate_sql(today()), sql("DATE('now')"))
+  expect_equal(translate_sql(now()), sql("DATETIME('now')"))
+})
+
 test_that("custom aggregates translated", {
   local_con(simulate_sqlite())
 
@@ -39,4 +46,27 @@ test_that("as.numeric()/as.double() get custom translation", {
   out <- mf %>% mutate(x1 = as.numeric(x), x2 = as.double(x)) %>% collect()
   expect_type(out$x1, "double")
   expect_type(out$x2, "double")
+})
+
+test_that("date extraction agrees with R", {
+  db <- memdb_frame(x = "2000-01-02 03:40:50.5")
+  out <- db %>% transmute(
+    year = year(x),
+    month = month(x),
+    day = day(x),
+    hour = hour(x),
+    minute = minute(x),
+    second = second(x),
+    yday = yday(x),
+  ) %>% collect() %>% as.list()
+
+  expect_equal(out, list(
+    year = 2000,
+    month = 1,
+    day = 2,
+    hour = 3,
+    minute = 40,
+    second = 50.5,
+    yday = 2
+  ))
 })
