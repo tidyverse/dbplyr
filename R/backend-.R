@@ -576,16 +576,6 @@ db_explain.DBIConnection <- function(con, sql, ...) {
 }
 
 #' @export
-sql_explain <- function(con, sql, ...) {
-  UseMethod("sql_explain")
-}
-
-#' @export
-sql_explain.DBIConnection <- function(con, sql, ...) {
-  build_sql("EXPLAIN ", sql, con = con)
-}
-
-#' @export
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
   qry <- dbSendQuery(con, sql)
@@ -602,6 +592,29 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 
   as.integer(dbGetQuery(con, rows)[[1]])
 }
+
+
+# SQL methods -------------------------------------------------------------
+
+#' SQL generation methods for database methods
+#'
+#' * `explain()` -> `db_explain` -> `sql_explain()`
+#'
+#' @keywords internal
+#' @name db_sql
+NULL
+
+#' @rdname db_sql
+#' @export
+sql_explain <- function(con, sql, ...) {
+  UseMethod("sql_explain")
+}
+
+#' @export
+sql_explain.DBIConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN ", sql, con = con)
+}
+
 
 # Utility functions ------------------------------------------------------------
 
