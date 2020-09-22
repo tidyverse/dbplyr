@@ -18,6 +18,7 @@ Check available:
 ```{r}
 odbc::odbcListDrivers()
 edit_file("/usr/local/etc/odbcinst.ini")
+Sys.setenv("GITHUB_MSSQL" = "true")
 ```
 
 ## Start

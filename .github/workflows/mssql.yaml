@@ -74,6 +74,10 @@ jobs:
           dpkg -L msodbcsql17
         shell: sudo bash {0}
 
+      - name: Check drivers
+        run: odbc::odbcListDrivers()
+        shell: Rscript {0}
+
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
