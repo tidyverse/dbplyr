@@ -78,7 +78,7 @@ The following examples work through some of the basic differences between R and 
 
 ## Modulo arithmetic
 
-dbplyr translates `%%` and `%/%` to their SQL equivalents but note that they are not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.
+dbplyr translates `%%` to the SQL equivalents but note that it's not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.
 
 ```{r}
 df <- tibble(
@@ -87,11 +87,11 @@ df <- tibble(
 )
 mf <- tbl_memdb(df)
 
-df %>% mutate(x %% y, x %/% y)
-
-mf %>% mutate(x %% y, x %/% y)
+df %>% mutate(x %% y)
+mf %>% mutate(x %% y)
 ```
 
+dbplyr no longer translates `%/%` because there's no robust cross-database translation available.
 
 ### Logical comparisons
 

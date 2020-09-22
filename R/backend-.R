@@ -34,6 +34,7 @@ base_scalar <- sql_translator(
   `+`    = sql_infix("+"),
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
+  `%/%`  = sql_not_supported("%/%"),
   `%%`   = sql_infix("%"),
   `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {

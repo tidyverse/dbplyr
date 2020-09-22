@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `%/%` now generates a clear error message; previously it was translated to
+  `/` which is not correct (#108).
+
 * SQLite gains translations for lubridate functions `today()`, `now()`, 
   `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`,`yday()`
   (#262).
