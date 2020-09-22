@@ -35,3 +35,5 @@ sql_translate_env.Redshift <- sql_translate_env.RedshiftConnection
 sql_paste_redshift <- function(sep) {
   sql_paste_infix(sep, "||", function(x) sql_expr(cast(!!x %as% text)))
 }
+
+globalVariables(c("REGEXP_REPLACE"))
