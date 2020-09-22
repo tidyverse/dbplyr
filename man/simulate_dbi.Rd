@@ -14,7 +14,7 @@
 \alias{simulate_teradata}
 \title{Simulate database connections}
 \usage{
-simulate_dbi(class = character())
+simulate_dbi(class = character(), ...)
 
 simulate_access()
 
@@ -24,7 +24,7 @@ simulate_mysql()
 
 simulate_impala()
 
-simulate_mssql()
+simulate_mssql(version = "15.0")
 
 simulate_odbc()
 

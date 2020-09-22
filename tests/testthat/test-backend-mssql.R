@@ -3,10 +3,10 @@
 test_that("custom scalar translated correctly", {
   local_con(simulate_mssql())
 
-  expect_equal(translate_sql(as.logical(x)),   sql("CAST(`x` AS BIT)"))
-  expect_equal(translate_sql(as.numeric(x)),   sql("CAST(`x` AS FLOAT)"))
-  expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS FLOAT)"))
-  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
+  expect_equal(translate_sql(as.logical(x)),   sql("TRY_CAST(`x` AS BIT)"))
+  expect_equal(translate_sql(as.numeric(x)),   sql("TRY_CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(as.double(x)),    sql("TRY_CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(as.character(x)), sql("TRY_CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(translate_sql(log(x)),          sql("LOG(`x`)"))
   expect_equal(translate_sql(nchar(x)),        sql("LEN(`x`)"))
   expect_equal(translate_sql(atan2(x)),        sql("ATN2(`x`)"))
@@ -52,8 +52,8 @@ test_that("custom window functions translated correctly", {
 
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_mssql())
-  expect_equal(translate_sql(as_date(x)),     sql("CAST(`x` AS DATE)"))
-  expect_equal(translate_sql(as_datetime(x)), sql("CAST(`x` AS DATETIME2)"))
+  expect_equal(translate_sql(as_date(x)),     sql("TRY_CAST(`x` AS DATE)"))
+  expect_equal(translate_sql(as_datetime(x)), sql("TRY_CAST(`x` AS DATETIME2)"))
   expect_equal(translate_sql(today()),   sql("CAST(SYSDATETIME() AS DATE)"))
   expect_equal(translate_sql(year(x)),   sql("DATEPART(YEAR, `x`)"))
   expect_equal(translate_sql(day(x)),    sql("DATEPART(DAY, `x`)"))
@@ -124,6 +124,7 @@ test_that("custom escapes translated correctly", {
   qry <- mf %>% filter(x %in% !!L)
   expect_snapshot(qry)
 })
+
 
 # Live database -----------------------------------------------------------
 

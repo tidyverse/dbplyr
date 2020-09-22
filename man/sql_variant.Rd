@@ -16,6 +16,7 @@
 \alias{sql_aggregate_2}
 \alias{sql_not_supported}
 \alias{sql_cast}
+\alias{sql_try_cast}
 \alias{sql_log}
 \alias{sql_cot}
 \alias{base_scalar}
@@ -54,6 +55,8 @@ sql_aggregate_2(f)
 sql_not_supported(f)
 
 sql_cast(type)
+
+sql_try_cast(type)
 
 sql_log()
 

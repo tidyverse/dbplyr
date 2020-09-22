@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
+  of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
+
 * SQLite gets correct translation for `median()` (#357).
 
 * `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
