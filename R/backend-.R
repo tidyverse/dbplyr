@@ -569,11 +569,20 @@ db_analyze.DBIConnection <- function(con, table, ...) {
 
 #' @export
 db_explain.DBIConnection <- function(con, sql, ...) {
-  exsql <- build_sql("EXPLAIN ", sql, con = con)
-  expl <- dbGetQuery(con, exsql)
+  sql <- sql_explain(con, sql, ...)
+  expl <- dbGetQuery(con, sql)
   out <- utils::capture.output(print(expl))
-
   paste(out, collapse = "\n")
+}
+
+#' @export
+sql_explain <- function(con, sql, ...) {
+  UseMethod("sql_explain")
+}
+
+#' @export
+sql_explain.DBIConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN ", sql, con = con)
 }
 
 #' @export

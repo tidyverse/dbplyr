@@ -17,3 +17,7 @@ test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
   expect_snapshot(mf %>% head())
 })
+
+test_that("can explain", {
+  expect_snapshot(sql_explain(simulate_oracle(), sql("SELECT * FROM foo")))
+})

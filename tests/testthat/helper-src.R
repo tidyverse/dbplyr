@@ -37,12 +37,6 @@ if (test_srcs$length() == 0) {
   }
 }
 
-
-skip_if_no_db <- function(db) {
-  if (!test_srcs$has(db))
-    skip(paste0("No ", db))
-}
-
 sqlite_con_with_aux <- function() {
   tmp <- tempfile()
 

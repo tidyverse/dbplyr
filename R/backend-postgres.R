@@ -198,24 +198,21 @@ db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
-db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
+sql_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
-  exsql <- build_sql(
+  build_sql(
     "EXPLAIN ",
     if (!is.null(format)) sql(paste0("(FORMAT ", format, ") ")),
     sql,
     con = con
   )
-  expl <- dbGetQuery(con, exsql)
-
-  paste(expl[[1]], collapse = "\n")
 }
 
 #' @export
-db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
+sql_explain.PostgreSQL <- sql_explain.PostgreSQLConnection
 
 #' @export
-db_explain.PqConnection <- db_explain.PostgreSQLConnection
+sql_explain.PqConnection <- sql_explain.PostgreSQLConnection
 
 globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY"))

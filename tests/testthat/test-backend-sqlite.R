@@ -70,3 +70,8 @@ test_that("date extraction agrees with R", {
     yday = 2
   ))
 })
+
+test_that("can explain a query", {
+  db <- copy_to_test("sqlite", data.frame(x = 1:5), indexes = list("x"))
+  expect_snapshot(db %>% filter(x > 2) %>% explain())
+})

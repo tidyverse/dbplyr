@@ -54,11 +54,12 @@ sql_translate_env.Oracle <- function(con) {
 }
 
 #' @export
-db_explain.Oracle <- function(con, sql, ...) {
-  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
-  expl <- DBI::dbGetQuery(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
-  out <- utils::capture.output(print(expl))
-  paste(out, collapse = "\n")
+sql_explain.Oracle <- function(con, sql, ...) {
+  build_sql(
+    "EXPLAIN PLAN FOR ", sql, ";\n",
+    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
+    con = con
+  )
 }
 
 #' @export

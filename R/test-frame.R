@@ -90,3 +90,16 @@ test_srcs <- local({
     }
   )
 })
+
+
+# Modern helpers ----------------------------------------------------------
+
+copy_to_test <- function(src, df, ...) {
+  skip_if_no_db(src)
+  copy_to(src_test(src), df, "test", ..., overwrite = TRUE)
+}
+
+skip_if_no_db <- function(db) {
+  if (!test_srcs$has(db))
+    testthat::skip(paste0("No ", db))
+}

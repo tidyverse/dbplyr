@@ -4,12 +4,8 @@ db_desc.SQLiteConnection <- function(x) {
 }
 
 #' @export
-db_explain.SQLiteConnection <- function(con, sql, ...) {
-  exsql <- build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
-  expl <- dbGetQuery(con, exsql)
-  out <- utils::capture.output(print(expl))
-
-  paste(out, collapse = "\n")
+sql_explain.SQLiteConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
 }
 
 sqlite_version <- function() {
