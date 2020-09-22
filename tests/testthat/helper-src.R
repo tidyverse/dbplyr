@@ -14,9 +14,12 @@ if (test_srcs$length() == 0) {
     )
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
     test_register_con("mssql", odbc::odbc(),
-      dsn = "MicrosoftSQLServer",
-      UID = "SA",
-      PWD = "Password12"
+      driver = "ODBC Driver 17 for SQL Server",
+      database = "testdb",
+      uid = "SA",
+      pwd = "Password12",
+      server = "localhost",
+      port = 1433
     )
   } else if (on_gha() || on_cran()) {
     # Only test with sqlite
