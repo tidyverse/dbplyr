@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* MS SQL translation does better a distinguishing between bit and boolean 
+  (#377, #318).
+
 * SQLite gains translations for lubridate functions `today()`, `now()`, 
   `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`,`yday()`
   (#262).
