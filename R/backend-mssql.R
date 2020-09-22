@@ -51,24 +51,25 @@
     sql_translator(.parent = base_odbc_scalar,
 
       `!`           = function(x) {
-                        if (sql_current_select()) {
-                          build_sql(sql("~"), list(x))
+                        if (mssql_needs_bit()) {
+                          x <- with_mssql_bool(x)
+                          mssql_as_bit(sql_expr(~ !!x))
                         } else {
                           sql_expr(NOT(!!x))
                         }
                       },
 
-      `!=`           = sql_infix("!="),
-      `==`           = sql_infix("="),
-      `<`            = sql_infix("<"),
-      `<=`           = sql_infix("<="),
-      `>`            = sql_infix(">"),
-      `>=`           = sql_infix(">="),
+      `!=`           = mssql_infix_comparison("!="),
+      `==`           = mssql_infix_comparison("="),
+      `<`            = mssql_infix_comparison("<"),
+      `<=`           = mssql_infix_comparison("<="),
+      `>`            = mssql_infix_comparison(">"),
+      `>=`           = mssql_infix_comparison(">="),
 
-      `&`            = mssql_generic_infix("&", "%AND%"),
-      `&&`           = mssql_generic_infix("&", "%AND%"),
-      `|`            = mssql_generic_infix("|", "%OR%"),
-      `||`           = mssql_generic_infix("|", "%OR%"),
+      `&`            = mssql_infix_boolean("&", "%AND%"),
+      `&&`           = mssql_infix_boolean("&", "%AND%"),
+      `|`            = mssql_infix_boolean("|", "%OR%"),
+      `||`           = mssql_infix_boolean("|", "%OR%"),
 
       bitwShiftL     = sql_not_supported("bitwShiftL"),
       bitwShiftR     = sql_not_supported("bitwShiftR"),
@@ -76,6 +77,7 @@
       `if`           = mssql_sql_if,
       if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
+      case_when      = mssql_case_when,
 
       as.logical    = sql_cast("BIT"),
 
@@ -92,8 +94,8 @@
       pmin          = sql_not_supported("pmin()"),
       pmax          = sql_not_supported("pmax()"),
 
-      is.null       = function(x) mssql_is_null(x, sql_current_context()),
-      is.na         = function(x) mssql_is_null(x, sql_current_context()),
+      is.null       = mssql_is_null,
+      is.na         = mssql_is_null,
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
@@ -277,45 +279,74 @@ mssql_temp_name <- function(name, temporary) {
   )
 }
 
-# `IS NULL` returns a boolean expression, so you can't use it in a result set
-# the approach using casting return a bit, so you can use in a result set, but not in where.
-# Microsoft documentation:  The result of a comparison operator has the Boolean data type.
-# This has three values: TRUE, FALSE, and UNKNOWN. Expressions that return a Boolean data type are
-# known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
-# be specified as the data type of  a table column or variable, and cannot be returned in a result set.
+# We have to jump through some hoops here because MS SQL has two boolean types:
+#
+# * BOOLEAN, which can be used in filters but not results
+# * BIT, which can be used in results, but not filters
+#
 # https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+# The result of a comparison operator has the
+# Boolean data type. This has three values: TRUE, FALSE, and UNKNOWN.
+# Unlike other SQL Server data types, a Boolean data type cannot be specified as
+# the data type of  a table column or variable, and cannot be returned in a
+# result set.
+#
+# This means that any top-level logical expressions need to be converted to
+# BIT in SELECT and ORDER clauses.
 
-mssql_is_null <- function(x, context = NULL) {
-  needs_bit <- is.list(context) && !is.null(context$clause) &&
-    context$clause %in% c("SELECT", "ORDER")
+mssql_needs_bit <- function() {
+  context <- sql_current_context()
+  identical(context$clause, "SELECT") || identical(context$clause, "ORDER")
+}
 
-  if (needs_bit) {
-    sql_expr(convert(BIT, iif(!!x %is% NULL, 1L, 0L)))
+with_mssql_bool <- function(code) {
+  local_context(list(clause = ""))
+  code
+}
+
+mssql_as_bit <- function(x) {
+  if (mssql_needs_bit()) {
+    sql_expr(iif(!!x, 1L, 0L))
   } else {
-    sql_is_null(x)
+    x
   }
 }
 
-mssql_generic_infix <- function(if_select, if_filter) {
-  force(if_select)
-  force(if_filter)
+mssql_is_null <- function(x) {
+  mssql_as_bit(sql_is_null({{x}}))
+}
+
+mssql_infix_comparison <- function(f) {
+  assert_that(is_string(f))
+  f <- toupper(f)
+  function(x, y) {
+    mssql_as_bit(build_sql(x, " ", sql(f), " ", y))
+  }
+}
+
+mssql_infix_boolean <- function(if_bit, if_bool) {
+  force(if_bit)
+  force(if_bool)
 
   function(x, y) {
-    if (sql_current_select()) {
-      f <- if_select
+    if (mssql_needs_bit()) {
+      x <- with_mssql_bool(x)
+      y <- with_mssql_bool(y)
+      mssql_as_bit(sql_call2(if_bool, x, y))
     } else {
-      f <- if_filter
+      sql_call2(if_bool, x, y)
     }
-    sql_call2(f, x, y)
   }
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
-  old <- set_current_context(list(clause = ""))
-  on.exit(set_current_context(old), add = TRUE)
-  cond <- build_sql(cond)
+  cond <- with_mssql_bool(cond)
+  sql_expr(IIF(!!cond, !!if_true, !!if_false))
+}
 
-  sql_if(cond, if_true, if_false)
+mssql_case_when <- function(...) {
+  local_context(list(clause = ""))
+  sql_case_when(...)
 }
 
 globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))

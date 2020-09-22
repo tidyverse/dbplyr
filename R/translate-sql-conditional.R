@@ -20,9 +20,6 @@ sql_case_when <- function(...) {
   query <- vector("list", n)
   value <- vector("list", n)
 
-  old <- sql_current_context()
-  on.exit(set_current_context(old), add = TRUE)
-  set_current_context(list(clause = ""))
   for (i in seq_len(n)) {
     f <- formulas[[i]]
 

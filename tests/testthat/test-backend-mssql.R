@@ -73,35 +73,22 @@ test_that("custom lubridate functions translated correctly", {
 
 # verb translation --------------------------------------------------------
 
-test_that("filter and mutate translate is.na correctly", {
+test_that("convert between bit and boolean as needed", {
   mf <- lazy_frame(x = 1, con = simulate_mssql())
 
-  expect_snapshot(mf %>% mutate(z = is.na(x)))
-  expect_snapshot(mf %>% mutate(z = !is.na(x)))
+  # No conversion
   expect_snapshot(mf %>% filter(is.na(x)))
-  expect_snapshot(mf %>% mutate(x = x == 1))
-  expect_snapshot(mf %>% mutate(x = x != 1))
-  expect_snapshot(mf %>% mutate(x = x > 1))
-  expect_snapshot(mf %>% mutate(x = x >= 1))
-  expect_snapshot(mf %>% mutate(x = !(x == 1)))
-  expect_snapshot(mf %>% mutate(x = !(x != 1)))
-  expect_snapshot(mf %>% mutate(x = !(x > 1)))
-  expect_snapshot(mf %>% mutate(x = !(x >= 1)))
-  expect_snapshot(mf %>% mutate(x = x > 4 & x < 5))
-  expect_snapshot(mf %>% filter(x > 4 & x < 5))
-  expect_snapshot(mf %>% mutate(x = x > 4 | x < 5))
-  expect_snapshot(mf %>% filter(x > 4 | x < 5))
-  expect_snapshot(mf %>% mutate(x = ifelse(x == 0, 0, 1)))
-})
+  expect_snapshot(mf %>% filter(!is.na(x)))
+  expect_snapshot(mf %>% filter(x == 1L || x == 2L))
+  expect_snapshot(mf %>% mutate(z = ifelse(x == 1L, 1L, 2L)))
+  expect_snapshot(mf %>% mutate(z = case_when(x == 1L ~ 1L)))
 
-test_that("Special ifelse and case_when cases return the correct queries", {
-  mf <- lazy_frame(x = 1, con = simulate_mssql())
-  expect_snapshot(mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)))
-  expect_snapshot(mf %>% mutate(z = case_when(
-    is.na(x) ~ 1,
-    !is.na(x) ~ 2,
-    TRUE ~ 3
-  )))
+  # Single conversion on outer layer
+  expect_snapshot(mf %>% mutate(z = !is.na(x)))
+  expect_snapshot(mf %>% mutate(x = x == 1L))
+  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L))
+  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L || x == 3L))
+  expect_snapshot(mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L)))
 })
 
 test_that("ORDER BY in subqueries uses TOP 9223372036854775807 (#337)", {
