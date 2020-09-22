@@ -13,13 +13,11 @@ if (test_srcs$length() == 0) {
       password = "password"
     )
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
-    if (packageVersion("odbc")) {
-      test_register_con("mssql", odbc::odbc(),
-        dsn = "MicrosoftSQLServer",
-        UID = "SA",
-        PWD = "Password12"
-      )
-    }
+    test_register_con("mssql", odbc::odbc(),
+      dsn = "MicrosoftSQLServer",
+      UID = "SA",
+      PWD = "Password12"
+    )
   } else if (on_gha() || on_cran()) {
     # Only test with sqlite
   } else  {
