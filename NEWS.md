@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* SQLite gets correct translation for `median()` (#357).
+
 * `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
   and friends now return DBI connections rather than the now deprecated 
   `src_dbi()` (#440).

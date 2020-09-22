@@ -25,6 +25,12 @@ test_that("sqlite mimics two argument log", {
   expect_equal(translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
 })
 
+test_that("custom aggregates translated", {
+  local_con(simulate_sqlite())
+
+  expect_equal(translate_sql(median(x), window = FALSE), sql('MEDIAN(`x`)'))
+  expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
+})
 # live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {
