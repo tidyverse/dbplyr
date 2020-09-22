@@ -349,4 +349,15 @@ mssql_case_when <- function(...) {
   sql_case_when(...)
 }
 
+#' @export
+`sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
+  if (mssql_needs_bit()) {
+    y <- ifelse(x, "0", "1")
+  } else {
+    y <- as.character(x)
+  }
+  y[is.na(x)] <- "NULL"
+  y
+}
+
 globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))

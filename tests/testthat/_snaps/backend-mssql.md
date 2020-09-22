@@ -132,3 +132,22 @@
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
+# logical escaping depends on context
+
+    Code
+      mf %>% filter(x == TRUE)
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`x` = TRUE)
+
+---
+
+    Code
+      mf %>% mutate(x = TRUE)
+    Output
+      <SQL>
+      SELECT 0 AS `x`
+      FROM `df`
+

@@ -112,6 +112,12 @@ test_that("custom escapes translated correctly", {
   expect_snapshot(qry)
 })
 
+test_that("logical escaping depends on context", {
+  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+  expect_snapshot(mf %>% filter(x == TRUE))
+  expect_snapshot(mf %>% mutate(x = TRUE))
+})
+
 
 # Live database -----------------------------------------------------------
 
@@ -142,4 +148,15 @@ test_that("mssql can compute() with temporary tables (#272)", {
     df1 %>%
       mutate(x = x + 1L)
   )
+})
+
+test_that("bit conversion works for important cases", {
+  skip_if_no_db("mssql")
+
+  df <- tibble(x = 1:3, y = 3:1, bool = c(TRUE, FALSE, TRUE))
+  db <- copy_to(src_test("mssql"), df1, name = unique_table_name())
+
+  expect_equal(db %>% mutate(z = !bool) %>% pull(), c(FALSE, TRUE, FALSE))
+  expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
+  expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(TRUE, TRUE, TRUE))
 })
