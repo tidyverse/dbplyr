@@ -10,7 +10,7 @@ name: mssql
 
 jobs:
   mssql:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-16.04
 
     services:
       sqlserver:
@@ -64,13 +64,14 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      - name: Install SQL Server
+      - name: Install SQL Server driver
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
           apt-get update
           ACCEPT_EULA=Y apt-get install -y msodbcsql17
           sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE test;'
+          dpkg -L msodbcsql17
         shell: sudo bash {0}
 
       - name: Check
