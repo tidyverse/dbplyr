@@ -187,6 +187,18 @@ sql_aggregate_2 <- function(f) {
   }
 }
 
+#' @rdname sql_variant
+#' @export
+sql_aggregate_n <- function(f, f_r = f) {
+  assert_that(is_string(f))
+
+  warned <- FALSE
+  function(..., na.rm = FALSE) {
+    warned <<- check_na_rm(f_r, na.rm, warned)
+    build_sql(sql(f), list(...))
+  }
+}
+
 sql_aggregate_win <- function(f) {
   force(f)
 

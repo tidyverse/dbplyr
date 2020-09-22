@@ -43,107 +43,99 @@ sql_select.ACCESS <- function(con, select, from,
 #' @export
 sql_translate_env.ACCESS <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_odbc_scalar,
+    sql_translator(.parent = base_scalar,
+      # Much of this translation comes from: https://www.techonthenet.com/access/functions/
 
-                   # Much of this translation comes from: https://www.techonthenet.com/access/functions/
+      # Conversion
+      as.numeric    = sql_prefix("CDBL"),
+      as.double     = sql_prefix("CDBL"),
+      # as.integer() always rounds down. CInt does not, but Int does
+      as.integer    = sql_prefix("INT"),
+      as.logical    = sql_prefix("CBOOL"),
+      as.character  = sql_prefix("CSTR"),
+      as.Date       = sql_prefix("CDATE"),
 
-                   # Conversion
-                   as.numeric    = sql_prefix("CDBL"),
-                   as.double     = sql_prefix("CDBL"),
-                   # as.integer() always rounds down. CInt does not, but Int does
-                   as.integer    = sql_prefix("INT"),
-                   as.logical    = sql_prefix("CBOOL"),
-                   as.character  = sql_prefix("CSTR"),
-                   as.Date       = sql_prefix("CDATE"),
+      # Math
+      exp           = sql_prefix("EXP"),
+      log           = sql_prefix("LOG"),
+      log10         = function(x) {
+       sql_expr(log(!!x) / log(10L))
+      },
+      sqrt          = sql_prefix("SQR"),
+      sign          = sql_prefix("SGN"),
+      floor         = sql_prefix("INT"),
+      # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
+      ceiling       = function(x) {
+       sql_expr(int(!!x + .9999999999))
+      },
+      ceil          = function(x) {
+       sql_expr(int(!!x + .9999999999))
+      },
+      # There is no POWER function in Access. It uses ^ instead
+      `^`           = function(x, y) {
+       sql_expr((!!x) ^ (!!y))
+      },
 
-                   # Math
-                   exp           = sql_prefix("EXP"),
-                   log           = sql_prefix("LOG"),
-                   log10         = function(x) {
-                     sql_expr(log(!!x) / log(10L))
-                   },
-                   sqrt          = sql_prefix("SQR"),
-                   sign          = sql_prefix("SGN"),
-                   floor         = sql_prefix("INT"),
-                   # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
-                   ceiling       = function(x) {
-                     sql_expr(int(!!x + .9999999999))
-                   },
-                   ceil          = function(x) {
-                     sql_expr(int(!!x + .9999999999))
-                   },
-                   # There is no POWER function in Access. It uses ^ instead
-                   `^`           = function(x, y) {
-                     sql_expr((!!x) ^ (!!y))
-                   },
+      # Strings
+      nchar         = sql_prefix("LEN"),
+      tolower       = sql_prefix("LCASE"),
+      toupper       = sql_prefix("UCASE"),
+      # Pull `left` chars from the left, then `right` chars from the right to replicate substr
+      substr        = function(x, start, stop){
+       right  <- stop - start + 1
+       left   <- stop
+       sql_expr(right(left(!!x, !!left), !!right))
+      },
+      trimws        = sql_prefix("TRIM"),
+      # No support for CONCAT in Access
+      paste         = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
+      paste0        = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
 
-                   # Strings
-                   nchar         = sql_prefix("LEN"),
-                   tolower       = sql_prefix("LCASE"),
-                   toupper       = sql_prefix("UCASE"),
-                   # Pull `left` chars from the left, then `right` chars from the right to replicate substr
-                   substr        = function(x, start, stop){
-                     right  <- stop - start + 1
-                     left   <- stop
-                     sql_expr(right(left(!!x, !!left), !!right))
-                   },
-                   trimws        = sql_prefix("TRIM"),
-                   # No support for CONCAT in Access
-                   paste         = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
-                   paste0        = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
+      # Logic
+      # Access always returns -1 for True and 0 for False
+      is.null       = sql_prefix("ISNULL"),
+      is.na         = sql_prefix("ISNULL"),
+      # IIF() is like ifelse()
+      ifelse        = function(test, yes, no){
+       sql_expr(iif(!!test, !!yes, !!no))
+      },
 
-                   # Logic
-                   # Access always returns -1 for True and 0 for False
-                   is.null       = sql_prefix("ISNULL"),
-                   is.na         = sql_prefix("ISNULL"),
-                   # IIF() is like ifelse()
-                   ifelse        = function(test, yes, no){
-                     sql_expr(iif(!!test, !!yes, !!no))
-                   },
+      # Coalesce doesn't exist in Access.
+      # NZ() only works while in Access, not with the Access driver
+      # IIF(ISNULL()) is the best way to construct this
+      coalesce      = function(x, y) {
+       sql_expr(iif(isnull(!!x), !!y, !!x))
+      },
 
-                   # Coalesce doesn't exist in Access.
-                   # NZ() only works while in Access, not with the Access driver
-                   # IIF(ISNULL()) is the best way to construct this
-                   coalesce      = function(x, y) {
-                     sql_expr(iif(isnull(!!x), !!y, !!x))
-                   },
+      # pmin/pmax for 2 columns
+      pmin          = function(x, y) {
+       sql_expr(iif(!!x <= !!y, !!x, !!y))
+      },
 
-                   # pmin/pmax for 2 columns
-                   pmin          = function(x, y) {
-                     sql_expr(iif(!!x <= !!y, !!x, !!y))
-                   },
+      pmax          = function(x, y) {
+       sql_expr(iif(!!x <= !!y, !!y, !!x))
+      },
 
-                   pmax          = function(x, y) {
-                     sql_expr(iif(!!x <= !!y, !!y, !!x))
-                   },
-
-                   # Dates
-                   Sys.Date      = sql_prefix("DATE")
-
+      # Dates
+      Sys.Date      = sql_prefix("DATE")
     ),
 
-    sql_translator(.parent = base_odbc_agg,
+    sql_translator(.parent = base_agg,
+      sd         = sql_aggregate("STDEV"),
+      var        = sql_aggregate("VAR"),
+      cor        = sql_not_supported("cor"),
+      cov        = sql_not_supported("cov"),
 
-                   mean          = sql_prefix("AVG"),
-                   sd            = sql_prefix("STDEV"),
-                   var           = sql_prefix("VAR"),
-                   max           = sql_prefix("MAX"),
-                   min           = sql_prefix("MIN"),
-                   # Access does not have functions for cor and cov
-                   cor           = sql_not_supported("cor()"),
-                   cov           = sql_not_supported("cov()"),
-
-                   # Count
-                   # Count(Distinct *) does not work in Access
-                   # This would work but we don't know the table name when translating:
-                   # SELECT Count(*) FROM (SELECT DISTINCT * FROM table_name) AS T
-                   n_distinct    = sql_not_supported("n_distinct")
+      # Count(Distinct *) does not work in Access
+      # This would work but we don't know the table name when translating:
+      # SELECT Count(*) FROM (SELECT DISTINCT * FROM table_name) AS T
+      n_distinct    = sql_not_supported("n_distinct"),
     ),
 
     # Window functions not supported in Access
     sql_translator(.parent = base_no_win)
-
-  )}
+  )
+}
 
 # db_ generics -----------------------------------
 

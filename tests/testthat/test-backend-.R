@@ -24,6 +24,8 @@ test_that("basic arithmetic is correct", {
   expect_equal(translate_sql(2 * 4), sql("2.0 * 4.0"))
   expect_equal(translate_sql(5 ^ 2), sql("POWER(5.0, 2.0)"))
   expect_equal(translate_sql(100L %% 3L), sql("100 % 3"))
+
+  expect_error(translate_sql(100L %/% 3L), "not available")
 })
 
 test_that("small numbers aren't converted to 0", {
@@ -81,3 +83,4 @@ test_that("default raw escapes translated correctly", {
   qry <- mf %>% filter(x %in% !!L)
   expect_snapshot(qry)
 })
+

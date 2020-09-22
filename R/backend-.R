@@ -34,6 +34,7 @@ base_scalar <- sql_translator(
   `+`    = sql_infix("+"),
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
+  `%/%`  = sql_not_supported("%/%"),
   `%%`   = sql_infix("%"),
   `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {
@@ -181,8 +182,8 @@ base_scalar <- sql_translator(
     sql_expr(!!x %BETWEEN% !!left %AND% !!right)
   },
 
-  pmin = sql_prefix("LEAST"),
-  pmax = sql_prefix("GREATEST"),
+  pmin = sql_aggregate_n("LEAST", "pmin"),
+  pmax = sql_aggregate_n("GREATEST", "pmax"),
 
   `%>%` = `%>%`,
 
@@ -223,6 +224,7 @@ base_scalar <- sql_translator(
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
+  substring = sql_substr("SUBSTR"),
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),

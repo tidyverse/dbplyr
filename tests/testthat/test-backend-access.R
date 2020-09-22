@@ -39,8 +39,8 @@ test_that("custom scalar translated correctly", {
 test_that("custom aggregators translated correctly", {
   local_con(simulate_access())
 
-  expect_equal(translate_sql(sd(x), window = FALSE),  sql("STDEV(`x`)"))
-  expect_equal(translate_sql(var(x), window = FALSE), sql("VAR(`x`)"))
+  expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE),  sql("STDEV(`x`)"))
+  expect_equal(translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR(`x`)"))
 
   expect_error(translate_sql(cor(x), window = FALSE), "not available")
   expect_error(translate_sql(cov(x), window = FALSE), "not available")

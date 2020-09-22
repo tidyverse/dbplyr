@@ -2,7 +2,7 @@
 title: "Reprexes for dbplyr"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{reprex}
+  %\VignetteIndexEntry{Reprexes for dbplyr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

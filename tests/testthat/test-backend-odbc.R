@@ -10,11 +10,17 @@ test_that("custom scalar translated correctly", {
 test_that("custom aggregators translated correctly", {
   local_con(simulate_odbc())
 
-  expect_equal(translate_sql(sd(x), window = FALSE),         sql("STDDEV_SAMP(`x`)"))
+  expect_equal(
+    translate_sql(sd(x, na.rm = TRUE), window = FALSE),
+    sql("STDDEV_SAMP(`x`)")
+  )
 })
 
 test_that("custom window functions translated correctly", {
   local_con(simulate_odbc())
 
-  expect_equal(translate_sql(sd(x, na.rm = TRUE)), sql("STDDEV_SAMP(`x`) OVER ()"))
+  expect_equal(
+    translate_sql(sd(x, na.rm = TRUE)),
+    sql("STDDEV_SAMP(`x`) OVER ()")
+  )
 })

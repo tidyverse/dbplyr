@@ -30,7 +30,7 @@ test_that("custom bitwise operations translated correctly", {
 test_that("custom aggregators translated correctly", {
   local_con(simulate_teradata())
 
-  expect_equal(translate_sql(var(x), window = FALSE), sql("VAR_SAMP(`x`)"))
+  expect_equal(translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR_SAMP(`x`)"))
 
   expect_error(translate_sql(cor(x), window = FALSE), "not available")
   expect_error(translate_sql(cov(x), window = FALSE), "not available")
