@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `substring()` is now translated the same way as `substr()` (#378).
+
 * `pmin()` and `pmax()` translations now have `na.rm` arguments (#479).
   All `sd()` and `var()` translations have `na.rm`. All warn on first
   use for consistency with `mean()` and friends.

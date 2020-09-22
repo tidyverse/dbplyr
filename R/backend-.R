@@ -224,6 +224,7 @@ base_scalar <- sql_translator(
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
+  substring = sql_substr("SUBSTR"),
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),
