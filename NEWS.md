@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* MySQL uses standard SQL for index creation.
+
 * MS SQL translation does better a distinguishing between bit and boolean 
   (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
   simpler expressions.

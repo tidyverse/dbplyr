@@ -140,27 +140,6 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
 }
 
 #' @export
-db_create_index.MySQLConnection <- function(con, table, columns, name = NULL,
-                                            unique = FALSE, ...) {
-  name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  index <- build_sql(
-    "ADD ",
-    if (unique) sql("UNIQUE "),
-    "INDEX ", ident(name), " ", fields,
-    con = con
-  )
-
-  sql <- build_sql("ALTER TABLE ", as.sql(table), "\n", index, con = con)
-  dbExecute(con, sql)
-}
-
-#' @export
-db_create_index.MariaDBConnection <- db_create_index.MySQLConnection
-#' @export
-db_create_index.MySQL <- db_create_index.MySQLConnection
-
-#' @export
 db_analyze.MySQLConnection <- function(con, table, ...) {
   sql <- build_sql("ANALYZE TABLE ", as.sql(table), con = con)
   dbExecute(con, sql)
