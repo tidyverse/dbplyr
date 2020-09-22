@@ -153,10 +153,15 @@ test_that("mssql can compute() with temporary tables (#272)", {
 test_that("bit conversion works for important cases", {
   skip_if_no_db("mssql")
 
-  df <- tibble(x = 1:3, y = 3:1, bool = c(TRUE, FALSE, TRUE))
-  db <- copy_to(src_test("mssql"), df1, name = unique_table_name())
-
-  expect_equal(db %>% mutate(z = !bool) %>% pull(), c(FALSE, TRUE, FALSE))
+  df <- tibble(x = 1:3, y = 3:1)
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
   expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
+  expect_equal(db %>% filter(x == y) %>% pull(), 2)
+
+  df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  expect_equal(db %>% filter(x) %>% pull(), TRUE)
+  expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
+  expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
   expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(TRUE, TRUE, TRUE))
 })
