@@ -244,7 +244,7 @@ mssql_temp_name <- function(name, temporary) {
 `db_copy_to.Microsoft SQL Server` <- function(con, table, values,
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
+                            analyze = TRUE, ..., in_transaction = TRUE) {
   NextMethod(
     table = mssql_temp_name(table, temporary),
     types = types,

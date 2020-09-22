@@ -22,6 +22,10 @@
 #'   will create a new index.
 #' @param analyze if `TRUE` (the default), will automatically ANALYZE the
 #'   new table so that the query optimiser has useful information.
+#' @param in_transaction Should the table creation be wrapped in a transaction?
+#'   This typically makes things faster, but you may want to suppress if the
+#'   database doesn't support transactions, or you're wrapping in a transaction
+#'   higher up (and your database doesn't support nested transactions.)
 #' @inheritParams dplyr::copy_to
 #' @return A [tbl()] object (invisibly).
 #' @examples
@@ -44,7 +48,9 @@
 copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
+                            analyze = TRUE, ...,
+                            in_transaction = TRUE
+                            ) {
   assert_that(is_string(name), is.flag(temporary))
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
@@ -71,6 +77,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
       unique_indexes = unique_indexes,
       indexes = indexes,
       analyze = analyze,
+      in_transaction = in_transaction,
       ...
     )
 
@@ -96,7 +103,8 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 db_copy_to <-  function(con, table, values,
                         overwrite = FALSE, types = NULL, temporary = TRUE,
                         unique_indexes = NULL, indexes = NULL,
-                        analyze = TRUE, ...) {
+                        analyze = TRUE, ...,
+                        in_transaction = TRUE) {
   UseMethod("db_copy_to")
 }
 
@@ -104,12 +112,13 @@ db_copy_to <-  function(con, table, values,
 db_copy_to.DBIConnection <- function(con, table, values,
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
+                            analyze = TRUE, ...,
+                            in_transaction = TRUE) {
 
   types <- types %||% db_data_type(con, values)
   names(types) <- names(values)
 
-  with_transaction(con, {
+  with_transaction(con, in_transaction, {
     # Only remove if it exists; returns NA for MySQL
     if (overwrite && !is_false(db_has_table(con, table))) {
       db_drop_table(con, table, force = TRUE)
@@ -125,12 +134,16 @@ db_copy_to.DBIConnection <- function(con, table, values,
 }
 
 # Don't use `tryCatch()` because it messes with the callstack
-with_transaction <- function(con, code) {
-  db_begin(con)
-  on.exit(db_rollback(con))
+with_transaction <- function(con, in_transaction, code) {
+  if (in_transaction) {
+    db_begin(con)
+    on.exit(db_rollback(con))
+  }
 
   code
 
-  on.exit()
-  db_commit(con)
+  if (in_transaction) {
+    on.exit()
+    db_commit(con)
+  }
 }

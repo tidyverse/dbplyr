@@ -4,6 +4,9 @@
   (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
   simpler expressions.
 
+* `copy_to()` gains an `in_transaction` argument so you can optionally 
+  suppress the transaction wrapper (#368).
+
 * The join functions now error when additional arguments are provided
   (instead of silently swallowing them!) (#382).
 

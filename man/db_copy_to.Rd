@@ -32,7 +32,8 @@ db_copy_to(
   unique_indexes = NULL,
   indexes = NULL,
   analyze = TRUE,
-  ...
+  ...,
+  in_transaction = TRUE
 )
 }
 \description{

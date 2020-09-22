@@ -14,7 +14,8 @@
   unique_indexes = NULL,
   indexes = NULL,
   analyze = TRUE,
-  ...
+  ...,
+  in_transaction = TRUE
 )
 }
 \arguments{
@@ -49,6 +50,11 @@ will create a new index.}
 new table so that the query optimiser has useful information.}
 
 \item{...}{other parameters passed to methods.}
+
+\item{in_transaction}{Should the table creation be wrapped in a transaction?
+This typically makes things faster, but you may want to suppress if the
+database doesn't support transactions, or you're wrapping in a transaction
+higher up (and your database doesn't support nested transactions.)}
 }
 \value{
 A \code{\link[=tbl]{tbl()}} object (invisibly).
