@@ -193,7 +193,7 @@ importantly it allows us to simulate SQL generation for any database without
 actually connecting to it.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_dbi</span>(class = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+    <pre class="usage"><span class='fu'>simulate_dbi</span>(class = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>...</span>)
 
 <span class='fu'>simulate_access</span>()
 
@@ -203,7 +203,7 @@ actually connecting to it.</p>
 
 <span class='fu'>simulate_impala</span>()
 
-<span class='fu'>simulate_mssql</span>()
+<span class='fu'>simulate_mssql</span>(version = <span class='st'>"15.0"</span>)
 
 <span class='fu'>simulate_odbc</span>()
 
