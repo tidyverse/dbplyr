@@ -73,35 +73,22 @@ test_that("custom lubridate functions translated correctly", {
 
 # verb translation --------------------------------------------------------
 
-test_that("filter and mutate translate is.na correctly", {
+test_that("convert between bit and boolean as needed", {
   mf <- lazy_frame(x = 1, con = simulate_mssql())
 
-  expect_snapshot(mf %>% mutate(z = is.na(x)))
-  expect_snapshot(mf %>% mutate(z = !is.na(x)))
+  # No conversion
   expect_snapshot(mf %>% filter(is.na(x)))
-  expect_snapshot(mf %>% mutate(x = x == 1))
-  expect_snapshot(mf %>% mutate(x = x != 1))
-  expect_snapshot(mf %>% mutate(x = x > 1))
-  expect_snapshot(mf %>% mutate(x = x >= 1))
-  expect_snapshot(mf %>% mutate(x = !(x == 1)))
-  expect_snapshot(mf %>% mutate(x = !(x != 1)))
-  expect_snapshot(mf %>% mutate(x = !(x > 1)))
-  expect_snapshot(mf %>% mutate(x = !(x >= 1)))
-  expect_snapshot(mf %>% mutate(x = x > 4 & x < 5))
-  expect_snapshot(mf %>% filter(x > 4 & x < 5))
-  expect_snapshot(mf %>% mutate(x = x > 4 | x < 5))
-  expect_snapshot(mf %>% filter(x > 4 | x < 5))
-  expect_snapshot(mf %>% mutate(x = ifelse(x == 0, 0, 1)))
-})
+  expect_snapshot(mf %>% filter(!is.na(x)))
+  expect_snapshot(mf %>% filter(x == 1L || x == 2L))
+  expect_snapshot(mf %>% mutate(z = ifelse(x == 1L, 1L, 2L)))
+  expect_snapshot(mf %>% mutate(z = case_when(x == 1L ~ 1L)))
 
-test_that("Special ifelse and case_when cases return the correct queries", {
-  mf <- lazy_frame(x = 1, con = simulate_mssql())
-  expect_snapshot(mf %>% mutate(z = ifelse(x %in% c(1, 2), 0, 1)))
-  expect_snapshot(mf %>% mutate(z = case_when(
-    is.na(x) ~ 1,
-    !is.na(x) ~ 2,
-    TRUE ~ 3
-  )))
+  # Single conversion on outer layer
+  expect_snapshot(mf %>% mutate(z = !is.na(x)))
+  expect_snapshot(mf %>% mutate(x = x == 1L))
+  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L))
+  expect_snapshot(mf %>% mutate(x = x == 1L || x == 2L || x == 3L))
+  expect_snapshot(mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L)))
 })
 
 test_that("ORDER BY in subqueries uses TOP 9223372036854775807 (#337)", {
@@ -123,6 +110,12 @@ test_that("custom escapes translated correctly", {
   # expect_snapshot() also uses !!
   qry <- mf %>% filter(x %in% !!L)
   expect_snapshot(qry)
+})
+
+test_that("logical escaping depends on context", {
+  mf <- lazy_frame(x = "abc", con = simulate_mssql())
+  expect_snapshot(mf %>% filter(x == TRUE))
+  expect_snapshot(mf %>% mutate(x = TRUE))
 })
 
 
@@ -155,4 +148,25 @@ test_that("mssql can compute() with temporary tables (#272)", {
     df1 %>%
       mutate(x = x + 1L)
   )
+})
+
+test_that("bit conversion works for important cases", {
+  skip_if_no_db("mssql")
+
+  df <- tibble(x = 1:3, y = 3:1)
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
+  expect_equal(db %>% filter(x == y) %>% pull(), 2)
+
+  df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  expect_equal(db %>% filter(x == 1) %>% pull(), TRUE)
+  expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(1, 1, 1))
+
+  # Currently not supported: would need to determine that we have a bit
+  # vector in a boolean context, and convert to boolean with x == 1.
+  # expect_equal(db %>% mutate(z = x) %>% pull(), c(TRUE, FALSE, FALSE))
+  # expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
+  # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
+
 })

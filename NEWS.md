@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* MS SQL translation does better a distinguishing between bit and boolean 
+  (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
+  simpler expressions.
+
 * `substring()` is now translated the same way as `substr()` (#378).
 
 * `pmin()` and `pmax()` translations now have `na.rm` arguments (#479).

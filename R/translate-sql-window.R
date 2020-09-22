@@ -244,10 +244,13 @@ set_current_context <- function(context) {
 
 sql_current_context <- function() sql_context$context
 
-sql_current_select  <- function() sql_context$context %in% c("SELECT", "ORDER")
+local_context <- function(x, env = parent.frame()) {
+  old <- set_current_context(x)
+  withr::defer(set_current_context(old), envir = env)
+  invisible()
+}
 
 # Where translation -------------------------------------------------------
-
 
 uses_window_fun <- function(x, con) {
   if (is.null(x)) return(FALSE)

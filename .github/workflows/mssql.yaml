@@ -25,6 +25,7 @@ jobs:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_MSSQL: true
       RSPM: "https://demo.rstudiopm.com/all/__linux__/bionic/latest"
+      ODBCSYSINI: ${{ github.workspace }}/.github/odbc
 
     steps:
       - uses: actions/checkout@v2
@@ -63,19 +64,30 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      - name: Install SQL Server Driver
+      - name: Install SQL Server driver
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
           apt-get update
           ACCEPT_EULA=Y apt-get install -y msodbcsql17
+          sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE test;'
+          dpkg -L msodbcsql17
         shell: sudo bash {0}
+
+      - name: Check drivers
+        run: odbc::odbcListDrivers()
+        shell: Rscript {0}
 
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
         run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
 
       - name: Upload check results
         if: failure()
