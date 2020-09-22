@@ -7,6 +7,8 @@
   * `paste()` and `paste0()` use `||` (#458).
   
   * `as.numeric()` and `as.double()` cast to `FLOAT` (#408).
+  
+  * `substr()` and `str_sub()` use `SUBSTRING()` (#327).
 
 * `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
   of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).

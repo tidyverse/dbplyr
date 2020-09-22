@@ -9,6 +9,9 @@ test_that("string translations", {
   expect_error(translate_sql(str_replace("xx", ".", "a")), "not available")
   expect_equal(translate_sql(str_replace_all("xx", ".", "a")), sql("REGEXP_REPLACE('xx', '.', 'a')"))
 
+  expect_equal(translate_sql(substr(x, 2, 2)), sql("SUBSTRING(`x`, 2, 1)"))
+  expect_equal(translate_sql(str_sub(x, 2, -2)), sql("SUBSTRING(`x`, 2, LEN(`x`) - 2)"))
+
   expect_equal(translate_sql(paste("x", "y")), sql("'x' || ' ' || 'y'"))
   expect_equal(translate_sql(paste0("x", "y")), sql("'x' || 'y'"))
   expect_equal(translate_sql(str_c("x", "y")), sql("'x' || 'y'"))
