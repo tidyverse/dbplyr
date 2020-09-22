@@ -26,7 +26,7 @@ Sys.setenv("GITHUB_MSSQL" = "true")
 ```
 docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Password12' -t -i -p 1433:1433 microsoft/mssql-server-linux
 
-sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE testdb;'
+sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE test;'
 ```
 
 ## Connect
@@ -34,7 +34,7 @@ sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE testdb;'
 ```{r, eval = FALSE}
 con <- DBI::dbConnect(odbc::odbc(),
   driver = "ODBC Driver 17 for SQL Server",
-  database = "testdb",
+  database = "test",
   uid = "SA",
   pwd = "Password12",
   server = "localhost",

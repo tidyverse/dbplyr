@@ -15,7 +15,7 @@ if (test_srcs$length() == 0) {
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
     test_register_con("mssql", odbc::odbc(),
       driver = "ODBC Driver 17 for SQL Server",
-      database = "testdb",
+      database = "test",
       uid = "SA",
       pwd = "Password12",
       server = "localhost",
