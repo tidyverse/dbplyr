@@ -210,31 +210,26 @@ mssql_version <- function(con) {
     return(
       list(ProductVersion_Major = NULL,
            ProductVersion_Minor = NULL,
-           ProductVersion_Revision = NULL,
-           ProductVersion_Build = NULL)
+           ProductVersion_Revision = NULL)
     )
   } else {
     return(
-      mssql_interpret_version_string(DBI::dbGetInfo(con)$db.version)
+      mssql_interpret_version(DBI::dbGetInfo(con)$db.version)
     )
   }
 }
 
-mssql_interpret_version_string <- function(db_version) {
-  # returns list of MSSQL Server version numbers
+mssql_interpret_version <- function(db_version) {
+  # returns integer list of MSSQL Server version numbers
   # 'db_version' - character string. version numbers separated by periods '.'
   version_list <- unlist(strsplit(db_version, ".", fixed = TRUE))
   server_version <- list(
-    ProductVersion_Major = version_list[1],
-    ProductVersion_Minor = version_list[2],
-    ProductVersion_Revision = version_list[3]
+    ProductVersion_Major = as.integer(version_list[1]),
+    ProductVersion_Minor = as.integer(version_list[2]),
+    ProductVersion_Revision = as.integer(version_list[3])
+    # SQL Version 2008+ have a fourth number, 'Build'
+    # but currently DBI::dbGetInfo does not return the fourth number
   )
-  if (length(version) > 3) {
-    server_version$Build = version_list[4]
-  } else {
-    # SQL version 2000-2005 do not include Build numbers
-    server_version$Build = NULL
-  }
   return(server_version)
 }
 
