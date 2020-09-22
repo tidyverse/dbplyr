@@ -202,8 +202,7 @@ only visible to the current connection to the database.</p>
   unique_indexes = <span class='kw'>NULL</span>,
   indexes = <span class='kw'>NULL</span>,
   analyze = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>,
-  in_transaction = <span class='fl'>TRUE</span>
+  <span class='kw'>...</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -260,13 +259,6 @@ new table so that the query optimiser has useful information.</p></td>
     <tr>
       <th>...</th>
       <td><p>other parameters passed to methods.</p></td>
-    </tr>
-    <tr>
-      <th>in_transaction</th>
-      <td><p>Should the table creation be wrapped in a transaction?
-This typically makes things faster, but you may want to suppress if the
-database doesn't support transactions, or you're wrapping in a transaction
-higher up (and your database doesn't support nested transactions.)</p></td>
     </tr>
     </table>
 
