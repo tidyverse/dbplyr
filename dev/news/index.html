@@ -184,6 +184,8 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="https://rdrr.io/r/base/Extremes.html">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html">pmax()</a></code> translations now have <code>na.rm</code> arguments (<a href='https://github.com/tidyverse/dbplyr/issues/479'>#479</a>). All <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> and <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code> translations have <code>na.rm</code>. All warn on first use for consistency with <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and friends.</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> now generates a clear error message; previously it was translated to <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code> which is not correct (<a href='https://github.com/tidyverse/dbplyr/issues/108'>#108</a>).</p></li>
 <li><p>SQLite gains translations for lubridate functions <code>today()</code>, <code>now()</code>, <code>year()</code>, <code>month()</code>, <code>day()</code>, <code>hour()</code>, <code>minute()</code>, <code>second()</code>,<code>yday()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/262'>#262</a>).</p></li>
 <li><p>You can now use <code><a href="https://rdrr.io/r/base/ns-dblcolon.html">::</a></code> in translations, so that (e.g.) <code><a href="https://dplyr.tidyverse.org/reference/context.html">dbplyr::n()</a></code> is translated to <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/207'>#207</a>).</p></li>
 <li>

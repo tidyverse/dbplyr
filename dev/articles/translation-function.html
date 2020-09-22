@@ -222,7 +222,7 @@
 <div id="modulo-arithmetic" class="section level2">
 <h2 class="hasAnchor">
 <a href="#modulo-arithmetic" class="anchor"></a>Modulo arithmetic</h2>
-<p>dbplyr translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> and <code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> to their SQL equivalents but note that they are not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
+<p>dbplyr translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> to the SQL equivalents but note that it’s not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="kw">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
   x = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">10L</span>, <span class="fl">10L</span>, <span class="op">-</span><span class="fl">10L</span>, <span class="op">-</span><span class="fl">10L</span>), 
@@ -230,25 +230,25 @@
 )
 <span class="kw">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span>(<span class="kw">df</span>)
 
-<span class="kw">df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">x</span> <span class="op">%%</span> <span class="kw">y</span>, <span class="kw">x</span> <span class="op">%/%</span> <span class="kw">y</span>)
-<span class="co">#&gt; # A tibble: 4 x 4</span>
-<span class="co">#&gt;       x     y `x%%y` `x%/%y`</span>
-<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span>
-<span class="co">#&gt; 1    10     3      1       3</span>
-<span class="co">#&gt; 2    10    -3     -2      -4</span>
-<span class="co">#&gt; 3   -10     3      2      -4</span>
-<span class="co">#&gt; 4   -10    -3     -1       3</span>
-
-<span class="kw">mf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">x</span> <span class="op">%%</span> <span class="kw">y</span>, <span class="kw">x</span> <span class="op">%/%</span> <span class="kw">y</span>)
-<span class="co">#&gt; # Source:   lazy query [?? x 4]</span>
+<span class="kw">df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">x</span> <span class="op">%%</span> <span class="kw">y</span>)
+<span class="co">#&gt; # A tibble: 4 x 3</span>
+<span class="co">#&gt;       x     y `x%%y`</span>
+<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span class="co">#&gt; 1    10     3      1</span>
+<span class="co">#&gt; 2    10    -3     -2</span>
+<span class="co">#&gt; 3   -10     3      2</span>
+<span class="co">#&gt; 4   -10    -3     -1</span>
+<span class="kw">mf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">x</span> <span class="op">%%</span> <span class="kw">y</span>)
+<span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
 <span class="co">#&gt; # Database: sqlite 3.30.1 [:memory:]</span>
-<span class="co">#&gt;       x     y `x%%y` `x%/%y`</span>
-<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;</span>
-<span class="co">#&gt; 1    10     3      1       3</span>
-<span class="co">#&gt; 2    10    -3      1      -3</span>
-<span class="co">#&gt; 3   -10     3     -1      -3</span>
-<span class="co">#&gt; 4   -10    -3     -1       3</span>
+<span class="co">#&gt;       x     y `x%%y`</span>
+<span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span class="co">#&gt; 1    10     3      1</span>
+<span class="co">#&gt; 2    10    -3      1</span>
+<span class="co">#&gt; 3   -10     3     -1</span>
+<span class="co">#&gt; 4   -10    -3     -1</span>
 </pre></div>
+<p>dbplyr no longer translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> because there’s no robust cross-database translation available.</p>
 <div id="logical-comparisons" class="section level3">
 <h3 class="hasAnchor">
 <a href="#logical-comparisons" class="anchor"></a>Logical comparisons</h3>
