@@ -262,4 +262,4 @@ sql_cot <- function(){
   }
 }
 
-globalVariables(c("%as%", "cast", "ln"))
+globalVariables(c("%as%", "cast", "ln", "try_cast"))
