@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New RedShift translations when used with `RPostgres::Redshift()`.
+
 * `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
   of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
 

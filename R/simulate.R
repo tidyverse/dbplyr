@@ -67,6 +67,10 @@ simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
 
 #' @export
 #' @rdname simulate_dbi
+simulate_redshift <- function() simulate_dbi("RedshiftConnection")
+
+#' @export
+#' @rdname simulate_dbi
 simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
 #' @export

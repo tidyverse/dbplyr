@@ -147,8 +147,6 @@ sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
 #' @export
 sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
 
-#' @export
-sql_translate_env.Redshift <- sql_translate_env.PostgreSQLConnection
 
 
 # DBI methods ------------------------------------------------------------------

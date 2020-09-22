@@ -10,6 +10,7 @@
 \alias{simulate_odbc}
 \alias{simulate_oracle}
 \alias{simulate_postgres}
+\alias{simulate_redshift}
 \alias{simulate_sqlite}
 \alias{simulate_teradata}
 \title{Simulate database connections}
@@ -31,6 +32,8 @@ simulate_odbc()
 simulate_oracle()
 
 simulate_postgres()
+
+simulate_redshift()
 
 simulate_sqlite()
 
