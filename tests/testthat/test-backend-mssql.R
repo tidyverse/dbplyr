@@ -128,20 +128,29 @@ test_that("custom escapes translated correctly", {
 # SQL server version string translation -----------------------------------
 
 test_that("sql $db.version string translation", {
-  expect_equal(mssql_interpret_version("12.00.2000"),
-               list(ProductVersion_Major = 12,
-                    ProductVersion_Minor = 0,
-                    ProductVersion_Revision = 2000)
+  expect_equal(
+    mssql_interpret_version("12.00.2000"),
+    list(
+      ProductVersion_Major = 12,
+      ProductVersion_Minor = 0,
+      ProductVersion_Revision = 2000
+    )
   )
-  expect_equal(mssql_interpret_version("10.50.6529"),
-               list(ProductVersion_Major = 10,
-                    ProductVersion_Minor = 50,
-                    ProductVersion_Revision = 6529)
+  expect_equal(
+    mssql_interpret_version("10.50.6529"),
+    list(
+      ProductVersion_Major = 10,
+      ProductVersion_Minor = 50,
+      ProductVersion_Revision = 6529
+    )
   )
-  expect_equal(mssql_interpret_version("9.00.4340"),
-               list(ProductVersion_Major = 9,
-                    ProductVersion_Minor = 0,
-                    ProductVersion_Revision = 4340)
+  expect_equal(
+    mssql_interpret_version("9.00.4340"),
+    list(
+      ProductVersion_Major = 9,
+      ProductVersion_Minor = 0,
+      ProductVersion_Revision = 4340
+    )
   )
 })
 

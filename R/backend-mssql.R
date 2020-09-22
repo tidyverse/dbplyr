@@ -152,24 +152,25 @@
       },
     )
 
-  if (any(mssql_version(con)$ProductVersion_Major >= 11,
-          is.null(mssql_version(con)$ProductVersion_Major))) {
+  if (any(
+    mssql_version(con)$ProductVersion_Major >= 11,
+    is.null(mssql_version(con)$ProductVersion_Major)
+  )) {
     # version 11 equates to MSSQL 2012.
     # mssql_version returns list of NULLs if con is defined by 'testthat'
-    mssql_scalar <- sql_translator(.parent = mssql_scalar,
-                                   as.logical    = sql_try_cast("BIT"),
-
-                                   as.Date       = sql_try_cast("DATE"),
-                                   as.POSIXct    = sql_try_cast("TIMESTAMP"),
-                                   as.numeric    = sql_try_cast("FLOAT"),
-                                   as.double     = sql_try_cast("FLOAT"),
-                                   as.integer    = sql_try_cast("NUMERIC"),
-                                   # in MSSQL, NUMERIC converts to integer
-                                   as.integer64  = sql_try_cast("BIGINT"),
-                                   as.character  = sql_try_cast("VARCHAR(MAX)"),
-
-                                   as_date = sql_try_cast("DATE"),
-                                   as_datetime = sql_try_cast("DATETIME2")
+    mssql_scalar <- sql_translator(
+      .parent = mssql_scalar,
+      as.logical = sql_try_cast("BIT"),
+      as.Date = sql_try_cast("DATE"),
+      as.POSIXct = sql_try_cast("TIMESTAMP"),
+      as.numeric = sql_try_cast("FLOAT"),
+      as.double = sql_try_cast("FLOAT"),
+      as.integer = sql_try_cast("NUMERIC"),
+      # in MSSQL, NUMERIC converts to integer
+      as.integer64 = sql_try_cast("BIGINT"),
+      as.character = sql_try_cast("VARCHAR(MAX)"),
+      as_date = sql_try_cast("DATE"),
+      as_datetime = sql_try_cast("DATETIME2")
     )
   }
 
@@ -208,9 +209,11 @@ mssql_version <- function(con) {
     # this should not happen with normal usage
     # during 'testthat', an invalid 'con' object is used
     return(
-      list(ProductVersion_Major = NULL,
-           ProductVersion_Minor = NULL,
-           ProductVersion_Revision = NULL)
+      list(
+        ProductVersion_Major = NULL,
+        ProductVersion_Minor = NULL,
+        ProductVersion_Revision = NULL
+      )
     )
   } else {
     return(
