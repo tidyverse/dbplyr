@@ -39,7 +39,7 @@ sql_translate_env.SQLiteConnection <- function(con) {
     ),
     sql_translator(.parent = base_agg,
       sd = sql_aggregate("STDEV", "sd"),
-      median = sql_prefix("MEDIAN"),
+      median = sql_aggregate("MEDIAN"),
     ),
     if (sqlite_version() >= "3.25") {
       sql_translator(.parent = base_win,
