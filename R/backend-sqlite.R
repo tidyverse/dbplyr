@@ -35,15 +35,16 @@ sql_translate_env.SQLiteConnection <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_prefix("MIN"),
-      pmax = sql_prefix("MAX"),
-
+      pmax = sql_prefix("MAX")
     ),
     sql_translator(.parent = base_agg,
-      sd = sql_aggregate("STDEV", "sd")
+      sd = sql_aggregate("STDEV", "sd"),
+      median = sql_prefix("MEDIAN"),
     ),
     if (sqlite_version() >= "3.25") {
       sql_translator(.parent = base_win,
-        sd = win_aggregate("STDEV")
+        sd = win_aggregate("STDEV"),
+        median = win_absent("median")
       )
     } else {
       base_no_win
