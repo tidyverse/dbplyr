@@ -554,10 +554,7 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
 
 #' @export
 db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
-  sql <- build_sql(
-    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
-    con = con
-  )
+  sql <- sql_drop_table(con, table, force = force, ...)
   dbExecute(con, sql)
 }
 
@@ -602,7 +599,8 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 #' SQL generation methods for database methods
 #'
 #' * `explain()` -> `db_explain` -> `sql_explain()`
-#' * `db_copy_to()` -> `sql_analyze()` -> `sql_analyze()`
+#' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
+#' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -630,6 +628,19 @@ sql_analyze.DBIConnection <- function(con, table, ...) {
   build_sql("ANALYZE ", as.sql(table), con = con)
 }
 
+#' @rdname db_sql
+#' @export
+sql_drop_table <- function(con, table, force = FALSE, ...) {
+  UseMethod("sql_drop_table")
+}
+
+#' @export
+sql_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
+  build_sql(
+    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
+    con = con
+  )
+}
 
 # Utility functions ------------------------------------------------------------
 

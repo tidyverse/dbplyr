@@ -84,3 +84,15 @@ test_that("default raw escapes translated correctly", {
   expect_snapshot(qry)
 })
 
+
+# DDL ---------------------------------------------------------------------
+
+test_that("DDL operations generate expected SQL", {
+  con <- simulate_dbi()
+
+  expect_snapshot(sql_analyze(con, ident("table")))
+  expect_snapshot(sql_explain(con, sql("SELECT * FROM foo")))
+
+  expect_snapshot(sql_drop_table(con, ident("table")))
+  expect_snapshot(sql_drop_table(con, ident("table"), force = TRUE))
+})

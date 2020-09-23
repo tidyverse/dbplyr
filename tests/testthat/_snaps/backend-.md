@@ -28,3 +28,31 @@
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 
+# DDL operations generate expected SQL
+
+    Code
+      sql_analyze(con, ident("table"))
+    Output
+      <SQL> ANALYZE `table`
+
+---
+
+    Code
+      sql_explain(con, sql("SELECT * FROM foo"))
+    Output
+      <SQL> EXPLAIN SELECT * FROM foo
+
+---
+
+    Code
+      sql_drop_table(con, ident("table"))
+    Output
+      <SQL> DROP TABLE `table`
+
+---
+
+    Code
+      sql_drop_table(con, ident("table"), force = TRUE)
+    Output
+      <SQL> DROP TABLE IF EXISTS `table`
+

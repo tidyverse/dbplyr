@@ -4,16 +4,20 @@
 \alias{db_sql}
 \alias{sql_explain}
 \alias{sql_analyze}
+\alias{sql_drop_table}
 \title{SQL generation methods for database methods}
 \usage{
 sql_explain(con, sql, ...)
 
 sql_analyze(con, table, ...)
+
+sql_drop_table(con, table, force = FALSE, ...)
 }
 \description{
 \itemize{
 \item \code{explain()} -> \code{db_explain} -> \code{sql_explain()}
-\item \code{db_copy_to()} -> \code{sql_analyze()} -> \code{sql_analyze()}
+\item \code{db_copy_to(analyze = TRUE)} -> \code{sql_analyze()} -> \code{sql_analyze()}
+\item \code{db_copy_to(overwrite = TRUE)} -> \code{db_drop_table()} -> \code{sql_drop_table()}
 }
 }
 \keyword{internal}

@@ -79,20 +79,18 @@ sql_subquery.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
 }
 
 #' @export
-db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
+sql_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
   if (force) {
     # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
-    sql <- build_sql(
-      "BEGIN ",
-      "EXECUTE IMMEDIATE 'DROP TABLE ", ident(table), "';",
-      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; ",
+    build_sql(
+      "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ", as.sql(table), "';\n",
+      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF;\n",
       "END;",
       con = con
     )
   } else {
-    sql <- build_sql("DROP TABLE ", ident(table), con = con)
+    build_sql("DROP TABLE ", as.sql(table), con = con)
   }
-  DBI::dbExecute(con, sql)
 }
 
 # registered onLoad located in the zzz.R script
@@ -117,7 +115,7 @@ sql_analyze.OraConnection <- sql_analyze.Oracle
 sql_subquery.OraConnection <- sql_subquery.Oracle
 
 #' @export
-db_drop_table.OraConnection <- db_drop_table.Oracle
+sql_drop_table.OraConnection <- sql_drop_table.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle
