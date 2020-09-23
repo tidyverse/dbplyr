@@ -79,29 +79,11 @@ db_insert_into.DBIConnection <- function(con, table, values, ...) {
   dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
 }
 
-#' @export
-db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
-                                            unique = FALSE, ...) {
-  if (is.null(indexes)) return()
-  assert_that(is.list(indexes))
-
-  for (index in indexes) {
-    db_create_index(con, table, index, unique = unique, ...)
-  }
-}
 
 #' @export
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
-  assert_that(is_string(table), is.character(columns))
-
-  name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  sql <- build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
-    " ON ", as.sql(table), " ", fields,
-    con = con)
-
+  sql <- sql_create_index(con, table, columns, name = name, unique = unique, ...)
   dbExecute(con, sql)
 }
 

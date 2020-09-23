@@ -125,13 +125,23 @@ db_copy_to.DBIConnection <- function(con, table, values,
     }
 
     table <- db_write_table(con, table, types = types, values = values, temporary = temporary)
-    db_create_indexes(con, table, unique_indexes, unique = TRUE)
-    db_create_indexes(con, table, indexes, unique = FALSE)
+    create_indexes(con, table, unique_indexes, unique = TRUE)
+    create_indexes(con, table, indexes, unique = FALSE)
     if (analyze) db_analyze(con, table)
   })
 
   table
 }
+
+create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
+  if (is.null(indexes)) return()
+  assert_that(is.list(indexes))
+
+  for (index in indexes) {
+    db_create_index(con, table, index, unique = unique, ...)
+  }
+}
+
 
 # Don't use `tryCatch()` because it messes with the callstack
 with_transaction <- function(con, in_transaction, code) {

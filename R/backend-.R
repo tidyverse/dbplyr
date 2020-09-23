@@ -443,6 +443,7 @@ base_no_win <- sql_translator(
 #' * `explain()` -> `db_explain` -> `sql_explain()`
 #' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
 #' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
+#' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -490,3 +491,21 @@ sql_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
   )
 }
 
+#' @rdname db_sql
+#' @export
+sql_create_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+  UseMethod("sql_create_index")
+}
+#' @export
+sql_create_index.DBIConnection <- function(con, table, columns, name = NULL,
+                                           unique = FALSE, ...) {
+  assert_that(is_string(table), is.character(columns))
+
+  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
+  fields <- escape(ident(columns), parens = TRUE, con = con)
+  build_sql(
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
+    " ON ", as.sql(table), " ", fields,
+    con = con
+  )
+}

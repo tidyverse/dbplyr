@@ -74,4 +74,7 @@ test_that("DDL operations generate expected SQL", {
 
   expect_snapshot(sql_subquery(con, ident("table")))
   expect_snapshot(sql_subquery(con, sql("SELECT * FROM foo")))
+
+  expect_snapshot(sql_create_index(con, ident("table"), c("a", "b")))
+  expect_snapshot(sql_create_index(con, ident("table"), "c", unique = TRUE))
 })

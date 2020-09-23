@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `db_create_indexes()` generic is no longer used.
+
 * MySQL uses standard SQL for index creation.
 
 * MS SQL translation does better a distinguishing between bit and boolean 

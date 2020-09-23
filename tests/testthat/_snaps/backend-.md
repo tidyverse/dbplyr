@@ -70,3 +70,17 @@
     Output
       <SQL> (SELECT * FROM foo) `q02`
 
+---
+
+    Code
+      sql_create_index(con, ident("table"), c("a", "b"))
+    Output
+      <SQL> CREATE INDEX `table_a_b` ON `table` (`a`, `b`)
+
+---
+
+    Code
+      sql_create_index(con, ident("table"), "c", unique = TRUE)
+    Output
+      <SQL> CREATE UNIQUE INDEX `table_c` ON `table` (`c`)
+

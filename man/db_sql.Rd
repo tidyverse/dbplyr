@@ -5,6 +5,7 @@
 \alias{sql_explain}
 \alias{sql_analyze}
 \alias{sql_drop_table}
+\alias{sql_create_index}
 \title{SQL generation methods for database methods}
 \usage{
 sql_explain(con, sql, ...)
@@ -12,12 +13,15 @@ sql_explain(con, sql, ...)
 sql_analyze(con, table, ...)
 
 sql_drop_table(con, table, force = FALSE, ...)
+
+sql_create_index(con, table, columns, name = NULL, unique = FALSE, ...)
 }
 \description{
 \itemize{
 \item \code{explain()} -> \code{db_explain} -> \code{sql_explain()}
 \item \code{db_copy_to(analyze = TRUE)} -> \code{sql_analyze()} -> \code{sql_analyze()}
 \item \code{db_copy_to(overwrite = TRUE)} -> \code{db_drop_table()} -> \code{sql_drop_table()}
+\item \code{db_copy_to(indexes = ...)} -> \code{db_create_index()} -> \code{sql_create_index()}
 }
 }
 \keyword{internal}
