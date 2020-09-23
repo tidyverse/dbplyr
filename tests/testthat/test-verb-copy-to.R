@@ -41,7 +41,14 @@ test_that("only overwrite existing table if explicitly requested", {
 test_that("can create a new table in non-default schema", {
   con <- sqlite_con_with_aux()
   on.exit(DBI::dbDisconnect(con))
-  aux_mtcars <- copy_to(con, mtcars, in_schema("aux", "mtcars"), temporary = FALSE)
 
-  expect_equal(tbl_vars(aux_mtcars), tbl_vars(mtcars))
+  df1 <- tibble(x = 1)
+  df2 <- tibble(x = 2)
+
+  db1 <- copy_to(con, df1, in_schema("aux", "df"), temporary = FALSE)
+  expect_equal(collect(db1), df1)
+
+  # And can overwrite
+  db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
+  expect_equal(collect(db2), df2)
 })

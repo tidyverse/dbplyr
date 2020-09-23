@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Can now `copy_to()` can now `overwrite` when table is specified with schema 
+  (#489).
+
 * A number of `db_*` generics have been replaced with SQL generation generics:
   `sql_analyze()`, `sql_create_index()`, `sql_explain()`, `sql_drop_table()`,
   `sql_save_query()`. This makes them easier to test is part of the process

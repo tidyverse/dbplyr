@@ -23,7 +23,12 @@ test_that("can explain", {
 })
 
 test_that("can overwrite temp tables", {
-  src <- src_test("MariaDB")
-  copy_to(src, mtcars, "mtcars", overwrite = TRUE)
-  expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
+  con <- src_test("MariaDB")
+
+  df1 <- tibble(x = 1)
+  copy_to(con, df1, "test-df", temporary = TRUE)
+
+  df2 <- tibble(x = 2)
+  db2 <- copy_to(con, df2, "test-df", temporary = TRUE, overwrite = TRUE)
+  expect_equal(collect(db2), df2)
 })

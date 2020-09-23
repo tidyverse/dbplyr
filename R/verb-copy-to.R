@@ -119,12 +119,12 @@ db_copy_to.DBIConnection <- function(con, table, values,
   names(types) <- names(values)
 
   with_transaction(con, in_transaction, {
-    # Only remove if it exists; returns NA for MySQL
-    if (overwrite && !is_false(dbExistsTable(con, table))) {
-      db_drop_table(con, table, force = TRUE)
-    }
-
-    table <- db_write_table(con, table, types = types, values = values, temporary = temporary)
+    table <- db_write_table(con, table,
+      types = types,
+      values = values,
+      temporary = temporary,
+      overwrite = overwrite
+    )
     create_indexes(con, table, unique_indexes, unique = TRUE)
     create_indexes(con, table, indexes, unique = FALSE)
     if (analyze) db_analyze(con, table)

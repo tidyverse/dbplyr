@@ -19,13 +19,14 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
 }
 
 #' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
   dbWriteTable(
     con,
     name = dbi_quote(as.sql(table), con),
     value = values,
     field.types = types,
     temporary = temporary,
+    overwrite = overwrite,
     row.names = FALSE
   )
 
