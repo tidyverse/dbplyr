@@ -56,3 +56,17 @@
     Output
       <SQL> DROP TABLE IF EXISTS `table`
 
+---
+
+    Code
+      sql_subquery(con, ident("table"))
+    Output
+      <IDENT> table
+
+---
+
+    Code
+      sql_subquery(con, sql("SELECT * FROM foo"))
+    Output
+      <SQL> (SELECT * FROM foo) `q02`
+

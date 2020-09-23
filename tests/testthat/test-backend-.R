@@ -1,23 +1,4 @@
-test_that("db_write_table calls dbQuoteIdentifier on table name" ,{
-  idents <- character()
-
-  setClass("DummyDBIConnection", representation("DBIConnection"))
-  setMethod("dbQuoteIdentifier", c("DummyDBIConnection", "character"),
-    function(conn, x, ...) {
-      idents <<- c(idents, x)
-    }
-  )
-
-  setMethod("dbWriteTable", c("DummyDBIConnection", "character", "ANY"),
-    function(conn, name, value, ...) {TRUE}
-  )
-
-  dummy_con <- new("DummyDBIConnection")
-  db_write_table(dummy_con, "somecrazytablename", NA, NA)
-  expect_true("somecrazytablename" %in% idents)
-})
-
-# basic arithmetic --------------------------------------------------------
+# mathematics --------------------------------------------------------
 
 test_that("basic arithmetic is correct", {
   expect_equal(translate_sql(1 + 2), sql("1.0 + 2.0"))
@@ -31,8 +12,6 @@ test_that("basic arithmetic is correct", {
 test_that("small numbers aren't converted to 0", {
   expect_equal(translate_sql(1e-9), sql("1e-09"))
 })
-
-# minus -------------------------------------------------------------------
 
 test_that("unary minus flips sign of number", {
   expect_equal(translate_sql(-10L), sql("-10"))
@@ -49,8 +28,6 @@ test_that("binary minus subtracts", {
   expect_equal(translate_sql(1L - 10L), sql("1 - 10"))
 })
 
-# log ---------------------------------------------------------------------
-
 test_that("log base comes first", {
   expect_equal(translate_sql(log(x, 10)), sql('LOG(10.0, `x`)'))
 })
@@ -59,7 +36,7 @@ test_that("log becomes ln", {
   expect_equal(translate_sql(log(x)), sql('LN(`x`)'))
 })
 
-# bitwise -----------------------------------------------------------------
+# binary/bitwise ---------------------------------------------------------------
 
 test_that("bitwise operations", {
   expect_equal(translate_sql(bitwNot(x)),        sql("~(`x`)"))
@@ -84,7 +61,6 @@ test_that("default raw escapes translated correctly", {
   expect_snapshot(qry)
 })
 
-
 # DDL ---------------------------------------------------------------------
 
 test_that("DDL operations generate expected SQL", {
@@ -95,4 +71,7 @@ test_that("DDL operations generate expected SQL", {
 
   expect_snapshot(sql_drop_table(con, ident("table")))
   expect_snapshot(sql_drop_table(con, ident("table"), force = TRUE))
+
+  expect_snapshot(sql_subquery(con, ident("table")))
+  expect_snapshot(sql_subquery(con, sql("SELECT * FROM foo")))
 })
