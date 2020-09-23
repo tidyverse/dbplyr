@@ -45,6 +45,12 @@ test_that("custom window functions translated correctly", {
   expect_error(translate_sql(cov(x)), "not supported")
 })
 
+test_that("generates custom sql", {
+  con <- simulate_teradata()
+
+  expect_snapshot(sql_analyze(con, ident("table")))
+})
+
 # verb translation --------------------------------------------------------
 
 test_that("head translated to TOP", {

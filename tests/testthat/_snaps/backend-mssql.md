@@ -151,3 +151,10 @@
       SELECT 1 AS `x`
       FROM `df`
 
+# generates custom sql
+
+    Code
+      sql_analyze(con, ident("table"))
+    Output
+      <SQL> UPDATE STATISTICS `table`
+

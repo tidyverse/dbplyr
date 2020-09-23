@@ -27,14 +27,12 @@ sql_translate_env.Hive <- function(con) {
 }
 
 #' @export
-db_analyze.Hive <- function(con, table, ...) {
-  # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  sql <- build_sql(
-    "ANALYZE TABLE ",
-    as.sql(table),
-    " COMPUTE STATISTICS"
-    , con = con)
-  DBI::dbExecute(con, sql)
+sql_analyze.Hive <- function(con, table, ...) {
+  # https://cwiki.apache.org/confluence/display/Hive/StatsDev
+  build_sql(
+    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
+    con = con
+  )
 }
 
 globalVariables("regexp_replace")

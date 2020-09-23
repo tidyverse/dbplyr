@@ -118,6 +118,12 @@ test_that("logical escaping depends on context", {
   expect_snapshot(mf %>% mutate(x = TRUE))
 })
 
+test_that("generates custom sql", {
+  con <- simulate_mssql()
+
+  expect_snapshot(sql_analyze(con, ident("table")))
+})
+
 
 # Live database -----------------------------------------------------------
 

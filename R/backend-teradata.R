@@ -85,15 +85,9 @@ sql_translate_env.Teradata <- function(con) {
   )}
 
 #' @export
-db_analyze.Teradata <- function(con, table, ...) {
-  # Using COLLECT STATISTICS instead of ANALYZE as recommended in this article
+sql_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
-  sql <- build_sql(
-    "COLLECT STATISTICS ",
-    ident(table)
-    , con = con
-  )
-  DBI::dbExecute(con, sql)
+  build_sql("COLLECT STATISTICS ", as.sql(table) , con = con)
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR"))

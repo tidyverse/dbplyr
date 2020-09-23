@@ -3,13 +3,17 @@
 \name{db_sql}
 \alias{db_sql}
 \alias{sql_explain}
+\alias{sql_analyze}
 \title{SQL generation methods for database methods}
 \usage{
 sql_explain(con, sql, ...)
+
+sql_analyze(con, table, ...)
 }
 \description{
 \itemize{
 \item \code{explain()} -> \code{db_explain} -> \code{sql_explain()}
+\item \code{db_copy_to()} -> \code{sql_analyze()} -> \code{sql_analyze()}
 }
 }
 \keyword{internal}

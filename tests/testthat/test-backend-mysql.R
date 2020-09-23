@@ -3,6 +3,13 @@ test_that("use CHAR type for as.character", {
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
 })
 
+test_that("generates custom sql", {
+  con <- simulate_mysql()
+
+  expect_snapshot(sql_analyze(con, ident("table")))
+  expect_snapshot(sql_explain(con, sql("SELECT * FROM table")))
+})
+
 # live database -----------------------------------------------------------
 
 test_that("logicals converted to integer correctly", {

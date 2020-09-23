@@ -1,3 +1,17 @@
+# generates custom sql
+
+    Code
+      sql_analyze(con, ident("table"))
+    Output
+      <SQL> ANALYZE TABLE `table`
+
+---
+
+    Code
+      sql_explain(con, sql("SELECT * FROM table"))
+    Output
+      <SQL> EXPLAIN SELECT * FROM table
+
 # can explain
 
     Code

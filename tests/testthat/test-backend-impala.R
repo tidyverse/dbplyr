@@ -15,3 +15,9 @@ test_that("custom bitwise operations translated correctly", {
   expect_equal(translate_sql(bitwShiftL(x, 2L)), sql("SHIFTLEFT(`x`, 2)"))
   expect_equal(translate_sql(bitwShiftR(x, 2L)), sql("SHIFTRIGHT(`x`, 2)"))
 })
+
+test_that("generates custom sql", {
+  con <- simulate_impala()
+
+  expect_snapshot(sql_analyze(con, ident("table")))
+})

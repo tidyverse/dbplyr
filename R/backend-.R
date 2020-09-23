@@ -563,7 +563,10 @@ db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
 
 #' @export
 db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE ", as.sql(table), con = con)
+  sql <- sql_analyze(con, table, ...)
+  if (is.null(sql)) {
+    return()
+  }
   dbExecute(con, sql)
 }
 
@@ -599,6 +602,7 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 #' SQL generation methods for database methods
 #'
 #' * `explain()` -> `db_explain` -> `sql_explain()`
+#' * `db_copy_to()` -> `sql_analyze()` -> `sql_analyze()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -613,6 +617,17 @@ sql_explain <- function(con, sql, ...) {
 #' @export
 sql_explain.DBIConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
+}
+
+#' @rdname db_sql
+#' @export
+sql_analyze <- function(con, table, ...) {
+  UseMethod("sql_analyze")
+}
+
+#' @export
+sql_analyze.DBIConnection <- function(con, table, ...) {
+  build_sql("ANALYZE ", as.sql(table), con = con)
 }
 
 

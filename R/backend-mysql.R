@@ -140,15 +140,14 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
 }
 
 #' @export
-db_analyze.MySQLConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE TABLE ", as.sql(table), con = con)
-  dbExecute(con, sql)
+sql_analyze.MySQLConnection <- function(con, table, ...) {
+  build_sql("ANALYZE TABLE ", as.sql(table), con = con)
 }
 
 #' @export
-db_analyze.MariaDBConnection <- db_analyze.MySQLConnection
+sql_analyze.MariaDBConnection <- sql_analyze.MySQLConnection
 #' @export
-db_analyze.MySQL <- db_analyze.MySQLConnection
+sql_analyze.MySQL <- sql_analyze.MySQLConnection
 
 # SQL methods -------------------------------------------------------------
 

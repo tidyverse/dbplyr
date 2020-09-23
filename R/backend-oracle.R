@@ -63,13 +63,9 @@ sql_explain.Oracle <- function(con, sql, ...) {
 }
 
 #' @export
-db_analyze.Oracle <- function(con, table, ...) {
+sql_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  sql <- dbplyr::build_sql(
-    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
-    con = con
-  )
-  DBI::dbExecute(con, sql)
+  build_sql("ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS", con = con)
 }
 
 #' @export
@@ -115,7 +111,7 @@ sql_translate_env.OraConnection <- sql_translate_env.Oracle
 sql_select.OraConnection <- sql_select.Oracle
 
 #' @export
-db_analyze.OraConnection <- db_analyze.Oracle
+sql_analyze.OraConnection <- sql_analyze.Oracle
 
 #' @export
 sql_subquery.OraConnection <- sql_subquery.Oracle
