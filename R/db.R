@@ -13,12 +13,8 @@ db_data_type.DBIConnection <- function(con, fields) {
 #' @export
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
                                         ...) {
-  tt_sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(name), " AS ", sql,
-    con = con
-  )
-  dbExecute(con, tt_sql, immediate = TRUE)
+  sql <- sql_save_query(con, sql, name, temporary = temporary, ...)
+  dbExecute(con, sql, immediate = TRUE)
   name
 }
 

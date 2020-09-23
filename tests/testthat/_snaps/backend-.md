@@ -84,3 +84,11 @@
     Output
       <SQL> CREATE UNIQUE INDEX `table_c` ON `table` (`c`)
 
+---
+
+    Code
+      sql_save_query(con, ident("table"), sql("SELECT * FROM foo"))
+    Output
+      <SQL> CREATE TEMPORARY TABLE 
+      SELECT * FROM foo AS `table`
+

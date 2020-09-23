@@ -122,34 +122,19 @@ test_that("generates custom sql", {
   con <- simulate_mssql()
 
   expect_snapshot(sql_analyze(con, ident("table")))
+  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("table")))
+  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("#table")))
+  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE))
 })
-
 
 # Live database -----------------------------------------------------------
 
-test_that("mssql can copy_to() with temporary tables (#272)", {
-  df1 <- tibble(x = 1:3)
+test_that("can copy_to() and compute() with temporary tables (#272)", {
+  df <- tibble(x = 1:3)
+  db <- copy_to(src_test("mssql"), df, name = "temp", temporary = TRUE)
 
-  expect_equal(
-    src_test("mssql") %>%
-      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
-      collect(),
-    df1
-  )
-})
-
-test_that("mssql can compute() with temporary tables (#272)", {
-  df1 <- tibble(x = 1:3)
-
-  expect_equal(
-    src_test("mssql") %>%
-      copy_to(df1, name = unique_table_name(), temporary = TRUE) %>%
-      mutate(x = x + 1L) %>%
-      compute(temporary = TRUE) %>%
-      collect(),
-    df1 %>%
-      mutate(x = x + 1L)
-  )
+  expect_equal(db %>% pull(), 1:3)
+  expect_equal(db %>% mutate(y = x + 1) %>% compute() %>% pull(), 2:4)
 })
 
 test_that("bit conversion works for important cases", {

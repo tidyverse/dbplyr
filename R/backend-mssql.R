@@ -221,21 +221,22 @@ mssql_version <- function(con) {
   build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
 }
 
-
 # Temporary tables --------------------------------------------------------
 # SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 
-
-mssql_temp_name <- function(name, temporary) {
-  if (temporary && substr(name, 1, 1) != "#") {
+mssql_table_rename <- function(name, temporary) {
+  if (!temporary || substr(name, 1, 1) == "#") {
+    name
+  } else {
     name <- paste0("#", name)
-    inform(paste0("Created a temporary table named: ", name),
+    inform(
+      paste0("Created a temporary table named ", name),
       class = c("dbplyr_message_temp_table", "dbplyr_message")
     )
+    name
   }
-  name
 }
 
 #' @export
@@ -244,40 +245,35 @@ mssql_temp_name <- function(name, temporary) {
                             unique_indexes = NULL, indexes = NULL,
                             analyze = TRUE, ..., in_transaction = TRUE) {
   NextMethod(
-    table = mssql_temp_name(table, temporary),
+    table = mssql_table_rename(table, temporary),
     types = types,
     values = values,
     temporary = FALSE
   )
-}
-
-#' @export
-`db_save_query.Microsoft SQL Server` <- function(con, sql, name,
-                                                 temporary = TRUE, ...){
-  name <- mssql_temp_name(name, temporary)
-
-  # Different syntax for MSSQL: https://stackoverflow.com/q/16683758/946850
-  tt_sql <- build_sql(
-    "SELECT * ",
-    "INTO ", as.sql(name), " ",
-    "FROM (", sql, ") AS temp",
-    con = con
-  )
-  dbExecute(con, tt_sql, immediate = TRUE)
-  name
-
 }
 
 #' @export
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
   NextMethod(
-    table = mssql_temp_name(table, temporary),
+    table = mssql_table_rename(table, temporary),
     types = types,
     values = values,
     temporary = FALSE
   )
 }
 
+#' @export
+`sql_save_query.Microsoft SQL Server` <- function(con, sql, name,
+                                                  temporary = TRUE, ...){
+
+  name <- mssql_table_rename(name, temporary)
+  # https://stackoverflow.com/q/16683758/946850
+  build_sql(
+    "SELECT * INTO ", as.sql(name), " ",
+    "FROM (", sql, ") AS temp",
+    con = con
+  )
+}
 # We have to jump through some hoops here because MS SQL has two boolean types:
 #
 # * BOOLEAN, which can be used in filters but not results

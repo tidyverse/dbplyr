@@ -444,6 +444,7 @@ base_no_win <- sql_translator(
 #' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
 #' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
 #' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
+#' * `compute()` -> `db_compute()` -> `db_save_query()` -> `sql_save_query()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -506,6 +507,20 @@ sql_create_index.DBIConnection <- function(con, table, columns, name = NULL,
   build_sql(
     "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
     " ON ", as.sql(table), " ", fields,
+    con = con
+  )
+}
+
+#' @rdname db_sql
+#' @export
+sql_save_query <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("sql_save_query")
+}
+#' @export
+sql_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
+    as.sql(name), " AS ", sql,
     con = con
   )
 }

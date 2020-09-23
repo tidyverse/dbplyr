@@ -158,3 +158,26 @@
     Output
       <SQL> UPDATE STATISTICS `table`
 
+---
+
+    Code
+      sql_save_query(con, sql("SELECT * FROM foo"), ident("table"))
+    Message <dbplyr_message_temp_table>
+      Created a temporary table named #table
+    Output
+      <SQL> SELECT * INTO `#table` FROM (SELECT * FROM foo) AS temp
+
+---
+
+    Code
+      sql_save_query(con, sql("SELECT * FROM foo"), ident("#table"))
+    Output
+      <SQL> SELECT * INTO `#table` FROM (SELECT * FROM foo) AS temp
+
+---
+
+    Code
+      sql_save_query(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE)
+    Output
+      <SQL> SELECT * INTO `table` FROM (SELECT * FROM foo) AS temp
+
