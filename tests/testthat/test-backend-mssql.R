@@ -128,8 +128,6 @@ test_that("generates custom sql", {
 # Live database -----------------------------------------------------------
 
 test_that("mssql can copy_to() with temporary tables (#272)", {
-  skip_if_no_db("mssql")
-
   df1 <- tibble(x = 1:3)
 
   expect_equal(
@@ -141,8 +139,6 @@ test_that("mssql can copy_to() with temporary tables (#272)", {
 })
 
 test_that("mssql can compute() with temporary tables (#272)", {
-  skip_if_no_db("mssql")
-
   df1 <- tibble(x = 1:3)
 
   expect_equal(
@@ -157,8 +153,6 @@ test_that("mssql can compute() with temporary tables (#272)", {
 })
 
 test_that("bit conversion works for important cases", {
-  skip_if_no_db("mssql")
-
   df <- tibble(x = 1:3, y = 3:1)
   db <- copy_to(src_test("mssql"), df, name = unique_table_name())
   expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))

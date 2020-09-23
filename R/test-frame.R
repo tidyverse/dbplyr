@@ -42,9 +42,10 @@ test_register_con <- function(name, ...) {
 src_test <- function(name) {
   srcs <- test_srcs$get()
   if (!name %in% names(srcs)) {
-    stop("Couldn't find test src ", name, call. = FALSE)
+    testthat::skip(paste0("No ", name))
+  } else {
+    srcs[[name]]
   }
-  srcs[[name]]
 }
 
 #' @export
@@ -95,11 +96,5 @@ test_srcs <- local({
 # Modern helpers ----------------------------------------------------------
 
 copy_to_test <- function(src, df, ...) {
-  skip_if_no_db(src)
   copy_to(src_test(src), df, "test", ..., overwrite = TRUE)
-}
-
-skip_if_no_db <- function(db) {
-  if (!test_srcs$has(db))
-    testthat::skip(paste0("No ", db))
 }

@@ -6,12 +6,6 @@ db_desc.DBIConnection <- function(x) {
 }
 
 #' @export
-db_list_tables.DBIConnection <- function(con) dbListTables(con)
-
-#' @export
-db_has_table.DBIConnection <- function(con, table) dbExistsTable(con, table)
-
-#' @export
 db_data_type.DBIConnection <- function(con, fields) {
   vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
 }
@@ -27,17 +21,6 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
   dbExecute(con, tt_sql, immediate = TRUE)
   name
 }
-
-#' @export
-db_begin.DBIConnection <- function(con, ...) {
-  dbBegin(con)
-}
-
-#' @export
-db_commit.DBIConnection <- function(con, ...) dbCommit(con)
-
-#' @export
-db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
 
 #' @export
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {

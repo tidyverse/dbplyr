@@ -151,17 +151,6 @@ sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
 
 # DBI methods ------------------------------------------------------------------
 
-# Doesn't return TRUE for temporary tables
-#' @export
-db_has_table.PostgreSQLConnection <- function(con, table, ...) {
-  table %in% db_list_tables(con)
-}
-
-#' @export
-db_begin.PostgreSQLConnection <- function(con, ...) {
-  dbExecute(con, "BEGIN TRANSACTION")
-}
-
 #' @export
 db_write_table.PostgreSQLConnection <- function(con, table, types, values,
                                                 temporary = TRUE, ...) {

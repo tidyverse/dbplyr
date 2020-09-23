@@ -21,3 +21,9 @@ test_that("can explain", {
   db <- copy_to_test("MariaDB", data.frame(x = 1:3))
   expect_snapshot(db %>% mutate(y = x + 1) %>% explain())
 })
+
+test_that("can overwrite temp tables", {
+  src <- src_test("MariaDB")
+  copy_to(src, mtcars, "mtcars", overwrite = TRUE)
+  expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
+})

@@ -1,6 +1,8 @@
 # dbplyr (development version)
 
-* `db_create_indexes()` generic is no longer used.
+* A number of `db_*` generics are no longer used: `db_create_indexes()`,
+  `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,
+  `db_has_table()`.
 
 * MySQL uses standard SQL for index creation.
 

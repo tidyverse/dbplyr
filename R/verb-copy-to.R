@@ -120,7 +120,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
 
   with_transaction(con, in_transaction, {
     # Only remove if it exists; returns NA for MySQL
-    if (overwrite && !is_false(db_has_table(con, table))) {
+    if (overwrite && !is_false(dbExistsTable(con, table))) {
       db_drop_table(con, table, force = TRUE)
     }
 
@@ -146,14 +146,14 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
 # Don't use `tryCatch()` because it messes with the callstack
 with_transaction <- function(con, in_transaction, code) {
   if (in_transaction) {
-    db_begin(con)
-    on.exit(db_rollback(con))
+    dbBegin(con)
+    on.exit(dbRollback(con))
   }
 
   code
 
   if (in_transaction) {
     on.exit()
-    db_commit(con)
+    dbCommit(con)
   }
 }

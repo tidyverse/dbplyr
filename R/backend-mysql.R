@@ -66,18 +66,6 @@ sql_translate_env.MySQL <- sql_translate_env.MySQLConnection
 # DBI methods ------------------------------------------------------------------
 
 #' @export
-db_has_table.MySQLConnection <- function(con, table, ...) {
-  # MySQL has no way to list temporary tables, so we always NA to
-  # skip any local checks and rely on the database to throw informative errors
-  NA
-}
-
-#' @export
-db_has_table.MariaDBConnection <- db_has_table.MySQLConnection
-#' @export
-db_has_table.MySQL <- db_has_table.MySQLConnection
-
-#' @export
 db_data_type.MySQLConnection <- function(con, fields, ...) {
   char_type <- function(x) {
     n <- max(nchar(as.character(x), "bytes"), 0L, na.rm = TRUE)
@@ -102,21 +90,6 @@ db_data_type.MySQLConnection <- function(con, fields, ...) {
     )
   }
   vapply(fields, data_type, character(1))
-}
-
-#' @export
-db_begin.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "START TRANSACTION")
-}
-
-#' @export
-db_commit.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "COMMIT")
-}
-
-#' @export
-db_rollback.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "ROLLBACK")
 }
 
 #' @export
