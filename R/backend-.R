@@ -19,15 +19,6 @@ sql_translate_env.DBIConnection <- function(con) {
 }
 
 #' @export
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
-  }
-}
-
-#' @export
 #' @rdname sql_variant
 #' @format NULL
 base_scalar <- sql_translator(
@@ -445,168 +436,91 @@ base_no_win <- sql_translator(
   count        = win_absent("COUNT")
 )
 
-# db_ methods -------------------------------------------------------------
+# SQL methods -------------------------------------------------------------
+
+#' SQL generation methods for database methods
+#'
+#' * `explain()` -> `db_explain` -> `sql_explain()`
+#' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
+#' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
+#' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
+#' * `compute()` -> `db_compute()` -> `db_save_query()` -> `sql_save_query()`
+#'
+#' @keywords internal
+#' @name db_sql
+NULL
 
 #' @export
-db_desc.DBIConnection <- function(x) {
-  class(x)[[1]]
-}
-
-#' @export
-db_list_tables.DBIConnection <- function(con) dbListTables(con)
-
-#' @export
-db_has_table.DBIConnection <- function(con, table) dbExistsTable(con, table)
-
-#' @export
-db_data_type.DBIConnection <- function(con, fields) {
-  vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
-}
-
-#' @export
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
-                                        ...) {
-  tt_sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(name), " AS ", sql,
-    con = con
-  )
-  dbExecute(con, tt_sql, immediate = TRUE)
-  name
-}
-
-#' @export
-db_begin.DBIConnection <- function(con, ...) {
-  dbBegin(con)
-}
-
-#' @export
-db_commit.DBIConnection <- function(con, ...) dbCommit(con)
-
-#' @export
-db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
-
-#' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
-  dbWriteTable(
-    con,
-    name = dbi_quote(as.sql(table), con),
-    value = values,
-    field.types = types,
-    temporary = temporary,
-    row.names = FALSE
-  )
-
-  table
-}
-
-#' @export
-db_create_table.DBIConnection <- function(con, table, types,
-                                          temporary = TRUE, ...) {
-  assert_that(is_string(table), is.character(types))
-
-  field_names <- escape(ident(names(types)), collapse = NULL, con = con)
-  fields <- sql_vector(
-    paste0(field_names, " ", types),
-    parens = TRUE,
-    collapse = ", ",
-    con = con
-  )
-  sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(table), " ", fields,
-    con = con
-  )
-
-  dbExecute(con, sql, immediate = TRUE)
-}
-
-#' @export
-db_insert_into.DBIConnection <- function(con, table, values, ...) {
-  dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
-}
-
-#' @export
-db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
-                                            unique = FALSE, ...) {
-  if (is.null(indexes)) return()
-  assert_that(is.list(indexes))
-
-  for (index in indexes) {
-    db_create_index(con, table, index, unique = unique, ...)
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 
+#' @rdname db_sql
 #' @export
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
-  assert_that(is_string(table), is.character(columns))
-
-  name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  sql <- build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
-    " ON ", as.sql(table), " ", fields,
-    con = con)
-
-  dbExecute(con, sql)
+sql_explain <- function(con, sql, ...) {
+  UseMethod("sql_explain")
+}
+#' @export
+sql_explain.DBIConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN ", sql, con = con)
 }
 
+#' @rdname db_sql
 #' @export
-db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
-  sql <- build_sql(
+sql_analyze <- function(con, table, ...) {
+  UseMethod("sql_analyze")
+}
+#' @export
+sql_analyze.DBIConnection <- function(con, table, ...) {
+  build_sql("ANALYZE ", as.sql(table), con = con)
+}
+
+#' @rdname db_sql
+#' @export
+sql_drop_table <- function(con, table, force = FALSE, ...) {
+  UseMethod("sql_drop_table")
+}
+#' @export
+sql_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
+  build_sql(
     "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
     con = con
   )
-  dbExecute(con, sql)
 }
 
+#' @rdname db_sql
 #' @export
-db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE ", as.sql(table), con = con)
-  dbExecute(con, sql)
+sql_create_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+  UseMethod("sql_create_index")
 }
-
 #' @export
-db_explain.DBIConnection <- function(con, sql, ...) {
-  exsql <- build_sql("EXPLAIN ", sql, con = con)
-  expl <- dbGetQuery(con, exsql)
-  out <- utils::capture.output(print(expl))
+sql_create_index.DBIConnection <- function(con, table, columns, name = NULL,
+                                           unique = FALSE, ...) {
+  assert_that(is_string(table), is.character(columns))
 
-  paste(out, collapse = "\n")
+  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
+  fields <- escape(ident(columns), parens = TRUE, con = con)
+  build_sql(
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
+    " ON ", as.sql(table), " ", fields,
+    con = con
+  )
 }
 
+#' @rdname db_sql
 #' @export
-db_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
-  qry <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(qry))
-
-  res <- dbFetch(qry, 0)
-  names(res)
+sql_save_query <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("sql_save_query")
 }
-
 #' @export
-db_query_rows.DBIConnection <- function(con, sql, ...) {
-  from <- sql_subquery(con, sql, "master")
-  rows <- build_sql("SELECT COUNT(*) FROM ", from, con = con)
-
-  as.integer(dbGetQuery(con, rows)[[1]])
+sql_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
+    as.sql(name), " AS ", sql,
+    con = con
+  )
 }
-
-# Utility functions ------------------------------------------------------------
-
-res_warn_incomplete <- function(res, hint = "n = -1") {
-  if (dbHasCompleted(res)) return()
-
-  rows <- big_mark(dbGetRowCount(res))
-  warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
-    call. = FALSE)
-}
-
-
-dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
-dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))

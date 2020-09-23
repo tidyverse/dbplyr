@@ -25,7 +25,7 @@ same_src.src_sql <- function(x, y) {
 #' @importFrom dplyr src_tbls
 #' @export
 src_tbls.src_sql <- function(x, ...) {
-  db_list_tables(x$con)
+  dbListTables(x$con)
 }
 
 #' @export

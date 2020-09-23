@@ -7,3 +7,7 @@ test_that("custom scalar & string functions translated correctly", {
   expect_equal(translate_sql(str_replace_all(x, "old", "new")), sql("REGEXP_REPLACE(`x`, 'old', 'new')"))
   expect_equal(translate_sql(median(x, na.rm = TRUE)),          sql("PERCENTILE(`x`, 0.5) OVER ()"))
 })
+
+test_that("generates custom sql", {
+  expect_snapshot(sql_analyze(simulate_hive(), ident("tbl")))
+})

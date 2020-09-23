@@ -75,3 +75,11 @@ c_character <- function(...) {
 }
 
 cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
+
+res_warn_incomplete <- function(res, hint = "n = -1") {
+  if (dbHasCompleted(res)) return()
+
+  rows <- big_mark(dbGetRowCount(res))
+  warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
+    call. = FALSE)
+}

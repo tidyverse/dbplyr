@@ -87,6 +87,7 @@ Collate:
     'data-cache.R'
     'data-lahman.R'
     'data-nycflights13.R'
+    'db.R'
     'dbplyr.R'
     'explain.R'
     'ident.R'

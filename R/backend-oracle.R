@@ -54,21 +54,18 @@ sql_translate_env.Oracle <- function(con) {
 }
 
 #' @export
-db_explain.Oracle <- function(con, sql, ...) {
-  DBI::dbExecute(con, build_sql("EXPLAIN PLAN FOR ", sql, con = con))
-  expl <- DBI::dbGetQuery(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
-  out <- utils::capture.output(print(expl))
-  paste(out, collapse = "\n")
+sql_explain.Oracle <- function(con, sql, ...) {
+  build_sql(
+    "EXPLAIN PLAN FOR ", sql, ";\n",
+    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
+    con = con
+  )
 }
 
 #' @export
-db_analyze.Oracle <- function(con, table, ...) {
+sql_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  sql <- dbplyr::build_sql(
-    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
-    con = con
-  )
-  DBI::dbExecute(con, sql)
+  build_sql("ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS", con = con)
 }
 
 #' @export
@@ -82,20 +79,18 @@ sql_subquery.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
 }
 
 #' @export
-db_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
+sql_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
   if (force) {
     # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
-    sql <- build_sql(
-      "BEGIN ",
-      "EXECUTE IMMEDIATE 'DROP TABLE ", ident(table), "';",
-      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF; ",
+    build_sql(
+      "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ", as.sql(table), "';\n",
+      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF;\n",
       "END;",
       con = con
     )
   } else {
-    sql <- build_sql("DROP TABLE ", ident(table), con = con)
+    build_sql("DROP TABLE ", as.sql(table), con = con)
   }
-  DBI::dbExecute(con, sql)
 }
 
 # registered onLoad located in the zzz.R script
@@ -114,13 +109,13 @@ sql_translate_env.OraConnection <- sql_translate_env.Oracle
 sql_select.OraConnection <- sql_select.Oracle
 
 #' @export
-db_analyze.OraConnection <- db_analyze.Oracle
+sql_analyze.OraConnection <- sql_analyze.Oracle
 
 #' @export
 sql_subquery.OraConnection <- sql_subquery.Oracle
 
 #' @export
-db_drop_table.OraConnection <- db_drop_table.Oracle
+sql_drop_table.OraConnection <- sql_drop_table.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle

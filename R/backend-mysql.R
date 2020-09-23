@@ -66,18 +66,6 @@ sql_translate_env.MySQL <- sql_translate_env.MySQLConnection
 # DBI methods ------------------------------------------------------------------
 
 #' @export
-db_has_table.MySQLConnection <- function(con, table, ...) {
-  # MySQL has no way to list temporary tables, so we always NA to
-  # skip any local checks and rely on the database to throw informative errors
-  NA
-}
-
-#' @export
-db_has_table.MariaDBConnection <- db_has_table.MySQLConnection
-#' @export
-db_has_table.MySQL <- db_has_table.MySQLConnection
-
-#' @export
 db_data_type.MySQLConnection <- function(con, fields, ...) {
   char_type <- function(x) {
     n <- max(nchar(as.character(x), "bytes"), 0L, na.rm = TRUE)
@@ -105,21 +93,6 @@ db_data_type.MySQLConnection <- function(con, fields, ...) {
 }
 
 #' @export
-db_begin.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "START TRANSACTION")
-}
-
-#' @export
-db_commit.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "COMMIT")
-}
-
-#' @export
-db_rollback.MySQLConnection <- function(con, ...) {
-  dbExecute(con, "ROLLBACK")
-}
-
-#' @export
 db_write_table.MySQLConnection <- function(con, table, types, values,
                                            temporary = TRUE, ...) {
   db_create_table(con, table, types, temporary = temporary)
@@ -140,36 +113,14 @@ db_write_table.MySQLConnection <- function(con, table, types, values,
 }
 
 #' @export
-db_create_index.MySQLConnection <- function(con, table, columns, name = NULL,
-                                            unique = FALSE, ...) {
-  name <- name %||% paste0(c(table, columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  index <- build_sql(
-    "ADD ",
-    if (unique) sql("UNIQUE "),
-    "INDEX ", ident(name), " ", fields,
-    con = con
-  )
-
-  sql <- build_sql("ALTER TABLE ", as.sql(table), "\n", index, con = con)
-  dbExecute(con, sql)
+sql_analyze.MySQLConnection <- function(con, table, ...) {
+  build_sql("ANALYZE TABLE ", as.sql(table), con = con)
 }
 
 #' @export
-db_create_index.MariaDBConnection <- db_create_index.MySQLConnection
+sql_analyze.MariaDBConnection <- sql_analyze.MySQLConnection
 #' @export
-db_create_index.MySQL <- db_create_index.MySQLConnection
-
-#' @export
-db_analyze.MySQLConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE TABLE ", as.sql(table), con = con)
-  dbExecute(con, sql)
-}
-
-#' @export
-db_analyze.MariaDBConnection <- db_analyze.MySQLConnection
-#' @export
-db_analyze.MySQL <- db_analyze.MySQLConnection
+sql_analyze.MySQL <- sql_analyze.MySQLConnection
 
 # SQL methods -------------------------------------------------------------
 
