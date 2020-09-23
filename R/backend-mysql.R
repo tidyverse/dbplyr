@@ -1,5 +1,5 @@
 #' @export
-db_desc.MySQLConnection <- function(x) {
+db_desc.MariaDBConnection <- function(x) {
   info <- dbGetInfo(x)
 
   paste0(
@@ -8,14 +8,13 @@ db_desc.MySQLConnection <- function(x) {
     "]"
   )
 }
+#' @export
+db_desc.MySQL <- db_desc.MariaDBConnection
+#' @export
+db_desc.MySQLConnection <- db_desc.MariaDBConnection
 
 #' @export
-db_desc.MariaDBConnection <- db_desc.MySQLConnection
-#' @export
-db_desc.MySQL <- db_desc.MySQLConnection
-
-#' @export
-sql_translate_env.MySQLConnection <- function(con) {
+sql_translate_env.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
@@ -57,84 +56,30 @@ sql_translate_env.MySQLConnection <- function(con) {
     )
   )
 }
+#' @export
+sql_translate_env.MySQL <- sql_translate_env.MariaDBConnection
+#' @export
+sql_translate_env.MySQLConnection <- sql_translate_env.MariaDBConnection
 
 #' @export
-sql_translate_env.MariaDBConnection <- sql_translate_env.MySQLConnection
-#' @export
-sql_translate_env.MySQL <- sql_translate_env.MySQLConnection
-
-# DBI methods ------------------------------------------------------------------
-
-#' @export
-db_data_type.MySQLConnection <- function(con, fields, ...) {
-  char_type <- function(x) {
-    n <- max(nchar(as.character(x), "bytes"), 0L, na.rm = TRUE)
-    if (n <= 65535) {
-      paste0("varchar(", n, ")")
-    } else {
-      "mediumtext"
-    }
-  }
-
-  data_type <- function(x) {
-    switch(
-      class(x)[1],
-      logical =   "boolean",
-      integer =   "integer",
-      numeric =   "double",
-      factor =    char_type(x),
-      character = char_type(x),
-      Date =      "date",
-      POSIXct =   "datetime",
-      stop("Unknown class ", paste(class(x), collapse = "/"), call. = FALSE)
-    )
-  }
-  vapply(fields, data_type, character(1))
-}
-
-#' @export
-db_write_table.MySQLConnection <- function(con, table, types, values,
-                                           temporary = TRUE, ...) {
-  db_create_table(con, table, types, temporary = temporary)
-
-  values <- purrr::modify_if(values, is.logical, as.integer)
-  values <- purrr::modify_if(values, is.factor, as.character)
-  values <- purrr::modify_if(values, is.character, encodeString, na.encode = FALSE)
-
-  tmp <- tempfile(fileext = ".csv")
-  utils::write.table(values, tmp, sep = "\t", quote = FALSE, qmethod = "escape",
-    na = "\\N", row.names = FALSE, col.names = FALSE)
-
-  sql <- build_sql("LOAD DATA LOCAL INFILE ", encodeString(tmp), " INTO TABLE ",
-    as.sql(table), con = con)
-  dbExecute(con, sql)
-
-  table
-}
-
-#' @export
-sql_analyze.MySQLConnection <- function(con, table, ...) {
+sql_analyze.MariaDBConnection <- function(con, table, ...) {
   build_sql("ANALYZE TABLE ", as.sql(table), con = con)
 }
+#' @export
+sql_analyze.MySQL <- sql_analyze.MariaDBConnection
+#' @export
+sql_analyze.MySQLConnection <- sql_analyze.MariaDBConnection
 
 #' @export
-sql_analyze.MariaDBConnection <- sql_analyze.MySQLConnection
-#' @export
-sql_analyze.MySQL <- sql_analyze.MySQLConnection
-
-# SQL methods -------------------------------------------------------------
-
-#' @export
-sql_escape_ident.MySQLConnection <- function(con, x) {
-  sql_quote(x, "`")
-}
-
-#' @export
-sql_join.MySQLConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   if (identical(type, "full")) {
     stop("MySQL does not support full joins", call. = FALSE)
   }
   NextMethod()
 }
+#' @export
+sql_join.MySQL <- sql_join.MariaDBConnection
+#' @export
+sql_join.MySQLConnection <- sql_join.MariaDBConnection
 
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))

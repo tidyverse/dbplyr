@@ -39,7 +39,7 @@ simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
 #' @rdname simulate_dbi
-simulate_mysql <- function() simulate_dbi("MySQLConnection")
+simulate_mysql <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 #' @rdname simulate_dbi
