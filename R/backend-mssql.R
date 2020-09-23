@@ -263,6 +263,18 @@ mssql_table_rename <- function(name, temporary) {
 }
 
 #' @export
+`db_save_query.Microsoft SQL Server` <- function(con, sql, name, temporary = TRUE,
+                                        ...) {
+
+  NextMethod(
+    sql = sql,
+    name = mssql_table_rename(name, temporary),
+    temporary = FALSE
+  )
+}
+
+
+#' @export
 `sql_save_query.Microsoft SQL Server` <- function(con, sql, name,
                                                   temporary = TRUE, ...){
 
