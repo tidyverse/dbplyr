@@ -27,7 +27,7 @@ sql_translate_env.Hive <- function(con) {
 }
 
 #' @export
-sql_analyze.Hive <- function(con, table, ...) {
+sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
   build_sql(
     "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",

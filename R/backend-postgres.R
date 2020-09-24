@@ -147,7 +147,7 @@ sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
-sql_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
+sql_query_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
   build_sql(
@@ -158,8 +158,8 @@ sql_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
   )
 }
 #' @export
-sql_explain.PostgreSQL <- sql_explain.PostgreSQLConnection
+sql_query_explain.PostgreSQL <- sql_query_explain.PostgreSQLConnection
 #' @export
-sql_explain.PqConnection <- sql_explain.PostgreSQLConnection
+sql_query_explain.PqConnection <- sql_query_explain.PostgreSQLConnection
 
 globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY"))

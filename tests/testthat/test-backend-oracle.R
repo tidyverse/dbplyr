@@ -21,6 +21,6 @@ test_that("queries translate correctly", {
 test_that("generates custom sql", {
   con <- simulate_oracle()
 
-  expect_snapshot(sql_analyze(con, ident("table")))
-  expect_snapshot(sql_explain(con, sql("SELECT * FROM foo")))
+  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
 })

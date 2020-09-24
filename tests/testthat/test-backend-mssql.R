@@ -121,10 +121,10 @@ test_that("logical escaping depends on context", {
 test_that("generates custom sql", {
   con <- simulate_mssql()
 
-  expect_snapshot(sql_analyze(con, ident("table")))
-  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("table")))
-  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("#table")))
-  expect_snapshot(sql_save_query(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE))
+  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table")))
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("#table")))
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE))
 })
 
 # Live database -----------------------------------------------------------

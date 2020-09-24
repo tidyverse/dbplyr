@@ -48,11 +48,9 @@ If you can't, this likely indicates some problem with the DBI methods. Use [DBIt
 
 Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
 
-*   If `copy_to()` fails, it's likely you need a method for 
-    `sql_write_table()`, `sql_create_index()` or `sql_analyze()`.
-  
-    If it fails during creation of the tbl, you may need a method for
-    `sql_query_fields()`.
+*   If `copy_to()` fails, you probably need a method for `sql_table_analyze()` 
+    or `sql_index_create()`. If `copy_to()` fails during creation of the tbl, 
+    you may need a method for `sql_query_fields()`.
 
 *   If `collapse()` fails, your database has a non-standard way of constructing 
     subqueries. Add a method for `sql_subquery()`.

@@ -18,7 +18,7 @@ sql_translate_env.Impala <- function(con) {
 }
 
 #' @export
-sql_analyze.Impala <- function(con, table, ...) {
+sql_table_analyze.Impala <- function(con, table, ...) {
   # Using COMPUTE STATS instead of ANALYZE as recommended in this article
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
   build_sql("COMPUTE STATS ", as.sql(table), con = con)

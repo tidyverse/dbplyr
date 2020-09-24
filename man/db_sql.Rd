@@ -2,22 +2,22 @@
 % Please edit documentation in R/backend-.R
 \name{db_sql}
 \alias{db_sql}
-\alias{sql_explain}
-\alias{sql_analyze}
-\alias{sql_create_index}
-\alias{sql_save_query}
+\alias{sql_query_explain}
+\alias{sql_table_analyze}
+\alias{sql_index_create}
+\alias{sql_query_save}
 \alias{sql_join_suffix}
 \alias{sql_query_fields}
 \alias{sql_query_rows}
 \title{SQL generation methods for database methods}
 \usage{
-sql_explain(con, sql, ...)
+sql_query_explain(con, sql, ...)
 
-sql_analyze(con, table, ...)
+sql_table_analyze(con, table, ...)
 
-sql_create_index(con, table, columns, name = NULL, unique = FALSE, ...)
+sql_index_create(con, table, columns, name = NULL, unique = FALSE, ...)
 
-sql_save_query(con, sql, name, temporary = TRUE, ...)
+sql_query_save(con, sql, name, temporary = TRUE, ...)
 
 sql_join_suffix(con, ...)
 
@@ -27,12 +27,12 @@ sql_query_rows(con, sql, ...)
 }
 \description{
 \itemize{
-\item \code{explain()} -> \code{db_explain} -> \code{sql_explain()}
-\item \code{db_copy_to(analyze = TRUE)} -> \code{sql_analyze()} -> \code{sql_analyze()}
-\item \code{db_copy_to(indexes = ...)} -> \code{db_create_index()} -> \code{sql_create_index()}
-\item \code{compute()} -> \code{db_compute()} -> \code{db_save_query()} -> \code{sql_save_query()}
-\item \code{do()} -> \code{db_query_rows()} -> \code{sql_query_rows()}
-\item \code{tbl()} -> \code{db_query_fields()} -> \code{sql_query_fields()}
+\item \code{sql_table_analyze()} <- \code{db_analyze()} <- \code{db_copy_to(analyze = TRUE)}
+\item \code{sql_index_create()} <- \code{db_create_index()} <- \code{db_copy_to(indexes = ...)}
+\item \code{sql_query_explain()} <- \code{db_explain} <- \code{explain()}
+\item \code{sql_query_fields()} <- \code{db_query_fields()} <- \code{tbl()}
+\item \code{sql_query_rows()} <- \code{db_query_rows()} <- \code{do()}
+\item \code{sql_query_save()} <- \code{db_save_query()} <- \code{db_compute()} <- \code{compute()}
 }
 }
 \keyword{internal}

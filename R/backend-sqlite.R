@@ -4,7 +4,7 @@ db_desc.SQLiteConnection <- function(x) {
 }
 
 #' @export
-sql_explain.SQLiteConnection <- function(con, sql, ...) {
+sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
 }
 

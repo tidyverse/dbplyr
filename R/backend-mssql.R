@@ -216,7 +216,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+`sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
 }
@@ -275,7 +275,7 @@ mssql_table_rename <- function(name, temporary) {
 
 
 #' @export
-`sql_save_query.Microsoft SQL Server` <- function(con, sql, name,
+`sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
                                                   temporary = TRUE, ...){
 
   name <- mssql_table_rename(name, temporary)

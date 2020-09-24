@@ -154,14 +154,14 @@
 # generates custom sql
 
     Code
-      sql_analyze(con, ident("table"))
+      sql_table_analyze(con, ident("table"))
     Output
       <SQL> UPDATE STATISTICS `table`
 
 ---
 
     Code
-      sql_save_query(con, sql("SELECT * FROM foo"), ident("table"))
+      sql_query_save(con, sql("SELECT * FROM foo"), ident("table"))
     Message <dbplyr_message_temp_table>
       Created a temporary table named #table
     Output
@@ -170,14 +170,14 @@
 ---
 
     Code
-      sql_save_query(con, sql("SELECT * FROM foo"), ident("#table"))
+      sql_query_save(con, sql("SELECT * FROM foo"), ident("#table"))
     Output
       <SQL> SELECT * INTO `#table` FROM (SELECT * FROM foo) AS temp
 
 ---
 
     Code
-      sql_save_query(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE)
+      sql_query_save(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE)
     Output
       <SQL> SELECT * INTO `table` FROM (SELECT * FROM foo) AS temp
 

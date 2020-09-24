@@ -6,8 +6,8 @@ test_that("use CHAR type for as.character", {
 test_that("generates custom sql", {
   con <- simulate_mysql()
 
-  expect_snapshot(sql_analyze(con, ident("table")))
-  expect_snapshot(sql_explain(con, sql("SELECT * FROM table")))
+  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_query_explain(con, sql("SELECT * FROM table")))
 })
 
 # live database -----------------------------------------------------------

@@ -140,7 +140,7 @@ sql_translate_env.ACCESS <- function(con) {
 # db_ generics -----------------------------------
 
 #' @export
-sql_analyze.ACCESS <- function(con, table, ...) {
+sql_table_analyze.ACCESS <- function(con, table, ...) {
   # Do nothing. Access doesn't support an analyze / update statistics function
   NULL
 }

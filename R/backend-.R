@@ -440,12 +440,12 @@ base_no_win <- sql_translator(
 
 #' SQL generation methods for database methods
 #'
-#' * `explain()` -> `db_explain` -> `sql_explain()`
-#' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
-#' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
-#' * `compute()` -> `db_compute()` -> `db_save_query()` -> `sql_save_query()`
-#' * `do()` -> `db_query_rows()` -> `sql_query_rows()`
-#' * `tbl()` -> `db_query_fields()` -> `sql_query_fields()`
+#' * `sql_table_analyze()` <- `db_analyze()` <- `db_copy_to(analyze = TRUE)`
+#' * `sql_index_create()` <- `db_create_index()` <- `db_copy_to(indexes = ...)`
+#' * `sql_query_explain()` <- `db_explain` <- `explain()`
+#' * `sql_query_fields()` <- `db_query_fields()` <- `tbl()`
+#' * `sql_query_rows()` <- `db_query_rows()` <- `do()`
+#' * `sql_query_save()` <- `db_save_query()` <- `db_compute()` <- `compute()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -462,31 +462,31 @@ sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(),
 
 #' @rdname db_sql
 #' @export
-sql_explain <- function(con, sql, ...) {
-  UseMethod("sql_explain")
+sql_query_explain <- function(con, sql, ...) {
+  UseMethod("sql_query_explain")
 }
 #' @export
-sql_explain.DBIConnection <- function(con, sql, ...) {
+sql_query_explain.DBIConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
 #' @rdname db_sql
 #' @export
-sql_analyze <- function(con, table, ...) {
-  UseMethod("sql_analyze")
+sql_table_analyze <- function(con, table, ...) {
+  UseMethod("sql_table_analyze")
 }
 #' @export
-sql_analyze.DBIConnection <- function(con, table, ...) {
+sql_table_analyze.DBIConnection <- function(con, table, ...) {
   build_sql("ANALYZE ", as.sql(table), con = con)
 }
 
 #' @rdname db_sql
 #' @export
-sql_create_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
-  UseMethod("sql_create_index")
+sql_index_create <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+  UseMethod("sql_index_create")
 }
 #' @export
-sql_create_index.DBIConnection <- function(con, table, columns, name = NULL,
+sql_index_create.DBIConnection <- function(con, table, columns, name = NULL,
                                            unique = FALSE, ...) {
   assert_that(is_string(table), is.character(columns))
 
@@ -501,11 +501,11 @@ sql_create_index.DBIConnection <- function(con, table, columns, name = NULL,
 
 #' @rdname db_sql
 #' @export
-sql_save_query <- function(con, sql, name, temporary = TRUE, ...) {
-  UseMethod("sql_save_query")
+sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("sql_query_save")
 }
 #' @export
-sql_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
     as.sql(name), " AS ", sql,

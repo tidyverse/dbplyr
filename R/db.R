@@ -8,7 +8,7 @@ db_desc.DBIConnection <- function(x) {
 #' @export
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
                                         ...) {
-  sql <- sql_save_query(con, sql, name, temporary = temporary, ...)
+  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
   dbExecute(con, sql, immediate = TRUE)
   name
 }
@@ -32,13 +32,13 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
 #' @export
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
-  sql <- sql_create_index(con, table, columns, name = name, unique = unique, ...)
+  sql <- sql_index_create(con, table, columns, name = name, unique = unique, ...)
   dbExecute(con, sql)
 }
 
 #' @export
 db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- sql_analyze(con, table, ...)
+  sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
     return()
   }
@@ -47,7 +47,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
 
 #' @export
 db_explain.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_explain(con, sql, ...)
+  sql <- sql_query_explain(con, sql, ...)
   expl <- dbGetQuery(con, sql)
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")

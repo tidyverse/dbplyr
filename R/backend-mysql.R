@@ -62,13 +62,13 @@ sql_translate_env.MySQL <- sql_translate_env.MariaDBConnection
 sql_translate_env.MySQLConnection <- sql_translate_env.MariaDBConnection
 
 #' @export
-sql_analyze.MariaDBConnection <- function(con, table, ...) {
+sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
   build_sql("ANALYZE TABLE ", as.sql(table), con = con)
 }
 #' @export
-sql_analyze.MySQL <- sql_analyze.MariaDBConnection
+sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
 #' @export
-sql_analyze.MySQLConnection <- sql_analyze.MariaDBConnection
+sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 
 #' @export
 sql_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {

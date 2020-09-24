@@ -66,14 +66,14 @@ test_that("default raw escapes translated correctly", {
 test_that("DDL operations generate expected SQL", {
   con <- simulate_dbi()
 
-  expect_snapshot(sql_analyze(con, ident("table")))
-  expect_snapshot(sql_explain(con, sql("SELECT * FROM foo")))
+  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
 
   expect_snapshot(sql_subquery(con, ident("table")))
   expect_snapshot(sql_subquery(con, sql("SELECT * FROM foo")))
 
-  expect_snapshot(sql_create_index(con, ident("table"), c("a", "b")))
-  expect_snapshot(sql_create_index(con, ident("table"), "c", unique = TRUE))
+  expect_snapshot(sql_index_create(con, ident("table"), c("a", "b")))
+  expect_snapshot(sql_index_create(con, ident("table"), "c", unique = TRUE))
 
-  expect_snapshot(sql_save_query(con, ident("table"), sql("SELECT * FROM foo")))
+  expect_snapshot(sql_query_save(con, ident("table"), sql("SELECT * FROM foo")))
 })
