@@ -74,7 +74,8 @@ op_grps.op_select <- function(op) {
   old2new <- set_names(names(new2old), new2old)
 
   grps <- op_grps(op$x)
-  grps[grps %in% names(old2new)] <- old2new[grps]
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
   grps
 }
 

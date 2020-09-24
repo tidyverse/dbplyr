@@ -64,7 +64,6 @@ test_that("select preserves grouping vars", {
   expect_named(out, c("b", "a"))
 })
 
-
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
@@ -218,6 +217,12 @@ test_that("rename preserves existing", {
 })
 
 test_that("rename renames grouping vars", {
-  df <- lazy_frame(a = 1, b = 2) %>% group_by(a) %>% rename(c = a)
-  expect_equal(op_grps(df), "c")
+  df <- lazy_frame(a = 1, b = 2)
+  expect_equal(df %>% group_by(a) %>% rename(c = a) %>% op_grps(), "c")
+})
+
+test_that("mutate preserves grouping vars (#396)", {
+  df <- lazy_frame(a = 1, b = 2, c = 3) %>% group_by(a, b)
+  expect_equal(df %>% mutate(a = 1) %>% op_grps(), c("a", "b"))
+  expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
 })

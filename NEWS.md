@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `mutate()` grouping variables no longer generates a downstream error (#396)
+
 * `mutate()` correctly generates subqueries when you re-use the same variable
   three or more times (#412).
 
