@@ -17,7 +17,6 @@
 #' @importFrom dplyr db_commit
 #' @importFrom dplyr db_create_index
 #' @importFrom dplyr db_create_indexes
-#' @importFrom dplyr db_create_table
 #' @importFrom dplyr db_data_type
 #' @importFrom dplyr db_desc
 #' @importFrom dplyr db_drop_table

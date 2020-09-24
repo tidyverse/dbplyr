@@ -35,27 +35,6 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
 }
 
 #' @export
-db_create_table.DBIConnection <- function(con, table, types,
-                                          temporary = TRUE, ...) {
-  assert_that(is_string(table), is.character(types))
-
-  field_names <- escape(ident(names(types)), collapse = NULL, con = con)
-  fields <- sql_vector(
-    paste0(field_names, " ", types),
-    parens = TRUE,
-    collapse = ", ",
-    con = con
-  )
-  sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(table), " ", fields,
-    con = con
-  )
-
-  dbExecute(con, sql, immediate = TRUE)
-}
-
-#' @export
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
   sql <- sql_create_index(con, table, columns, name = name, unique = unique, ...)
