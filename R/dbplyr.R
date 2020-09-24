@@ -13,18 +13,13 @@
 
 # Generics that really should live in dbplyr
 #' @importFrom dplyr db_analyze
-#' @importFrom dplyr db_begin
-#' @importFrom dplyr db_commit
 #' @importFrom dplyr db_create_index
-#' @importFrom dplyr db_create_indexes
 #' @importFrom dplyr db_data_type
 #' @importFrom dplyr db_desc
 #' @importFrom dplyr db_drop_table
 #' @importFrom dplyr db_explain
-#' @importFrom dplyr db_has_table
 #' @importFrom dplyr db_query_fields
 #' @importFrom dplyr db_query_rows
-#' @importFrom dplyr db_rollback
 #' @importFrom dplyr db_save_query
 #' @importFrom dplyr db_write_table
 #' @importFrom dplyr sql_join

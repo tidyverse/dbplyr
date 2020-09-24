@@ -44,31 +44,21 @@ tbl(con, "mtcars")
 
 If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/rstats-db/DBItest) to narrow down the problem.
 
-Now is a good time to implement a method for `db_desc()`. This should briefly describe the connection, typically formatting the information returned from `dbGetInfo()`. This is what dbplyr does for Postgres connections:
-
-```{r}
-#' @export
-db_desc.PostgreSQLConnection <- function(x) {
-  info <- dbGetInfo(x)
-  host <- if (info$host == "") "localhost" else info$host
-
-  paste0("postgres ", info$serverVersion, " [", info$user, "@",
-    host, ":", info$port, "/", info$dbname, "]")
-}
-```
-
 ## Copying, computing, collecting and collapsing
 
-Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work.
+Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
 
-* If `copy_to()` fails, it's likely you need a method for `db_write_table()`,
-  `db_create_indexes()` or `db_analyze()`.
-
-* If `collapse()` fails, your database has a non-standard way of constructing 
-  subqueries. Add a method for `sql_subquery()`.
+*   If `copy_to()` fails, it's likely you need a method for 
+    `sql_write_table()`, `sql_create_index()` or `sql_analyze()`.
   
-* If `compute()` fails, your database has a non-standard way of saving queries
-  in temporary tables. Add a method for `db_save_query()`.
+    If it fails during creation of the tbl, you may need a method for
+    `sql_query_fields()`.
+
+*   If `collapse()` fails, your database has a non-standard way of constructing 
+    subqueries. Add a method for `sql_subquery()`.
+  
+*   If `compute()` fails, your database has a non-standard way of saving queries
+    in temporary tables. Add a method for `db_save_query()`.
 
 ## SQL translation
 
