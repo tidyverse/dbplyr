@@ -193,10 +193,27 @@
 <li><p>Each individual element of <code><a href="../reference/in_schema.html">in_schema()</a></code> is now correctly quoted (<a href='https://github.com/tidyverse/dbplyr/issues/287'>#287</a>). (use <code><a href="../reference/sql.html">sql()</a></code> to opt out of quoting, if needed). And <code><a href="https://dbi.r-dbi.org/reference/Id.html">DBI::Id()</a></code> should work anywhere that <code><a href="../reference/in_schema.html">in_schema()</a></code> does.</p></li>
 <li><p>Can now <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> can now <code>overwrite</code> when table is specified with schema (<a href='https://github.com/tidyverse/dbplyr/issues/489'>#489</a>).</p></li>
 <li>
-<p>A number of <code>db_*</code> generics have been replaced with SQL generation generics: <code><a href="../reference/db_sql.html">sql_analyze()</a></code>, <code><a href="../reference/db_sql.html">sql_create_index()</a></code>, <code><a href="../reference/db_sql.html">sql_explain()</a></code>, <code><a href="../reference/db_sql.html">sql_drop_table()</a></code>, <code><a href="../reference/db_sql.html">sql_save_query()</a></code>, <code><a href="../reference/db_sql.html">sql_query_fields()</a></code>, <code><a href="../reference/db_sql.html">sql_query_rows()</a></code>.</p>
+<p>A number of <code>db_*</code> generics have been replaced with SQL generation generics:</p>
+<ul>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_analyze()</a></code> -&gt; <code><a href="../reference/db_sql.html">sql_table_analyze()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_index()</a></code> -&gt; <code><a href="../reference/db_sql.html">sql_index_create()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> -&gt; <code>sql_queriy_explain()</code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_fields()</a></code> -&gt; <code><a href="../reference/db_sql.html">sql_query_fields()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_rows()</a></code> -&gt; <code><a href="../reference/db_sql.html">sql_query_rows()</a></code>
+</li>
+</ul>
 <p>This makes them easier to test and is an important part of the process of moving all database generics in dbplyr (<a href='https://github.com/tidyverse/dbplyr/issues/284'>#284</a>).</p>
 </li>
-<li><p>A number of <code>db_*</code> generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, <code>db_data_types()</code>. These were only used for data insertion, and that now all happens via <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code>.</p></li>
+<li><p>A number of <code>db_*</code> generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, <code>db_data_types()</code>. These were only used for data insertion, and that now all happens via <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code>.</p></li>
 <li><p>MySQL uses standard SQL for index creation.</p></li>
 <li><p>MS SQL translation does better a distinguishing between bit and boolean (<a href='https://github.com/tidyverse/dbplyr/issues/377'>#377</a>, <a href='https://github.com/tidyverse/dbplyr/issues/318'>#318</a>). <code>if</code> and <code>ifelse</code> once again generate <code>IIF</code>, creating simpler expressions.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> gains an <code>in_transaction</code> argument so you can optionally suppress the transaction wrapper (<a href='https://github.com/tidyverse/dbplyr/issues/368'>#368</a>).</p></li>
