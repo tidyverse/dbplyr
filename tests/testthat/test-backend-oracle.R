@@ -23,7 +23,4 @@ test_that("generates custom sql", {
 
   expect_snapshot(sql_analyze(con, ident("table")))
   expect_snapshot(sql_explain(con, sql("SELECT * FROM foo")))
-
-  expect_snapshot(sql_drop_table(con, ident("table")))
-  expect_snapshot(sql_drop_table(con, ident("table"), force = TRUE))
 })

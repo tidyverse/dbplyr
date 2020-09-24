@@ -24,7 +24,7 @@
   (#489).
 
 * A number of `db_*` generics have been replaced with SQL generation generics:
-  `sql_analyze()`, `sql_create_index()`, `sql_explain()`, `sql_drop_table()`,
+  `sql_analyze()`, `sql_create_index()`, `sql_explain()`,
   `sql_save_query()`, `sql_query_fields()`, `sql_query_rows()`. 
   
     This makes them easier to test and is an important part of the process of
@@ -32,8 +32,9 @@
   
 * A number of `db_*` generics are no longer used: `db_create_indexes()`,
   `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,
-  `db_has_table()`, `db_create_table()`, `db_data_types()`. These were only
-  used for data insertion, and that now all happens via `dbWriteTable()`.
+  `drop_drop_table()`, `db_has_table()`, `db_create_table()`, 
+  `db_data_types()`. These were only used for data insertion, and that now all 
+  happens via `dbWriteTable()`.
 
 * MySQL uses standard SQL for index creation.
 

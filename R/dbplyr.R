@@ -15,7 +15,6 @@
 #' @importFrom dplyr db_analyze
 #' @importFrom dplyr db_create_index
 #' @importFrom dplyr db_desc
-#' @importFrom dplyr db_drop_table
 #' @importFrom dplyr db_explain
 #' @importFrom dplyr db_query_fields
 #' @importFrom dplyr db_query_rows

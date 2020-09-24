@@ -442,7 +442,6 @@ base_no_win <- sql_translator(
 #'
 #' * `explain()` -> `db_explain` -> `sql_explain()`
 #' * `db_copy_to(analyze = TRUE)` -> `sql_analyze()` -> `sql_analyze()`
-#' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
 #' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
 #' * `compute()` -> `db_compute()` -> `db_save_query()` -> `sql_save_query()`
 #' * `do()` -> `db_query_rows()` -> `sql_query_rows()`
@@ -479,19 +478,6 @@ sql_analyze <- function(con, table, ...) {
 #' @export
 sql_analyze.DBIConnection <- function(con, table, ...) {
   build_sql("ANALYZE ", as.sql(table), con = con)
-}
-
-#' @rdname db_sql
-#' @export
-sql_drop_table <- function(con, table, force = FALSE, ...) {
-  UseMethod("sql_drop_table")
-}
-#' @export
-sql_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
-  build_sql(
-    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
-    con = con
-  )
 }
 
 #' @rdname db_sql

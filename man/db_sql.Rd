@@ -4,7 +4,6 @@
 \alias{db_sql}
 \alias{sql_explain}
 \alias{sql_analyze}
-\alias{sql_drop_table}
 \alias{sql_create_index}
 \alias{sql_save_query}
 \alias{sql_join_suffix}
@@ -15,8 +14,6 @@
 sql_explain(con, sql, ...)
 
 sql_analyze(con, table, ...)
-
-sql_drop_table(con, table, force = FALSE, ...)
 
 sql_create_index(con, table, columns, name = NULL, unique = FALSE, ...)
 
@@ -32,7 +29,6 @@ sql_query_rows(con, sql, ...)
 \itemize{
 \item \code{explain()} -> \code{db_explain} -> \code{sql_explain()}
 \item \code{db_copy_to(analyze = TRUE)} -> \code{sql_analyze()} -> \code{sql_analyze()}
-\item \code{db_copy_to(overwrite = TRUE)} -> \code{db_drop_table()} -> \code{sql_drop_table()}
 \item \code{db_copy_to(indexes = ...)} -> \code{db_create_index()} -> \code{sql_create_index()}
 \item \code{compute()} -> \code{db_compute()} -> \code{db_save_query()} -> \code{sql_save_query()}
 \item \code{do()} -> \code{db_query_rows()} -> \code{sql_query_rows()}

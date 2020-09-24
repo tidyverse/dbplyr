@@ -78,21 +78,6 @@ sql_subquery.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
   }
 }
 
-#' @export
-sql_drop_table.Oracle <- function(con, table, force = FALSE, ...) {
-  if (force) {
-    # https://stackoverflow.com/questions/1799128/oracle-if-table-exists
-    build_sql(
-      "BEGIN EXECUTE IMMEDIATE 'DROP TABLE ", as.sql(table), "';\n",
-      "EXCEPTION WHEN OTHERS THEN IF SQLCODE != -942 THEN RAISE; END IF;\n",
-      "END;",
-      con = con
-    )
-  } else {
-    build_sql("DROP TABLE ", as.sql(table), con = con)
-  }
-}
-
 # registered onLoad located in the zzz.R script
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
@@ -113,9 +98,6 @@ sql_analyze.OraConnection <- sql_analyze.Oracle
 
 #' @export
 sql_subquery.OraConnection <- sql_subquery.Oracle
-
-#' @export
-sql_drop_table.OraConnection <- sql_drop_table.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle

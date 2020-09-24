@@ -45,20 +45,6 @@
 ---
 
     Code
-      sql_drop_table(con, ident("table"))
-    Output
-      <SQL> DROP TABLE `table`
-
----
-
-    Code
-      sql_drop_table(con, ident("table"), force = TRUE)
-    Output
-      <SQL> DROP TABLE IF EXISTS `table`
-
----
-
-    Code
       sql_subquery(con, ident("table"))
     Output
       <IDENT> table

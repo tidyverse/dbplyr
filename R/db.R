@@ -37,12 +37,6 @@ db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
 }
 
 #' @export
-db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
-  sql <- sql_drop_table(con, table, force = force, ...)
-  dbExecute(con, sql)
-}
-
-#' @export
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_analyze(con, table, ...)
   if (is.null(sql)) {
