@@ -9,6 +9,16 @@
       FROM (SELECT `x` + 1.0 AS `x`
       FROM `multi_mutate`))
 
+# transmute includes all needed variables
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `x`, `x` + `y` AS `x2`
+      FROM (SELECT `x` / 2.0 AS `x`, `y`
+      FROM `df`) `q01`
+
 # mutate generates subqueries as needed
 
     Code

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `transmute()` now correctly tracks variables it needs when creating
+  subqueries (#313).
+
 * New `sql_join_suffix()` allows backends to control the default suffixes used   (#254).
 
 * `distinct()` no longer duplicates column if grouped (#354).

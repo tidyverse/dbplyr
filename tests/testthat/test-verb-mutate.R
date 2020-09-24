@@ -28,6 +28,13 @@ test_that("can refer to fresly created values", {
   expect_snapshot(show_query(out2))
 })
 
+test_that("transmute includes all needed variables", {
+  lf <- lazy_frame(x = 1, y = 2)
+  out <- transmute(lf, x = x / 2, x2 = x + y)
+  expect_named(out$ops$x$args$vars, c("x", "y"))
+  expect_snapshot(out)
+})
+
 test_that("queries are not nested unnecessarily", {
   # Should only be one query deep
   sql <- memdb_frame(x = 1) %>%
