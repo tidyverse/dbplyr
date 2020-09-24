@@ -15,7 +15,7 @@
   y,
   by = NULL,
   copy = FALSE,
-  suffix = c(".x", ".y"),
+  suffix = NULL,
   auto_index = FALSE,
   ...,
   sql_on = NULL
@@ -26,7 +26,7 @@
   y,
   by = NULL,
   copy = FALSE,
-  suffix = c(".x", ".y"),
+  suffix = NULL,
   auto_index = FALSE,
   ...,
   sql_on = NULL
@@ -37,7 +37,7 @@
   y,
   by = NULL,
   copy = FALSE,
-  suffix = c(".x", ".y"),
+  suffix = NULL,
   auto_index = FALSE,
   ...,
   sql_on = NULL
@@ -48,7 +48,7 @@
   y,
   by = NULL,
   copy = FALSE,
-  suffix = c(".x", ".y"),
+  suffix = NULL,
   auto_index = FALSE,
   ...,
   sql_on = NULL

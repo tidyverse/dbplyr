@@ -7,6 +7,7 @@
 \alias{sql_drop_table}
 \alias{sql_create_index}
 \alias{sql_save_query}
+\alias{sql_join_suffix}
 \title{SQL generation methods for database methods}
 \usage{
 sql_explain(con, sql, ...)
@@ -18,6 +19,8 @@ sql_drop_table(con, table, force = FALSE, ...)
 sql_create_index(con, table, columns, name = NULL, unique = FALSE, ...)
 
 sql_save_query(con, sql, name, temporary = TRUE, ...)
+
+sql_join_suffix(con, ...)
 }
 \description{
 \itemize{
