@@ -19,12 +19,27 @@ simulate_dbi <- function(class = character(), ...) {
   )
 }
 
-# Needed to work around fundamental hackiness of how I'm mingling
-# S3 and S4 dispatch
+
+sql_escape_ident <- function(con, x) {
+  UseMethod("sql_escape_ident")
+}
+#' @export
+sql_escape_ident.DBIConnection <- function(con, x) {
+  dbQuoteIdentifier(con, x)
+}
+#' @export
 sql_escape_ident.TestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
+sql_escape_string <- function(con, x) {
+  UseMethod("sql_escape_string")
+}
+#' @export
+sql_escape_string.DBIConnection <- function(con, x) {
+  dbQuoteString(con, x)
+}
+#' @export
 sql_escape_string.TestConnection <- function(con, x) {
   sql_quote(x, "'")
 }

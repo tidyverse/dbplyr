@@ -94,21 +94,21 @@ test_that("raw is SQL-99 compatible (by default)", {
 
 test_that("names_to_as() doesn't alias when ident name and value are identical", {
   x <- ident(name = "name")
-  y <- sql_escape_ident(con = simulate_dbi(),  x = x)
+  y <- sql("`name`")
 
   expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name`")
 })
 
 test_that("names_to_as() doesn't alias when ident name is missing", {
   x <- ident("*")
-  y <- sql_escape_ident(con = simulate_dbi(),  x = x)
+  y <- sql("`*`")
 
-  expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`*`")
+  expect_equal(names_to_as(y, names2(x), con = simulate_dbi()),  "`*`")
 })
 
 test_that("names_to_as() aliases when ident name and value are different", {
   x <- ident(new_name = "name")
-  y <- sql_escape_ident(con = simulate_dbi(),  x = x)
+  y <- sql(new_name = "`name`")
 
   expect_equal(names_to_as(y, names2(x),  con = simulate_dbi()),  "`name` AS `new_name`")
 })

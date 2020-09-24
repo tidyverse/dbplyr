@@ -250,11 +250,6 @@ sql_escape_raw <- function(con, x) {
 # DBIConnection methods --------------------------------------------------------
 
 #' @export
-sql_escape_string.DBIConnection <- function(con, x) {
-  dbQuoteString(con, x)
-}
-
-#' @export
 sql_escape_date.DBIConnection <- function(con, x) {
   sql_escape_string(con, as.character(x))
 }
@@ -263,11 +258,6 @@ sql_escape_date.DBIConnection <- function(con, x) {
 sql_escape_datetime.DBIConnection <- function(con, x) {
   x <- strftime(x, "%Y-%m-%dT%H:%M:%OSZ", tz = "UTC")
   sql_escape_string(con, x)
-}
-
-#' @export
-sql_escape_ident.DBIConnection <- function(con, x) {
-  dbQuoteIdentifier(con, x)
 }
 
 #' @export
