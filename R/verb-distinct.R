@@ -17,7 +17,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 
 #' @export
 op_vars.op_distinct <- function(op) {
-  c(op_grps(op$x), op_vars(op$x))
+  union(op_grps(op$x), op_vars(op$x))
 }
 
 #' @export

@@ -26,6 +26,11 @@ test_that("distinct throws error if column is specified and .keep_all is TRUE", 
   expect_snapshot_error(mf %>% distinct(x, .keep_all = TRUE) %>% collect())
 })
 
+test_that("distinct doesn't duplicate colum names if grouped (#354)", {
+  df <- lazy_frame(a = 1)
+  expect_equal(df %>% group_by(a) %>% distinct() %>% op_vars(), "a")
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
