@@ -230,7 +230,7 @@ mssql_table_rename <- function(name, temporary) {
   if (!temporary || substr(name, 1, 1) == "#") {
     name
   } else {
-    name <- paste0("#", name)
+    name <- ident(paste0("#", name))
     inform(
       paste0("Created a temporary table named ", name),
       class = c("dbplyr_message_temp_table", "dbplyr_message")
