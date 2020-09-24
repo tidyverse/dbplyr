@@ -10,13 +10,16 @@ sql(...)
 
 is.sql(x)
 
-as.sql(x)
+as.sql(x, con)
 }
 \arguments{
 \item{...}{Character vectors that will be combined into a single SQL
 expression.}
 
 \item{x}{Object to coerce}
+
+\item{con}{Needed when \code{x} is directly suppled from the user so that
+schema specifications can be quoted using the correct identifiers.}
 }
 \description{
 These functions are critical when writing functions that translate R

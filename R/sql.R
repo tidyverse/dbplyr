@@ -57,11 +57,13 @@ format.sql <- function(x, ...) {
 #' @rdname sql
 #' @export
 #' @param x Object to coerce
-as.sql <- function(x) UseMethod("as.sql")
+#' @param con Needed when `x` is directly suppled from the user so that
+#'   schema specifications can be quoted using the correct identifiers.
+as.sql <- function(x, con) UseMethod("as.sql")
 
 #' @export
-as.sql.ident <- function(x) x
+as.sql.ident <- function(x, con) x
 #' @export
-as.sql.sql <- function(x) x
+as.sql.sql <- function(x, con) x
 #' @export
-as.sql.character <- function(x) ident(x)
+as.sql.character <- function(x, con) ident(x)

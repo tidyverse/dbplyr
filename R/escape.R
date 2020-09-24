@@ -52,11 +52,6 @@ escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
 }
 
 #' @export
-escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
-}
-
-#' @export
 escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_logical(con, x), parens, collapse, con = con)
 }

@@ -20,7 +20,6 @@ test_that("zero length inputs yield zero length output when not collapsed", {
   con <- simulate_dbi()
   expect_equal(sql_vector(sql(), collapse = NULL, con = con), sql())
   expect_equal(sql_vector(ident(), collapse = NULL, con = con), sql())
-  expect_equal(sql_vector(ident_q(), collapse = NULL, con = con), sql())
 })
 
 test_that("zero length inputs yield length-1 output when collapsed", {
@@ -30,8 +29,6 @@ test_that("zero length inputs yield length-1 output when collapsed", {
   expect_equal(sql_vector(sql(), parens = TRUE, collapse = "", con = con), sql("()"))
   expect_equal(sql_vector(ident(), parens = FALSE, collapse = "", con = con), sql(""))
   expect_equal(sql_vector(ident(), parens = TRUE, collapse = "", con = con), sql("()"))
-  expect_equal(sql_vector(ident_q(), parens = FALSE, collapse = "", con = con), sql(""))
-  expect_equal(sql_vector(ident_q(), parens = TRUE, collapse = "", con = con), sql("()"))
 })
 
 # Numeric ------------------------------------------------------------------

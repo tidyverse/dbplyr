@@ -14,7 +14,7 @@
 #'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
-  from <- as.sql(from)
+  from <- as.sql(from, con = src$con)
 
   vars <- vars %||% db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)

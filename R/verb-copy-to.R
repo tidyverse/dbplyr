@@ -51,11 +51,13 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             analyze = TRUE, ...,
                             in_transaction = TRUE
                             ) {
-  assert_that(is_string(name), is.flag(temporary))
+  assert_that(is.flag(temporary))
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
     stop("`df` must be a local dataframe or a remote tbl_sql", call. = FALSE)
   }
+
+  name <- as.sql(name, con = dest$con)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
     out <- compute(df,

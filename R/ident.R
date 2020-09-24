@@ -25,13 +25,6 @@ ident <- function(...) {
 }
 
 #' @export
-#' @rdname ident
-ident_q <- function(...) {
-  x <- c_character(...)
-  structure(x, class = c("ident_q", "ident", "character"))
-}
-
-#' @export
 print.ident <- function(x, ...) cat(format(x, ...), sep = "\n")
 #' @export
 format.ident <- function(x, ...) {

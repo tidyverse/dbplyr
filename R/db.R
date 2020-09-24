@@ -20,9 +20,10 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
 
 #' @export
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
+
   dbWriteTable(
     con,
-    name = dbi_quote(as.sql(table), con),
+    name = dbi_quote(table, con),
     value = values,
     field.types = types,
     temporary = temporary,
@@ -111,7 +112,6 @@ db_query_rows.DBIConnection <- function(con, sql, ...) {
 # Utility functions ------------------------------------------------------------
 
 dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))
 dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
 dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))

@@ -1,9 +1,12 @@
 #' Refer to a table in a schema
 #'
-#' @param schema,table Names of schema and table.
+#' @param schema,table Names of schema and table. These will be automatically
+#'   quoted; use `sql()` to pass a raw name that won't get quoted.
 #' @export
 #' @examples
 #' in_schema("my_schema", "my_table")
+#' # eliminate quotes
+#' in_schema(sql("my_schema"), sql("my_table"))
 #'
 #' # Example using schemas with SQLite
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -19,5 +22,45 @@
 #' con %>% tbl("df")
 #' con %>% tbl(in_schema("aux", "df"))
 in_schema <- function(schema, table) {
-  ident_q(paste0(schema, ".", table))
+  structure(
+    list(schema = as.sql(schema), table = as.sql(table)),
+    class = "dbplyr_schema"
+  )
 }
+
+#' @export
+print.dbplyr_schema <- function(x, ...) {
+  cat_line("<SCHEMA> ", escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+
+#' @export
+as.sql.dbplyr_schema <- function(x, con) {
+  ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
+}
+
+# Support for DBI::Id() ---------------------------------------------------
+
+#' @export
+as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
+
+# Old dbplyr approach -----------------------------------------------------
+
+#' Declare a identifer as being pre-quoted.
+#'
+#' No longer needed; please use [sql()] instead.
+#'
+#' @keywords internal
+#' @export
+#' @rdname
+ident_q <- function(...) {
+  x <- c_character(...)
+  structure(x, class = c("ident_q", "ident", "character"))
+}
+
+#' @export
+escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+  sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
+}
+
+#' @export
+dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))

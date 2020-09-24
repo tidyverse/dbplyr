@@ -34,7 +34,6 @@ op_base_local <- function(df) {
 }
 
 op_base_remote <- function(x, vars) {
-  stopifnot(is.sql(x) || is.ident(x))
   op_base(x, vars, class = "remote")
 }
 

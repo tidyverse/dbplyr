@@ -2,13 +2,10 @@
 % Please edit documentation in R/ident.R
 \name{ident}
 \alias{ident}
-\alias{ident_q}
 \alias{is.ident}
 \title{Flag a character vector as SQL identifiers}
 \usage{
 ident(...)
-
-ident_q(...)
 
 is.ident(x)
 }

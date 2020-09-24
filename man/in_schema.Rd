@@ -7,13 +7,16 @@
 in_schema(schema, table)
 }
 \arguments{
-\item{schema, table}{Names of schema and table.}
+\item{schema, table}{Names of schema and table. These will be automatically
+quoted; use \code{sql()} to pass a raw name that won't get quoted.}
 }
 \description{
 Refer to a table in a schema
 }
 \examples{
 in_schema("my_schema", "my_table")
+# eliminate quotes
+in_schema(sql("my_schema"), sql("my_table"))
 
 # Example using schemas with SQLite
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")

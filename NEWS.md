@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Each individual element of `in_schema()` is now correctly quoted (#287). 
+  (use `sql()` to opt out of quoting, if needed). And `DBI::Id()` should work
+  anywhere that `in_schema()` does.
+
 * Can now `copy_to()` can now `overwrite` when table is specified with schema 
   (#489).
 

@@ -66,11 +66,6 @@ sql_translate_env.SQLiteConnection <- function(con) {
 }
 
 #' @export
-sql_escape_ident.SQLiteConnection <- function(con, x) {
-  sql_quote(x, "`")
-}
-
-#' @export
 sql_escape_logical.SQLiteConnection <- function(con, x){
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
