@@ -445,6 +445,8 @@ base_no_win <- sql_translator(
 #' * `db_copy_to(overwrite = TRUE)` -> `db_drop_table()` -> `sql_drop_table()`
 #' * `db_copy_to(indexes = ...)` -> `db_create_index()` -> `sql_create_index()`
 #' * `compute()` -> `db_compute()` -> `db_save_query()` -> `sql_save_query()`
+#' * `do()` -> `db_query_rows()` -> `sql_query_rows()`
+#' * `tbl()` -> `db_query_fields()` -> `sql_query_fields()`
 #'
 #' @keywords internal
 #' @name db_sql
@@ -533,4 +535,27 @@ sql_join_suffix <- function(con, ...) {
 #' @export
 sql_join_suffix.DBIConnection <- function(con, ...) {
   c(".x", ".y")
+}
+
+#' @rdname db_sql
+#' @export
+sql_query_fields <- function(con, sql, ...) {
+  UseMethod("sql_query_fields")
+}
+
+#' @export
+sql_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
+}
+
+#' @rdname db_sql
+#' @export
+sql_query_rows <- function(con, sql, ...) {
+  UseMethod("sql_query_rows")
+}
+
+#' @export
+sql_query_rows.DBIConnection <- function(con, sql, ...) {
+  from <- sql_subquery(con, sql, "master")
+  build_sql("SELECT COUNT(*) FROM ", from, con = con)
 }

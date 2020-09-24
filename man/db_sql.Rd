@@ -8,6 +8,8 @@
 \alias{sql_create_index}
 \alias{sql_save_query}
 \alias{sql_join_suffix}
+\alias{sql_query_fields}
+\alias{sql_query_rows}
 \title{SQL generation methods for database methods}
 \usage{
 sql_explain(con, sql, ...)
@@ -21,6 +23,10 @@ sql_create_index(con, table, columns, name = NULL, unique = FALSE, ...)
 sql_save_query(con, sql, name, temporary = TRUE, ...)
 
 sql_join_suffix(con, ...)
+
+sql_query_fields(con, sql, ...)
+
+sql_query_rows(con, sql, ...)
 }
 \description{
 \itemize{
@@ -29,6 +35,8 @@ sql_join_suffix(con, ...)
 \item \code{db_copy_to(overwrite = TRUE)} -> \code{db_drop_table()} -> \code{sql_drop_table()}
 \item \code{db_copy_to(indexes = ...)} -> \code{db_create_index()} -> \code{sql_create_index()}
 \item \code{compute()} -> \code{db_compute()} -> \code{db_save_query()} -> \code{sql_save_query()}
+\item \code{do()} -> \code{db_query_rows()} -> \code{sql_query_rows()}
+\item \code{tbl()} -> \code{db_query_fields()} -> \code{sql_query_fields()}
 }
 }
 \keyword{internal}

@@ -25,8 +25,10 @@
 
 * A number of `db_*` generics have been replaced with SQL generation generics:
   `sql_analyze()`, `sql_create_index()`, `sql_explain()`, `sql_drop_table()`,
-  `sql_save_query()`. This makes them easier to test is part of the process
-  of detangling dbplyr and dplyr (#284).
+  `sql_save_query()`, `sql_query_fields()`, `sql_query_rows()`. 
+  
+    This makes them easier to test and is an important part of the process of
+    moving all database generics in dbplyr (#284).
   
 * A number of `db_*` generics are no longer used: `db_create_indexes()`,
   `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,

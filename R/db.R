@@ -66,19 +66,13 @@ db_explain.DBIConnection <- function(con, sql, ...) {
 
 #' @export
 db_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
-  qry <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(qry))
-
-  res <- dbFetch(qry, 0)
-  names(res)
+  sql <- sql_query_fields(con, sql, ...)
+  names(dbGetQuery(con, sql))
 }
 
 #' @export
 db_query_rows.DBIConnection <- function(con, sql, ...) {
-  from <- sql_subquery(con, sql, "master")
-  rows <- build_sql("SELECT COUNT(*) FROM ", from, con = con)
-
+  sql <- sql_query_rows(con, sql, ...)
   as.integer(dbGetQuery(con, rows)[[1]])
 }
 
