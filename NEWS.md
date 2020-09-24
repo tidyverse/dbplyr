@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `intersect()`, `union()` and `setdiff()` gain an `all` argument to add the
+  `ALL` argument (#414).
+
 * Each individual element of `in_schema()` is now correctly quoted (#287). 
   (use `sql()` to opt out of quoting, if needed). And `DBI::Id()` should work
   anywhere that `in_schema()` does.

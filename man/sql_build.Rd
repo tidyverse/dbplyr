@@ -26,7 +26,7 @@ select_query(
 
 semi_join_query(x, y, anti = FALSE, by = NULL)
 
-set_op_query(x, y, type = type)
+set_op_query(x, y, type = type, all = all)
 
 sql_build(op, con = NULL, ...)
 

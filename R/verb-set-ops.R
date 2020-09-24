@@ -1,25 +1,42 @@
+#' SQL set operations
+#'
+#' These are methods for the dplyr generics `dplyr::intersect()`,
+#' `dplyr::union()`, and `dplyr::setdiff()`. They are translated to
+#' `INTERSECT`, `UNION`, and `EXCEPT` respectively.
+#'
+#' @inheritParams left_join.tbl_lazy
+#' @param ... Not currently used; provided for future extensions.
+#' @param all If `TRUE`, includes all matches in output, not just unique rows.
+#' @name dbplyr-set_ops
+#' @aliases NULL
+NULL
+
 # registered onLoad
+#' @rdname dbplyr-set_ops
 #' @importFrom dplyr intersect
-intersect.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "INTERSECT", copy = copy, ...)
+intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  add_op_set_op(x, y, "INTERSECT", all = all, copy = copy, ...)
 }
 # registered onLoad
+#' @rdname dbplyr-set_ops
 #' @importFrom dplyr union
-union.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "UNION", copy = copy, ...)
+union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  add_op_set_op(x, y, "UNION", all = all, copy = copy, ...)
 }
 #' @export
+#' @rdname dbplyr-set_ops
 #' @importFrom dplyr union_all
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "UNION ALL", copy = copy, ...)
+  add_op_set_op(x, y, "UNION", all = TRUE, copy = copy, ...)
 }
 # registered onLoad
+#' @rdname dbplyr-set_ops
 #' @importFrom dplyr setdiff
-setdiff.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "EXCEPT", copy = copy, ...)
+setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  add_op_set_op(x, y, "EXCEPT", all = all, copy = copy, ...)
 }
 
-add_op_set_op <- function(x, y, type, copy = FALSE, ...) {
+add_op_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
   y <- auto_copy(x, y, copy)
 
   if (inherits(x$src$con, "SQLiteConnection")) {
@@ -38,7 +55,7 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ...) {
   x <- fill_vars(x, vars)
   y <- fill_vars(y, vars)
 
-  x$ops <- op_double("set_op", x, y, args = list(type = type))
+  x$ops <- op_double("set_op", x, y, args = list(type = type, all = all))
   x
 }
 
@@ -68,5 +85,5 @@ op_vars.op_set_op <- function(op) {
 #' @export
 sql_build.op_set_op <- function(op, con, ...) {
   # add_op_set_op() ensures that both have same variables
-  set_op_query(op$x, op$y, type = op$args$type)
+  set_op_query(op$x, op$y, type = op$args$type, all = op$args$type)
 }
