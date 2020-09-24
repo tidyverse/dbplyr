@@ -1,3 +1,14 @@
+# can refer to fresly created values
+
+    Code
+      show_query(out2)
+    Output
+      <SQL>
+      SELECT `x` + 4.0 AS `x`
+      FROM (SELECT `x` + 2.0 AS `x`
+      FROM (SELECT `x` + 1.0 AS `x`
+      FROM `multi_mutate`))
+
 # mutate generates subqueries as needed
 
     Code

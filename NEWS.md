@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `mutate()` correctly generates subqueries when you re-use the same variable
+  three or more times (#412).
+
 * Each individual element of `in_schema()` is now correctly quoted (#287). 
   (use `sql()` to opt out of quoting, if needed). And `DBI::Id()` should work
   anywhere that `in_schema()` does.
