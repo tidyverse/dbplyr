@@ -14,7 +14,6 @@
 # Generics that really should live in dbplyr
 #' @importFrom dplyr db_analyze
 #' @importFrom dplyr db_create_index
-#' @importFrom dplyr db_data_type
 #' @importFrom dplyr db_desc
 #' @importFrom dplyr db_drop_table
 #' @importFrom dplyr db_explain

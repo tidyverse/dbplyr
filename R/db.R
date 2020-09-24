@@ -6,11 +6,6 @@ db_desc.DBIConnection <- function(x) {
 }
 
 #' @export
-db_data_type.DBIConnection <- function(con, fields) {
-  vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
-}
-
-#' @export
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
                                         ...) {
   sql <- sql_save_query(con, sql, name, temporary = temporary, ...)

@@ -117,9 +117,6 @@ db_copy_to.DBIConnection <- function(con, table, values,
                             analyze = TRUE, ...,
                             in_transaction = TRUE) {
 
-  types <- types %||% db_data_type(con, values)
-  names(types) <- names(values)
-
   with_transaction(con, in_transaction, {
     table <- db_write_table(con, table,
       types = types,
@@ -143,7 +140,6 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
     db_create_index(con, table, index, unique = unique, ...)
   }
 }
-
 
 # Don't use `tryCatch()` because it messes with the callstack
 with_transaction <- function(con, in_transaction, code) {
