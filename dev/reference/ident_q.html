@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • dbplyr</title>
+<title>Declare a identifer as being pre-quoted. — ident_q • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,7 +49,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Declare a identifer as being pre-quoted. — ident_q" />
+<meta property="og:description" content="No longer needed; please use sql() instead." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -78,7 +79,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -173,164 +174,22 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Declare a identifer as being pre-quoted.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/schema.R'><code>R/schema.R</code></a></small>
+    <div class="hidden name"><code>ident_q.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>No longer needed; please use <code><a href='sql.html'>sql()</a></code> instead.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>ident_q</span>(<span class='kw'>...</span>)</pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-dplyr-verbs" class="hasAnchor"><a href="#section-dplyr-verbs" class="anchor"></a>dplyr verbs</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="tbl.src_dbi.html">tbl(<i>&lt;src_dbi&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Use dplyr verbs with a remote database table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="arrange.tbl_lazy.html">arrange(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Arrange rows by variables in a remote database table</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="copy_to.src_sql.html">copy_to(<i>&lt;src_sql&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Copy a local data frame to a DBI backend.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="collapse.tbl_sql.html">collapse(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">compute(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">collect(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Force computation of query</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="do.tbl_sql.html">do(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Perform arbitrary computation on remote backend</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Join SQL tables</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-database-connection" class="hasAnchor"><a href="#section-database-connection" class="anchor"></a>Database connection</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="in_schema.html">in_schema()</a></code> </p>
-        </td>
-        <td><p>Refer to a table in a schema</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="memdb_frame.html">memdb_frame()</a></code> <code><a href="memdb_frame.html">tbl_memdb()</a></code> <code><a href="memdb_frame.html">src_memdb()</a></code> </p>
-        </td>
-        <td><p>Create a database table in temporary in-memory database.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="remote_name.html">remote_name()</a></code> <code><a href="remote_name.html">remote_src()</a></code> <code><a href="remote_name.html">remote_con()</a></code> <code><a href="remote_name.html">remote_query()</a></code> <code><a href="remote_name.html">remote_query_plan()</a></code> </p>
-        </td>
-        <td><p>Metadata about a remote table</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-sql-generation" class="hasAnchor"><a href="#section-sql-generation" class="anchor"></a>SQL generation</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="build_sql.html">build_sql()</a></code> </p>
-        </td>
-        <td><p>Build a SQL string.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="escape.html">escape()</a></code> <code><a href="escape.html">escape_ansi()</a></code> <code><a href="escape.html">sql_vector()</a></code> </p>
-        </td>
-        <td><p>Escape/quote a string.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="ident.html">ident()</a></code> <code><a href="ident.html">is.ident()</a></code> </p>
-        </td>
-        <td><p>Flag a character vector as SQL identifiers</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="partial_eval.html">partial_eval()</a></code> </p>
-        </td>
-        <td><p>Partially evaluate an expression.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sql.html">sql()</a></code> <code><a href="sql.html">is.sql()</a></code> <code><a href="sql.html">as.sql()</a></code> </p>
-        </td>
-        <td><p>SQL escaping.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sql_expr.html">sql_expr()</a></code> <code><a href="sql_expr.html">sql_call2()</a></code> </p>
-        </td>
-        <td><p>Generate SQL from R expressions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="translate_sql.html">translate_sql()</a></code> <code><a href="translate_sql.html">translate_sql_()</a></code> </p>
-        </td>
-        <td><p>Translate an expression to sql.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="window_order.html">window_order()</a></code> <code><a href="window_order.html">window_frame()</a></code> </p>
-        </td>
-        <td><p>Override window order and frame</p></td>
-      </tr>
-    </tbody>
-    </table>
+
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

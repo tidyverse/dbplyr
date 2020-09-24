@@ -186,14 +186,12 @@ for schema.table." />
 
     <div class="ref-description">
     <p><code>ident()</code> takes unquoted strings and flags them as identifiers.
-<code>ident_q()</code> assumes its input has already been quoted, and ensures
+<code><a href='ident_q.html'>ident_q()</a></code> assumes its input has already been quoted, and ensures
 it does not get quoted again. This is currently used only for
 for <code>schema.table</code>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>ident</span>(<span class='kw'>...</span>)
-
-<span class='fu'>ident_q</span>(<span class='kw'>...</span>)
 
 <span class='fu'>is.ident</span>(<span class='kw'>x</span>)</pre>
 
@@ -222,7 +220,7 @@ for <code>schema.table</code>.</p>
 <span class='co'># You can supply multiple inputs</span>
 <span class='fu'>ident</span>(a = <span class='st'>"x"</span>, b = <span class='st'>"y"</span>)
 </div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'>ident_q</span>(a = <span class='st'>"x"</span>, b = <span class='st'>"y"</span>)
+#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'><a href='ident_q.html'>ident_q</a></span>(a = <span class='st'>"x"</span>, b = <span class='st'>"y"</span>)
 </div><div class='output co'>#&gt; &lt;IDENT&gt; x
 #&gt; &lt;IDENT&gt; y</div></pre>
   </div>

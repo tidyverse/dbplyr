@@ -193,7 +193,7 @@ all its inputs and return an sql object.</p>
 
 <span class='fu'>is.sql</span>(<span class='kw'>x</span>)
 
-<span class='fu'>as.sql</span>(<span class='kw'>x</span>)</pre>
+<span class='fu'>as.sql</span>(<span class='kw'>x</span>, <span class='kw'>con</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -206,6 +206,11 @@ expression.</p></td>
     <tr>
       <th>x</th>
       <td><p>Object to coerce</p></td>
+    </tr>
+    <tr>
+      <th>con</th>
+      <td><p>Needed when <code>x</code> is directly suppled from the user so that
+schema specifications can be quoted using the correct identifiers.</p></td>
     </tr>
     </table>
 

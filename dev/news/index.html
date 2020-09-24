@@ -184,6 +184,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p>Each individual element of <code><a href="../reference/in_schema.html">in_schema()</a></code> is now correctly quoted (<a href='https://github.com/tidyverse/dbplyr/issues/287'>#287</a>). (use <code><a href="../reference/sql.html">sql()</a></code> to opt out of quoting, if needed). And <code><a href="https://dbi.r-dbi.org/reference/Id.html">DBI::Id()</a></code> should work anywhere that <code><a href="../reference/in_schema.html">in_schema()</a></code> does.</p></li>
 <li><p>Can now <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> can now <code>overwrite</code> when table is specified with schema (<a href='https://github.com/tidyverse/dbplyr/issues/489'>#489</a>).</p></li>
 <li><p>A number of <code>db_*</code> generics have been replaced with SQL generation generics: <code><a href="../reference/db_sql.html">sql_analyze()</a></code>, <code><a href="../reference/db_sql.html">sql_create_index()</a></code>, <code><a href="../reference/db_sql.html">sql_explain()</a></code>, <code><a href="../reference/db_sql.html">sql_drop_table()</a></code>, <code><a href="../reference/db_sql.html">sql_save_query()</a></code>. This makes them easier to test is part of the process of detangling dbplyr and dplyr (<a href='https://github.com/tidyverse/dbplyr/issues/284'>#284</a>).</p></li>
 <li><p>A number of <code>db_*</code> generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>.</p></li>
@@ -516,7 +517,7 @@
 <li><p>Multiple <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> calls in a row now collapse to a single call. This avoids a printing problem with MS SQL (<a href='https://github.com/tidyverse/dbplyr/issues/3084'>#3084</a>).</p></li>
 <li><p><code><a href="../reference/escape.html">escape()</a></code> now works with integer64 values from the bit64 package (<a href='https://github.com/tidyverse/dbplyr/issues/3230'>#3230</a>)</p></li>
 <li><p><code>if</code>, <code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else()</a></code> now correctly scope the false condition so that it only applies to non-NULL conditions (<a href='https://github.com/tidyverse/dbplyr/issues/3157'>#3157</a>)</p></li>
-<li><p><code><a href="../reference/ident.html">ident()</a></code> and <code><a href="../reference/ident.html">ident_q()</a></code> handle 0-length inputs better, and should be easier to use with S3 (<a href='https://github.com/tidyverse/dbplyr/issues/3212'>#3212</a>)</p></li>
+<li><p><code><a href="../reference/ident.html">ident()</a></code> and <code><a href="../reference/ident_q.html">ident_q()</a></code> handle 0-length inputs better, and should be easier to use with S3 (<a href='https://github.com/tidyverse/dbplyr/issues/3212'>#3212</a>)</p></li>
 <li><p><code><a href="../reference/in_schema.html">in_schema()</a></code> should now work in more places, particularly in <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/3013'>#3013</a>, <a href='https://github.com/baileych'>@baileych</a>)</p></li>
 <li><p>SQL generation for joins no longer gets stuck in a endless loop if you request an empty suffix (<a href='https://github.com/tidyverse/dbplyr/issues/3220'>#3220</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> has better logic for splitting a single mutate into multiple subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/3095'>#3095</a>).</p></li>
@@ -646,7 +647,7 @@
 <ul>
 <li><p>New <code><a href="../reference/sql.html">as.sql()</a></code> safely coerces an input to SQL.</p></li>
 <li><p>More translators for <code><a href="https://rdrr.io/r/base/character.html">as.character()</a></code>, <code><a href="https://rdrr.io/r/base/integer.html">as.integer()</a></code> and <code><a href="https://rdrr.io/r/base/double.html">as.double()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/2775'>#2775</a>).</p></li>
-<li><p>New <code><a href="../reference/ident.html">ident_q()</a></code> makes it possible to specifier identifiers that do not need to be quoted.</p></li>
+<li><p>New <code><a href="../reference/ident_q.html">ident_q()</a></code> makes it possible to specifier identifiers that do not need to be quoted.</p></li>
 <li>
 <p>Translation of inline scalars:</p>
 <ul>

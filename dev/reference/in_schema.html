@@ -192,14 +192,17 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>schema, table</th>
-      <td><p>Names of schema and table.</p></td>
+      <td><p>Names of schema and table. These will be automatically
+quoted; use <code><a href='sql.html'>sql()</a></code> to pass a raw name that won't get quoted.</p></td>
     </tr>
     </table>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>in_schema</span>(<span class='st'>"my_schema"</span>, <span class='st'>"my_table"</span>)
-</div><div class='output co'>#&gt; &lt;IDENT&gt; my_schema.my_table</div><div class='input'>
+</div><div class='output co'>#&gt; &lt;SCHEMA&gt; `my_schema`.`my_table`</div><div class='input'><span class='co'># eliminate quotes</span>
+<span class='fu'>in_schema</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"my_schema"</span>), <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"my_table"</span>))
+</div><div class='output co'>#&gt; &lt;SCHEMA&gt; my_schema.my_table</div><div class='input'>
 <span class='co'># Example using schemas with SQLite</span>
 <span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='kw'>DBI</span>::<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw'>RSQLite</span>::<span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>)
 
@@ -227,7 +230,7 @@
 #&gt; </span><span style='color: #555555;'> 9</span><span>          4.4         2.9          1.4         0.2 setosa 
 #&gt; </span><span style='color: #555555;'>10</span><span>          4.9         3.1          1.5         0.1 setosa 
 #&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'><span class='kw'>con</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'>in_schema</span>(<span class='st'>"aux"</span>, <span class='st'>"df"</span>))
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   table&lt;aux.df&gt; [?? x 11]</span><span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   table&lt;`aux`.`df`&gt; [?? x 11]</span><span>
 #&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
