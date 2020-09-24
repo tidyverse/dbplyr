@@ -184,6 +184,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute()</a></code> now correctly tracks variables it needs when creating subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/313'>#313</a>).</p></li>
 <li><p>New <code>sql_join_suffix()</code> allows backends to control the default suffixes used (<a href='https://github.com/tidyverse/dbplyr/issues/254'>#254</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct()</a></code> no longer duplicates column if grouped (<a href='https://github.com/tidyverse/dbplyr/issues/354'>#354</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> grouping variables no longer generates a downstream error (<a href='https://github.com/tidyverse/dbplyr/issues/396'>#396</a>)</p></li>
