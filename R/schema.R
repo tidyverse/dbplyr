@@ -51,7 +51,6 @@ as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
 #'
 #' @keywords internal
 #' @export
-#' @rdname
 ident_q <- function(...) {
   x <- c_character(...)
   structure(x, class = c("ident_q", "ident", "character"))
