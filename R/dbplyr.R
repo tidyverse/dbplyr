@@ -23,7 +23,6 @@
 #' @importFrom dplyr db_drop_table
 #' @importFrom dplyr db_explain
 #' @importFrom dplyr db_has_table
-#' @importFrom dplyr db_insert_into
 #' @importFrom dplyr db_query_fields
 #' @importFrom dplyr db_query_rows
 #' @importFrom dplyr db_rollback

@@ -56,12 +56,6 @@ db_create_table.DBIConnection <- function(con, table, types,
 }
 
 #' @export
-db_insert_into.DBIConnection <- function(con, table, values, ...) {
-  dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
-}
-
-
-#' @export
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
   sql <- sql_create_index(con, table, columns, name = name, unique = unique, ...)
