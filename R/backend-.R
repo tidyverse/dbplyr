@@ -524,3 +524,13 @@ sql_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
     con = con
   )
 }
+
+#' @rdname db_sql
+#' @export
+sql_join_suffix <- function(con, ...) {
+  UseMethod("sql_join_suffix")
+}
+#' @export
+sql_join_suffix.DBIConnection <- function(con, ...) {
+  c(".x", ".y")
+}

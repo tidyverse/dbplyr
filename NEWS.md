@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New `sql_join_suffix()` allows backends to control the default suffixes used   (#254).
+
 * `distinct()` no longer duplicates column if grouped (#354).
 
 * `mutate()` grouping variables no longer generates a downstream error (#396)

@@ -68,7 +68,7 @@ NULL
 #' @export
 #' @importFrom dplyr inner_join
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                                suffix = c(".x", ".y"),
+                                suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL) {
 
@@ -88,7 +88,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 #' @importFrom dplyr left_join
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               suffix = c(".x", ".y"),
+                               suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL) {
 
@@ -108,7 +108,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 #' @importFrom dplyr right_join
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                                suffix = c(".x", ".y"),
+                                suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL) {
 
@@ -128,7 +128,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @export
 #' @importFrom dplyr full_join
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               suffix = c(".x", ".y"),
+                               suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL) {
 
@@ -182,7 +182,7 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 
 add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
-                        suffix = c(".x", ".y"),
+                        suffix = NULL,
                         auto_index = FALSE) {
 
   if (!is.null(sql_on)) {
@@ -200,6 +200,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     indexes = if (auto_index) list(by$y)
   )
 
+  suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
 
   x$ops <- op_double("join", x, y, args = list(
