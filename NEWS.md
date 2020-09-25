@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `sql_optimise()` now can partially optimise a pipeline; due to an unfortunate
+  bug it previously gave up too easily.
+
 * dbplyr no longer creates an `ORDER` BY clause in subqueries. This is not
   part of the SQL spec, and has very limited support across databases. Now
   such queries generate a warning suggesting that you move your `arrange()`

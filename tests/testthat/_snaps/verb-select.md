@@ -134,16 +134,13 @@
       LIMIT 1
     Code
       lf %>% arrange(a) %>% head(1) %>% arrange(b)
-    Warning <warning>
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT *
       FROM (SELECT *
-      FROM (SELECT *
-      FROM `df`) `q01`
-      LIMIT 1) `q02`
+      FROM `df`
+      ORDER BY `a`
+      LIMIT 1) `q01`
       ORDER BY `b`
     Code
       # mutate
@@ -186,15 +183,11 @@
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
-    Warning <warning>
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT -`a` AS `a`, `b`
-      FROM (SELECT *
       FROM (SELECT -`a` AS `a`, `b`
-      FROM `df`) `q01`) `q02`
+      FROM `df`) `q01`
 
 # arrange renders correctly for joins (#373)
 

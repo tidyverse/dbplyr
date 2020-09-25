@@ -69,6 +69,7 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
     from[as.character(outer)] <- x[as.character(outer)]
     from
   } else {
+    x$from <- from
     x
   }
 }
