@@ -4,7 +4,8 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
                                              order_by = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
-                                             ...) {
+                                             ...,
+                                             subquery = FALSE) {
   out <- vector("list", 7)
   names(out) <- c("select", "from", "where", "group_by",
                   "having", "order_by","limit")
@@ -30,7 +31,7 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
   out$where     <- sql_clause_where(where, con)
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
+  out$order_by  <- sql_clause_order_by(order_by, con, subquery, limit)
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
