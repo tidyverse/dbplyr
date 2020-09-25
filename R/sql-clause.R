@@ -1,3 +1,24 @@
+sql_select_clauses <- function(con,
+                               select,
+                               from,
+                               where,
+                               group_by,
+                               having,
+                               order_by,
+                               limit = NULL) {
+  out <- list(
+    select = select,
+    from = from,
+    where = where,
+    group_by = group_by,
+    having = having,
+    order_by = order_by,
+    limit = limit
+  )
+  out <- purrr::compact(out)
+  escape(unname(out), collapse = "\n", parens = FALSE, con = con)
+}
+
 sql_clause_select <- function(con, select, distinct = FALSE, top = NULL) {
   assert_that(is.character(select))
   if (is_empty(select)) {

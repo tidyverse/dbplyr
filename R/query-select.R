@@ -129,19 +129,15 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                distinct = FALSE,
                                ...,
                                subquery = FALSE) {
-  out <- vector("list", 7)
-  names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
-    "limit")
-
-  out$select    <- sql_clause_select(con, select, distinct)
-  out$from      <- sql_clause_from(con, from)
-  out$where     <- sql_clause_where(con, where)
-  out$group_by  <- sql_clause_group_by(con, group_by)
-  out$having    <- sql_clause_having(con, having)
-  out$order_by  <- sql_clause_order_by(con, order_by, subquery, limit)
-  out$limit     <- sql_clause_limit(con, limit)
-
-  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
+    limit     = sql_clause_limit(con, limit)
+  )
 }
 
 warn_drop_order_by <- function() {

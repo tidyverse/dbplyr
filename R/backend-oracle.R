@@ -1,29 +1,25 @@
 #' @export
-sql_select.Oracle<- function(con, select, from, where = NULL,
+sql_select.Oracle <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
                              order_by = NULL,
                              limit = NULL,
                              distinct = FALSE,
                              ...,
                              subquery = FALSE) {
-  out <- vector("list", 7)
-  names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
-                  "limit")
 
-  out$select    <- sql_clause_select(con, select, distinct)
-  out$from      <- sql_clause_from(con, from)
-  out$where     <- sql_clause_where(con, where)
-  out$group_by  <- sql_clause_group_by(con, group_by)
-  out$having    <- sql_clause_having(con, having)
-  out$order_by  <- sql_clause_order_by(con, order_by, subquery, limit)
-  # Requires Oracle 12c, released in 2013
-  if (!is.null(limit)) {
-    out$limit <- build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
-  }
-
-  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
+    # Requires Oracle 12c, released in 2013
+    limit =   if (!is.null(limit)) {
+      build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
+    }
+  )
 }
-
 
 #' @export
 sql_translate_env.Oracle <- function(con) {
