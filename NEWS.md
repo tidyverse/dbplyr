@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* `slice_min()`, `slice_max()`, and `slice_order()` are now supported.
+  `slice_head()` and `slice_tail()` throw clear error messages (#394)
+
+* `window_order()` overrides ordering, rather than appending to it.
+
 * Now supports `relocate()` from dplyr 1.0.0 (#494).
 
 * `sql_escape_ident()` and `sql_escape_string()` generics from dbplyr are no

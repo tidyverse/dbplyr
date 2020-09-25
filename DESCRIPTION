@@ -104,6 +104,7 @@ Collate:
     'remote.R'
     'schema.R'
     'simulate.R'
+    'slice.R'
     'sql-build.R'
     'sql-expr.R'
     'src-sql.R'

@@ -41,7 +41,7 @@ add_op_order <- function(.data, dots = list()) {
 }
 #' @export
 op_sort.op_order <- function(op) {
-  c(op_sort(op$x), op$dots)
+  op$dots
 }
 
 #' @export
