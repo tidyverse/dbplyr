@@ -55,51 +55,24 @@ test_that("arrange renders correctly for single-table verbs (#373)", {
     "complex mutate"
     lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
     lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-    lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
-    lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
     lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
   })
 })
 
-test_that("arrange renders correctly for joins (#373)", {
+test_that("can combine arrange with dual table verbs", {
   expect_snapshot({
     lf <- lazy_frame(a = 1:3, b = 3:1)
     rf <- lazy_frame(a = 1:3, c = 4:6)
 
-    "join"
+    "warn if arrange before join"
     lf %>% arrange(a) %>% left_join(rf)
-    lf %>% arrange(b) %>% left_join(rf)
-    lf %>% left_join(rf) %>% arrange(a)
-    lf %>% left_join(rf) %>% arrange(b)
-    lf %>% left_join(rf %>% arrange(a))
-    lf %>% left_join(rf %>% arrange(c))
-  })
-})
-
-test_that("arrange renders correctly for semi-joins (#373)", {
-  expect_snapshot({
-    lf <- lazy_frame(a = 1:3, b = 3:1)
-    rf <- lazy_frame(a = 1:3, c = 4:6)
-
-    "semi_join"
     lf %>% arrange(a) %>% semi_join(rf)
-    lf %>% arrange(b) %>% semi_join(rf)
+    lf %>% arrange(a) %>% union(rf)
+
+    "can arrange after join"
+    lf %>% left_join(rf) %>% arrange(a)
     lf %>% semi_join(rf) %>% arrange(a)
-    lf %>% semi_join(rf) %>% arrange(b)
-    lf %>% semi_join(rf %>% arrange(a))
-    lf %>% semi_join(rf %>% arrange(c))
-  })
-})
-
-test_that("arrange renders correctly for set operations (#373)", {
-  expect_snapshot({
-    lf <- lazy_frame(a = 1:3, b = 3:1)
-    rf <- lazy_frame(a = 1:3, c = 4:6)
-
-    "setop"
-    lf %>% union_all(rf) %>% arrange(a)
-    lf %>% arrange(a) %>% union_all(rf)
-    lf %>% union_all(rf %>% arrange(a))
+    lf %>% union(rf) %>% arrange(a)
   })
 })
 
