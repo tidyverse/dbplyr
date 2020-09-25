@@ -56,7 +56,7 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
     return(x)
   }
 
-  from <- sql_optimise(x$from, subquery = TRUE)
+  from <- sql_optimise(x$from, subquery = subquery)
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
@@ -66,6 +66,13 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
   can_squash <- length(outer) == 0 || length(inner) == 0 || min(outer) > max(inner)
 
   if (can_squash) {
+    # Have we optimised away an ORDER BY
+    if (length(from$order_by) > 0 && length(x$order_by) > 0) {
+      if (!identical(x$order_by, from$order_by)) {
+        warn_drop_order_by()
+      }
+    }
+
     from[as.character(outer)] <- x[as.character(outer)]
     from
   } else {
@@ -131,20 +138,15 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
   out$where     <- sql_clause_where(where, con)
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
-
-  if (length(order_by) > 0) {
-    if (!subquery || !is.null(limit)) {
-      out$order_by  <- sql_clause_order_by(order_by, con)
-    } else {
-      warn(c(
-        "ORDER BY is ignored in subqueries without LIMIT",
-        i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"
-      ))
-    }
-  }
-
+  out$order_by  <- sql_clause_order_by(order_by, con, subquery, limit)
   out$limit     <- sql_clause_limit(limit, con)
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
+warn_drop_order_by <- function() {
+  warn(c(
+    "ORDER BY is ignored in subqueries without LIMIT",
+    i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"
+  ))
+}

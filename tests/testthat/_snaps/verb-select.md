@@ -62,6 +62,9 @@
       # double arrange
     Code
       lf %>% arrange(a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT *
@@ -78,6 +81,9 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `b`
@@ -162,6 +168,9 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT 1.0 AS `a`, `b`
@@ -169,6 +178,9 @@
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `a`, `a` AS `b`
@@ -176,6 +188,9 @@
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `a`, 1.0 AS `b`
@@ -183,6 +198,9 @@
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT -`a` AS `a`, `b`

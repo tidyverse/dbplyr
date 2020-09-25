@@ -50,6 +50,11 @@ sql_clause_group_by <- function(group_by, con) sql_clause_generic("GROUP BY", gr
 
 sql_clause_having <- function(having, con) sql_clause_generic("HAVING", having, con)
 
-sql_clause_order_by <- function(order_by, con) sql_clause_generic("ORDER BY", order_by, con)
-
-
+sql_clause_order_by <- function(order_by, con, subquery = FALSE, limit = NULL) {
+  if (subquery && length(order_by) > 0 && is.null(limit)) {
+    warn_drop_order_by()
+    NULL
+  } else {
+    sql_clause_generic("ORDER BY", order_by, con)
+  }
+}
