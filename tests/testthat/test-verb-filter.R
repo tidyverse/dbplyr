@@ -53,11 +53,10 @@ test_that("cumulative aggregates generate window function", {
   df1 <- memdb_frame(x = c(1:3, 2:4), g = rep(c(1, 2), each = 3))
   out <- df1 %>%
     group_by(g) %>%
-    arrange(x) %>%
-    filter(cumsum(x) > 3) %>%
-    collect()
+    window_order(x) %>%
+    filter(cumsum(x) > 3)
 
-  expect_equal(out$x, c(3L, 3L, 4L))
+  expect_equal(pull(out, x), c(3L, 3L, 4L))
 })
 
 # sql_build ---------------------------------------------------------------
