@@ -227,7 +227,7 @@ unlikely to conflict with an existing table.</p></td>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>)
 <span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'>memdb_frame</span>(x = <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>), y = <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span>(<span class='fl'>100</span>))
 <span class='kw'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>x</span>)
-</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_008&gt; [?? x 2]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_009&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
 #&gt;          x       y
@@ -245,7 +245,7 @@ unlikely to conflict with an existing table.</p></td>
 #&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'><span class='kw'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>x</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *
-#&gt; FROM `dbplyr_008`
+#&gt; FROM `dbplyr_009`
 #&gt; ORDER BY `x`</div><div class='input'>
 <span class='kw'>mtcars_db</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_memdb</span>(<span class='kw'>mtcars</span>)
 </div><div class='output co'>#&gt; <span class='error'>Error: Table `mtcars` exists in database, and both overwrite and append are FALSE</span></div><div class='input'><span class='kw'>mtcars_db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='kw'>cyl</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(n = <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span>()) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()

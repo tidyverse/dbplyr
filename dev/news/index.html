@@ -187,6 +187,8 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_min()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max()</a></code>, and <code>slice_order()</code> are now supported. <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_tail()</a></code> throw clear error messages (<a href='https://github.com/tidyverse/dbplyr/issues/394'>#394</a>)</p></li>
+<li><p><code><a href="../reference/window_order.html">window_order()</a></code> overrides ordering, rather than appending to it.</p></li>
 <li><p>Now supports <code><a href="https://dplyr.tidyverse.org/reference/relocate.html">relocate()</a></code> from dplyr 1.0.0 (<a href='https://github.com/tidyverse/dbplyr/issues/494'>#494</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code> generics from dbplyr are no longer used; these methods should now be supplied for <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteString.html">DBI::dbQuoteString()</a></code> respectively.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute()</a></code> now correctly tracks variables it needs when creating subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/313'>#313</a>).</p></li>
