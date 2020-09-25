@@ -16,17 +16,12 @@ sql_select.Oracle<- function(con, select, from, where = NULL,
   out$group_by  <- sql_clause_group_by(con, group_by)
   out$having    <- sql_clause_having(con, having)
   out$order_by  <- sql_clause_order_by(con, order_by, subquery, limit)
-
-  # Processing limit via ROWNUM in a WHERE clause, thie method
-  # is backwards & forward compatible: https://oracle-base.com/articles/misc/top-n-queries
-  if (!is.null(limit) && !identical(limit, Inf)) {
-    out <- escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
-    out <- build_sql(
-      "SELECT * FROM ", sql_subquery(con, out), " WHERE ROWNUM <= ", limit,
-      con = con)
-  }else{
-    escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+  # Requires Oracle 12c, released in 2013
+  if (!is.null(limit)) {
+    out$limit <- build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
   }
+
+  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 

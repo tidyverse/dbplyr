@@ -109,7 +109,7 @@
     Code
       sql_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
     Output
-      <SQL> SELECT TOP(10) 'x'
+      <SQL> SELECT TOP 10 'x'
       FROM 'y'
       ORDER BY 'z'
 

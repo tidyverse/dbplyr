@@ -55,9 +55,5 @@ test_that("generates custom sql", {
 
 test_that("head translated to TOP", {
   mf <- lazy_frame(x = 1, con = simulate_teradata())
-
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT  TOP 6 *\nFROM `df`")
-  )
+  expect_snapshot(mf %>% head() %>% sql_render())
 })

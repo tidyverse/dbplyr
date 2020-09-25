@@ -5,3 +5,11 @@
     Output
       <SQL> COLLECT STATISTICS `table`
 
+# head translated to TOP
+
+    Code
+      mf %>% head() %>% sql_render()
+    Output
+      <SQL> SELECT TOP 6 *
+      FROM `df`
+

@@ -10,23 +10,7 @@ sql_select.Teradata <- function(con, select, from, where = NULL,
   names(out) <- c("select", "from", "where", "group_by",
                   "having", "order_by","limit")
 
-  assert_that(is.character(select), length(select) > 0L)
-  out$select    <- build_sql(
-    "SELECT ",
-
-    if (distinct) sql("DISTINCT "),
-
-    # Teradata uses the TOP statement instead of LIMIT which is what SQL92 uses
-    # TOP is expected after DISTINCT and not at the end of the query
-    # e.g: SELECT TOP 100 * FROM my_table
-    if (!is.null(limit) && !identical(limit, Inf)) {
-      build_sql(" TOP ", as.integer(limit), " ", con = con)
-    },
-
-    escape(select, collapse = ", ", con = con),
-    con = con
-  )
-
+  out$select    <- sql_clause_select(con, select, distinct, top = limit)
   out$from      <- sql_clause_from(con, from)
   out$where     <- sql_clause_where(con, where)
   out$group_by  <- sql_clause_group_by(con, group_by)

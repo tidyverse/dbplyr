@@ -1,4 +1,4 @@
-sql_clause_select <- function(con, select, distinct = FALSE){
+sql_clause_select <- function(con, select, distinct = FALSE, top = NULL) {
   assert_that(is.character(select))
   if (is_empty(select)) {
     abort("Query contains no columns")
@@ -7,6 +7,7 @@ sql_clause_select <- function(con, select, distinct = FALSE){
   build_sql(
     "SELECT ",
     if (distinct) sql("DISTINCT "),
+    if (!is.null(top)) build_sql("TOP ", as.integer(top), " ", con = con),
     escape(select, collapse = ", ", con = con),
     con = con
   )

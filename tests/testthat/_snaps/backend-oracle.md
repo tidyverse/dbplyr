@@ -4,8 +4,9 @@
       mf %>% head()
     Output
       <SQL>
-      SELECT * FROM (SELECT *
-      FROM (`df`) ) `q01` WHERE ROWNUM <= 6.0
+      SELECT *
+      FROM (`df`) 
+      FETCH FIRST 6 ROWS ONLY
 
 # generates custom sql
 

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Oracle translation now depends on Oracle 12c, and uses a "row-limiting" 
+  clause for `head()`.
+
 * `sql_optimise()` now can partially optimise a pipeline; due to an unfortunate
   bug it previously gave up too easily.
 
