@@ -62,12 +62,13 @@
       # double arrange
     Code
       lf %>% arrange(a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT *
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       # remove ordered by
@@ -76,17 +77,17 @@
     Output
       <SQL>
       SELECT `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
+      ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       # un-arrange
@@ -102,9 +103,8 @@
     Output
       <SQL>
       SELECT `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
+      ORDER BY `a`
     Code
       # use order
     Code
@@ -112,9 +112,8 @@
     Output
       <SQL>
       SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
+      ORDER BY `a`
 
 # arrange renders correctly for single-table verbs (#373)
 
@@ -145,10 +144,9 @@
       <SQL>
       SELECT *
       FROM (SELECT *
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
-      LIMIT 1) `q02`
+      ORDER BY `a`
+      LIMIT 1) `q01`
       ORDER BY `b`
     Code
       # mutate
@@ -166,46 +164,48 @@
     Output
       <SQL>
       SELECT `b` AS `a`, `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT 1.0 AS `a`, `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = a) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `a`, `a` AS `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% arrange(a) %>% mutate(b = 1) %>% arrange(b)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `a`, 1.0 AS `b`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT -`a` AS `a`, `b`
-      FROM (SELECT *
       FROM (SELECT -`a` AS `a`, `b`
       FROM `df`) `q01`
-      ORDER BY `a`) `q02`
 
 # arrange renders correctly for joins (#373)
 
@@ -219,12 +219,14 @@
       lf %>% arrange(a) %>% left_join(rf)
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
       FROM (SELECT *
-      FROM `df`
-      ORDER BY `a`) `LHS`
+      FROM `df`) `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
       
@@ -232,12 +234,14 @@
       lf %>% arrange(b) %>% left_join(rf)
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
       FROM (SELECT *
-      FROM `df`
-      ORDER BY `b`) `LHS`
+      FROM `df`) `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
       
@@ -271,26 +275,30 @@
       lf %>% left_join(rf %>% arrange(a))
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
       FROM `df` AS `LHS`
       LEFT JOIN (SELECT *
-      FROM `df`
-      ORDER BY `a`) `RHS`
+      FROM `df`) `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
       
     Code
       lf %>% left_join(rf %>% arrange(c))
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
       FROM `df` AS `LHS`
       LEFT JOIN (SELECT *
-      FROM `df`
-      ORDER BY `c`) `RHS`
+      FROM `df`) `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
       
 
@@ -306,11 +314,13 @@
       lf %>% arrange(a) %>% semi_join(rf)
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT * FROM (SELECT *
-      FROM `df`
-      ORDER BY `a`) `LHS`
+      FROM `df`) `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
@@ -319,11 +329,13 @@
       lf %>% arrange(b) %>% semi_join(rf)
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT * FROM (SELECT *
-      FROM `df`
-      ORDER BY `b`) `LHS`
+      FROM `df`) `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
@@ -358,26 +370,30 @@
       lf %>% semi_join(rf %>% arrange(a))
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT * FROM `df` AS `LHS`
       WHERE EXISTS (
         SELECT 1 FROM (SELECT *
-      FROM `df`
-      ORDER BY `a`) `RHS`
+      FROM `df`) `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
       )
     Code
       lf %>% semi_join(rf %>% arrange(c))
     Message <message>
       Joining, by = "a"
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT * FROM `df` AS `LHS`
       WHERE EXISTS (
         SELECT 1 FROM (SELECT *
-      FROM `df`
-      ORDER BY `c`) `RHS`
+      FROM `df`) `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
       )
 
@@ -405,9 +421,8 @@
     Output
       <SQL>
       (SELECT `a`, `b`, NULL AS `c`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`)
+      ORDER BY `a`)
       UNION ALL
       (SELECT `a`, NULL AS `b`, `c`
       FROM `df`)
@@ -419,7 +434,6 @@
       FROM `df`)
       UNION ALL
       (SELECT `a`, NULL AS `b`, `c`
-      FROM (SELECT *
       FROM `df`
-      ORDER BY `a`) `q01`)
+      ORDER BY `a`)
 

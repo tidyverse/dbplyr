@@ -91,9 +91,15 @@ test_that("convert between bit and boolean as needed", {
   expect_snapshot(mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L)))
 })
 
-test_that("ORDER BY in subqueries uses TOP 9223372036854775807 (#337)", {
+test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
     sql_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
+  )
+})
+
+test_that("custom limit translation", {
+  expect_snapshot(
+    sql_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
   )
 })
 

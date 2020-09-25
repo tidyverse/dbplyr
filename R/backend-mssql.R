@@ -11,26 +11,9 @@
                   "having", "order_by","limit")
 
   assert_that(is.character(select), length(select) > 0L)
-  out$select    <- build_sql(
-    "SELECT ",
-
-    if (distinct) sql("DISTINCT "),
-
-    if (!is.null(limit) && !identical(limit, Inf)) {
-      # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
-      # TOP is expected after DISTINCT and not at the end of the query
-      # e.g: SELECT TOP 100 * FROM my_table
-      build_sql("TOP(", as.integer(limit), ") ", con = con)
-    } else if (length(order_by) > 0 && subquery) {
-      # Stop-gap measure so that a wider range of queries is supported (#276).
-      # MS SQL doesn't allow ORDER BY in subqueries,
-      # unless also TOP (or FOR XML) is specified.
-      # Workaround: Use TOP 9223372036854775807 as this is signed 64-bit int max
-      # and some versions of SQL Server such as Azure Data Warehouse don't
-      # support TOP 100 PERCENT. https://stackoverflow.com/a/4971263
-      sql("TOP 9223372036854775807 ")
-    },
-
+  out$select <- build_sql(
+    "SELECT ", if (distinct) sql("DISTINCT "),
+    if (!is.null(limit)) build_sql("TOP(", as.integer(limit), ") ", con = con),
     escape(select, collapse = ", ", con = con),
     con = con
   )
@@ -39,7 +22,7 @@
   out$where     <- sql_clause_where(where, con)
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
+  out$order_by  <- sql_clause_order_by(order_by, con, subquery, limit)
 
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)

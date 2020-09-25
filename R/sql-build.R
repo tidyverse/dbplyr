@@ -60,7 +60,7 @@ sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALS
 #' @export
 sql_render.op <- function(query, con = NULL, ..., subquery = FALSE) {
   qry <- sql_build(query, con = con, ...)
-  qry <- sql_optimise(qry, con = con, ...)
+  qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
   sql_render(qry, con = con, ..., subquery = subquery)
 }
 
@@ -82,7 +82,7 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE) {
 
 #' @export
 #' @rdname sql_build
-sql_optimise <- function(x, con = NULL, ...) {
+sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_optimise")
 }
 

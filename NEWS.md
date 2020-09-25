@@ -1,5 +1,14 @@
 # dbplyr (development version)
 
+* `sql_optimise()` now can partially optimise a pipeline; due to an unfortunate
+  bug it previously gave up too easily.
+
+* dbplyr no longer creates an `ORDER` BY clause in subqueries. This is not
+  part of the SQL spec, and has very limited support across databases. Now
+  such queries generate a warning suggesting that you move your `arrange()`
+  call later in the pipeline (#276). (There's one exception: `ORDER BY`
+  is still generated if `LIMIT` is present.)
+
 * `slice_min()`, `slice_max()`, and `slice_order()` are now supported.
   `slice_head()` and `slice_tail()` throw clear error messages (#394)
 

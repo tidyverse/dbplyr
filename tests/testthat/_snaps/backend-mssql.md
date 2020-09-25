@@ -93,12 +93,23 @@
       SELECT CAST(IIF(~(`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
       FROM `df`
 
-# ORDER BY in subqueries uses TOP 9223372036854775807 (#337)
+# handles ORDER BY in subqueries
 
     Code
       sql_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
+    Warning <warning>
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
-      <SQL> SELECT TOP 9223372036854775807 'x'
+      <SQL> SELECT 'x'
+      FROM 'y'
+
+# custom limit translation
+
+    Code
+      sql_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
+    Output
+      <SQL> SELECT TOP(10) 'x'
       FROM 'y'
       ORDER BY 'z'
 
