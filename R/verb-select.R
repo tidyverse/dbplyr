@@ -24,6 +24,24 @@ rename.tbl_lazy <- function(.data, ...) {
   .data
 }
 
+#' @importFrom dplyr relocate
+#' @export
+relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
+  vars <- simulate_vars(.data)
+  new_vars <- dplyr::relocate(
+    simulate_vars(.data),
+    ...,
+    .before = {{.before}},
+    .after = {{.after}}
+  )
+  .data$ops <- op_select(.data$ops, syms(set_names(names(new_vars))))
+  .data
+}
+
+simulate_vars <- function(x) {
+  as_tibble(rep_named(op_vars(x), list(logical())))
+}
+
 # op_select ---------------------------------------------------------------
 
 op_select <- function(x, vars) {

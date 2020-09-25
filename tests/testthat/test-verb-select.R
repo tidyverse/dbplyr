@@ -64,6 +64,15 @@ test_that("select preserves grouping vars", {
   expect_named(out, c("b", "a"))
 })
 
+test_that("relocate works", {
+  mf <- memdb_frame(a = 1, b = 2, c = 1) %>% group_by(b)
+
+  out1 <- mf %>% relocate(c) %>% collect()
+  expect_named(out1, c("c", "a", "b"))
+  out2 <- mf %>% relocate(a, .after = c) %>% collect()
+  expect_named(out2, c("b", "c", "a"))
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

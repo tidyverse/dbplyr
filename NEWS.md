@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Now supports `relocate()` from dplyr 1.0.0 (#494).
+
 * `sql_escape_ident()` and `sql_escape_string()` generics from dbplyr are no
   longer used; these methods should now be supplied for
   `DBI::dbQuoteIdentifier()` and `DBI::dbQuoteString()` respectively.
