@@ -32,7 +32,7 @@ sql_build(op, con = NULL, ...)
 
 sql_render(query, con = NULL, ..., subquery = FALSE)
 
-sql_optimise(x, con = NULL, ...)
+sql_optimise(x, con = NULL, ..., subquery = FALSE)
 }
 \arguments{
 \item{op}{A sequence of lazy operations}
