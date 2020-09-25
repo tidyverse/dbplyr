@@ -92,9 +92,9 @@ select_query_clauses <- function(x) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE) {
+sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
   from <- sql_subquery(con,
-    sql_render(query$from, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$from, con, ..., subquery = TRUE),
     name = NULL
   )
 
@@ -107,7 +107,7 @@ sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE)
     limit = query$limit,
     distinct = query$distinct,
     ...,
-    bare_identifier_ok = bare_identifier_ok
+    subquery = subquery
   )
 }
 

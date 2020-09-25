@@ -28,15 +28,15 @@ print.join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
   from_x <- sql_subquery(
     con,
-    sql_render(query$x, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$x, con, ..., subquery = TRUE),
     name = "LHS"
   )
   from_y <- sql_subquery(
     con,
-    sql_render(query$y, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$y, con, ..., subquery = TRUE),
     name = "RHS"
   )
 

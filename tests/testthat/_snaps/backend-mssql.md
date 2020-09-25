@@ -96,7 +96,7 @@
 # ORDER BY in subqueries uses TOP 9223372036854775807 (#337)
 
     Code
-      sql_select(simulate_mssql(), "x", "y", order_by = "z", bare_identifier_ok = TRUE)
+      sql_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
     Output
       <SQL> SELECT TOP 9223372036854775807 'x'
       FROM 'y'

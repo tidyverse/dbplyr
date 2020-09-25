@@ -5,7 +5,7 @@
                                              limit = NULL,
                                              distinct = FALSE,
                                              ...,
-                                             bare_identifier_ok = FALSE) {
+                                             subquery = FALSE) {
   out <- vector("list", 7)
   names(out) <- c("select", "from", "where", "group_by",
                   "having", "order_by","limit")
@@ -21,7 +21,7 @@
       # TOP is expected after DISTINCT and not at the end of the query
       # e.g: SELECT TOP 100 * FROM my_table
       build_sql("TOP(", as.integer(limit), ") ", con = con)
-    } else if (length(order_by) > 0 && bare_identifier_ok) {
+    } else if (length(order_by) > 0 && subquery) {
       # Stop-gap measure so that a wider range of queries is supported (#276).
       # MS SQL doesn't allow ORDER BY in subqueries,
       # unless also TOP (or FOR XML) is specified.

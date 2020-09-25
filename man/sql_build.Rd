@@ -30,7 +30,7 @@ set_op_query(x, y, type = type)
 
 sql_build(op, con = NULL, ...)
 
-sql_render(query, con = NULL, ..., bare_identifier_ok = FALSE)
+sql_render(query, con = NULL, ..., subquery = FALSE)
 
 sql_optimise(x, con = NULL, ...)
 }
@@ -43,9 +43,9 @@ without an active database connection.}
 
 \item{...}{Other arguments passed on to the methods. Not currently used.}
 
-\item{bare_identifier_ok}{Is it ok to return a bare table identifier.
-Set to \code{TRUE} when generating queries to be nested within other
-queries where a bare table name is ok.}
+\item{subquery}{Is this SQL going to be used in a subquery?
+This is important because you can place a bare table name in a subquery
+and  ORDER BY does not work in subqueries.}
 }
 \description{
 \code{sql_build()} creates a \code{select_query} S3 object, that is rendered
