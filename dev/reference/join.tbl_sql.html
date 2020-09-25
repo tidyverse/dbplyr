@@ -106,7 +106,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.4.4.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.99.0.9000</span>
         </div>
       </div>
     </div>
@@ -125,6 +125,9 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 transition guide</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
