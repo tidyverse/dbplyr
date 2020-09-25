@@ -211,11 +211,11 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(delay = <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw">dep_delay</span>)) <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
 </pre></div>
-<pre><code>## &lt;SQL&gt;</code></pre>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning
 ## This warning is displayed only once per session.</code></pre>
-<pre><code>## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+<pre><code>## &lt;SQL&gt;
+## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
 ## FROM `nycflights13::flights`
 ## GROUP BY `month`, `day`</code></pre>
 </li>

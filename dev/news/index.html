@@ -187,6 +187,8 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="../reference/join_query.html">sql_optimise()</a></code> now can partially optimise a pipeline; due to an unfortunate bug it previously gave up too easily.</p></li>
+<li><p>dbplyr no longer creates an <code>ORDER</code> BY clause in subqueries. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present.)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_min()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max()</a></code>, and <code>slice_order()</code> are now supported. <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_tail()</a></code> throw clear error messages (<a href='https://github.com/tidyverse/dbplyr/issues/394'>#394</a>)</p></li>
 <li><p><code><a href="../reference/window_order.html">window_order()</a></code> overrides ordering, rather than appending to it.</p></li>
 <li><p>Now supports <code><a href="https://dplyr.tidyverse.org/reference/relocate.html">relocate()</a></code> from dplyr 1.0.0 (<a href='https://github.com/tidyverse/dbplyr/issues/494'>#494</a>).</p></li>
