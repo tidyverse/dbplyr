@@ -1,9 +1,12 @@
-#' Copy a local data frame to a DBI backend.
+#' Copy a local data frame to a remote database
 #'
-#' This [copy_to()] method works for all DBI sources. It is useful for
-#' copying small amounts of data to a database for examples, experiments,
-#' and joins. By default, it creates temporary tables which are typically
-#' only visible to the current connection to the database.
+#' @description
+#' This is an implementation of the dplyr [copy_to()] generic and it mostly
+#' a wrapper around [DBI::dbWriteTable()].
+#'
+#' It is useful for copying small amounts of data to a database for examples,
+#' experiments, and joins. By default, it creates temporary tables which are
+#' only visible within the current connection to the database.
 #'
 #' @export
 #' @param df A local data frame, a `tbl_sql` from same source, or a `tbl_sql`
@@ -27,23 +30,18 @@
 #'   database doesn't support transactions, or you're wrapping in a transaction
 #'   higher up (and your database doesn't support nested transactions.)
 #' @inheritParams dplyr::copy_to
-#' @return A [tbl()] object (invisibly).
+#' @inherit arrange.tbl_lazy return
 #' @examples
-#' library(dplyr)
-#' set.seed(1014)
+#' library(dplyr, warn.conflicts = FALSE)
 #'
-#' mtcars$model <- rownames(mtcars)
-#' mtcars2 <- src_memdb() %>%
-#'   copy_to(mtcars, indexes = list("model"), overwrite = TRUE)
-#' mtcars2 %>% filter(model == "Hornet 4 Drive")
+#' df <- data.frame(x = 1:5, y = letters[5:1])
+#' db <- copy_to(src_memdb(), df)
+#' db
 #'
-#' cyl8 <- mtcars2 %>% filter(cyl == 8)
-#' cyl8_cached <- copy_to(src_memdb(), cyl8)
-#'
-#' # copy_to is called automatically if you set copy = TRUE
+#' df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
+#' # copy_to() is called automatically if you set copy = TRUE
 #' # in the join functions
-#' df <- tibble(cyl = c(6, 8))
-#' mtcars2 %>% semi_join(df, copy = TRUE)
+#' db %>% left_join(df2, copy = TRUE)
 #' @importFrom dplyr copy_to
 copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,

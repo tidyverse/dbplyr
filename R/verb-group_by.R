@@ -1,7 +1,29 @@
-# group_by ----------------------------------------------------------------
-
+#' Group by one or more variables
+#'
+#' This is a method for the dplyr [group_by()] generic. It is translated to
+#' the `GROUP BY` clause of the SQL query when used with
+#' [`summarise()`][summarise.tbl_lazy] and to the `PARTITION BY` clause of
+#' window functions when used with [`mutate()`][mutate.tbl_lazy].
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::group_by
+#' @param .drop Not supported by this method.
+#' @param add Deprecated. Please use `.add` instead.
 #' @export
 #' @importFrom dplyr group_by
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
+#' db %>%
+#'   group_by(g) %>%
+#'   summarise(n()) %>%
+#'   show_query()
+#'
+#' db %>%
+#'   group_by(g) %>%
+#'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
+#'   show_query()
 group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE) {
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))

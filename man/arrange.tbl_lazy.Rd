@@ -2,46 +2,46 @@
 % Please edit documentation in R/verb-arrange.R
 \name{arrange.tbl_lazy}
 \alias{arrange.tbl_lazy}
-\title{Arrange rows by variables in a remote database table}
+\title{Arrange rows by column values}
 \usage{
 \method{arrange}{tbl_lazy}(.data, ..., .by_group = FALSE)
 }
 \arguments{
-\item{.data}{A data frame, data frame extension (e.g. a tibble), or a
-lazy data frame (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
-more details.}
+\item{.data}{A lazy data frame backed by a database query.}
 
-\item{...}{Variables, or functions or variables. Use desc() to sort a
-variable in descending order.}
+\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
+variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
 
 \item{.by_group}{If \code{TRUE}, will sort first by grouping variable. Applies to
 grouped data frames only.}
 }
 \value{
-An object of the same class as \code{.data}.
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
+and return data to R.
 }
 \description{
-Order rows of database tables by an expression involving its variables.
+This is an method for the dplyr \code{\link[=arrange]{arrange()}} generic. It generates
+the \verb{ORDER BY} clause of the SQL query. It also affects the
+\code{\link[=window_order]{window_order()}} of windowed expressions in \code{\link[=mutate.tbl_lazy]{mutate.tbl_lazy()}}.
+
+Note that \verb{ORDER BY} clauses can not generally appear in subqueries, which
+means that you should \code{arrange()} as late as possible in your pipelines.
 }
 \section{Missing values}{
 
-Compared to its sorting behaviour on local data, the \code{\link[=arrange]{arrange()}} method for
-most database tables sorts NA at the beginning unless wrapped with \code{\link[=desc]{desc()}}.
-Users can override this behaviour by explicitly sorting on \code{is.na(x)}.
+Unlike R, most databases sorts \code{NA} (\code{NULL}s) at the front. You can
+can override this behaviour by explicitly sorting on \code{is.na(x)}.
 }
 
 \examples{
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
-dbplyr::memdb_frame(a = c(3, 4, 1, 2)) \%>\%
-  arrange(a)
+db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
+db \%>\% arrange(a) \%>\% show_query()
 
-# NA sorted first
-dbplyr::memdb_frame(a = c(3, 4, NA, 2)) \%>\%
-  arrange(a)
-
+# Note that NAs are sorted first
+db \%>\% arrange(b)
 # override by sorting on is.na() first
-dbplyr::memdb_frame(a = c(3, 4, NA, 2)) \%>\%
-  arrange(is.na(a), a)
-
+db \%>\% arrange(is.na(b), b)
 }

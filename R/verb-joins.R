@@ -1,11 +1,9 @@
 #' Join SQL tables
 #'
 #' @description
-#' These methods provide implementations of the generic join functions for
-#' remote database tables. See [join] for the overall details of the join
-#' functions.
+#' These are methods for the dplyr [join] generics. They are translated
+#' to the following SQL queries:
 #'
-#' Basic translation:
 #' * `inner_join(x, y)`: `SELECT * FROM x JOIN y ON x.a = y.a`
 #' * `left_join(x, y)`:  `SELECT * FROM x LEFT JOIN y ON x.a = y.a`
 #' * `right_join(x, y)`: `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`
@@ -13,16 +11,7 @@
 #' * `semi_join(x, y)`:  `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
 #' * `anti_join(x, y)`:  `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
 #'
-#' @section Implementation notes:
-#'
-#' Semi-joins are implemented using `WHERE EXISTS`, and anti-joins with
-#' `WHERE NOT EXISTS`.
-#'
-#' AllAn arbitrary join predicate can
-#' be specified by passing an SQL expression to the `sql_on` argument.
-#' Use `LHS` and `RHS` to refer to the
-#' table, respectively.
-#'
+#' @param x,y A pair of lazy data frames backed by database queries.
 #' @inheritParams dplyr::join
 #' @param copy If `x` and `y` are not from the same data source,
 #'   and `copy` is `TRUE`, then `y` will be copied into a
@@ -38,17 +27,16 @@
 #'   there are matching indexes in `x`.
 #' @param sql_on A custom join predicate as an SQL expression.
 #'   Usually joins use column equality, but you can perform more complex
-#'   queries by suppliy `sql_on` which should be a SQL expression that
+#'   queries by supply `sql_on` which should be a SQL expression that
 #'   uses `LHS` and `RHS` aliases to refer to the left-hand side or
 #'   right-hand side of the join respectively.
+#' @inherit arrange.tbl_lazy return
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
-#' # Create v simple "remote" database table
+#'
 #' band_db <- tbl_memdb(dplyr::band_members)
 #' instrument_db <- tbl_memdb(dplyr::band_instruments)
-#'
 #' band_db %>% left_join(instrument_db) %>% show_query()
-#' band_db %>% left_join(instrument_db)
 #'
 #' # Can join with local data frames by setting copy = TRUE
 #' band_db %>%
@@ -56,11 +44,10 @@
 #'
 #' # By default, joins are equijoins, but you can use `sql_on` to
 #' # express richer relationships
-#'
 #' db1 <- memdb_frame(x = 1:5)
 #' db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-#' db1 %>% left_join(db2)
-#' db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x")
+#' db1 %>% left_join(db2) %>% show_query()
+#' db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x") %>% show_query()
 #' @name join.tbl_sql
 NULL
 

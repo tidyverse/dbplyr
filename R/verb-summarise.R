@@ -1,5 +1,26 @@
+#' Summarise each group to one row
+#'
+#' This is a method for the dplyr [summarise()] generic. It generates the
+#' `SELECT` clause of the SQL query, and generally needs to be combined with
+#' `group_by()`.
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::summarise
+#' @inherit arrange.tbl_lazy return
 #' @importFrom dplyr summarise
 #' @export
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(g = c(1, 1, 1, 2, 2), x = c(4, 3, 6, 9, 2))
+#' db %>%
+#'   summarise(n()) %>%
+#'   show_query()
+#'
+#' db %>%
+#'   group_by(g) %>%
+#'   summarise(n()) %>%
+#'   show_query()
 summarise.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))

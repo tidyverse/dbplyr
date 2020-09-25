@@ -1,15 +1,32 @@
-# mutate ------------------------------------------------------------------
-
+#' Create, modify, and delete columns
+#'
+#' These are methods for the dplyr [mutate()] and [transmute()] generics.
+#' They are translated to computed expressions in the `SELECT` clause of
+#' the SQL query.
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::mutate
+#' @inherit arrange.tbl_lazy return
 #' @export
 #' @importFrom dplyr mutate
-mutate.tbl_lazy <- function(.data, ..., .dots = list()) {
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(x = 1:5, y = 5:1)
+#' db %>%
+#'   mutate(a = (x + y) / 2, b = sqrt(x^2L + y^2L)) %>%
+#'   show_query()
+#'
+#' # dbplyr automatically creates subqueries as needed
+#' db %>%
+#'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
+#'   show_query()
+mutate.tbl_lazy <- function(.data, ...) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
 
   nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
 }
-
-# transmute ---------------------------------------------------------------
 
 #' @export
 #' @importFrom dplyr transmute

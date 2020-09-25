@@ -11,7 +11,7 @@
 #' (e.g.) `slice_min(db, x, n = 3)` will select the three rows with the smallest
 #' value of `x` in each group.
 #'
-#' @param .data A lazy data frame backed by a database query.
+#' @inheritParams arrange.tbl_lazy
 #' @param ... Not used.
 #' @param n,prop Provide either `n`, the number of rows, or `prop`, the
 #'   proportion of rows to select. If neither are supplied, `n = 1` will be
@@ -31,11 +31,11 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' db <- memdb_frame(x = 1:3, y = c(1, 1, 2))
-#' db %>% slice_min(x)
-#' db %>% slice_max(x)
-#' db %>% slice_sample()
+#' db %>% slice_min(x) %>% show_query()
+#' db %>% slice_max(x) %>% show_query()
+#' db %>% slice_sample() %>% show_query()
 #'
-#' db %>% group_by(y) %>% slice_min(x)
+#' db %>% group_by(y) %>% slice_min(x) %>% show_query()
 #'
 #' # By default, ties are includes so you may get more rows
 #' # than you expect

@@ -75,13 +75,7 @@
 )
 }
 \arguments{
-\item{x}{A pair of data frames, data frame extensions (e.g. a tibble), or
-lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
-more details.}
-
-\item{y}{A pair of data frames, data frame extensions (e.g. a tibble), or
-lazy data frames (e.g. from dbplyr or dtplyr). See \emph{Methods}, below, for
-more details.}
+\item{x, y}{A pair of lazy data frames backed by database queries.}
 
 \item{by}{A character vector of variables to join by.
 
@@ -123,16 +117,18 @@ there are matching indexes in \code{x}.}
 
 \item{sql_on}{A custom join predicate as an SQL expression.
 Usually joins use column equality, but you can perform more complex
-queries by suppliy \code{sql_on} which should be a SQL expression that
+queries by supply \code{sql_on} which should be a SQL expression that
 uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
 right-hand side of the join respectively.}
 }
+\value{
+Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
+and return data to R.
+}
 \description{
-These methods provide implementations of the generic join functions for
-remote database tables. See \link{join} for the overall details of the join
-functions.
-
-Basic translation:
+These are methods for the dplyr \link{join} generics. They are translated
+to the following SQL queries:
 \itemize{
 \item \code{inner_join(x, y)}: \verb{SELECT * FROM x JOIN y ON x.a = y.a}
 \item \code{left_join(x, y)}:  \verb{SELECT * FROM x LEFT JOIN y ON x.a = y.a}
@@ -142,26 +138,12 @@ Basic translation:
 \item \code{anti_join(x, y)}:  \verb{SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)}
 }
 }
-\section{Implementation notes}{
-
-
-Semi-joins are implemented using \verb{WHERE EXISTS}, and anti-joins with
-\verb{WHERE NOT EXISTS}.
-
-AllAn arbitrary join predicate can
-be specified by passing an SQL expression to the \code{sql_on} argument.
-Use \code{LHS} and \code{RHS} to refer to the
-table, respectively.
-}
-
 \examples{
 library(dplyr, warn.conflicts = FALSE)
-# Create v simple "remote" database table
+
 band_db <- tbl_memdb(dplyr::band_members)
 instrument_db <- tbl_memdb(dplyr::band_instruments)
-
 band_db \%>\% left_join(instrument_db) \%>\% show_query()
-band_db \%>\% left_join(instrument_db)
 
 # Can join with local data frames by setting copy = TRUE
 band_db \%>\%
@@ -169,9 +151,8 @@ band_db \%>\%
 
 # By default, joins are equijoins, but you can use `sql_on` to
 # express richer relationships
-
 db1 <- memdb_frame(x = 1:5)
 db2 <- memdb_frame(x = 1:3, y = letters[1:3])
-db1 \%>\% left_join(db2)
-db1 \%>\% left_join(db2, sql_on = "LHS.x < RHS.x")
+db1 \%>\% left_join(db2) \%>\% show_query()
+db1 \%>\% left_join(db2, sql_on = "LHS.x < RHS.x") \%>\% show_query()
 }

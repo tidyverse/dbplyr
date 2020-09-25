@@ -1,12 +1,18 @@
-#' Force computation of query
+#' Compute results of a query
 #'
-#' `collapse()` creates a subquery; `compute()` stores the results in a
-#' remote table; `collect()` downloads the results into the current
-#' R session.
+#' These are methods for the dplyr generics [collapse()], [compute()],
+#' and [collect()]. `collapse()` creates a subquery, `compute()` stores
+#' the results in a remote table, and `collect()` executes the query and
+#' downloads the data into R.
 #'
 #' @export
-#' @param x A `tbl_sql`
+#' @param x A lazy data frame backed by a database query.
 #' @importFrom dplyr collapse
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
+#' db %>% filter(a <= 2) %>% collect()
 collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 

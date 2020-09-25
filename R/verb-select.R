@@ -1,7 +1,19 @@
-# select and rename -----------------------------------------------------------
-
-#' @importFrom dplyr select
+#' Subset, rename, and reorder columns using their names
+#'
+#' These are methods for the dplyr [select()], [rename()], and [relocate()]
+#' generics. They generate the `SELECT` clause of the SQL query.
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::select
 #' @export
+#' @importFrom dplyr select
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(x = 1, y = 2, z = 3)
+#' db %>% select(-y) %>% show_query()
+#' db %>% relocate(z) %>% show_query()
+#' db %>% rename(first = x, last = z) %>% show_query()
 select.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
 
@@ -12,6 +24,7 @@ select.tbl_lazy <- function(.data, ...) {
   .data
 }
 
+#' @rdname select.tbl_lazy
 #' @importFrom dplyr rename
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
@@ -24,7 +37,9 @@ rename.tbl_lazy <- function(.data, ...) {
   .data
 }
 
+#' @rdname select.tbl_lazy
 #' @importFrom dplyr relocate
+#' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   vars <- simulate_vars(.data)
