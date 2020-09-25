@@ -28,10 +28,22 @@
     <loc>https://dbplyr.tidyverse.org/reference/dbplyr-slice.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/distinct.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/do.tbl_sql.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/escape.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/filter.tbl_lazy.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/group_by.tbl_lazy.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/head.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/ident.html</loc>
@@ -55,6 +67,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/memdb_frame.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/mutate.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/named_commas.html</loc>
   </url>
   <url>
@@ -64,10 +79,16 @@
     <loc>https://dbplyr.tidyverse.org/reference/partial_eval.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/pull.tbl_sql.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/reexports.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/remote_name.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/select.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/simulate_dbi.html</loc>
@@ -95,6 +116,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/src_sql.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/summarise.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/tbl.src_dbi.html</loc>

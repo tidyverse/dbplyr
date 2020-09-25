@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Arrange rows by variables in a remote database table — arrange.tbl_lazy • dbplyr</title>
+<title>Arrange rows by column values — arrange.tbl_lazy • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,8 +49,12 @@
 
 
 
-<meta property="og:title" content="Arrange rows by variables in a remote database table — arrange.tbl_lazy" />
-<meta property="og:description" content="Order rows of database tables by an expression involving its variables." />
+<meta property="og:title" content="Arrange rows by column values — arrange.tbl_lazy" />
+<meta property="og:description" content="This is an method for the dplyr arrange() generic. It generates
+the ORDER BY clause of the SQL query. It also affects the
+window_order() of windowed expressions in mutate.tbl_lazy().
+Note that ORDER BY clauses can not generally appear in subqueries, which
+means that you should arrange() as late as possible in your pipelines." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -179,13 +183,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Arrange rows by variables in a remote database table</h1>
+    <h1>Arrange rows by column values</h1>
     <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-arrange.R'><code>R/verb-arrange.R</code></a></small>
     <div class="hidden name"><code>arrange.tbl_lazy.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Order rows of database tables by an expression involving its variables.</p>
+    <p>This is an method for the dplyr <code><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange()</a></code> generic. It generates
+the <code>ORDER BY</code> clause of the SQL query. It also affects the
+<code><a href='window_order.html'>window_order()</a></code> of windowed expressions in <code><a href='mutate.tbl_lazy.html'>mutate.tbl_lazy()</a></code>.</p>
+<p>Note that <code>ORDER BY</code> clauses can not generally appear in subqueries, which
+means that you should <code><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange()</a></code> as late as possible in your pipelines.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
@@ -196,14 +204,12 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>.data</th>
-      <td><p>A data frame, data frame extension (e.g. a tibble), or a
-lazy data frame (e.g. from dbplyr or dtplyr). See <em>Methods</em>, below, for
-more details.</p></td>
+      <td><p>A lazy data frame backed by a database query.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Variables, or functions or variables. Use desc() to sort a
-variable in descending order.</p></td>
+      <td><p>&lt;<code><a href='https://dplyr.tidyverse.org/reference/dplyr_data_masking.html'>data-masking</a></code>&gt; Variables, or functions or
+variables. Use <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc()</a></code> to sort a variable in descending order.</p></td>
     </tr>
     <tr>
       <th>.by_group</th>
@@ -214,61 +220,46 @@ grouped data frames only.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of the same class as <code>.data</code>.</p>
+    <p>Another <code>tbl_lazy</code>. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code> to see the generated
+query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to execute the query
+and return data to R.</p>
     <h2 class="hasAnchor" id="missing-values"><a class="anchor" href="#missing-values"></a>Missing values</h2>
 
     
 
-<p>Compared to its sorting behaviour on local data, the <code><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange()</a></code> method for
-most database tables sorts NA at the beginning unless wrapped with <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc()</a></code>.
-Users can override this behaviour by explicitly sorting on <code><a href='https://rdrr.io/r/base/NA.html'>is.na(x)</a></code>.</p>
+<p>Unlike R, most databases sorts <code>NA</code> (<code>NULL</code>s) at the front. You can
+can override this behaviour by explicitly sorting on <code><a href='https://rdrr.io/r/base/NA.html'>is.na(x)</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>)
-</div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘dplyr’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:dbplyr’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    ident, sql</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'>
-<span class='kw'>dbplyr</span>::<span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(a = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>)) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>a</span>)
-</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 1]</span><span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts = <span class='fl'>FALSE</span>)
+
+<span class='kw'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(a = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>), b = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>NA</span>))
+<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>a</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT *
+#&gt; FROM `dbplyr_001`
+#&gt; ORDER BY `a`</div><div class='input'>
+<span class='co'># Note that NAs are sorted first</span>
+<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>b</span>)
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: a</span><span>
-#&gt;       a
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1
-#&gt; </span><span style='color: #555555;'>2</span><span>     2
-#&gt; </span><span style='color: #555555;'>3</span><span>     3
-#&gt; </span><span style='color: #555555;'>4</span><span>     4</div><div class='input'>
-<span class='co'># NA sorted first</span>
-<span class='kw'>dbplyr</span>::<span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(a = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>a</span>)
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_002&gt; [?? x 1]</span><span>
+#&gt; </span><span style='color: #555555;'># Ordered by: b</span><span>
+#&gt;       a     b
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     2    </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>     4     1
+#&gt; </span><span style='color: #555555;'>3</span><span>     1     2
+#&gt; </span><span style='color: #555555;'>4</span><span>     3     5</div><div class='input'><span class='co'># override by sorting on is.na() first</span>
+<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='kw'>b</span>), <span class='kw'>b</span>)
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: a</span><span>
-#&gt;       a
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span>     2
-#&gt; </span><span style='color: #555555;'>3</span><span>     3
-#&gt; </span><span style='color: #555555;'>4</span><span>     4</div><div class='input'>
-<span class='co'># override by sorting on is.na() first</span>
-<span class='kw'>dbplyr</span>::<span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(a = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>NA</span>, <span class='fl'>2</span>)) <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='kw'>a</span>), <span class='kw'>a</span>)
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_003&gt; [?? x 1]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.30.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: is.na(a), a</span><span>
-#&gt;       a
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     2
-#&gt; </span><span style='color: #555555;'>2</span><span>     3
-#&gt; </span><span style='color: #555555;'>3</span><span>     4
-#&gt; </span><span style='color: #555555;'>4</span><span>    </span><span style='color: #BB0000;'>NA</span><span></div><div class='input'>
-</div></span></pre>
+#&gt; </span><span style='color: #555555;'># Ordered by: is.na(b), b</span><span>
+#&gt;       a     b
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     4     1
+#&gt; </span><span style='color: #555555;'>2</span><span>     1     2
+#&gt; </span><span style='color: #555555;'>3</span><span>     3     5
+#&gt; </span><span style='color: #555555;'>4</span><span>     2    </span><span style='color: #BB0000;'>NA</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
