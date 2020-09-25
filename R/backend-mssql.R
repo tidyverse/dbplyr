@@ -18,11 +18,11 @@
     con = con
   )
 
-  out$from      <- sql_clause_from(from, con)
-  out$where     <- sql_clause_where(where, con)
-  out$group_by  <- sql_clause_group_by(group_by, con)
-  out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con, subquery, limit)
+  out$from      <- sql_clause_from(con, from)
+  out$where     <- sql_clause_where(con, where)
+  out$group_by  <- sql_clause_group_by(con, group_by)
+  out$having    <- sql_clause_having(con, having)
+  out$order_by  <- sql_clause_order_by(con, order_by, subquery, limit)
 
 
   escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
