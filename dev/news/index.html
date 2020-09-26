@@ -187,6 +187,9 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p>Join SQL now only uses aliases where needed to disambiguate columns; this should make generated queries more readable.</p></li>
+<li><p><code>_join()</code> function gains <code>na_matches</code> argument that allows you to control whether or not <code>NA</code> values match other <code>NA</code> values. The default is <code>"never"</code>, which is the usual database behaviour but you can change to <code>"na"</code> to switch to R’s usual behaviour (<a href='https://github.com/tidyverse/dbplyr/issues/180'>#180</a>).</p></li>
+<li><p>New <code><a href="../reference/db_sql.html">sql_expr_matches()</a></code> generic that allows database to select more efficient alternatives when determine if two values “match” (i.e. like equality but also matching <code>NULL</code>s). For more details, see <a href="https://modern-sql.com/feature/is-distinct-from" class="uri">https://modern-sql.com/feature/is-distinct-from</a></p></li>
 <li><p>Oracle translation now depends on Oracle 12c, and uses a “row-limiting” clause for <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>.</p></li>
 <li><p><code><a href="../reference/join_query.html">sql_optimise()</a></code> now can partially optimise a pipeline; due to an unfortunate bug it previously gave up too easily.</p></li>
 <li><p>dbplyr no longer creates an <code>ORDER</code> BY clause in subqueries. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present.)</p></li>

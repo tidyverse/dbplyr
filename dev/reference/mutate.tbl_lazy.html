@@ -224,7 +224,7 @@ and return data to R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`, (`x` + `y`) / 2.0 AS `a`, SQRT(POWER(`x`, 2) + POWER(`y`, 2)) AS `b`
-#&gt; FROM `dbplyr_013`</div><div class='input'>
+#&gt; FROM `dbplyr_015`</div><div class='input'>
 <span class='co'># dbplyr automatically creates subqueries as needed</span>
 <span class='kw'>db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(x1 = <span class='kw'>x</span> <span class='op'>+</span> <span class='fl'>1</span>, x2 = <span class='kw'>x1</span> <span class='op'>*</span> <span class='fl'>2</span>) <span class='op'>%&gt;%</span>
@@ -232,7 +232,7 @@ and return data to R.</p>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`, `x1`, `x1` * 2.0 AS `x2`
 #&gt; FROM (SELECT `x`, `y`, `x` + 1.0 AS `x1`
-#&gt; FROM `dbplyr_013`)</div></pre>
+#&gt; FROM `dbplyr_015`)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -224,14 +224,14 @@ and return data to R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_016`</div><div class='input'>
+#&gt; FROM `dbplyr_018`</div><div class='input'>
 <span class='kw'>db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span>(<span class='kw'>g</span>) <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(<span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span>()) <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `g`, COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_016`
+#&gt; FROM `dbplyr_018`
 #&gt; GROUP BY `g`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

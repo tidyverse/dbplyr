@@ -233,13 +233,13 @@ left-hand side; specifying both is an error.</p></td>
 <span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span>(<span class='op'>-</span><span class='kw'>y</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `z`
-#&gt; FROM `dbplyr_015`</div><div class='input'><span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/relocate.html'>relocate</a></span>(<span class='kw'>z</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
+#&gt; FROM `dbplyr_017`</div><div class='input'><span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/relocate.html'>relocate</a></span>(<span class='kw'>z</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `z`, `x`, `y`
-#&gt; FROM `dbplyr_015`</div><div class='input'><span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span>(first = <span class='kw'>x</span>, last = <span class='kw'>z</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
+#&gt; FROM `dbplyr_017`</div><div class='input'><span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span>(first = <span class='kw'>x</span>, last = <span class='kw'>z</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x` AS `first`, `y`, `z` AS `last`
-#&gt; FROM `dbplyr_015`</div></pre>
+#&gt; FROM `dbplyr_017`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

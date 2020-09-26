@@ -215,7 +215,8 @@ to the following SQL queries:</p><ul>
   suffix = <span class='kw'>NULL</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )
 
 <span class='co'># S3 method for tbl_lazy</span>
@@ -227,7 +228,8 @@ to the following SQL queries:</p><ul>
   suffix = <span class='kw'>NULL</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )
 
 <span class='co'># S3 method for tbl_lazy</span>
@@ -239,7 +241,8 @@ to the following SQL queries:</p><ul>
   suffix = <span class='kw'>NULL</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )
 
 <span class='co'># S3 method for tbl_lazy</span>
@@ -251,7 +254,8 @@ to the following SQL queries:</p><ul>
   suffix = <span class='kw'>NULL</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )
 
 <span class='co'># S3 method for tbl_lazy</span>
@@ -262,7 +266,8 @@ to the following SQL queries:</p><ul>
   copy = <span class='fl'>FALSE</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )
 
 <span class='co'># S3 method for tbl_lazy</span>
@@ -273,7 +278,8 @@ to the following SQL queries:</p><ul>
   copy = <span class='fl'>FALSE</span>,
   auto_index = <span class='fl'>FALSE</span>,
   <span class='kw'>...</span>,
-  sql_on = <span class='kw'>NULL</span>
+  sql_on = <span class='kw'>NULL</span>,
+  na_matches = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"never"</span>, <span class='st'>"na"</span>)
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -334,6 +340,13 @@ queries by supply <code>sql_on</code> which should be a SQL expression that
 uses <code>LHS</code> and <code>RHS</code> aliases to refer to the left-hand side or
 right-hand side of the join respectively.</p></td>
     </tr>
+    <tr>
+      <th>na_matches</th>
+      <td><p>Should NA (NULL) values match one another?
+The default, "never", is how databases usually work. <code>"na"</code> makes
+the joins behave like the dplyr join functions, <code><a href='https://rdrr.io/r/base/merge.html'>merge()</a></code>, <code><a href='https://rdrr.io/r/base/match.html'>match()</a></code>,
+and <code><a href='https://rdrr.io/r/base/match.html'>%in%</a></code>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -349,7 +362,7 @@ and return data to R.</p>
 <span class='kw'>instrument_db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>tbl_memdb</a></span>(<span class='kw'>dplyr</span>::<span class='kw'><a href='https://dplyr.tidyverse.org/reference/band_members.html'>band_instruments</a></span>)
 <span class='kw'>band_db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='kw'>instrument_db</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "name"</span></div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `LHS`.`name` AS `name`, `LHS`.`band` AS `band`, `RHS`.`plays` AS `plays`
+#&gt; SELECT `LHS`.`name` AS `name`, `band`, `plays`
 #&gt; FROM `dplyr::band_members` AS `LHS`
 #&gt; LEFT JOIN `dplyr::band_instruments` AS `RHS`
 #&gt; ON (`LHS`.`name` = `RHS`.`name`)
@@ -364,21 +377,40 @@ and return data to R.</p>
 #&gt; </span><span style='color: #555555;'>1</span><span> Mick  Stones  </span><span style='color: #BB0000;'>NA</span><span>    
 #&gt; </span><span style='color: #555555;'>2</span><span> John  Beatles guitar
 #&gt; </span><span style='color: #555555;'>3</span><span> Paul  Beatles bass  </div><div class='input'>
+<span class='co'># Unlike R, joins in SQL don't usually match NAs (NULLs)</span>
+<span class='kw'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>NA</span>))
+<span class='kw'>label</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>NA</span>), label = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"one"</span>, <span class='st'>"missing"</span>))
+<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='kw'>label</span>, by = <span class='st'>"x"</span>)
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
+#&gt;       x label
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1 one  
+#&gt; </span><span style='color: #555555;'>2</span><span>     2 </span><span style='color: #BB0000;'>NA</span><span>   
+#&gt; </span><span style='color: #555555;'>3</span><span>    </span><span style='color: #BB0000;'>NA</span><span> </span><span style='color: #BB0000;'>NA</span><span>   </div><div class='input'><span class='co'># But you can activate R's usual behaviour with the na_matches argument</span>
+<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='kw'>label</span>, by = <span class='st'>"x"</span>, na_matches = <span class='st'>"na"</span>)
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
+#&gt;       x label  
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  
+#&gt; </span><span style='color: #555555;'>1</span><span>     1 one    
+#&gt; </span><span style='color: #555555;'>2</span><span>     2 </span><span style='color: #BB0000;'>NA</span><span>     
+#&gt; </span><span style='color: #555555;'>3</span><span>    </span><span style='color: #BB0000;'>NA</span><span> missing</div><div class='input'>
 <span class='co'># By default, joins are equijoins, but you can use `sql_on` to</span>
 <span class='co'># express richer relationships</span>
 <span class='kw'>db1</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(x = <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>)
 <span class='kw'>db2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(x = <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>, y = <span class='kw'>letters</span>[<span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>])
 <span class='kw'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='kw'>db2</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "x"</span></div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `LHS`.`x` AS `x`, `RHS`.`y` AS `y`
-#&gt; FROM `dbplyr_010` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_011` AS `RHS`
+#&gt; SELECT `LHS`.`x` AS `x`, `y`
+#&gt; FROM `dbplyr_012` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
 #&gt; ON (`LHS`.`x` = `RHS`.`x`)
 #&gt; </div><div class='input'><span class='kw'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span>(<span class='kw'>db2</span>, sql_on = <span class='st'>"LHS.x &lt; RHS.x"</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `RHS`.`y` AS `y`
-#&gt; FROM `dbplyr_010` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_011` AS `RHS`
+#&gt; SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`
+#&gt; FROM `dbplyr_012` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
 #&gt; ON (LHS.x &lt; RHS.x)
 #&gt; </div></span></pre>
   </div>
