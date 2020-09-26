@@ -83,7 +83,7 @@ sql_join_vars <- function(con, vars) {
       alias = vars$alias,
       x = vars$x,
       y = vars$y,
-      MoreArgs = list(con = con),
+      MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y),
       SIMPLIFY = FALSE,
       USE.NAMES = TRUE
     ),
@@ -93,7 +93,7 @@ sql_join_vars <- function(con, vars) {
   )
 }
 
-sql_join_var <- function(con, alias, x, y) {
+sql_join_var <- function(con, alias, x, y, all_x, all_y) {
   if (!is.na(x) && !is.na(y)) {
     sql_expr(
       COALESCE(
@@ -103,9 +103,9 @@ sql_join_var <- function(con, alias, x, y) {
       con = con
     )
   } else if (!is.na(x)) {
-    sql_table_prefix(con, x, table = "LHS")
+    sql_table_prefix(con, x, table = if (x %in% all_y) "LHS")
   } else if (!is.na(y)) {
-    sql_table_prefix(con, y, table = "RHS")
+    sql_table_prefix(con, y, table = if (y %in% all_x) "RHS")
   } else {
     stop("No source for join column ", alias, call. = FALSE)
   }

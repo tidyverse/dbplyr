@@ -75,7 +75,7 @@
       inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `LHS`.`y` AS `y`, `RHS`.`x` AS `x.y`, `RHS`.`z` AS `z`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
@@ -87,7 +87,7 @@
       left_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `LHS`.`y` AS `y`, `RHS`.`x` AS `x.y`, `RHS`.`z` AS `z`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
@@ -99,7 +99,7 @@
       right_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `LHS`.`y` AS `y`, `RHS`.`x` AS `x.y`, `RHS`.`z` AS `z`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
@@ -111,7 +111,7 @@
       full_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `LHS`.`y` AS `y`, `RHS`.`x` AS `x.y`, `RHS`.`z` AS `z`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)

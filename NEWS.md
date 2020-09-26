@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Join SQL now only uses aliases where needed to disambiguate columns;
+  this should make generated queries more readable.
+
 * `_join()` function gains `na_matches` argument that allows you to control 
   whether or not `NA` values match other `NA` values. The default is `"never"`,
   which is the usual database behaviour but you can change to `"na"` to switch

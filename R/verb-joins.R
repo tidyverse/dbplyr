@@ -263,7 +263,13 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   #  alias - name of column in join result
   #  x - name of column from left table or NA if only from right table
   #  y - name of column from right table or NA if only from left table
-  list(alias = c(x_new, y_new), x = c(x_x, y_x), y = c(x_y, y_y))
+  list(
+    alias = c(x_new, y_new),
+    x = c(x_x, y_x),
+    y = c(x_y, y_y),
+    all_x = x_names,
+    all_y = c(y_names, by$y)
+  )
 }
 
 check_suffix <- function(x) {

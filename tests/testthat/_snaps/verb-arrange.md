@@ -168,7 +168,7 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+      SELECT `LHS`.`a` AS `a`, `b`, `c`
       FROM (SELECT *
       FROM `df`) `LHS`
       LEFT JOIN `df` AS `RHS`
@@ -208,7 +208,7 @@
     Output
       <SQL>
       SELECT *
-      FROM (SELECT `LHS`.`a` AS `a`, `LHS`.`b` AS `b`, `RHS`.`c` AS `c`
+      FROM (SELECT `LHS`.`a` AS `a`, `b`, `c`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
