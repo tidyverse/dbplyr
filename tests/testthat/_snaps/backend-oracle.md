@@ -23,3 +23,15 @@
       <SQL> EXPLAIN PLAN FOR SELECT * FROM foo;
       SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));
 
+---
+
+    Code
+      left_join(lf, lf, by = "x", na_matches = "na")
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x`
+      FROM (`df`) `LHS`
+      LEFT JOIN (`df`) `RHS`
+      ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
+      
+

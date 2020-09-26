@@ -38,6 +38,12 @@ test_that("custom aggregates translated", {
   expect_equal(translate_sql(median(x, na.rm = TRUE), window = FALSE), sql('MEDIAN(`x`)'))
   expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
 })
+
+test_that("custom SQL translation", {
+  lf <- lazy_frame(x = 1, con = simulate_sqlite())
+  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+})
+
 # live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {

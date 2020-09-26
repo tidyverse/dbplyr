@@ -18,7 +18,8 @@
   suffix = NULL,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 
 \method{left_join}{tbl_lazy}(
@@ -29,7 +30,8 @@
   suffix = NULL,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 
 \method{right_join}{tbl_lazy}(
@@ -40,7 +42,8 @@
   suffix = NULL,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 
 \method{full_join}{tbl_lazy}(
@@ -51,7 +54,8 @@
   suffix = NULL,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 
 \method{semi_join}{tbl_lazy}(
@@ -61,7 +65,8 @@
   copy = FALSE,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 
 \method{anti_join}{tbl_lazy}(
@@ -71,7 +76,8 @@
   copy = FALSE,
   auto_index = FALSE,
   ...,
-  sql_on = NULL
+  sql_on = NULL,
+  na_matches = c("never", "na")
 )
 }
 \arguments{
@@ -120,6 +126,11 @@ Usually joins use column equality, but you can perform more complex
 queries by supply \code{sql_on} which should be a SQL expression that
 uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
 right-hand side of the join respectively.}
+
+\item{na_matches}{Should NA (NULL) values match one another?
+The default, "never", is how databases usually work. \code{"na"} makes
+the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[=match]{match()}},
+and \code{\%in\%}.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
@@ -148,6 +159,13 @@ band_db \%>\% left_join(instrument_db) \%>\% show_query()
 # Can join with local data frames by setting copy = TRUE
 band_db \%>\%
   left_join(dplyr::band_instruments, copy = TRUE)
+
+# Unlike R, joins in SQL don't usually match NAs (NULLs)
+db <- memdb_frame(x = c(1, 2, NA))
+label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
+db \%>\% left_join(label, by = "x")
+# But you can activate R's usual behaviour with the na_matches argument
+db \%>\% left_join(label, by = "x", na_matches = "na")
 
 # By default, joins are equijoins, but you can use `sql_on` to
 # express richer relationships

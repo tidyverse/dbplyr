@@ -8,6 +8,9 @@ test_that("generates custom sql", {
 
   expect_snapshot(sql_table_analyze(con, ident("table")))
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM table")))
+
+  lf <- lazy_frame(x = 1, con = con)
+  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
 # live database -----------------------------------------------------------

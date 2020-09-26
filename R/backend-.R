@@ -446,6 +446,10 @@ base_no_win <- sql_translator(
 #' * `sql_query_fields()` <- `db_query_fields()` <- `tbl()`
 #' * `sql_query_rows()` <- `db_query_rows()` <- `do()`
 #' * `sql_query_save()` <- `db_save_query()` <- `db_compute()` <- `compute()`
+#' * `sql_expr_matches(con, x, y)` is used to generate an alternative to
+#'   `x == y` to use when you want `NULL`s to match. The default translation
+#'   uses a `CASE WHEN` as described in
+#'   <https://modern-sql.com/feature/is-distinct-from>
 #'
 #' @keywords internal
 #' @name db_sql
@@ -544,4 +548,21 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- sql_subquery(con, sql, "master")
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
+}
+
+#' @export
+#' @rdname db_sql
+sql_expr_matches <- function(con, x, y) {
+  UseMethod("sql_expr_matches")
+}
+
+# https://modern-sql.com/feature/is-distinct-from
+#' @export
+sql_expr_matches.DBIConnection <- function(con, x, y) {
+  build_sql(
+    "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
+    "THEN 0 ",
+    "ELSE 1 = 0",
+    con = con
+  )
 }

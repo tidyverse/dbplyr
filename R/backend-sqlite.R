@@ -85,4 +85,10 @@ sql_subquery.SQLiteConnection <- function(con, from, name = unique_subquery_name
   }
 }
 
+#' @export
+sql_expr_matches.SQLiteConnection <- function(con, x, y) {
+  # https://sqlite.org/lang_expr.html#isisnot
+  build_sql(x, " IS ", y, con = con)
+}
+
 globalVariables(c("datetime", "NUMERIC", "REAL"))

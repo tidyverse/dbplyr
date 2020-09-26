@@ -9,6 +9,7 @@
 \alias{sql_join_suffix}
 \alias{sql_query_fields}
 \alias{sql_query_rows}
+\alias{sql_expr_matches}
 \title{SQL generation methods for database methods}
 \usage{
 sql_query_explain(con, sql, ...)
@@ -24,6 +25,8 @@ sql_join_suffix(con, ...)
 sql_query_fields(con, sql, ...)
 
 sql_query_rows(con, sql, ...)
+
+sql_expr_matches(con, x, y)
 }
 \description{
 \itemize{
@@ -33,6 +36,10 @@ sql_query_rows(con, sql, ...)
 \item \code{sql_query_fields()} <- \code{db_query_fields()} <- \code{tbl()}
 \item \code{sql_query_rows()} <- \code{db_query_rows()} <- \code{do()}
 \item \code{sql_query_save()} <- \code{db_save_query()} <- \code{db_compute()} <- \code{compute()}
+\item \code{sql_expr_matches(con, x, y)} is used to generate an alternative to
+\code{x == y} to use when you want \code{NULL}s to match. The default translation
+uses a \verb{CASE WHEN} as described in
+\url{https://modern-sql.com/feature/is-distinct-from}
 }
 }
 \keyword{internal}

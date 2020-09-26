@@ -1,13 +1,14 @@
 #' @export
 #' @rdname sql_build
-join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y")) {
+join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
   structure(
     list(
       x = x,
       y = y,
       vars = vars,
       type = type,
-      by = by
+      by = by,
+      na_matches = na_matches
     ),
     class = c("join_query", "query")
   )
@@ -40,13 +41,18 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
     name = "RHS"
   )
 
-  sql_join(con, from_x, from_y, vars = query$vars, type = query$type, by = query$by)
+  sql_join(con, from_x, from_y,
+    vars = query$vars,
+    type = query$type,
+    by = query$by,
+    na_matches = query$na_matches
+  )
 }
 
 # SQL generation ----------------------------------------------------------
 
 #' @export
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -58,7 +64,7 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, .
   )
 
   select <- sql_join_vars(con, vars)
-  on <- sql_join_tbls(con, by)
+  on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
   build_sql(
@@ -105,19 +111,23 @@ sql_join_var <- function(con, alias, x, y) {
   }
 }
 
-sql_join_tbls <- function(con, by) {
+sql_join_tbls <- function(con, by, na_matches = "never") {
+  na_matches <- arg_match(na_matches, c("na", "never"))
+
   on <- NULL
-  if (length(by$x) + length(by$y) > 0) {
-    on <- sql_vector(
-      paste0(
-        sql_table_prefix(con, by$x, "LHS"),
-        " = ",
-        sql_table_prefix(con, by$y, "RHS")
-      ),
-      collapse = " AND ",
-      parens = TRUE,
-      con = con
-    )
+  if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
+    lhs <- sql_table_prefix(con, by$x, "LHS")
+    rhs <- sql_table_prefix(con, by$y, "RHS")
+
+    if (na_matches == "na") {
+      compare <- purrr::map_chr(seq_along(lhs), function(i) {
+        sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
+      })
+    } else {
+      compare <- paste0(lhs, " = ", rhs)
+    }
+
+    on <- sql_vector(compare, collapse = " AND ", parens = TRUE, con = con)
   } else if (length(by$on) > 0) {
     on <- build_sql("(", by$on, ")", con = con)
   }

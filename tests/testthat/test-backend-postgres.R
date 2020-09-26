@@ -58,6 +58,11 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(translate_sql(quarter(x, fiscal_start = 2)))
 })
 
+test_that("custom SQL translation", {
+  lf <- lazy_frame(x = 1, con = simulate_postgres())
+  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+})
+
 # live database -----------------------------------------------------------
 
 test_that("can explain", {

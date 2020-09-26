@@ -30,6 +30,10 @@
 #'   queries by supply `sql_on` which should be a SQL expression that
 #'   uses `LHS` and `RHS` aliases to refer to the left-hand side or
 #'   right-hand side of the join respectively.
+#' @param na_matches Should NA (NULL) values match one another?
+#'   The default, "never", is how databases usually work. `"na"` makes
+#'   the joins behave like the dplyr join functions, [merge()], [match()],
+#'   and `%in%`.
 #' @inherit arrange.tbl_lazy return
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
@@ -41,6 +45,13 @@
 #' # Can join with local data frames by setting copy = TRUE
 #' band_db %>%
 #'   left_join(dplyr::band_instruments, copy = TRUE)
+#'
+#' # Unlike R, joins in SQL don't usually match NAs (NULLs)
+#' db <- memdb_frame(x = c(1, 2, NA))
+#' label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
+#' db %>% left_join(label, by = "x")
+#' # But you can activate R's usual behaviour with the na_matches argument
+#' db %>% left_join(label, by = "x", na_matches = "na")
 #'
 #' # By default, joins are equijoins, but you can use `sql_on` to
 #' # express richer relationships
@@ -57,7 +68,7 @@ NULL
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL) {
+                                sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -67,6 +78,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -77,7 +89,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -87,6 +99,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -97,7 +110,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL) {
+                                sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -107,6 +120,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -117,7 +131,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -127,6 +141,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -136,7 +151,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @importFrom dplyr semi_join
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_semi_join(
     x, y,
@@ -145,6 +160,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -154,7 +170,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @importFrom dplyr anti_join
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_semi_join(
     x, y,
@@ -163,6 +179,7 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
@@ -170,7 +187,8 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 
 add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         suffix = NULL,
-                        auto_index = FALSE) {
+                        auto_index = FALSE,
+                        na_matches = "never") {
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -194,13 +212,14 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     vars = vars,
     type = type,
     by = by,
-    suffix = suffix
+    suffix = suffix,
+    na_matches = na_matches
   ))
   x
 }
 
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE) {
+                             auto_index = FALSE, na_matches = "never") {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
@@ -214,7 +233,8 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
 
   x$ops <- op_double("semi_join", x, y, args = list(
     anti = anti,
-    by = by
+    by = by,
+    na_matches = na_matches
   ))
   x
 }
@@ -288,11 +308,17 @@ sql_build.op_join <- function(op, con, ...) {
     vars = op$args$vars,
     type = op$args$type,
     by = op$args$by,
-    suffix = op$args$suffix
+    suffix = op$args$suffix,
+    na_matches = op$args$na_matches
   )
 }
 
 #' @export
 sql_build.op_semi_join <- function(op, con, ...) {
-  semi_join_query(op$x, op$y, anti = op$args$anti, by = op$args$by)
+  semi_join_query(
+    op$x, op$y,
+    anti = op$args$anti,
+    by = op$args$by,
+    na_matches = op$args$na_matches
+  )
 }

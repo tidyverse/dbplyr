@@ -1,12 +1,13 @@
 #' @export
 #' @rdname sql_build
-semi_join_query <- function(x, y, anti = FALSE, by = NULL) {
+semi_join_query <- function(x, y, anti = FALSE, by = NULL, na_matches = FALSE) {
   structure(
     list(
       x = x,
       y = y,
       anti = anti,
-      by = by
+      by = by,
+      na_matches = na_matches
     ),
     class = c("semi_join_query", "query")
   )

@@ -160,6 +160,11 @@ test_that("join verbs generate expected ops", {
   expect_equal(ja$ops$args$anti, TRUE)
 })
 
+test_that("can optionally match NA values", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+})
+
 test_that("join captures both tables", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
@@ -196,7 +201,7 @@ test_that("extra args generates error", {
   lf2 <- lazy_frame(x = 1, z = 2)
 
   expect_error(
-    inner_join(lf1, lf2, by = "x", na_matches = "na"),
+    inner_join(lf1, lf2, by = "x", never_used = "na"),
     "unused argument"
   )
 })

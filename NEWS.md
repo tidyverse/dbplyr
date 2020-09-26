@@ -1,5 +1,15 @@
 # dbplyr (development version)
 
+* `_join()` function gains `na_matches` argument that allows you to control 
+  whether or not `NA` values match other `NA` values. The default is `"never"`,
+  which is the usual database behaviour but you can change to `"na"` to switch
+  to R's usual behaviour (#180).
+
+* New `sql_expr_matches()` generic that allows database to select more
+  efficient alternatives when determine if two values "match" (i.e. like
+  equality but also matching `NULL`s). For more details, see
+  <https://modern-sql.com/feature/is-distinct-from>
+
 * Oracle translation now depends on Oracle 12c, and uses a "row-limiting" 
   clause for `head()`.
 

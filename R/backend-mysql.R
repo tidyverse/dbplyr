@@ -82,4 +82,16 @@ sql_join.MySQL <- sql_join.MariaDBConnection
 #' @export
 sql_join.MySQLConnection <- sql_join.MariaDBConnection
 
+
+#' @export
+sql_expr_matches.MariaDBConnection <- function(con, x, y) {
+  # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
+  build_sql(x, " <=> ", y, con = con)
+}
+#' @export
+sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
+#' @export
+sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
+
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
+

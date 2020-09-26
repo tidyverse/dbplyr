@@ -77,6 +77,13 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   add_op_set_op(x, y, "MINUS", copy = copy, ...)
 }
 
+#' @export
+sql_expr_matches.Oracle <- function(con, x, y) {
+  # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
+  build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
+}
+
+
 # roacle package ----------------------------------------------------------
 
 #' @export
@@ -93,3 +100,6 @@ sql_subquery.OraConnection <- sql_subquery.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle
+
+#' @export
+sql_expr_matches.OraConnection <- sql_expr_matches.Oracle

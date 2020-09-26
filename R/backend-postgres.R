@@ -143,6 +143,16 @@ sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
 #' @export
 sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
 
+#' @export
+sql_expr_matches.PostgreSQLConnection <- function(con, x, y) {
+  # https://www.postgresql.org/docs/current/functions-comparison.html
+  build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
+}
+#' @export
+sql_expr_matches.PostgreSQL <- sql_expr_matches.PostgreSQLConnection
+#' @export
+sql_expr_matches.PqConnection <- sql_expr_matches.PostgreSQLConnection
+
 # DBI methods ------------------------------------------------------------------
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html

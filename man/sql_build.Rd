@@ -11,7 +11,15 @@
 \alias{sql_optimise}
 \title{Build and render SQL from a sequence of lazy operations}
 \usage{
-join_query(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"))
+join_query(
+  x,
+  y,
+  vars,
+  type = "inner",
+  by = NULL,
+  suffix = c(".x", ".y"),
+  na_matches = FALSE
+)
 
 select_query(
   from,
@@ -24,7 +32,7 @@ select_query(
   distinct = FALSE
 )
 
-semi_join_query(x, y, anti = FALSE, by = NULL)
+semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type = type)
 
