@@ -1,3 +1,68 @@
+#' Backend: SQL server
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * `SELECT` uses `TOP` not `LIMIT`
+#' * Automatically prefixes `#` to create temporary tables. Add the prefix
+#'   yourself to avoid the message.
+#' * String basics: `paste()`, `substr()`, `nchar()`
+#' * Custom types for `as.*` functions
+#' * Lubridate extraction functions, `year()`, `month()`, `day()` etc
+#' * Semi-automated bit <-> boolean translation (see below)
+#'
+#' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @section Bit vs boolean:
+#' SQL server uses two incompatible types to represent `TRUE` and `FALSE`
+#' values:
+#'
+#' * The `BOOLEAN` type is the result of logical comparisons (e.g. `x > y`)
+#'   and can be used `WHERE` but not to create new columns in `SELECT`.
+#'   <https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
+#'
+#' * The `BIT` type is a special type of numeric column used to store
+#'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
+#'   <https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
+#'
+#' dbplyr does its best to automatically create the correct type when needed,
+#' but can't do it 100% correctly because it does not have a full type
+#' inference system. This means that you many need to manually do conversions
+#' from time to time.
+#'
+#' * To convert from bit to boolean use `x == 1`
+#' * To convert from boolean to bit use `as.logical(if(x, 0, 1))`
+#'
+#' @param version Version of MS SQL to simulate. Currently only, difference is
+#'   that 15.0 and above will use `TRY_CAST()` instead of `CAST()`.
+#' @name backend-mssql
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+#' lf %>% head()
+#' lf %>% transmute(x = paste(b, c, d))
+#'
+#' # Can use boolean as is:
+#' lf %>% filter(c > d)
+#' # Need to convert from boolean to bit:
+#' lf %>% transmute(x = c > d)
+#' # Can use boolean as is:
+#' lf %>% transmute(x = ifelse(c > d, "c", "d"))
+NULL
+
+#' @export
+#' @rdname simulate_dbi
+simulate_mssql <- function(version = "15.0") {
+  simulate_dbi("Microsoft SQL Server",
+    version = numeric_version(version)
+  )
+}
+
 #' @export
 `sql_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
@@ -257,20 +322,8 @@ mssql_table_rename <- function(name, temporary) {
     con = con
   )
 }
-# We have to jump through some hoops here because MS SQL has two boolean types:
-#
-# * BOOLEAN, which can be used in filters but not results
-# * BIT, which can be used in results, but not filters
-#
-# https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
-# The result of a comparison operator has the
-# Boolean data type. This has three values: TRUE, FALSE, and UNKNOWN.
-# Unlike other SQL Server data types, a Boolean data type cannot be specified as
-# the data type of  a table column or variable, and cannot be returned in a
-# result set.
-#
-# * bit -> boolean: x == 1
-# * boolean -> bit: CAST(IIF(x, 0, 1) AS BIT)
+
+
 
 mssql_needs_bit <- function() {
   context <- sql_current_context()

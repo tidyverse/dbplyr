@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Documentation has been radically improved with new topics for each major 
+  verb and each backend giving more details about the SQL translation.
+
 * Date-time escaping methods for Athena and Presto have moved to the packages
   where they belong.
 

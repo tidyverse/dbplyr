@@ -1,3 +1,32 @@
+#' Backend: SQLite
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * Uses non-standard `LOG()` function
+#' * Date-time extraction functions from lubridate
+#' * Custom median translation
+#'
+#' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-sqlite
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_sqlite())
+#' lf %>% transmute(x = paste(c, " times"))
+#' lf %>% transmute(x = log(b), y = log(b, base = 2))
+NULL
+
+#' @export
+#' @rdname backend-sqlite
+simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
+
+
 #' @export
 db_desc.SQLiteConnection <- function(x) {
   paste0("sqlite ", sqlite_version(), " [", x@dbname, "]")

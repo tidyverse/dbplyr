@@ -1,3 +1,34 @@
+#' Backend: MS Access
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * `SELECT` uses `TOP`, not `LIMIT`
+#' * Non-standard types and mathematical functions
+#' * String concatenation uses `&`
+#' * No `ANALYZE` equivalent
+#' * `TRUE` and `FALSE` converted to 1 and 0
+#'
+#' Use `simulate_access()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-access
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#' lf <- lazy_frame(x = 1, y = 2, z = "a", con = simulate_access())
+#'
+#' lf %>% head()
+#' lf %>% mutate(y = as.numeric(y), z = sqrt(x^2 + 10))
+#' lf %>% mutate(a = paste0(z, " times"))
+NULL
+
+#' @export
+#' @rdname backend-access
+simulate_access <- function() simulate_dbi("ACCESS")
+
 # sql_ generics --------------------------------------------
 
 #' @export

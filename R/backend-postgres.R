@@ -1,3 +1,31 @@
+#' Backend: PostgreSQL
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * Many stringr functions
+#' * lubridate date-time extraction functions
+#' * More standard statistical summaries
+#'
+#' Use `simulate_postgres()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-postgres
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+#' lf %>% summarise(x = sd(b, na.rm = TRUE))
+#' lf %>% summarise(y = cor(b, c), y = cov(b, c))
+NULL
+
+#' @export
+#' @rdname backend-postgres
+simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
+
 #' @export
 db_desc.PostgreSQLConnection <- function(x) {
   info <- dbGetInfo(x)

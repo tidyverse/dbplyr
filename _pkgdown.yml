@@ -28,6 +28,10 @@ reference:
   - slice_min.tbl_lazy
   - summarise.tbl_lazy
 
+- title: Built-in database backends
+  contents:
+  - starts_with("backend")
+
 - title: Database connection
   contents:
   - in_schema

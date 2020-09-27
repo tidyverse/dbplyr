@@ -1,3 +1,31 @@
+#' Backend: MySQL/MariaDB
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * `paste()` uses `CONCAT_WS()`
+#' * String translations for `str_detect()`, `str_locate()`, and
+#'   `str_replace_all()`
+#' * Clear error message for unsupported full joins
+#'
+#' Use `simulate_mysql()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-mysql
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
+#' lf %>% transmute(x = paste0(z, " times"))
+NULL
+
+#' @export
+#' @rdname backend-mysql
+simulate_mysql <- function() simulate_dbi("MariaDBConnection")
+
 #' @export
 db_desc.MariaDBConnection <- function(x) {
   info <- dbGetInfo(x)
@@ -56,6 +84,7 @@ sql_translate_env.MariaDBConnection <- function(con) {
     )
   )
 }
+
 #' @export
 sql_translate_env.MySQL <- sql_translate_env.MariaDBConnection
 #' @export

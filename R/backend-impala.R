@@ -1,3 +1,27 @@
+#' Backend: Impala
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are a scattering of custom translations provided by users, mostly focussed
+#' on bitwise operations.
+#'
+#' Use `simulate_impala()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-impala
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_impala())
+#' lf %>% transmute(X = bitwNot(bitwOr(b, c)))
+NULL
+
+#' @export
+#' @rdname simulate_dbi
+simulate_impala <- function() simulate_dbi("Impala")
+
 #' @export
 sql_translate_env.Impala <- function(con) {
   sql_variant(

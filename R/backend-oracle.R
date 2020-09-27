@@ -1,3 +1,33 @@
+#' Backend: Oracle
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * Use `FETCH FIRST` instead of `LIMIT`
+#' * Custom types
+#' * `paste()` uses `||`
+#' * Custom subquery generation (no `AS`)
+#' * `setdiff()` uses `MINUS` instead of `EXCEPT`
+#'
+#' Use `simulate_oracle()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-oracle
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_oracle())
+#' lf %>% transmute(x = paste0(c, " times"))
+#' lf %>% setdiff(lf)
+NULL
+
+#' @export
+#' @rdname backend-oracle
+simulate_oracle <- function() simulate_dbi("Oracle")
+
 #' @export
 sql_select.Oracle <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
