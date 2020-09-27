@@ -1,0 +1,44 @@
+# Setting up SAP HANA
+
+## Sign up for free cloud trial
+
+* <https://saphanajourney.com/hana-cloud/plans/>
+* Go to <https://account.hanatrial.ondemand.com/cockpit>
+* Click trial, then "dev" space.
+* Then follow <https://saphanajourney.com/hana-cloud/learning-article/how-to-create-your-trial-sap-hana-cloud-instance/>
+* Allow access from all IP addresses.
+* Need to restart service every day; it's automatically stopped each night.
+
+## Install drivers
+
+* Download SAP HANA installer from <https://www.sap.com/cmp/td/sap-hana-express-edition.html>
+* Uncheck virtual machine; check "clients (mac)"
+* Untar download
+* Untar `hdb_client_mac.tgz`
+* `./hdb_inst`
+
+Configure odbc.init: `edit_file("/usr/local/etc/odbcinst.ini")`
+
+```
+[SAP HANA]
+Description=SAP HANA
+Driver=/Applications/sap/hdbclient/libodbcHDB.dylib
+```
+
+Check:
+
+```{r}
+odbc::odbcListDrivers()
+```
+
+## Connect
+
+```{r, eval = FALSE}
+con <- DBI::dbConnect(odbc::odbc(),
+  driver = "OSAP HANA",
+  database = "test",
+  uid = "SA",
+  pwd = "Password12",
+  servernode = "localhost"
+)
+```
