@@ -1,5 +1,3 @@
-context("test-verb-pull")
-
 test_that("can extract default, by name, or positive/negative position", {
   x <- 1:10
   y <- runif(10)

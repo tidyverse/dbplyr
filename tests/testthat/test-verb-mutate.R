@@ -1,5 +1,3 @@
-context("mutate")
-
 test_that("mutate computed before summarise", {
   mf <- memdb_frame(x = c(1, 2, 3), y = c(9, 8, 7))
 
@@ -24,10 +22,17 @@ test_that("can refer to fresly created values", {
     collect()
   expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
 
-  out2 <- memdb_frame(x = 1) %>%
-    mutate(x = x + 1, x = x + 1, x = x + 1) %>%
-    collect()
-  expect_equal(out2, tibble(x = 4))
+  out2 <- memdb_frame(x = 1, .name = "multi_mutate") %>%
+    mutate(x = x + 1, x = x + 2, x = x + 4)
+  expect_equal(collect(out2), tibble(x = 8))
+  expect_snapshot(show_query(out2))
+})
+
+test_that("transmute includes all needed variables", {
+  lf <- lazy_frame(x = 1, y = 2)
+  out <- transmute(lf, x = x / 2, x2 = x + y)
+  expect_named(out$ops$x$args$vars, c("x", "y"))
+  expect_snapshot(out)
 })
 
 test_that("queries are not nested unnecessarily", {
@@ -66,32 +71,43 @@ test_that("supports overwriting variables (#3222)", {
 
 # SQL generation -----------------------------------------------------------
 
-test_that("mutate calls windowed versions of sql functions", {
-  dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = as.numeric(row_number(x))))
+test_that("mutate generates new variables and replaces existing", {
+  df1 <- memdb_frame(x = 1)
+  out <- df1 %>% mutate(x = 2, y = 3) %>% collect()
+  expect_equal(out, tibble(x = 2, y = 3))
+})
 
-  expect_equal(out$df$r, c(1, 2, 1, 2))
-  expect_equal_tbls(out)
+test_that("transmute only returns new variables", {
+  df1 <- memdb_frame(x = 1)
+  out <- df1 %>% transmute(y = 3) %>% collect()
+  expect_equal(out, tibble(y = 3))
+})
+
+test_that("mutate calls windowed versions of sql functions", {
+  df1 <- memdb_frame(x = 1:4, g = rep(c(1, 2), each = 2))
+  out <- df1 %>% group_by(g) %>% mutate(r = row_number(x)) %>% collect()
+  expect_equal(out$r, c(1, 2, 1, 2))
 })
 
 test_that("recycled aggregates generate window function", {
-  dfs <- test_frame_windowed(x = as.numeric(1:4), g = rep(c(1, 2), each = 2))
-  out <- lapply(dfs, . %>% group_by(g) %>% mutate(r = x - mean(x, na.rm = TRUE)))
+  df1 <- memdb_frame(x = as.numeric(1:4), g = rep(c(1, 2), each = 2))
+  out <- df1 %>%
+    group_by(g) %>%
+    mutate(r = x - mean(x, na.rm = TRUE)) %>%
+    collect()
 
-  expect_equal(out$df$r, c(-0.5, 0.5, -0.5, 0.5))
-  expect_equal_tbls(out)
+  expect_equal(out$r, c(-0.5, 0.5, -0.5, 0.5))
 })
 
 test_that("cumulative aggregates generate window function", {
-  dfs <- test_frame_windowed(x = 1:4, g = rep(c(1, 2), each = 2))
-  out <- lapply(dfs, . %>%
+  df1 <- memdb_frame(x = 1:4, g = rep(c(1, 2), each = 2))
+  out <- df1 %>%
     group_by(g) %>%
     arrange(x) %>%
-    mutate(r = as.numeric(cumsum(x)))
-  )
+    mutate(r = cumsum(x)) %>%
+    collect()
 
-  expect_equal(out$df$r, c(1, 3, 3, 7))
-  expect_equal_tbls(out)
+  expect_equal(out$r, c(1, 3, 3, 7))
 })
 
 test_that("mutate overwrites previous variables", {
@@ -126,23 +142,15 @@ test_that("quoting for rendering mutated grouped table", {
 test_that("mutate generates subqueries as needed", {
   lf <- lazy_frame(x = 1, con = simulate_sqlite())
 
-  reg <- list(
-    inplace = lf %>% mutate(x = x + 1, x = x + 1),
-    increment = lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
-  )
-
-  expect_known_output(print(reg), test_path("sql/mutate-subqueries.sql"))
+  expect_snapshot(lf %>% mutate(x = x + 1, x = x + 1))
+  expect_snapshot(lf %>% mutate(x1 = x + 1, x2 = x1 + 1))
 })
 
 test_that("mutate collapses over nested select", {
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
-  reg <- list(
-    xy = lf %>% select(x:y) %>% mutate(x = x * 2, y = y * 2),
-    yx = lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2)
-  )
-
-  expect_known_output(print(reg), test_path("sql/mutate-select-collapse.sql"))
+  expect_snapshot(lf %>% select(x:y) %>% mutate(x = x * 2, y = y * 2))
+  expect_snapshot(lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2))
 })
 
 # sql_build ---------------------------------------------------------------
@@ -165,13 +173,13 @@ test_that("mutate can drop variables with NULL", {
 
 test_that("mutate_all generates correct sql", {
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate_all(~ . + 1L) %>%
+    dplyr::mutate_all(~ . + 1L) %>%
     sql_build()
 
   expect_equal(out$select, sql(x = '`x` + 1', y = '`y` + 1'))
 
   out <- lazy_frame(x = 1) %>%
-    mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
+    dplyr::mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
     sql_build()
   expect_equal(out$select, sql(`x` = '`x`', one = '`x` + 1', two = '`x` + 2'))
 })
@@ -179,7 +187,7 @@ test_that("mutate_all generates correct sql", {
 test_that("mutate_all scopes nested quosures correctly", {
   num <- 10L
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate_all(~ . + num) %>%
+    dplyr::mutate_all(~ . + num) %>%
     sql_build()
 
   expect_equal(out$select, sql(x = '`x` + 10', y = '`y` + 10'))

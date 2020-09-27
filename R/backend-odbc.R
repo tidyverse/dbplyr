@@ -1,8 +1,27 @@
-#' @include translate-sql-window.R
-#' @include translate-sql-helpers.R
-#' @include translate-sql-paste.R
-#' @include escape.R
+#' Backend: ODBC
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are minor translations for common data types.
+#'
+#' Use `simulate_odbc()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-odbc
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_odbc())
+#' lf %>% transmute(x = as.numeric(b))
+#' lf %>% transmute(x = as.integer(b))
+#' lf %>% transmute(x = as.character(b))
 NULL
+
+#' @export
+#' @rdname backend-odbc
+simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
 sql_translate_env.OdbcConnection <- function(con) {
@@ -29,9 +48,7 @@ base_odbc_scalar <- sql_translator(
 #' @format NULL
 base_odbc_agg <- sql_translator(
   .parent = base_agg,
-  n = function() sql("COUNT(*)"),
-  count = function() sql("COUNT(*)"),
-  sd = sql_prefix("STDDEV_SAMP")
+  sd = sql_aggregate("STDDEV_SAMP", "sd")
 )
 
 #' @export
@@ -40,8 +57,6 @@ base_odbc_agg <- sql_translator(
 base_odbc_win <- sql_translator(
   .parent = base_win,
   sd = win_aggregate("STDDEV_SAMP"),
-  n = function() win_over(sql("COUNT(*)"), win_current_group()),
-  count = function() win_over(sql("COUNT(*)"), win_current_group())
 )
 
 #' @export

@@ -1,7 +1,201 @@
 # dbplyr (development version)
 
+* Documentation has been radically improved with new topics for each major 
+  verb and each backend giving more details about the SQL translation.
+
+* Date-time escaping methods for Athena and Presto have moved to the packages
+  where they belong.
+
+* Join SQL now only uses aliases where needed to disambiguate columns;
+  this should make generated queries more readable.
+
+* `_join()` function gains `na_matches` argument that allows you to control 
+  whether or not `NA` values match other `NA` values. The default is `"never"`,
+  which is the usual database behaviour but you can change to `"na"` to switch
+  to R's usual behaviour (#180).
+
+* New `sql_expr_matches()` generic that allows database to select more
+  efficient alternatives when determine if two values "match" (i.e. like
+  equality but also matching `NULL`s). For more details, see
+  <https://modern-sql.com/feature/is-distinct-from>
+
+* Oracle translation now depends on Oracle 12c, and uses a "row-limiting" 
+  clause for `head()`.
+
+* `sql_optimise()` now can partially optimise a pipeline; due to an unfortunate
+  bug it previously gave up too easily.
+
+* dbplyr no longer creates an `ORDER` BY clause in subqueries. This is not
+  part of the SQL spec, and has very limited support across databases. Now
+  such queries generate a warning suggesting that you move your `arrange()`
+  call later in the pipeline (#276). (There's one exception: `ORDER BY`
+  is still generated if `LIMIT` is present.)
+
+* `slice_min()`, `slice_max()`, and `slice_order()` are now supported.
+  `slice_head()` and `slice_tail()` throw clear error messages (#394)
+
+* `window_order()` overrides ordering, rather than appending to it.
+
+* Now supports `relocate()` from dplyr 1.0.0 (#494).
+
+* `sql_escape_ident()` and `sql_escape_string()` generics from dbplyr are no
+  longer used; these methods should now be supplied for
+  `DBI::dbQuoteIdentifier()` and `DBI::dbQuoteString()` respectively.
+
+* `transmute()` now correctly tracks variables it needs when creating
+  subqueries (#313).
+
+* New `sql_join_suffix()` allows backends to control the default suffixes used   (#254).
+
+* `distinct()` no longer duplicates column if grouped (#354).
+
+* `mutate()` grouping variables no longer generates a downstream error (#396)
+
+* `mutate()` correctly generates subqueries when you re-use the same variable
+  three or more times (#412).
+
+* Each individual element of `in_schema()` is now correctly quoted (#287). 
+  (use `sql()` to opt out of quoting, if needed). And `DBI::Id()` should work
+  anywhere that `in_schema()` does.
+
+* Can now `copy_to()` can now `overwrite` when table is specified with schema 
+  (#489).
+
+*   A number of `db_*` generics have been replaced with SQL generation generics:
+
+    * `db_analyze()` -> `sql_table_analyze()`
+    * `db_create_index()` -> `sql_index_create()`
+    * `db_explain()` -> `sql_queriy_explain()` 
+    * `db_query_fields()` -> `sql_query_fields()`
+    * `db_query_rows()` -> `sql_query_rows()`
+  
+    This makes them easier to test and is an important part of the process of
+    moving all database generics in dbplyr (#284).
+  
+* A number of `db_*` generics are no longer used: `db_create_indexes()`,
+  `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,
+  `drop_drop_table()`, `db_has_table()`, `db_create_table()`, 
+  `db_data_types()`. These were only used for data insertion, and that now all 
+  happens via `dbWriteTable()`.
+
+* MySQL uses standard SQL for index creation.
+
+* MS SQL translation does better a distinguishing between bit and boolean 
+  (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
+  simpler expressions.
+
+* `copy_to()` gains an `in_transaction` argument so you can optionally 
+  suppress the transaction wrapper (#368).
+
+* The join functions now error when additional arguments are provided
+  (instead of silently swallowing them!) (#382).
+
+* `substring()` is now translated the same way as `substr()` (#378).
+
+* `pmin()` and `pmax()` translations now have `na.rm` arguments (#479).
+  All `sd()` and `var()` translations have `na.rm`. All warn on first
+  use for consistency with `mean()` and friends.
+  
+* `%/%` now generates a clear error message; previously it was translated to
+  `/` which is not correct (#108).
+
+* SQLite gains translations for lubridate functions `today()`, `now()`, 
+  `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`,`yday()`
+  (#262).
+
+* You can now use `::` in translations, so that (e.g.) `dbplyr::n()` is
+  translated to `count(*)` (#207).
+
+* New RedShift translations when used with `RPostgres::Redshift()`.
+  * `str_replace()` errors since there's no Redshift translation, 
+     and `str_replace_all()` uses `REGEXP_REPLACE()` (#446).
+     
+  * `paste()` and `paste0()` use `||` (#458).
+  
+  * `as.numeric()` and `as.double()` cast to `FLOAT` (#408).
+  
+  * `substr()` and `str_sub()` use `SUBSTRING()` (#327).
+
+* `sql_translate_env.Microsoft SQL Server()` now uses `sql_try_cast()` instead
+  of `sql_cast()` for MSSQL version 11+ (2012+) (@DavidPatShuiFong, #380).
+
+* SQLite gets correct translation for `median()` (#357).
+
+* `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
+  and friends now return DBI connections rather than the now deprecated 
+  `src_dbi()` (#440).
+
+* `db_drop_table()` now works for Oracle (#353).
+
+* The default translation for `n()` is now `count(*)` (#343). 
+
+* odbc no longer translates `count()`.
+
+* Subquery names are now scoped within the query. This means that query text 
+  should now be deterministic which helps some query optimisers/cachers (#336).
+
+* `sub_str()` translation is more consistent in edge cases (@ianmcook).
+
+* Postgres: New translations for stringr functions: `str_squish()`, 
+  `str_remove()`, `str_remove_all()` (@shosaco).
+
+* All old lazy eval shims have been removed. 
+
+* `median()` now takes a new argument `na.rm` for consistency with `mean()`,
+  but still does always remove any missing values (@lorenzwalthert, #483).
+
+* [blob](https://blob.tidyverse.org/) vectors can now be used with `!!` and `!!!` operators, for example in `filter()` (@okhoma, #433)
+
+# dbplyr 1.4.4
+
+* Internally `DBI::dbExecute()` now uses `immediate = TRUE`; this improves
+  support for session-scoped temporary tables in MS SQL (@krlmlr, #438).
+
+* Subqueries with `ORDER BY` use `TOP 9223372036854775807` instead of 
+  `TOP 100 PERCENT` on SQL Server for compatibility with Azure Data Warehouse 
+  (#337, @alexkyllo).
+
+* `escape()` now supports `blob` vectors using new `sql_escape_raw()` 
+  generic. It enables using [blob](https://blob.tidyverse.org/) variables in 
+  dplyr verbs, for example to filter nvarchar values by UTF-16 blobs
+  (see https://github.com/r-dbi/DBI/issues/215#issuecomment-356376133). 
+  (@okhoma, #433)
+
+* Added `setOldClass()` calls for `"ident"` and `"ident_q"` classes for 
+  compatibility with dplyr 1.0.0 (#448, @krlmlr).
+
+* Postgres `str_detect()` translation uses same argument names as stringr,
+  and gains a `negate` argument (#444).
+
+* `semi_join()` and `anti_join()` now correctly support the `sql_on` argument 
+  (#443, @krlmlr).
+
+# dbplyr 1.4.3
+
+* dbplyr now uses RPostgres (instead of RPostgreSQL) and RMariaDB (instead of 
+  RMySQL) for its internal tests and data functions (#427).
+
+* The Date and POSIXt methods for `escape()` now use exported 
+  `sql_escape_date()` and `sql_escape_datetime()` generics to allow backend
+  specific formatting of date and datetime literals. These are used to
+  provide methods for Athena and Presto backends (@OssiLehtinen, #384, #391).
+
+* `first()`, `last()`, `nth()`, `lead()` and `lag()` now respect the
+  `window_frame()` (@krlmlr, #366).
+
+* SQL server: new translations for `str_flatten()` (@PauloJhonny, #405).
+
+* SQL server: temporary datasets are now session-local, not global (#401).
+
+* Postgres: correct `str_detect()`, `str_replace()` and `str_replace_all()` 
+  translation (@shosaco, #362).
+
+# dbplyr 1.4.2
+
 * Fix bug when partially evaluating unquoting quosure containing a single 
   symbol (#317)
+
+* Fixes for rlang and dpylr compatibility.
 
 # dbplyr 1.4.1
 

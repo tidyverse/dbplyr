@@ -1,3 +1,27 @@
+#' Backend: Impala
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are a scattering of custom translations provided by users, mostly focussed
+#' on bitwise operations.
+#'
+#' Use `simulate_impala()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-impala
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_impala())
+#' lf %>% transmute(X = bitwNot(bitwOr(b, c)))
+NULL
+
+#' @export
+#' @rdname simulate_dbi
+simulate_impala <- function() simulate_dbi("Impala")
+
 #' @export
 sql_translate_env.Impala <- function(con) {
   sql_variant(
@@ -18,9 +42,8 @@ sql_translate_env.Impala <- function(con) {
 }
 
 #' @export
-db_analyze.Impala <- function(con, table, ...) {
+sql_table_analyze.Impala <- function(con, table, ...) {
   # Using COMPUTE STATS instead of ANALYZE as recommended in this article
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
-  sql <- build_sql("COMPUTE STATS ", as.sql(table), con = con)
-  DBI::dbExecute(con, sql)
+  build_sql("COMPUTE STATS ", as.sql(table), con = con)
 }

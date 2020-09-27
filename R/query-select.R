@@ -51,24 +51,32 @@ print.select_query <- function(x, ...) {
 }
 
 #' @export
-sql_optimise.select_query <- function(x, con = NULL, ...) {
+sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
   if (!inherits(x$from, "select_query")) {
     return(x)
   }
 
-  from <- sql_optimise(x$from)
+  from <- sql_optimise(x$from, subquery = subquery)
 
   # If all outer clauses are executed after the inner clauses, we
   # can drop them down a level
-  outer <- select_query_clauses(x)
-  inner <- select_query_clauses(from)
+  outer <- select_query_clauses(x, subquery = subquery)
+  inner <- select_query_clauses(from, subquery = TRUE)
 
   can_squash <- length(outer) == 0 || length(inner) == 0 || min(outer) > max(inner)
 
   if (can_squash) {
+    # Have we optimised away an ORDER BY
+    if (length(from$order_by) > 0 && length(x$order_by) > 0) {
+      if (!identical(x$order_by, from$order_by)) {
+        warn_drop_order_by()
+      }
+    }
+
     from[as.character(outer)] <- x[as.character(outer)]
     from
   } else {
+    x$from <- from
     x
   }
 }
@@ -77,14 +85,14 @@ sql_optimise.select_query <- function(x, con = NULL, ...) {
 # https://sqlbolt.com/lesson/select_queries_order_of_execution
 
 # List clauses used by a query, in the order they are executed in
-select_query_clauses <- function(x) {
+select_query_clauses <- function(x, subquery = FALSE) {
   present <- c(
     where =    length(x$where) > 0,
     group_by = length(x$group_by) > 0,
     having =   length(x$having) > 0,
     select =   !identical(x$select, sql("*")),
     distinct = x$distinct,
-    order_by = length(x$order_by) > 0,
+    order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
     limit    = !is.null(x$limit)
   )
 
@@ -92,9 +100,9 @@ select_query_clauses <- function(x) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE) {
+sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
   from <- sql_subquery(con,
-    sql_render(query$from, con, ..., bare_identifier_ok = TRUE),
+    sql_render(query$from, con, ..., subquery = TRUE),
     name = NULL
   )
 
@@ -107,7 +115,7 @@ sql_render.select_query <- function(query, con, ..., bare_identifier_ok = FALSE)
     limit = query$limit,
     distinct = query$distinct,
     ...,
-    bare_identifier_ok = bare_identifier_ok
+    subquery = subquery
   )
 }
 
@@ -119,19 +127,22 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                order_by = NULL,
                                limit = NULL,
                                distinct = FALSE,
-                               ...) {
-  out <- vector("list", 7)
-  names(out) <- c("select", "from", "where", "group_by", "having", "order_by",
-    "limit")
-
-  out$select    <- sql_clause_select(select, con, distinct)
-  out$from      <- sql_clause_from(from, con)
-  out$where     <- sql_clause_where(where, con)
-  out$group_by  <- sql_clause_group_by(group_by, con)
-  out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
-  out$limit     <- sql_clause_limit(limit, con)
-
-  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
+                               ...,
+                               subquery = FALSE) {
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
+    limit     = sql_clause_limit(con, limit)
+  )
 }
 
+warn_drop_order_by <- function() {
+  warn(c(
+    "ORDER BY is ignored in subqueries without LIMIT",
+    i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"
+  ))
+}

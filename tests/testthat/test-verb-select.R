@@ -1,9 +1,3 @@
-context("select")
-
-df <- as.data.frame(as.list(setNames(1:26, letters)))
-tbls <- test_load(df)
-
-
 test_that("select quotes correctly", {
   out <- memdb_frame(x = 1, y = 1) %>%
     select(x) %>%
@@ -70,33 +64,31 @@ test_that("select preserves grouping vars", {
   expect_named(out, c("b", "a"))
 })
 
+test_that("relocate works", {
+  mf <- memdb_frame(a = 1, b = 2, c = 1) %>% group_by(b)
+
+  out1 <- mf %>% relocate(c) %>% collect()
+  expect_named(out1, c("c", "a", "b"))
+  out2 <- mf %>% relocate(a, .after = c) %>% collect()
+  expect_named(out2, c("b", "c", "a"))
+})
 
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
   lf <- lazy_frame(x = 1, y = 2)
 
-  reg <- list(
-    flip2 = lf %>% select(2:1) %>% select(2:1),
-    flip3 = lf %>% select(2:1) %>% select(2:1) %>% select(2:1),
-    rename = lf %>% select(x1 = x) %>% select(x2 = x1)
-  )
-
-  expect_known_output(print(reg), test_path("sql/select-collapse.sql"))
+  expect_snapshot(lf %>% select(2:1) %>% select(2:1))
+  expect_snapshot(lf %>% select(2:1) %>% select(2:1) %>% select(2:1))
+  expect_snapshot(lf %>% select(x1 = x) %>% select(x2 = x1))
 })
 
 test_that("mutate collapses over nested select", {
   lf <- lazy_frame(g = 0, x = 1, y = 2)
 
-  reg <- list(
-    a = lf %>% mutate(a = 1, b = 2) %>% select(a),
-    x = lf %>% mutate(a = 1, b = 2) %>% select(x)
-  )
-
-  expect_known_output(print(reg), test_path("sql/select-mutate-collapse.sql"))
+  expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(a))
+  expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(x))
 })
-
-
 
 # sql_build -------------------------------------------------------------
 
@@ -119,7 +111,7 @@ test_that("select renames variables", {
 test_that("select can refer to variables in local env", {
   vars <- c("x", "y")
   out <- lazy_frame(x = 1, y = 1) %>%
-    select(one_of(vars)) %>%
+    select(dplyr::one_of(vars)) %>%
     sql_build()
 
   expect_equal(out$select, sql("x" = "`x`", "y" = "`y`"))
@@ -147,6 +139,12 @@ test_that("rename preserves existing", {
 })
 
 test_that("rename renames grouping vars", {
-  df <- lazy_frame(a = 1, b = 2) %>% group_by(a) %>% rename(c = a)
-  expect_equal(op_grps(df), "c")
+  df <- lazy_frame(a = 1, b = 2)
+  expect_equal(df %>% group_by(a) %>% rename(c = a) %>% op_grps(), "c")
+})
+
+test_that("mutate preserves grouping vars (#396)", {
+  df <- lazy_frame(a = 1, b = 2, c = 3) %>% group_by(a, b)
+  expect_equal(df %>% mutate(a = 1) %>% op_grps(), c("a", "b"))
+  expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
 })

@@ -1,5 +1,3 @@
-context("test-partial-eval.R")
-
 test_that("namespace operators always evaluated locally", {
   expect_equal(partial_eval(quote(base::sum(1, 2))), 3)
   expect_equal(partial_eval(quote(base:::sum(1, 2))), 3)
@@ -11,7 +9,7 @@ test_that("namespaced calls to dplyr functions are stripped", {
 
 test_that("use quosure environment for unevaluted formulas", {
   x <- 1
-  expect_equal(partial_eval(expr(~x)), ~1)
+  expect_equal(partial_eval(expr(~x)), quote(~1))
 })
 
 test_that("can look up inlined function", {
@@ -37,4 +35,9 @@ test_that("respects tidy evaluation pronouns", {
   expect_equal(partial_eval(expr(.env$x)), "X")
   expect_equal(partial_eval(expr(.env[["x"]])), "X")
   expect_equal(partial_eval(expr(.env[[x]])), "XX")
+})
+
+test_that("fails with multi-classes", {
+  x <- structure(list(), class = c('a', 'b'))
+  expect_error(partial_eval(x), "Unknown input type", fixed = TRUE)
 })

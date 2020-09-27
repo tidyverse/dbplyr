@@ -1,3 +1,68 @@
+#' Backend: SQL server
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * `SELECT` uses `TOP` not `LIMIT`
+#' * Automatically prefixes `#` to create temporary tables. Add the prefix
+#'   yourself to avoid the message.
+#' * String basics: `paste()`, `substr()`, `nchar()`
+#' * Custom types for `as.*` functions
+#' * Lubridate extraction functions, `year()`, `month()`, `day()` etc
+#' * Semi-automated bit <-> boolean translation (see below)
+#'
+#' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @section Bit vs boolean:
+#' SQL server uses two incompatible types to represent `TRUE` and `FALSE`
+#' values:
+#'
+#' * The `BOOLEAN` type is the result of logical comparisons (e.g. `x > y`)
+#'   and can be used `WHERE` but not to create new columns in `SELECT`.
+#'   <https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
+#'
+#' * The `BIT` type is a special type of numeric column used to store
+#'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
+#'   <https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
+#'
+#' dbplyr does its best to automatically create the correct type when needed,
+#' but can't do it 100% correctly because it does not have a full type
+#' inference system. This means that you many need to manually do conversions
+#' from time to time.
+#'
+#' * To convert from bit to boolean use `x == 1`
+#' * To convert from boolean to bit use `as.logical(if(x, 0, 1))`
+#'
+#' @param version Version of MS SQL to simulate. Currently only, difference is
+#'   that 15.0 and above will use `TRY_CAST()` instead of `CAST()`.
+#' @name backend-mssql
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mssql())
+#' lf %>% head()
+#' lf %>% transmute(x = paste(b, c, d))
+#'
+#' # Can use boolean as is:
+#' lf %>% filter(c > d)
+#' # Need to convert from boolean to bit:
+#' lf %>% transmute(x = c > d)
+#' # Can use boolean as is:
+#' lf %>% transmute(x = ifelse(c > d, "c", "d"))
+NULL
+
+#' @export
+#' @rdname simulate_dbi
+simulate_mssql <- function(version = "15.0") {
+  simulate_dbi("Microsoft SQL Server",
+    version = numeric_version(version)
+  )
+}
+
 #' @export
 `sql_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
@@ -5,70 +70,42 @@
                                              limit = NULL,
                                              distinct = FALSE,
                                              ...,
-                                             bare_identifier_ok = FALSE) {
-  out <- vector("list", 7)
-  names(out) <- c("select", "from", "where", "group_by",
-                  "having", "order_by","limit")
-
-  assert_that(is.character(select), length(select) > 0L)
-  out$select    <- build_sql(
-    "SELECT ",
-
-    if (distinct) sql("DISTINCT "),
-
-    if (!is.null(limit) && !identical(limit, Inf)) {
-      # MS SQL uses the TOP statement instead of LIMIT which is what SQL92 uses
-      # TOP is expected after DISTINCT and not at the end of the query
-      # e.g: SELECT TOP 100 * FROM my_table
-      assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-      build_sql("TOP(", as.integer(limit), ") ", con = con)
-    } else if (!is.null(order_by) && bare_identifier_ok) {
-      # Stop-gap measure so that a wider range of queries is supported (#276).
-      # MS SQL doesn't allow ORDER BY in subqueries,
-      # unless also TOP (or FOR XML) is specified.
-      # Workaround: Use TOP 100 PERCENT
-      # https://stackoverflow.com/a/985953/946850
-      sql("TOP 100 PERCENT ")
-    },
-
-    escape(select, collapse = ", ", con = con),
-    con = con
+                                             subquery = FALSE) {
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct, top = limit),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
   )
-
-  out$from      <- sql_clause_from(from, con)
-  out$where     <- sql_clause_where(where, con)
-  out$group_by  <- sql_clause_group_by(group_by, con)
-  out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
-
-
-  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 #' @export
 `sql_translate_env.Microsoft SQL Server` <- function(con) {
-  sql_variant(
+  mssql_scalar <-
     sql_translator(.parent = base_odbc_scalar,
 
       `!`           = function(x) {
-                        if (sql_current_select()) {
-                          build_sql(sql("~"), list(x))
+                        if (mssql_needs_bit()) {
+                          x <- with_mssql_bool(x)
+                          mssql_as_bit(sql_expr(~ !!x))
                         } else {
                           sql_expr(NOT(!!x))
                         }
                       },
 
-      `!=`           = sql_infix("!="),
-      `==`           = sql_infix("="),
-      `<`            = sql_infix("<"),
-      `<=`           = sql_infix("<="),
-      `>`            = sql_infix(">"),
-      `>=`           = sql_infix(">="),
+      `!=`           = mssql_infix_comparison("!="),
+      `==`           = mssql_infix_comparison("="),
+      `<`            = mssql_infix_comparison("<"),
+      `<=`           = mssql_infix_comparison("<="),
+      `>`            = mssql_infix_comparison(">"),
+      `>=`           = mssql_infix_comparison(">="),
 
-      `&`            = mssql_generic_infix("&", "%AND%"),
-      `&&`           = mssql_generic_infix("&", "%AND%"),
-      `|`            = mssql_generic_infix("|", "%OR%"),
-      `||`           = mssql_generic_infix("|", "%OR%"),
+      `&`            = mssql_infix_boolean("&", "%AND%"),
+      `&&`           = mssql_infix_boolean("&", "%AND%"),
+      `|`            = mssql_infix_boolean("|", "%OR%"),
+      `||`           = mssql_infix_boolean("|", "%OR%"),
 
       bitwShiftL     = sql_not_supported("bitwShiftL"),
       bitwShiftR     = sql_not_supported("bitwShiftR"),
@@ -76,12 +113,13 @@
       `if`           = mssql_sql_if,
       if_else        = function(condition, true, false) mssql_sql_if(condition, true, false),
       ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
+      case_when      = mssql_case_when,
 
       as.logical    = sql_cast("BIT"),
 
       as.Date       = sql_cast("DATE"),
-      as.numeric    = sql_cast("NUMERIC"),
-      as.double     = sql_cast("NUMERIC"),
+      as.numeric    = sql_cast("FLOAT"),
+      as.double     = sql_cast("FLOAT"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       log           = sql_prefix("LOG"),
       atan2         = sql_prefix("ATN2"),
@@ -92,14 +130,15 @@
       pmin          = sql_not_supported("pmin()"),
       pmax          = sql_not_supported("pmax()"),
 
-      is.null       = function(x) mssql_is_null(x, sql_current_context()),
-      is.na         = function(x) mssql_is_null(x, sql_current_context()),
+      is.null       = mssql_is_null,
+      is.na         = mssql_is_null,
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
       paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       substr = sql_substr("SUBSTRING"),
+      substring = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),
@@ -150,126 +189,206 @@
           sql_expr(DATEPART(QUARTER, !!x))
         }
       },
+    )
 
-    ),
+  if (mssql_version(con) >= "11.0") { # MSSQL 2012
+    mssql_scalar <- sql_translator(
+      .parent = mssql_scalar,
+      as.logical = sql_try_cast("BIT"),
+      as.Date = sql_try_cast("DATE"),
+      as.POSIXct = sql_try_cast("TIMESTAMP"),
+      as.numeric = sql_try_cast("FLOAT"),
+      as.double = sql_try_cast("FLOAT"),
+      as.integer = sql_try_cast("NUMERIC"),
+      # in MSSQL, NUMERIC converts to integer
+      as.integer64 = sql_try_cast("BIGINT"),
+      as.character = sql_try_cast("VARCHAR(MAX)"),
+      as_date = sql_try_cast("DATE"),
+      as_datetime = sql_try_cast("DATETIME2")
+    )
+  }
+
+  sql_variant(
+    mssql_scalar,
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()")
+      cov           = sql_not_supported("cov()"),
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+
     ),
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
       # MSSQL does not have function for: cor and cov
       cor           = win_absent("cor"),
-      cov           = win_absent("cov")
+      cov           = win_absent("cov"),
+      str_flatten = function(x, collapse = "") {
+        win_over(
+          sql_expr(string_agg(!!x, !!collapse)),
+          partition = win_current_group(),
+          order = win_current_order()
+        )
+      }
     )
 
   )}
 
-#' @export
-`db_analyze.Microsoft SQL Server` <- function(con, table, ...) {
-  # Using UPDATE STATISTICS instead of ANALYZE as recommended in this article
-  # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  sql <- build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
-  DBI::dbExecute(con, sql)
+mssql_version <- function(con) {
+  if (inherits(con, "TestConnection")) {
+    attr(con, "version")
+  } else {
+    numeric_version(DBI::dbGetInfo(con)$db.version)
+  }
 }
 
+#' @export
+`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+  # SQL Server binary constants should be prefixed with 0x
+  # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
+  paste0(c("0x", format(x)), collapse = "")
+}
+
+#' @export
+`sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+  # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
+  build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
+}
 
 # Temporary tables --------------------------------------------------------
 # SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
+# <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 
-mssql_temp_name <- function(name, temporary){
-  # check that name has prefixed '##' if temporary
-  if (temporary && substr(name, 1, 1) != "#") {
-    name <- paste0("##", name)
-    message("Created a temporary table named: ", name)
+mssql_table_rename <- function(name, temporary) {
+  if (!temporary || substr(name, 1, 1) == "#") {
+    name
+  } else {
+    name <- ident(paste0("#", name))
+    inform(
+      paste0("Created a temporary table named ", name),
+      class = c("dbplyr_message_temp_table", "dbplyr_message")
+    )
+    name
   }
-  name
 }
 
 #' @export
 `db_copy_to.Microsoft SQL Server` <- function(con, table, values,
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
+                            analyze = TRUE, ..., in_transaction = TRUE) {
   NextMethod(
-    table = mssql_temp_name(table, temporary),
+    table = mssql_table_rename(table, temporary),
     types = types,
     values = values,
     temporary = FALSE
   )
-}
-
-#' @export
-`db_save_query.Microsoft SQL Server` <- function(con, sql, name,
-                                                 temporary = TRUE, ...){
-  name <- mssql_temp_name(name, temporary)
-
-  # Different syntax for MSSQL: https://stackoverflow.com/q/16683758/946850
-  tt_sql <- build_sql(
-    "SELECT * ",
-    "INTO ", as.sql(name), " ",
-    "FROM (", sql, ") AS temp",
-    con = con
-  )
-  dbExecute(con, tt_sql)
-  name
-
 }
 
 #' @export
 `db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
   NextMethod(
-    table = mssql_temp_name(table, temporary),
+    table = mssql_table_rename(table, temporary),
     types = types,
     values = values,
     temporary = FALSE
   )
 }
 
-# `IS NULL` returns a boolean expression, so you can't use it in a result set
-# the approach using casting return a bit, so you can use in a result set, but not in where.
-# Microsoft documentation:  The result of a comparison operator has the Boolean data type.
-# This has three values: TRUE, FALSE, and UNKNOWN. Expressions that return a Boolean data type are
-# known as Boolean expressions. Unlike other SQL Server data types, a Boolean data type cannot
-# be specified as the data type of  a table column or variable, and cannot be returned in a result set.
-# https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql
+#' @export
+`db_save_query.Microsoft SQL Server` <- function(con, sql, name, temporary = TRUE,
+                                        ...) {
 
-mssql_is_null <- function(x, context = NULL) {
-  needs_bit <- is.list(context) && !is.null(context$clause) &&
-    context$clause %in% c("SELECT", "ORDER")
+  NextMethod(
+    sql = sql,
+    name = mssql_table_rename(name, temporary),
+    temporary = FALSE
+  )
+}
 
-  if (needs_bit) {
-    sql_expr(convert(BIT, iif(!!x %is% NULL, 1L, 0L)))
+
+#' @export
+`sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
+                                                  temporary = TRUE, ...){
+
+  name <- mssql_table_rename(name, temporary)
+  # https://stackoverflow.com/q/16683758/946850
+  build_sql(
+    "SELECT * INTO ", as.sql(name), " ",
+    "FROM (", sql, ") AS temp",
+    con = con
+  )
+}
+
+
+
+mssql_needs_bit <- function() {
+  context <- sql_current_context()
+  identical(context$clause, "SELECT") || identical(context$clause, "ORDER")
+}
+
+with_mssql_bool <- function(code) {
+  local_context(list(clause = ""))
+  code
+}
+
+mssql_as_bit <- function(x) {
+  if (mssql_needs_bit()) {
+    sql_expr(cast(iif(!!x, 1L, 0L) %as% BIT))
   } else {
-    sql_is_null(x)
+    x
   }
 }
 
-mssql_generic_infix <- function(if_select, if_filter) {
-  force(if_select)
-  force(if_filter)
+mssql_is_null <- function(x) {
+  mssql_as_bit(sql_is_null({{x}}))
+}
+
+mssql_infix_comparison <- function(f) {
+  assert_that(is_string(f))
+  f <- toupper(f)
+  function(x, y) {
+    mssql_as_bit(build_sql(x, " ", sql(f), " ", y))
+  }
+}
+
+mssql_infix_boolean <- function(if_bit, if_bool) {
+  force(if_bit)
+  force(if_bool)
 
   function(x, y) {
-    if (sql_current_select()) {
-      f <- if_select
+    if (mssql_needs_bit()) {
+      x <- with_mssql_bool(x)
+      y <- with_mssql_bool(y)
+      mssql_as_bit(sql_call2(if_bool, x, y))
     } else {
-      f <- if_filter
+      sql_call2(if_bool, x, y)
     }
-    sql_call2(f, x, y)
   }
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL) {
-  old <- set_current_context(list(clause = ""))
-  on.exit(set_current_context(old), add = TRUE)
-  cond <- build_sql(cond)
-
-  sql_if(cond, if_true, if_false)
+  cond <- with_mssql_bool(cond)
+  sql_expr(IIF(!!cond, !!if_true, !!if_false))
 }
 
-globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "iif", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))
+mssql_case_when <- function(...) {
+  local_context(list(clause = ""))
+  sql_case_when(...)
+}
+
+#' @export
+`sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
+  if (mssql_needs_bit()) {
+    y <- ifelse(x, "1", "0")
+  } else {
+    y <- as.character(x)
+  }
+  y[is.na(x)] <- "NULL"
+  y
+}
+
+globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))

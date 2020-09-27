@@ -4,7 +4,7 @@
 #' The base translator, `base_sql`,
 #' provides custom mappings for `!` (to NOT), `&&` and `&` to
 #' `AND`, `||` and `|` to `OR`, `^` to `POWER`,
-#' \code{\%>\%} to \code{\%}, `ceiling` to `CEIL`, `mean` to
+#' `%>%` to `%`, `ceiling` to `CEIL`, `mean` to
 #' `AVG`, `var` to `VARIANCE`, `tolower` to `LOWER`,
 #' `toupper` to `UPPER` and `nchar` to `LENGTH`.
 #'
@@ -12,9 +12,9 @@
 #' vectors that are passed to sql.
 #'
 #' All other functions will be preserved as is. R's infix functions
-#' (e.g. \code{\%like\%}) will be converted to their SQL equivalents
+#' (e.g. `%like%`) will be converted to their SQL equivalents
 #' (e.g. `LIKE`). You can use this to access SQL string concatenation:
-#' `||` is mapped to `OR`, but \code{\%||\%} is mapped to `||`.
+#' `||` is mapped to `OR`, but `%||%` is mapped to `||`.
 #' To suppress this behaviour, and force errors immediately when dplyr doesn't
 #' know how to translate a function it encounters, using set the
 #' `dplyr.strict_sql` option to `TRUE`.
@@ -82,7 +82,7 @@
 #' translate_sql(cumsum(mpg))
 #' translate_sql(cumsum(mpg), vars_order = "mpg")
 translate_sql <- function(...,
-                          con = simulate_dbi(),
+                          con = NULL,
                           vars = character(),
                           vars_group = NULL,
                           vars_order = NULL,
@@ -92,6 +92,8 @@ translate_sql <- function(...,
   if (!missing(vars)) {
     abort("`vars` is deprecated. Please use partial_eval() directly.")
   }
+
+  con <- con %||% sql_current_con() %||% simulate_dbi()
 
   translate_sql_(
     quos(...),
@@ -127,8 +129,7 @@ translate_sql_ <- function(dots,
   on.exit(set_current_con(old_con), add = TRUE)
 
   if (length(context) > 0) {
-    old_context <- set_current_context(context)
-    on.exit(set_current_context(old_context), add = TRUE)
+    local_context(context)
   }
 
   if (window) {
@@ -169,13 +170,28 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     top_env <- child_env(NULL)
   }
 
-
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
   if (!window) {
     special_calls2 <- copy_env(variant$aggregate, parent = special_calls)
   } else {
     special_calls2 <- copy_env(variant$window, parent = special_calls)
+  }
+  special_calls2$`::` <- function(pkg, name) {
+    pkg <- as.character(substitute(pkg))
+    name <- as.character(substitute(name))
+    if (!is_installed(pkg)) {
+      abort(glue("There is no package called '{pkg}'"))
+    }
+    if (!env_has(ns_env(pkg), name)) {
+      abort(glue("'{name}' is not an exported object from '{pkg}'"))
+    }
+
+    if (env_has(special_calls2, name) || env_has(special_calls, name)) {
+      env_get(special_calls2, name, inherit = TRUE)
+    } else {
+      abort(glue("No known translation for {pkg}::{name}()"))
+    }
   }
 
   # Existing symbols in expression

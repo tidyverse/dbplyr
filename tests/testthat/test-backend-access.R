@@ -1,70 +1,53 @@
-context("test-backend-access.R")
-
-
 test_that("custom scalar translated correctly", {
+  local_con(simulate_access())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_access())
-  }
   # Conversion
-  expect_equal(trans(as.numeric(x)),   sql("CDBL(`x`)"))
-  expect_equal(trans(as.double(x)),    sql("CDBL(`x`)"))
-  expect_equal(trans(as.integer(x)),   sql("INT(`x`)"))
-  expect_equal(trans(as.logical(x)),   sql("CBOOL(`x`)"))
-  expect_equal(trans(as.character(x)), sql("CSTR(`x`)"))
-  expect_equal(trans(as.Date(x)),      sql("CDATE(`x`)"))
+  expect_equal(translate_sql(as.numeric(x)),   sql("CDBL(`x`)"))
+  expect_equal(translate_sql(as.double(x)),    sql("CDBL(`x`)"))
+  expect_equal(translate_sql(as.integer(x)),   sql("INT(`x`)"))
+  expect_equal(translate_sql(as.logical(x)),   sql("CBOOL(`x`)"))
+  expect_equal(translate_sql(as.character(x)), sql("CSTR(`x`)"))
+  expect_equal(translate_sql(as.Date(x)),      sql("CDATE(`x`)"))
   # Math
-  expect_equal(trans(exp(x)),          sql("EXP(`x`)"))
-  expect_equal(trans(log(x)),          sql("LOG(`x`)"))
-  expect_equal(trans(log10(x)),        sql("LOG(`x`) / LOG(10)"))
-  expect_equal(trans(sqrt(x)),         sql("SQR(`x`)"))
-  expect_equal(trans(sign(x)),         sql("SGN(`x`)"))
-  expect_equal(trans(floor(x)),        sql("INT(`x`)"))
-  expect_equal(trans(ceiling(x)),      sql("INT(`x` + 0.9999999999)"))
-  expect_equal(trans(ceil(x)),         sql("INT(`x` + 0.9999999999)"))
+  expect_equal(translate_sql(exp(x)),          sql("EXP(`x`)"))
+  expect_equal(translate_sql(log(x)),          sql("LOG(`x`)"))
+  expect_equal(translate_sql(log10(x)),        sql("LOG(`x`) / LOG(10)"))
+  expect_equal(translate_sql(sqrt(x)),         sql("SQR(`x`)"))
+  expect_equal(translate_sql(sign(x)),         sql("SGN(`x`)"))
+  expect_equal(translate_sql(floor(x)),        sql("INT(`x`)"))
+  expect_equal(translate_sql(ceiling(x)),      sql("INT(`x` + 0.9999999999)"))
+  expect_equal(translate_sql(ceil(x)),         sql("INT(`x` + 0.9999999999)"))
   # String
-  expect_equal(trans(nchar(x)),        sql("LEN(`x`)"))
-  expect_equal(trans(tolower(x)),      sql("LCASE(`x`)"))
-  expect_equal(trans(toupper(x)),      sql("UCASE(`x`)"))
-  expect_equal(trans(substr(x, 1, 2)), sql("RIGHT(LEFT(`x`, 2.0), 2.0)"))
-  expect_equal(trans(paste(x)),        sql("CSTR(`x`)"))
-  expect_equal(trans(trimws(x)),       sql("TRIM(`x`)"))
-  expect_equal(trans(is.null(x)),      sql("ISNULL(`x`)"))
-  expect_equal(trans(is.na(x)),        sql("ISNULL(`x`)"))
-  expect_equal(trans(coalesce(x, y)),  sql("IIF(ISNULL(`x`), `y`, `x`)"))
-  expect_equal(trans(pmin(x, y)),      sql("IIF(`x` <= `y`, `x`, `y`)"))
-  expect_equal(trans(pmax(x, y)),      sql("IIF(`x` <= `y`, `y`, `x`)"))
-  expect_equal(trans(Sys.Date()),      sql("DATE()"))
-
-
-  # Special paste() tests
-  expect_equal(trans(paste(x, y, sep = "+")), sql("`x` & '+' & `y`"))
-  expect_equal(trans(paste0(x, y)), sql("`x` & `y`"))
-
-  expect_error(trans(paste(x, collapse = "-")),"`collapse` not supported")
-
+  expect_equal(translate_sql(nchar(x)),        sql("LEN(`x`)"))
+  expect_equal(translate_sql(tolower(x)),      sql("LCASE(`x`)"))
+  expect_equal(translate_sql(toupper(x)),      sql("UCASE(`x`)"))
+  expect_equal(translate_sql(substr(x, 1, 2)), sql("RIGHT(LEFT(`x`, 2.0), 2.0)"))
+  expect_equal(translate_sql(paste(x)),        sql("CSTR(`x`)"))
+  expect_equal(translate_sql(trimws(x)),       sql("TRIM(`x`)"))
+  expect_equal(translate_sql(is.null(x)),      sql("ISNULL(`x`)"))
+  expect_equal(translate_sql(is.na(x)),        sql("ISNULL(`x`)"))
+  expect_equal(translate_sql(coalesce(x, y)),  sql("IIF(ISNULL(`x`), `y`, `x`)"))
+  expect_equal(translate_sql(pmin(x, y)),      sql("IIF(`x` <= `y`, `x`, `y`)"))
+  expect_equal(translate_sql(pmax(x, y)),      sql("IIF(`x` <= `y`, `y`, `x`)"))
+  expect_equal(translate_sql(Sys.Date()),      sql("DATE()"))
+  # paste()
+  expect_equal(translate_sql(paste(x, y, sep = "+")), sql("`x` & '+' & `y`"))
+  expect_equal(translate_sql(paste0(x, y)), sql("`x` & `y`"))
+  expect_error(translate_sql(paste(x, collapse = "-")),"`collapse` not supported")
 })
 
 test_that("custom aggregators translated correctly", {
+  local_con(simulate_access())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_access())
-  }
+  expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE),  sql("STDEV(`x`)"))
+  expect_equal(translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR(`x`)"))
 
-  expect_equal(trans(sd(x)),  sql("STDEV(`x`)"))
-  expect_equal(trans(var(x)), sql("VAR(`x`)"))
-
-  expect_error(trans(cor(x)), "not available")
-  expect_error(trans(cov(x)), "not available")
-  expect_error(trans(n_distinct(x)), "not available")
-
+  expect_error(translate_sql(cor(x), window = FALSE), "not available")
+  expect_error(translate_sql(cov(x), window = FALSE), "not available")
+  expect_error(translate_sql(n_distinct(x), window = FALSE), "not available")
 })
 
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_access())
-
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT TOP 6 *\nFROM `df`")
-  )
+  expect_snapshot(mf %>% head())
 })

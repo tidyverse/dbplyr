@@ -25,15 +25,14 @@ sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
 
     if (end == -1L) {
       sql_call2(subset_f, string, start)
-    } else if (end <= 0) {
-      if (start < 0) {
-        length <- pmax(- start + end + 1L, 0L)
+    } else {
+      if (end == 0L) {
+        length <- 0L
+      } else if(start > 0 && end < 0) {
+        length <- sql_expr(!!sql_call2(length_f, string) - !!(start - end - 2L))
       } else {
-        length <- sql_expr(!!sql_call2(length_f, string) - !!(abs(end) - 1L))
+        length <- pmax(end - start + 1L, 0L)
       }
-      sql_call2(subset_f, string, start, length)
-    } else if (end > 0) {
-      length <- pmax(end - start + 1L, 0L)
       sql_call2(subset_f, string, start, length)
     }
   }
@@ -42,8 +41,9 @@ sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
 sql_str_trim <- function(string, side = c("both", "left", "right")) {
   side <- match.arg(side)
   switch(side,
-    left = sql_expr(LTRIM(!!string)),
-    right = sql_expr(RTRIM(!!string)),
-    both = sql_expr(LTRIM(RTRIM(!!string))),
+    left = sql_expr(ltrim(!!string)),
+    right = sql_expr(rtrim(!!string)),
+    both = sql_expr(ltrim(rtrim(!!string))),
   )
 }
+globalVariables(c("ltrim", "rtrim"))

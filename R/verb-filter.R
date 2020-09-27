@@ -1,4 +1,20 @@
+#' Subset rows using column values
+#'
+#' This is a method for the dplyr [filter()] generic. It generates the
+#' `WHERE` clause of the SQL query.
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::filter
+#' @param .preserve Not supported by this method.
+#' @inherit arrange.tbl_lazy return
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
+#' db %>% filter(x < 5) %>% show_query()
+#' db %>% filter(is.na(x)) %>% show_query()
 # registered onLoad
+#' @importFrom dplyr filter
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {
     stop("`.preserve` is not supported on database backends", call. = FALSE)

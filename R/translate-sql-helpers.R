@@ -187,6 +187,18 @@ sql_aggregate_2 <- function(f) {
   }
 }
 
+#' @rdname sql_variant
+#' @export
+sql_aggregate_n <- function(f, f_r = f) {
+  assert_that(is_string(f))
+
+  warned <- FALSE
+  function(..., na.rm = FALSE) {
+    warned <<- check_na_rm(f_r, na.rm, warned)
+    build_sql(sql(f), list(...))
+  }
+}
+
 sql_aggregate_win <- function(f) {
   force(f)
 
@@ -233,6 +245,16 @@ sql_cast <- function(type) {
 
 #' @rdname sql_variant
 #' @export
+sql_try_cast <- function(type) {
+  type <- sql(type)
+  function(x) {
+    sql_expr(try_cast(!!x %as% !!type))
+    # try_cast available in MSSQL 2012+
+  }
+}
+
+#' @rdname sql_variant
+#' @export
 sql_log <- function() {
   function(x, base = exp(1)){
     if (isTRUE(all.equal(base, exp(1)))) {
@@ -252,4 +274,4 @@ sql_cot <- function(){
   }
 }
 
-globalVariables(c("%as%", "cast", "ln"))
+globalVariables(c("%as%", "cast", "ln", "try_cast"))

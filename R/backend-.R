@@ -19,21 +19,13 @@ sql_translate_env.DBIConnection <- function(con) {
 }
 
 #' @export
-sql_subquery.DBIConnection <- function(con, from, name = unique_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% unique_table_name()), con = con)
-  }
-}
-
-#' @export
 #' @rdname sql_variant
 #' @format NULL
 base_scalar <- sql_translator(
   `+`    = sql_infix("+"),
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
+  `%/%`  = sql_not_supported("%/%"),
   `%%`   = sql_infix("%"),
   `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {
@@ -181,8 +173,8 @@ base_scalar <- sql_translator(
     sql_expr(!!x %BETWEEN% !!left %AND% !!right)
   },
 
-  pmin = sql_prefix("LEAST"),
-  pmax = sql_prefix("GREATEST"),
+  pmin = sql_aggregate_n("LEAST", "pmin"),
+  pmax = sql_aggregate_n("GREATEST", "pmax"),
 
   `%>%` = `%>%`,
 
@@ -223,6 +215,7 @@ base_scalar <- sql_translator(
   paste = sql_paste(" "),
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
+  substring = sql_substr("SUBSTR"),
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),
@@ -289,7 +282,7 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = function() sql("COUNT()"),
+  n          = function() sql("COUNT(*)"),
   mean       = sql_aggregate("AVG", "mean"),
   var        = sql_aggregate("VARIANCE", "var"),
   sum        = sql_aggregate("SUM"),
@@ -333,21 +326,24 @@ base_win <- sql_translator(
     win_over(
       sql_expr(FIRST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   last = function(x, order_by = NULL) {
     win_over(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   nth = function(x, n, order_by = NULL) {
     win_over(
       sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
 
@@ -355,14 +351,16 @@ base_win <- sql_translator(
     win_over(
       sql_expr(LEAD(!!x, !!n, !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
       sql_expr(LAG(!!x, !!as.integer(n), !!default)),
       win_current_group(),
-      order_by %||% win_current_order()
+      order_by %||% win_current_order(),
+      win_current_frame()
     )
   },
   # Recycled aggregate fuctions take single argument, don't need order and
@@ -438,177 +436,133 @@ base_no_win <- sql_translator(
   count        = win_absent("COUNT")
 )
 
-# db_ methods -------------------------------------------------------------
+# SQL methods -------------------------------------------------------------
+
+#' SQL generation methods for database methods
+#'
+#' * `sql_table_analyze()` <- `db_analyze()` <- `db_copy_to(analyze = TRUE)`
+#' * `sql_index_create()` <- `db_create_index()` <- `db_copy_to(indexes = ...)`
+#' * `sql_query_explain()` <- `db_explain` <- `explain()`
+#' * `sql_query_fields()` <- `db_query_fields()` <- `tbl()`
+#' * `sql_query_rows()` <- `db_query_rows()` <- `do()`
+#' * `sql_query_save()` <- `db_save_query()` <- `db_compute()` <- `compute()`
+#' * `sql_expr_matches(con, x, y)` is used to generate an alternative to
+#'   `x == y` to use when you want `NULL`s to match. The default translation
+#'   uses a `CASE WHEN` as described in
+#'   <https://modern-sql.com/feature/is-distinct-from>
+#'
+#' @keywords internal
+#' @name db_sql
+NULL
 
 #' @export
-db_desc.DBIConnection <- function(x) {
-  class(x)[[1]]
-}
-
-#' @export
-db_list_tables.DBIConnection <- function(con) dbListTables(con)
-
-#' @export
-db_has_table.DBIConnection <- function(con, table) dbExistsTable(con, table)
-
-#' @export
-db_data_type.DBIConnection <- function(con, fields) {
-  vapply(fields, dbDataType, dbObj = con, FUN.VALUE = character(1))
-}
-
-#' @export
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
-                                        ...) {
-  tt_sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(name), " AS ", sql,
-    con = con
-  )
-  dbExecute(con, tt_sql)
-  name
-}
-
-#' @export
-db_begin.DBIConnection <- function(con, ...) {
-  dbBegin(con)
-}
-
-#' @export
-db_commit.DBIConnection <- function(con, ...) dbCommit(con)
-
-#' @export
-db_rollback.DBIConnection <- function(con, ...) dbRollback(con)
-
-#' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, ...) {
-  dbWriteTable(
-    con,
-    name = dbi_quote(as.sql(table), con),
-    value = values,
-    field.types = types,
-    temporary = temporary,
-    row.names = FALSE
-  )
-
-  table
-}
-
-#' @export
-db_create_table.DBIConnection <- function(con, table, types,
-                                          temporary = TRUE, ...) {
-  assert_that(is_string(table), is.character(types))
-
-  field_names <- escape(ident(names(types)), collapse = NULL, con = con)
-  fields <- sql_vector(
-    paste0(field_names, " ", types),
-    parens = TRUE,
-    collapse = ", ",
-    con = con
-  )
-  sql <- build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "),
-    "TABLE ", as.sql(table), " ", fields,
-    con = con
-  )
-
-  dbExecute(con, sql)
-}
-
-#' @export
-db_insert_into.DBIConnection <- function(con, table, values, ...) {
-  dbWriteTable(con, table, values, append = TRUE, row.names = FALSE)
-}
-
-#' @export
-db_create_indexes.DBIConnection <- function(con, table, indexes = NULL,
-                                            unique = FALSE, ...) {
-  if (is.null(indexes)) return()
-  assert_that(is.list(indexes))
-
-  for (index in indexes) {
-    db_create_index(con, table, index, unique = unique, ...)
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 
+#' @rdname db_sql
 #' @export
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
+sql_query_explain <- function(con, sql, ...) {
+  UseMethod("sql_query_explain")
+}
+#' @export
+sql_query_explain.DBIConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN ", sql, con = con)
+}
+
+#' @rdname db_sql
+#' @export
+sql_table_analyze <- function(con, table, ...) {
+  UseMethod("sql_table_analyze")
+}
+#' @export
+sql_table_analyze.DBIConnection <- function(con, table, ...) {
+  build_sql("ANALYZE ", as.sql(table), con = con)
+}
+
+#' @rdname db_sql
+#' @export
+sql_index_create <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+  UseMethod("sql_index_create")
+}
+#' @export
+sql_index_create.DBIConnection <- function(con, table, columns, name = NULL,
+                                           unique = FALSE, ...) {
   assert_that(is_string(table), is.character(columns))
 
-  name <- name %||% paste0(c(table, columns), collapse = "_")
+  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
-  sql <- build_sql(
+  build_sql(
     "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
     " ON ", as.sql(table), " ", fields,
-    con = con)
-
-  dbExecute(con, sql)
-}
-
-#' @export
-db_drop_table.DBIConnection <- function(con, table, force = FALSE, ...) {
-  sql <- build_sql(
-    "DROP TABLE ", if (force) sql("IF EXISTS "), as.sql(table),
     con = con
   )
-  dbExecute(con, sql)
+}
+
+#' @rdname db_sql
+#' @export
+sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("sql_query_save")
+}
+#' @export
+sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
+    as.sql(name), " AS ", sql,
+    con = con
+  )
+}
+
+#' @rdname db_sql
+#' @export
+sql_join_suffix <- function(con, ...) {
+  UseMethod("sql_join_suffix")
+}
+#' @export
+sql_join_suffix.DBIConnection <- function(con, ...) {
+  c(".x", ".y")
+}
+
+#' @rdname db_sql
+#' @export
+sql_query_fields <- function(con, sql, ...) {
+  UseMethod("sql_query_fields")
 }
 
 #' @export
-db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- build_sql("ANALYZE ", as.sql(table), con = con)
-  dbExecute(con, sql)
+sql_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
+}
+
+#' @rdname db_sql
+#' @export
+sql_query_rows <- function(con, sql, ...) {
+  UseMethod("sql_query_rows")
 }
 
 #' @export
-db_explain.DBIConnection <- function(con, sql, ...) {
-  exsql <- build_sql("EXPLAIN ", sql, con = con)
-  expl <- dbGetQuery(con, exsql)
-  out <- utils::capture.output(print(expl))
-
-  paste(out, collapse = "\n")
-}
-
-#' @export
-db_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
-  qry <- dbSendQuery(con, sql)
-  on.exit(dbClearResult(qry))
-
-  res <- dbFetch(qry, 0)
-  names(res)
-}
-
-#' @export
-db_query_rows.DBIConnection <- function(con, sql, ...) {
+sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- sql_subquery(con, sql, "master")
-  rows <- build_sql("SELECT COUNT(*) FROM ", from, con = con)
-
-  as.integer(dbGetQuery(con, rows)[[1]])
+  build_sql("SELECT COUNT(*) FROM ", from, con = con)
 }
 
-# Utility functions ------------------------------------------------------------
-
-unique_table_name <- local({
-  i <- 0
-
-  function() {
-    i <<- i + 1
-    sprintf("dbplyr_%03i", i)
-  }
-})
-
-res_warn_incomplete <- function(res, hint = "n = -1") {
-  if (dbHasCompleted(res)) return()
-
-  rows <- big_mark(dbGetRowCount(res))
-  warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
-    call. = FALSE)
+#' @export
+#' @rdname db_sql
+sql_expr_matches <- function(con, x, y) {
+  UseMethod("sql_expr_matches")
 }
 
-
-dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident_q <- function(x, con) DBI::SQL(x)
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, x)
-dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(x)
+# https://modern-sql.com/feature/is-distinct-from
+#' @export
+sql_expr_matches.DBIConnection <- function(con, x, y) {
+  build_sql(
+    "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
+    "THEN 0 ",
+    "ELSE 1 = 0",
+    con = con
+  )
+}

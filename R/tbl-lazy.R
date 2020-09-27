@@ -12,15 +12,16 @@
 #'
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
 #' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
-tbl_lazy <- function(df, con = simulate_dbi(), src = NULL) {
+tbl_lazy <- function(df, con = NULL, src = NULL) {
 
   if (!is.null(src)) {
     warn("`src` is deprecated; please use `con` instead")
     con <- src
   }
+  con <- con %||% sql_current_con() %||% simulate_dbi()
   subclass <- class(con)[[1]]
 
-  make_tbl(
+  dplyr::make_tbl(
     purrr::compact(c(subclass, "lazy")),
     ops = op_base_local(df),
     src = src_dbi(con)
@@ -30,7 +31,8 @@ setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy
-lazy_frame <- function(..., con = simulate_dbi(), src = NULL) {
+lazy_frame <- function(..., con = NULL, src = NULL) {
+  con <- con %||% sql_current_con() %||% simulate_dbi()
   tbl_lazy(tibble(...), con = con, src = src)
 }
 
@@ -54,16 +56,19 @@ as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
   stop("Can not coerce `tbl_lazy` to data.frame", call. = FALSE)
 }
 
+#' @importFrom dplyr same_src
 #' @export
 same_src.tbl_lazy <- function(x, y) {
   inherits(y, "tbl_lazy")
 }
 
+#' @importFrom dplyr tbl_vars
 #' @export
 tbl_vars.tbl_lazy <- function(x) {
   op_vars(x$ops)
 }
 
+#' @importFrom dplyr groups
 #' @export
 groups.tbl_lazy <- function(x) {
   lapply(group_vars(x), as.name)
@@ -74,57 +79,8 @@ group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }
 
+#' @importFrom dplyr group_vars
 #' @export
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$ops)
 }
-
-# lazyeval ----------------------------------------------------------------
-
-# nocov start
-#' @export
-filter_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  filter(.data, !!!dots)
-}
-#' @export
-arrange_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  arrange(.data, !!!dots)
-}
-#' @export
-select_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  select(.data, !!!dots)
-}
-#' @export
-rename_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  rename(.data, !!!dots)
-}
-#' @export
-summarise_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  summarise(.data, !!!dots)
-}
-#' @export
-mutate_.tbl_lazy <- function(.data, ..., .dots = list()) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  mutate(.data, !!!dots)
-}
-#' @export
-group_by_.tbl_lazy <- function(.data, ..., .dots = list(), add = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  group_by(.data, !!!dots, add = add)
-}
-#' @export
-distinct_.tbl_lazy <- function(.data, ..., .dots = list(), .keep_all = FALSE) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  distinct(.data, !!! dots, .keep_all = .keep_all)
-}
-#' @export
-do_.tbl_sql <- function(.data, ..., .dots = list(), .chunk_size = 1e4L) {
-  dots <- dplyr:::compat_lazy_dots(.dots, caller_env(), ...)
-  do(.data, !!! dots, .chunk_size = .chunk_size)
-}
-# nocov end

@@ -12,11 +12,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# dbplyr <img src="man/figures/logo.png" align="right" height="139" />
+# dbplyr <a href='https://dbplyr.tidyverse.org'><img src='man/figures/logo.png' align="right" height="139" /></a>
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.org/tidyverse/dbplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dbplyr)
 [![CRAN status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
+[![R build status](https://github.com/tidyverse/dbplyr/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverse/dbplyr/actions)
 [![Codecov test coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/master/graph/badge.svg)](https://codecov.io/gh/tidyverse/dbplyr?branch=master)
 <!-- badges: end -->
 
@@ -76,3 +76,6 @@ summary %>% show_query()
 summary %>% collect()
 ```
 
+## Code of Conduct
+
+Please note that the dbplyr project is released with a [Contributor Code of Conduct](https://dbplyr.tidyverse.org/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

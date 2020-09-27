@@ -15,8 +15,12 @@ test_register_con(name, ...)
 
 src_test(name)
 
-test_load(df, name = unique_table_name(), srcs = test_srcs$get(),
-  ignore = character())
+test_load(
+  df,
+  name = unique_table_name(),
+  srcs = test_srcs$get(),
+  ignore = character()
+)
 
 test_frame(..., srcs = test_srcs$get(), ignore = character())
 }
@@ -27,8 +31,9 @@ use \code{test_frame()}.
 }
 \examples{
 \dontrun{
-test_register_src("df", src_df(env = new.env()))
-test_register_src("sqlite", src_sqlite(":memory:", create = TRUE))
+test_register_src("sqlite", {
+  DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
+})
 
 test_frame(x = 1:3, y = 3:1)
 test_load(mtcars)

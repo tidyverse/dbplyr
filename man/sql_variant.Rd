@@ -14,8 +14,10 @@
 \alias{sql_prefix}
 \alias{sql_aggregate}
 \alias{sql_aggregate_2}
+\alias{sql_aggregate_n}
 \alias{sql_not_supported}
 \alias{sql_cast}
+\alias{sql_try_cast}
 \alias{sql_log}
 \alias{sql_cot}
 \alias{base_scalar}
@@ -35,11 +37,13 @@ sql_paste(default_sep, f = "CONCAT_WS")
 
 sql_paste_infix(default_sep, op, cast)
 
-sql_variant(scalar = sql_translator(), aggregate = sql_translator(),
-  window = sql_translator())
+sql_variant(
+  scalar = sql_translator(),
+  aggregate = sql_translator(),
+  window = sql_translator()
+)
 
-sql_translator(..., .funs = list(), .parent = new.env(parent =
-  emptyenv()))
+sql_translator(..., .funs = list(), .parent = new.env(parent = emptyenv()))
 
 sql_infix(f, pad = TRUE)
 
@@ -49,9 +53,13 @@ sql_aggregate(f, f_r = f)
 
 sql_aggregate_2(f)
 
+sql_aggregate_n(f, f_r = f)
+
 sql_not_supported(f)
 
 sql_cast(type)
+
+sql_try_cast(type)
 
 sql_log()
 

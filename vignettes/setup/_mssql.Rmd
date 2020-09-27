@@ -1,0 +1,38 @@
+# MySQL
+
+## Install drivers
+
+```
+brew tap microsoft/mssql-release https://github.com/Microsoft/homebrew-mssql-release
+brew update
+brew install msodbcsql17 mssql-tools
+```
+
+Check available:
+
+```{r}
+odbc::odbcListDrivers()
+edit_file("/usr/local/etc/odbcinst.ini")
+Sys.setenv("GITHUB_MSSQL" = "true")
+```
+
+## Start
+
+```
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Password12' -t -i -p 1433:1433 microsoft/mssql-server-linux
+
+sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE test;'
+```
+
+## Connect
+
+```{r, eval = FALSE}
+con <- DBI::dbConnect(odbc::odbc(),
+  driver = "ODBC Driver 17 for SQL Server",
+  database = "test",
+  uid = "SA",
+  pwd = "Password12",
+  server = "localhost",
+  port = 1433
+)
+```

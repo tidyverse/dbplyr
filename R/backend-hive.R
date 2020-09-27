@@ -1,3 +1,32 @@
+#' Backend: Hive
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are a scattering of custom translations provided by users.
+#'
+#' Use `simulate_hive()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-hive
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
+#' lf %>% transmute(x = cot(b))
+#' lf %>% transmute(x = bitwShiftL(c, 1L))
+#' lf %>% transmute(x = str_replace_all(z, "a", "b"))
+#'
+#' lf %>% summarise(x = median(d, na.rm = TRUE))
+#' lf %>% summarise(x = var(c, na.rm = TRUE))
+NULL
+
+#' @export
+#' @rdname simulate_dbi
+simulate_hive <- function() simulate_dbi("Hive")
+
+
 #' @export
 sql_translate_env.Hive <- function(con) {
   sql_variant(
@@ -14,7 +43,7 @@ sql_translate_env.Hive <- function(con) {
       }
     ),
     sql_translator(.parent = base_odbc_agg,
-      var = sql_prefix("VARIANCE"),
+      var = sql_aggregate("VARIANCE", "var"),
       quantile = sql_quantile("PERCENTILE"),
       median = sql_median("PERCENTILE")
     ),
@@ -27,14 +56,12 @@ sql_translate_env.Hive <- function(con) {
 }
 
 #' @export
-db_analyze.Hive <- function(con, table, ...) {
-  # Using ANALYZE TABLE instead of ANALYZE as recommended in this article: https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  sql <- build_sql(
-    "ANALYZE TABLE ",
-    as.sql(table),
-    " COMPUTE STATISTICS"
-    , con = con)
-  DBI::dbExecute(con, sql)
+sql_table_analyze.Hive <- function(con, table, ...) {
+  # https://cwiki.apache.org/confluence/display/Hive/StatsDev
+  build_sql(
+    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
+    con = con
+  )
 }
 
 globalVariables("regexp_replace")

@@ -1,72 +1,59 @@
-context("test-backend-terdata.R")
-
 test_that("custom scalar translated correctly", {
+  local_con(simulate_teradata())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_teradata())
-  }
+  expect_equal(translate_sql(x != y),          sql("`x` <> `y`"))
+  expect_equal(translate_sql(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
+  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
+  expect_equal(translate_sql(log(x)),          sql("LN(`x`)"))
+  expect_equal(translate_sql(cot(x)),          sql("1 / TAN(`x`)"))
+  expect_equal(translate_sql(nchar(x)),        sql("CHARACTER_LENGTH(`x`)"))
+  expect_equal(translate_sql(ceil(x)),         sql("CEILING(`x`)"))
+  expect_equal(translate_sql(ceiling(x)),      sql("CEILING(`x`)"))
+  expect_equal(translate_sql(atan2(x, y)),     sql("ATAN2(`y`, `x`)"))
+  expect_equal(translate_sql(substr(x, 1, 2)), sql("SUBSTR(`x`, 1.0, 2.0)"))
 
-  expect_equal(trans(x != y),          sql("`x` <> `y`"))
-  expect_equal(trans(as.numeric(x)),   sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
-  expect_equal(trans(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
-  expect_equal(trans(log(x)),          sql("LN(`x`)"))
-  expect_equal(trans(cot(x)),          sql("1 / TAN(`x`)"))
-  expect_equal(trans(nchar(x)),        sql("CHARACTER_LENGTH(`x`)"))
-  expect_equal(trans(ceil(x)),         sql("CEILING(`x`)"))
-  expect_equal(trans(ceiling(x)),      sql("CEILING(`x`)"))
-  expect_equal(trans(atan2(x, y)),     sql("ATAN2(`y`, `x`)"))
-  expect_equal(trans(substr(x, 1, 2)), sql("SUBSTR(`x`, 1.0, 2.0)"))
-
-  expect_error(trans(paste(x)),        sql("not supported"))
-
+  expect_error(translate_sql(paste(x)),        sql("not supported"))
 })
 
 test_that("custom bitwise operations translated correctly", {
+  local_con(simulate_teradata())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), con = simulate_impala())
-  }
-
-  expect_equal(trans(bitwNot(x)),        sql("BITNOT(`x`)"))
-  expect_equal(trans(bitwAnd(x, 128L)),  sql("BITAND(`x`, 128)"))
-  expect_equal(trans(bitwOr(x, 128L)),   sql("BITOR(`x`, 128)"))
-  expect_equal(trans(bitwXor(x, 128L)),  sql("BITXOR(`x`, 128)"))
-  expect_equal(trans(bitwShiftL(x, 2L)), sql("SHIFTLEFT(`x`, 2)"))
-  expect_equal(trans(bitwShiftR(x, 2L)), sql("SHIFTRIGHT(`x`, 2)"))
-
+  expect_equal(translate_sql(bitwNot(x)),        sql("BITNOT(`x`)"))
+  expect_equal(translate_sql(bitwAnd(x, 128L)),  sql("BITAND(`x`, 128)"))
+  expect_equal(translate_sql(bitwOr(x, 128L)),   sql("BITOR(`x`, 128)"))
+  expect_equal(translate_sql(bitwXor(x, 128L)),  sql("BITXOR(`x`, 128)"))
+  expect_equal(translate_sql(bitwShiftL(x, 2L)), sql("SHIFTLEFT(`x`, 2)"))
+  expect_equal(translate_sql(bitwShiftR(x, 2L)), sql("SHIFTRIGHT(`x`, 2)"))
 })
 
 test_that("custom aggregators translated correctly", {
+  local_con(simulate_teradata())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), window = FALSE, con = simulate_teradata())
-  }
+  expect_equal(translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR_SAMP(`x`)"))
 
-  expect_equal(trans(var(x)), sql("VAR_SAMP(`x`)"))
-
-  expect_error(trans(cor(x)), "not available")
-  expect_error(trans(cov(x)), "not available")
+  expect_error(translate_sql(cor(x), window = FALSE), "not available")
+  expect_error(translate_sql(cov(x), window = FALSE), "not available")
 })
 
 test_that("custom window functions translated correctly", {
+  local_con(simulate_teradata())
 
-  trans <- function(x) {
-    translate_sql(!!enquo(x), window = TRUE, con = simulate_teradata())
-  }
+  expect_equal(translate_sql(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
 
-  expect_equal(trans(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
-
-  expect_error(trans(cor(x)), "not supported")
-  expect_error(trans(cov(x)), "not supported")
+  expect_error(translate_sql(cor(x)), "not supported")
+  expect_error(translate_sql(cov(x)), "not supported")
 })
 
-test_that("filter and mutate translate is.na correctly", {
+test_that("generates custom sql", {
+  con <- simulate_teradata()
+
+  expect_snapshot(sql_table_analyze(con, ident("table")))
+})
+
+# verb translation --------------------------------------------------------
+
+test_that("head translated to TOP", {
   mf <- lazy_frame(x = 1, con = simulate_teradata())
-
-  expect_equal(
-    mf %>% head() %>% sql_render(),
-    sql("SELECT  TOP 6 *\nFROM `df`")
-  )
-
+  expect_snapshot(mf %>% head() %>% sql_render())
 })

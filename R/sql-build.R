@@ -24,6 +24,7 @@
 #'   without an active database connection.
 #' @param ... Other arguments passed on to the methods. Not currently used.
 sql_build <- function(op, con = NULL, ...) {
+  unique_subquery_name_reset()
   UseMethod("sql_build")
 }
 
@@ -44,33 +45,33 @@ sql_build.ident <- function(op, con = NULL, ...) {
 
 #' @export
 #' @rdname sql_build
-#' @param bare_identifier_ok Is it ok to return a bare table identifier.
-#'   Set to `TRUE` when generating queries to be nested within other
-#'   queries where a bare table name is ok.
-sql_render <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+#' @param subquery Is this SQL going to be used in a subquery?
+#'   This is important because you can place a bare table name in a subquery
+#'   and  ORDER BY does not work in subqueries.
+sql_render <- function(query, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_render")
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ..., bare_identifier_ok = FALSE) {
-  sql_render(query$ops, con = con, ..., bare_identifier_ok = bare_identifier_ok)
+sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE) {
+  sql_render(query$ops, con = con, ..., subquery = subquery)
 }
 
 #' @export
-sql_render.op <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+sql_render.op <- function(query, con = NULL, ..., subquery = FALSE) {
   qry <- sql_build(query, con = con, ...)
-  qry <- sql_optimise(qry, con = con, ...)
-  sql_render(qry, con = con, ..., bare_identifier_ok = bare_identifier_ok)
+  qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
+  sql_render(qry, con = con, ..., subquery = subquery)
 }
 
 #' @export
-sql_render.sql <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
+sql_render.sql <- function(query, con = NULL, ..., subquery = FALSE) {
   query
 }
 
 #' @export
-sql_render.ident <- function(query, con = NULL, ..., bare_identifier_ok = FALSE) {
-  if (bare_identifier_ok) {
+sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE) {
+  if (subquery) {
     query
   } else {
     sql_select(con, sql("*"), query)
@@ -81,7 +82,7 @@ sql_render.ident <- function(query, con = NULL, ..., bare_identifier_ok = FALSE)
 
 #' @export
 #' @rdname sql_build
-sql_optimise <- function(x, con = NULL, ...) {
+sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_optimise")
 }
 

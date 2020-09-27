@@ -1,11 +1,18 @@
-context("translate")
-
 test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
   old <- options(dplyr.strict_sql = TRUE)
   on.exit(options(old))
 
   expect_equal(translate_sql(1 + 2), sql("1.0 + 2.0"))
   expect_error(translate_sql(blah(x)), "could not find function")
+})
+
+test_that("namespace calls are translated", {
+  expect_equal(translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
+  expect_equal(translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
+
+  expect_snapshot_error(translate_sql(NOSUCHPACKAGE::foo()))
+  expect_snapshot_error(translate_sql(dbplyr::NOSUCHFUNCTION()))
+  expect_snapshot_error(translate_sql(base::abbreviate(x)))
 })
 
 test_that("Wrong number of arguments raises error", {
@@ -126,8 +133,10 @@ test_that("hypergeometric functions use manual calculation", {
 
 
 test_that("pmin and max use GREATEST and LEAST", {
-  expect_equal(translate_sql(pmin(x, y)), sql("LEAST(`x`, `y`)"))
-  expect_equal(translate_sql(pmax(x, y)), sql("GREATEST(`x`, `y`)"))
+  expect_warning(translate_sql(pmin(x, y)), "always removed")
+  expect_equal(translate_sql(pmin(x, y, z)), sql("LEAST(`x`, `y`, `z`)"))
+
+  expect_equal(translate_sql(pmax(x, y, na.rm = TRUE)), sql("GREATEST(`x`, `y`)"))
 })
 
 test_that("round uses integer digits", {
@@ -142,6 +151,10 @@ test_that("different arguments of substr are corrected", {
   expect_equal(translate_sql(substr(x, 3, 3)), sql("SUBSTR(`x`, 3, 1)"))
   expect_equal(translate_sql(substr(x, 3, 2)), sql("SUBSTR(`x`, 3, 0)"))
   expect_equal(translate_sql(substr(x, 3, 1)), sql("SUBSTR(`x`, 3, 0)"))
+})
+
+test_that("substring is also translated", {
+  expect_equal(translate_sql(substring(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
 })
 
 test_that("paste() translated to CONCAT_WS", {

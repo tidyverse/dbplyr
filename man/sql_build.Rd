@@ -11,22 +11,36 @@
 \alias{sql_optimise}
 \title{Build and render SQL from a sequence of lazy operations}
 \usage{
-join_query(x, y, vars, type = "inner", by = NULL, suffix = c(".x",
-  ".y"))
+join_query(
+  x,
+  y,
+  vars,
+  type = "inner",
+  by = NULL,
+  suffix = c(".x", ".y"),
+  na_matches = FALSE
+)
 
-select_query(from, select = sql("*"), where = character(),
-  group_by = character(), having = character(),
-  order_by = character(), limit = NULL, distinct = FALSE)
+select_query(
+  from,
+  select = sql("*"),
+  where = character(),
+  group_by = character(),
+  having = character(),
+  order_by = character(),
+  limit = NULL,
+  distinct = FALSE
+)
 
-semi_join_query(x, y, anti = FALSE, by = NULL)
+semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type = type)
 
 sql_build(op, con = NULL, ...)
 
-sql_render(query, con = NULL, ..., bare_identifier_ok = FALSE)
+sql_render(query, con = NULL, ..., subquery = FALSE)
 
-sql_optimise(x, con = NULL, ...)
+sql_optimise(x, con = NULL, ..., subquery = FALSE)
 }
 \arguments{
 \item{op}{A sequence of lazy operations}
@@ -37,9 +51,9 @@ without an active database connection.}
 
 \item{...}{Other arguments passed on to the methods. Not currently used.}
 
-\item{bare_identifier_ok}{Is it ok to return a bare table identifier.
-Set to \code{TRUE} when generating queries to be nested within other
-queries where a bare table name is ok.}
+\item{subquery}{Is this SQL going to be used in a subquery?
+This is important because you can place a bare table name in a subquery
+and  ORDER BY does not work in subqueries.}
 }
 \description{
 \code{sql_build()} creates a \code{select_query} S3 object, that is rendered

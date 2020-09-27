@@ -1,9 +1,12 @@
-#' Copy a local data frame to a DBI backend.
+#' Copy a local data frame to a remote database
 #'
-#' This [copy_to()] method works for all DBI sources. It is useful for
-#' copying small amounts of data to a database for examples, experiments,
-#' and joins. By default, it creates temporary tables which are typically
-#' only visible to the current connection to the database.
+#' @description
+#' This is an implementation of the dplyr [copy_to()] generic and it mostly
+#' a wrapper around [DBI::dbWriteTable()].
+#'
+#' It is useful for copying small amounts of data to a database for examples,
+#' experiments, and joins. By default, it creates temporary tables which are
+#' only visible within the current connection to the database.
 #'
 #' @export
 #' @param df A local data frame, a `tbl_sql` from same source, or a `tbl_sql`
@@ -22,33 +25,37 @@
 #'   will create a new index.
 #' @param analyze if `TRUE` (the default), will automatically ANALYZE the
 #'   new table so that the query optimiser has useful information.
+#' @param in_transaction Should the table creation be wrapped in a transaction?
+#'   This typically makes things faster, but you may want to suppress if the
+#'   database doesn't support transactions, or you're wrapping in a transaction
+#'   higher up (and your database doesn't support nested transactions.)
 #' @inheritParams dplyr::copy_to
-#' @return A [tbl()] object (invisibly).
+#' @inherit arrange.tbl_lazy return
 #' @examples
-#' library(dplyr)
-#' set.seed(1014)
+#' library(dplyr, warn.conflicts = FALSE)
 #'
-#' mtcars$model <- rownames(mtcars)
-#' mtcars2 <- src_memdb() %>%
-#'   copy_to(mtcars, indexes = list("model"), overwrite = TRUE)
-#' mtcars2 %>% filter(model == "Hornet 4 Drive")
+#' df <- data.frame(x = 1:5, y = letters[5:1])
+#' db <- copy_to(src_memdb(), df)
+#' db
 #'
-#' cyl8 <- mtcars2 %>% filter(cyl == 8)
-#' cyl8_cached <- copy_to(src_memdb(), cyl8)
-#'
-#' # copy_to is called automatically if you set copy = TRUE
+#' df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
+#' # copy_to() is called automatically if you set copy = TRUE
 #' # in the join functions
-#' df <- tibble(cyl = c(6, 8))
-#' mtcars2 %>% semi_join(df, copy = TRUE)
+#' db %>% left_join(df2, copy = TRUE)
+#' @importFrom dplyr copy_to
 copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
-  assert_that(is_string(name), is.flag(temporary))
+                            analyze = TRUE, ...,
+                            in_transaction = TRUE
+                            ) {
+  assert_that(is.flag(temporary))
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
     stop("`df` must be a local dataframe or a remote tbl_sql", call. = FALSE)
   }
+
+  name <- as.sql(name, con = dest$con)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
     out <- compute(df,
@@ -70,6 +77,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
       unique_indexes = unique_indexes,
       indexes = indexes,
       analyze = analyze,
+      in_transaction = in_transaction,
       ...
     )
 
@@ -79,6 +87,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   invisible(out)
 }
 
+#' @importFrom dplyr auto_copy
 #' @export
 auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
   copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
@@ -94,7 +103,8 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 db_copy_to <-  function(con, table, values,
                         overwrite = FALSE, types = NULL, temporary = TRUE,
                         unique_indexes = NULL, indexes = NULL,
-                        analyze = TRUE, ...) {
+                        analyze = TRUE, ...,
+                        in_transaction = TRUE) {
   UseMethod("db_copy_to")
 }
 
@@ -102,33 +112,44 @@ db_copy_to <-  function(con, table, values,
 db_copy_to.DBIConnection <- function(con, table, values,
                             overwrite = FALSE, types = NULL, temporary = TRUE,
                             unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...) {
+                            analyze = TRUE, ...,
+                            in_transaction = TRUE) {
 
-  types <- types %||% db_data_type(con, values)
-  names(types) <- names(values)
-
-  with_transaction(con, {
-    # Only remove if it exists; returns NA for MySQL
-    if (overwrite && !is_false(db_has_table(con, table))) {
-      db_drop_table(con, table, force = TRUE)
-    }
-
-    table <- db_write_table(con, table, types = types, values = values, temporary = temporary)
-    db_create_indexes(con, table, unique_indexes, unique = TRUE)
-    db_create_indexes(con, table, indexes, unique = FALSE)
+  with_transaction(con, in_transaction, {
+    table <- db_write_table(con, table,
+      types = types,
+      values = values,
+      temporary = temporary,
+      overwrite = overwrite
+    )
+    create_indexes(con, table, unique_indexes, unique = TRUE)
+    create_indexes(con, table, indexes, unique = FALSE)
     if (analyze) db_analyze(con, table)
   })
 
   table
 }
 
+create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
+  if (is.null(indexes)) return()
+  assert_that(is.list(indexes))
+
+  for (index in indexes) {
+    db_create_index(con, table, index, unique = unique, ...)
+  }
+}
+
 # Don't use `tryCatch()` because it messes with the callstack
-with_transaction <- function(con, code) {
-  db_begin(con)
-  on.exit(db_rollback(con))
+with_transaction <- function(con, in_transaction, code) {
+  if (in_transaction) {
+    dbBegin(con)
+    on.exit(dbRollback(con))
+  }
 
   code
 
-  on.exit()
-  db_commit(con)
+  if (in_transaction) {
+    on.exit()
+    dbCommit(con)
+  }
 }

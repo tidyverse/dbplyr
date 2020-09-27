@@ -1,0 +1,31 @@
+# PostgreSQL
+
+## Install
+
+First install PostgreSQL, create a data directory, and create a default database.
+
+```
+brew install postgresql
+export PGDATA=~/db/postgres-9.5 # set this globally somewhere
+initdb -E utf8
+createdb
+createdb hadley
+createdb test
+createdb lahman
+createdb nycflights13
+```
+
+## Start
+
+```
+pg_ctl start
+```
+
+## Connect
+
+```{r, eval = FALSE}
+install.packages("RPostgreSQL")
+library(DBI)
+con <- dbConnect(RPostgreSQL::PostgreSQL(), dbname = "hadley")
+dbListTables(con)
+```

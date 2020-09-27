@@ -4,24 +4,30 @@
 \alias{collapse.tbl_sql}
 \alias{compute.tbl_sql}
 \alias{collect.tbl_sql}
-\title{Force computation of query}
+\title{Compute results of a query}
 \usage{
 \method{collapse}{tbl_sql}(x, ...)
 
-\method{compute}{tbl_sql}(x, name = unique_table_name(),
-  temporary = TRUE, unique_indexes = list(), indexes = list(),
-  analyze = TRUE, ...)
+\method{compute}{tbl_sql}(
+  x,
+  name = unique_table_name(),
+  temporary = TRUE,
+  unique_indexes = list(),
+  indexes = list(),
+  analyze = TRUE,
+  ...
+)
 
 \method{collect}{tbl_sql}(x, ..., n = Inf, warn_incomplete = TRUE)
 }
 \arguments{
-\item{x}{A \code{tbl_sql}}
+\item{x}{A lazy data frame backed by a database query.}
 
 \item{...}{other parameters passed to methods.}
 
 \item{name}{Table name in remote database.}
 
-\item{temporary}{Should the table be temporary (\code{TRUE}, the default\code{) or persistent (}FALSE`)?}
+\item{temporary}{Should the table be temporary (\code{TRUE}, the default\verb{) or persistent (}FALSE`)?}
 
 \item{unique_indexes}{a list of character vectors. Each element of the list
 will create a new unique index over the specified column(s). Duplicate rows
@@ -38,7 +44,14 @@ new table so that the query optimiser has useful information.}
 \item{warn_incomplete}{Warn if \code{n} is less than the number of result rows?}
 }
 \description{
-\code{collapse()} creates a subquery; \code{compute()} stores the results in a
-remote table; \code{collect()} downloads the results into the current
-R session.
+These are methods for the dplyr generics \code{\link[=collapse]{collapse()}}, \code{\link[=compute]{compute()}},
+and \code{\link[=collect]{collect()}}. \code{collapse()} creates a subquery, \code{compute()} stores
+the results in a remote table, and \code{collect()} executes the query and
+downloads the data into R.
+}
+\examples{
+library(dplyr, warn.conflicts = FALSE)
+
+db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
+db \%>\% filter(a <= 2) \%>\% collect()
 }

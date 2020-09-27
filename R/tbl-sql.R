@@ -1,27 +1,28 @@
 #' Create an SQL tbl (abstract)
 #'
 #' Generally, you should no longer need to provide a custom `tbl()`
-#' method you you can default `tbl.DBIConnect` method.
+#' method.
+#' The default `tbl.DBIConnect` method should work in most cases.
 #'
 #' @keywords internal
 #' @export
 #' @param subclass name of subclass
 #' @param ... needed for agreement with generic. Not otherwise used.
-#' @param vars DEPRECATED
+#' @param vars Provide column names as a character vector
+#'   to avoid retrieving them from the database.
+#'   Mainly useful for better performance when creating
+#'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
-  from <- as.sql(from)
-
-  if (!missing(vars)) {
-    warning("`vars` argument is deprecated as it is no longer needed", call. = FALSE)
-  }
+  from <- as.sql(from, con = src$con)
 
   vars <- vars %||% db_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
 
-  make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
+  dplyr::make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
 }
 
+#' @importFrom dplyr same_src
 #' @export
 same_src.tbl_sql <- function(x, y) {
   inherits(y, "tbl_sql") && same_src(x$src, y$src)
@@ -29,6 +30,7 @@ same_src.tbl_sql <- function(x, y) {
 
 # Grouping methods -------------------------------------------------------------
 
+#' @importFrom dplyr group_size
 #' @export
 group_size.tbl_sql <- function(x) {
   df <- x %>%
@@ -37,6 +39,7 @@ group_size.tbl_sql <- function(x) {
   df$n
 }
 
+#' @importFrom dplyr n_groups
 #' @export
 n_groups.tbl_sql <- function(x) {
   if (length(groups(x)) == 0) return(1L)

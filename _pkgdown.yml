@@ -12,12 +12,25 @@ home:
 reference:
 - title: dplyr verbs
   contents:
+  - tbl.src_dbi
   - arrange.tbl_lazy
   - copy_to.src_sql
   - collapse.tbl_sql
+  - distinct.tbl_lazy
   - do.tbl_sql
+  - filter.tbl_lazy
+  - head.tbl_lazy
+  - group_by.tbl_lazy
   - inner_join.tbl_lazy
-  - src_dbi
+  - mutate.tbl_lazy
+  - pull.tbl_sql
+  - select.tbl_lazy
+  - slice_min.tbl_lazy
+  - summarise.tbl_lazy
+
+- title: Built-in database backends
+  contents:
+  - starts_with("backend")
 
 - title: Database connection
   contents:

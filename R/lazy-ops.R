@@ -34,7 +34,6 @@ op_base_local <- function(df) {
 }
 
 op_base_remote <- function(x, vars) {
-  stopifnot(is.sql(x) || is.ident(x))
   op_base(x, vars, class = "remote")
 }
 
@@ -51,7 +50,7 @@ print.op_base_remote <- function(x, ...) {
 
 #' @export
 print.op_base_local <- function(x, ...) {
-  cat("<Local data frame> ", dim_desc(x$x), "\n", sep = "")
+  cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
 }
 
 #' @export

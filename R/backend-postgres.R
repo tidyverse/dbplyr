@@ -1,3 +1,31 @@
+#' Backend: PostgreSQL
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * Many stringr functions
+#' * lubridate date-time extraction functions
+#' * More standard statistical summaries
+#'
+#' Use `simulate_postgres()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-postgres
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_postgres())
+#' lf %>% summarise(x = sd(b, na.rm = TRUE))
+#' lf %>% summarise(y = cor(b, c), y = cov(b, c))
+NULL
+
+#' @export
+#' @rdname backend-postgres
+simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
+
 #' @export
 db_desc.PostgreSQLConnection <- function(x) {
   info <- dbGetInfo(x)
@@ -6,10 +34,8 @@ db_desc.PostgreSQLConnection <- function(x) {
   paste0("postgres ", info$serverVersion, " [", info$user, "@",
     host, ":", info$port, "/", info$dbname, "]")
 }
-
 #' @export
 db_desc.PostgreSQL <- db_desc.PostgreSQLConnection
-
 #' @export
 db_desc.PqConnection <- db_desc.PostgreSQLConnection
 
@@ -52,11 +78,27 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_locate  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
-      str_detect  = function(string, pattern) {
-        sql_expr(strpos(!!string, !!pattern) > 0L)
+      str_detect = function(string, pattern, negate = FALSE) {
+        if (isTRUE(negate)) {
+          sql_expr(!(!!string ~ !!pattern))
+        } else {
+          sql_expr(!!string ~ !!pattern)
+        }
+      },
+      str_replace = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },
       str_replace_all = function(string, pattern, replacement){
-        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 'g'))
+      },
+      str_squish = function(string){
+        sql_expr(ltrim(rtrim(regexp_replace(!!string, '\\s+', ' ', 'g'))))
+      },
+      str_remove = function(string, pattern){
+        sql_expr(regexp_replace(!!string, !!pattern, ''))
+      },
+      str_remove_all = function(string, pattern){
+        sql_expr(regexp_replace(!!string, !!pattern, '', 'g'))
       },
 
       # lubridate functions
@@ -143,7 +185,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       },
     ),
     sql_translator(.parent = base_agg,
-      n = function() sql("COUNT(*)"),
       cor = sql_aggregate_2("CORR"),
       cov = sql_aggregate_2("COVAR_SAMP"),
       sd = sql_aggregate("STDDEV_SAMP", "sd"),
@@ -153,9 +194,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
       str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
     ),
     sql_translator(.parent = base_win,
-      n = function() {
-        win_over(sql("COUNT(*)"), partition = win_current_group())
-      },
       cor = win_aggregate_2("CORR"),
       cov = win_aggregate_2("COVAR_SAMP"),
       sd =  win_aggregate("STDDEV_SAMP"),
@@ -172,84 +210,38 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
     )
   )
 }
-
 #' @export
 sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
-
 #' @export
 sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
 
 #' @export
-sql_translate_env.Redshift <- sql_translate_env.PostgreSQLConnection
-
+sql_expr_matches.PostgreSQLConnection <- function(con, x, y) {
+  # https://www.postgresql.org/docs/current/functions-comparison.html
+  build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
+}
+#' @export
+sql_expr_matches.PostgreSQL <- sql_expr_matches.PostgreSQLConnection
+#' @export
+sql_expr_matches.PqConnection <- sql_expr_matches.PostgreSQLConnection
 
 # DBI methods ------------------------------------------------------------------
 
-# Doesn't return TRUE for temporary tables
-#' @export
-db_has_table.PostgreSQLConnection <- function(con, table, ...) {
-  table %in% db_list_tables(con)
-}
-
-#' @export
-db_begin.PostgreSQLConnection <- function(con, ...) {
-  dbExecute(con, "BEGIN TRANSACTION")
-}
-
-#' @export
-db_write_table.PostgreSQLConnection <- function(con, table, types, values,
-                                                temporary = TRUE, ...) {
-
-  db_create_table(con, table, types, temporary = temporary)
-
-  if (nrow(values) == 0)
-    return(NULL)
-
-  cols <- lapply(values, escape, collapse = NULL, parens = FALSE, con = con)
-  col_mat <- matrix(unlist(cols, use.names = FALSE), nrow = nrow(values))
-
-  rows <- apply(col_mat, 1, paste0, collapse = ", ")
-  values <- paste0("(", rows, ")", collapse = "\n, ")
-
-  sql <- build_sql("INSERT INTO ", as.sql(table), " VALUES ", sql(values), con = con)
-  dbExecute(con, sql)
-
-  table
-}
-
-#' @export
-db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
-  fields <- build_sql(
-    "SELECT * FROM ", sql_subquery(con, sql), " WHERE 0=1",
-    con = con
-  )
-
-  qry <- dbSendQuery(con, fields)
-  on.exit(dbClearResult(qry))
-
-  dbGetInfo(qry)$fieldDescription[[1]]$name
-}
-
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
-db_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
+sql_query_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
-  exsql <- build_sql(
+  build_sql(
     "EXPLAIN ",
     if (!is.null(format)) sql(paste0("(FORMAT ", format, ") ")),
     sql,
     con = con
   )
-  expl <- dbGetQuery(con, exsql)
-
-  paste(expl[[1]], collapse = "\n")
 }
-
 #' @export
-db_explain.PostgreSQL <- db_explain.PostgreSQLConnection
-
+sql_query_explain.PostgreSQL <- sql_query_explain.PostgreSQLConnection
 #' @export
-db_explain.PqConnection <- db_explain.PostgreSQLConnection
+sql_query_explain.PqConnection <- sql_query_explain.PostgreSQLConnection
 
 globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY"))

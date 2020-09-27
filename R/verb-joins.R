@@ -1,19 +1,17 @@
-#' Join sql tbls.
+#' Join SQL tables
 #'
-#' See [join] for a description of the general purpose of the
-#' functions.
+#' @description
+#' These are methods for the dplyr [join] generics. They are translated
+#' to the following SQL queries:
 #'
-#' @section Implementation notes:
+#' * `inner_join(x, y)`: `SELECT * FROM x JOIN y ON x.a = y.a`
+#' * `left_join(x, y)`:  `SELECT * FROM x LEFT JOIN y ON x.a = y.a`
+#' * `right_join(x, y)`: `SELECT * FROM x RIGHT JOIN y ON x.a = y.a`
+#' * `full_join(x, y)`:  `SELECT * FROM x FULL JOIN y ON x.a = y.a`
+#' * `semi_join(x, y)`:  `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
+#' * `anti_join(x, y)`:  `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
 #'
-#' Semi-joins are implemented using `WHERE EXISTS`, and anti-joins with
-#' `WHERE NOT EXISTS`.
-#'
-#' All joins use column equality by default.
-#' An arbitrary join predicate can be specified by passing
-#' an SQL expression to the `sql_on` argument.
-#' Use `LHS` and `RHS` to refer to the left-hand side or
-#' right-hand side table, respectively.
-#'
+#' @param x,y A pair of lazy data frames backed by database queries.
 #' @inheritParams dplyr::join
 #' @param copy If `x` and `y` are not from the same data source,
 #'   and `copy` is `TRUE`, then `y` will be copied into a
@@ -27,85 +25,50 @@
 #' @param auto_index if `copy` is `TRUE`, automatically create
 #'   indices for the variables in `by`. This may speed up the join if
 #'   there are matching indexes in `x`.
-#' @param sql_on A custom join predicate as an SQL expression. The SQL
-#'   can refer to the `LHS` and `RHS` aliases to disambiguate
-#'   column names.
+#' @param sql_on A custom join predicate as an SQL expression.
+#'   Usually joins use column equality, but you can perform more complex
+#'   queries by supply `sql_on` which should be a SQL expression that
+#'   uses `LHS` and `RHS` aliases to refer to the left-hand side or
+#'   right-hand side of the join respectively.
+#' @param na_matches Should NA (NULL) values match one another?
+#'   The default, "never", is how databases usually work. `"na"` makes
+#'   the joins behave like the dplyr join functions, [merge()], [match()],
+#'   and `%in%`.
+#' @inherit arrange.tbl_lazy return
 #' @examples
-#' \dontrun{
-#' library(dplyr)
-#' if (has_lahman("sqlite")) {
+#' library(dplyr, warn.conflicts = FALSE)
 #'
-#' # Left joins ----------------------------------------------------------------
-#' lahman_s <- lahman_sqlite()
-#' batting <- tbl(lahman_s, "Batting")
-#' team_info <- select(tbl(lahman_s, "Teams"), yearID, lgID, teamID, G, R:H)
+#' band_db <- tbl_memdb(dplyr::band_members)
+#' instrument_db <- tbl_memdb(dplyr::band_instruments)
+#' band_db %>% left_join(instrument_db) %>% show_query()
 #'
-#' # Combine player and whole team statistics
-#' first_stint <- select(filter(batting, stint == 1), playerID:H)
-#' both <- left_join(first_stint, team_info, type = "inner", by = c("yearID", "teamID", "lgID"))
-#' head(both)
-#' explain(both)
+#' # Can join with local data frames by setting copy = TRUE
+#' band_db %>%
+#'   left_join(dplyr::band_instruments, copy = TRUE)
 #'
-#' # Join with a local data frame
-#' grid <- expand.grid(
-#'   teamID = c("WAS", "ATL", "PHI", "NYA"),
-#'   yearID = 2010:2012)
-#' top4a <- left_join(batting, grid, copy = TRUE)
-#' explain(top4a)
+#' # Unlike R, joins in SQL don't usually match NAs (NULLs)
+#' db <- memdb_frame(x = c(1, 2, NA))
+#' label <- memdb_frame(x = c(1, NA), label = c("one", "missing"))
+#' db %>% left_join(label, by = "x")
+#' # But you can activate R's usual behaviour with the na_matches argument
+#' db %>% left_join(label, by = "x", na_matches = "na")
 #'
-#' # Indices don't really help here because there's no matching index on
-#' # batting
-#' top4b <- left_join(batting, grid, copy = TRUE, auto_index = TRUE)
-#' explain(top4b)
-#'
-#' # Semi-joins ----------------------------------------------------------------
-#'
-#' people <- tbl(lahman_s, "Master")
-#'
-#' # All people in half of fame
-#' hof <- tbl(lahman_s, "HallOfFame")
-#' semi_join(people, hof)
-#'
-#' # All people not in the hall of fame
-#' anti_join(people, hof)
-#'
-#' # Find all managers
-#' manager <- tbl(lahman_s, "Managers")
-#' semi_join(people, manager)
-#'
-#' # Find all managers in hall of fame
-#' famous_manager <- semi_join(semi_join(people, manager), hof)
-#' famous_manager
-#' explain(famous_manager)
-#'
-#' # Anti-joins ----------------------------------------------------------------
-#'
-#' # batters without person covariates
-#' anti_join(batting, people)
-#'
-#' # Arbitrary predicates ------------------------------------------------------
-#'
-#' # Find all pairs of awards given to the same player
-#' # with at least 18 years between the awards:
-#' awards_players <- tbl(lahman_s, "AwardsPlayers")
-#' inner_join(
-#'   awards_players, awards_players,
-#'   sql_on = paste0(
-#'     "(LHS.playerID = RHS.playerID) AND ",
-#'     "(LHS.yearID < RHS.yearID - 18)"
-#'   )
-#' )
-#' }
-#' }
+#' # By default, joins are equijoins, but you can use `sql_on` to
+#' # express richer relationships
+#' db1 <- memdb_frame(x = 1:5)
+#' db2 <- memdb_frame(x = 1:3, y = letters[1:3])
+#' db1 %>% left_join(db2) %>% show_query()
+#' db1 %>% left_join(db2, sql_on = "LHS.x < RHS.x") %>% show_query()
 #' @name join.tbl_sql
 NULL
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr inner_join
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                                suffix = c(".x", ".y"),
+                                suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL) {
+                                sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -115,16 +78,18 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr left_join
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               suffix = c(".x", ".y"),
+                               suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -134,16 +99,18 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr right_join
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                                suffix = c(".x", ".y"),
+                                suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL) {
+                                sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -153,16 +120,18 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr full_join
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
-                               suffix = c(".x", ".y"),
+                               suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_join(
     x, y,
@@ -172,15 +141,17 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     suffix = suffix,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr semi_join
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_semi_join(
     x, y,
@@ -189,15 +160,17 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr anti_join
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL) {
+                               sql_on = NULL, na_matches = c("never", "na")) {
 
   add_op_semi_join(
     x, y,
@@ -206,14 +179,16 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     sql_on = sql_on,
     copy = copy,
     auto_index = auto_index,
+    na_matches = na_matches,
     ...
   )
 }
 
 
 add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
-                        suffix = c(".x", ".y"),
-                        auto_index = FALSE, ...) {
+                        suffix = NULL,
+                        auto_index = FALSE,
+                        na_matches = "never") {
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -221,7 +196,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(
@@ -230,23 +205,25 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     indexes = if (auto_index) list(by$y)
   )
 
+  suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
 
   x$ops <- op_double("join", x, y, args = list(
     vars = vars,
     type = type,
     by = by,
-    suffix = suffix
+    suffix = suffix,
+    na_matches = na_matches
   ))
   x
 }
 
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, ...) {
+                             auto_index = FALSE, na_matches = "never") {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
-    by <- common_by(by, x, y)
+    by <- dplyr::common_by(by, x, y)
   }
 
   y <- auto_copy(
@@ -256,7 +233,8 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
 
   x$ops <- op_double("semi_join", x, y, args = list(
     anti = anti,
-    by = by
+    by = by,
+    na_matches = na_matches
   ))
   x
 }
@@ -285,7 +263,13 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   #  alias - name of column in join result
   #  x - name of column from left table or NA if only from right table
   #  y - name of column from right table or NA if only from left table
-  list(alias = c(x_new, y_new), x = c(x_x, y_x), y = c(x_y, y_y))
+  list(
+    alias = c(x_new, y_new),
+    x = c(x_x, y_x),
+    y = c(x_y, y_y),
+    all_x = x_names,
+    all_y = c(y_names, by$y)
+  )
 }
 
 check_suffix <- function(x) {
@@ -330,11 +314,17 @@ sql_build.op_join <- function(op, con, ...) {
     vars = op$args$vars,
     type = op$args$type,
     by = op$args$by,
-    suffix = op$args$suffix
+    suffix = op$args$suffix,
+    na_matches = op$args$na_matches
   )
 }
 
 #' @export
 sql_build.op_semi_join <- function(op, con, ...) {
-  semi_join_query(op$x, op$y, anti = op$args$anti, by = op$args$by)
+  semi_join_query(
+    op$x, op$y,
+    anti = op$args$anti,
+    by = op$args$by,
+    na_matches = op$args$na_matches
+  )
 }

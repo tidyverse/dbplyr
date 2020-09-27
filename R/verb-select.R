@@ -1,6 +1,19 @@
-# select and rename -----------------------------------------------------------
-
+#' Subset, rename, and reorder columns using their names
+#'
+#' These are methods for the dplyr [select()], [rename()], and [relocate()]
+#' generics. They generate the `SELECT` clause of the SQL query.
+#'
+#' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::select
 #' @export
+#' @importFrom dplyr select
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' db <- memdb_frame(x = 1, y = 2, z = 3)
+#' db %>% select(-y) %>% show_query()
+#' db %>% relocate(z) %>% show_query()
+#' db %>% rename(first = x, last = z) %>% show_query()
 select.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
 
@@ -11,6 +24,8 @@ select.tbl_lazy <- function(.data, ...) {
   .data
 }
 
+#' @rdname select.tbl_lazy
+#' @importFrom dplyr rename
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   dots <- quos(...)
@@ -20,6 +35,26 @@ rename.tbl_lazy <- function(.data, ...) {
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
   .data
+}
+
+#' @rdname select.tbl_lazy
+#' @importFrom dplyr relocate
+#' @inheritParams dplyr::relocate
+#' @export
+relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
+  vars <- simulate_vars(.data)
+  new_vars <- dplyr::relocate(
+    simulate_vars(.data),
+    ...,
+    .before = {{.before}},
+    .after = {{.after}}
+  )
+  .data$ops <- op_select(.data$ops, syms(set_names(names(new_vars))))
+  .data
+}
+
+simulate_vars <- function(x) {
+  as_tibble(rep_named(op_vars(x), list(logical())))
 }
 
 # op_select ---------------------------------------------------------------
@@ -72,7 +107,8 @@ op_grps.op_select <- function(op) {
   old2new <- set_names(names(new2old), new2old)
 
   grps <- op_grps(op$x)
-  grps[grps %in% names(old2new)] <- old2new[grps]
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
   grps
 }
 

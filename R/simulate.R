@@ -11,59 +11,35 @@
 #'
 #' @keywords internal
 #' @export
-simulate_dbi <- function(class = character()) {
+simulate_dbi <- function(class = character(), ...) {
   structure(
     list(),
+    ...,
     class = c(class, "TestConnection", "DBIConnection")
   )
 }
 
-# Needed to work around fundamental hackiness of how I'm mingling
-# S3 and S4 dispatch
+
+sql_escape_ident <- function(con, x) {
+  UseMethod("sql_escape_ident")
+}
+#' @export
+sql_escape_ident.DBIConnection <- function(con, x) {
+  dbQuoteIdentifier(con, x)
+}
+#' @export
 sql_escape_ident.TestConnection <- function(con, x) {
   sql_quote(x, "`")
 }
 
+sql_escape_string <- function(con, x) {
+  UseMethod("sql_escape_string")
+}
+#' @export
+sql_escape_string.DBIConnection <- function(con, x) {
+  dbQuoteString(con, x)
+}
+#' @export
 sql_escape_string.TestConnection <- function(con, x) {
   sql_quote(x, "'")
 }
-
-#' @export
-#' @rdname simulate_dbi
-simulate_access <- function() simulate_dbi("ACCESS")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_hive <- function() simulate_dbi("Hive")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_mysql <- function() simulate_dbi("MySQLConnection")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_impala <- function() simulate_dbi("Impala")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_mssql <- function() simulate_dbi("Microsoft SQL Server")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_odbc <- function() simulate_dbi("OdbcConnection")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_oracle <- function() simulate_dbi("Oracle")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
-
-#' @export
-#' @rdname simulate_dbi
-simulate_teradata <- function() simulate_dbi("Teradata")

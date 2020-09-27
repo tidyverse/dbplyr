@@ -15,7 +15,7 @@
 #' df %>% arrange(x) %>% show_query()
 #'
 #' mtcars_db <- tbl_memdb(mtcars)
-#' mtcars_db %>% count(cyl) %>% show_query()
+#' mtcars_db %>% group_by(cyl) %>% summarise(n = n()) %>% show_query()
 memdb_frame <- function(..., .name = unique_table_name()) {
   x <- copy_to(src_memdb(), tibble(...), name = .name)
   x
@@ -30,5 +30,7 @@ tbl_memdb <- function(df, name = deparse(substitute(df))) {
 #' @rdname memdb_frame
 #' @export
 src_memdb <- function() {
-  cache_computation("src_memdb", src_sqlite(":memory:", TRUE))
+  cache_computation("src_memdb", {
+    src_dbi(DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE))
+  })
 }

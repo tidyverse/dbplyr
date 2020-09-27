@@ -1,8 +1,5 @@
-context("test-translate-sql-window.r")
-
 test_that("aggregation functions warn once if na.rm = FALSE", {
-  old <- set_current_con(simulate_dbi())
-  on.exit(set_current_con(old))
+  local_con(simulate_dbi())
   sql_mean <- win_aggregate("MEAN")
 
   expect_warning(sql_mean("x"), "Missing values")
@@ -58,9 +55,18 @@ test_that("ntile always casts to integer", {
 })
 
 test_that("first, last, and nth translated to _value", {
-  expect_equal(translate_sql(first(x)), sql("FIRST_VALUE(`x`) OVER ()"))
-  expect_equal(translate_sql(last(x)), sql("LAST_VALUE(`x`) OVER ()"))
-  expect_equal(translate_sql(nth(x, 1)), sql("NTH_VALUE(`x`, 1) OVER ()"))
+  expect_equal(
+    translate_sql(first(x)),
+    sql("FIRST_VALUE(`x`) OVER ()")
+  )
+  expect_equal(
+    translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
+    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)")
+  )
+  expect_equal(
+    translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
+    sql("NTH_VALUE(`x`, 3) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
+  )
 })
 
 test_that("can override frame of recycled functions", {
@@ -73,15 +79,13 @@ test_that("can override frame of recycled functions", {
 # win_over ----------------------------------------------------------------
 
 test_that("over() only requires first argument", {
-  old <- set_current_con(simulate_dbi())
-  on.exit(set_current_con(old))
+  local_con(simulate_dbi())
 
   expect_equal(win_over("X"), sql("'X' OVER ()"))
 })
 
 test_that("multiple group by or order values don't have parens", {
-  old <- set_current_con(simulate_dbi())
-  on.exit(set_current_con(old))
+  local_con(simulate_dbi())
 
   expect_equal(
     win_over(ident("x"), order = c("x", "y")),

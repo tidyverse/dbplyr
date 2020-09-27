@@ -29,9 +29,10 @@ sql_median <- function(f,
                        style = c("infix", "ordered"),
                        window = FALSE) {
 
+  warned <- FALSE
   quantile <- sql_quantile(f, style = style, window = window)
-
-  function(x) {
+  function(x, na.rm = FALSE) {
+    warned <<- check_na_rm("median", na.rm, warned)
     quantile(x, 0.5)
   }
 }

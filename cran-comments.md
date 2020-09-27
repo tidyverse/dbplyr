@@ -1,3 +1,7 @@
+This is a resubmission; I have tried to ensure that unnecessary tests are no longer run on the CRAN check machine.
+
+---
+
 ## Test environments
 
 * local: darwin15.6.0-3.5.1
@@ -11,13 +15,7 @@
 
 ## revdepcheck results
 
-We checked 47 reverse dependencies (42 from CRAN + 5 from BioConductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 51 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 0 new problems
- * We failed to check 1 packages
-
-Issues with CRAN packages are summarised below.
-
-### Failed to check
-
-* MonetDBLite (NA)
+ * We failed to check 0 packages

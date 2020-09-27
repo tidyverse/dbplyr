@@ -1,39 +1,46 @@
+#' Backend: Teradata
+#'
+#' @description
+#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' details of overall translation technology. Key differences for this backend
+#' are:
+#'
+#' * Uses `TOP` instead of `LIMIT`
+#' * Selection of user supplied translations
+#'
+#' Use `simulate_teradata()` with `lazy_frame()` to see simulated SQL without
+#' converting to live access database.
+#'
+#' @name backend-teradata
+#' @aliases NULL
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#'
+#' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_teradata())
+#' lf %>% head()
+NULL
+
+#' @export
+#' @rdname backend-teradata
+simulate_teradata <- function() simulate_dbi("Teradata")
+
 #' @export
 sql_select.Teradata <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
                                              order_by = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
-                                             ...) {
-  out <- vector("list", 7)
-  names(out) <- c("select", "from", "where", "group_by",
-                  "having", "order_by","limit")
+                                             ...,
+                                             subquery = FALSE) {
 
-  assert_that(is.character(select), length(select) > 0L)
-  out$select    <- build_sql(
-    "SELECT ",
-
-    if (distinct) sql("DISTINCT "),
-
-    # Teradata uses the TOP statement instead of LIMIT which is what SQL92 uses
-    # TOP is expected after DISTINCT and not at the end of the query
-    # e.g: SELECT TOP 100 * FROM my_table
-    if (!is.null(limit) && !identical(limit, Inf)) {
-      assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
-      build_sql(" TOP ", as.integer(limit), " ", con = con)
-    },
-
-    escape(select, collapse = ", ", con = con),
-    con = con
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct, top = limit),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
   )
-
-  out$from      <- sql_clause_from(from, con)
-  out$where     <- sql_clause_where(where, con)
-  out$group_by  <- sql_clause_group_by(group_by, con)
-  out$having    <- sql_clause_having(having, con)
-  out$order_by  <- sql_clause_order_by(order_by, con)
-
-  escape(unname(purrr::compact(out)), collapse = "\n", parens = FALSE, con = con)
 }
 
 #' @export
@@ -75,7 +82,7 @@ sql_translate_env.Teradata <- function(con) {
     sql_translator(.parent = base_odbc_agg,
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()"),
-      var           = sql_prefix("VAR_SAMP"),
+      var           = sql_aggregate("VAR_SAMP", "var"),
     ),
     sql_translator(.parent = base_odbc_win,
       cor           = win_absent("cor"),
@@ -86,15 +93,9 @@ sql_translate_env.Teradata <- function(con) {
   )}
 
 #' @export
-db_analyze.Teradata <- function(con, table, ...) {
-  # Using COLLECT STATISTICS instead of ANALYZE as recommended in this article
+sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
-  sql <- build_sql(
-    "COLLECT STATISTICS ",
-    ident(table)
-    , con = con
-  )
-  DBI::dbExecute(con, sql)
+  build_sql("COLLECT STATISTICS ", as.sql(table) , con = con)
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR"))
