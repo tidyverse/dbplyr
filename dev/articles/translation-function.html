@@ -159,9 +159,9 @@
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">x</span> <span class="op">^</span> <span class="fl">2L</span>)
 <span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span>
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">x</span> <span class="op">^</span> <span class="fl">2L</span>, con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">x</span> <span class="op">^</span> <span class="fl">2L</span>, con = <span class="fu"><a href="../reference/backend-sqlite.html">simulate_sqlite</a></span>())
 <span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span>
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">x</span> <span class="op">^</span> <span class="fl">2L</span>, con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_access</a></span>())
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="kw">x</span> <span class="op">^</span> <span class="fl">2L</span>, con = <span class="fu"><a href="../reference/backend-access.html">simulate_access</a></span>())
 <span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span>
 </pre></div>
 <p>Perfect translation is not possible because databases don’t have all the functions that R does. The goal of dplyr is to provide a semantic rather than a literal translation: what you mean, rather than precisely what is done. In fact, even for functions that exist both in databases and R, you shouldn’t expect results to be identical; database programmers have different priorities than R core programmers. For example, in R in order to get a higher level of numerical accuracy, <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> loops through the data twice. R’s <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> also provides a <code>trim</code> option for computing trimmed means; this is something that databases do not provide.</p>

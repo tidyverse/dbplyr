@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate database connections — simulate_hive • dbplyr</title>
+<title>Backend: Redshift — backend-redshift • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,12 +49,11 @@
 
 
 
-<meta property="og:title" content="Simulate database connections — simulate_hive" />
-<meta property="og:description" content="These functions generate S3 objects that have been designed to simulate
-the action of a database connection, without actually having the database
-available. Obviously, this simulation can only be incomplete, but most
-importantly it allows us to simulate SQL generation for any database without
-actually connecting to it." />
+<meta property="og:title" content="Backend: Redshift — backend-redshift" />
+<meta property="og:description" content="Base translations come from PostgreSQL backend. There
+are generally few differences, apart from string manipulation.
+Use simulate_redshift() with lazy_frame() to see simulated SQL without
+converting to live access database." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -183,33 +182,36 @@ actually connecting to it." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulate database connections</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-hive.R'><code>R/backend-hive.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-impala.R'><code>R/backend-impala.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-mssql.R'><code>R/backend-mssql.R</code></a>, and 1 more</small>
-    <div class="hidden name"><code>simulate_dbi.Rd</code></div>
+    <h1>Backend: Redshift</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-redshift.R'><code>R/backend-redshift.R</code></a></small>
+    <div class="hidden name"><code>backend-redshift.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>These functions generate S3 objects that have been designed to simulate
-the action of a database connection, without actually having the database
-available. Obviously, this simulation can only be incomplete, but most
-importantly it allows us to simulate SQL generation for any database without
-actually connecting to it.</p>
+    <p>Base translations come from <a href='backend-postgres.html'>PostgreSQL backend</a>. There
+are generally few differences, apart from string manipulation.</p>
+<p>Use <code>simulate_redshift()</code> with <code><a href='tbl_lazy.html'>lazy_frame()</a></code> to see simulated SQL without
+converting to live access database.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_hive</span>()
-
-<span class='fu'>simulate_impala</span>()
-
-<span class='fu'>simulate_mssql</span>(version = <span class='st'>"15.0"</span>)
-
-<span class='fu'>simulate_dbi</span>(class = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(), <span class='kw'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>simulate_redshift</span>()</pre>
 
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Simulated SQL always quotes identifies with <code>`x`</code>, and strings with
-<code>'x'</code>.</p>
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts = <span class='fl'>FALSE</span>)
 
+<span class='kw'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span>(a = <span class='fl'>TRUE</span>, b = <span class='fl'>1</span>, c = <span class='fl'>2</span>, d = <span class='st'>"z"</span>, con = <span class='fu'>simulate_redshift</span>())
+<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='kw'>c</span>, <span class='st'>" times"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT `c` || ' ' || ' times' AS `x`
+#&gt; FROM `df`</div><div class='input'><span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/substr.html'>substr</a></span>(<span class='kw'>c</span>, <span class='fl'>2</span>, <span class='fl'>3</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT SUBSTRING(`c`, 2, 2) AS `x`
+#&gt; FROM `df`</div><div class='input'><span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'>str_replace_all</span>(<span class='kw'>c</span>, <span class='st'>"a"</span>, <span class='st'>"z"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT REGEXP_REPLACE(`c`, 'a', 'z') AS `x`
+#&gt; FROM `df`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create an sql translator — sql_substr • dbplyr</title>
+<title>Backend: SQL server — backend-mssql • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,11 +49,21 @@
 
 
 
-<meta property="og:title" content="Create an sql translator — sql_substr" />
-<meta property="og:description" content="When creating a package that maps to a new SQL based src, you'll often
-want to provide some additional mappings from common R commands to the
-commands that your tbl provides. These three functions make that
-easy." />
+<meta property="og:title" content="Backend: SQL server — backend-mssql" />
+<meta property="og:description" content="See vignette(&quot;translate-function&quot;) and vignette(&quot;translate-verb&quot;) for
+details of overall translation technology. Key differences for this backend
+are:
+SELECT uses TOP not LIMIT
+Automatically prefixes # to create temporary tables. Add the prefix
+yourself to avoid the message.
+String basics: paste(), substr(), nchar()
+Custom types for as.* functions
+Lubridate extraction functions, year(), month(), day() etc
+Semi-automated bit &amp;lt;-&amp;gt; boolean translation (see below)
+
+
+Use simulate_mssql() with lazy_frame() to see simulated SQL without
+converting to live access database." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -182,150 +192,87 @@ easy." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create an sql translator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-string.R'><code>R/translate-sql-string.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-paste.R'><code>R/translate-sql-paste.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql-helpers.R'><code>R/translate-sql-helpers.R</code></a>, and 2 more</small>
-    <div class="hidden name"><code>sql_variant.Rd</code></div>
+    <h1>Backend: SQL server</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-mssql.R'><code>R/backend-mssql.R</code></a></small>
+    <div class="hidden name"><code>backend-mssql.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>When creating a package that maps to a new SQL based src, you'll often
-want to provide some additional mappings from common R commands to the
-commands that your tbl provides. These three functions make that
-easy.</p>
+    <p>See <code>vignette("translate-function")</code> and <code>vignette("translate-verb")</code> for
+details of overall translation technology. Key differences for this backend
+are:</p><ul>
+<li><p><code>SELECT</code> uses <code>TOP</code> not <code>LIMIT</code></p></li>
+<li><p>Automatically prefixes <code>#</code> to create temporary tables. Add the prefix
+yourself to avoid the message.</p></li>
+<li><p>String basics: <code><a href='https://rdrr.io/r/base/paste.html'>paste()</a></code>, <code><a href='https://rdrr.io/r/base/substr.html'>substr()</a></code>, <code><a href='https://rdrr.io/r/base/nchar.html'>nchar()</a></code></p></li>
+<li><p>Custom types for <code>as.*</code> functions</p></li>
+<li><p>Lubridate extraction functions, <code>year()</code>, <code>month()</code>, <code>day()</code> etc</p></li>
+<li><p>Semi-automated bit &lt;-&gt; boolean translation (see below)</p></li>
+</ul>
+
+<p>Use <code><a href='simulate_hive.html'>simulate_mssql()</a></code> with <code><a href='tbl_lazy.html'>lazy_frame()</a></code> to see simulated SQL without
+converting to live access database.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sql_substr</span>(f = <span class='st'>"SUBSTR"</span>)
-
-<span class='fu'>sql_str_sub</span>(subset_f = <span class='st'>"SUBSTR"</span>, length_f = <span class='st'>"LENGTH"</span>)
-
-<span class='fu'>sql_paste</span>(<span class='kw'>default_sep</span>, f = <span class='st'>"CONCAT_WS"</span>)
-
-<span class='fu'>sql_paste_infix</span>(<span class='kw'>default_sep</span>, <span class='kw'>op</span>, <span class='kw'>cast</span>)
-
-<span class='fu'>sql_variant</span>(
-  scalar = <span class='fu'>sql_translator</span>(),
-  aggregate = <span class='fu'>sql_translator</span>(),
-  window = <span class='fu'>sql_translator</span>()
-)
-
-<span class='fu'>sql_translator</span>(<span class='kw'>...</span>, .funs = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), .parent = <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(parent = <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
-
-<span class='fu'>sql_infix</span>(<span class='kw'>f</span>, pad = <span class='fl'>TRUE</span>)
-
-<span class='fu'>sql_prefix</span>(<span class='kw'>f</span>, n = <span class='kw'>NULL</span>)
-
-<span class='fu'>sql_aggregate</span>(<span class='kw'>f</span>, f_r = <span class='kw'>f</span>)
-
-<span class='fu'>sql_aggregate_2</span>(<span class='kw'>f</span>)
-
-<span class='fu'>sql_aggregate_n</span>(<span class='kw'>f</span>, f_r = <span class='kw'>f</span>)
-
-<span class='fu'>sql_not_supported</span>(<span class='kw'>f</span>)
-
-<span class='fu'>sql_cast</span>(<span class='kw'>type</span>)
-
-<span class='fu'>sql_try_cast</span>(<span class='kw'>type</span>)
-
-<span class='fu'>sql_log</span>()
-
-<span class='fu'>sql_cot</span>()
-
-<span class='kw'>base_scalar</span>
-
-<span class='kw'>base_agg</span>
-
-<span class='kw'>base_win</span>
-
-<span class='kw'>base_no_win</span>
-
-<span class='kw'>base_odbc_scalar</span>
-
-<span class='kw'>base_odbc_agg</span>
-
-<span class='kw'>base_odbc_win</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>f</th>
-      <td><p>the name of the sql function as a string</p></td>
-    </tr>
-    <tr>
-      <th>scalar, aggregate, window</th>
-      <td><p>The three families of functions than an
-SQL variant can supply.</p></td>
-    </tr>
-    <tr>
-      <th>..., .funs</th>
-      <td><p>named functions, used to add custom converters from standard
-R functions to sql functions. Specify individually in <code>...</code>, or
-provide a list of <code>.funs</code></p></td>
-    </tr>
-    <tr>
-      <th>.parent</th>
-      <td><p>the sql variant that this variant should inherit from.
-Defaults to <code>base_agg</code> which provides a standard set of
-mappings for the most common operators and functions.</p></td>
-    </tr>
-    <tr>
-      <th>pad</th>
-      <td><p>If <code>TRUE</code>, the default, pad the infix operator with spaces.</p></td>
-    </tr>
-    <tr>
-      <th>n</th>
-      <td><p>for <code>sql_infix()</code>, an optional number of arguments to expect.
-Will signal error if not correct.</p></td>
-    </tr>
-    <tr>
-      <th>f_r</th>
-      <td><p>the name of the r function being translated as a string</p></td>
+      <th>version</th>
+      <td><p>Version of MS SQL to simulate. Currently only, difference is
+that 15.0 and above will use <code>TRY_CAST()</code> instead of <code>CAST()</code>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="helper-functions"><a class="anchor" href="#helper-functions"></a>Helper functions</h2>
+    <h2 class="hasAnchor" id="bit-vs-boolean"><a class="anchor" href="#bit-vs-boolean"></a>Bit vs boolean</h2>
 
     
 
+<p>SQL server uses two incompatible types to represent <code>TRUE</code> and <code>FALSE</code>
+values:</p><ul>
+<li><p>The <code>BOOLEAN</code> type is the result of logical comparisons (e.g. <code>x &gt; y</code>)
+and can be used <code>WHERE</code> but not to create new columns in <code>SELECT</code>.
+<a href='https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql'>https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql</a></p></li>
+<li><p>The <code>BIT</code> type is a special type of numeric column used to store
+<code>TRUE</code> and <code>FALSE</code> values, but can't be used in <code>WHERE</code> clauses.
+<a href='https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15'>https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15</a></p></li>
+</ul>
 
-<p><code>sql_infix()</code> and <code>sql_prefix()</code> create default SQL infix and prefix
-functions given the name of the SQL function. They don't perform any input
-checking, but do correctly escape their input, and are useful for
-quickly providing default wrappers for a new SQL variant.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+<p>dbplyr does its best to automatically create the correct type when needed,
+but can't do it 100% correctly because it does not have a full type
+inference system. This means that you many need to manually do conversions
+from time to time.</p><ul>
+<li><p>To convert from bit to boolean use <code>x == 1</code></p></li>
+<li><p>To convert from boolean to bit use <code>as.logical(if(x, 0, 1))</code></p></li>
+</ul>
 
-    <div class='dont-index'><p><code><a href='win_over.html'>win_over()</a></code> for helper functions for window functions.</p>
-<p><code><a href='sql.html'>sql()</a></code> for an example of a more customised sql
-conversion function.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># An example of adding some mappings for the statistical functions that</span>
-<span class='co'># postgresql provides: http://bit.ly/K5EdTn</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts = <span class='fl'>FALSE</span>)
 
-<span class='kw'>postgres_agg</span> <span class='op'>&lt;-</span> <span class='fu'>sql_translator</span>(.parent = <span class='kw'>base_agg</span>,
-  cor = <span class='fu'>sql_aggregate_2</span>(<span class='st'>"CORR"</span>),
-  cov = <span class='fu'>sql_aggregate_2</span>(<span class='st'>"COVAR_SAMP"</span>),
-  sd =  <span class='fu'>sql_aggregate</span>(<span class='st'>"STDDEV_SAMP"</span>, <span class='st'>"sd"</span>),
-  var = <span class='fu'>sql_aggregate</span>(<span class='st'>"VAR_SAMP"</span>, <span class='st'>"var"</span>)
-)
-
-<span class='co'># Next we have to simulate a connection that uses this variant</span>
-<span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span>(<span class='st'>"TestCon"</span>)
-<span class='kw'>sql_translate_env.TestCon</span> <span class='op'>&lt;-</span> <span class='fu'>function</span>(<span class='kw'>x</span>) {
-  <span class='fu'>sql_variant</span>(
-    <span class='kw'>base_scalar</span>,
-    <span class='kw'>postgres_agg</span>,
-    <span class='kw'>base_no_win</span>
-  )
-}
-
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/cor.html'>cor</a></span>(<span class='kw'>x</span>, <span class='kw'>y</span>), con = <span class='kw'>con</span>, window = <span class='fl'>FALSE</span>)
-</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='kw'>income</span> <span class='op'>/</span> <span class='kw'>years</span>), con = <span class='kw'>con</span>, window = <span class='fl'>FALSE</span>)
-</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
-<span class='co'># Any functions not explicitly listed in the converter will be translated</span>
-<span class='co'># to sql as is, so you don't need to convert all functions.</span>
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='kw'>y</span>, <span class='kw'>x</span>), con = <span class='kw'>con</span>)
-</div><div class='output co'>#&gt; &lt;SQL&gt; regr_intercept(`y`, `x`)</div></pre>
+<span class='kw'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span>(a = <span class='fl'>TRUE</span>, b = <span class='fl'>1</span>, c = <span class='fl'>2</span>, d = <span class='st'>"z"</span>, con = <span class='fu'><a href='simulate_hive.html'>simulate_mssql</a></span>())
+<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>()
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT TOP 6 *
+#&gt; FROM `df`</div><div class='input'><span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='kw'>b</span>, <span class='kw'>c</span>, <span class='kw'>d</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT `b` + ' ' + `c` + ' ' + `d` AS `x`
+#&gt; FROM `df`</div><div class='input'>
+<span class='co'># Can use boolean as is:</span>
+<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='kw'>c</span> <span class='op'>&gt;</span> <span class='kw'>d</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT *
+#&gt; FROM `df`
+#&gt; WHERE (`c` &gt; `d`)</div><div class='input'><span class='co'># Need to convert from boolean to bit:</span>
+<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='kw'>c</span> <span class='op'>&gt;</span> <span class='kw'>d</span>)
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT CAST(IIF(`c` &gt; `d`, 1, 0) AS BIT) AS `x`
+#&gt; FROM `df`</div><div class='input'><span class='co'># Can use boolean as is:</span>
+<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='kw'>c</span> <span class='op'>&gt;</span> <span class='kw'>d</span>, <span class='st'>"c"</span>, <span class='st'>"d"</span>))
+</div><div class='output co'>#&gt; &lt;SQL&gt;
+#&gt; SELECT IIF(`c` &gt; `d`, 'c', 'd') AS `x`
+#&gt; FROM `df`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

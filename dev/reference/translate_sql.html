@@ -298,7 +298,7 @@ from <code><a href='https://rdrr.io/r/stats/sd.html'>sd()</a></code> to the SQL 
 </div><div class='output co'>#&gt; &lt;SQL&gt; `x` = 1</div><div class='input'>
 <span class='co'># If you have an already quoted object, use translate_sql_:</span>
 <span class='kw'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span>(<span class='kw'>y</span> <span class='op'>+</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span>(<span class='kw'>t</span>))
-<span class='fu'>translate_sql_</span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>x</span>), con = <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>())
+<span class='fu'>translate_sql_</span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>x</span>), con = <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span>())
 </div><div class='output co'>#&gt; &lt;SQL&gt; `y` + 1.0 / SIN(`t`)</div><div class='input'>
 <span class='co'># Windowed translation --------------------------------------------</span>
 <span class='co'># Known window functions automatically get OVER()</span>

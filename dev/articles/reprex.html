@@ -201,11 +201,11 @@
 <div id="translating-verbs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#translating-verbs" class="anchor"></a>Translating verbs</h2>
-<p>Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it’s possible to generate SQL without a database using <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an <code>con</code> argument which takes a database “simulator” like <code><a href="../reference/simulate_dbi.html">simulate_postgres()</a></code>, <code><a href="../reference/simulate_dbi.html">simulate_sqlite()</a></code>, etc.</p>
+<p>Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it’s possible to generate SQL without a database using <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an <code>con</code> argument which takes a database “simulator” like <code><a href="../reference/backend-postgres.html">simulate_postgres()</a></code>, <code><a href="../reference/backend-sqlite.html">simulate_sqlite()</a></code>, etc.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="kw">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span>)
 
-<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_postgres</a></span>()) <span class="op">%&gt;%</span> 
+<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span>()) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">5</span>) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
 <span class="co">#&gt; &lt;SQL&gt;</span>
@@ -213,7 +213,7 @@
 <span class="co">#&gt; FROM `df`</span>
 <span class="co">#&gt; LIMIT 5</span>
 
-<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_mssql</a></span>()) <span class="op">%&gt;%</span> 
+<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/simulate_hive.html">simulate_mssql</a></span>()) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">5</span>) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
 <span class="co">#&gt; &lt;SQL&gt;</span>
@@ -227,9 +227,9 @@
 <a href="#translating-individual-expressions" class="anchor"></a>Translating individual expressions</h2>
 <p>In some cases, you might be able to track the problem down to incorrect translation for a single column expression. In that case, you can make your reprex even simpler with <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_postgres</a></span>())
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span>())
 <span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span>
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/simulate_dbi.html">simulate_sqlite</a></span>())
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/backend-sqlite.html">simulate_sqlite</a></span>())
 <span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span>
 </pre></div>
 </div>

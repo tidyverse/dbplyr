@@ -188,7 +188,7 @@ available database simulations." />
 
     <div class="ref-description">
     <p>These functions are useful for testing SQL generation without having to
-have an active database connection. See <code><a href='simulate_dbi.html'>simulate_dbi()</a></code> for a list
+have an active database connection. See <code><a href='simulate_hive.html'>simulate_dbi()</a></code> for a list
 available database simulations.</p>
     </div>
 
@@ -202,7 +202,7 @@ available database simulations.</p>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>)
 <span class='kw'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(x = <span class='fl'>1</span>, y = <span class='fl'>2</span>)
 
-<span class='kw'>df_sqlite</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_lazy</span>(<span class='kw'>df</span>, con = <span class='fu'><a href='simulate_dbi.html'>simulate_sqlite</a></span>())
+<span class='kw'>df_sqlite</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_lazy</span>(<span class='kw'>df</span>, con = <span class='fu'><a href='backend-sqlite.html'>simulate_sqlite</a></span>())
 <span class='kw'>df_sqlite</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='kw'>x</span>, na.rm = <span class='fl'>TRUE</span>)) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT STDEV(`x`) AS `x`

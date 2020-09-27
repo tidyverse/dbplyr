@@ -7,6 +7,39 @@
     <loc>https://dbplyr.tidyverse.org/reference/arrange.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-access.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-hive.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-impala.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-mssql.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-mysql.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-odbc.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-oracle.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-postgres.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-redshift.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-sqlite.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-teradata.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/build_sql.html</loc>
   </url>
   <url>

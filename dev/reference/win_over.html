@@ -247,7 +247,7 @@ the grouping and order context set up by <code><a href='https://dplyr.tidyverse.
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>()
+    <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span>()
 
 <span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), con = <span class='kw'>con</span>)
 </div><div class='output co'>#&gt; &lt;SQL&gt; avg(x) OVER ()</div><div class='input'><span class='fu'>win_over</span>(<span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"avg(x)"</span>), <span class='st'>"y"</span>, con = <span class='kw'>con</span>)
