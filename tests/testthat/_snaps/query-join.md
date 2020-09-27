@@ -69,6 +69,32 @@
       ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       
 
+# only disambiguates shared variables
+
+    Code
+      left_join(lf1, lf2)
+    Message <message>
+      Joining, by = "x"
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x`, `y`, `z`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+      ON (`LHS`.`x` = `RHS`.`x`)
+      
+
+---
+
+    Code
+      left_join(lf1, lf2, by = c(y = "z"))
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+      ON (`LHS`.`y` = `RHS`.`z`)
+      
+
 # sql_on query doesn't change unexpectedly
 
     Code
