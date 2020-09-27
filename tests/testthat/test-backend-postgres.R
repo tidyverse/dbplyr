@@ -51,11 +51,21 @@ test_that("postgres mimics two argument log", {
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_postgres())
 
-  expect_equal(translate_sql(yday(x)),                      sql("EXTRACT(DOY FROM `x`)"))
-  expect_equal(translate_sql(quarter(x)),                   sql("EXTRACT(QUARTER FROM `x`)"))
+  expect_equal(translate_sql(yday(x)), sql("EXTRACT(DOY FROM `x`)"))
+  expect_equal(translate_sql(quarter(x)), sql("EXTRACT(QUARTER FROM `x`)"))
   expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
-
   expect_error(translate_sql(quarter(x, fiscal_start = 2)))
+
+  expect_equal(translate_sql(seconds(x)), sql("CAST('`x` seconds' AS INTERVAL)"))
+  expect_equal(translate_sql(minutes(x)), sql("CAST('`x` minutes' AS INTERVAL)"))
+  expect_equal(translate_sql(hours(x)),   sql("CAST('`x` hours' AS INTERVAL)"))
+  expect_equal(translate_sql(days(x)),    sql("CAST('`x` days' AS INTERVAL)"))
+  expect_equal(translate_sql(weeks(x)),   sql("CAST('`x` weeks' AS INTERVAL)"))
+  expect_equal(translate_sql(months(x)),  sql("CAST('`x` months' AS INTERVAL)"))
+  expect_equal(translate_sql(years(x)),   sql("CAST('`x` years' AS INTERVAL)"))
+
+  expect_equal(translate_sql(floor_date(x, 'month')),       sql("DATE_TRUNC('month', `x`)"))
+  expect_equal(translate_sql(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
 })
 
 test_that("custom SQL translation", {
