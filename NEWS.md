@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Date-time escaping methods for Athena and Presto have moved to the packages
+  where they belong.
+
 * Join SQL now only uses aliases where needed to disambiguate columns;
   this should make generated queries more readable.
 
