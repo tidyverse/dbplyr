@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* PostgreSQL: new translations for lubridate period functions `years()`,
+  `months()`, `days()`, and `floor_date()` (@bkkkk, #333).
+
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.
 

@@ -124,6 +124,22 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
       },
+      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        if (!label) {
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          sql_expr(EXTRACT("dow" %FROM% DATE(!!x) + !!offset) + 1)
+        } else if (label && !abbr) {
+          sql_expr(TO_CHAR(!!x, "Day"))
+        } else if (label && abbr) {
+          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
+        } else {
+          stop("Unrecognized arguments to `wday`", call. = FALSE)
+        }
+      },
+      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
+
+      # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
       seconds = function(x) {
         interval <- paste(x, "seconds")
         sql_expr(CAST(!!interval %AS% INTERVAL))
@@ -152,36 +168,13 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
         interval <- paste(x, "years")
         sql_expr(CAST(!!interval %AS% INTERVAL))
       },
-      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
-        if (!label) {
-          week_start <- week_start %||% getOption("lubridate.week.start", 7)
-          offset <- as.integer(7 - week_start)
-          sql_expr(EXTRACT("dow" %FROM% DATE(!!x) + !!offset) + 1)
-        } else if (label && !abbr) {
-          sql_expr(TO_CHAR(!!x, "Day"))
-        } else if (label && abbr) {
-          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
-        } else {
-          stop("Unrecognized arguments to `wday`", call. = FALSE)
-        }
-      },
-      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
-      floor_date = function(x, unit = "seconds", week_start = NULL) {
-        supported_intervals <- c("second", "minute", "hour", "day", "week",
-                                 "month", "quarter", "year")
 
-        if (!unit %in% supported_intervals) {
-          stop(paste("Error: Invalid period name:", unit))
-        }
-
-        if (unit == "week" & !is.null(week_start)) {
-          week_start <- week_start %||% getOption("lubridate.week.start", 7)
-          offset <- as.integer(7 - week_start + 1)
-          interval <- paste(offset, "days")
-          sql_expr(DATE(DATE_TRUNC(!!unit, !!x + CAST(!!interval %AS% INTERVAL))) - CAST(!!interval %AS% INTERVAL))
-        } else {
-          sql_expr(DATE_TRUNC(!!unit, !!x))
-        }
+      # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+      floor_date = function(x, unit = "seconds") {
+        unit <- arg_match(unit,
+          c("second", "minute", "hour", "day", "week", "month", "quarter", "year")
+        )
+        sql_expr(DATE_TRUNC(!!unit, !!x))
       },
     ),
     sql_translator(.parent = base_agg,
