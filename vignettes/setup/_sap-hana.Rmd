@@ -1,4 +1,4 @@
-# Setting up SAP HANA
+# SAP HANA
 
 ## Sign up for free cloud trial
 

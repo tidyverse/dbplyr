@@ -1,9 +1,4 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{MySQL setup}
--->
-
-# Setting up MariaDB
+# MariaDB
 
 ## Install
 

@@ -1,9 +1,4 @@
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{PostgreSQL setup}
--->
-
-# Setting up PostgreSQL
+# PostgreSQL
 
 ## Install
 
