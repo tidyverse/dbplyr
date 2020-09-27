@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Experimental new SAP HANA backend (#233).
+
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.
 
