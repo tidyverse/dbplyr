@@ -60,15 +60,24 @@ sql_translate_env.Oracle <- function(con) {
 
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
+      # https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/date-and-time-functions.html#function_date
+      as.Date = function(x) sql_expr(DATE(!!x)),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
       as.integer64  = sql_cast("NUMBER(19)"),
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER"),
+
+
+      # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+
+      # lubridate --------------------------------------------------------------
+      today = function() sql_expr(SYSDATE),
+      now = function() sql_expr(CURRENT_TIMESTAMP)
     ),
     base_odbc_agg,
     base_odbc_win
@@ -133,3 +142,5 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
+
+globalVariables(c("DATE", "SYSDATE", "CURRENT_TIMESTAMP"))

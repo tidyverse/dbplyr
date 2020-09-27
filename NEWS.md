@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Oracle: gains translations for `today()` and `now()`, and
+  improved `as.Date()` translation (@rlh1994, #267).
+
 * PostgreSQL: new translations for lubridate period functions `years()`,
   `months()`, `days()`, and `floor_date()` (@bkkkk, #333).
 
