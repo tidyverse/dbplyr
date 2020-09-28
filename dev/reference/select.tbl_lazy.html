@@ -51,7 +51,9 @@
 
 <meta property="og:title" content="Subset, rename, and reorder columns using their names — select.tbl_lazy" />
 <meta property="og:description" content="These are methods for the dplyr select(), rename(), and relocate()
-generics. They generate the SELECT clause of the SQL query." />
+generics. They generate the SELECT clause of the SQL query.
+These functions do not support predicate functions, i.e. you can
+not use where(is.numeric) to select all numeric variables." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -188,6 +190,8 @@ generics. They generate the SELECT clause of the SQL query." />
     <div class="ref-description">
     <p>These are methods for the dplyr <code><a href='https://dplyr.tidyverse.org/reference/select.html'>select()</a></code>, <code><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename()</a></code>, and <code><a href='https://dplyr.tidyverse.org/reference/relocate.html'>relocate()</a></code>
 generics. They generate the <code>SELECT</code> clause of the SQL query.</p>
+<p>These functions do not support predicate functions, i.e. you can
+not use <code>where(is.numeric)</code> to select all numeric variables.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
@@ -195,6 +199,9 @@ generics. They generate the <code>SELECT</code> clause of the SQL query.</p>
 
 <span class='co'># S3 method for tbl_lazy</span>
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span>(<span class='kw'>.data</span>, <span class='kw'>...</span>)
+
+<span class='co'># S3 method for tbl_lazy</span>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename_with</a></span>(<span class='kw'>.data</span>, <span class='kw'>.fn</span>, .cols = <span class='fu'><a href='https://tidyselect.r-lib.org/reference/everything.html'>everything</a></span>(), <span class='kw'>...</span>)
 
 <span class='co'># S3 method for tbl_lazy</span>
 <span class='fu'><a href='https://dplyr.tidyverse.org/reference/relocate.html'>relocate</a></span>(<span class='kw'>.data</span>, <span class='kw'>...</span>, .before = <span class='kw'>NULL</span>, .after = <span class='kw'>NULL</span>)</pre>
@@ -210,6 +217,16 @@ generics. They generate the <code>SELECT</code> clause of the SQL query.</p>
       <th>...</th>
       <td><p>&lt;<code><a href='https://dplyr.tidyverse.org/reference/dplyr_data_masking.html'>data-masking</a></code>&gt; Variables, or functions or
 variables. Use <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc()</a></code> to sort a variable in descending order.</p></td>
+    </tr>
+    <tr>
+      <th>.fn</th>
+      <td><p>A function used to transform the selected <code>.cols</code>. Should
+return a character vector the same length as the input.</p></td>
+    </tr>
+    <tr>
+      <th>.cols</th>
+      <td><p>&lt;<code><a href='https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html'>tidy-select</a></code>&gt; Columns to rename;
+defaults to all columns.</p></td>
     </tr>
     <tr>
       <th>.before</th>
