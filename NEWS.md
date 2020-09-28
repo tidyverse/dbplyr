@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* `select()` and `rename()` support dplyr 1.0.0 select syntax (apart from
+  predicate functions which can't easily work on computed queries) (#502).
+  
+* `rename_with()` makes it easy to rename columns programmatically (#502).
+
 * Attempting to embed a Shiny reactive in a query now gives a helpful error
   (#439).
 
