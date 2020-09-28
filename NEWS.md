@@ -1,45 +1,31 @@
 # dbplyr (development version)
 
-* `across()` now translated into individual SQL statements (#480).
+## dplyr 1.0.0
 
-* Experimental new SAP HANA backend (#233). Requires the latest
-  version of odbc.
+* `across()` now translated into individual SQL statements (#480).
 
 * `select()` and `rename()` support dplyr 1.0.0 select syntax (apart from
   predicate functions which can't easily work on computed queries) (#502).
+
+* Now supports `relocate()` from dplyr 1.0.0 (#494).
   
 * `rename_with()` makes it easy to rename columns programmatically (#502).
 
-* Attempting to embed a Shiny reactive in a query now gives a helpful error
-  (#439).
+* `slice_min()`, `slice_max()`, and `slice_order()` are now supported.
+  `slice_head()` and `slice_tail()` throw clear error messages (#394)
 
-* Oracle: gains translations for `today()` and `now()`, and
-  improved `as.Date()` translation (@rlh1994, #267).
-
-* PostgreSQL: new translations for lubridate period functions `years()`,
-  `months()`, `days()`, and `floor_date()` (@bkkkk, #333).
+## SQL generation
 
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.
-
-* Date-time escaping methods for Athena and Presto have moved to the packages
-  where they belong.
-
-* Join SQL now only uses aliases where needed to disambiguate columns;
-  this should make generated queries more readable.
 
 * `_join()` function gains `na_matches` argument that allows you to control 
   whether or not `NA` values match other `NA` values. The default is `"never"`,
   which is the usual database behaviour but you can change to `"na"` to switch
   to R's usual behaviour (#180).
-
-* New `sql_expr_matches()` generic that allows database to select more
-  efficient alternatives when determine if two values "match" (i.e. like
-  equality but also matching `NULL`s). For more details, see
-  <https://modern-sql.com/feature/is-distinct-from>
-
-* Oracle translation now depends on Oracle 12c, and uses a "row-limiting" 
-  clause for `head()`.
+  
+    SQL in joins now only uses aliases where needed to disambiguate columns;
+    this should make generated queries more readable.
 
 * `sql_optimise()` now can partially optimise a pipeline; due to an unfortunate
   bug it previously gave up too easily.
@@ -50,52 +36,29 @@
   call later in the pipeline (#276). (There's one exception: `ORDER BY`
   is still generated if `LIMIT` is present.)
 
-* `slice_min()`, `slice_max()`, and `slice_order()` are now supported.
-  `slice_head()` and `slice_tail()` throw clear error messages (#394)
-
-* `window_order()` overrides ordering, rather than appending to it.
-
-* Now supports `relocate()` from dplyr 1.0.0 (#494).
-
-* `sql_escape_ident()` and `sql_escape_string()` generics from dbplyr are no
-  longer used; these methods should now be supplied for
-  `DBI::dbQuoteIdentifier()` and `DBI::dbQuoteString()` respectively.
-
-* `transmute()` now correctly tracks variables it needs when creating
-  subqueries (#313).
-
-* New `sql_join_suffix()` allows backends to control the default suffixes used   (#254).
-
-* `distinct()` no longer duplicates column if grouped (#354).
-
-* `mutate()` grouping variables no longer generates a downstream error (#396)
-
-* `mutate()` correctly generates subqueries when you re-use the same variable
-  three or more times (#412).
-
 * Each individual element of `in_schema()` is now correctly quoted (#287). 
   (use `sql()` to opt out of quoting, if needed). And `DBI::Id()` should work
   anywhere that `in_schema()` does.
 
-* Can now `copy_to()` can now `overwrite` when table is specified with schema 
-  (#489).
+* Subquery names are now scoped within the query. This means that query text 
+  should now be deterministic which helps some query optimisers/cachers (#336).
 
-*   A number of `db_*` generics have been replaced with SQL generation generics:
+## SQL translation
 
-    * `db_analyze()` -> `sql_table_analyze()`
-    * `db_create_index()` -> `sql_index_create()`
-    * `db_explain()` -> `sql_queriy_explain()` 
-    * `db_query_fields()` -> `sql_query_fields()`
-    * `db_query_rows()` -> `sql_query_rows()`
-  
-    This makes them easier to test and is an important part of the process of
-    moving all database generics in dbplyr (#284).
-  
-* A number of `db_*` generics are no longer used: `db_create_indexes()`,
-  `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,
-  `drop_drop_table()`, `db_has_table()`, `db_create_table()`, 
-  `db_data_types()`. These were only used for data insertion, and that now all 
-  happens via `dbWriteTable()`.
+* Experimental new SAP HANA backend (#233). Requires the latest
+  version of odbc.
+
+* Oracle: gains translations for `today()` and `now()`, and
+  improved `as.Date()` translation (@rlh1994, #267).
+
+* PostgreSQL: new translations for lubridate period functions `years()`,
+  `months()`, `days()`, and `floor_date()` (@bkkkk, #333).
+
+* Date-time escaping methods for Athena and Presto have moved to the packages
+  where they belong.
+
+* Oracle translation now depends on Oracle 12c, and uses a "row-limiting" 
+  clause for `head()`.
 
 * MySQL uses standard SQL for index creation.
 
@@ -103,11 +66,19 @@
   (#377, #318). `if` and `ifelse` once again generate `IIF`, creating
   simpler expressions.
 
-* `copy_to()` gains an `in_transaction` argument so you can optionally 
-  suppress the transaction wrapper (#368).
+* The default translation for `n()` is now `count(*)` (#343). 
 
-* The join functions now error when additional arguments are provided
-  (instead of silently swallowing them!) (#382).
+* odbc no longer translates `count()`.
+
+* `sub_str()` translation is more consistent in edge cases (@ianmcook).
+
+* Postgres: New translations for stringr functions: `str_squish()`, 
+  `str_remove()`, `str_remove_all()` (@shosaco).
+
+* `median()` now takes a new argument `na.rm` for consistency with `mean()`,
+  but still does always remove any missing values (@lorenzwalthert, #483).
+
+* [blob](https://blob.tidyverse.org/) vectors can now be used with `!!` and `!!!` operators, for example in `filter()` (@okhoma, #433)
 
 * `substring()` is now translated the same way as `substr()` (#378).
 
@@ -140,30 +111,67 @@
 
 * SQLite gets correct translation for `median()` (#357).
 
+## Extensibility
+
+* New `sql_expr_matches()` generic that allows database to select more
+  efficient alternatives when determine if two values "match" (i.e. like
+  equality but also matching `NULL`s). For more details, see
+  <https://modern-sql.com/feature/is-distinct-from>
+
+* `sql_escape_ident()` and `sql_escape_string()` generics from dbplyr are no
+  longer used; these methods should now be supplied for
+  `DBI::dbQuoteIdentifier()` and `DBI::dbQuoteString()` respectively.
+
+*   A number of `db_*` generics have been replaced with SQL generation generics:
+
+    * `db_analyze()` -> `sql_table_analyze()`
+    * `db_create_index()` -> `sql_index_create()`
+    * `db_explain()` -> `sql_queriy_explain()` 
+    * `db_query_fields()` -> `sql_query_fields()`
+    * `db_query_rows()` -> `sql_query_rows()`
+  
+    This makes them easier to test and is an important part of the process of
+    moving all database generics in dbplyr (#284).
+  
+* A number of `db_*` generics are no longer used: `db_create_indexes()`,
+  `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`,
+  `drop_drop_table()`, `db_has_table()`, `db_create_table()`, 
+  `db_data_types()`. These were only used for data insertion, and that now all 
+  happens via `dbWriteTable()`.
+
+## Minor improvements and bug fixes
+
+* Attempting to embed a Shiny reactive in a query now gives a helpful error
+  (#439).
+
+* `window_order()` overrides ordering, rather than appending to it.
+
+* `transmute()` now correctly tracks variables it needs when creating
+  subqueries (#313).
+
+* New `sql_join_suffix()` allows backends to control the default suffixes used   (#254).
+
+* `distinct()` no longer duplicates column if grouped (#354).
+
+* `mutate()` grouping variables no longer generates a downstream error (#396)
+
+* `mutate()` correctly generates subqueries when you re-use the same variable
+  three or more times (#412).
+
+* Can now `copy_to()` can now `overwrite` when table is specified with schema 
+  (#489).
+
+* `copy_to()` gains an `in_transaction` argument so you can optionally 
+  suppress the transaction wrapper (#368).
+
+* The join functions now error when additional arguments are provided
+  (instead of silently swallowing them!) (#382).
+
 * `copy_lahman()` and `copy_nycflights13()` (and hence `nycflights13_sqlite()`)
   and friends now return DBI connections rather than the now deprecated 
   `src_dbi()` (#440).
 
-* `db_drop_table()` now works for Oracle (#353).
-
-* The default translation for `n()` is now `count(*)` (#343). 
-
-* odbc no longer translates `count()`.
-
-* Subquery names are now scoped within the query. This means that query text 
-  should now be deterministic which helps some query optimisers/cachers (#336).
-
-* `sub_str()` translation is more consistent in edge cases (@ianmcook).
-
-* Postgres: New translations for stringr functions: `str_squish()`, 
-  `str_remove()`, `str_remove_all()` (@shosaco).
-
 * All old lazy eval shims have been removed. 
-
-* `median()` now takes a new argument `na.rm` for consistency with `mean()`,
-  but still does always remove any missing values (@lorenzwalthert, #483).
-
-* [blob](https://blob.tidyverse.org/) vectors can now be used with `!!` and `!!!` operators, for example in `filter()` (@okhoma, #433)
 
 # dbplyr 1.4.4
 
