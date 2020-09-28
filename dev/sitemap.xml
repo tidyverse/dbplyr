@@ -10,6 +10,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/backend-access.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-hana.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/backend-hive.html</loc>
   </url>
   <url>
