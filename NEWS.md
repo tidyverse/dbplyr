@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Experimental new SAP HANA backend (#233). Requires the latest
+  version of odbc.
+
 * `select()` and `rename()` support dplyr 1.0.0 select syntax (apart from
   predicate functions which can't easily work on computed queries) (#502).
   

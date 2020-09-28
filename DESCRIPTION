@@ -71,6 +71,7 @@ Collate:
     'translate-sql-conditional.R'
     'backend-.R'
     'backend-access.R'
+    'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
     'backend-mssql.R'

@@ -8,6 +8,7 @@
 * Then follow <https://saphanajourney.com/hana-cloud/learning-article/how-to-create-your-trial-sap-hana-cloud-instance/>
 * Allow access from all IP addresses.
 * Need to restart service every day; it's automatically stopped each night.
+* Need to create `test` database using database explorer
 
 ## Install drivers
 
@@ -35,10 +36,13 @@ odbc::odbcListDrivers()
 
 ```{r, eval = FALSE}
 con <- DBI::dbConnect(odbc::odbc(),
-  driver = "OSAP HANA",
-  database = "test",
-  uid = "SA",
+  driver = "SAP HANA",
+  uid = "DBADMIN",
   pwd = "Password12",
-  servernode = "localhost"
+  servernode = "a9441502-7166-4a5a-b5d8-23abe3b5009c.hana.trial-us10.hanacloud.ondemand.com:443",
+  encrypt="true",
+  sslValidateCertificate = "false"
 )
+class(con)
+#> [1] "HDB"
 ```
