@@ -186,35 +186,71 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
+<p>(Will become dbplyr 2.0.0)</p>
+<div id="dplyr-100-compatibility" class="section level2">
+<h2 class="hasAnchor">
+<a href="#dplyr-100-compatibility" class="anchor"></a>dplyr 1.0.0 compatibility</h2>
 <ul>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> now translated into individual SQL statements (<a href='https://github.com/tidyverse/dbplyr/issues/480'>#480</a>).</p></li>
-<li><p>Experimental new SAP HANA backend (<a href='https://github.com/tidyverse/dbplyr/issues/233'>#233</a>). Requires the latest version of odbc.</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/rename.html">rename()</a></code> support dplyr 1.0.0 select syntax (apart from predicate functions which can’t easily work on computed queries) (<a href='https://github.com/tidyverse/dbplyr/issues/502'>#502</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/rename.html">rename_with()</a></code> makes it easy to rename columns programmatically (<a href='https://github.com/tidyverse/dbplyr/issues/502'>#502</a>).</p></li>
-<li><p>Attempting to embed a Shiny reactive in a query now gives a helpful error (<a href='https://github.com/tidyverse/dbplyr/issues/439'>#439</a>).</p></li>
-<li><p>Oracle: gains translations for <code>today()</code> and <code>now()</code>, and improved <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> translation (<a href='https://github.com/rlh1994'>@rlh1994</a>, <a href='https://github.com/tidyverse/dbplyr/issues/267'>#267</a>).</p></li>
-<li><p>PostgreSQL: new translations for lubridate period functions <code>years()</code>, <code><a href="https://rdrr.io/r/base/weekday.POSIXt.html">months()</a></code>, <code>days()</code>, and <code>floor_date()</code> (<a href='https://github.com/bkkkk'>@bkkkk</a>, <a href='https://github.com/tidyverse/dbplyr/issues/333'>#333</a>).</p></li>
-<li><p>Documentation has been radically improved with new topics for each major verb and each backend giving more details about the SQL translation.</p></li>
-<li><p>Date-time escaping methods for Athena and Presto have moved to the packages where they belong.</p></li>
-<li><p>Join SQL now only uses aliases where needed to disambiguate columns; this should make generated queries more readable.</p></li>
-<li><p><code>_join()</code> function gains <code>na_matches</code> argument that allows you to control whether or not <code>NA</code> values match other <code>NA</code> values. The default is <code>"never"</code>, which is the usual database behaviour but you can change to <code>"na"</code> to switch to R’s usual behaviour (<a href='https://github.com/tidyverse/dbplyr/issues/180'>#180</a>).</p></li>
-<li><p>New <code><a href="../reference/db_sql.html">sql_expr_matches()</a></code> generic that allows database to select more efficient alternatives when determine if two values “match” (i.e. like equality but also matching <code>NULL</code>s). For more details, see <a href="https://modern-sql.com/feature/is-distinct-from" class="uri">https://modern-sql.com/feature/is-distinct-from</a></p></li>
-<li><p>Oracle translation now depends on Oracle 12c, and uses a “row-limiting” clause for <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>.</p></li>
-<li><p><code><a href="../reference/join_query.html">sql_optimise()</a></code> now can partially optimise a pipeline; due to an unfortunate bug it previously gave up too easily.</p></li>
-<li><p>dbplyr no longer creates an <code>ORDER</code> BY clause in subqueries. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present.)</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html">across()</a></code> is now translated into individual SQL statements (<a href='https://github.com/tidyverse/dbplyr/issues/480'>#480</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/rename.html">rename()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> support dplyr 1.0.0 tidyselect syntax (apart from predicate functions which can’t easily work on computed queries) (<a href='https://github.com/tidyverse/dbplyr/issues/502'>#502</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/relocate.html">relocate()</a></code> makes it easy to move columns (<a href='https://github.com/tidyverse/dbplyr/issues/494'>#494</a>) and <code><a href="https://dplyr.tidyverse.org/reference/rename.html">rename_with()</a></code> makes it easy to rename columns programmatically (<a href='https://github.com/tidyverse/dbplyr/issues/502'>#502</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_min()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max()</a></code>, and <code>slice_order()</code> are now supported. <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_head()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_tail()</a></code> throw clear error messages (<a href='https://github.com/tidyverse/dbplyr/issues/394'>#394</a>)</p></li>
-<li><p><code><a href="../reference/window_order.html">window_order()</a></code> overrides ordering, rather than appending to it.</p></li>
-<li><p>Now supports <code><a href="https://dplyr.tidyverse.org/reference/relocate.html">relocate()</a></code> from dplyr 1.0.0 (<a href='https://github.com/tidyverse/dbplyr/issues/494'>#494</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code> generics from dbplyr are no longer used; these methods should now be supplied for <code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteString.html">DBI::dbQuoteString()</a></code> respectively.</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute()</a></code> now correctly tracks variables it needs when creating subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/313'>#313</a>).</p></li>
-<li><p>New <code><a href="../reference/db_sql.html">sql_join_suffix()</a></code> allows backends to control the default suffixes used (<a href='https://github.com/tidyverse/dbplyr/issues/254'>#254</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct()</a></code> no longer duplicates column if grouped (<a href='https://github.com/tidyverse/dbplyr/issues/354'>#354</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> grouping variables no longer generates a downstream error (<a href='https://github.com/tidyverse/dbplyr/issues/396'>#396</a>)</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> correctly generates subqueries when you re-use the same variable three or more times (<a href='https://github.com/tidyverse/dbplyr/issues/412'>#412</a>).</p></li>
-<li><p>Each individual element of <code><a href="../reference/in_schema.html">in_schema()</a></code> is now correctly quoted (<a href='https://github.com/tidyverse/dbplyr/issues/287'>#287</a>). (use <code><a href="../reference/sql.html">sql()</a></code> to opt out of quoting, if needed). And <code><a href="https://dbi.r-dbi.org/reference/Id.html">DBI::Id()</a></code> should work anywhere that <code><a href="../reference/in_schema.html">in_schema()</a></code> does.</p></li>
-<li><p>Can now <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> can now <code>overwrite</code> when table is specified with schema (<a href='https://github.com/tidyverse/dbplyr/issues/489'>#489</a>).</p></li>
+</ul>
+</div>
+<div id="sql-generation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#sql-generation" class="anchor"></a>SQL generation</h2>
+<ul>
+<li><p>Documentation has been radically improved with new topics for each major verb and each backend giving more details about the SQL translation.</p></li>
+<li><p>Join functions gains a <code>na_matches</code> argument that allows you to control whether or not <code>NA</code> (<code>NULL</code>) values match other <code>NA</code> values. The default is <code>"never"</code>, which is the usual behaviour in databases. You can set <code>na_matches = "na"</code> to match R’s usual join behaviour (<a href='https://github.com/tidyverse/dbplyr/issues/180'>#180</a>). Additional arguments error (instead of being silently swallowed) (<a href='https://github.com/tidyverse/dbplyr/issues/382'>#382</a>).</p></li>
+<li><p>Joins now only use aliases where needed to disambiguate columns; this should make generated queries more readable.</p></li>
+<li><p>Subqueries no longer include an <code>ORDER BY</code> clause. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present; this tends to affect the returns rows but not necessarily their order).</p></li>
+<li><p>Subquery names are now scoped within the query. This makes query text deterministic which helps some query optimisers/cachers (<a href='https://github.com/tidyverse/dbplyr/issues/336'>#336</a>).</p></li>
+<li><p><code><a href="../reference/join_query.html">sql_optimise()</a></code> now can partially optimise a pipeline; due to an unfortunate bug it previously gave up too easily.</p></li>
+<li><p><code><a href="../reference/in_schema.html">in_schema()</a></code> quotes each input individually (<a href='https://github.com/tidyverse/dbplyr/issues/287'>#287</a>) (use <code><a href="../reference/sql.html">sql()</a></code> to opt out of quoting, if needed). And <code><a href="https://dbi.r-dbi.org/reference/Id.html">DBI::Id()</a></code> should work anywhere that <code><a href="../reference/in_schema.html">in_schema()</a></code> does.</p></li>
+</ul>
+</div>
+<div id="sql-translation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#sql-translation" class="anchor"></a>SQL translation</h2>
+<ul>
+<li><p>Experimental new SAP HANA backend (<a href='https://github.com/tidyverse/dbplyr/issues/233'>#233</a>). Requires the latest version of odbc.</p></li>
 <li>
-<p>A number of <code>db_*</code> generics have been replaced with SQL generation generics:</p>
+<p>All backends:</p>
+<ul>
+<li><p>You can now use <code><a href="https://rdrr.io/r/base/ns-dblcolon.html">::</a></code> in translations, so that (e.g.) <code><a href="https://dplyr.tidyverse.org/reference/context.html">dbplyr::n()</a></code> is translated to <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/207'>#207</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> now generates a clear error message; previously it was translated to <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code> which is not correct (<a href='https://github.com/tidyverse/dbplyr/issues/108'>#108</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/context.html">n()</a></code> is translated to <code>count(*)</code> instead of <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/343'>#343</a>).</p></li>
+<li><p><code>sub_str()</code> translation is more consistent in edge cases (<a href='https://github.com/ianmcook'>@ianmcook</a>).</p></li>
+<li><p>All <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> (<a href='https://github.com/lorenzwalthert'>@lorenzwalthert</a>, <a href='https://github.com/tidyverse/dbplyr/issues/483'>#483</a>), <code><a href="https://rdrr.io/r/base/Extremes.html">pmin()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html">pmax()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/479'>#479</a>), <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> and <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code> functions have an <code>na.rm</code> argument that warns once when not <code>TRUE</code>. This makes them consistent with <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and <code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>.</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/substr.html">substring()</a></code> is now translated the same way as <code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/378'>#378</a>).</p></li>
+</ul>
+</li>
+<li><p><a href="https://blob.tidyverse.org/">blob</a> vectors can now be used with <code>!!</code> and <code>!!!</code> operators, for example in <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> (<a href='https://github.com/okhoma'>@okhoma</a>, <a href='https://github.com/tidyverse/dbplyr/issues/433'>#433</a>)</p></li>
+<li><p>MySQL uses standard SQL for index creation.</p></li>
+<li><p>MS SQL translation does better a distinguishing between bit and boolean (<a href='https://github.com/tidyverse/dbplyr/issues/377'>#377</a>, <a href='https://github.com/tidyverse/dbplyr/issues/318'>#318</a>). <code>if</code> and <code>ifelse</code> once again generate <code>IIF</code>, creating simpler expressions. <code>as.*()</code> function uses <code>TRY_CAST()</code> instead of <code>CAST()</code> for version 11+ (2012+) (<a href='https://github.com/DavidPatShuiFong'>@DavidPatShuiFong</a>, <a href='https://github.com/tidyverse/dbplyr/issues/380'>#380</a>).</p></li>
+<li><p>odbc no longer translates <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code>; this was an accidental inclusion.</p></li>
+<li><p>Oracle translation now depends on Oracle 12c, and uses a “row-limiting” clause for <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>. It gains translations for <code>today()</code> and <code>now()</code>, and improved <code><a href="https://rdrr.io/r/base/as.Date.html">as.Date()</a></code> translation (<a href='https://github.com/rlh1994'>@rlh1994</a>, <a href='https://github.com/tidyverse/dbplyr/issues/267'>#267</a>).</p></li>
+<li><p>PostgreSQL: new translations for lubridate period functions <code>years()</code>, <code><a href="https://rdrr.io/r/base/weekday.POSIXt.html">months()</a></code>, <code>days()</code>, and <code>floor_date()</code> (<a href='https://github.com/bkkkk'>@bkkkk</a>, <a href='https://github.com/tidyverse/dbplyr/issues/333'>#333</a>) and stringr functions <code>str_squish()</code>, <code>str_remove()</code>, and <code>str_remove_all()</code> (<a href='https://github.com/shosaco'>@shosaco</a>).</p></li>
+<li>
+<p>New RedShift translations when used with <code><a href="https://rpostgres.r-dbi.org/reference/Redshift.html">RPostgres::Redshift()</a></code>.</p>
+<ul>
+<li><p><code>str_replace()</code> errors since there’s no Redshift translation, and <code>str_replace_all()</code> uses <code>REGEXP_REPLACE()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/446'>#446</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html">paste0()</a></code> use <code><a href="https://rdrr.io/r/base/Logic.html">||</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/458'>#458</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> and <code><a href="https://rdrr.io/r/base/double.html">as.double()</a></code> cast to <code>FLOAT</code> (<a href='https://github.com/tidyverse/dbplyr/issues/408'>#408</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> and <code>str_sub()</code> use <code>SUBSTRING()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/327'>#327</a>).</p></li>
+</ul>
+</li>
+<li><p>SQLite gains translations for lubridate functions <code>today()</code>, <code>now()</code>, <code>year()</code>, <code>month()</code>, <code>day()</code>, <code>hour()</code>, <code>minute()</code>, <code>second()</code>,<code>yday()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/262'>#262</a>), and correct translation for <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/357'>#357</a>).</p></li>
+</ul>
+</div>
+<div id="extensibility" class="section level2">
+<h2 class="hasAnchor">
+<a href="#extensibility" class="anchor"></a>Extensibility</h2>
+<p>If you are the author of a dbplyr backend, please see <code><a href="../articles/backend-2.html">vignette("backend-2")</a></code> for details.</p>
+<ul>
+<li>
+<p>A number of <code>db_*</code> generics have been replaced with new SQL generation generics:</p>
 <ul>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_analyze()</a></code> -&gt; <code><a href="../reference/db_sql.html">sql_table_analyze()</a></code>
@@ -234,38 +270,28 @@
 </ul>
 <p>This makes them easier to test and is an important part of the process of moving all database generics in dbplyr (<a href='https://github.com/tidyverse/dbplyr/issues/284'>#284</a>).</p>
 </li>
-<li><p>A number of <code>db_*</code> generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, <code>db_data_types()</code>. These were only used for data insertion, and that now all happens via <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable()</a></code>.</p></li>
-<li><p>MySQL uses standard SQL for index creation.</p></li>
-<li><p>MS SQL translation does better a distinguishing between bit and boolean (<a href='https://github.com/tidyverse/dbplyr/issues/377'>#377</a>, <a href='https://github.com/tidyverse/dbplyr/issues/318'>#318</a>). <code>if</code> and <code>ifelse</code> once again generate <code>IIF</code>, creating simpler expressions.</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> gains an <code>in_transaction</code> argument so you can optionally suppress the transaction wrapper (<a href='https://github.com/tidyverse/dbplyr/issues/368'>#368</a>).</p></li>
-<li><p>The join functions now error when additional arguments are provided (instead of silently swallowing them!) (<a href='https://github.com/tidyverse/dbplyr/issues/382'>#382</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/substr.html">substring()</a></code> is now translated the same way as <code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/378'>#378</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/Extremes.html">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html">pmax()</a></code> translations now have <code>na.rm</code> arguments (<a href='https://github.com/tidyverse/dbplyr/issues/479'>#479</a>). All <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code> and <code><a href="https://rdrr.io/r/stats/cor.html">var()</a></code> translations have <code>na.rm</code>. All warn on first use for consistency with <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code> and friends.</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> now generates a clear error message; previously it was translated to <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code> which is not correct (<a href='https://github.com/tidyverse/dbplyr/issues/108'>#108</a>).</p></li>
-<li><p>SQLite gains translations for lubridate functions <code>today()</code>, <code>now()</code>, <code>year()</code>, <code>month()</code>, <code>day()</code>, <code>hour()</code>, <code>minute()</code>, <code>second()</code>,<code>yday()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/262'>#262</a>).</p></li>
-<li><p>You can now use <code><a href="https://rdrr.io/r/base/ns-dblcolon.html">::</a></code> in translations, so that (e.g.) <code><a href="https://dplyr.tidyverse.org/reference/context.html">dbplyr::n()</a></code> is translated to <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/207'>#207</a>).</p></li>
-<li>
-<p>New RedShift translations when used with <code><a href="https://rpostgres.r-dbi.org/reference/Redshift.html">RPostgres::Redshift()</a></code>.</p>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">DBI::dbWriteTable()</a></code> is now used instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code>. This means that following dplyr generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, and <code>db_data_types()</code>.</p></li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> is now used instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteString.html">DBI::dbQuoteString()</a></code> instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code>.</p></li>
+<li><p>New <code><a href="../reference/db_sql.html">sql_expr_matches()</a></code> generic allows databases to use more efficient alternatives when determine if two values “match” (i.e. like equality but a pair of <code>NULL</code>s will also match). For more details, see <a href="https://modern-sql.com/feature/is-distinct-from" class="uri">https://modern-sql.com/feature/is-distinct-from</a></p></li>
+<li><p>New <code><a href="../reference/db_sql.html">sql_join_suffix()</a></code> allows backends to control the default suffixes used (<a href='https://github.com/tidyverse/dbplyr/issues/254'>#254</a>).</p></li>
+</ul>
+</div>
+<div id="minor-improvements-and-bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
-<li><p><code>str_replace()</code> errors since there’s no Redshift translation, and <code>str_replace_all()</code> uses <code>REGEXP_REPLACE()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/446'>#446</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html">paste0()</a></code> use <code><a href="https://rdrr.io/r/base/Logic.html">||</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/458'>#458</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/numeric.html">as.numeric()</a></code> and <code><a href="https://rdrr.io/r/base/double.html">as.double()</a></code> cast to <code>FLOAT</code> (<a href='https://github.com/tidyverse/dbplyr/issues/408'>#408</a>).</p></li>
-<li><p><code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> and <code>str_sub()</code> use <code>SUBSTRING()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/327'>#327</a>).</p></li>
-</ul>
-</li>
-<li><p><code>sql_translate_env.Microsoft SQL Server()</code> now uses <code><a href="../reference/sql_substr.html">sql_try_cast()</a></code> instead of <code><a href="../reference/sql_substr.html">sql_cast()</a></code> for MSSQL version 11+ (2012+) (<a href='https://github.com/DavidPatShuiFong'>@DavidPatShuiFong</a>, <a href='https://github.com/tidyverse/dbplyr/issues/380'>#380</a>).</p></li>
-<li><p>SQLite gets correct translation for <code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/357'>#357</a>).</p></li>
+<li><p>All old lazy eval shims have been removed. These have been deprecated for some time.</p></li>
+<li><p>Date-time escaping methods for Athena and Presto have moved to the packages where they belong.</p></li>
+<li><p>Attempting to embed a Shiny reactive in a query now gives a helpful error (<a href='https://github.com/tidyverse/dbplyr/issues/439'>#439</a>).</p></li>
 <li><p><code><a href="../reference/lahman.html">copy_lahman()</a></code> and <code><a href="../reference/nycflights13.html">copy_nycflights13()</a></code> (and hence <code><a href="../reference/nycflights13.html">nycflights13_sqlite()</a></code>) and friends now return DBI connections rather than the now deprecated <code><a href="../reference/src_dbi.html">src_dbi()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/440'>#440</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> now works for Oracle (<a href='https://github.com/tidyverse/dbplyr/issues/353'>#353</a>).</p></li>
-<li><p>The default translation for <code><a href="https://dplyr.tidyverse.org/reference/context.html">n()</a></code> is now <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/343'>#343</a>).</p></li>
-<li><p>odbc no longer translates <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code>.</p></li>
-<li><p>Subquery names are now scoped within the query. This means that query text should now be deterministic which helps some query optimisers/cachers (<a href='https://github.com/tidyverse/dbplyr/issues/336'>#336</a>).</p></li>
-<li><p><code>sub_str()</code> translation is more consistent in edge cases (<a href='https://github.com/ianmcook'>@ianmcook</a>).</p></li>
-<li><p>Postgres: New translations for stringr functions: <code>str_squish()</code>, <code>str_remove()</code>, <code>str_remove_all()</code> (<a href='https://github.com/shosaco'>@shosaco</a>).</p></li>
-<li><p>All old lazy eval shims have been removed.</p></li>
-<li><p><code><a href="https://rdrr.io/r/stats/median.html">median()</a></code> now takes a new argument <code>na.rm</code> for consistency with <code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, but still does always remove any missing values (<a href='https://github.com/lorenzwalthert'>@lorenzwalthert</a>, <a href='https://github.com/tidyverse/dbplyr/issues/483'>#483</a>).</p></li>
-<li><p><a href="https://blob.tidyverse.org/">blob</a> vectors can now be used with <code>!!</code> and <code>!!!</code> operators, for example in <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> (<a href='https://github.com/okhoma'>@okhoma</a>, <a href='https://github.com/tidyverse/dbplyr/issues/433'>#433</a>)</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> can now <code>overwrite</code> when table is specified with schema (<a href='https://github.com/tidyverse/dbplyr/issues/489'>#489</a>), and gains an <code>in_transaction</code> argument used to optionally suppress the transaction wrapper (<a href='https://github.com/tidyverse/dbplyr/issues/368'>#368</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct()</a></code> no longer duplicates column if grouped (<a href='https://github.com/tidyverse/dbplyr/issues/354'>#354</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute()</a></code> now correctly tracks variables it needs when creating subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/313'>#313</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> grouping variables no longer generates a downstream error (<a href='https://github.com/tidyverse/dbplyr/issues/396'>#396</a>)</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> correctly generates subqueries when you re-use the same variable three or more times (<a href='https://github.com/tidyverse/dbplyr/issues/412'>#412</a>).</p></li>
+<li><p><code><a href="../reference/window_order.html">window_order()</a></code> overrides ordering, rather than appending to it.</p></li>
 </ul>
+</div>
 </div>
     <div id="dbplyr-144" class="section level1">
 <h1 class="page-header" data-toc-text="1.4.4">
@@ -412,9 +438,9 @@
 </li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes" class="section level2">
+<div id="minor-improvements-and-bug-fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p>Aggregation functions only warn once per session about the use of <code>na.rm = TRUE</code> (<a href='https://github.com/tidyverse/dbplyr/issues/216'>#216</a>).</p></li>
 <li><p>table names generated by <code>random_table_name()</code> have the prefix “dbplyr_”, which makes it easier to find them programmatically (<a href='https://github.com/mattle24'>@mattle24</a>, <a href='https://github.com/tidyverse/dbplyr/issues/111'>#111</a>)</p></li>
@@ -451,9 +477,9 @@
 <li><p><code>src</code> and <code>tbl</code> objects now include a class generated from the class of the underlying connection object. This makes it possible for dplyr backends to implement different behaviour at the dplyr level, when needed. (<a href='https://github.com/tidyverse/dbplyr/issues/2293'>#2293</a>)</p></li>
 </ul>
 </div>
-<div id="sql-translation" class="section level2">
+<div id="sql-translation-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#sql-translation" class="anchor"></a>SQL translation</h2>
+<a href="#sql-translation-1" class="anchor"></a>SQL translation</h2>
 <ul>
 <li><p><code>x %in% y</code> is now translated to <code>FALSE</code> if <code>y</code> is empty (<a href='https://github.com/mgirlich'>@mgirlich</a>, <a href='https://github.com/tidyverse/dbplyr/issues/160'>#160</a>).</p></li>
 <li><p>New <code>as.integer64(x)</code> translation to <code>CAST(x AS BIGINT)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/3305'>#3305</a>)</p></li>
@@ -491,9 +517,9 @@
 </li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-1" class="section level2">
+<div id="minor-improvements-and-bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-1" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-2" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> will only remove existing table when <code>overwrite = TRUE</code> and the table already exists, eliminating a confusing “NOTICE” from PostgreSQL (<a href='https://github.com/tidyverse/dbplyr/issues/3197'>#3197</a>).</p></li>
 <li><p><code><a href="../reference/partial_eval.html">partial_eval()</a></code> handles unevaluated formulas (<a href='https://github.com/tidyverse/dbplyr/issues/184'>#184</a>).</p></li>
@@ -557,9 +583,9 @@
 <li><p><code>db_write_table</code> now needs to return the table name</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-2" class="section level2">
+<div id="minor-improvements-and-bug-fixes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-2" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-3" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p>Multiple <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code> calls in a row now collapse to a single call. This avoids a printing problem with MS SQL (<a href='https://github.com/tidyverse/dbplyr/issues/3084'>#3084</a>).</p></li>
 <li><p><code><a href="../reference/escape.html">escape()</a></code> now works with integer64 values from the bit64 package (<a href='https://github.com/tidyverse/dbplyr/issues/3230'>#3230</a>)</p></li>
@@ -610,9 +636,9 @@
 <li><p>Added SQL translations for Oracle (<a href='https://github.com/edgararuiz'>@edgararuiz</a>).</p></li>
 </ul>
 </div>
-<div id="minor-improvements-and-bug-fixes-3" class="section level2">
+<div id="minor-improvements-and-bug-fixes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-improvements-and-bug-fixes-3" class="anchor"></a>Minor improvements and bug fixes</h2>
+<a href="#minor-improvements-and-bug-fixes-4" class="anchor"></a>Minor improvements and bug fixes</h2>
 <ul>
 <li><p><code>x %in% c(1)</code> now generates the same SQL as <code>x %in% 1</code> (<a href='https://github.com/tidyverse/dbplyr/issues/2898'>#2898</a>).</p></li>
 <li><p><code><a href="https://rdrr.io/r/utils/head.html">head(tbl, 0)</a></code> is now supported (<a href='https://github.com/tidyverse/dbplyr/issues/2863'>#2863</a>).</p></li>
