@@ -3,6 +3,20 @@
 * Experimental new SAP HANA backend (#233). Requires the latest
   version of odbc.
 
+* `select()` and `rename()` support dplyr 1.0.0 select syntax (apart from
+  predicate functions which can't easily work on computed queries) (#502).
+  
+* `rename_with()` makes it easy to rename columns programmatically (#502).
+
+* Attempting to embed a Shiny reactive in a query now gives a helpful error
+  (#439).
+
+* Oracle: gains translations for `today()` and `now()`, and
+  improved `as.Date()` translation (@rlh1994, #267).
+
+* PostgreSQL: new translations for lubridate period functions `years()`,
+  `months()`, `days()`, and `floor_date()` (@bkkkk, #333).
+
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.
 

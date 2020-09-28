@@ -124,7 +124,6 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
       },
-
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         if (!label) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
@@ -138,7 +137,45 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           stop("Unrecognized arguments to `wday`", call. = FALSE)
         }
       },
-      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x))
+      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
+
+      # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
+      seconds = function(x) {
+        interval <- paste(x, "seconds")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      minutes = function(x) {
+        interval <- paste(x, "minutes")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      hours = function(x) {
+        interval <- paste(x, "hours")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      days = function(x) {
+        interval <- paste(x, "days")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      weeks = function(x) {
+        interval <- paste(x, "weeks")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      months = function(x) {
+        interval <- paste(x, "months")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+      years = function(x) {
+        interval <- paste(x, "years")
+        sql_expr(CAST(!!interval %AS% INTERVAL))
+      },
+
+      # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+      floor_date = function(x, unit = "seconds") {
+        unit <- arg_match(unit,
+          c("second", "minute", "hour", "day", "week", "month", "quarter", "year")
+        )
+        sql_expr(DATE_TRUNC(!!unit, !!x))
+      },
     ),
     sql_translator(.parent = base_agg,
       cor = sql_aggregate_2("CORR"),
@@ -200,4 +237,4 @@ sql_query_explain.PostgreSQL <- sql_query_explain.PostgreSQLConnection
 #' @export
 sql_query_explain.PqConnection <- sql_query_explain.PostgreSQLConnection
 
-globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY"))
+globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL"))

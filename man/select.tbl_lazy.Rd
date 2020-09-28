@@ -3,12 +3,15 @@
 \name{select.tbl_lazy}
 \alias{select.tbl_lazy}
 \alias{rename.tbl_lazy}
+\alias{rename_with.tbl_lazy}
 \alias{relocate.tbl_lazy}
 \title{Subset, rename, and reorder columns using their names}
 \usage{
 \method{select}{tbl_lazy}(.data, ...)
 
 \method{rename}{tbl_lazy}(.data, ...)
+
+\method{rename_with}{tbl_lazy}(.data, .fn, .cols = everything(), ...)
 
 \method{relocate}{tbl_lazy}(.data, ..., .before = NULL, .after = NULL)
 }
@@ -17,6 +20,12 @@
 
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+
+\item{.fn}{A function used to transform the selected \code{.cols}. Should
+return a character vector the same length as the input.}
+
+\item{.cols}{<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Columns to rename;
+defaults to all columns.}
 
 \item{.before}{<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Destination of
 columns selected by \code{...}. Supplying neither will move columns to the
@@ -29,6 +38,9 @@ left-hand side; specifying both is an error.}
 \description{
 These are methods for the dplyr \code{\link[=select]{select()}}, \code{\link[=rename]{rename()}}, and \code{\link[=relocate]{relocate()}}
 generics. They generate the \code{SELECT} clause of the SQL query.
+
+These functions do not support predicate functions, i.e. you can
+not use \code{where(is.numeric)} to select all numeric variables.
 }
 \examples{
 library(dplyr, warn.conflicts = FALSE)
