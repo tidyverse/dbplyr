@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `across()` now translated into individual SQL statements (#480).
+
 * Experimental new SAP HANA backend (#233). Requires the latest
   version of odbc.
 

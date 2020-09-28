@@ -73,12 +73,23 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
 partial_eval_dots <- function(dots, vars) {
   stopifnot(inherits(dots, "quosures"))
 
-  lapply(dots, function(x) {
-    new_quosure(
-      partial_eval(get_expr(x), vars = vars, env = get_env(x)),
-      get_env(x)
-    )
-  })
+  dots <- lapply(dots, partial_eval_quo, vars = vars)
+
+  # Flatten across() calls
+  is_list <- vapply(dots, is.list, logical(1))
+  dots[!is_list] <- lapply(dots[!is_list], list)
+  names(dots)[is_list] <- ""
+
+  unlist(dots, recursive = FALSE)
+}
+
+partial_eval_quo <- function(x, vars) {
+  expr <- partial_eval(get_expr(x), vars, get_env(x))
+  if (is.list(expr)) {
+    lapply(expr, new_quosure, env = get_env(x))
+  } else {
+    new_quosure(expr, get_env(x))
+  }
 }
 
 partial_eval_sym <- function(sym, vars, env) {
@@ -142,6 +153,8 @@ partial_eval_call <- function(call, vars, env) {
     } else {
       eval_bare(idx, env)
     }
+  } else if (is_call(call, "across")) {
+    partial_eval_across(call, vars, env)
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local
@@ -155,7 +168,54 @@ partial_eval_call <- function(call, vars, env) {
       call
     }
   }
+}
 
+partial_eval_across <- function(call, vars, env) {
+  call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
+
+  tbl <- as_tibble(rep_named(vars, list(logical())))
+  cols <- syms(vars)[tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)]
+
+  .fns <- eval(call$.fns, env)
+
+  if (is.function(.fns)) {
+    .fns <- find_fun(.fns)
+  } else if (is.list(.fns)) {
+    .fns <- purrr::map_chr(.fns, find_fun)
+  } else if (is.character(.fns)) {
+    # as is
+  } else {
+    abort("Unsupported `.fns` for dbplyr::across()")
+  }
+  funs <- set_names(syms(.fns), .fns)
+
+  # Generate grid of expressions
+  out <- vector("list", length(cols) * length(.fns))
+  k <- 1
+  for (i in seq_along(cols)) {
+    for (j in seq_along(funs)) {
+      out[[k]] <- expr((!!funs[[j]])(!!cols[[i]], !!!call$...))
+      k <- k + 1
+    }
+  }
+
+  .names <- eval(call$.names, env)
+  names(out) <- across_names(cols, names(funs), .names, env)
+  out
+}
+
+across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
+  if (length(funs) == 1) {
+    names <- names %||% "{.col}"
+  } else {
+    names <- names %||% "{.col}_{.fn}"
+  }
+
+  glue_env <- child_env(env,
+    .col = rep(cols, each = length(funs)),
+    .fn = rep(funs %||% seq_along(funs), length(cols))
+  )
+  glue(names, .envir = glue_env)
 }
 
 find_fun <- function(fun) {
