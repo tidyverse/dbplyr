@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Attempting to embed a Shiny reactive in a query now gives a helpful error
+  (#439).
+
 * Oracle: gains translations for `today()` and `now()`, and
   improved `as.Date()` translation (@rlh1994, #267).
 

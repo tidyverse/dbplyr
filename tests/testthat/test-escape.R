@@ -90,6 +90,18 @@ test_that("raw is SQL-99 compatible (by default)", {
   expect_equal(escape(as_blob(as.raw(c(0x00, 0xff))), con = con), sql("X'00ff'"))
 })
 
+
+# Helpful errors --------------------------------------------------------
+
+test_that("shiny objects give useful errors", {
+  lf <- lazy_frame(a = 1)
+  input <- structure(list(), class = "reactivevalues")
+  x <- structure(function() "y", class = "reactive")
+
+  expect_snapshot_error(lf %>% filter(mpg == input$x) %>% show_query())
+  expect_snapshot_error(lf %>% filter(mpg == x()) %>% show_query())
+})
+
 # names_to_as() -----------------------------------------------------------
 
 test_that("names_to_as() doesn't alias when ident name and value are identical", {

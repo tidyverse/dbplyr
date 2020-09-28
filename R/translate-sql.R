@@ -165,7 +165,7 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
   # Default for unknown functions
   if (!strict) {
     unknown <- setdiff(all_calls(expr), names(variant))
-    top_env <- ceply(unknown, default_op, parent = empty_env())
+    top_env <- ceply(unknown, default_op, parent = empty_env(), env = get_env(expr))
   } else {
     top_env <- child_env(NULL)
   }
@@ -213,8 +213,15 @@ is_infix_user <- function(x) {
   grepl("^%.*%$", x)
 }
 
-default_op <- function(x) {
+default_op <- function(x, env) {
   assert_that(is_string(x))
+
+  # Check for shiny reactives; these are zero-arg functions
+  # so need special handling to give a useful error
+  obj <- env_get(env, x, default = NULL, inherit = TRUE)
+  if (inherits(obj, "reactive")) {
+    error_embed("a shiny reactive", "foo()")
+  }
 
   if (is_infix_base(x)) {
     sql_infix(x)
@@ -225,7 +232,6 @@ default_op <- function(x) {
     sql_prefix(x)
   }
 }
-
 
 all_calls <- function(x) {
   if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
