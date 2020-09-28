@@ -1,6 +1,7 @@
 # dbplyr (development version)
 
-* Experimental new SAP HANA backend (#233).
+* Experimental new SAP HANA backend (#233). Requires the latest
+  version of odbc.
 
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.

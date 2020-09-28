@@ -27,8 +27,6 @@ NULL
 #' @rdname backend-hana
 simulate_hana <- function() simulate_dbi("HDB")
 
-# setClass("HDB", contains = "OdbcConnection")
-
 #' @export
 sql_translate_env.HDB <- function(con) {
   sql_variant(
@@ -50,29 +48,6 @@ sql_translate_env.HDB <- function(con) {
     base_win
   )
 }
-
-#' @export
-setMethod(sqlCreateTable, "HDB",
-  function(con, table, fields, row.names = NA, temporary = FALSE, ...) {
-    table <- dbQuoteIdentifier(con, table)
-
-    if (is.data.frame(fields)) {
-      fields <- sqlRownamesToColumn(fields, row.names)
-      fields <- vapply(fields, function(x) dbDataType(con, x), character(1))
-    }
-
-    field_names <- dbQuoteIdentifier(con, names(fields))
-    field_types <- unname(fields)
-    fields <- paste0(field_names, " ", field_types)
-
-    SQL(paste0(
-      "CREATE ", if (temporary) "LOCAL TEMPORARY COLUMN ",
-      "TABLE ", table, " (\n",
-      "  ", paste(fields, collapse = ",\n  "),
-      "\n)\n"
-    ))
-  }
-)
 
 #' @export
 db_copy_to.HDB <- function(con, table, values,
