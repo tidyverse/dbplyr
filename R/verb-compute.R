@@ -58,43 +58,6 @@ compute.tbl_sql <- function(x,
     add_op_order(op_sort(x))
 }
 
-#' @export
-#' @rdname db_copy_to
-db_compute <- function(con,
-                      table,
-                      sql,
-                      temporary = TRUE,
-                      unique_indexes = list(),
-                      indexes = list(),
-                      analyze = TRUE,
-                      ...) {
-  UseMethod("db_compute")
-}
-
-#' @export
-db_compute.DBIConnection <- function(con,
-                                     table,
-                                     sql,
-                                     temporary = TRUE,
-                                     unique_indexes = list(),
-                                     indexes = list(),
-                                     analyze = TRUE,
-                                     ...) {
-  if (!is.list(indexes)) {
-    indexes <- as.list(indexes)
-  }
-  if (!is.list(unique_indexes)) {
-    unique_indexes <- as.list(unique_indexes)
-  }
-
-  table <- db_save_query(con, sql, table, temporary = temporary)
-  create_indexes(con, table, unique_indexes, unique = TRUE)
-  create_indexes(con, table, indexes, unique = FALSE)
-  if (analyze) db_analyze(con, table)
-
-  table
-}
-
 # collect -----------------------------------------------------------------
 
 #' @rdname collapse.tbl_sql
@@ -114,39 +77,4 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
   sql <- db_sql_render(x$src$con, x)
   out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete)
   dplyr::grouped_df(out, intersect(op_grps(x), names(out)))
-}
-
-#' @export
-#' @rdname db_copy_to
-db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
-  UseMethod("db_collect")
-}
-
-#' @export
-db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
-  res <- dbSendQuery(con, sql)
-  tryCatch({
-    out <- dbFetch(res, n = n)
-    if (warn_incomplete) {
-      res_warn_incomplete(res, "n = Inf")
-    }
-  }, finally = {
-    dbClearResult(res)
-  })
-
-  out
-}
-
-# sql_render --------------------------------------------------------------
-
-# Used by implyr
-#' @rdname db_copy_to
-#' @export
-db_sql_render <- function(con, sql, ...) {
-  UseMethod("db_sql_render")
-}
-
-#' @export
-db_sql_render.DBIConnection <- function(con, sql, ...) {
-  sql_render(sql, con = con, ...)
 }
