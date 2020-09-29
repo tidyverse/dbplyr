@@ -56,7 +56,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
       overwrite = overwrite
     )
     create_indexes(con, table, unique_indexes, unique = TRUE)
-    create_indexes(con, table, indexes, unique = FALSE)
+    create_indexes(con, table, indexes)
     if (analyze) dplyr::db_analyze(con, table)
   })
 
@@ -88,16 +88,9 @@ db_compute.DBIConnection <- function(con,
   table <- new$table
   temporary <- new$temporary
 
-  if (!is.list(indexes)) {
-    indexes <- as.list(indexes)
-  }
-  if (!is.list(unique_indexes)) {
-    unique_indexes <- as.list(unique_indexes)
-  }
-
   table <- dplyr::db_save_query(con, sql, table, temporary = temporary)
   create_indexes(con, table, unique_indexes, unique = TRUE)
-  create_indexes(con, table, indexes, unique = FALSE)
+  create_indexes(con, table, indexes)
   if (analyze) dplyr::db_analyze(con, table)
 
   table
@@ -156,9 +149,11 @@ dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
 dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
-  if (is.null(indexes)) return()
-  assert_that(is.list(indexes))
+  if (is.null(indexes)) {
+    return()
+  }
 
+  indexes <- as.list(indexes)
   for (index in indexes) {
     dplyr::db_create_index(con, table, index, unique = unique, ...)
   }
