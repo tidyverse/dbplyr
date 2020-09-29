@@ -76,7 +76,7 @@ sql_translate_env.Oracle <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
       # lubridate --------------------------------------------------------------
-      today = function() sql_expr(SYSDATE),
+      today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
       now = function() sql_expr(CURRENT_TIMESTAMP)
     ),
     base_odbc_agg,
