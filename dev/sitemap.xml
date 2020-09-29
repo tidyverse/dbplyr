@@ -52,10 +52,16 @@
     <loc>https://dbplyr.tidyverse.org/reference/copy_to.src_sql.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/reference/db_copy_to.html</loc>
+    <loc>https://dbplyr.tidyverse.org/reference/db-io.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/reference/db_sql.html</loc>
+    <loc>https://dbplyr.tidyverse.org/reference/db-misc.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/db-quote.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/db-sql.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/dbplyr-package.html</loc>
@@ -134,9 +140,6 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_build.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/reference/sql_escape_logical.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_expr.html</loc>
