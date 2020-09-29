@@ -32,7 +32,7 @@ sql_escape_raw(con, charToRaw("hi"))
 \seealso{
 Other generic: 
 \code{\link{db-sql}},
-\code{\link{db_compute}()},
+\code{\link{db_copy_to}()},
 \code{\link{db_desc.DBIConnection}()}
 }
 \concept{generic}

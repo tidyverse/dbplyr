@@ -48,7 +48,7 @@ Query <- R6::R6Class("Query",
 
     nrow = function() {
       if (!is.null(private$.nrow)) return(private$.nrow)
-      private$.nrow <- db_query_rows(self$con, self$sql)
+      private$.nrow <- dplyr::db_query_rows(self$con, self$sql)
       private$.nrow
     },
 

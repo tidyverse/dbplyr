@@ -18,7 +18,8 @@ Miscellaneous database generics
 \seealso{
 Other generic: 
 \code{\link{db-sql}},
-\code{\link{db_compute}()},
+\code{\link{db_copy_to}()},
 \code{\link{sql_escape_logical}()}
 }
 \concept{generic}
+\keyword{internal}

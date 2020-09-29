@@ -173,17 +173,8 @@
 
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), ident("table"))
-    Message <dbplyr_message_temp_table>
-      Created a temporary table named #table
     Output
-      <SQL> SELECT * INTO `#table` FROM (SELECT * FROM foo) AS temp
-
----
-
-    Code
-      sql_query_save(con, sql("SELECT * FROM foo"), ident("#table"))
-    Output
-      <SQL> SELECT * INTO `#table` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `table` FROM (SELECT * FROM foo) AS temp
 
 ---
 

@@ -128,19 +128,29 @@ test_that("generates custom sql", {
   con <- simulate_mssql()
 
   expect_snapshot(sql_table_analyze(con, ident("table")))
+
+  # Creates the same SQL since there's no temporary CLAUSE
+  # Automatic renaming is handled upstream by db_collect()/db_copy_to()
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table")))
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("#table")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE))
 })
 
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#272)", {
+  con <- src_test("mssql")
   df <- tibble(x = 1:3)
-  db <- copy_to(src_test("mssql"), df, name = "temp", temporary = TRUE)
-
+  expect_message(
+    db <- copy_to(con, df, name = "temp", temporary = TRUE),
+    "Created a temporary table",
+  )
   expect_equal(db %>% pull(), 1:3)
-  expect_equal(db %>% mutate(y = x + 1) %>% compute() %>% pull(), 2:4)
+
+  db2 <- expect_message(
+    db %>% mutate(y = x + 1) %>% compute(),
+    "Created a temporary table"
+  )
+  expect_equal(db2 %>% pull(), 2:4)
 })
 
 test_that("bit conversion works for important cases", {

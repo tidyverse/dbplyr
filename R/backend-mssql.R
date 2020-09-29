@@ -257,64 +257,25 @@ mssql_version <- function(con) {
   build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
 }
 
-# Temporary tables --------------------------------------------------------
-# SQL server does not support CREATE TEMPORARY TABLE and instead prefixes
+# SQL server does not use CREATE TEMPORARY TABLE and instead prefixes
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
-
-mssql_table_rename <- function(name, temporary) {
-  if (!temporary || substr(name, 1, 1) == "#") {
-    name
-  } else {
-    name <- ident(paste0("#", name))
-    inform(
-      paste0("Created a temporary table named ", name),
-      class = c("dbplyr_message_temp_table", "dbplyr_message")
-    )
-    name
+#' @export
+`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary) {
+  if (temporary && substr(table, 1, 1) != "#") {
+    table <- hash_temp(table)
   }
-}
 
-#' @export
-`db_copy_to.Microsoft SQL Server` <- function(con, table, values,
-                            overwrite = FALSE, types = NULL, temporary = TRUE,
-                            unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ..., in_transaction = TRUE) {
-  NextMethod(
-    table = mssql_table_rename(table, temporary),
-    types = types,
-    values = values,
+  list(
+    table = table,
     temporary = FALSE
   )
 }
-
-#' @export
-`db_write_table.Microsoft SQL Server`  <- function(con, table, types, values, temporary = TRUE, ...) {
-  NextMethod(
-    table = mssql_table_rename(table, temporary),
-    types = types,
-    values = values,
-    temporary = FALSE
-  )
-}
-
-#' @export
-`db_save_query.Microsoft SQL Server` <- function(con, sql, name, temporary = TRUE,
-                                        ...) {
-
-  NextMethod(
-    sql = sql,
-    name = mssql_table_rename(name, temporary),
-    temporary = FALSE
-  )
-}
-
 
 #' @export
 `sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
                                                   temporary = TRUE, ...){
 
-  name <- mssql_table_rename(name, temporary)
   # https://stackoverflow.com/q/16683758/946850
   build_sql(
     "SELECT * INTO ", as.sql(name), " ",
@@ -323,7 +284,7 @@ mssql_table_rename <- function(name, temporary) {
   )
 }
 
-
+# Bit vs boolean ----------------------------------------------------------
 
 mssql_needs_bit <- function() {
   context <- sql_current_context()

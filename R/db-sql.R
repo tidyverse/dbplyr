@@ -26,6 +26,7 @@ sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(),
 }
 
 #' @export
+#' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
   expl <- dbGetQuery(con, sql)
@@ -43,6 +44,7 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 }
 
 #' @export
+#' @importFrom dplyr db_analyze
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
@@ -61,6 +63,7 @@ sql_table_analyze.DBIConnection <- function(con, table, ...) {
 }
 
 #' @export
+#' @importFrom dplyr db_create_index
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
   sql <- sql_index_create(con, table, columns, name = name, unique = unique, ...)
@@ -100,6 +103,7 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 }
 
 #' @export
+#' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
   names(dbGetQuery(con, sql))
@@ -115,6 +119,7 @@ sql_query_fields.DBIConnection <- function(con, sql, ...) {
 }
 
 #' @export
+#' @importFrom dplyr db_query_rows
 db_query_rows.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_rows(con, sql, ...)
   as.integer(dbGetQuery(con, rows)[[1]])

@@ -9,7 +9,7 @@
 \alias{sql_query_fields}
 \alias{sql_query_rows}
 \alias{sql_expr_matches}
-\title{SQL generation methods for database methods}
+\title{SQL generation generics}
 \usage{
 sql_query_explain(con, sql, ...)
 
@@ -41,7 +41,7 @@ uses a \verb{CASE WHEN} as described in
 }
 \seealso{
 Other generic: 
-\code{\link{db_compute}()},
+\code{\link{db_copy_to}()},
 \code{\link{db_desc.DBIConnection}()},
 \code{\link{sql_escape_logical}()}
 }

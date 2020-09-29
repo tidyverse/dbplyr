@@ -83,3 +83,12 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
   warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
     call. = FALSE)
 }
+
+hash_temp <- function(name) {
+  name <- ident(paste0("#", name))
+  inform(
+    paste0("Created a temporary table named ", name),
+    class = c("dbplyr_message_temp_table", "dbplyr_message")
+  )
+  name
+}

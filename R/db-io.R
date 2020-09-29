@@ -7,22 +7,26 @@
 #' SQL generation generics. They tend to be most needed when a backend has
 #' special handling of temporary tables.
 #'
-#' * `db_copy_to()` implements [copy_to.tbl_sql()] by calling
-#'   `db_write_table()` to transfer the data, then optionally adds indexes
-#'   (via [sql_create_index()]) and analyses (via [sql_analyze()]).
+#' * `db_copy_to()` implements [copy_to.src_sql()] by calling
+#'   `dplyr::db_write_table()` to transfer the data, then optionally adds indexes
+#'   (via [sql_index_create()]) and analyses (via [sql_table_analyze()]).
 #'
 #' * `db_compute()` implements [compute.tbl_sql()] by calling
-#'   `db_save_query()` to create the table, then optionally adds indexes
-#'   (via [sql_create_index()]) and analyses (via [sql_analyze()]).
+#'   `dplyr::db_save_query()` to create the table, then optionally adds indexes
+#'   (via [sql_index_create()]) and analyses (via [sql_table_analyze()]).
 #'
 #' * `db_collect()` implements [collect.tbl_sql()] using [DBI::dbSendQuery()]
 #'   and [DBI::dbFetch()].
 #'
+#' * `db_table_temporary()` is used for databases that have special naming
+#'   schemes for temporary tables (e.g. SQL server and SAP HANA require
+#'   temporary tables to start with `#`)
+#'
 #' @keywords internal
 #' @family generic
-#' @export
 #' @name db-io
 #' @aliases NULL
+NULL
 
 #' @export
 #' @rdname db-io
@@ -40,8 +44,12 @@ db_copy_to.DBIConnection <- function(con, table, values,
                             analyze = TRUE, ...,
                             in_transaction = TRUE) {
 
+  new <- db_table_temporary(con, table, temporary)
+  table <- new$table
+  temporary <- new$temporary
+
   with_transaction(con, in_transaction, {
-    table <- db_write_table(con, table,
+    table <- dplyr::db_write_table(con, table,
       types = types,
       values = values,
       temporary = temporary,
@@ -49,7 +57,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
     )
     create_indexes(con, table, unique_indexes, unique = TRUE)
     create_indexes(con, table, indexes, unique = FALSE)
-    if (analyze) db_analyze(con, table)
+    if (analyze) dplyr::db_analyze(con, table)
   })
 
   table
@@ -76,6 +84,10 @@ db_compute.DBIConnection <- function(con,
                                      indexes = list(),
                                      analyze = TRUE,
                                      ...) {
+  new <- db_table_temporary(con, table, temporary)
+  table <- new$table
+  temporary <- new$temporary
+
   if (!is.list(indexes)) {
     indexes <- as.list(indexes)
   }
@@ -83,10 +95,10 @@ db_compute.DBIConnection <- function(con,
     unique_indexes <- as.list(unique_indexes)
   }
 
-  table <- db_save_query(con, sql, table, temporary = temporary)
+  table <- dplyr::db_save_query(con, sql, table, temporary = temporary)
   create_indexes(con, table, unique_indexes, unique = TRUE)
   create_indexes(con, table, indexes, unique = FALSE)
-  if (analyze) db_analyze(con, table)
+  if (analyze) dplyr::db_analyze(con, table)
 
   table
 }
@@ -112,14 +124,15 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
 }
 
 #' @export
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
-                                        ...) {
+#' @importFrom dplyr db_save_query
+db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
   dbExecute(con, sql, immediate = TRUE)
   name
 }
 
 #' @export
+#' @importFrom dplyr db_write_table
 db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
 
   dbWriteTable(
@@ -147,7 +160,7 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   assert_that(is.list(indexes))
 
   for (index in indexes) {
-    db_create_index(con, table, index, unique = unique, ...)
+    dplyr::db_create_index(con, table, index, unique = unique, ...)
   }
 }
 
@@ -164,4 +177,17 @@ with_transaction <- function(con, in_transaction, code) {
     on.exit()
     dbCommit(con)
   }
+}
+
+#' @export
+#' @rdname db-io
+db_table_temporary <- function(con, table, temporary) {
+  UseMethod("db_table_temporary")
+}
+#' @export
+db_table_temporary.DBIConnection <- function(con, table, temporary) {
+  list(
+    table = table,
+    temporary = temporary
+  )
 }

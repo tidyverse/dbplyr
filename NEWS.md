@@ -117,6 +117,9 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
   
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).
+
+*  New `db_temporary_table()` generic makes it easier to work with databases
+   that require temporary tables to be specially named.
   
 * `DBI::dbWriteTable()` is now used instead of `db_write_table()`. This
    means that following dplyr generics are no longer used: 

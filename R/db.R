@@ -1,12 +1,14 @@
 #' Miscellaneous database generics
 #'
 #' @family generic
+#' @keywords internal
 #' @name db-misc
 #' @aliases NULL
 NULL
 
 #' @rdname db-misc
 #' @export
+#' @importFrom dplyr db_desc
 db_desc.DBIConnection <- function(x) {
   class(x)[[1]]
 }

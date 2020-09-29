@@ -31,7 +31,7 @@ src_tbls.src_sql <- function(x, ...) {
 #' @export
 format.src_sql <- function(x, ...) {
   paste0(
-    "src:  ", db_desc(x$con), "\n",
+    "src:  ", dplyr::db_desc(x$con), "\n",
     wrap("tbls: ", paste0(sort(src_tbls(x)), collapse = ", "))
   )
 }

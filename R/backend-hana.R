@@ -50,31 +50,14 @@ sql_translate_env.HDB <- function(con) {
 }
 
 #' @export
-db_copy_to.HDB <- function(con, table, values,
-                           overwrite = FALSE, types = NULL, temporary = TRUE,
-                           unique_indexes = NULL, indexes = NULL,
-                           analyze = TRUE, ..., in_transaction = TRUE) {
-  NextMethod(
-    table = mssql_table_rename(table, temporary),
-    types = types,
-    values = values
-  )
-}
+db_table_temporary.HDB <- function(con, table, temporary) {
+  if (temporary && substr(table, 1, 1) != "#") {
+    table <- hash_temp(table)
+  }
 
-#' @export
-db_write_table.HDB <- function(con, table, types, values, temporary = TRUE, ...) {
-  NextMethod(
-    table = mssql_table_rename(table, temporary),
-    types = types,
-    values = values
-  )
-}
-
-#' @export
-db_save_query.HDB <- function(con, sql, name, temporary = TRUE, ...) {
-  NextMethod(
-    sql = sql,
-    name = mssql_table_rename(name, temporary)
+  list(
+    table = table,
+    temporary = FALSE
   )
 }
 
