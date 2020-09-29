@@ -49,6 +49,14 @@ reference:
   - translate_sql
   - window_order
 
+- title: dbplyr Backends
+  desc: Documentation for authors of new dbplyr backends
+  contents:
+  - db-io
+  - db-misc
+  - db-sql
+  - db-quote
+
 navbar:
   components:
     home: ~

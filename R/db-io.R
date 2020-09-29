@@ -1,0 +1,167 @@
+#' Database I/O generics
+#'
+#' @description
+#' These generics are responsible for getting data into and out of the
+#' database. They should be used a last resort - only use them when you can't
+#' make a backend work by providing methods for DBI generics, or for dbplyr's
+#' SQL generation generics. They tend to be most needed when a backend has
+#' special handling of temporary tables.
+#'
+#' * `db_copy_to()` implements [copy_to.tbl_sql()] by calling
+#'   `db_write_table()` to transfer the data, then optionally adds indexes
+#'   (via [sql_create_index()]) and analyses (via [sql_analyze()]).
+#'
+#' * `db_compute()` implements [compute.tbl_sql()] by calling
+#'   `db_save_query()` to create the table, then optionally adds indexes
+#'   (via [sql_create_index()]) and analyses (via [sql_analyze()]).
+#'
+#' * `db_collect()` implements [collect.tbl_sql()] using [DBI::dbSendQuery()]
+#'   and [DBI::dbFetch()].
+#'
+#' @keywords internal
+#' @family generic
+#' @export
+#' @name db-io
+#' @aliases NULL
+
+#' @export
+#' @rdname db-io
+db_copy_to <-  function(con, table, values,
+                        overwrite = FALSE, types = NULL, temporary = TRUE,
+                        unique_indexes = NULL, indexes = NULL,
+                        analyze = TRUE, ...,
+                        in_transaction = TRUE) {
+  UseMethod("db_copy_to")
+}
+#' @export
+db_copy_to.DBIConnection <- function(con, table, values,
+                            overwrite = FALSE, types = NULL, temporary = TRUE,
+                            unique_indexes = NULL, indexes = NULL,
+                            analyze = TRUE, ...,
+                            in_transaction = TRUE) {
+
+  with_transaction(con, in_transaction, {
+    table <- db_write_table(con, table,
+      types = types,
+      values = values,
+      temporary = temporary,
+      overwrite = overwrite
+    )
+    create_indexes(con, table, unique_indexes, unique = TRUE)
+    create_indexes(con, table, indexes, unique = FALSE)
+    if (analyze) db_analyze(con, table)
+  })
+
+  table
+}
+
+#' @export
+#' @rdname db-io
+db_compute <- function(con,
+                      table,
+                      sql,
+                      temporary = TRUE,
+                      unique_indexes = list(),
+                      indexes = list(),
+                      analyze = TRUE,
+                      ...) {
+  UseMethod("db_compute")
+}
+#' @export
+db_compute.DBIConnection <- function(con,
+                                     table,
+                                     sql,
+                                     temporary = TRUE,
+                                     unique_indexes = list(),
+                                     indexes = list(),
+                                     analyze = TRUE,
+                                     ...) {
+  if (!is.list(indexes)) {
+    indexes <- as.list(indexes)
+  }
+  if (!is.list(unique_indexes)) {
+    unique_indexes <- as.list(unique_indexes)
+  }
+
+  table <- db_save_query(con, sql, table, temporary = temporary)
+  create_indexes(con, table, unique_indexes, unique = TRUE)
+  create_indexes(con, table, indexes, unique = FALSE)
+  if (analyze) db_analyze(con, table)
+
+  table
+}
+
+#' @export
+#' @rdname db-io
+db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
+  UseMethod("db_collect")
+}
+#' @export
+db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
+  res <- dbSendQuery(con, sql)
+  tryCatch({
+    out <- dbFetch(res, n = n)
+    if (warn_incomplete) {
+      res_warn_incomplete(res, "n = Inf")
+    }
+  }, finally = {
+    dbClearResult(res)
+  })
+
+  out
+}
+
+#' @export
+db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
+                                        ...) {
+  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
+  dbExecute(con, sql, immediate = TRUE)
+  name
+}
+
+#' @export
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
+
+  dbWriteTable(
+    con,
+    name = dbi_quote(table, con),
+    value = values,
+    field.types = types,
+    temporary = temporary,
+    overwrite = overwrite,
+    row.names = FALSE
+  )
+
+  table
+}
+
+# Utility functions ------------------------------------------------------------
+
+dbi_quote <- function(x, con) UseMethod("dbi_quote")
+dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
+dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
+dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))
+
+create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
+  if (is.null(indexes)) return()
+  assert_that(is.list(indexes))
+
+  for (index in indexes) {
+    db_create_index(con, table, index, unique = unique, ...)
+  }
+}
+
+# Don't use `tryCatch()` because it messes with the callstack
+with_transaction <- function(con, in_transaction, code) {
+  if (in_transaction) {
+    dbBegin(con)
+    on.exit(dbRollback(con))
+  }
+
+  code
+
+  if (in_transaction) {
+    on.exit()
+    dbCommit(con)
+  }
+}

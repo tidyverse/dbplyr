@@ -7,8 +7,9 @@
 #' queries.
 #'
 #' @keywords internal
-#' @family generics
-#' @name sql_escape
+#' @family generic
+#' @name db-quote
+#' @aliases NULL
 #' @examples
 #' con <- simulate_dbi()
 #' sql_escape_logical(con, c(TRUE, FALSE, NA))
@@ -17,7 +18,7 @@
 #' sql_escape_raw(con, charToRaw("hi"))
 NULL
 
-#' @rdname sql_escape
+#' @rdname db-quote
 #' @export
 sql_escape_logical <- function(con, x) {
   UseMethod("sql_escape_logical")
@@ -30,7 +31,7 @@ sql_escape_logical.DBIConnection <- function(con, x) {
 }
 
 #' @export
-#' @rdname sql_escape
+#' @rdname db-quote
 sql_escape_date <- function(con, x) {
   UseMethod("sql_escape_date")
 }
@@ -40,7 +41,7 @@ sql_escape_date.DBIConnection <- function(con, x) {
 }
 
 #' @export
-#' @rdname sql_escape
+#' @rdname db-quote
 sql_escape_datetime <- function(con, x) {
   UseMethod("sql_escape_datetime")
 }
@@ -51,7 +52,7 @@ sql_escape_datetime.DBIConnection <- function(con, x) {
 }
 
 #' @export
-#' @rdname sql_escape
+#' @rdname db-quote
 sql_escape_raw <- function(con, x) {
   UseMethod("sql_escape_raw")
 }

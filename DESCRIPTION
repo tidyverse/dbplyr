@@ -87,6 +87,8 @@ Collate:
     'data-lahman.R'
     'data-nycflights13.R'
     'db-escape.R'
+    'db-io.R'
+    'db-sql.R'
     'db.R'
     'dbplyr.R'
     'explain.R'
