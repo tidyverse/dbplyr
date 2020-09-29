@@ -1,71 +1,22 @@
-# db_ methods -------------------------------------------------------------
+# misc --------------------------------------------------------------------
 
 #' @export
 db_desc.DBIConnection <- function(x) {
   class(x)[[1]]
 }
 
+#' @rdname db_sql
 #' @export
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
-                                        ...) {
-  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  dbExecute(con, sql, immediate = TRUE)
-  name
+sql_join_suffix <- function(con, ...) {
+  UseMethod("sql_join_suffix")
+}
+#' @export
+sql_join_suffix.DBIConnection <- function(con, ...) {
+  c(".x", ".y")
 }
 
-#' @export
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
 
-  dbWriteTable(
-    con,
-    name = dbi_quote(table, con),
-    value = values,
-    field.types = types,
-    temporary = temporary,
-    overwrite = overwrite,
-    row.names = FALSE
-  )
-
-  table
-}
-
-#' @export
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
-  sql <- sql_index_create(con, table, columns, name = name, unique = unique, ...)
-  dbExecute(con, sql)
-}
-
-#' @export
-db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- sql_table_analyze(con, table, ...)
-  if (is.null(sql)) {
-    return()
-  }
-  dbExecute(con, sql)
-}
-
-#' @export
-db_explain.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_query_explain(con, sql, ...)
-  expl <- dbGetQuery(con, sql)
-  out <- utils::capture.output(print(expl))
-  paste(out, collapse = "\n")
-}
-
-#' @export
-db_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_query_fields(con, sql, ...)
-  names(dbGetQuery(con, sql))
-}
-
-#' @export
-db_query_rows.DBIConnection <- function(con, sql, ...) {
-  sql <- sql_query_rows(con, sql, ...)
-  as.integer(dbGetQuery(con, rows)[[1]])
-}
-
-# SQL methods -------------------------------------------------------------
+# SQL generation ------------------------------------------------------
 
 #' SQL generation methods for database methods
 #'
@@ -93,6 +44,13 @@ sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(),
   }
 }
 
+#' @export
+db_explain.DBIConnection <- function(con, sql, ...) {
+  sql <- sql_query_explain(con, sql, ...)
+  expl <- dbGetQuery(con, sql)
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
+}
 #' @rdname db_sql
 #' @export
 sql_query_explain <- function(con, sql, ...) {
@@ -103,6 +61,14 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
+#' @export
+db_analyze.DBIConnection <- function(con, table, ...) {
+  sql <- sql_table_analyze(con, table, ...)
+  if (is.null(sql)) {
+    return()
+  }
+  dbExecute(con, sql)
+}
 #' @rdname db_sql
 #' @export
 sql_table_analyze <- function(con, table, ...) {
@@ -113,6 +79,12 @@ sql_table_analyze.DBIConnection <- function(con, table, ...) {
   build_sql("ANALYZE ", as.sql(table), con = con)
 }
 
+#' @export
+db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
+                                          unique = FALSE, ...) {
+  sql <- sql_index_create(con, table, columns, name = name, unique = unique, ...)
+  dbExecute(con, sql)
+}
 #' @rdname db_sql
 #' @export
 sql_index_create <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
@@ -146,33 +118,31 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
   )
 }
 
-#' @rdname db_sql
 #' @export
-sql_join_suffix <- function(con, ...) {
-  UseMethod("sql_join_suffix")
+db_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql <- sql_query_fields(con, sql, ...)
+  names(dbGetQuery(con, sql))
 }
-#' @export
-sql_join_suffix.DBIConnection <- function(con, ...) {
-  c(".x", ".y")
-}
-
 #' @rdname db_sql
 #' @export
 sql_query_fields <- function(con, sql, ...) {
   UseMethod("sql_query_fields")
 }
-
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
   sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
 }
 
+#' @export
+db_query_rows.DBIConnection <- function(con, sql, ...) {
+  sql <- sql_query_rows(con, sql, ...)
+  as.integer(dbGetQuery(con, rows)[[1]])
+}
 #' @rdname db_sql
 #' @export
 sql_query_rows <- function(con, sql, ...) {
   UseMethod("sql_query_rows")
 }
-
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- sql_subquery(con, sql, "master")
@@ -184,7 +154,6 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
 sql_expr_matches <- function(con, x, y) {
   UseMethod("sql_expr_matches")
 }
-
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
 sql_expr_matches.DBIConnection <- function(con, x, y) {
@@ -195,6 +164,18 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
     con = con
   )
 }
+
+#' @rdname db_copy_to
+#' @export
+db_sql_render <- function(con, sql, ...) {
+  UseMethod("db_sql_render")
+}
+#' @export
+db_sql_render.DBIConnection <- function(con, sql, ...) {
+  sql_render(sql, con = con, ...)
+}
+
+# I/O ------------------------------------------------------------
 
 #' More db generics
 #'
@@ -210,8 +191,6 @@ db_copy_to <-  function(con, table, values,
                         in_transaction = TRUE) {
   UseMethod("db_copy_to")
 }
-
-
 #' @export
 db_copy_to.DBIConnection <- function(con, table, values,
                             overwrite = FALSE, types = NULL, temporary = TRUE,
@@ -234,7 +213,6 @@ db_copy_to.DBIConnection <- function(con, table, values,
   table
 }
 
-
 #' @export
 #' @rdname db_copy_to
 db_compute <- function(con,
@@ -247,8 +225,6 @@ db_compute <- function(con,
                       ...) {
   UseMethod("db_compute")
 }
-
-
 #' @export
 db_compute.DBIConnection <- function(con,
                                      table,
@@ -273,23 +249,11 @@ db_compute.DBIConnection <- function(con,
   table
 }
 
-#' @rdname db_copy_to
-#' @export
-db_sql_render <- function(con, sql, ...) {
-  UseMethod("db_sql_render")
-}
-
-#' @export
-db_sql_render.DBIConnection <- function(con, sql, ...) {
-  sql_render(sql, con = con, ...)
-}
-
 #' @export
 #' @rdname db_copy_to
 db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
   UseMethod("db_collect")
 }
-
 #' @export
 db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
   res <- dbSendQuery(con, sql)
@@ -303,6 +267,30 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
   })
 
   out
+}
+
+#' @export
+db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE,
+                                        ...) {
+  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
+  dbExecute(con, sql, immediate = TRUE)
+  name
+}
+
+#' @export
+db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
+
+  dbWriteTable(
+    con,
+    name = dbi_quote(table, con),
+    value = values,
+    field.types = types,
+    temporary = temporary,
+    overwrite = overwrite,
+    row.names = FALSE
+  )
+
+  table
 }
 
 # Utility functions ------------------------------------------------------------
@@ -335,4 +323,3 @@ with_transaction <- function(con, in_transaction, code) {
     dbCommit(con)
   }
 }
-
