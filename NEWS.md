@@ -113,7 +113,6 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
     * `db_create_index()` -> `sql_index_create()`
     * `db_explain()` -> `sql_queriy_explain()` 
     * `db_query_fields()` -> `sql_query_fields()`
-    * `db_query_rows()` -> `sql_query_rows()`
   
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).
@@ -126,6 +125,9 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
    `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`,
    `db_list_tables()`, `drop_drop_table()`, `db_has_table()`, 
    `db_create_table()`, and `db_data_types()`. 
+
+* `db_query_rows()` is no longer used; it appears that it hasn't been used for
+  some time.
 
 * `DBI::dbQuoteIdentifier()` is now used instead of `sql_escape_ident()` and
   `DBI::dbQuoteString()` instead of `sql_escape_string()`.

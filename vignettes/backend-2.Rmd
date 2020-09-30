@@ -15,13 +15,34 @@ knitr::opts_chunk$set(
 ```
 
 This transition guide is aimed at backend authors.
-One of the big goals of dbplyr 2.0.0 is to ensure that all dbplyr generics can live in dplyr.
-I've done my best to design than transition so you can write a backend that works with both dbplyr 1.0.0 and dbplyr 2.0.0, and the complete transition won't happen immediately but will play out over the next year or two.
+dbplyr 2.0.0 is an important release because it includes a plan to all move backend generics into dbplyr (instead of being a mix of dbplyr and dplyr).
+This move has been designed to be as gradual as possible so not there are no sudden breakages and backend authors have plenty of time to make changes.
 
-(dbplyr 2.0.0 won't be released for at least 3 months after I notify all backend authors, and if you need more time I'm happy to extend this deadline.)
+The current timeline is something like this:
 
-The basic idea is that no generics will "move"; instead dbplyr will add new generics and dplyr will eventually remove them.
-This makes it straightforward to support both dbplyr 1.0.0 and 2.0.0 in a single package.
+-   dbplyr 2.0.0 provides a new interface for database backends, but the old interface remains as is so existing backends continue to work.
+    Backend authors can choose to use the new interface.
+
+-   dbplyr 2.1.0 (released \>= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.
+
+-   dbplyr 2.2.0 (released \>= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.
+
+## 2nd edition
+
+dbplyr 2.0.0 draws inspiration from the idea of an [edition](https://testthat.r-lib.org/articles/third-edition.html) so that for dbplyr to use the new generics with your backend, you need to do two things:
+
+-   Depend on dbplyr 2.0.0 in your `DESCRIPTION`, e.g.
+    `Imports: dbplyr (>= 2.0.0)`
+
+-   Provide a method for the `dbplyr_edition` generic that declares you want the second edition:
+
+    ```{r}
+    #' @importFrom dbplyr dbplyr_edition
+    #' @export
+    dbplyr_edition.myConnectionClass <- function(con) 2L
+    ```
+
+Next you'll need to update your methods, following the advice below.
 
 ## DBI generics
 
@@ -35,12 +56,7 @@ Now thanks to the work of Kiril Muller and on others on DBITest and friends, the
 If you have provided methods any of these dbplyr generics you'll need to:
 
 -   Implement a method for the corresponding DBI generic: this ensures that your package will work with dbplyr 2.0.0.
-
-```{=html}
-<!-- -->
-```
--   Call the DBI generic from the existing dbplyr method.
-    Don't delete your existing methods or your package will no longer work with dbplyr 1.0.0.
+-   Call the DBI generic from the existing dbplyr method. Don't delete your existing methods or your package will no longer work with dbplyr 1.0.0.
 
 I *think* that this should cause relatively little pain because DBI support is now much better than it used to be and most backend authors provide both the dbplyr and DBI interfaces.
 Even if there is some pain, I think it's relatively worthwhile pain as it helps out everyone, not just dbplyr users.
@@ -56,7 +72,6 @@ If you have any of the following generics, extract the SQL generation code into 
     db_analyze        -> sql_table_analyze
     db_query_rows     -> sql_query_rows
     db_save_query     -> sql_query_save
-    db_query_fields   -> sql_query_fields
     db_explain        -> sql_query_explain
 
 Again, you'll need to keep your old `db_` method (so your package continues to work with dbplyr 1.0.0), but you may want to use your new `sql_` method from it to avoid code duplication.

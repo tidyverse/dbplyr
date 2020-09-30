@@ -16,7 +16,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
   from <- as.sql(from, con = src$con)
 
-  vars <- vars %||% dplyr::db_query_fields(src$con, from)
+  vars <- vars %||% dbplyr_query_fields(src$con, from)
   ops <- op_base_remote(from, vars)
 
   dplyr::make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)

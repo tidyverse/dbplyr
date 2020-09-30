@@ -10,6 +10,9 @@
 \alias{sql_query_rows}
 \alias{sql_expr_matches}
 \alias{db_analyze.DBIConnection}
+\alias{db_create_index.DBIConnection}
+\alias{db_explain.DBIConnection}
+\alias{db_query_fields.DBIConnection}
 \title{SQL generation generics}
 \usage{
 sql_query_explain(con, sql, ...)
@@ -27,17 +30,24 @@ sql_query_rows(con, sql, ...)
 sql_expr_matches(con, x, y)
 
 \method{db_analyze}{DBIConnection}(con, table, ...)
+
+\method{db_create_index}{DBIConnection}(con, table, columns, name = NULL, unique = FALSE, ...)
+
+\method{db_explain}{DBIConnection}(con, sql, ...)
+
+\method{db_query_fields}{DBIConnection}(con, sql, ...)
 }
 \description{
 \itemize{
-\item \code{sql_table_analyze(con, table)} should produce SQL to "analyze" the table,
+\item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
-\item \code{sql_index_create()} <- \code{db_create_index()} <- \code{db_copy_to(indexes = ...)}
-\item \code{sql_query_explain()} <- \code{db_explain} <- \code{explain()}
-\item \code{sql_query_fields()} <- \code{db_query_fields()} <- \code{tbl()}
-\item \code{sql_query_rows()} <- \code{db_query_rows()} <- \code{do()}
-\item \code{sql_query_save()} <- \code{db_save_query()} <- \code{db_compute()} <- \code{compute()}
+\item \code{sql_query_explain(con, sql)} generates SQL that "explains" a query,
+i.e. generates a query plan describing what indexes etc that the
+database will use.
+\item \code{sql_index_create()} generates SQL for adding an index to table.
+\item \code{sql_query_fields()} generates SQL for a 0-row result that is used to
+capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 \item \code{sql_expr_matches(con, x, y)} is used to generate an alternative to
 \code{x == y} to use when you want \code{NULL}s to match. The default translation
 uses a \verb{CASE WHEN} as described in
@@ -52,6 +62,10 @@ update your backend, you'll need to extract out the SQL generation from your
 existing code, and place it in a new method for a dbplyr \code{sql_} generic.
 \itemize{
 \item \code{db_analyze()} is replaced by \code{sql_table_analyze()}
+\item \code{db_explain()} is replaced by \code{sql_query_explain()}
+\item \code{db_create_index()} is replaced by \code{sql_index_create()}
+\item \code{db_query_fields()} is replaced by \code{sql_query_fields()}
+\item \code{db_query_rows()} is no longer used; you can delete it
 }
 
 Learn more in \code{vignette("backend-2.0")}

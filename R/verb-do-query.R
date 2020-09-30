@@ -3,7 +3,6 @@ NULL
 
 Query <- R6::R6Class("Query",
   private = list(
-    .nrow = NULL,
     .vars = NULL
   ),
   public = list(
@@ -44,12 +43,6 @@ Query <- R6::R6Class("Query",
 
     vars = function() {
       private$.vars
-    },
-
-    nrow = function() {
-      if (!is.null(private$.nrow)) return(private$.nrow)
-      private$.nrow <- dplyr::db_query_rows(self$con, self$sql)
-      private$.nrow
     },
 
     ncol = function() {

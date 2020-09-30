@@ -155,7 +155,7 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
 
   indexes <- as.list(indexes)
   for (index in indexes) {
-    dplyr::db_create_index(con, table, index, unique = unique, ...)
+    dbplyr_create_index(con, table, index, unique = unique, ...)
   }
 }
 
