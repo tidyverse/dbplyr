@@ -61,9 +61,8 @@ Now rather than implementation method for a `db_*` generic from dplyr, you can i
 
 If you have any of the following generics, extract the SQL generation code into a new `sql_` method:
 
-    db_create_index   -> sql_index_create
+    db_create_index   -> sql_table_index
     db_analyze        -> sql_table_analyze
-    db_query_rows     -> sql_query_rows
     db_save_query     -> sql_query_save
     db_explain        -> sql_query_explain
 
@@ -80,7 +79,7 @@ To make it possible to release your package to CRAN before dbplyr 2.0.0 is out (
 ```{r}
 .onLoad <- function(...) {
   if (packageVersion("dbplyr" >= "1.99")) {
-    s3_register("dbplyr::sql_index_create", "backend_class")
+    s3_register("dbplyr::sql_table_index", "backend_class")
     s3_register("dbplyr::sql_table_analyze", "backend_class")
   }
 }

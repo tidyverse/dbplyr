@@ -1,15 +1,19 @@
 #' SQL generation generics
 #'
 #' @description
+#' * `sql_expr_matches(con, x, y)` generates an alternative to `x = y` when a
+#'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
+#'   as described in <https://modern-sql.com/feature/is-distinct-from>.
+#'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
 #'   ensuring that the database has up-to-date statistics for use in the query
 #'   planner. It called from [copy_to()] when `analyze = TRUE`.
 #'
+#' * `sql_table_index()` generates SQL for adding an index to table. The
+#'
 #' * `sql_query_explain(con, sql)` generates SQL that "explains" a query,
 #'   i.e. generates a query plan describing what indexes etc that the
 #'   database will use.
-#'
-#' * `sql_index_create()` generates SQL for adding an index to table.
 #'
 #' * `sql_query_fields()` generates SQL for a 0-row result that is used to
 #'   capture field names in [tbl_sql()]
@@ -20,11 +24,6 @@
 #' * `sql_query_wrap(con, from)` generates SQL for wrapping a query into a
 #'   subquery.
 #'
-#' * `sql_expr_matches(con, x, y)` is used to generate an alternative to
-#'   `x == y` to use when you want `NULL`s to match. The default translation
-#'   uses a `CASE WHEN` as described in
-#'   <https://modern-sql.com/feature/is-distinct-from>
-#'
 #' @section dbplyr 2.0.0:
 #'
 #' These generics replace many of the `db_` generics provided by dplyr. To
@@ -33,7 +32,7 @@
 #'
 #' * `db_analyze()` is replaced by `sql_table_analyze()`
 #' * `db_explain()` is replaced by `sql_query_explain()`
-#' * `db_create_index()` is replaced by `sql_index_create()`
+#' * `db_create_index()` is replaced by `sql_table_index()`
 #' * `db_query_fields()` is replaced by `sql_query_fields()`
 #' * `db_query_rows()` is no longer used; you can delete it
 #' * `db_save_query()` is replaced by `sql_query_save()`
@@ -44,94 +43,6 @@
 #' @family generic
 #' @name db-sql
 NULL
-
-#' @export
-#' @rdname db-sql
-sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
-  UseMethod("sql_query_wrap")
-}
-#' @export
-sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
-  }
-}
-
-#' @rdname db-sql
-#' @export
-sql_query_explain <- function(con, sql, ...) {
-  UseMethod("sql_query_explain")
-}
-#' @export
-sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  build_sql("EXPLAIN ", sql, con = con)
-}
-
-#' @rdname db-sql
-#' @export
-sql_table_analyze <- function(con, table, ...) {
-  UseMethod("sql_table_analyze")
-}
-#' @export
-sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  build_sql("ANALYZE ", as.sql(table), con = con)
-}
-
-#' @rdname db-sql
-#' @export
-sql_index_create <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
-  UseMethod("sql_index_create")
-}
-#' @export
-sql_index_create.DBIConnection <- function(con, table, columns, name = NULL,
-                                           unique = FALSE, ...) {
-  assert_that(is_string(table), is.character(columns))
-
-  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
-    " ON ", as.sql(table), " ", fields,
-    con = con
-  )
-}
-
-#' @rdname db-sql
-#' @export
-sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
-  UseMethod("sql_query_save")
-}
-#' @export
-sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
-  build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name), " AS ", sql,
-    con = con
-  )
-}
-
-#' @rdname db-sql
-#' @export
-sql_query_fields <- function(con, sql, ...) {
-  UseMethod("sql_query_fields")
-}
-#' @export
-sql_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
-}
-
-#' @rdname db-sql
-#' @export
-sql_query_rows <- function(con, sql, ...) {
-  UseMethod("sql_query_rows")
-}
-#' @export
-sql_query_rows.DBIConnection <- function(con, sql, ...) {
-  from <- dbplyr_sql_subquery(con, sql, "master")
-  build_sql("SELECT COUNT(*) FROM ", from, con = con)
-}
 
 #' @export
 #' @rdname db-sql
@@ -149,6 +60,94 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
   )
 }
 
+#' @rdname db-sql
+#' @export
+sql_table_analyze <- function(con, table, ...) {
+  UseMethod("sql_table_analyze")
+}
+#' @export
+sql_table_analyze.DBIConnection <- function(con, table, ...) {
+  build_sql("ANALYZE ", as.sql(table), con = con)
+}
+
+#' @rdname db-sql
+#' @export
+sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+  UseMethod("sql_table_index")
+}
+#' @export
+sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
+                                           unique = FALSE, ...) {
+  assert_that(is_string(table), is.character(columns))
+
+  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
+  fields <- escape(ident(columns), parens = TRUE, con = con)
+  build_sql(
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
+    " ON ", as.sql(table), " ", fields,
+    con = con
+  )
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_explain <- function(con, sql, ...) {
+  UseMethod("sql_query_explain")
+}
+#' @export
+sql_query_explain.DBIConnection <- function(con, sql, ...) {
+  build_sql("EXPLAIN ", sql, con = con)
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_fields <- function(con, sql, ...) {
+  UseMethod("sql_query_fields")
+}
+#' @export
+sql_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  UseMethod("sql_query_save")
+}
+#' @export
+sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
+    as.sql(name), " AS ", sql,
+    con = con
+  )
+}
+#' @export
+#' @rdname db-sql
+sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
+  UseMethod("sql_query_wrap")
+}
+#' @export
+sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+  if (is.ident(from)) {
+    setNames(from, name)
+  } else {
+    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
+  }
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_rows <- function(con, sql, ...) {
+  UseMethod("sql_query_rows")
+}
+#' @export
+sql_query_rows.DBIConnection <- function(con, sql, ...) {
+  from <- dbplyr_sql_subquery(con, sql, "master")
+  build_sql("SELECT COUNT(*) FROM ", from, con = con)
+}
+
+
 # dplyr fallbacks ---------------------------------------------------------
 
 dbplyr_analyze <- function(con, ...) {
@@ -156,7 +155,6 @@ dbplyr_analyze <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_analyze
-#' @rdname db-sql
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
@@ -169,11 +167,10 @@ dbplyr_create_index <- function(con, ...) {
   dbplyr_fallback(con, "db_create_index", ...)
 }
 #' @export
-#' @rdname db-sql
 #' @importFrom dplyr db_create_index
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
-  sql <- sql_index_create(con, table, columns, name = name, unique = unique, ...)
+  sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
   dbExecute(con, sql)
 }
 
@@ -182,7 +179,6 @@ dbplyr_explain <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_explain
-#' @rdname db-sql
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
   expl <- dbGetQuery(con, sql)
@@ -194,7 +190,6 @@ dbplyr_query_fields <- function(con, ...) {
   dbplyr_fallback(con, "db_query_fields", ...)
 }
 #' @export
-#' @rdname db-sql
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
@@ -205,7 +200,6 @@ dbplyr_save_query <- function(con, ...) {
   dbplyr_fallback(con, "db_save_query", ...)
 }
 #' @export
-#' @rdname db-sql
 #' @importFrom dplyr db_save_query
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
@@ -217,7 +211,6 @@ dbplyr_sql_subquery <- function(con, ...) {
   dbplyr_fallback(con, "sql_subquery", ...)
 }
 #' @export
-#' @rdname db-sql
 #' @importFrom dplyr sql_subquery
 sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
   sql_query_wrap(con, from = from, name = name, ...)

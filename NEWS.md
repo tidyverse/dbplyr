@@ -109,11 +109,11 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
 *   A number of `db_*` generics have been replaced with new SQL generation
     generics:
 
-    * `db_analyze()` -> `sql_table_analyze()`
-    * `db_create_index()` -> `sql_index_create()`
-    * `db_explain()` -> `sql_queriy_explain()` 
-    * `db_query_fields()` -> `sql_query_fields()`
-    * `db_save_query()` -> `sql_query_save()`
+    * `dplyr::db_analyze()` -> `dbplyr::sql_table_analyze()`
+    * `dplyr::db_create_index()` -> `dbplyr::sql_table_index()`
+    * `dplyr::db_explain()` -> `dbplyr::sql_queriy_explain()` 
+    * `dplyr::db_query_fields()` -> `dbplyr::sql_query_fields()`
+    * `dplyr::db_save_query()` -> `dbplyr::sql_query_save()`
   
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).

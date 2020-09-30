@@ -2,67 +2,50 @@
 % Please edit documentation in R/db-sql.R
 \name{db-sql}
 \alias{db-sql}
-\alias{sql_query_wrap}
-\alias{sql_query_explain}
-\alias{sql_table_analyze}
-\alias{sql_index_create}
-\alias{sql_query_save}
-\alias{sql_query_fields}
-\alias{sql_query_rows}
 \alias{sql_expr_matches}
-\alias{db_analyze.DBIConnection}
-\alias{db_create_index.DBIConnection}
-\alias{db_explain.DBIConnection}
-\alias{db_query_fields.DBIConnection}
-\alias{db_save_query.DBIConnection}
-\alias{sql_subquery.DBIConnection}
+\alias{sql_table_analyze}
+\alias{sql_table_index}
+\alias{sql_query_explain}
+\alias{sql_query_fields}
+\alias{sql_query_save}
+\alias{sql_query_wrap}
+\alias{sql_query_rows}
 \title{SQL generation generics}
 \usage{
-sql_query_wrap(con, from, name = unique_subquery_name(), ...)
-
-sql_query_explain(con, sql, ...)
+sql_expr_matches(con, x, y)
 
 sql_table_analyze(con, table, ...)
 
-sql_index_create(con, table, columns, name = NULL, unique = FALSE, ...)
+sql_table_index(con, table, columns, name = NULL, unique = FALSE, ...)
 
-sql_query_save(con, sql, name, temporary = TRUE, ...)
+sql_query_explain(con, sql, ...)
 
 sql_query_fields(con, sql, ...)
 
+sql_query_save(con, sql, name, temporary = TRUE, ...)
+
+sql_query_wrap(con, from, name = unique_subquery_name(), ...)
+
 sql_query_rows(con, sql, ...)
-
-sql_expr_matches(con, x, y)
-
-\method{db_analyze}{DBIConnection}(con, table, ...)
-
-\method{db_create_index}{DBIConnection}(con, table, columns, name = NULL, unique = FALSE, ...)
-
-\method{db_explain}{DBIConnection}(con, sql, ...)
-
-\method{db_query_fields}{DBIConnection}(con, sql, ...)
-
-\method{db_save_query}{DBIConnection}(con, sql, name, temporary = TRUE, ...)
-
-\method{sql_subquery}{DBIConnection}(con, from, name = unique_subquery_name(), ...)
 }
 \description{
 \itemize{
+\item \code{sql_expr_matches(con, x, y)} generates an alternative to \code{x = y} when a
+pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
+as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
+\item \code{sql_table_index()} generates SQL for adding an index to table. The
 \item \code{sql_query_explain(con, sql)} generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
 database will use.
-\item \code{sql_index_create()} generates SQL for adding an index to table.
 \item \code{sql_query_fields()} generates SQL for a 0-row result that is used to
 capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 \item \code{sql_query_save(con, sql)} generates SQL for saving a query into a
 (temporary) table.
-\item \code{sql_expr_matches(con, x, y)} is used to generate an alternative to
-\code{x == y} to use when you want \code{NULL}s to match. The default translation
-uses a \verb{CASE WHEN} as described in
-\url{https://modern-sql.com/feature/is-distinct-from}
+\item \code{sql_query_wrap(con, from)} generates SQL for wrapping a query into a
+subquery.
 }
 }
 \section{dbplyr 2.0.0}{
@@ -74,7 +57,7 @@ existing code, and place it in a new method for a dbplyr \code{sql_} generic.
 \itemize{
 \item \code{db_analyze()} is replaced by \code{sql_table_analyze()}
 \item \code{db_explain()} is replaced by \code{sql_query_explain()}
-\item \code{db_create_index()} is replaced by \code{sql_index_create()}
+\item \code{db_create_index()} is replaced by \code{sql_table_index()}
 \item \code{db_query_fields()} is replaced by \code{sql_query_fields()}
 \item \code{db_query_rows()} is no longer used; you can delete it
 \item \code{db_save_query()} is replaced by \code{sql_query_save()}
@@ -85,8 +68,8 @@ Learn more in \code{vignette("backend-2.0")}
 
 \seealso{
 Other generic: 
+\code{\link{db_connection_describe}()},
 \code{\link{db_copy_to}()},
-\code{\link{db_desc.DBIConnection}()},
 \code{\link{sql_escape_logical}()}
 }
 \concept{generic}

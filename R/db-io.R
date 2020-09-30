@@ -9,12 +9,12 @@
 #'
 #' * `db_copy_to()` implements [copy_to.src_sql()] by calling
 #'   `db_write_table()` (which calls [DBI::dbWriteTable()]) to transfer the
-#'   data, then optionally adds indexes (via [sql_index_create()]) and
+#'   data, then optionally adds indexes (via [sql_table_index()]) and
 #'   analyses (via [sql_table_analyze()]).
 #'
 #' * `db_compute()` implements [compute.tbl_sql()] by calling
 #'   [sql_query_save()] to create the table, then optionally adds indexes
-#'   (via [sql_index_create()]) and analyses (via [sql_table_analyze()]).
+#'   (via [sql_table_index()]) and analyses (via [sql_table_analyze()]).
 #'
 #' * `db_collect()` implements [collect.tbl_sql()] using [DBI::dbSendQuery()]
 #'   and [DBI::dbFetch()].

@@ -61,7 +61,7 @@ This declares that your package uses version 2 of the API, which is the version 
 Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:
 
 *   If `copy_to()` fails, you probably need a method for `sql_table_analyze()` 
-    or `sql_index_create()`. If `copy_to()` fails during creation of the tbl, 
+    or `sql_table_index()`. If `copy_to()` fails during creation of the tbl, 
     you may need a method for `sql_query_fields()`.
 
 *   If `collapse()` fails, your database has a non-standard way of constructing 

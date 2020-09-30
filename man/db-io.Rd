@@ -45,11 +45,11 @@ special handling of temporary tables.
 \itemize{
 \item \code{db_copy_to()} implements \code{\link[=copy_to.src_sql]{copy_to.src_sql()}} by calling
 \code{db_write_table()} (which calls \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}) to transfer the
-data, then optionally adds indexes (via \code{\link[=sql_index_create]{sql_index_create()}}) and
+data, then optionally adds indexes (via \code{\link[=sql_table_index]{sql_table_index()}}) and
 analyses (via \code{\link[=sql_table_analyze]{sql_table_analyze()}}).
 \item \code{db_compute()} implements \code{\link[=compute.tbl_sql]{compute.tbl_sql()}} by calling
 \code{\link[=sql_query_save]{sql_query_save()}} to create the table, then optionally adds indexes
-(via \code{\link[=sql_index_create]{sql_index_create()}}) and analyses (via \code{\link[=sql_table_analyze]{sql_table_analyze()}}).
+(via \code{\link[=sql_table_index]{sql_table_index()}}) and analyses (via \code{\link[=sql_table_analyze]{sql_table_analyze()}}).
 \item \code{db_collect()} implements \code{\link[=collect.tbl_sql]{collect.tbl_sql()}} using \code{\link[DBI:dbSendQuery]{DBI::dbSendQuery()}}
 and \code{\link[DBI:dbFetch]{DBI::dbFetch()}}.
 \item \code{db_table_temporary()} is used for databases that have special naming

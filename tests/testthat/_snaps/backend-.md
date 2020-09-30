@@ -59,14 +59,14 @@
 ---
 
     Code
-      sql_index_create(con, ident("table"), c("a", "b"))
+      sql_table_index(con, ident("table"), c("a", "b"))
     Output
       <SQL> CREATE INDEX `table_a_b` ON `table` (`a`, `b`)
 
 ---
 
     Code
-      sql_index_create(con, ident("table"), "c", unique = TRUE)
+      sql_table_index(con, ident("table"), "c", unique = TRUE)
     Output
       <SQL> CREATE UNIQUE INDEX `table_c` ON `table` (`c`)
 
