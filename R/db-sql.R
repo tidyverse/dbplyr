@@ -17,6 +17,9 @@
 #' * `sql_query_save(con, sql)` generates SQL for saving a query into a
 #'   (temporary) table.
 #'
+#' * `sql_query_wrap(con, from)` generates SQL for wrapping a query into a
+#'   subquery.
+#'
 #' * `sql_expr_matches(con, x, y)` is used to generate an alternative to
 #'   `x == y` to use when you want `NULL`s to match. The default translation
 #'   uses a `CASE WHEN` as described in
@@ -43,7 +46,12 @@
 NULL
 
 #' @export
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+#' @rdname db-sql
+sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
+  UseMethod("sql_query_wrap")
+}
+#' @export
+sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
@@ -111,7 +119,7 @@ sql_query_fields <- function(con, sql, ...) {
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql_select(con, sql("*"), sql_subquery(con, sql), where = sql("0 = 1"))
+  sql_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
 }
 
 #' @rdname db-sql
@@ -121,7 +129,7 @@ sql_query_rows <- function(con, sql, ...) {
 }
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
-  from <- sql_subquery(con, sql, "master")
+  from <- dbplyr_sql_subquery(con, sql, "master")
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
 }
 
@@ -203,4 +211,14 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
   dbExecute(con, sql, immediate = TRUE)
   name
+}
+
+dbplyr_sql_subquery <- function(con, ...) {
+  dbplyr_fallback(con, "sql_subquery", ...)
+}
+#' @export
+#' @rdname db-sql
+#' @importFrom dplyr sql_subquery
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+  sql_query_wrap(con, from = from, name = name, ...)
 }

@@ -100,7 +100,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_subquery.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
@@ -135,7 +135,7 @@ sql_select.OraConnection <- sql_select.Oracle
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
 
 #' @export
-sql_subquery.OraConnection <- sql_subquery.Oracle
+sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle

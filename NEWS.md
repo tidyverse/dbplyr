@@ -118,6 +118,11 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).
 
+* A number of other generics have been renamed to facilitate the move from
+  dplyr to dbplyr
+
+  * `dplyr::sql_subquery()` -> `dbplyr::sql_query_wrap()`
+
 *  New `db_temporary_table()` generic makes it easier to work with databases
    that require temporary tables to be specially named.
   

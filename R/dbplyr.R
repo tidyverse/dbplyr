@@ -16,6 +16,5 @@
 #' @importFrom dplyr sql_select
 #' @importFrom dplyr sql_semi_join
 #' @importFrom dplyr sql_set_op
-#' @importFrom dplyr sql_subquery
 #' @importFrom dplyr sql_translate_env
 NULL

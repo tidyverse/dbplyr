@@ -2,6 +2,7 @@
 % Please edit documentation in R/db-sql.R
 \name{db-sql}
 \alias{db-sql}
+\alias{sql_query_wrap}
 \alias{sql_query_explain}
 \alias{sql_table_analyze}
 \alias{sql_index_create}
@@ -14,8 +15,11 @@
 \alias{db_explain.DBIConnection}
 \alias{db_query_fields.DBIConnection}
 \alias{db_save_query.DBIConnection}
+\alias{sql_subquery.DBIConnection}
 \title{SQL generation generics}
 \usage{
+sql_query_wrap(con, from, name = unique_subquery_name(), ...)
+
 sql_query_explain(con, sql, ...)
 
 sql_table_analyze(con, table, ...)
@@ -39,6 +43,8 @@ sql_expr_matches(con, x, y)
 \method{db_query_fields}{DBIConnection}(con, sql, ...)
 
 \method{db_save_query}{DBIConnection}(con, sql, name, temporary = TRUE, ...)
+
+\method{sql_subquery}{DBIConnection}(con, from, name = unique_subquery_name(), ...)
 }
 \description{
 \itemize{

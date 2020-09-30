@@ -45,14 +45,14 @@
 ---
 
     Code
-      sql_subquery(con, ident("table"))
+      sql_query_wrap(con, ident("table"))
     Output
       <IDENT> table
 
 ---
 
     Code
-      sql_subquery(con, sql("SELECT * FROM foo"))
+      sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
       <SQL> (SELECT * FROM foo) `q02`
 
