@@ -143,4 +143,4 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
-globalVariables(c("DATE", "SYSDATE", "CURRENT_TIMESTAMP"))
+globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))
