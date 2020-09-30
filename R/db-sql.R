@@ -14,6 +14,9 @@
 #' * `sql_query_fields()` generates SQL for a 0-row result that is used to
 #'   capture field names in [tbl_sql()]
 #'
+#' * `sql_query_save(con, sql)` generates SQL for saving a query into a
+#'   (temporary) table.
+#'
 #' * `sql_expr_matches(con, x, y)` is used to generate an alternative to
 #'   `x == y` to use when you want `NULL`s to match. The default translation
 #'   uses a `CASE WHEN` as described in
@@ -30,6 +33,7 @@
 #' * `db_create_index()` is replaced by `sql_index_create()`
 #' * `db_query_fields()` is replaced by `sql_query_fields()`
 #' * `db_query_rows()` is no longer used; you can delete it
+#' * `db_save_query()` is replaced by `sql_query_save()`
 #'
 #' Learn more in `vignette("backend-2.0")`
 #'
@@ -139,16 +143,6 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
 
 # dplyr fallbacks ---------------------------------------------------------
 
-dbplyr_fallback <- function(con, .generic, ...) {
-  if (dbplyr_edition(con) >= 2) {
-    # Always call DBIConnection method which contains the default implementation
-    fun <- sym(paste0(.generic, ".DBIConnection"))
-  } else {
-    fun <- call("::", quote(dplyr), sym(.generic))
-  }
-  eval_bare(expr((!!fun)(con, ...)))
-}
-
 dbplyr_analyze <- function(con, ...) {
   dbplyr_fallback(con, "db_analyze", ...)
 }
@@ -197,4 +191,16 @@ dbplyr_query_fields <- function(con, ...) {
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
   names(dbGetQuery(con, sql))
+}
+
+dbplyr_save_query <- function(con, ...) {
+  dbplyr_fallback(con, "db_save_query", ...)
+}
+#' @export
+#' @rdname db-sql
+#' @importFrom dplyr db_save_query
+db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
+  dbExecute(con, sql, immediate = TRUE)
+  name
 }

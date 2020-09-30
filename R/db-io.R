@@ -88,7 +88,7 @@ db_compute.DBIConnection <- function(con,
   table <- new$table
   temporary <- new$temporary
 
-  table <- dplyr::db_save_query(con, sql, table, temporary = temporary)
+  table <- dbplyr_save_query(con, sql, table, temporary = temporary)
   create_indexes(con, table, unique_indexes, unique = TRUE)
   create_indexes(con, table, indexes)
   if (analyze) dbplyr_analyze(con, table)
@@ -116,13 +116,6 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
   out
 }
 
-#' @export
-#' @importFrom dplyr db_save_query
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
-  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  dbExecute(con, sql, immediate = TRUE)
-  name
-}
 
 #' @export
 #' @importFrom dplyr db_write_table

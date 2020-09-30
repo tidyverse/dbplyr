@@ -13,6 +13,7 @@
 \alias{db_create_index.DBIConnection}
 \alias{db_explain.DBIConnection}
 \alias{db_query_fields.DBIConnection}
+\alias{db_save_query.DBIConnection}
 \title{SQL generation generics}
 \usage{
 sql_query_explain(con, sql, ...)
@@ -36,6 +37,8 @@ sql_expr_matches(con, x, y)
 \method{db_explain}{DBIConnection}(con, sql, ...)
 
 \method{db_query_fields}{DBIConnection}(con, sql, ...)
+
+\method{db_save_query}{DBIConnection}(con, sql, name, temporary = TRUE, ...)
 }
 \description{
 \itemize{
@@ -48,6 +51,8 @@ database will use.
 \item \code{sql_index_create()} generates SQL for adding an index to table.
 \item \code{sql_query_fields()} generates SQL for a 0-row result that is used to
 capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
+\item \code{sql_query_save(con, sql)} generates SQL for saving a query into a
+(temporary) table.
 \item \code{sql_expr_matches(con, x, y)} is used to generate an alternative to
 \code{x == y} to use when you want \code{NULL}s to match. The default translation
 uses a \verb{CASE WHEN} as described in
@@ -66,6 +71,7 @@ existing code, and place it in a new method for a dbplyr \code{sql_} generic.
 \item \code{db_create_index()} is replaced by \code{sql_index_create()}
 \item \code{db_query_fields()} is replaced by \code{sql_query_fields()}
 \item \code{db_query_rows()} is no longer used; you can delete it
+\item \code{db_save_query()} is replaced by \code{sql_query_save()}
 }
 
 Learn more in \code{vignette("backend-2.0")}
