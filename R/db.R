@@ -1,5 +1,9 @@
 #' Miscellaneous database generics
 #'
+#' Use a `dbplyr_edition()` method to declare that your backend supports
+#' version 2.0.0 of the dbplyr API where all generics live in dbplyr.
+#' See `vignette("backend-2")` for more details.
+#'
 #' @family generic
 #' @keywords internal
 #' @name db-misc
@@ -31,4 +35,14 @@ db_sql_render <- function(con, sql, ...) {
 #' @export
 db_sql_render.DBIConnection <- function(con, sql, ...) {
   sql_render(sql, con = con, ...)
+}
+
+#' @rdname db-misc
+#' @export
+dbplyr_edition <- function(con) {
+  UseMethod("dbplyr_edition")
+}
+#' @export
+dbplyr_edition.DBIConnection <- function(con) {
+  1L
 }

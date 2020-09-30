@@ -1,6 +1,10 @@
 #' SQL generation generics
 #'
-#' * `sql_table_analyze()` <- `db_analyze()` <- `db_copy_to(analyze = TRUE)`
+#' @description
+#' * `sql_table_analyze(con, table)` should produce SQL to "analyze" the table,
+#'   ensuring that the database has up-to-date statistics for use in the query
+#'   planner. It called from [copy_to()] when `analyze = TRUE`.
+#'
 #' * `sql_index_create()` <- `db_create_index()` <- `db_copy_to(indexes = ...)`
 #' * `sql_query_explain()` <- `db_explain` <- `explain()`
 #' * `sql_query_fields()` <- `db_query_fields()` <- `tbl()`
@@ -10,6 +14,16 @@
 #'   `x == y` to use when you want `NULL`s to match. The default translation
 #'   uses a `CASE WHEN` as described in
 #'   <https://modern-sql.com/feature/is-distinct-from>
+#'
+#' @section dbplyr 2.0.0:
+#'
+#' These generics replace many of the `db_` generics provided by dplyr. To
+#' update your backend, you'll need to extract out the SQL generation from your
+#' existing code, and place it in a new method for a dbplyr `sql_` generic.
+#'
+#' * `db_analyze()` is replaced by `sql_table_analyze()`
+#'
+#' Learn more in `vignette("backend-2.0")`
 #'
 #' @keywords internal
 #' @family generic
@@ -43,15 +57,6 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
-#' @export
-#' @importFrom dplyr db_analyze
-db_analyze.DBIConnection <- function(con, table, ...) {
-  sql <- sql_table_analyze(con, table, ...)
-  if (is.null(sql)) {
-    return()
-  }
-  dbExecute(con, sql)
-}
 #' @rdname db-sql
 #' @export
 sql_table_analyze <- function(con, table, ...) {
@@ -149,4 +154,24 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
     "ELSE 1 = 0",
     con = con
   )
+}
+
+# dplyr fallbacks ---------------------------------------------------------
+
+dbplyr_analyze <- function(con, table, ...) {
+  if (dbplyr_edition(con) >= 2) {
+    db_analyze.DBIConnection(con, table, ...)
+  } else {
+    dplyr::db_analyze(con, table, ...)
+  }
+}
+#' @export
+#' @importFrom dplyr db_analyze
+#' @rdname db-sql
+db_analyze.DBIConnection <- function(con, table, ...) {
+  sql <- sql_table_analyze(con, table, ...)
+  if (is.null(sql)) {
+    return()
+  }
+  dbExecute(con, sql)
 }

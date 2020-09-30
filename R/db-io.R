@@ -57,7 +57,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
     )
     create_indexes(con, table, unique_indexes, unique = TRUE)
     create_indexes(con, table, indexes)
-    if (analyze) dplyr::db_analyze(con, table)
+    if (analyze) dbplyr_analyze(con, table)
   })
 
   table
@@ -91,7 +91,7 @@ db_compute.DBIConnection <- function(con,
   table <- dplyr::db_save_query(con, sql, table, temporary = temporary)
   create_indexes(con, table, unique_indexes, unique = TRUE)
   create_indexes(con, table, indexes)
-  if (analyze) dplyr::db_analyze(con, table)
+  if (analyze) dbplyr_analyze(con, table)
 
   table
 }

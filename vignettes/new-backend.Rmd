@@ -44,6 +44,18 @@ tbl(con, "mtcars")
 
 If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/rstats-db/DBItest) to narrow down the problem.
 
+## Write your first method
+
+The first method of your dbplyr backend should always be for the `dbplyr_edition()` generic:
+
+```{r}
+#' @importFrom dbplyr dbplyr_edition
+#' @export
+dbplyr_edition.myConnectionClass <- function(con) 2L
+```
+
+This declares that your package uses version 2 of the API, which is the version that this vignette documents.
+
 ## Copying, computing, collecting and collapsing
 
 Next, check that `copy_to()`, `collapse()`, `compute()`, and `collect()` work:

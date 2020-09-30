@@ -4,6 +4,7 @@
 \alias{db_desc.DBIConnection}
 \alias{sql_join_suffix}
 \alias{db_sql_render}
+\alias{dbplyr_edition}
 \title{Miscellaneous database generics}
 \usage{
 \method{db_desc}{DBIConnection}(x)
@@ -11,9 +12,13 @@
 sql_join_suffix(con, ...)
 
 db_sql_render(con, sql, ...)
+
+dbplyr_edition(con)
 }
 \description{
-Miscellaneous database generics
+Use a \code{dbplyr_edition()} method to declare that your backend supports
+version 2.0.0 of the dbplyr API where all generics live in dbplyr.
+See \code{vignette("backend-2")} for more details.
 }
 \seealso{
 Other generic: 

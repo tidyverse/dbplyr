@@ -9,6 +9,7 @@
 \alias{sql_query_fields}
 \alias{sql_query_rows}
 \alias{sql_expr_matches}
+\alias{db_analyze.DBIConnection}
 \title{SQL generation generics}
 \usage{
 sql_query_explain(con, sql, ...)
@@ -24,10 +25,14 @@ sql_query_fields(con, sql, ...)
 sql_query_rows(con, sql, ...)
 
 sql_expr_matches(con, x, y)
+
+\method{db_analyze}{DBIConnection}(con, table, ...)
 }
 \description{
 \itemize{
-\item \code{sql_table_analyze()} <- \code{db_analyze()} <- \code{db_copy_to(analyze = TRUE)}
+\item \code{sql_table_analyze(con, table)} should produce SQL to "analyze" the table,
+ensuring that the database has up-to-date statistics for use in the query
+planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
 \item \code{sql_index_create()} <- \code{db_create_index()} <- \code{db_copy_to(indexes = ...)}
 \item \code{sql_query_explain()} <- \code{db_explain} <- \code{explain()}
 \item \code{sql_query_fields()} <- \code{db_query_fields()} <- \code{tbl()}
@@ -39,6 +44,19 @@ uses a \verb{CASE WHEN} as described in
 \url{https://modern-sql.com/feature/is-distinct-from}
 }
 }
+\section{dbplyr 2.0.0}{
+
+
+These generics replace many of the \code{db_} generics provided by dplyr. To
+update your backend, you'll need to extract out the SQL generation from your
+existing code, and place it in a new method for a dbplyr \code{sql_} generic.
+\itemize{
+\item \code{db_analyze()} is replaced by \code{sql_table_analyze()}
+}
+
+Learn more in \code{vignette("backend-2.0")}
+}
+
 \seealso{
 Other generic: 
 \code{\link{db_copy_to}()},
