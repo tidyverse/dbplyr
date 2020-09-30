@@ -113,6 +113,7 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
     * `db_create_index()` -> `sql_index_create()`
     * `db_explain()` -> `sql_queriy_explain()` 
     * `db_query_fields()` -> `sql_query_fields()`
+    * `db_save_query()` -> `sql_query_save()`
   
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).
@@ -120,8 +121,8 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
 *  New `db_temporary_table()` generic makes it easier to work with databases
    that require temporary tables to be specially named.
   
-* `DBI::dbWriteTable()` is now used instead of `db_write_table()`. This
-   means that following dplyr generics are no longer used: 
+* `db_write_table()` now calls `DBI::dbWriteTable()` instead of nine generics
+   that formerly each did a small part of this:
    `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`,
    `db_list_tables()`, `drop_drop_table()`, `db_has_table()`, 
    `db_create_table()`, and `db_data_types()`. 

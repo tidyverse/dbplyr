@@ -47,19 +47,12 @@ Next you'll need to update your methods, following the advice below.
 ## DBI generics
 
 When dbplyr was first created there was much spurious variation across DBI backends, and a layer of shims was need to make dbplyr usable.
-Now thanks to the work of Kiril Muller and on others on DBITest and friends, these shims are no longer needed, and dbplyr will now call the DBI generics directly:
+Now thanks to the work of Kirill Müller and on others on DBITest and friends, these shims are no longer needed in most cases, and dbplyr now calls the DBI generics more directly:
 
--   Transaction management (using inside `copy_to()` to make indexing as efficient as possible): `db_begin()` -\> `dbBegin()`, `db_commit()` -\> `dbCommit()`, and `db_rollback()` -\> `dbRollback()`
--   `copy_to()` now uses `dbWriteTable()` instead of `db_write_table()`. This also eliminates this eliminates `db_create_table()`, `db_insert_into()`, and `db_data_type()` that were used for initial creation, and `db_list_tables()`, `db_has_table()` and `db_drop_table()` used to support overwriting existing tables.
--   Escaping now uses the DBI generics: `sql_escape_ident()` is replaced by `dbQuoteIdentifer()` and `sql_escape_string()` is replaced by `dbQuoteString()`. (These two generics still exist inside of dplyr but are used purely for testing).
+-   `db_write_table()` calls `DBI::dbWriteTable()` instead of nine generics that formerly each did a small part of this: `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`, `db_drop_table()`, `db_has_table()`, `db_create_table()`, and `db_data_types()`. Since these generics are no longer used, you can delete their methods from your package. (And if dplyr no longer works, you'll need to fix the `dbWriteTable()` method).
+-   `dbplyr::sql_escape_ident()` and `dbplyr::sql_escape_string()` are no longer used in favour of calling `dbQuoteIdentifer()` and `dbQuoteString()` directly. If you've provided those methods, you'll need to move their implementation to methods for the DBI generics.
 
-If you have provided methods any of these dbplyr generics you'll need to:
-
--   Implement a method for the corresponding DBI generic: this ensures that your package will work with dbplyr 2.0.0.
--   Call the DBI generic from the existing dbplyr method. Don't delete your existing methods or your package will no longer work with dbplyr 1.0.0.
-
-I *think* that this should cause relatively little pain because DBI support is now much better than it used to be and most backend authors provide both the dbplyr and DBI interfaces.
-Even if there is some pain, I think it's relatively worthwhile pain as it helps out everyone, not just dbplyr users.
+Making these changes are important because they ensure your backend works consistently whether you use it through DBI or dplyr.
 
 ## SQL generation
 
