@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>dplyr 2.0.0 transition guide • dbplyr</title>
+<title>dplyr 2.0.0 backend API • dbplyr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -19,7 +19,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
 <!--optional theme--><link href="../.css" rel="stylesheet">
-<meta property="og:title" content="dplyr 2.0.0 transition guide">
+<meta property="og:title" content="dplyr 2.0.0 backend API">
 <meta property="og:description" content="dbplyr">
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
 <meta name="twitter:card" content="summary">
@@ -71,7 +71,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/backend-2.html">dplyr 2.0.0 transition guide</a>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
     </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
@@ -135,7 +135,7 @@
       </header><script src="backend-2_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>dplyr 2.0.0 transition guide</h1>
+      <h1 data-toc-skip>dplyr 2.0.0 backend API</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/master/vignettes/backend-2.Rmd"><code>vignettes/backend-2.Rmd</code></a></small>
@@ -145,12 +145,12 @@
 
     
     
-<p>This transition guide is aimed at backend authors. dbplyr 2.0.0 is an important for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr). This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.</p>
+<p>This transition guide is aimed at backend authors. dbplyr 2.0.0 is an important release for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr). This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.</p>
 <p>The current timeline is something like this:</p>
 <ul>
-<li><p>dbplyr 2.0.0 provides a new interface for database backends, but the old interface remains as is so existing backends continue to work. Backend authors can choose to use the new interface.</p></li>
-<li><p>dbplyr 2.1.0 (released &gt;= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.</p></li>
-<li><p>dbplyr 2.2.0 (released &gt;= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.</p></li>
+<li><p>dbplyr 2.0.0 adds a new interface for database backends. The old interface remains so all existing backends continue to work, but new packages should use the new interface, and existing backends should start the update process. </p></li>
+<li><p>dbplyr 2.1.0 (to be released &gt;= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.</p></li>
+<li><p>dbplyr 2.2.0 (to be released &gt;= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.</p></li>
 <li><p>A future version of dplyr will deprecate then remove the database generics.</p></li>
 </ul>
 <div id="unused-generics" class="section level2">
