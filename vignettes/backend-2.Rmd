@@ -1,8 +1,8 @@
 ---
-title: "dplyr 2.0.0 transition guide"
+title: "dplyr 2.0.0 backend API"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dplyr 2.0.0 transition guide}
+  %\VignetteIndexEntry{dplyr 2.0.0 backend API}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,17 +15,17 @@ knitr::opts_chunk$set(
 ```
 
 This transition guide is aimed at backend authors.
-dbplyr 2.0.0 is an important for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr).
+dbplyr 2.0.0 is an important release for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr).
 This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.
 
 The current timeline is something like this:
 
--   dbplyr 2.0.0 provides a new interface for database backends, but the old interface remains as is so existing backends continue to work.
-    Backend authors can choose to use the new interface.
+-   dbplyr 2.0.0 adds a new interface for database backends.
+    The old interface remains so all existing backends continue to work, but new packages should use the new interface, and existing backends should start the update process. 
 
--   dbplyr 2.1.0 (released \>= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.
+-   dbplyr 2.1.0 (to be released \>= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.
 
--   dbplyr 2.2.0 (released \>= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.
+-   dbplyr 2.2.0 (to be released \>= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.
 
 -   A future version of dplyr will deprecate then remove the database generics.
 
