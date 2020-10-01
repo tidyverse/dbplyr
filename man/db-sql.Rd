@@ -62,7 +62,7 @@ sql_query_join(
 
 sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ...)
 
-sql_query_set_op(con, x, y, method, ...)
+sql_query_set_op(con, x, y, method, ..., all = FALSE)
 }
 \description{
 SQL translation:

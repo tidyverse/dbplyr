@@ -328,14 +328,14 @@ sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...)
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ...) {
+sql_query_set_op <- function(con, x, y, method, ..., all = FALSE) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ...) {
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE) {
   build_sql(
     "(", x, ")",
-    "\n", sql(method), "\n",
+    "\n", sql(method), if (all) sql(" ALL"), "\n",
     "(", y, ")",
     con = con
   )

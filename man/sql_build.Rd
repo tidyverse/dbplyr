@@ -34,7 +34,7 @@ select_query(
 
 semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
 
-set_op_query(x, y, type = type)
+set_op_query(x, y, type = type, all = FALSE)
 
 sql_build(op, con = NULL, ...)
 

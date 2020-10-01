@@ -2,7 +2,8 @@ test_that("2nd edition uses sql methods", {
   local_methods(
     db_analyze.Test = function(con, ...) stop("db_method")
   )
-  con <- simulate_dbi("Test")
+
+  con <- structure(list(), class = c("Test", "DBIConnection"))
   expect_error(dbplyr_analyze(con), "db_method")
 
   local_methods(

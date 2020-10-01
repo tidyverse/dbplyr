@@ -22,6 +22,7 @@ reference:
   - head.tbl_lazy
   - group_by.tbl_lazy
   - inner_join.tbl_lazy
+  - intersect.tbl_lazy
   - mutate.tbl_lazy
   - pull.tbl_sql
   - select.tbl_lazy

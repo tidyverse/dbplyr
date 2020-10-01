@@ -19,6 +19,9 @@ simulate_dbi <- function(class = character(), ...) {
   )
 }
 
+#' @export
+dbplyr_edition.TestConnection <- function(con) 2L
+
 
 sql_escape_ident <- function(con, x) {
   UseMethod("sql_escape_ident")

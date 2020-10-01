@@ -19,6 +19,9 @@
 * Documentation has been radically improved with new topics for each major 
   verb and each backend giving more details about the SQL translation.
 
+* `intersect()`, `union()` and `setdiff()` gain an `all` argument to add the
+   `ALL` argument (#414).
+
 * Join functions gains a `na_matches` argument that allows you to control 
   whether or not `NA` (`NULL`) values match other `NA` values. The default is
   `"never"`, which is the usual behaviour in databases. You can set 
