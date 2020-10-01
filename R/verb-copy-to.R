@@ -14,7 +14,7 @@
 #'   through R in one pass, so it is only suitable for transferring small
 #'   amounts of data.
 #' @param types a character vector giving variable types to use for the columns.
-#'    See \url{http://www.sqlite.org/datatype3.html} for available types.
+#'    See <https://www.sqlite.org/datatype3.html> for available types.
 #' @param temporary if `TRUE`, will create a temporary table that is
 #'   local to this connection and will be automatically deleted when the
 #'   connection expires

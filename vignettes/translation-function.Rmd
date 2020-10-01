@@ -131,7 +131,7 @@ translate_sql(switch(x, a = 1L, b = 2L, 3L))
 
 ## Unknown functions
 
-Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](http://www.sqlite.org/lang_corefunc.html):
+Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](https://www.sqlite.org/lang_corefunc.html):
 
 ```{r}
 translate_sql(glob(x, y))

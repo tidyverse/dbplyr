@@ -33,7 +33,7 @@ name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
 exists.}
 
 \item{types}{a character vector giving variable types to use for the columns.
-See \url{http://www.sqlite.org/datatype3.html} for available types.}
+See \url{https://www.sqlite.org/datatype3.html} for available types.}
 
 \item{temporary}{if \code{TRUE}, will create a temporary table that is
 local to this connection and will be automatically deleted when the

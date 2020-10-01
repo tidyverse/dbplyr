@@ -42,7 +42,7 @@ DBI::dbWriteTable(con, "mtcars", mtcars)
 tbl(con, "mtcars")
 ```
 
-If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/rstats-db/DBItest) to narrow down the problem.
+If you can't, this likely indicates some problem with the DBI methods. Use [DBItest](https://github.com/r-dbi/DBItest) to narrow down the problem.
 
 ## Write your first method
 
