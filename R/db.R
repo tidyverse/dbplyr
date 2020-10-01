@@ -66,9 +66,10 @@ dbplyr_edition <- function(con) {
   UseMethod("dbplyr_edition")
 }
 #' @export
-dbplyr_edition.DBIConnection <- function(con) {
+dbplyr_edition.default <- function(con) {
   1L
 }
+# Needed because pool uses an object of call Pool/R6
 
 # fallback helper ---------------------------------------------------------
 
