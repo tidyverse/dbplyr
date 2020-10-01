@@ -60,7 +60,7 @@ temporary tables to start with \verb{#})
 \seealso{
 Other generic: 
 \code{\link{db-sql}},
-\code{\link{db_desc.DBIConnection}()},
+\code{\link{db_connection_describe}()},
 \code{\link{sql_escape_logical}()}
 }
 \concept{generic}

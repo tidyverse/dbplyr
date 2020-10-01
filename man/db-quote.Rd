@@ -32,8 +32,8 @@ sql_escape_raw(con, charToRaw("hi"))
 \seealso{
 Other generic: 
 \code{\link{db-sql}},
-\code{\link{db_copy_to}()},
-\code{\link{db_desc.DBIConnection}()}
+\code{\link{db_connection_describe}()},
+\code{\link{db_copy_to}()}
 }
 \concept{generic}
 \keyword{internal}

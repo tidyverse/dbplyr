@@ -1,8 +1,19 @@
 #' Miscellaneous database generics
 #'
-#' Use a `dbplyr_edition()` method to declare that your backend supports
-#' version 2.0.0 of the dbplyr API where all generics live in dbplyr.
-#' See `vignette("backend-2")` for more details.
+#' * `db_connection_describe()` provides a short string describing the
+#'   database connection, helping users tell which database a table comes
+#'   from. It should be a single line, and ideally less than 60 characters wide.
+#'
+#' * `dbplyr_edition()` declares which version of the dbplyr API you want.
+#'    See below for more details.
+#'
+#' @section dplyr 2.0.0:
+#' dplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
+#' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
+#' the following methods.
+#'
+#' * `dplyr::db_desc()` -> `dbplyr::db_connection_describe()` (also note that
+#'    the argument named changed from `x` to `con`).
 #'
 #' @family generic
 #' @keywords internal
@@ -10,12 +21,24 @@
 #' @aliases NULL
 NULL
 
-#' @rdname db-misc
+dbplyr_connection_describe <- function(con, ...) {
+  dbplyr_fallback(con, "db_desc", ...)
+}
 #' @export
 #' @importFrom dplyr db_desc
 db_desc.DBIConnection <- function(x) {
-  class(x)[[1]]
+  db_connection_describe(x)
 }
+#' @export
+#' @rdname db-misc
+db_connection_describe <- function(con) {
+  UseMethod("db_connection_describe")
+}
+#' @export
+db_connection_describe.DBIConnection <- function(con) {
+  class(con)[[1]]
+}
+
 
 #' @rdname db-misc
 #' @export

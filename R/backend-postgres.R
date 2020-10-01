@@ -27,17 +27,17 @@ NULL
 simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
 
 #' @export
-db_desc.PostgreSQLConnection <- function(x) {
-  info <- dbGetInfo(x)
+db_connection_describe.PostgreSQLConnection <- function(con) {
+  info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
   paste0("postgres ", info$serverVersion, " [", info$user, "@",
     host, ":", info$port, "/", info$dbname, "]")
 }
 #' @export
-db_desc.PostgreSQL <- db_desc.PostgreSQLConnection
+db_connection_describe.PostgreSQL <- db_connection_describe.PostgreSQLConnection
 #' @export
-db_desc.PqConnection <- db_desc.PostgreSQLConnection
+db_connection_describe.PqConnection <- db_connection_describe.PostgreSQLConnection
 
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE

@@ -60,8 +60,8 @@ base_odbc_win <- sql_translator(
 )
 
 #' @export
-db_desc.OdbcConnection <- function(x) {
-  info <- DBI::dbGetInfo(x)
+db_connection_describe.OdbcConnection <- function(con) {
+  info <- DBI::dbGetInfo(con)
 
   host <- if (info$servername == "") "localhost" else info$servername
   port <- if (info$port == "") "" else paste0(":", info$port)

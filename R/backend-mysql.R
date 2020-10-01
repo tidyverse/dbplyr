@@ -27,8 +27,8 @@ NULL
 simulate_mysql <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
-db_desc.MariaDBConnection <- function(x) {
-  info <- dbGetInfo(x)
+db_connection_describe.MariaDBConnection <- function(con) {
+  info <- dbGetInfo(con)
 
   paste0(
     "mysql ", info$serverVersion, " [",
@@ -37,9 +37,9 @@ db_desc.MariaDBConnection <- function(x) {
   )
 }
 #' @export
-db_desc.MySQL <- db_desc.MariaDBConnection
+db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 #' @export
-db_desc.MySQLConnection <- db_desc.MariaDBConnection
+db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
 sql_translate_env.MariaDBConnection <- function(con) {

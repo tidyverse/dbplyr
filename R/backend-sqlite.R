@@ -28,8 +28,8 @@ simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
 
 #' @export
-db_desc.SQLiteConnection <- function(x) {
-  paste0("sqlite ", sqlite_version(), " [", x@dbname, "]")
+db_connection_describe.SQLiteConnection <- function(con) {
+  paste0("sqlite ", sqlite_version(), " [", con@dbname, "]")
 }
 
 #' @export

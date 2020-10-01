@@ -72,7 +72,7 @@ tbl_sum.tbl_sql <- function(x) {
   sort <- op_sort(x$ops)
   c(
     "Source" = tbl_desc(x),
-    "Database" = dplyr::db_desc(x$src$con),
+    "Database" = dbplyr_connection_describe(x$src$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )
