@@ -27,6 +27,15 @@ NULL
 simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
 
 #' @export
+dbplyr_edition.PostgreSQLConnection <- function(con) {
+  2L
+}
+#' @export
+dbplyr_edition.PostgreSQL <- dbplyr_edition.PostgreSQLConnection
+#' @export
+dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQLConnection
+
+#' @export
 db_connection_describe.PostgreSQLConnection <- function(con) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host

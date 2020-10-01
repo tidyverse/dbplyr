@@ -29,6 +29,11 @@ NULL
 simulate_oracle <- function() simulate_dbi("Oracle")
 
 #' @export
+dbplyr_edition.Oracle <- function(con) {
+  2L
+}
+
+#' @export
 sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
                              order_by = NULL,
@@ -124,6 +129,9 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 
 
 # roacle package ----------------------------------------------------------
+
+#' @export
+dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
 
 #' @export
 sql_translation.OraConnection <- sql_translation.Oracle

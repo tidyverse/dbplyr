@@ -27,6 +27,15 @@ NULL
 simulate_mysql <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
+dbplyr_edition.MariaDBConnection <- function(con) {
+  2L
+}
+#' @export
+dbplyr_edition.MySQL <- dbplyr_edition.MariaDBConnection
+#' @export
+dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
+
+#' @export
 db_connection_describe.MariaDBConnection <- function(con) {
   info <- dbGetInfo(con)
 

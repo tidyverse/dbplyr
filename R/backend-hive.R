@@ -26,6 +26,10 @@ NULL
 #' @rdname simulate_dbi
 simulate_hive <- function() simulate_dbi("Hive")
 
+#' @export
+dbplyr_edition.Hive <- function(con) {
+  2L
+}
 
 #' @export
 sql_translation.Hive <- function(con) {

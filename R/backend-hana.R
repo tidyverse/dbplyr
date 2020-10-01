@@ -28,6 +28,11 @@ NULL
 simulate_hana <- function() simulate_dbi("HDB")
 
 #' @export
+dbplyr_edition.HDB <- function(con) {
+  2L
+}
+
+#' @export
 sql_translation.HDB <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,

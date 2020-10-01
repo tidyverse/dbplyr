@@ -29,6 +29,11 @@ NULL
 #' @rdname backend-access
 simulate_access <- function() simulate_dbi("ACCESS")
 
+#' @export
+dbplyr_edition.ACCESS <- function(con) {
+  2L
+}
+
 # sql_ generics --------------------------------------------
 
 #' @export

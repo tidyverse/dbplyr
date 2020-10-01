@@ -23,6 +23,13 @@ NULL
 simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 
 #' @export
+dbplyr_edition.RedshiftConnection <- function(con) {
+  2L
+}
+#' @export
+dbplyr_edition.Redshift <- dbplyr_edition.RedshiftConnection
+
+#' @export
 sql_translation.RedshiftConnection <- function(con) {
   postgres <- sql_translation.PostgreSQL(con)
 

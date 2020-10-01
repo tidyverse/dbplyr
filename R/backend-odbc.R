@@ -24,6 +24,11 @@ NULL
 simulate_odbc <- function() simulate_dbi("OdbcConnection")
 
 #' @export
+dbplyr_edition.OdbcConnection <- function(con) {
+  2L
+}
+
+#' @export
 sql_translation.OdbcConnection <- function(con) {
   sql_variant(
     base_odbc_scalar,

@@ -25,6 +25,11 @@ NULL
 simulate_teradata <- function() simulate_dbi("Teradata")
 
 #' @export
+dbplyr_edition.Teradata <- function(con) {
+  2L
+}
+
+#' @export
 sql_query_select.Teradata <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
                                              order_by = NULL,

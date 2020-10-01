@@ -26,6 +26,10 @@ NULL
 #' @rdname backend-sqlite
 simulate_sqlite <- function() simulate_dbi("SQLiteConnection")
 
+#' @export
+dbplyr_edition.SQLiteConnection <- function(con) {
+  2L
+}
 
 #' @export
 db_connection_describe.SQLiteConnection <- function(con) {
