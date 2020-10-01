@@ -85,9 +85,9 @@ test_that("date and date-times are converted to ISO 8601", {
 
 test_that("raw is SQL-99 compatible (by default)", {
   con <- simulate_dbi()
-  expect_equal(escape(as_blob(raw(0)), con = con), sql("X''"))
-  expect_equal(escape(as_blob(as.raw(c(0x01, 0x02, 0x03))), con = con), sql("X'010203'"))
-  expect_equal(escape(as_blob(as.raw(c(0x00, 0xff))), con = con), sql("X'00ff'"))
+  expect_equal(escape(blob::as_blob(raw(0)), con = con), sql("X''"))
+  expect_equal(escape(blob::as_blob(as.raw(c(0x01, 0x02, 0x03))), con = con), sql("X'010203'"))
+  expect_equal(escape(blob::as_blob(as.raw(c(0x00, 0xff))), con = con), sql("X'00ff'"))
 })
 
 

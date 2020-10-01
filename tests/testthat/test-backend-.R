@@ -50,8 +50,8 @@ test_that("bitwise operations", {
 test_that("default raw escapes translated correctly", {
   mf <- lazy_frame(x = "abc", con = simulate_sqlite())
 
-  a <- as_blob("abc")
-  b <- as_blob(as.raw(c(0x01, 0x02)))
+  a <- blob::as_blob("abc")
+  b <- blob::as_blob(as.raw(c(0x01, 0x02)))
   L <- c(a, b)
 
   expect_snapshot(mf %>% filter(x == a))
