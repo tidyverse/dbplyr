@@ -49,7 +49,7 @@ sql_query_select.ACCESS <- function(con, select, from,
 }
 
 #' @export
-sql_translate_env.ACCESS <- function(con) {
+sql_translation.ACCESS <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       # Much of this translation comes from: https://www.techonthenet.com/access/functions/

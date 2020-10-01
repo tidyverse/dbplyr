@@ -23,8 +23,8 @@ NULL
 simulate_redshift <- function() simulate_dbi("RedshiftConnection")
 
 #' @export
-sql_translate_env.RedshiftConnection <- function(con) {
-  postgres <- sql_translate_env.PostgreSQL(con)
+sql_translation.RedshiftConnection <- function(con) {
+  postgres <- sql_translation.PostgreSQL(con)
 
   sql_variant(
     sql_translator(.parent = postgres$scalar,
@@ -55,7 +55,7 @@ sql_translate_env.RedshiftConnection <- function(con) {
 }
 
 #' @export
-sql_translate_env.Redshift <- sql_translate_env.RedshiftConnection
+sql_translation.Redshift <- sql_translation.RedshiftConnection
 
 sql_paste_redshift <- function(sep) {
   sql_paste_infix(sep, "||", function(x) sql_expr(cast(!!x %as% text)))

@@ -44,7 +44,7 @@ sql_query_select.Teradata <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_translate_env.Teradata <- function(con) {
+sql_translation.Teradata <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       `!=`          = sql_infix("<>"),

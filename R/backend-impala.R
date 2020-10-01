@@ -23,7 +23,7 @@ NULL
 simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export
-sql_translate_env.Impala <- function(con) {
+sql_translation.Impala <- function(con) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
       bitwNot       = sql_prefix("BITNOT", 1),

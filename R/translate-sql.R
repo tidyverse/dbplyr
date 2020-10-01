@@ -143,7 +143,7 @@ translate_sql_ <- function(dots,
     on.exit(set_win_current_frame(old_frame), add = TRUE)
   }
 
-  variant <- sql_translate_env(con)
+  variant <- dbplyr_sql_translation(con)
   pieces <- lapply(dots, function(x) {
     if (is_null(get_expr(x))) {
       NULL

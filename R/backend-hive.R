@@ -28,7 +28,7 @@ simulate_hive <- function() simulate_dbi("Hive")
 
 
 #' @export
-sql_translate_env.Hive <- function(con) {
+sql_translation.Hive <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       bitwShiftL    = sql_prefix("SHIFTLEFT", 2),

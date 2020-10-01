@@ -42,7 +42,7 @@ db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
-sql_translate_env.MariaDBConnection <- function(con) {
+sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
@@ -86,9 +86,9 @@ sql_translate_env.MariaDBConnection <- function(con) {
 }
 
 #' @export
-sql_translate_env.MySQL <- sql_translate_env.MariaDBConnection
+sql_translation.MySQL <- sql_translation.MariaDBConnection
 #' @export
-sql_translate_env.MySQLConnection <- sql_translate_env.MariaDBConnection
+sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {

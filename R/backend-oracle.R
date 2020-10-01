@@ -52,7 +52,7 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_translate_env.Oracle <- function(con) {
+sql_translation.Oracle <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
@@ -126,7 +126,7 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 # roacle package ----------------------------------------------------------
 
 #' @export
-sql_translate_env.OraConnection <- sql_translate_env.Oracle
+sql_translation.OraConnection <- sql_translation.Oracle
 
 #' @export
 sql_query_select.OraConnection <- sql_query_select.Oracle

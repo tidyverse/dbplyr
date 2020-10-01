@@ -82,7 +82,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_translate_env.Microsoft SQL Server` <- function(con) {
+`sql_translation.Microsoft SQL Server` <- function(con) {
   mssql_scalar <-
     sql_translator(.parent = base_odbc_scalar,
 

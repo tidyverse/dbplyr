@@ -8,6 +8,8 @@
 #'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
 #'   as described in <https://modern-sql.com/feature/is-distinct-from>.
 #'
+#' * `sql_translation(con)` generates a SQL translation environment.
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -83,6 +85,21 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
     "ELSE 1 = 0",
     con = con
   )
+}
+
+#' @export
+#' @rdname db-sql
+sql_translation <- function(con) {
+  UseMethod("sql_translation")
+}
+# sql_translation.DBIConnection lives in backend-.R
+dbplyr_sql_translation <- function(con) {
+  dbplyr_fallback(con, "sql_translate_env")
+}
+#' @importFrom dplyr sql_translate_env
+#' @export
+sql_translate_env.DBIConnection <- function(con) {
+  sql_translation(con)
 }
 
 

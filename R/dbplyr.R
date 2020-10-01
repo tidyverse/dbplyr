@@ -10,7 +10,3 @@
 #' @import tibble
 #' @keywords internal
 "_PACKAGE"
-
-# Generics that really should live in dbplyr
-#' @importFrom dplyr sql_translate_env
-NULL

@@ -55,7 +55,7 @@ sqlite_version <- function() {
 # SQL methods -------------------------------------------------------------
 
 #' @export
-sql_translate_env.SQLiteConnection <- function(con) {
+sql_translation.SQLiteConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.numeric = sql_cast("REAL"),

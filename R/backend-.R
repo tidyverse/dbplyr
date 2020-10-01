@@ -10,7 +10,7 @@
 NULL
 
 #' @export
-sql_translate_env.DBIConnection <- function(con) {
+sql_translation.DBIConnection <- function(con) {
   sql_variant(
     base_scalar,
     base_agg,

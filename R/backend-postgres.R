@@ -57,7 +57,7 @@ postgres_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translate_env.PostgreSQLConnection <- function(con) {
+sql_translation.PostgreSQLConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       bitwXor = sql_infix("#"),
@@ -204,9 +204,9 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
   )
 }
 #' @export
-sql_translate_env.PostgreSQL <- sql_translate_env.PostgreSQLConnection
+sql_translation.PostgreSQL <- sql_translation.PostgreSQLConnection
 #' @export
-sql_translate_env.PqConnection <- sql_translate_env.PostgreSQLConnection
+sql_translation.PqConnection <- sql_translation.PostgreSQLConnection
 
 #' @export
 sql_expr_matches.PostgreSQLConnection <- function(con, x, y) {

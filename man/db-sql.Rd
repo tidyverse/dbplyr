@@ -3,6 +3,7 @@
 \name{db-sql}
 \alias{db-sql}
 \alias{sql_expr_matches}
+\alias{sql_translation}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
 \alias{sql_query_explain}
@@ -17,6 +18,8 @@
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
+
+sql_translation(con)
 
 sql_table_analyze(con, table, ...)
 
@@ -67,6 +70,7 @@ SQL translation:
 \item \code{sql_expr_matches(con, x, y)} generates an alternative to \code{x = y} when a
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
+\item \code{sql_translation(con)} generates a SQL translation environment.
 }
 
 Tables:

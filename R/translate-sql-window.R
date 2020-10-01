@@ -260,12 +260,12 @@ uses_window_fun <- function(x, con) {
     calls <- all_calls(x)
   }
 
-  win_f <- ls(envir = sql_translate_env(con)$window)
+  win_f <- ls(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
 }
 
 common_window_funs <- function() {
-  ls(sql_translate_env(NULL)$window)
+  ls(dbplyr_sql_translation(NULL)$window)
 }
 
 #' @noRd

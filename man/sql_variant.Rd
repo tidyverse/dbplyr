@@ -128,7 +128,7 @@ postgres_agg <- sql_translator(.parent = base_agg,
 
 # Next we have to simulate a connection that uses this variant
 con <- simulate_dbi("TestCon")
-sql_translate_env.TestCon <- function(x) {
+sql_translation.TestCon <- function(x) {
   sql_variant(
     base_scalar,
     postgres_agg,

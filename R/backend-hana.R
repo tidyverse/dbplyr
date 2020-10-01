@@ -28,7 +28,7 @@ NULL
 simulate_hana <- function() simulate_dbi("HDB")
 
 #' @export
-sql_translate_env.HDB <- function(con) {
+sql_translation.HDB <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.character = sql_cast("SHORTTEXT"),

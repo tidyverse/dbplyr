@@ -38,7 +38,7 @@ sql_build.op_filter <- function(op, con, ...) {
     )
   } else {
     # Do partial evaluation, then extract out window functions
-    where <- translate_window_where_all(op$dots, ls(sql_translate_env(con)$window))
+    where <- translate_window_where_all(op$dots, ls(dbplyr_sql_translation(con)$window))
 
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
