@@ -78,10 +78,10 @@ Make sure you've read `vignette("translation-verb")` so you have the lay of the 
 
 Check that SQL translation for the key verbs work:
 
-* `summarise()`, `mutate()`, `filter()` etc: powered by `sql_select()`
-* `left_join()`, `inner_join()`: powered by `sql_join()`
-* `semi_join()`, `anti_join()`: powered by `sql_semi_join()`
-* `union()`, `intersect()`, `setdiff()`: powered by `sql_set_op()`
+* `summarise()`, `mutate()`, `filter()` etc: powered by `sql_query_select()`
+* `left_join()`, `inner_join()`: powered by `sql_query_join()`
+* `semi_join()`, `anti_join()`: powered by `sql_query_semi_join()`
+* `union()`, `intersect()`, `setdiff()`: powered by `sql_query_set_op()`
 
 ### Vectors
 

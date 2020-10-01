@@ -94,7 +94,8 @@ The verb level SQL translation is implemented on top of `tbl_lazy`, which basica
   optimisations. Currently this only involves removing subqueries where
   possible.
 
-* `sql_render()` calls an SQL generation function (`sql_select()`, `sql_join()`, 
-  `sql_subquery()`, `sql_semijoin()` etc) to produce the actual SQL.
-  Each of these functions is a generic, taking the connection as an argument,
-  so that the details can be customised for different databases.
+* `sql_render()` calls an SQL generation function (`sql_query_select()`,
+  `sql_query_join()`, `sql_query_semi_join()`, `sql_query_set_op()`, ...)
+  to produce the actual SQL. Each of these functions is a generic, taking 
+  the connection as an argument, so that the translation can be customised 
+  for different databases.

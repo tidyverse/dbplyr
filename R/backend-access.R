@@ -32,7 +32,7 @@ simulate_access <- function() simulate_dbi("ACCESS")
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_select.ACCESS <- function(con, select, from,
+sql_query_select.ACCESS <- function(con, select, from,
                               where = NULL,  group_by = NULL,
                               having = NULL, order_by = NULL,
                               limit = NULL,  distinct = FALSE, ...,

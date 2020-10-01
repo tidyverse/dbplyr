@@ -27,28 +27,5 @@ sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE) {
   from_x <- sql_render(query$x, con, ..., subquery = FALSE)
   from_y <- sql_render(query$y, con, ..., subquery = FALSE)
 
-  sql_set_op(con, from_x, from_y, method = query$type)
-}
-
-# SQL generation ----------------------------------------------------------
-
-#' @export
-sql_set_op.default <- function(con, x, y, method) {
-  build_sql(
-    "(", x, ")",
-    "\n", sql(method), "\n",
-    "(", y, ")",
-    con = con
-  )
-}
-
-#' @export
-sql_set_op.SQLiteConnection <- function(con, x, y, method) {
-  # SQLite does not allow parentheses
-  build_sql(
-    x,
-    "\n", sql(method), "\n",
-    y,
-    con = con
-  )
+  dbplyr_query_set_op(con, from_x, from_y, method = query$type)
 }

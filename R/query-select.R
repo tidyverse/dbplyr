@@ -106,7 +106,7 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
     name = NULL
   )
 
-  sql_select(
+  dbplyr_query_select(
     con, query$select, from,
     where = query$where,
     group_by = query$group_by,
@@ -116,27 +116,6 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
     distinct = query$distinct,
     ...,
     subquery = subquery
-  )
-}
-
-# SQL generation ----------------------------------------------------------
-
-#' @export
-sql_select.DBIConnection <- function(con, select, from, where = NULL,
-                               group_by = NULL, having = NULL,
-                               order_by = NULL,
-                               limit = NULL,
-                               distinct = FALSE,
-                               ...,
-                               subquery = FALSE) {
-  sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
-    limit     = sql_clause_limit(con, limit)
   )
 }
 

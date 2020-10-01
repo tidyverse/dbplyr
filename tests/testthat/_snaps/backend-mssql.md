@@ -96,7 +96,7 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
+      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
     Warning <warning>
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
@@ -107,7 +107,7 @@
 # custom limit translation
 
     Code
-      sql_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
+      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
     Output
       <SQL> SELECT TOP 10 'x'
       FROM 'y'

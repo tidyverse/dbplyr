@@ -1,15 +1,22 @@
 #' SQL generation generics
 #'
 #' @description
+#'
+#' SQL translation:
+#'
 #' * `sql_expr_matches(con, x, y)` generates an alternative to `x = y` when a
 #'   pair of `NULL`s should match. The default translation uses a `CASE WHEN`
 #'   as described in <https://modern-sql.com/feature/is-distinct-from>.
+#'
+#' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
 #'   ensuring that the database has up-to-date statistics for use in the query
 #'   planner. It called from [copy_to()] when `analyze = TRUE`.
 #'
 #' * `sql_table_index()` generates SQL for adding an index to table. The
+#'
+#' Query manipulation:
 #'
 #' * `sql_query_explain(con, sql)` generates SQL that "explains" a query,
 #'   i.e. generates a query plan describing what indexes etc that the
@@ -24,18 +31,36 @@
 #' * `sql_query_wrap(con, from)` generates SQL for wrapping a query into a
 #'   subquery.
 #'
+#' Query generation:
+#'
+#' * `sql_query_select()` generate SQL for a `SELECT` query
+#' * `sql_query_join()` generate SQL for joins
+#' * `sql_query_semi_join()` generate SQL for semi- and anti-joins
+#' * `sql_query_set_op()` generate SQL for `UNION`, `INTERSECT`, and `EXCEPT`
+#'   queries.
+#'
 #' @section dbplyr 2.0.0:
 #'
-#' These generics replace many of the `db_` generics provided by dplyr. To
-#' update your backend, you'll need to extract out the SQL generation from your
+#' Many `dplyr::db_*` generics have been replaced by `dbplyr::sql_*` generics.
+#' To update your backend, you'll need to extract the SQL generation out of your
 #' existing code, and place it in a new method for a dbplyr `sql_` generic.
 #'
-#' * `db_analyze()` is replaced by `sql_table_analyze()`
-#' * `db_explain()` is replaced by `sql_query_explain()`
-#' * `db_create_index()` is replaced by `sql_table_index()`
-#' * `db_query_fields()` is replaced by `sql_query_fields()`
-#' * `db_query_rows()` is no longer used; you can delete it
-#' * `db_save_query()` is replaced by `sql_query_save()`
+#' * `dplyr::db_analyze()` is replaced by `dbplyr::sql_table_analyze()`
+#' * `dplyr::db_explain()` is replaced by `dbplyr::sql_query_explain()`
+#' * `dplyr::db_create_index()` is replaced by `dbplyr::sql_table_index()`
+#' * `dplyr::db_query_fields()` is replaced by `dbplyr::sql_query_fields()`
+#' * `dplyr::db_query_rows()` is no longer used; you can delete it
+#' * `dplyr::db_save_query()` is replaced by `dbplyr::sql_query_save()`
+#'
+#' The query generating functions have also changed names. Their behaviour is
+#' unchanged, so you just need to rename the generic and import from dbplyr
+#' instead of dplyr.
+#'
+#' * `dplyr::sql_select()` is replaced by `dbplyr::sql_query_select()`
+#' * `dplyr::sql_join()` is replaced by `dbplyr::sql_query_join()`
+#' * `dplyr::sql_semi_join()` is replaced by `dbplyr::sql_query_semi_join()`
+#' * `dplyr::sql_set_op()` is replaced by `dbplyr::sql_query_set_op()`
+#' * `dplyr::sql_subquery()` is replaced by `dbplyr::sql_query_wrap()`
 #'
 #' Learn more in `vignette("backend-2.0")`
 #'
@@ -59,6 +84,9 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
     con = con
   )
 }
+
+
+# Tables ------------------------------------------------------------------
 
 #' @rdname db-sql
 #' @export
@@ -89,6 +117,8 @@ sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
   )
 }
 
+# Query manipulation ------------------------------------------------------
+
 #' @rdname db-sql
 #' @export
 sql_query_explain <- function(con, sql, ...) {
@@ -106,7 +136,7 @@ sql_query_fields <- function(con, sql, ...) {
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
-  sql_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
+  dbplyr_query_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
 }
 
 #' @rdname db-sql
@@ -145,6 +175,162 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
+}
+
+
+# Query generation --------------------------------------------------------
+
+#' @rdname db-sql
+#' @export
+sql_query_select <- function(con, select, from, where = NULL,
+                             group_by = NULL, having = NULL,
+                             order_by = NULL,
+                             limit = NULL,
+                             distinct = FALSE,
+                             ...,
+                             subquery = FALSE) {
+  UseMethod("sql_query_select")
+}
+
+#' @export
+sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
+                               group_by = NULL, having = NULL,
+                               order_by = NULL,
+                               limit = NULL,
+                               distinct = FALSE,
+                               ...,
+                               subquery = FALSE) {
+  sql_select_clauses(con,
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(con, from),
+    where     = sql_clause_where(con, where),
+    group_by  = sql_clause_group_by(con, group_by),
+    having    = sql_clause_having(con, having),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
+    limit     = sql_clause_limit(con, limit)
+  )
+}
+dbplyr_query_select <- function(con, ...) {
+  dbplyr_fallback(con, "sql_select", ...)
+}
+#' @importFrom dplyr sql_select
+#' @export
+sql_select.DBIConnection <- function(con, select, from, where = NULL,
+                                     group_by = NULL, having = NULL,
+                                     order_by = NULL,
+                                     limit = NULL,
+                                     distinct = FALSE,
+                                     ...,
+                                     subquery = FALSE) {
+  sql_query_select(
+    con, select, from,
+    where = where,
+    group_by = group_by,
+    having = having,
+    order_by = order_by,
+    limit = limit,
+    distinct = distinct,
+    ...,
+    subquery = subquery
+  )
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+  UseMethod("sql_query_join")
+}
+#' @export
+sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+  JOIN <- switch(
+    type,
+    left = sql("LEFT JOIN"),
+    inner = sql("INNER JOIN"),
+    right = sql("RIGHT JOIN"),
+    full = sql("FULL JOIN"),
+    cross = sql("CROSS JOIN"),
+    stop("Unknown join type:", type, call. = FALSE)
+  )
+
+  select <- sql_join_vars(con, vars)
+  on <- sql_join_tbls(con, by, na_matches = na_matches)
+
+  # Wrap with SELECT since callers assume a valid query is returned
+  build_sql(
+    "SELECT ", select, "\n",
+    "FROM ", x, "\n",
+    JOIN, " ", y, "\n",
+    if (!is.null(on)) build_sql("ON ", on, "\n", con = con) else NULL,
+    con = con
+  )
+}
+dbplyr_query_join <- function(con, ...) {
+  dbplyr_fallback(con, "sql_join", ...)
+}
+#' @export
+#' @importFrom dplyr sql_join
+sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+  sql_query_join(
+    con, x, y, vars,
+    type = type,
+    by = by,
+    na_matches = na_matches,
+    ...
+  )
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+  UseMethod("sql_query_semi_join")
+}
+#' @export
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+  lhs <- escape(ident("LHS"), con = con)
+  rhs <- escape(ident("RHS"), con = con)
+
+  on <- sql_join_tbls(con, by)
+
+  build_sql(
+    "SELECT * FROM ", x, "\n",
+    "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
+    "  SELECT 1 FROM ", y, "\n",
+    "  WHERE ", on, "\n",
+    ")",
+    con = con
+  )
+}
+dbplyr_query_semi_join <- function(con, ...) {
+  dbplyr_fallback(con, "sql_semi_join", ...)
+}
+#' @export
+#' @importFrom dplyr sql_semi_join
+sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+  sql_query_semi_join(con, x, y, anti = anti, by = by, ...)
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_set_op <- function(con, x, y, method, ...) {
+  UseMethod("sql_query_set_op")
+}
+#' @export
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ...) {
+  build_sql(
+    "(", x, ")",
+    "\n", sql(method), "\n",
+    "(", y, ")",
+    con = con
+  )
+}
+dbplyr_query_set_op <- function(con, ...) {
+  dbplyr_fallback(con, "sql_set_op", ...)
+}
+#' @importFrom dplyr sql_set_op
+#' @export
+sql_set_op.DBIConnection <- function(con, x, y, method) {
+  # dplyr::sql_set_op() doesn't have ...
+  sql_query_set_op(con, x, y, method)
 }
 
 

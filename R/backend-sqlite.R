@@ -37,6 +37,17 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
   build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
 }
 
+#' @export
+sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ...) {
+  # SQLite does not allow parentheses
+  build_sql(
+    x,
+    "\n", sql(method), "\n",
+    y,
+    con = con
+  )
+}
+
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
 }

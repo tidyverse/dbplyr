@@ -64,7 +64,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
+`sql_query_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
                                              order_by = NULL,
                                              limit = NULL,

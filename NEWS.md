@@ -106,6 +106,18 @@
 
 If you are the author of a dbplyr backend, please see `vignette("backend-2")` for details.
 
+*   `db_write_table()` now calls `DBI::dbWriteTable()` instead of nine generics
+    that formerly each did a small part: `db_create_indexes()`, `db_begin()`,
+    `db_rollback()`, `db_commit()`, `db_list_tables()`, `drop_drop_table()`,
+    `db_has_table()`, `db_create_table()`, and `db_data_types()`. You can delete
+    the methods for these generics.
+    
+    `db_query_rows()` is no longer used; it appears that it hasn't been used 
+    for some time.
+
+*   `DBI::dbQuoteIdentifier()` is now used instead of `sql_escape_ident()` and
+    `DBI::dbQuoteString()` instead of `sql_escape_string()`.
+
 *   A number of `db_*` generics have been replaced with new SQL generation
     generics:
 
@@ -118,33 +130,26 @@ If you are the author of a dbplyr backend, please see `vignette("backend-2")` fo
     This makes them easier to test and is an important part of the process of
     moving all database generics in dbplyr (#284).
 
-* A number of other generics have been renamed to facilitate the move from
-  dplyr to dbplyr
+*   A number of other generics have been renamed to facilitate the move from
+    dplyr to dbplyr:
 
-  * `dplyr::sql_subquery()` -> `dbplyr::sql_query_wrap()`
-
-*  New `db_temporary_table()` generic makes it easier to work with databases
-   that require temporary tables to be specially named.
+    * `dplyr::sql_select()` -> `dbplyr::sql_query_select()`
+    * `dplyr::sql_join()` -> `dbplyr::sql_query_join()`
+    * `dplyr::sql_semi_join()` -> `dbplyr::sql_query_semi_join()`
+    * `dplyr::sql_set_op()` -> `dbplyr::sql_query_set_op()`
+    * `dplyr::sql_subquery()` -> `dbplyr::sql_query_wrap()`
+    * `dplyr::db_desc()` -> `dbplyr::db_connection_describe()`
   
-* `db_write_table()` now calls `DBI::dbWriteTable()` instead of nine generics
-   that formerly each did a small part of this:
-   `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`,
-   `db_list_tables()`, `drop_drop_table()`, `db_has_table()`, 
-   `db_create_table()`, and `db_data_types()`. 
+*   New `db_temporary_table()` generic makes it easier to work with databases
+    that require temporary tables to be specially named.
 
-* `db_query_rows()` is no longer used; it appears that it hasn't been used for
-  some time.
+*   New `sql_expr_matches()` generic allows databases to use more efficient
+    alternatives when determine if two values "match" (i.e. like equality but 
+    a pair of `NULL`s will also match). For more details, see
+    <https://modern-sql.com/feature/is-distinct-from>
 
-* `DBI::dbQuoteIdentifier()` is now used instead of `sql_escape_ident()` and
-  `DBI::dbQuoteString()` instead of `sql_escape_string()`.
-
-* New `sql_expr_matches()` generic allows databases to use more efficient
-  alternatives when determine if two values "match" (i.e. like equality but 
-  a pair of `NULL`s will also match). For more details, see
-  <https://modern-sql.com/feature/is-distinct-from>
-
-* New `sql_join_suffix()` allows backends to control the default suffixes 
-  used (#254).
+*   New `sql_join_suffix()` allows backends to control the default suffixes 
+    used (#254).
 
 ## Minor improvements and bug fixes
 

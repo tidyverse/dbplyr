@@ -40,25 +40,5 @@ sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE)
     name = "RHS"
   )
 
-  sql_semi_join(con, from_x, from_y, anti = query$anti, by = query$by)
+  dbplyr_query_semi_join(con, from_x, from_y, anti = query$anti, by = query$by)
 }
-
-# SQL generation ----------------------------------------------------------
-
-#' @export
-sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  lhs <- escape(ident("LHS"), con = con)
-  rhs <- escape(ident("RHS"), con = con)
-
-  on <- sql_join_tbls(con, by)
-
-  build_sql(
-    "SELECT * FROM ", x, "\n",
-    "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
-    "  SELECT 1 FROM ", y, "\n",
-    "  WHERE ", on, "\n",
-    ")",
-    con = con
-  )
-}
-

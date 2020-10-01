@@ -10,6 +10,10 @@
 \alias{sql_query_save}
 \alias{sql_query_wrap}
 \alias{sql_query_rows}
+\alias{sql_query_select}
+\alias{sql_query_join}
+\alias{sql_query_semi_join}
+\alias{sql_query_set_op}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
@@ -27,16 +31,54 @@ sql_query_save(con, sql, name, temporary = TRUE, ...)
 sql_query_wrap(con, from, name = unique_subquery_name(), ...)
 
 sql_query_rows(con, sql, ...)
+
+sql_query_select(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE
+)
+
+sql_query_join(
+  con,
+  x,
+  y,
+  vars,
+  type = "inner",
+  by = NULL,
+  na_matches = FALSE,
+  ...
+)
+
+sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ...)
+
+sql_query_set_op(con, x, y, method, ...)
 }
 \description{
+SQL translation:
 \itemize{
 \item \code{sql_expr_matches(con, x, y)} generates an alternative to \code{x = y} when a
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
+}
+
+Tables:
+\itemize{
 \item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
 \item \code{sql_table_index()} generates SQL for adding an index to table. The
+}
+
+Query manipulation:
+\itemize{
 \item \code{sql_query_explain(con, sql)} generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
 database will use.
@@ -47,20 +89,40 @@ capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 \item \code{sql_query_wrap(con, from)} generates SQL for wrapping a query into a
 subquery.
 }
+
+Query generation:
+\itemize{
+\item \code{sql_query_select()} generate SQL for a \code{SELECT} query
+\item \code{sql_query_join()} generate SQL for joins
+\item \code{sql_query_semi_join()} generate SQL for semi- and anti-joins
+\item \code{sql_query_set_op()} generate SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
+queries.
+}
 }
 \section{dbplyr 2.0.0}{
 
 
-These generics replace many of the \code{db_} generics provided by dplyr. To
-update your backend, you'll need to extract out the SQL generation from your
+Many \verb{dplyr::db_*} generics have been replaced by \verb{dbplyr::sql_*} generics.
+To update your backend, you'll need to extract the SQL generation out of your
 existing code, and place it in a new method for a dbplyr \code{sql_} generic.
 \itemize{
-\item \code{db_analyze()} is replaced by \code{sql_table_analyze()}
-\item \code{db_explain()} is replaced by \code{sql_query_explain()}
-\item \code{db_create_index()} is replaced by \code{sql_table_index()}
-\item \code{db_query_fields()} is replaced by \code{sql_query_fields()}
-\item \code{db_query_rows()} is no longer used; you can delete it
-\item \code{db_save_query()} is replaced by \code{sql_query_save()}
+\item \code{dplyr::db_analyze()} is replaced by \code{dbplyr::sql_table_analyze()}
+\item \code{dplyr::db_explain()} is replaced by \code{dbplyr::sql_query_explain()}
+\item \code{dplyr::db_create_index()} is replaced by \code{dbplyr::sql_table_index()}
+\item \code{dplyr::db_query_fields()} is replaced by \code{dbplyr::sql_query_fields()}
+\item \code{dplyr::db_query_rows()} is no longer used; you can delete it
+\item \code{dplyr::db_save_query()} is replaced by \code{dbplyr::sql_query_save()}
+}
+
+The query generating functions have also changed names. Their behaviour is
+unchanged, so you just need to rename the generic and import from dbplyr
+instead of dplyr.
+\itemize{
+\item \code{dplyr::sql_select()} is replaced by \code{dbplyr::sql_query_select()}
+\item \code{dplyr::sql_join()} is replaced by \code{dbplyr::sql_query_join()}
+\item \code{dplyr::sql_semi_join()} is replaced by \code{dbplyr::sql_query_semi_join()}
+\item \code{dplyr::sql_set_op()} is replaced by \code{dbplyr::sql_query_set_op()}
+\item \code{dplyr::sql_subquery()} is replaced by \code{dbplyr::sql_query_wrap()}
 }
 
 Learn more in \code{vignette("backend-2.0")}

@@ -29,7 +29,7 @@ NULL
 simulate_oracle <- function() simulate_dbi("Oracle")
 
 #' @export
-sql_select.Oracle <- function(con, select, from, where = NULL,
+sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
                              order_by = NULL,
                              limit = NULL,
@@ -129,7 +129,7 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 sql_translate_env.OraConnection <- sql_translate_env.Oracle
 
 #' @export
-sql_select.OraConnection <- sql_select.Oracle
+sql_query_select.OraConnection <- sql_query_select.Oracle
 
 #' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle

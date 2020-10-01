@@ -41,7 +41,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
     name = "RHS"
   )
 
-  sql_join(con, from_x, from_y,
+  dbplyr_query_join(con, from_x, from_y,
     vars = query$vars,
     type = query$type,
     by = query$by,
@@ -51,30 +51,6 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
 
 # SQL generation ----------------------------------------------------------
 
-#' @export
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
-  JOIN <- switch(
-    type,
-    left = sql("LEFT JOIN"),
-    inner = sql("INNER JOIN"),
-    right = sql("RIGHT JOIN"),
-    full = sql("FULL JOIN"),
-    cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE)
-  )
-
-  select <- sql_join_vars(con, vars)
-  on <- sql_join_tbls(con, by, na_matches = na_matches)
-
-  # Wrap with SELECT since callers assume a valid query is returned
-  build_sql(
-    "SELECT ", select, "\n",
-    "FROM ", x, "\n",
-    JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("ON ", on, "\n", con = con) else NULL,
-    con = con
-  )
-}
 
 sql_join_vars <- function(con, vars) {
   sql_vector(

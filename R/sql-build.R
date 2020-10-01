@@ -74,7 +74,7 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE) {
   if (subquery) {
     query
   } else {
-    sql_select(con, sql("*"), query)
+    dbplyr_query_select(con, sql("*"), query)
   }
 }
 
