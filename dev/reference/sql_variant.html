@@ -311,7 +311,7 @@ conversion function.</p></div>
 
 <span class='co'># Next we have to simulate a connection that uses this variant</span>
 <span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span>(<span class='st'>"TestCon"</span>)
-<span class='kw'>sql_translate_env.TestCon</span> <span class='op'>&lt;-</span> <span class='fu'>function</span>(<span class='kw'>x</span>) {
+<span class='kw'>sql_translation.TestCon</span> <span class='op'>&lt;-</span> <span class='fu'>function</span>(<span class='kw'>x</span>) {
   <span class='fu'>sql_variant</span>(
     <span class='kw'>base_scalar</span>,
     <span class='kw'>postgres_agg</span>,

@@ -202,6 +202,7 @@
 <a href="#sql-generation" class="anchor"></a>SQL generation</h2>
 <ul>
 <li><p>Documentation has been radically improved with new topics for each major verb and each backend giving more details about the SQL translation.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/generics/man/setops.html">intersect()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/setops.html">union()</a></code> and <code><a href="https://rdrr.io/pkg/generics/man/setops.html">setdiff()</a></code> gain an <code>all</code> argument to add the <code>ALL</code> argument (<a href='https://github.com/tidyverse/dbplyr/issues/414'>#414</a>).</p></li>
 <li><p>Join functions gains a <code>na_matches</code> argument that allows you to control whether or not <code>NA</code> (<code>NULL</code>) values match other <code>NA</code> values. The default is <code>"never"</code>, which is the usual behaviour in databases. You can set <code>na_matches = "na"</code> to match R’s usual join behaviour (<a href='https://github.com/tidyverse/dbplyr/issues/180'>#180</a>). Additional arguments error (instead of being silently swallowed) (<a href='https://github.com/tidyverse/dbplyr/issues/382'>#382</a>).</p></li>
 <li><p>Joins now only use aliases where needed to disambiguate columns; this should make generated queries more readable.</p></li>
 <li><p>Subqueries no longer include an <code>ORDER BY</code> clause. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present; this tends to affect the returns rows but not necessarily their order).</p></li>
@@ -249,30 +250,57 @@
 <a href="#extensibility" class="anchor"></a>Extensibility</h2>
 <p>If you are the author of a dbplyr backend, please see <code><a href="../articles/backend-2.html">vignette("backend-2")</a></code> for details.</p>
 <ul>
+<li><p>New <code><a href="../reference/db-misc.html">dbplyr_edition()</a></code> generic allows you to opt-in to the 2nd edition of the dbplyr API.</p></li>
+<li>
+<p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code> now calls <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">DBI::dbWriteTable()</a></code> instead of nine generics that formerly each did a small part: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, and <code>db_data_types()</code>. You can now delete the methods for these generics.</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_rows()</a></code> is no longer used; it appears that it hasn’t been used for some time, so if you have a method, you can delete it.</p>
+</li>
+<li><p><code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> is now used instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteString.html">DBI::dbQuoteString()</a></code> instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code>.</p></li>
 <li>
 <p>A number of <code>db_*</code> generics have been replaced with new SQL generation generics:</p>
 <ul>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_analyze()</a></code> -&gt; <code><a href="../reference/db-sql.html">sql_table_analyze()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_analyze()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_analyze()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_index()</a></code> -&gt; <code><a href="../reference/db-sql.html">sql_index_create()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_create_index()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_index()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> -&gt; <code>sql_queriy_explain()</code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_explain()</a></code> -&gt; <code>dbplyr::sql_queriy_explain()</code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_fields()</a></code> -&gt; <code><a href="../reference/db-sql.html">sql_query_fields()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_query_fields()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_fields()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_rows()</a></code> -&gt; <code><a href="../reference/db-sql.html">sql_query_rows()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_save_query()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_save()</a></code>
 </li>
 </ul>
 <p>This makes them easier to test and is an important part of the process of moving all database generics in dbplyr (<a href='https://github.com/tidyverse/dbplyr/issues/284'>#284</a>).</p>
 </li>
+<li>
+<p>A number of other generics have been renamed to facilitate the move from dplyr to dbplyr:</p>
+<ul>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_select()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_select()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_join()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_semi_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_semi_join()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_set_op()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_set_op()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_subquery()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_wrap()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_desc()</a></code> -&gt; <code><a href="../reference/db-misc.html">dbplyr::db_connection_describe()</a></code>
+</li>
+</ul>
+</li>
 <li><p>New <code>db_temporary_table()</code> generic makes it easier to work with databases that require temporary tables to be specially named.</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">DBI::dbWriteTable()</a></code> is now used instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code>. This means that following dplyr generics are no longer used: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code>drop_drop_table()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, and <code>db_data_types()</code>.</p></li>
-<li><p><code><a href="https://dbi.r-dbi.org/reference/dbQuoteIdentifier.html">DBI::dbQuoteIdentifier()</a></code> is now used instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dbi.r-dbi.org/reference/dbQuoteString.html">DBI::dbQuoteString()</a></code> instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code>.</p></li>
 <li><p>New <code><a href="../reference/db-sql.html">sql_expr_matches()</a></code> generic allows databases to use more efficient alternatives when determine if two values “match” (i.e. like equality but a pair of <code>NULL</code>s will also match). For more details, see <a href="https://modern-sql.com/feature/is-distinct-from" class="uri">https://modern-sql.com/feature/is-distinct-from</a></p></li>
 <li><p>New <code><a href="../reference/db-misc.html">sql_join_suffix()</a></code> allows backends to control the default suffixes used (<a href='https://github.com/tidyverse/dbplyr/issues/254'>#254</a>).</p></li>
 </ul>

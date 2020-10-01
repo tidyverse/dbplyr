@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build and render SQL from a sequence of lazy operations — join_query • dbplyr</title>
+<title>SQL set operations — intersect.tbl_lazy • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,12 +49,10 @@
 
 
 
-<meta property="og:title" content="Build and render SQL from a sequence of lazy operations — join_query" />
-<meta property="og:description" content="sql_build() creates a select_query S3 object, that is rendered
-to a SQL string by sql_render(). The output from sql_build() is
-designed to be easy to test, as it's database agnostic, and has
-a hierarchical structure. Outside of testing, however, you should
-always call sql_render()." />
+<meta property="og:title" content="SQL set operations — intersect.tbl_lazy" />
+<meta property="og:description" content="These are methods for the dplyr generics dplyr::intersect(),
+dplyr::union(), and dplyr::setdiff(). They are translated to
+INTERSECT, UNION, and EXCEPT respectively." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -183,86 +181,61 @@ always call sql_render()." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Build and render SQL from a sequence of lazy operations</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-join.R'><code>R/query-join.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-select.R'><code>R/query-select.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/query-semi-join.R'><code>R/query-semi-join.R</code></a>, and 2 more</small>
-    <div class="hidden name"><code>sql_build.Rd</code></div>
+    <h1>SQL set operations</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-set-ops.R'><code>R/verb-set-ops.R</code></a></small>
+    <div class="hidden name"><code>intersect.tbl_lazy.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>sql_build()</code> creates a <code>select_query</code> S3 object, that is rendered
-to a SQL string by <code>sql_render()</code>. The output from <code>sql_build()</code> is
-designed to be easy to test, as it's database agnostic, and has
-a hierarchical structure. Outside of testing, however, you should
-always call <code>sql_render()</code>.</p>
+    <p>These are methods for the dplyr generics <code><a href='https://rdrr.io/pkg/generics/man/setops.html'>dplyr::intersect()</a></code>,
+<code><a href='https://rdrr.io/pkg/generics/man/setops.html'>dplyr::union()</a></code>, and <code><a href='https://rdrr.io/pkg/generics/man/setops.html'>dplyr::setdiff()</a></code>. They are translated to
+<code>INTERSECT</code>, <code>UNION</code>, and <code>EXCEPT</code> respectively.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>join_query</span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>y</span>,
-  <span class='kw'>vars</span>,
-  type = <span class='st'>"inner"</span>,
-  by = <span class='kw'>NULL</span>,
-  suffix = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>, <span class='st'>".y"</span>),
-  na_matches = <span class='fl'>FALSE</span>
-)
+    <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/setops.html'>intersect</a></span>(<span class='kw'>x</span>, <span class='kw'>y</span>, copy = <span class='fl'>FALSE</span>, <span class='kw'>...</span>, all = <span class='fl'>FALSE</span>)
 
-<span class='fu'>select_query</span>(
-  <span class='kw'>from</span>,
-  select = <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>),
-  where = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  group_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  having = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  order_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  limit = <span class='kw'>NULL</span>,
-  distinct = <span class='fl'>FALSE</span>
-)
+<span class='co'># S3 method for tbl_lazy</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/setops.html'>union</a></span>(<span class='kw'>x</span>, <span class='kw'>y</span>, copy = <span class='fl'>FALSE</span>, <span class='kw'>...</span>, all = <span class='fl'>FALSE</span>)
 
-<span class='fu'>semi_join_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, anti = <span class='fl'>FALSE</span>, by = <span class='kw'>NULL</span>, na_matches = <span class='fl'>FALSE</span>)
+<span class='co'># S3 method for tbl_lazy</span>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/setops.html'>union_all</a></span>(<span class='kw'>x</span>, <span class='kw'>y</span>, copy = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
 
-<span class='fu'>set_op_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, type = <span class='kw'>type</span>, all = <span class='fl'>FALSE</span>)
-
-<span class='fu'>sql_build</span>(<span class='kw'>op</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
-
-<span class='fu'>sql_render</span>(<span class='kw'>query</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>, subquery = <span class='fl'>FALSE</span>)
-
-<span class='fu'>sql_optimise</span>(<span class='kw'>x</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>, subquery = <span class='fl'>FALSE</span>)</pre>
+<span class='co'># S3 method for tbl_lazy</span>
+<span class='fu'><a href='https://rdrr.io/pkg/generics/man/setops.html'>setdiff</a></span>(<span class='kw'>x</span>, <span class='kw'>y</span>, copy = <span class='fl'>FALSE</span>, <span class='kw'>...</span>, all = <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>op</th>
-      <td><p>A sequence of lazy operations</p></td>
+      <th>x</th>
+      <td><p>A pair of lazy data frames backed by database queries.</p></td>
     </tr>
     <tr>
-      <th>con</th>
-      <td><p>A database connection. The default <code>NULL</code> uses a set of
-rules that should be very similar to ANSI 92, and allows for testing
-without an active database connection.</p></td>
+      <th>y</th>
+      <td><p>A pair of lazy data frames backed by database queries.</p></td>
+    </tr>
+    <tr>
+      <th>copy</th>
+      <td><p>If <code>x</code> and <code>y</code> are not from the same data source,
+and <code>copy</code> is <code>TRUE</code>, then <code>y</code> will be copied into a
+temporary table in same database as <code>x</code>. <code>*_join()</code> will automatically
+run <code>ANALYZE</code> on the created table in the hope that this will make
+you queries as efficient as possible by giving more data to the query
+planner.</p>
+<p>This allows you to join tables across srcs, but it's potentially expensive
+operation so you must opt into it.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Other arguments passed on to the methods. Not currently used.</p></td>
+      <td><p>Not currently used; provided for future extensions.</p></td>
     </tr>
     <tr>
-      <th>subquery</th>
-      <td><p>Is this SQL going to be used in a subquery?
-This is important because you can place a bare table name in a subquery
-and  ORDER BY does not work in subqueries.</p></td>
+      <th>all</th>
+      <td><p>If <code>TRUE</code>, includes all matches in output, not just unique rows.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p><code>sql_build()</code> is generic over the lazy operations, <a href='lazy_ops.html'>lazy_ops</a>,
-and generates an S3 object that represents the query. <code>sql_render()</code>
-takes a query object and then calls a function that is generic
-over the database. For example, <code>sql_build.op_mutate()</code> generates
-a <code>select_query</code>, and <code>sql_render.select_query()</code> calls
-<code><a href='https://dplyr.tidyverse.org/reference/backend_dbplyr.html'>sql_select()</a></code>, which has different methods for different databases.
-The default methods should generate ANSI 92 SQL where possible, so you
-backends only need to override the methods if the backend is not ANSI
-compliant.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

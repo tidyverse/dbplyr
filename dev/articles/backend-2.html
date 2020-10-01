@@ -145,119 +145,101 @@
 
     
     
-<p>This transition guide is aimed at backend authors. One of the big goals of dbplyr 2.0.0 is to ensure that all dbplyr generics can live in dplyr. I’ve done my best to design than transition so you can write a backend that works with both dbplyr 1.0.0 and dbplyr 2.0.0, and the complete transition won’t happen immediately but will play out over the next year or two.</p>
-<p>(dbplyr 2.0.0 won’t be released for at least 3 months after I notify all backend authors, and if you need more time I’m happy to extend this deadline.)</p>
-<p>The basic idea is that no generics will “move”; instead dbplyr will add new generics and dplyr will eventually remove them. This makes it straightforward to support both dbplyr 1.0.0 and 2.0.0 in a single package.</p>
-<div id="dbi-generics" class="section level2">
+<p>This transition guide is aimed at backend authors. dbplyr 2.0.0 is an important for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr). This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.</p>
+<p>The current timeline is something like this:</p>
+<ul>
+<li><p>dbplyr 2.0.0 provides a new interface for database backends, but the old interface remains as is so existing backends continue to work. Backend authors can choose to use the new interface.</p></li>
+<li><p>dbplyr 2.1.0 (released &gt;= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.</p></li>
+<li><p>dbplyr 2.2.0 (released &gt;= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.</p></li>
+<li><p>A future version of dplyr will deprecate then remove the database generics.</p></li>
+</ul>
+<div id="unused-generics" class="section level2">
 <h2 class="hasAnchor">
-<a href="#dbi-generics" class="anchor"></a>DBI generics</h2>
-<p>When dbplyr was first created there was much spurious variation across DBI backends, and a layer of shims was need to make dbplyr usable. Now thanks to the work of Kiril Muller and on others on DBITest and friends, these shims are no longer needed, and dbplyr will now call the DBI generics directly:</p>
+<a href="#unused-generics" class="anchor"></a>Unused generics</h2>
+<p>A number of generics are no longer used so you can delete the corresponding methods:</p>
 <ul>
-<li>Transaction management (using inside <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> to make indexing as efficient as possible): <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code> -&gt; <code>dbBegin()</code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code> -&gt; <code>dbCommit()</code>, and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code> -&gt; <code>dbRollback()</code>
-</li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code> calls <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">DBI::dbWriteTable()</a></code> instead of nine individual generics: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, and <code>db_data_types()</code>.</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code> are no longer used in favour of calling <code>dbQuoteIdentifer()</code> and <code>dbQuoteString()</code> directly.</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_query_rows()</a></code> was never actually used.</p></li>
+</ul>
+<p>Making these changes are important because they ensure your backend works consistently whether you use it through DBI or dplyr.</p>
+</div>
+<div id="nd-edition" class="section level2">
+<h2 class="hasAnchor">
+<a href="#nd-edition" class="anchor"></a>2nd edition</h2>
+<p>dbplyr 2.0.0 draws inspiration from the idea of an <a href="https://testthat.r-lib.org/articles/third-edition.html">edition</a> so that to tell dbplyr to use the new generics, you need to do two things:</p>
+<ul>
+<li><p>Depend on dbplyr 2.0.0 in your <code>DESCRIPTION</code>, e.g. <code>Imports: dbplyr (&gt;= 2.0.0)</code>. This ensures that when someone installs your package they get the latest version of dbplyr.</p></li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> now uses <code>dbWriteTable()</code> instead of <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code>. This also eliminates this eliminates <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_insert_into()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_data_type()</a></code> that were used for initial creation, and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_has_table()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> used to support overwriting existing tables.</li>
-<li>Escaping now uses the DBI generics: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_ident()</a></code> is replaced by <code>dbQuoteIdentifer()</code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_escape_string()</a></code> is replaced by <code>dbQuoteString()</code>. (These two generics still exist inside of dplyr but are used purely for testing).</li>
+<p>Provide a method for the <code>dbplyr_edition</code> generic:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="co">#' @importFrom dbplyr dbplyr_edition</span>
+<span class="co">#' @export</span>
+<span class="kw">dbplyr_edition.myConnectionClass</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">con</span>) <span class="fl">2L</span>
+</pre></div>
+<p>This tells dbplyr to use the new generics instead of the old generics.</p>
+</li>
 </ul>
-<p>If you have provided methods any of these dbplyr generics you’ll need to:</p>
-<ul>
-<li>Implement a method for the corresponding DBI generic: this ensures that your package will work with dbplyr 2.0.0.</li>
-</ul>
-<!-- --><ul>
-<li>Call the DBI generic from the existing dbplyr method. Don’t delete your existing methods or your package will no longer work with dbplyr 1.0.0.</li>
-</ul>
-<p>I <em>think</em> that this should cause relatively little pain because DBI support is now much better than it used to be and most backend authors provide both the dbplyr and DBI interfaces. Even if there is some pain, I think it’s relatively worthwhile pain as it helps out everyone, not just dbplyr users.</p>
+<p>Then you’ll need to update your methods, following the advice below.</p>
 </div>
 <div id="sql-generation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#sql-generation" class="anchor"></a>SQL generation</h2>
-<p>There are a number of dplyr generics that basically generate SQL and then execute it. Now rather than implementation method for a <code>db_*</code> generic from dplyr, you can implement a method for a <code>sql_*</code> generic from dbplyr.</p>
-<p>If you have any of the following generics, extract the SQL generation code into a new <code>sql_</code> method:</p>
-<pre><code>db_create_index   -&gt; sql_index_create
-db_analyze        -&gt; sql_table_analyze
-db_query_rows     -&gt; sql_query_rows
-db_save_query     -&gt; sql_query_save
-db_query_fields   -&gt; sql_query_fields
-db_explain        -&gt; sql_query_explain</code></pre>
-<p>Again, you’ll need to keep your old <code>db_</code> method (so your package continues to work with dbplyr 1.0.0), but you may want to use your new <code>sql_</code> method from it to avoid code duplication.</p>
-<p>Eventually, dbplyr will stop calling the <code>db_</code> generic and will call the <code>sql_</code> generics directly.</p>
+<p>There are a number of dplyr generics that generate then execute SQL. These have been replaced by dbplyr generics that just generate the SQL (and dbplyr takes care of executing it):</p>
+<ul>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_analyze()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_analyze()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_create_index()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_index()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_explain()</a></code> -&gt; <code>dbplyr::sql_queriy_explain()</code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_query_fields()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_fields()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_save_query()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_save()</a></code>
+</li>
+</ul>
+<p>If you have methods for any of those generics, you’ll need to extract the SQL generation code into a new <code>sql_</code> method.</p>
 </div>
 <div id="renamed-generics" class="section level2">
 <h2 class="hasAnchor">
 <a href="#renamed-generics" class="anchor"></a>Renamed generics</h2>
+<p>A number of other generics have been renamed:</p>
+<ul>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_select()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_select()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_join()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_semi_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_semi_join()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_set_op()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_set_op()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::sql_subquery()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_wrap()</a></code>
+</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">dplyr::db_desc()</a></code> -&gt; <code><a href="../reference/db-misc.html">dbplyr::db_connection_describe()</a></code>
+</li>
+</ul>
+<p>If you have methods for any of these generics, you’ll need to rename.</p>
 </div>
-<div id="conditional-method-registration" class="section level2">
+<div id="new-generics" class="section level2">
 <h2 class="hasAnchor">
-<a href="#conditional-method-registration" class="anchor"></a>Conditional method registration</h2>
-<p>To make it possible to release your package to CRAN before dbplyr 2.0.0 is out (providing the best experience for your users), you can rely on the usual <code>@export</code> roxygen tag or <code>S3method()</code> <code>NAMESPACE</code> directive because that requires importing the generic (which won’t be available until after dbplyr 2.0.0 is available).</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw">.onLoad</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">...</span>) {
-  <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span>(<span class="st">"dbplyr"</span> <span class="op">&gt;=</span> <span class="st">"1.99"</span>)) {
-    <span class="fu">s3_register</span>(<span class="st">"dbplyr::sql_index_create"</span>, <span class="st">"backend_class"</span>)
-    <span class="fu">s3_register</span>(<span class="st">"dbplyr::sql_table_analyze"</span>, <span class="st">"backend_class"</span>)
-  }
-}
-
-<span class="kw">s3_register</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">generic</span>, <span class="kw">class</span>, <span class="kw">method</span> = <span class="kw">NULL</span>) {
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/character.html">is.character</a></span>(<span class="kw">generic</span>), <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">generic</span>) <span class="op">==</span> <span class="fl">1</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/character.html">is.character</a></span>(<span class="kw">class</span>), <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">class</span>) <span class="op">==</span> <span class="fl">1</span>)
-
-  <span class="kw">pieces</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(<span class="kw">generic</span>, <span class="st">"::"</span>)[[<span class="fl">1</span>]]
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">pieces</span>) <span class="op">==</span> <span class="fl">2</span>)
-  <span class="kw">package</span> <span class="op">&lt;-</span> <span class="kw">pieces</span>[[<span class="fl">1</span>]]
-  <span class="kw">generic</span> <span class="op">&lt;-</span> <span class="kw">pieces</span>[[<span class="fl">2</span>]]
-
-  <span class="kw">caller</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html">parent.frame</a></span>()
-
-  <span class="kw">get_method_env</span> <span class="op">&lt;-</span> <span class="fu">function</span>() {
-    <span class="kw">top</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-topenv.html">topenv</a></span>(<span class="kw">caller</span>)
-    <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">isNamespace</a></span>(<span class="kw">top</span>)) {
-      <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/environment.html">environmentName</a></span>(<span class="kw">top</span>))
-    } <span class="co">else</span> {
-      <span class="kw">caller</span>
-    }
-  }
-  <span class="kw">get_method</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">method</span>, <span class="kw">env</span>) {
-    <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(<span class="kw">method</span>)) {
-      <span class="fu"><a href="https://rdrr.io/r/base/get.html">get</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">generic</span>, <span class="st">"."</span>, <span class="kw">class</span>), envir = <span class="fu">get_method_env</span>())
-    } <span class="co">else</span> {
-      <span class="kw">method</span>
-    }
-  }
-
-  <span class="kw">method_fn</span> <span class="op">&lt;-</span> <span class="fu">get_method</span>(<span class="kw">method</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/is.function.html">is.function</a></span>(<span class="kw">method_fn</span>))
-
-  <span class="co"># Always register hook in case package is later unloaded &amp; reloaded</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/userhooks.html">setHook</a></span>(
-    <span class="fu"><a href="https://rdrr.io/r/base/userhooks.html">packageEvent</a></span>(<span class="kw">package</span>, <span class="st">"onLoad"</span>),
-    <span class="fu">function</span>(<span class="kw">...</span>) {
-      <span class="kw">ns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace</a></span>(<span class="kw">package</span>)
-
-      <span class="co"># Refresh the method, it might have been updated by `devtools::load_all()`</span>
-      <span class="kw">method_fn</span> <span class="op">&lt;-</span> <span class="fu">get_method</span>(<span class="kw">method</span>)
-
-      <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">registerS3method</a></span>(<span class="kw">generic</span>, <span class="kw">class</span>, <span class="kw">method_fn</span>, envir = <span class="kw">ns</span>)
-    }
-  )
-
-  <span class="co"># Avoid registration failures during loading (pkgload or regular)</span>
-  <span class="co">if</span> (<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html">isNamespaceLoaded</a></span>(<span class="kw">package</span>)) {
-    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/invisible.html">invisible</a></span>())
-  }
-
-  <span class="kw">envir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">asNamespace</a></span>(<span class="kw">package</span>)
-
-  <span class="co"># Only register if generic can be accessed</span>
-  <span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/exists.html">exists</a></span>(<span class="kw">generic</span>, <span class="kw">envir</span>)) {
-    <span class="fu"><a href="https://rdrr.io/r/base/ns-internal.html">registerS3method</a></span>(<span class="kw">generic</span>, <span class="kw">class</span>, <span class="kw">method_fn</span>, envir = <span class="kw">envir</span>)
-  }
-
-  <span class="fu"><a href="https://rdrr.io/r/base/invisible.html">invisible</a></span>()
-}
-</pre></div>
-<p>(<code>s3_register()</code> is licensed with <a href="https://choosealicense.com/licenses/unlicense/">the unlicense</a> so you’re free to copy and paste into your package, and there’s no need to acknowledge the contribution. Learn more about it at <code><a href="https://vctrs.r-lib.org/reference/s3_register.html">?vctrs::s3_register</a></code>.)</p>
-<p>At some point in the future, you can formally require version 2.0.0 of dbplyr in your <code>DESCRIPTION</code>, and then delete this code, switching back to your usual way of exporting methods.</p>
+<a href="#new-generics" class="anchor"></a>New generics</h2>
+<p>You may also want to consider methods for the new generics in dbplyr 2.0.0:</p>
+<ul>
+<li><p>Provide a method for <code>db_temporary_table()</code> if your backend requires that temporary tables have special names.</p></li>
+<li><p>Provide a method for <code><a href="../reference/db-sql.html">sql_expr_matches()</a></code> if your database has special syntax for matching two values (see <a href="https://modern-sql.com/feature/is-distinct-from" class="uri">https://modern-sql.com/feature/is-distinct-from</a>).</p></li>
+<li><p>Provide a method for <code><a href="../reference/db-misc.html">sql_join_suffix()</a></code> if your backend can’t use the usual <code>.x</code> and <code>.y</code> suffixes in joins.</p></li>
+</ul>
 </div>
   </div>
 

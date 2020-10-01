@@ -222,7 +222,7 @@ For example, computed queries do not have a "name"</p>
     <pre class="examples"><div class='input'><span class='kw'>mf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(x = <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, y = <span class='fl'>5</span><span class='op'>:</span><span class='fl'>1</span>, .name = <span class='st'>"blorp"</span>)
 <span class='fu'>remote_name</span>(<span class='kw'>mf</span>)
 </div><div class='output co'>#&gt; &lt;IDENT&gt; blorp</div><div class='input'><span class='fu'>remote_src</span>(<span class='kw'>mf</span>)
-</div><div class='output co'>#&gt; src:  sqlite 3.30.1 [:memory:]
+</div><div class='output co'>#&gt; src:  sqlite 3.33.0 [:memory:]
 #&gt; tbls: blorp, dbplyr_001, dbplyr_002, dbplyr_003, dbplyr_004, dbplyr_005,
 #&gt;   dbplyr_006, dbplyr_007, dbplyr_008, dbplyr_009, dbplyr_010, dbplyr_011,
 #&gt;   dbplyr_012, dbplyr_013, dbplyr_014, dbplyr_015, dbplyr_016, df,
@@ -236,7 +236,7 @@ For example, computed queries do not have a "name"</p>
 <span class='kw'>mf2</span> <span class='op'>&lt;-</span> <span class='kw'>dplyr</span>::<span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='kw'>mf</span>, <span class='kw'>x</span> <span class='op'>&gt;</span> <span class='fl'>3</span>)
 <span class='fu'>remote_name</span>(<span class='kw'>mf2</span>)
 </div><div class='output co'>#&gt; NULL</div><div class='input'><span class='fu'>remote_src</span>(<span class='kw'>mf2</span>)
-</div><div class='output co'>#&gt; src:  sqlite 3.30.1 [:memory:]
+</div><div class='output co'>#&gt; src:  sqlite 3.33.0 [:memory:]
 #&gt; tbls: blorp, dbplyr_001, dbplyr_002, dbplyr_003, dbplyr_004, dbplyr_005,
 #&gt;   dbplyr_006, dbplyr_007, dbplyr_008, dbplyr_009, dbplyr_010, dbplyr_011,
 #&gt;   dbplyr_012, dbplyr_013, dbplyr_014, dbplyr_015, dbplyr_016, df,

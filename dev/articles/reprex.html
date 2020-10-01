@@ -166,7 +166,7 @@
 <span class="kw">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span>(g = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>), x = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y = <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>)
 <span class="kw">mf</span>
 <span class="co">#&gt; # Source:   table&lt;dbplyr_001&gt; [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.30.1 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt;</span>
 <span class="co">#&gt; 1     1     1     5</span>
@@ -179,7 +179,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="kw">g</span>) <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html">summarise_all</a></span>(<span class="kw">mean</span>, na.rm = <span class="fl">TRUE</span>)
 <span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.30.1 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1     1   1.5   4.5</span>

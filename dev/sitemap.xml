@@ -97,6 +97,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/in_schema.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/intersect.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/join.tbl_sql.html</loc>
   </url>
   <url>
