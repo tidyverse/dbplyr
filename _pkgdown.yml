@@ -7,6 +7,7 @@ development:
   mode: auto
 
 home:
+  title: A dplyr backend for databases
   strip_header: true
 
 reference:
