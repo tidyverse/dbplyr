@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 This transition guide is aimed at backend authors.
-dbplyr 2.0.0 is an important release because it includes a plan to all move backend generics into dbplyr (instead of being a mix of dbplyr and dplyr).
-This move has been designed to be as gradual as possible so not there are no sudden breakages and backend authors have plenty of time to make changes.
+dbplyr 2.0.0 is an important for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr).
+This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.
 
 The current timeline is something like this:
 
@@ -27,14 +27,29 @@ The current timeline is something like this:
 
 -   dbplyr 2.2.0 (released \>= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.
 
+-   A future version of dplyr will deprecate then remove the database generics.
+
+## Unused generics
+
+A number of generics are no longer used so you can delete the corresponding methods:
+
+-   `db_write_table()` calls `DBI::dbWriteTable()` instead of nine individual generics: `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`, `db_drop_table()`, `db_has_table()`, `db_create_table()`, and `db_data_types()`.
+
+-   `sql_escape_ident()` and `sql_escape_string()` are no longer used in favour of calling `dbQuoteIdentifer()` and `dbQuoteString()` directly.
+
+-   `db_query_rows()` was never actually used.
+
+Making these changes are important because they ensure your backend works consistently whether you use it through DBI or dplyr.
+
 ## 2nd edition
 
-dbplyr 2.0.0 draws inspiration from the idea of an [edition](https://testthat.r-lib.org/articles/third-edition.html) so that for dbplyr to use the new generics with your backend, you need to do two things:
+dbplyr 2.0.0 draws inspiration from the idea of an [edition](https://testthat.r-lib.org/articles/third-edition.html) so that to tell dbplyr to use the new generics, you need to do two things:
 
 -   Depend on dbplyr 2.0.0 in your `DESCRIPTION`, e.g.
-    `Imports: dbplyr (>= 2.0.0)`
+    `Imports: dbplyr (>= 2.0.0)`.
+    This ensures that when someone installs your package they get the latest version of dbplyr.
 
--   Provide a method for the `dbplyr_edition` generic that declares you want the second edition:
+-   Provide a method for the `dbplyr_edition` generic:
 
     ```{r}
     #' @importFrom dbplyr dbplyr_edition
@@ -42,108 +57,42 @@ dbplyr 2.0.0 draws inspiration from the idea of an [edition](https://testthat.r-
     dbplyr_edition.myConnectionClass <- function(con) 2L
     ```
 
-Next you'll need to update your methods, following the advice below.
+    This tells dbplyr to use the new generics instead of the old generics.
 
-## DBI generics
-
-When dbplyr was first created there was much spurious variation across DBI backends, and a layer of shims was need to make dbplyr usable.
-Now thanks to the work of Kirill Müller and on others on DBITest and friends, these shims are no longer needed in most cases, and dbplyr now calls the DBI generics more directly:
-
--   `db_write_table()` calls `DBI::dbWriteTable()` instead of nine generics that formerly each did a small part of this: `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`, `db_drop_table()`, `db_has_table()`, `db_create_table()`, and `db_data_types()`. Since these generics are no longer used, you can delete their methods from your package. (And if dplyr no longer works, you'll need to fix the `dbWriteTable()` method).
--   `dbplyr::sql_escape_ident()` and `dbplyr::sql_escape_string()` are no longer used in favour of calling `dbQuoteIdentifer()` and `dbQuoteString()` directly. If you've provided those methods, you'll need to move their implementation to methods for the DBI generics.
-
-Making these changes are important because they ensure your backend works consistently whether you use it through DBI or dplyr.
+Then you'll need to update your methods, following the advice below.
 
 ## SQL generation
 
-There are a number of dplyr generics that basically generate SQL and then execute it.
-Now rather than implementation method for a `db_*` generic from dplyr, you can implement a method for a `sql_*` generic from dbplyr.
+There are a number of dplyr generics that generate then execute SQL.
+These have been replaced by dbplyr generics that just generate the SQL (and dbplyr takes care of executing it):
 
-If you have any of the following generics, extract the SQL generation code into a new `sql_` method:
+-   `dplyr::db_analyze()` -\> `dbplyr::sql_table_analyze()`
+-   `dplyr::db_create_index()` -\> `dbplyr::sql_table_index()`
+-   `dplyr::db_explain()` -\> `dbplyr::sql_queriy_explain()`
+-   `dplyr::db_query_fields()` -\> `dbplyr::sql_query_fields()`
+-   `dplyr::db_save_query()` -\> `dbplyr::sql_query_save()`
 
-    db_create_index   -> sql_table_index
-    db_analyze        -> sql_table_analyze
-    db_save_query     -> sql_query_save
-    db_explain        -> sql_query_explain
-
-Again, you'll need to keep your old `db_` method (so your package continues to work with dbplyr 1.0.0), but you may want to use your new `sql_` method from it to avoid code duplication.
-
-Eventually, dbplyr will stop calling the `db_` generic and will call the `sql_` generics directly.
+If you have methods for any of those generics, you'll need to extract the SQL generation code into a new `sql_` method.
 
 ## Renamed generics
 
-## Conditional method registration
+A number of other generics have been renamed:
 
-To make it possible to release your package to CRAN before dbplyr 2.0.0 is out (providing the best experience for your users), you can rely on the usual `@export` roxygen tag or `S3method()` `NAMESPACE` directive because that requires importing the generic (which won't be available until after dbplyr 2.0.0 is available).
+-   `dplyr::sql_select()` -\> `dbplyr::sql_query_select()`
+-   `dplyr::sql_join()` -\> `dbplyr::sql_query_join()`
+-   `dplyr::sql_semi_join()` -\> `dbplyr::sql_query_semi_join()`
+-   `dplyr::sql_set_op()` -\> `dbplyr::sql_query_set_op()`
+-   `dplyr::sql_subquery()` -\> `dbplyr::sql_query_wrap()`
+-   `dplyr::db_desc()` -\> `dbplyr::db_connection_describe()`
 
-```{r}
-.onLoad <- function(...) {
-  if (packageVersion("dbplyr" >= "1.99")) {
-    s3_register("dbplyr::sql_table_index", "backend_class")
-    s3_register("dbplyr::sql_table_analyze", "backend_class")
-  }
-}
+If you have methods for any of these generics, you'll need to rename.
 
-s3_register <- function(generic, class, method = NULL) {
-  stopifnot(is.character(generic), length(generic) == 1)
-  stopifnot(is.character(class), length(class) == 1)
+## New generics
 
-  pieces <- strsplit(generic, "::")[[1]]
-  stopifnot(length(pieces) == 2)
-  package <- pieces[[1]]
-  generic <- pieces[[2]]
+You may also want to consider methods for the new generics in dbplyr 2.0.0:
 
-  caller <- parent.frame()
+-   Provide a method for `db_temporary_table()` if your backend requires that temporary tables have special names.
 
-  get_method_env <- function() {
-    top <- topenv(caller)
-    if (isNamespace(top)) {
-      asNamespace(environmentName(top))
-    } else {
-      caller
-    }
-  }
-  get_method <- function(method, env) {
-    if (is.null(method)) {
-      get(paste0(generic, ".", class), envir = get_method_env())
-    } else {
-      method
-    }
-  }
+-   Provide a method for `sql_expr_matches()` if your database has special syntax for matching two values (see <https://modern-sql.com/feature/is-distinct-from>).
 
-  method_fn <- get_method(method)
-  stopifnot(is.function(method_fn))
-
-  # Always register hook in case package is later unloaded & reloaded
-  setHook(
-    packageEvent(package, "onLoad"),
-    function(...) {
-      ns <- asNamespace(package)
-
-      # Refresh the method, it might have been updated by `devtools::load_all()`
-      method_fn <- get_method(method)
-
-      registerS3method(generic, class, method_fn, envir = ns)
-    }
-  )
-
-  # Avoid registration failures during loading (pkgload or regular)
-  if (!isNamespaceLoaded(package)) {
-    return(invisible())
-  }
-
-  envir <- asNamespace(package)
-
-  # Only register if generic can be accessed
-  if (exists(generic, envir)) {
-    registerS3method(generic, class, method_fn, envir = envir)
-  }
-
-  invisible()
-}
-```
-
-(`s3_register()` is licensed with [the unlicense](https://choosealicense.com/licenses/unlicense/) so you're free to copy and paste into your package, and there's no need to acknowledge the contribution.
-Learn more about it at `?vctrs::s3_register`.)
-
-At some point in the future, you can formally require version 2.0.0 of dbplyr in your `DESCRIPTION`, and then delete this code, switching back to your usual way of exporting methods.
+-   Provide a method for `sql_join_suffix()` if your backend can't use the usual `.x` and `.y` suffixes in joins.

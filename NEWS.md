@@ -106,17 +106,20 @@
 
 If you are the author of a dbplyr backend, please see `vignette("backend-2")` for details.
 
+*   New `dbplyr_edition()` generic allows you to opt-in to the 2nd edition of 
+    the dbplyr API.
+
 *   `db_write_table()` now calls `DBI::dbWriteTable()` instead of nine generics
     that formerly each did a small part: `db_create_indexes()`, `db_begin()`,
     `db_rollback()`, `db_commit()`, `db_list_tables()`, `drop_drop_table()`,
-    `db_has_table()`, `db_create_table()`, and `db_data_types()`. You can delete
-    the methods for these generics.
+    `db_has_table()`, `db_create_table()`, and `db_data_types()`. You can 
+    now delete the methods for these generics.
     
     `db_query_rows()` is no longer used; it appears that it hasn't been used 
-    for some time.
+    for some time, so if you have a method, you can delete it.
 
 *   `DBI::dbQuoteIdentifier()` is now used instead of `sql_escape_ident()` and
-    `DBI::dbQuoteString()` instead of `sql_escape_string()`.
+    `DBI::dbQuoteString()` instead of `sql_escape_string()`.  
 
 *   A number of `db_*` generics have been replaced with new SQL generation
     generics:
