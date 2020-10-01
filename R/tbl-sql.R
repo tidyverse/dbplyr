@@ -67,6 +67,7 @@ as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
 }
 
 #' @export
+#' @importFrom tibble tbl_sum
 tbl_sum.tbl_sql <- function(x) {
   grps <- op_grps(x$ops)
   sort <- op_sort(x$ops)

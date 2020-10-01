@@ -2,8 +2,8 @@ test_that("collect equivalent to as.data.frame/as_tibble", {
   mf <- memdb_frame(letters)
 
   expect_equal(as.data.frame(mf), data.frame(letters, stringsAsFactors = FALSE))
-  expect_equal(tibble::as_tibble(mf), tibble::tibble(letters))
-  expect_equal(collect(mf), tibble::tibble(letters))
+  expect_equal(as_tibble(mf), tibble(letters))
+  expect_equal(collect(mf), tibble(letters))
 })
 
 test_that("explicit collection returns all data", {
@@ -11,7 +11,7 @@ test_that("explicit collection returns all data", {
   big <- memdb_frame(x = seq_len(n))
 
   nrow1 <- big %>% as.data.frame() %>% nrow()
-  nrow2 <- big %>% tibble::as_tibble() %>% nrow()
+  nrow2 <- big %>% as_tibble() %>% nrow()
   nrow3 <- big %>% collect() %>% nrow()
 
   expect_equal(nrow1, n)

@@ -6,6 +6,7 @@
 #' @importFrom dplyr n
 #' @import rlang
 #' @import DBI
-#' @import tibble
+#' @importFrom tibble tibble as_tibble
+#' @importFrom magrittr %>%
 #' @keywords internal
 "_PACKAGE"
