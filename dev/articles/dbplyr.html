@@ -164,9 +164,9 @@
 <ul>
 <li><p><a href="https://CRAN.R-project.org/package=RMariaDB">RMariaDB</a> connects to MySQL and MariaDB</p></li>
 <li><p><a href="https://CRAN.R-project.org/package=RPostgres">RPostgres</a> connects to Postgres and Redshift.</p></li>
-<li><p><a href="https://github.com/rstats-db/RSQLite">RSQLite</a> embeds a SQLite database.</p></li>
-<li><p><a href="https://github.com/rstats-db/odbc#odbc">odbc</a> connects to many commercial databases via the open database connectivity protocol.</p></li>
-<li><p><a href="https://github.com/rstats-db/bigrquery">bigrquery</a> connects to Google’s BigQuery.</p></li>
+<li><p><a href="https://github.com/r-dbi/RSQLite">RSQLite</a> embeds a SQLite database.</p></li>
+<li><p><a href="https://github.com/r-dbi/odbc#odbc">odbc</a> connects to many commercial databases via the open database connectivity protocol.</p></li>
+<li><p><a href="https://github.com/r-dbi/bigrquery">bigrquery</a> connects to Google’s BigQuery.</p></li>
 </ul>
 <p>If the database you need to connect to is not listed here, you’ll need to do some investigation (i.e. googling) yourself.</p>
 <p>In this vignette, we’re going to use the RSQLite backend which is automatically installed when you install dbplyr. SQLite is a great way to get started with databases because it’s completely embedded inside an R package. Unlike most other systems, you don’t need to setup a separate database server. SQLite is great for demos, but is surprisingly powerful, and with a little practice you can use it to easily work with many gigabytes of data.</p>
@@ -277,7 +277,7 @@
 <span class="co">#&gt; 6 AUS   1521.</span>
 <span class="co">#&gt; # … with more rows</span>
 </pre></div>
-<p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="http://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="http://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
+<p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="https://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
 <li><p>It never pulls data into R unless you explicitly ask for it.</p></li>
@@ -375,7 +375,7 @@
 <h3 class="hasAnchor">
 <a href="#bigquery" class="anchor"></a>BigQuery</h3>
 <p>BigQuery is a hosted database server provided by Google. To connect, you need to provide your <code>project</code>, <code>dataset</code> and optionally a project for <code>billing</code> (if billing for <code>project</code> isn’t enabled).</p>
-<p>It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it’s a hosted solution, there’s no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can <a href="https://cloud.google.com/storage/docs/offline-media-import-export">ship hard drives</a>!)</p>
+<p>It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it’s a hosted solution, there’s no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can <a href="https://cloud.google.com/products/data-transfer">ship hard drives</a>!)</p>
 </div>
 </div>
   </div>

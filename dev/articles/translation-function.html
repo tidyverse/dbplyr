@@ -310,7 +310,7 @@
 <div id="unknown-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#unknown-functions" class="anchor"></a>Unknown functions</h2>
-<p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="http://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
+<p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="https://www.sqlite.org/lang_corefunc.html">SQLite</a>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit">
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu">glob</span>(<span class="kw">x</span>, <span class="kw">y</span>))
 <span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span>

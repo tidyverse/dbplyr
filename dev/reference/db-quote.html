@@ -216,8 +216,8 @@ queries.</p>
     <pre class="examples"><div class='input'><span class='kw'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span>()
 <span class='fu'>sql_escape_logical</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>TRUE</span>, <span class='fl'>FALSE</span>, <span class='fl'>NA</span>))
 </div><div class='output co'>#&gt; [1] "TRUE"  "FALSE" "NULL" </div><div class='input'><span class='fu'>sql_escape_date</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span>())
-</div><div class='output co'>#&gt; [1] "'2020-10-01'"</div><div class='input'><span class='fu'>sql_escape_date</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span>())
-</div><div class='output co'>#&gt; [1] "'2020-10-01 17:59:54'"</div><div class='input'><span class='fu'>sql_escape_raw</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/rawConversion.html'>charToRaw</a></span>(<span class='st'>"hi"</span>))
+</div><div class='output co'>#&gt; [1] "'2020-10-02'"</div><div class='input'><span class='fu'>sql_escape_date</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span>())
+</div><div class='output co'>#&gt; [1] "'2020-10-02 13:05:29'"</div><div class='input'><span class='fu'>sql_escape_raw</span>(<span class='kw'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/rawConversion.html'>charToRaw</a></span>(<span class='st'>"hi"</span>))
 </div><div class='output co'>#&gt; [1] "X'6869'"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
