@@ -85,6 +85,7 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           sql_expr(!!string ~ !!pattern)
         }
       },
+      str_like = sql_prefix("LIKE"),
       str_replace = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },

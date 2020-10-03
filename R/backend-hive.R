@@ -40,7 +40,9 @@ sql_translate_env.Hive <- function(con) {
 
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
-      }
+      },
+
+      str_like = sql_prefix("LIKE")
     ),
     sql_translator(.parent = base_odbc_agg,
       var = sql_aggregate("VARIANCE", "var"),

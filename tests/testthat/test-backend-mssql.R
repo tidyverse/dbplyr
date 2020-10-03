@@ -24,6 +24,7 @@ test_that("custom stringr functions translated correctly", {
   local_con(simulate_mssql())
 
   expect_equal(translate_sql(str_length(x)),     sql("LEN(`x`)"))
+  expect_equal(translate_sql(str_like(x)),       sql("LIKE(`x`)"))
 })
 
 test_that("custom aggregators translated correctly", {

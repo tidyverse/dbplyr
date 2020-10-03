@@ -13,6 +13,16 @@ test_that("generates custom sql", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
+test_that("custom stringr functions translated correctly", {
+  local_con(simulate_mysql())
+
+  expect_equal(translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
+  expect_equal(translate_sql(str_like(x)), sql("LIKE(`x`)"))
+  expect_equal(translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
+  expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+})
+
 # live database -----------------------------------------------------------
 
 test_that("logicals converted to integer correctly", {

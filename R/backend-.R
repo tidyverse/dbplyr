@@ -237,6 +237,7 @@ base_scalar <- sql_translator(
   str_glue = sql_not_supported("str_glue()"),
   str_glue_data = sql_not_supported("str_glue_data()"),
   str_interp = sql_not_supported("str_interp()"),
+  str_like = sql_not_supported("str_like()"),
   str_locate = sql_not_supported("str_locate()"),
   str_locate_all = sql_not_supported("str_locate_all()"),
   str_match = sql_not_supported("str_match()"),

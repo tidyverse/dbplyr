@@ -61,6 +61,7 @@ sql_translate_env.MariaDBConnection <- function(con) {
       # but available in MariaDB. A few more details at:
       # https://www.oreilly.com/library/view/mysql-cookbook/0596001452/ch04s11.html
       str_detect = sql_infix("REGEXP"),
+      str_like = sql_prefix("LIKE"),
       str_locate = function(string, pattern) {
         sql_expr(REGEXP_INSTR(!!string, !!pattern))
       },
