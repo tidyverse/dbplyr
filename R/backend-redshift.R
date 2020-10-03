@@ -47,6 +47,15 @@ sql_translate_env.RedshiftConnection <- function(con) {
       str_replace = sql_not_supported("str_replace"),
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(REGEXP_REPLACE(!!string, !!pattern, !!replacement))
+      },
+
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_patternmatching_condition_like.html
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
+        }
       }
     ),
     sql_translator(.parent = postgres$aggregate),

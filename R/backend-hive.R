@@ -40,6 +40,15 @@ sql_translate_env.Hive <- function(con) {
 
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+      },
+
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %LIKE% !!pattern)
+        } else {
+          warn("in Hive LIKE is case insensitive")
+          sql_expr(!!string %LIKE% !!pattern)
+        }
       }
     ),
     sql_translator(.parent = base_odbc_agg,

@@ -22,6 +22,8 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(translate_sql(str_squish(x)), sql("LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"))
   expect_equal(translate_sql(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '')"))
   expect_equal(translate_sql(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 'g')"))
+  expect_equal(translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
+  expect_equal(translate_sql(str_like(x, y, ignore_case = FALSE)), sql("`x` ILIKE `y`"))
 })
 
 test_that("two variable aggregates are translated correctly", {

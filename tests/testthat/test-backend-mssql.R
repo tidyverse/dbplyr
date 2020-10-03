@@ -24,6 +24,8 @@ test_that("custom stringr functions translated correctly", {
   local_con(simulate_mssql())
 
   expect_equal(translate_sql(str_length(x)),     sql("LEN(`x`)"))
+  expect_equal(translate_sql(str_like(x, y)),    sql("`x` LIKE `y`"))
+  expect_warning(translate_sql(str_like(x, y, FALSE)), "in SQL Server LIKE is case insensitive")
 })
 
 test_that("custom aggregators translated correctly", {

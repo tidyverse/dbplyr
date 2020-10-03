@@ -15,6 +15,9 @@ test_that("string translations", {
   expect_equal(translate_sql(paste("x", "y")), sql("'x' || ' ' || 'y'"))
   expect_equal(translate_sql(paste0("x", "y")), sql("'x' || 'y'"))
   expect_equal(translate_sql(str_c("x", "y")), sql("'x' || 'y'"))
+
+  expect_equal(translate_sql(str_like(x, y)), sql("`x` ILIKE `y`"))
+  expect_equal(translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`"))
 })
 
 test_that("numeric translations", {

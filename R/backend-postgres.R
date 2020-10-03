@@ -85,6 +85,13 @@ sql_translate_env.PostgreSQLConnection <- function(con) {
           sql_expr(!!string ~ !!pattern)
         }
       },
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %LIKE% !!pattern)
+        } else {
+          sql_expr(!!string %ILIKE% !!pattern)
+        }
+      },
       str_replace = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },

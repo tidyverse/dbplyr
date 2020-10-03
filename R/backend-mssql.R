@@ -146,6 +146,14 @@ simulate_mssql <- function(version = "15.0") {
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title()"),
       str_sub = sql_str_sub("SUBSTRING", "LEN"),
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %LIKE% !!pattern)
+        } else {
+          warn("in SQL Server LIKE is case insensitive")
+          sql_expr(!!string %LIKE% !!pattern)
+        }
+      },
 
       # lubridate ---------------------------------------------------------------
       # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
