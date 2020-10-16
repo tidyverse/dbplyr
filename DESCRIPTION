@@ -48,6 +48,7 @@ Suggests:
     RMariaDB (>= 1.0.2),
     rmarkdown,
     RPostgres (>= 1.1.3),
+    RPostgreSQL,
     RSQLite (>= 2.1.0),
     testthat (>= 2.99.0)
 Remotes: r-lib/testthat

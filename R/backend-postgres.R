@@ -229,6 +229,36 @@ sql_expr_matches.PqConnection <- sql_expr_matches.PostgreSQLConnection
 
 # DBI methods ------------------------------------------------------------------
 
+#' @export
+db_write_table.PostgreSQLConnection <- function(con, table, types, values,
+                                                temporary = TRUE, overwrite = FALSE, ....) {
+
+  dbWriteTable(
+    con,
+    name = table,
+    value = values,
+    field.types = types,
+    temporary = temporary,
+    overwrite = overwrite,
+    row.names = FALSE
+  )
+
+  table
+}
+
+#' @export
+db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
+  fields <- build_sql(
+    "SELECT * FROM ", sql_subquery(con, sql), " WHERE 0=1",
+    con = con
+  )
+
+  qry <- dbSendQuery(con, fields)
+  on.exit(dbClearResult(qry))
+
+  dbGetInfo(qry)$fieldDescription[[1]]$name
+}
+
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
 sql_query_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {

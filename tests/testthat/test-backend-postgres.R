@@ -85,3 +85,9 @@ test_that("can overwrite temp tables", {
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
 })
+
+test_that("can get variables with RPostgreSQL", {
+  src <- src_test("rpostgresql")
+  copy_to(src, mtcars, "mtcars", overwrite = TRUE)
+  expect_identical(colnames(tbl(src, "mtcars")), colnames(mtcars))
+})
