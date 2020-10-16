@@ -224,34 +224,34 @@ temporary tables to start with <code>#</code>)</p></li>
 
     </div>
 
-    <pre class="usage"><span class='fu'>db_copy_to</span>(
-  <span class='kw'>con</span>,
-  <span class='kw'>table</span>,
-  <span class='kw'>values</span>,
-  overwrite = <span class='fl'>FALSE</span>,
-  types = <span class='kw'>NULL</span>,
-  temporary = <span class='fl'>TRUE</span>,
-  unique_indexes = <span class='kw'>NULL</span>,
-  indexes = <span class='kw'>NULL</span>,
-  analyze = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>,
-  in_transaction = <span class='fl'>TRUE</span>
-)
+    <pre class="usage"><span class='fu'>db_copy_to</span><span class='op'>(</span>
+  <span class='va'>con</span>,
+  <span class='va'>table</span>,
+  <span class='va'>values</span>,
+  overwrite <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  types <span class='op'>=</span> <span class='cn'>NULL</span>,
+  temporary <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  unique_indexes <span class='op'>=</span> <span class='cn'>NULL</span>,
+  indexes <span class='op'>=</span> <span class='cn'>NULL</span>,
+  analyze <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>,
+  in_transaction <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='fu'>db_compute</span>(
-  <span class='kw'>con</span>,
-  <span class='kw'>table</span>,
-  <span class='kw'>sql</span>,
-  temporary = <span class='fl'>TRUE</span>,
-  unique_indexes = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  indexes = <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  analyze = <span class='fl'>TRUE</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'>db_compute</span><span class='op'>(</span>
+  <span class='va'>con</span>,
+  <span class='va'>table</span>,
+  <span class='va'>sql</span>,
+  temporary <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  unique_indexes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  indexes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  analyze <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
-<span class='fu'>db_collect</span>(<span class='kw'>con</span>, <span class='kw'>sql</span>, n = <span class='op'>-</span><span class='fl'>1</span>, warn_incomplete = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+<span class='fu'>db_collect</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>sql</span>, n <span class='op'>=</span> <span class='op'>-</span><span class='fl'>1</span>, warn_incomplete <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>db_table_temporary</span>(<span class='kw'>con</span>, <span class='kw'>table</span>, <span class='kw'>temporary</span>)</pre>
+<span class='fu'>db_table_temporary</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>table</span>, <span class='va'>temporary</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

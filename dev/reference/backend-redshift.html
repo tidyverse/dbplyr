@@ -194,21 +194,21 @@ are generally few differences, apart from string manipulation.</p>
 converting to live access database.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_redshift</span>()</pre>
+    <pre class="usage"><span class='fu'>simulate_redshift</span><span class='op'>(</span><span class='op'>)</span></pre>
 
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts = <span class='fl'>FALSE</span>)
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='kw'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span>(a = <span class='fl'>TRUE</span>, b = <span class='fl'>1</span>, c = <span class='fl'>2</span>, d = <span class='st'>"z"</span>, con = <span class='fu'>simulate_redshift</span>())
-<span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span>(<span class='kw'>c</span>, <span class='st'>" times"</span>))
+<span class='va'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='cn'>TRUE</span>, b <span class='op'>=</span> <span class='fl'>1</span>, c <span class='op'>=</span> <span class='fl'>2</span>, d <span class='op'>=</span> <span class='st'>"z"</span>, con <span class='op'>=</span> <span class='fu'>simulate_redshift</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>c</span>, <span class='st'>" times"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `c` || ' ' || ' times' AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'><a href='https://rdrr.io/r/base/substr.html'>substr</a></span>(<span class='kw'>c</span>, <span class='fl'>2</span>, <span class='fl'>3</span>))
+#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/substr.html'>substr</a></span><span class='op'>(</span><span class='va'>c</span>, <span class='fl'>2</span>, <span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT SUBSTRING(`c`, 2, 2) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='kw'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span>(x = <span class='fu'>str_replace_all</span>(<span class='kw'>c</span>, <span class='st'>"a"</span>, <span class='st'>"z"</span>))
+#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'>str_replace_all</span><span class='op'>(</span><span class='va'>c</span>, <span class='st'>"a"</span>, <span class='st'>"z"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT REGEXP_REPLACE(`c`, 'a', 'z') AS `x`
 #&gt; FROM `df`</div></pre>

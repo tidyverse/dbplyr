@@ -197,7 +197,7 @@ means that you should <code><a href='https://dplyr.tidyverse.org/reference/arran
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>.data</span>, <span class='kw'>...</span>, .by_group = <span class='fl'>FALSE</span>)</pre>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>.data</span>, <span class='va'>...</span>, .by_group <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -231,16 +231,16 @@ and return data to R.</p>
 can override this behaviour by explicitly sorting on <code><a href='https://rdrr.io/r/base/NA.html'>is.na(x)</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts = <span class='fl'>FALSE</span>)
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='kw'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span>(a = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span>), b = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>NA</span>))
-<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>a</span>) <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span>()
+<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, b <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>a</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *
 #&gt; FROM `dbplyr_001`
 #&gt; ORDER BY `a`</div><div class='input'>
 <span class='co'># Note that NAs are sorted first</span>
-<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='kw'>b</span>)
+<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: b</span><span>
@@ -250,7 +250,7 @@ can override this behaviour by explicitly sorting on <code><a href='https://rdrr
 #&gt; </span><span style='color: #555555;'>2</span><span>     4     1
 #&gt; </span><span style='color: #555555;'>3</span><span>     1     2
 #&gt; </span><span style='color: #555555;'>4</span><span>     3     5</div><div class='input'><span class='co'># override by sorting on is.na() first</span>
-<span class='kw'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span>(<span class='kw'>b</span>), <span class='kw'>b</span>)
+<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span>, <span class='va'>b</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: is.na(b), b</span><span>

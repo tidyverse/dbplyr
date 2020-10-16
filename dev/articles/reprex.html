@@ -153,9 +153,8 @@
 <li><p>Use <code><a href="../reference/translate_sql.html">translate_sql()</a></code> to simulate SQL generation of columnar expression.</p></li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org">dplyr</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://dbplyr.tidyverse.org">dbplyr</a></span>)
-</pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span></pre></div>
 <div id="using-memdb_frame" class="section level2">
 <h2 class="hasAnchor">
 <a href="#using-memdb_frame" class="anchor"></a>Using <code>memdb_frame()</code>
@@ -163,8 +162,8 @@
 <p>The first place to start is with SQLite. SQLite is particularly appealing because it’s completely embedded instead an R package so doesn’t have any external dependencies. SQLite is designed to be small and simple, so it can’t demonstrate all problems, but it’s easy to try out and a great place to start.</p>
 <p>You can easily create a SQLite in-memory database table using <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span>(g = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>), x = <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y = <span class="fl">5</span><span class="op">:</span><span class="fl">1</span>)
-<span class="kw">mf</span>
+<span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span>
+<span class="va">mf</span>
 <span class="co">#&gt; # Source:   table&lt;dbplyr_001&gt; [?? x 3]</span>
 <span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
@@ -175,51 +174,48 @@
 <span class="co">#&gt; 4     2     4     2</span>
 <span class="co">#&gt; 5     2     5     1</span>
 
-<span class="kw">mf</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="kw">g</span>) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html">summarise_all</a></span>(<span class="kw">mean</span>, na.rm = <span class="fl">TRUE</span>)
+<span class="va">mf</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html">summarise_all</a></span><span class="op">(</span><span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
 <span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1     1   1.5   4.5</span>
-<span class="co">#&gt; 2     2   4     2</span>
-</pre></div>
+<span class="co">#&gt; 2     2   4     2</span></pre></div>
 <p>Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame you can use <code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="kw">mtcars_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span>(<span class="kw">mtcars</span>)
-<span class="kw">mtcars_db</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="kw">cyl</span>) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(n = <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span>()) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
+<span class="va">mtcars_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span>
+<span class="va">mtcars_db</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">cyl</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT `cyl`, COUNT(*) AS `n`</span>
 <span class="co">#&gt; FROM `mtcars`</span>
-<span class="co">#&gt; GROUP BY `cyl`</span>
-</pre></div>
+<span class="co">#&gt; GROUP BY `cyl`</span></pre></div>
 </div>
 <div id="translating-verbs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#translating-verbs" class="anchor"></a>Translating verbs</h2>
 <p>Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it’s possible to generate SQL without a database using <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an <code>con</code> argument which takes a database “simulator” like <code><a href="../reference/backend-postgres.html">simulate_postgres()</a></code>, <code><a href="../reference/backend-sqlite.html">simulate_sqlite()</a></code>, etc.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span>)
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span>()) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">5</span>) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
+<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT *</span>
 <span class="co">#&gt; FROM `df`</span>
 <span class="co">#&gt; LIMIT 5</span>
 
-<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span>(x = <span class="kw">x</span>, con = <span class="fu"><a href="../reference/simulate_hive.html">simulate_mssql</a></span>()) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">5</span>) <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
+<span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/simulate_hive.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT TOP 5 *</span>
-<span class="co">#&gt; FROM `df`</span>
-</pre></div>
+<span class="co">#&gt; FROM `df`</span></pre></div>
 <p>If you isolate the problem to incorrect SQL generation, it would be very helpful if you could also suggest more appropriate SQL.</p>
 </div>
 <div id="translating-individual-expressions" class="section level2">
@@ -227,11 +223,10 @@
 <a href="#translating-individual-expressions" class="anchor"></a>Translating individual expressions</h2>
 <p>In some cases, you might be able to track the problem down to incorrect translation for a single column expression. In that case, you can make your reprex even simpler with <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span>())
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span>
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="kw">x</span>, <span class="fl">1</span>, <span class="fl">2</span>), con = <span class="fu"><a href="../reference/backend-sqlite.html">simulate_sqlite</a></span>())
-<span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span>
-</pre></div>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-sqlite.html">simulate_sqlite</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span></pre></div>
 </div>
   </div>
 

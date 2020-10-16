@@ -148,12 +148,11 @@
 <p>There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; <code>vignette("translate-function")</code> describes how individual expressions within those verbs are translated.</p>
 <p>All dplyr verbs generate a <code>SELECT</code> statement. To demonstrate we’ll make a temporary database with a couple of tables</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://dplyr.tidyverse.org">dplyr</a></span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
-<span class="kw">con</span> <span class="op">&lt;-</span> <span class="kw">DBI</span>::<span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="kw">RSQLite</span>::<span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="st">":memory:"</span>)
-<span class="kw">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="kw">con</span>, <span class="kw">nycflights13</span>::<span class="kw"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span>)
-<span class="kw">airports</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="kw">con</span>, <span class="kw">nycflights13</span>::<span class="kw"><a href="https://rdrr.io/pkg/nycflights13/man/airports.html">airports</a></span>)
-</pre></div>
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span>
+<span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span><span class="op">)</span>
+<span class="va">airports</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/airports.html">airports</a></span><span class="op">)</span></pre></div>
 <div id="single-table-verbs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#single-table-verbs" class="anchor"></a>Single table verbs</h2>
@@ -161,19 +160,17 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> modify the <code>SELECT</code> clause:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span>(<span class="st">"delay"</span>)) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
-</pre></div>
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `dep_delay`, `arr_delay`
 ## FROM `nycflights13::flights`</code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="kw">distance</span>, <span class="kw">air_time</span>) <span class="op">%&gt;%</span>  
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(speed = <span class="kw">distance</span> <span class="op">/</span> (<span class="kw">air_time</span> <span class="op">/</span> <span class="fl">60</span>)) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
-</pre></div>
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op">%&gt;%</span>  
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
 ## FROM `nycflights13::flights`</code></pre>
@@ -182,10 +179,9 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="kw">flights</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="kw">day</span> <span class="op">==</span> <span class="fl">1</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
-</pre></div>
+<span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
 ## FROM `nycflights13::flights`
@@ -194,10 +190,9 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> generates an <code>ORDER BY</code> clause:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="kw">flights</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="kw">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(<span class="kw">arr_delay</span>)) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
-</pre></div>
+<span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
 ## FROM `nycflights13::flights`
@@ -206,11 +201,10 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> work together to generate a <code>GROUP BY</code> clause:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="kw">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="kw">month</span>, <span class="kw">day</span>) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(delay = <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="kw">dep_delay</span>)) <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()
-</pre></div>
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning
 ## This warning is displayed only once per session.</code></pre>

@@ -254,52 +254,52 @@ queries.</p></li>
 
     </div>
 
-    <pre class="usage"><span class='fu'>sql_expr_matches</span>(<span class='kw'>con</span>, <span class='kw'>x</span>, <span class='kw'>y</span>)
+    <pre class="usage"><span class='fu'>sql_expr_matches</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>
 
-<span class='fu'>sql_translation</span>(<span class='kw'>con</span>)
+<span class='fu'>sql_translation</span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
 
-<span class='fu'>sql_table_analyze</span>(<span class='kw'>con</span>, <span class='kw'>table</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_table_analyze</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>table</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_table_index</span>(<span class='kw'>con</span>, <span class='kw'>table</span>, <span class='kw'>columns</span>, name = <span class='kw'>NULL</span>, unique = <span class='fl'>FALSE</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_table_index</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>table</span>, <span class='va'>columns</span>, name <span class='op'>=</span> <span class='cn'>NULL</span>, unique <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_explain</span>(<span class='kw'>con</span>, <span class='kw'>sql</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_query_explain</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>sql</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_fields</span>(<span class='kw'>con</span>, <span class='kw'>sql</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_query_fields</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>sql</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_save</span>(<span class='kw'>con</span>, <span class='kw'>sql</span>, <span class='kw'>name</span>, temporary = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_query_save</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>sql</span>, <span class='va'>name</span>, temporary <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_wrap</span>(<span class='kw'>con</span>, <span class='kw'>from</span>, name = <span class='fu'>unique_subquery_name</span>(), <span class='kw'>...</span>)
+<span class='fu'>sql_query_wrap</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>from</span>, name <span class='op'>=</span> <span class='fu'>unique_subquery_name</span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_rows</span>(<span class='kw'>con</span>, <span class='kw'>sql</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_query_rows</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>sql</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_select</span>(
-  <span class='kw'>con</span>,
-  <span class='kw'>select</span>,
-  <span class='kw'>from</span>,
-  where = <span class='kw'>NULL</span>,
-  group_by = <span class='kw'>NULL</span>,
-  having = <span class='kw'>NULL</span>,
-  order_by = <span class='kw'>NULL</span>,
-  limit = <span class='kw'>NULL</span>,
-  distinct = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>,
-  subquery = <span class='fl'>FALSE</span>
-)
+<span class='fu'>sql_query_select</span><span class='op'>(</span>
+  <span class='va'>con</span>,
+  <span class='va'>select</span>,
+  <span class='va'>from</span>,
+  where <span class='op'>=</span> <span class='cn'>NULL</span>,
+  group_by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  having <span class='op'>=</span> <span class='cn'>NULL</span>,
+  order_by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  limit <span class='op'>=</span> <span class='cn'>NULL</span>,
+  distinct <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>,
+  subquery <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
 
-<span class='fu'>sql_query_join</span>(
-  <span class='kw'>con</span>,
-  <span class='kw'>x</span>,
-  <span class='kw'>y</span>,
-  <span class='kw'>vars</span>,
-  type = <span class='st'>"inner"</span>,
-  by = <span class='kw'>NULL</span>,
-  na_matches = <span class='fl'>FALSE</span>,
-  <span class='kw'>...</span>
-)
+<span class='fu'>sql_query_join</span><span class='op'>(</span>
+  <span class='va'>con</span>,
+  <span class='va'>x</span>,
+  <span class='va'>y</span>,
+  <span class='va'>vars</span>,
+  type <span class='op'>=</span> <span class='st'>"inner"</span>,
+  by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  na_matches <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
-<span class='fu'>sql_query_semi_join</span>(<span class='kw'>con</span>, <span class='kw'>x</span>, <span class='kw'>y</span>, anti = <span class='fl'>FALSE</span>, by = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_query_semi_join</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>x</span>, <span class='va'>y</span>, anti <span class='op'>=</span> <span class='cn'>FALSE</span>, by <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_query_set_op</span>(<span class='kw'>con</span>, <span class='kw'>x</span>, <span class='kw'>y</span>, <span class='kw'>method</span>, <span class='kw'>...</span>, all = <span class='fl'>FALSE</span>)</pre>
+<span class='fu'>sql_query_set_op</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>method</span>, <span class='va'>...</span>, all <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="dbplyr-"><a class="anchor" href="#dbplyr-"></a>dbplyr 2.0.0</h2>

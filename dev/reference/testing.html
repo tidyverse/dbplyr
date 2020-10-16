@@ -192,32 +192,32 @@ data frame into each source. To create a new table in each source,
 use <code>test_frame()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>test_register_src</span>(<span class='kw'>name</span>, <span class='kw'>src</span>)
+    <pre class="usage"><span class='fu'>test_register_src</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>src</span><span class='op'>)</span>
 
-<span class='fu'>test_register_con</span>(<span class='kw'>name</span>, <span class='kw'>...</span>)
+<span class='fu'>test_register_con</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>src_test</span>(<span class='kw'>name</span>)
+<span class='fu'>src_test</span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span>
 
-<span class='fu'>test_load</span>(
-  <span class='kw'>df</span>,
-  name = <span class='fu'>unique_table_name</span>(),
-  srcs = <span class='kw'>test_srcs</span><span class='op'>$</span><span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(),
-  ignore = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>()
-)
+<span class='fu'>test_load</span><span class='op'>(</span>
+  <span class='va'>df</span>,
+  name <span class='op'>=</span> <span class='fu'>unique_table_name</span><span class='op'>(</span><span class='op'>)</span>,
+  srcs <span class='op'>=</span> <span class='va'>test_srcs</span><span class='op'>$</span><span class='fu'>get</span><span class='op'>(</span><span class='op'>)</span>,
+  ignore <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>test_frame</span>(<span class='kw'>...</span>, srcs = <span class='kw'>test_srcs</span><span class='op'>$</span><span class='fu'><a href='https://rdrr.io/r/base/get.html'>get</a></span>(), ignore = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())</pre>
+<span class='fu'>test_frame</span><span class='op'>(</span><span class='va'>...</span>, srcs <span class='op'>=</span> <span class='va'>test_srcs</span><span class='op'>$</span><span class='fu'>get</span><span class='op'>(</span><span class='op'>)</span>, ignore <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>test_register_src</span>(<span class='st'>"sqlite"</span>, {
-  <span class='kw'>DBI</span>::<span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span>(<span class='kw'>RSQLite</span>::<span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span>(), <span class='st'>":memory:"</span>, create = <span class='fl'>TRUE</span>)
-})
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>test_register_src</span><span class='op'>(</span><span class='st'>"sqlite"</span>, <span class='op'>{</span>
+  <span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span><span class='op'>(</span><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>":memory:"</span>, create <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='op'>}</span><span class='op'>)</span>
 
-<span class='fu'>test_frame</span>(x = <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>, y = <span class='fl'>3</span><span class='op'>:</span><span class='fl'>1</span>)
-<span class='fu'>test_load</span>(<span class='kw'>mtcars</span>)
-}
+<span class='fu'>test_frame</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>, y <span class='op'>=</span> <span class='fl'>3</span><span class='op'>:</span><span class='fl'>1</span><span class='op'>)</span>
+<span class='fu'>test_load</span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

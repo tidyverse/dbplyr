@@ -196,36 +196,36 @@ a hierarchical structure. Outside of testing, however, you should
 always call <code>sql_render()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>join_query</span>(
-  <span class='kw'>x</span>,
-  <span class='kw'>y</span>,
-  <span class='kw'>vars</span>,
-  type = <span class='st'>"inner"</span>,
-  by = <span class='kw'>NULL</span>,
-  suffix = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>".x"</span>, <span class='st'>".y"</span>),
-  na_matches = <span class='fl'>FALSE</span>
-)
+    <pre class="usage"><span class='fu'>join_query</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  <span class='va'>y</span>,
+  <span class='va'>vars</span>,
+  type <span class='op'>=</span> <span class='st'>"inner"</span>,
+  by <span class='op'>=</span> <span class='cn'>NULL</span>,
+  suffix <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>".x"</span>, <span class='st'>".y"</span><span class='op'>)</span>,
+  na_matches <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
 
-<span class='fu'>select_query</span>(
-  <span class='kw'>from</span>,
-  select = <span class='fu'><a href='sql.html'>sql</a></span>(<span class='st'>"*"</span>),
-  where = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  group_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  having = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  order_by = <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>(),
-  limit = <span class='kw'>NULL</span>,
-  distinct = <span class='fl'>FALSE</span>
-)
+<span class='fu'>select_query</span><span class='op'>(</span>
+  <span class='va'>from</span>,
+  select <span class='op'>=</span> <span class='fu'><a href='sql.html'>sql</a></span><span class='op'>(</span><span class='st'>"*"</span><span class='op'>)</span>,
+  where <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>,
+  group_by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>,
+  having <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>,
+  order_by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>,
+  limit <span class='op'>=</span> <span class='cn'>NULL</span>,
+  distinct <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span>
 
-<span class='fu'>semi_join_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, anti = <span class='fl'>FALSE</span>, by = <span class='kw'>NULL</span>, na_matches = <span class='fl'>FALSE</span>)
+<span class='fu'>semi_join_query</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, anti <span class='op'>=</span> <span class='cn'>FALSE</span>, by <span class='op'>=</span> <span class='cn'>NULL</span>, na_matches <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>set_op_query</span>(<span class='kw'>x</span>, <span class='kw'>y</span>, type = <span class='kw'>type</span>, all = <span class='fl'>FALSE</span>)
+<span class='fu'>set_op_query</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, type <span class='op'>=</span> <span class='va'>type</span>, all <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>sql_build</span>(<span class='kw'>op</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>)
+<span class='fu'>sql_build</span><span class='op'>(</span><span class='va'>op</span>, con <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>sql_render</span>(<span class='kw'>query</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>, subquery = <span class='fl'>FALSE</span>)
+<span class='fu'>sql_render</span><span class='op'>(</span><span class='va'>query</span>, con <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span>, subquery <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>sql_optimise</span>(<span class='kw'>x</span>, con = <span class='kw'>NULL</span>, <span class='kw'>...</span>, subquery = <span class='fl'>FALSE</span>)</pre>
+<span class='fu'>sql_optimise</span><span class='op'>(</span><span class='va'>x</span>, con <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span>, subquery <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
