@@ -24,13 +24,17 @@
 
     Argument `order_by` is missing, with no default.
 
-# slice_order errors when expected
+# slice_sample errors when expected
 
     Sampling with replacement is not supported on database backends
 
 ---
 
     Weighted resampling is not supported on database backends
+
+---
+
+    Sampling by `prop` is not supported on database backends
 
 # check_slice_size checks for common issues
 

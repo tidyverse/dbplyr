@@ -99,6 +99,10 @@ slice_max.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) 
 slice_sample.tbl_lazy <- function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
+  if (size$type == "prop") {
+    abort("Sampling by `prop` is not supported on database backends")
+  }
+
   if (!quo_is_null(weight_by)) {
     abort("Weighted resampling is not supported on database backends")
   }
@@ -144,7 +148,7 @@ check_slice_size <- function(n, prop) {
       abort("`n` must be a non-missing positive number.")
     }
 
-    list(type = "n", n = n)
+    list(type = "n", n = as.integer(n))
   } else if (!missing(prop) && missing(n)) {
     if (!is.numeric(prop) || length(prop) != 1) {
       abort("`prop` must be a single number")

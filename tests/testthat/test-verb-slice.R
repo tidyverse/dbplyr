@@ -26,7 +26,7 @@ test_that("slice_max orders in opposite order", {
   expect_snapshot_error(db %>% slice_max())
 })
 
-test_that("slice_order errors when expected", {
+test_that("slice_sample errors when expected", {
   db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
   # Can't see how to test this, but interactive experimentation
@@ -35,6 +35,7 @@ test_that("slice_order errors when expected", {
 
   expect_snapshot_error(db %>% slice_sample(replace = TRUE))
   expect_snapshot_error(db %>% slice_sample(weight_by = x))
+  expect_snapshot_error(db %>% slice_sample(prop = 0.5))
 })
 
 test_that("window_order is preserved", {
