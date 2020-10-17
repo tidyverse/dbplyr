@@ -26,14 +26,19 @@ NULL
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
 
+# Use dbplyr edition 1 for custom method dispatch on RPostgreSQL connections
 #' @export
 dbplyr_edition.PostgreSQLConnection <- function(con) {
-  2L
+  1L
 }
 #' @export
 dbplyr_edition.PostgreSQL <- dbplyr_edition.PostgreSQLConnection
+
+# Use dbplyr edition 2 for RPostgres connections
 #' @export
-dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQLConnection
+dbplyr_edition.PqConnection <- function(con) {
+  2L
+}
 
 #' @export
 db_connection_describe.PostgreSQLConnection <- function(con) {

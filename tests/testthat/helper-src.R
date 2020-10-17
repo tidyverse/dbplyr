@@ -12,11 +12,6 @@ if (test_srcs$length() == 0) {
       user = "postgres",
       password = "password"
     )
-    test_register_con("rpostgresql", RPostgreSQL::PostgreSQL(),
-      dbname = "test",
-      user = "postgres",
-      password = "password"
-    )
   } else if (identical(Sys.getenv("GITHUB_MSSQL"), "true")) {
     test_register_con("mssql", odbc::odbc(),
       driver = "ODBC Driver 17 for SQL Server",

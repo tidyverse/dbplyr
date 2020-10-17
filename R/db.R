@@ -74,7 +74,7 @@ dbplyr_edition.default <- function(con) {
 # fallback helper ---------------------------------------------------------
 
 dbplyr_fallback <- function(con, .generic, ...) {
-  if (dbplyr_edition(con) >= 2 && !("PostgreSQLConnection" %in% class(con))) {
+  if (dbplyr_edition(con) >= 2) {
     # Always call DBIConnection method which contains the default implementation
     fun <- sym(paste0(.generic, ".DBIConnection"))
   } else {
