@@ -220,6 +220,7 @@
 <p>All backends:</p>
 <ul>
 <li><p>You can now use <code><a href="https://rdrr.io/r/base/ns-dblcolon.html">::</a></code> in translations, so that (e.g.) <code><a href="https://dplyr.tidyverse.org/reference/context.html">dbplyr::n()</a></code> is translated to <code>count(*)</code> (<a href='https://github.com/tidyverse/dbplyr/issues/207'>#207</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/Extract.html">[[</a></code> can now also translate numeric indices (<a href='https://github.com/tidyverse/dbplyr/issues/520'>#520</a>).</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> now generates a clear error message; previously it was translated to <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code> which is not correct (<a href='https://github.com/tidyverse/dbplyr/issues/108'>#108</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/context.html">n()</a></code> is translated to <code>count(*)</code> instead of <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/343'>#343</a>).</p></li>
 <li><p><code>sub_str()</code> translation is more consistent in edge cases (<a href='https://github.com/ianmcook'>@ianmcook</a>).</p></li>
