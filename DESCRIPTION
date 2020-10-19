@@ -80,6 +80,7 @@ Collate:
     'backend-odbc.R'
     'backend-oracle.R'
     'backend-postgres.R'
+    'backend-postgres-old.R'
     'backend-redshift.R'
     'backend-sqlite.R'
     'backend-teradata.R'
