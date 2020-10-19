@@ -24,19 +24,17 @@ NULL
 
 #' @export
 #' @rdname backend-postgres
-simulate_postgres <- function() simulate_dbi("PostgreSQLConnection")
+simulate_postgres <- function() simulate_dbi("PqConnection")
 
 #' @export
-dbplyr_edition.PostgreSQLConnection <- function(con) {
+dbplyr_edition.PostgreSQL <- function(con) {
   2L
 }
 #' @export
-dbplyr_edition.PostgreSQL <- dbplyr_edition.PostgreSQLConnection
-#' @export
-dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQLConnection
+dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PostgreSQLConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
@@ -44,9 +42,7 @@ db_connection_describe.PostgreSQLConnection <- function(con) {
     host, ":", info$port, "/", info$dbname, "]")
 }
 #' @export
-db_connection_describe.PostgreSQL <- db_connection_describe.PostgreSQLConnection
-#' @export
-db_connection_describe.PqConnection <- db_connection_describe.PostgreSQLConnection
+db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
@@ -66,7 +62,7 @@ postgres_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translation.PostgreSQLConnection <- function(con) {
+sql_translation.PqConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       bitwXor = sql_infix("#"),
@@ -213,25 +209,19 @@ sql_translation.PostgreSQLConnection <- function(con) {
   )
 }
 #' @export
-sql_translation.PostgreSQL <- sql_translation.PostgreSQLConnection
-#' @export
-sql_translation.PqConnection <- sql_translation.PostgreSQLConnection
+sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PostgreSQLConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
   build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
 }
 #' @export
-sql_expr_matches.PostgreSQL <- sql_expr_matches.PostgreSQLConnection
-#' @export
-sql_expr_matches.PqConnection <- sql_expr_matches.PostgreSQLConnection
-
-# DBI methods ------------------------------------------------------------------
+sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
-sql_query_explain.PostgreSQLConnection <- function(con, sql, format = "text", ...) {
+sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
   build_sql(
@@ -242,8 +232,6 @@ sql_query_explain.PostgreSQLConnection <- function(con, sql, format = "text", ..
   )
 }
 #' @export
-sql_query_explain.PostgreSQL <- sql_query_explain.PostgreSQLConnection
-#' @export
-sql_query_explain.PqConnection <- sql_query_explain.PostgreSQLConnection
+sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL"))

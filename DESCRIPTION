@@ -48,6 +48,7 @@ Suggests:
     RMariaDB (>= 1.0.2),
     rmarkdown,
     RPostgres (>= 1.1.3),
+    RPostgreSQL,
     RSQLite (>= 2.1.0),
     testthat (>= 2.99.0)
 Remotes: r-lib/testthat
@@ -79,6 +80,7 @@ Collate:
     'backend-odbc.R'
     'backend-oracle.R'
     'backend-postgres.R'
+    'backend-postgres-old.R'
     'backend-redshift.R'
     'backend-sqlite.R'
     'backend-teradata.R'
