@@ -56,6 +56,8 @@
 
   * You can now use `::` in translations, so that (e.g.) `dbplyr::n()` is
     translated to `count(*)` (#207).
+    
+  * `[[` can now also translate numeric indices (#520).
   
   * `%/%` now generates a clear error message; previously it was translated to
     `/` which is not correct (#108).

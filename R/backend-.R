@@ -43,10 +43,14 @@ base_scalar <- sql_translator(
   `$`   = sql_infix(".", pad = FALSE),
   `[[`   = function(x, i) {
     i <- enexpr(i)
-    if (!is.character(i)) {
-      stop("Can only index with strings", call. = FALSE)
+    if (is.character(i)) {
+      build_sql(x, ".", ident(i))
+    } else if (is.numeric(i)) {
+      build_sql(x, "[", as.integer(i), "]")
+    } else {
+      stop("Can only index with strings and numbers", call. = FALSE)
     }
-    build_sql(x, ".", ident(i))
+
   },
   `[` = function(x, i) {
     build_sql("CASE WHEN (", i, ") THEN (", x, ") END")

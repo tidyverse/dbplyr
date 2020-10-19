@@ -183,17 +183,6 @@ test_that("str_trim() translates correctly ", {
 
 # subsetting --------------------------------------------------------------
 
-test_that("$ and [[ index into nested fields", {
-  expect_equal(translate_sql(a$b), sql("`a`.`b`"))
-
-  expect_equal(translate_sql(a[["b"]]), sql("`a`.`b`"))
-})
-
-test_that("can only subset with strings", {
-  expect_error(translate_sql(a[[1]]), "index with strings")
-  expect_error(translate_sql(a[[x]]), "index with strings")
-})
-
 test_that("[ treated as if it is logical subsetting", {
   expect_equal(translate_sql(y[x == 0L]), sql("CASE WHEN (`x` = 0) THEN (`y`) END"))
 })

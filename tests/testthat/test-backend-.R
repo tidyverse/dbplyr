@@ -36,6 +36,14 @@ test_that("log becomes ln", {
   expect_equal(translate_sql(log(x)), sql('LN(`x`)'))
 })
 
+test_that("can translate subsetting", {
+  expect_equal(translate_sql(a$b), sql("`a`.`b`"))
+  expect_equal(translate_sql(a[["b"]]), sql("`a`.`b`"))
+
+  expect_equal(translate_sql(a[["b"]][[1]]), sql('`a`.`b`[1]'))
+})
+
+
 # binary/bitwise ---------------------------------------------------------------
 
 test_that("bitwise operations", {
