@@ -203,7 +203,7 @@ are:</p><ul>
 <li><p>Custom types</p></li>
 <li><p><code><a href='https://rdrr.io/r/base/paste.html'>paste()</a></code> uses <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code></p></li>
 <li><p>Custom subquery generation (no <code>AS</code>)</p></li>
-<li><p><code><a href='https://rdrr.io/pkg/generics/man/setops.html'>setdiff()</a></code> uses <code>MINUS</code> instead of <code>EXCEPT</code></p></li>
+<li><p><code><a href='https://generics.r-lib.org/reference/setops.html'>setdiff()</a></code> uses <code>MINUS</code> instead of <code>EXCEPT</code></p></li>
 </ul>
 
 <p>Use <code>simulate_oracle()</code> with <code><a href='tbl_lazy.html'>lazy_frame()</a></code> to see simulated SQL without
@@ -221,7 +221,7 @@ converting to live access database.</p>
 <span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>c</span>, <span class='st'>" times"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `c` || ' times' AS `x`
-#&gt; FROM (`df`) </div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/pkg/generics/man/setops.html'>setdiff</a></span><span class='op'>(</span><span class='va'>lf</span><span class='op'>)</span>
+#&gt; FROM (`df`) </div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://generics.r-lib.org/reference/setops.html'>setdiff</a></span><span class='op'>(</span><span class='va'>lf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; (SELECT *
 #&gt; FROM `df`)

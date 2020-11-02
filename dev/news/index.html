@@ -202,7 +202,7 @@
 <a href="#sql-generation" class="anchor"></a>SQL generation</h2>
 <ul>
 <li><p>Documentation has been radically improved with new topics for each major verb and each backend giving more details about the SQL translation.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/generics/man/setops.html">intersect()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/setops.html">union()</a></code> and <code><a href="https://rdrr.io/pkg/generics/man/setops.html">setdiff()</a></code> gain an <code>all</code> argument to add the <code>ALL</code> argument (<a href='https://github.com/tidyverse/dbplyr/issues/414'>#414</a>).</p></li>
+<li><p><code><a href="https://generics.r-lib.org/reference/setops.html">intersect()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">union()</a></code> and <code><a href="https://generics.r-lib.org/reference/setops.html">setdiff()</a></code> gain an <code>all</code> argument to add the <code>ALL</code> argument (<a href='https://github.com/tidyverse/dbplyr/issues/414'>#414</a>).</p></li>
 <li><p>Join functions gains a <code>na_matches</code> argument that allows you to control whether or not <code>NA</code> (<code>NULL</code>) values match other <code>NA</code> values. The default is <code>"never"</code>, which is the usual behaviour in databases. You can set <code>na_matches = "na"</code> to match R’s usual join behaviour (<a href='https://github.com/tidyverse/dbplyr/issues/180'>#180</a>). Additional arguments error (instead of being silently swallowed) (<a href='https://github.com/tidyverse/dbplyr/issues/382'>#382</a>).</p></li>
 <li><p>Joins now only use aliases where needed to disambiguate columns; this should make generated queries more readable.</p></li>
 <li><p>Subqueries no longer include an <code>ORDER BY</code> clause. This is not part of the SQL spec, and has very limited support across databases. Now such queries generate a warning suggesting that you move your <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> call later in the pipeline (<a href='https://github.com/tidyverse/dbplyr/issues/276'>#276</a>). (There’s one exception: <code>ORDER BY</code> is still generated if <code>LIMIT</code> is present; this tends to affect the returns rows but not necessarily their order).</p></li>
@@ -487,7 +487,7 @@
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> gives a clear error message if you refer to a variable created in that same <code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/114'>#114</a>).</p></li>
 <li><p>New <code><a href="../reference/sql_expr.html">sql_call2()</a></code> which is to <code><a href="https://rlang.r-lib.org/reference/call2.html">rlang::call2()</a></code> as <code><a href="../reference/sql_expr.html">sql_expr()</a></code> is to <code><a href="https://rlang.r-lib.org/reference/nse-defuse.html">rlang::expr()</a></code>.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/explain.html">explain()</a></code> use <code><a href="https://rdrr.io/r/base/cat.html">cat()</a></code> rather than message.</p></li>
-<li><p><code><a href="https://rdrr.io/pkg/generics/man/setops.html">union()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/setops.html">union_all()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/setops.html">setdiff()</a></code> and <code><a href="https://rdrr.io/pkg/generics/man/setops.html">intersect()</a></code> do a better job of matching columns across backends (<a href='https://github.com/tidyverse/dbplyr/issues/183'>#183</a>).</p></li>
+<li><p><code><a href="https://generics.r-lib.org/reference/setops.html">union()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/setops.html">union_all()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">setdiff()</a></code> and <code><a href="https://generics.r-lib.org/reference/setops.html">intersect()</a></code> do a better job of matching columns across backends (<a href='https://github.com/tidyverse/dbplyr/issues/183'>#183</a>).</p></li>
 </ul>
 </div>
 </div>
@@ -528,7 +528,7 @@
 <p>Oracle</p>
 <ul>
 <li>Custom <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_drop_table()</a></code> now only drops tables if they exist (<a href='https://github.com/tidyverse/dbplyr/issues/3306'>#3306</a>)</li>
-<li>Custom <code><a href="https://rdrr.io/pkg/generics/man/setops.html">setdiff()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3493'>#3493</a>)</li>
+<li>Custom <code><a href="https://generics.r-lib.org/reference/setops.html">setdiff()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3493'>#3493</a>)</li>
 <li>Custom <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_explain()</a></code> translation (<a href='https://github.com/tidyverse/dbplyr/issues/3471'>#3471</a>)</li>
 </ul>
 </li>
@@ -734,7 +734,7 @@
 </li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> can now perform an inline mutate for database backends (<a href='https://github.com/tidyverse/dbplyr/issues/2422'>#2422</a>).</p></li>
 <li>
-<p>The SQL generation set operations (<code><a href="https://rdrr.io/pkg/generics/man/setops.html">intersect()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/setops.html">setdiff()</a></code>, <code><a href="https://rdrr.io/pkg/generics/man/setops.html">union()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/setops.html">union_all()</a></code>) have been considerably improved.</p>
+<p>The SQL generation set operations (<code><a href="https://generics.r-lib.org/reference/setops.html">intersect()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">setdiff()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">union()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/setops.html">union_all()</a></code>) have been considerably improved.</p>
 <p>By default, the component SELECT are surrounded with parentheses, except on SQLite. The SQLite backend will now throw an error if you attempt a set operation on a query that contains a LIMIT, as that is not supported in SQLite (<a href='https://github.com/tidyverse/dbplyr/issues/2270'>#2270</a>).</p>
 <p>All set operations match column names across inputs, filling in non-matching variables with NULL (<a href='https://github.com/tidyverse/dbplyr/issues/2556'>#2556</a>).</p>
 </li>
