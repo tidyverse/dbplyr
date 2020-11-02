@@ -46,9 +46,8 @@
 #' # we'll use the Lahman database. lahman_sqlite() takes care of
 #' # creating the database.
 #'
-#' if (has_lahman("sqlite")) {
-#' lahman_p <- lahman_sqlite()
-#' batting <- lahman_p %>% tbl("Batting")
+#' if (requireNamespace("Lahman", quietly = TRUE)) {
+#' batting <- copy_to(con, Lahman::Batting)
 #' batting
 #'
 #' # Basic data manipulation verbs work in the same way as with a tibble
