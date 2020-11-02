@@ -1,80 +1,3 @@
-# arkdb
-
-<details>
-
-* Version: 0.0.6
-* GitHub: https://github.com/ropensci/arkdb
-* Source code: https://github.com/cran/arkdb
-* Date/Publication: 2020-09-18 05:30:03 UTC
-* Number of recursive dependencies: 82
-
-Run `cloud_details(, "arkdb")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘spelling.R’
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      > test_check("arkdb")
-      [1] "Testing using backend duckdb_connection"
-      ── 1. Error: (unknown) (@test-arkdb.R#167)  ────────────────────────────────────
-      error in evaluating the argument 'conn' in selecting a method for function 'dbDisconnect': $ operator not defined for this S4 class
-      Backtrace:
-       1. DBI::dbDisconnect(db$con)
-       2. base::.handleSimpleError(...)
-       3. base:::h(simpleError(msg, call))
-      
-      ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 32 | SKIPPED: 4 | WARNINGS: 0 | FAILED: 1 ]
-      1. Error: (unknown) (@test-arkdb.R#167) 
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
-# bcdata
-
-<details>
-
-* Version: 0.2.0
-* GitHub: https://github.com/bcgov/bcdata
-* Source code: https://github.com/cran/bcdata
-* Date/Publication: 2020-06-25 07:00:02 UTC
-* Number of recursive dependencies: 103
-
-Run `cloud_details(, "bcdata")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-        7. dbplyr:::FUN(X[[i]], ...)
-        8. dbplyr:::sql_data_mask(x, variant, con = con, window = window)
-        9. dbplyr:::ceply(idents, escape, con = con, parent = special_calls2)
-       10. base::lapply(x, f, ...)
-       12. dbplyr:::escape.ident(X[[i]], ...)
-       14. dbplyr:::sql_escape_ident.DBIConnection(con, x)
-       15. DBI::dbQuoteIdentifier(con, x)
-      
-      ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 65 | SKIPPED: 82 | WARNINGS: 0 | FAILED: 2 ]
-      1. Failure: unsupported aggregation functions fail correctly (@test-cql-string.R#87) 
-      2. Error: subsetting works locally (@test-query-geodata-filter.R#122) 
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
 # chunked
 
 <details>
@@ -83,7 +6,7 @@ Run `cloud_details(, "bcdata")` for more info
 * GitHub: https://github.com/edwindj/chunked
 * Source code: https://github.com/cran/chunked
 * Date/Publication: 2020-03-24 08:20:02 UTC
-* Number of recursive dependencies: 47
+* Number of recursive dependencies: 52
 
 Run `cloud_details(, "chunked")` for more info
 
@@ -96,112 +19,156 @@ Run `cloud_details(, "chunked")` for more info
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-       1. chunked::write_chunkwise(tbl_iris, db, "iris")
-       2. chunked:::write_chunkwise.chunkwise(tbl_iris, db, "iris")
-       3. chunked::insert_chunkwise_into(x, dest, table, ...)
-       4. dplyr::db_begin(con)
+       1. ├─chunked::write_chunkwise(tbl_iris, db, "iris") test-write.R:26:2
+       2. └─chunked:::write_chunkwise.chunkwise(tbl_iris, db, "iris")
+       3.   └─chunked::insert_chunkwise_into(x, dest, table, ...)
+       4.     └─dplyr::db_begin(con)
       
       ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 42 | SKIPPED: 0 | WARNINGS: 0 | FAILED: 3 ]
-      1. Error: insert_chunkwise_into: can insert into a db (@test-insert-into.R#9) 
-      2. Error: insert_chunkwise_into: can insert modified table into a db (@test-insert-into.R#18) 
-      3. Error: write_chunkwise to db works (@test-write.R#26) 
+      ERROR (test-insert-into.R:9:5): insert_chunkwise_into: can insert into a db
+      ERROR (test-insert-into.R:18:5): insert_chunkwise_into: can insert modified table into a db
+      ERROR (test-write.R:26:3): write_chunkwise to db works
       
-      Error: testthat unit tests failed
+      [ FAIL 3 | WARN 0 | SKIP 0 | PASS 42 ]
+      Error: Test failures
       In addition: Warning message:
       call dbDisconnect() when finished working with a connection 
       Execution halted
     ```
 
-# dittodb
+# duckdb
 
 <details>
 
-* Version: 0.1.1
-* GitHub: https://github.com/ropensci/dittodb
-* Source code: https://github.com/cran/dittodb
-* Date/Publication: 2020-07-29 12:00:15 UTC
-* Number of recursive dependencies: 80
+* Version: 0.2.1-2
+* GitHub: https://github.com/cwida/duckdb
+* Source code: https://github.com/cran/duckdb
+* Date/Publication: 2020-09-30 08:00:07 UTC
+* Number of recursive dependencies: 47
 
-Run `cloud_details(, "dittodb")` for more info
+Run `cloud_details(, "duckdb")` for more info
 
 </details>
 
 ## Newly broken
 
-*   checking tests ... ERROR
+*   checking whether package ‘duckdb’ can be installed ... ERROR
     ```
-      Running ‘spelling.R’
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Complete output:
-      > library(testthat)
-      > test_check("dittodb")
-      Loading required package: dittodb
-      Loading required package: DBI
-      ── 1. Failure: (unknown) (@test-dbplyr-integration.R#59)  ──────────────────────
-      `flights_db <- tbl(con, "flights")` did not produce any warnings.
-      
-      ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 160 | SKIPPED: 7 | WARNINGS: 2 | FAILED: 1 ]
-      1. Failure: (unknown) (@test-dbplyr-integration.R#59) 
-      
-      Error: testthat unit tests failed
-      Execution halted
+    Installation failed.
+    See ‘/tmp/workdir/duckdb/new/duckdb.Rcheck/00install.out’ for details.
     ```
 
-# mdsr
-
-<details>
-
-* Version: 0.2.0
-* GitHub: https://github.com/beanumber/mdsr
-* Source code: https://github.com/cran/mdsr
-* Date/Publication: 2020-09-03 22:32:09 UTC
-* Number of recursive dependencies: 129
-
-Run `cloud_details(, "mdsr")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      
-      > 
-      > test_check("mdsr")
-      ── 1. Error: scidb works (@tests.R#18)  ────────────────────────────────────────
-      no applicable method for 'db_list_tables' applied to an object of class "c('MySQLConnection', 'DBIConnection', 'DBIObject')"
-      Backtrace:
-       1. testthat::expect_length(dplyr::db_list_tables(x$con), 4)
-       4. dplyr::db_list_tables(x$con)
-      
-      ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 5 | SKIPPED: 1 | WARNINGS: 0 | FAILED: 1 ]
-      1. Error: scidb works (@tests.R#18) 
-      
-      Error: testthat unit tests failed
-      Execution halted
-    ```
-
-## In both
+## Newly fixed
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  6.4Mb
+      installed size is 179.6Mb
       sub-directories of 1Mb or more:
-        data   6.2Mb
+        libs  179.3Mb
     ```
 
-*   checking data for non-ASCII characters ... NOTE
-    ```
-      Note: found 2866 marked UTF-8 strings
-    ```
+## Installation
 
+### Devel
+
+```
+* installing *source* package ‘duckdb’ ...
+** package ‘duckdb’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdbr.cpp -o duckdbr.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet-extension.cpp -o duckdb/extension/parquet/parquet-extension.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_reader.cpp -o duckdb/extension/parquet/parquet_reader.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_timestamp.cpp -o duckdb/extension/parquet/parquet_timestamp.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_writer.cpp -o duckdb/extension/parquet/parquet_writer.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-1.cpp -o duckdb/amalgamation-1.o
+In file included from duckdb/amalgamation-1.cpp:153:
+duckdb/src/execution/expression_executor/execute_constant.cpp:19:1: fatal error: error writing to /tmp/ccsRqZd0.s: No space left on device
+   19 | } // namespace duckdb
+      | ^
+compilation terminated.
+make: *** [/usr/lib/R/etc/Makeconf:177: duckdb/amalgamation-1.o] Error 1
+ERROR: compilation failed for package ‘duckdb’
+* removing ‘/tmp/workdir/duckdb/new/duckdb.Rcheck/duckdb’
+
+```
+### CRAN
+
+```
+* installing *source* package ‘duckdb’ ...
+** package ‘duckdb’ successfully unpacked and MD5 sums checked
+** using staged installation
+** libs
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdbr.cpp -o duckdbr.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet-extension.cpp -o duckdb/extension/parquet/parquet-extension.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_reader.cpp -o duckdb/extension/parquet/parquet_reader.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_timestamp.cpp -o duckdb/extension/parquet/parquet_timestamp.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/extension/parquet/parquet_writer.cpp -o duckdb/extension/parquet/parquet_writer.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-1.cpp -o duckdb/amalgamation-1.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-2.cpp -o duckdb/amalgamation-2.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-3.cpp -o duckdb/amalgamation-3.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-4.cpp -o duckdb/amalgamation-4.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-5.cpp -o duckdb/amalgamation-5.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-6.cpp -o duckdb/amalgamation-6.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-7.cpp -o duckdb/amalgamation-7.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/fmt/format.cc -o duckdb/third_party/fmt/format.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/pg_functions.cpp -o duckdb/third_party/libpg_query/pg_functions.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/postgres_parser.cpp -o duckdb/third_party/libpg_query/postgres_parser.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_nodes_list.cpp -o duckdb/third_party/libpg_query/src_backend_nodes_list.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_nodes_makefuncs.cpp -o duckdb/third_party/libpg_query/src_backend_nodes_makefuncs.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_nodes_value.cpp -o duckdb/third_party/libpg_query/src_backend_nodes_value.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_parser_gram.cpp -o duckdb/third_party/libpg_query/src_backend_parser_gram.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_parser_parser.cpp -o duckdb/third_party/libpg_query/src_backend_parser_parser.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_parser_scan.cpp -o duckdb/third_party/libpg_query/src_backend_parser_scan.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_backend_parser_scansup.cpp -o duckdb/third_party/libpg_query/src_backend_parser_scansup.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/libpg_query/src_common_keywords.cpp -o duckdb/third_party/libpg_query/src_common_keywords.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/miniz/miniz.cpp -o duckdb/third_party/miniz/miniz.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/parquet/parquet_constants.cpp -o duckdb/third_party/parquet/parquet_constants.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/parquet/parquet_types.cpp -o duckdb/third_party/parquet/parquet_types.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/bitstate.cc -o duckdb/third_party/re2/re2/bitstate.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/compile.cc -o duckdb/third_party/re2/re2/compile.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/dfa.cc -o duckdb/third_party/re2/re2/dfa.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/filtered_re2.cc -o duckdb/third_party/re2/re2/filtered_re2.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/mimics_pcre.cc -o duckdb/third_party/re2/re2/mimics_pcre.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/nfa.cc -o duckdb/third_party/re2/re2/nfa.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/onepass.cc -o duckdb/third_party/re2/re2/onepass.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/parse.cc -o duckdb/third_party/re2/re2/parse.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/perl_groups.cc -o duckdb/third_party/re2/re2/perl_groups.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/prefilter.cc -o duckdb/third_party/re2/re2/prefilter.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/prefilter_tree.cc -o duckdb/third_party/re2/re2/prefilter_tree.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/prog.cc -o duckdb/third_party/re2/re2/prog.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/re2.cc -o duckdb/third_party/re2/re2/re2.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/regexp.cc -o duckdb/third_party/re2/re2/regexp.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/set.cc -o duckdb/third_party/re2/re2/set.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/simplify.cc -o duckdb/third_party/re2/re2/simplify.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/stringpiece.cc -o duckdb/third_party/re2/re2/stringpiece.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/tostring.cc -o duckdb/third_party/re2/re2/tostring.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/unicode_casefold.cc -o duckdb/third_party/re2/re2/unicode_casefold.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/re2/unicode_groups.cc -o duckdb/third_party/re2/re2/unicode_groups.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/util/rune.cc -o duckdb/third_party/re2/util/rune.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/re2/util/strutil.cc -o duckdb/third_party/re2/util/strutil.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/snappy/snappy-sinksource.cc -o duckdb/third_party/snappy/snappy-sinksource.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/snappy/snappy.cc -o duckdb/third_party/snappy/snappy.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/thrift/thrift/protocol/TProtocol.cpp -o duckdb/third_party/thrift/thrift/protocol/TProtocol.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/thrift/thrift/transport/TBufferTransports.cpp -o duckdb/third_party/thrift/thrift/transport/TBufferTransports.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/thrift/thrift/transport/TTransportException.cpp -o duckdb/third_party/thrift/thrift/transport/TTransportException.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/utf8proc/utf8proc.cpp -o duckdb/third_party/utf8proc/utf8proc.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/third_party/utf8proc/utf8proc_wrapper.cpp -o duckdb/third_party/utf8proc/utf8proc_wrapper.o
+g++ -std=gnu++11 -I"/usr/share/R/include" -DNDEBUG -I. -DDUCKDB_DISABLE_PRINT -Iduckdb/src/include -Iduckdb/third_party/fmt/include -Iduckdb/third_party/re2 -Iduckdb/third_party/miniz -Iduckdb/third_party/utf8proc/include -Iduckdb/third_party/utf8proc -Iduckdb/third_party/libpg_query/include -Iduckdb/third_party/libpg_query -Iduckdb/third_party/concurrentqueue -Iduckdb/extension/parquet/include -Iduckdb/third_party/parquet -Iduckdb/third_party/snappy -Iduckdb/third_party/thrift -Iduckdb    -fpic  -g -O2 -fdebug-prefix-map=/build/r-base-jbaK_j/r-base-3.6.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c duckdb/amalgamation-8.cpp -o duckdb/amalgamation-8.o
+g++ -std=gnu++11 -shared -L/usr/lib/R/lib -Wl,-Bsymbolic-functions -Wl,-z,relro -o duckdb.so duckdbr.o duckdb/extension/parquet/parquet-extension.o duckdb/extension/parquet/parquet_reader.o duckdb/extension/parquet/parquet_timestamp.o duckdb/extension/parquet/parquet_writer.o duckdb/amalgamation-1.o duckdb/amalgamation-2.o duckdb/amalgamation-3.o duckdb/amalgamation-4.o duckdb/amalgamation-5.o duckdb/amalgamation-6.o duckdb/amalgamation-7.o duckdb/third_party/fmt/format.o duckdb/third_party/libpg_query/pg_functions.o duckdb/third_party/libpg_query/postgres_parser.o duckdb/third_party/libpg_query/src_backend_nodes_list.o duckdb/third_party/libpg_query/src_backend_nodes_makefuncs.o duckdb/third_party/libpg_query/src_backend_nodes_value.o duckdb/third_party/libpg_query/src_backend_parser_gram.o duckdb/third_party/libpg_query/src_backend_parser_parser.o duckdb/third_party/libpg_query/src_backend_parser_scan.o duckdb/third_party/libpg_query/src_backend_parser_scansup.o duckdb/third_party/libpg_query/src_common_keywords.o duckdb/third_party/miniz/miniz.o duckdb/third_party/parquet/parquet_constants.o duckdb/third_party/parquet/parquet_types.o duckdb/third_party/re2/re2/bitstate.o duckdb/third_party/re2/re2/compile.o duckdb/third_party/re2/re2/dfa.o duckdb/third_party/re2/re2/filtered_re2.o duckdb/third_party/re2/re2/mimics_pcre.o duckdb/third_party/re2/re2/nfa.o duckdb/third_party/re2/re2/onepass.o duckdb/third_party/re2/re2/parse.o duckdb/third_party/re2/re2/perl_groups.o duckdb/third_party/re2/re2/prefilter.o duckdb/third_party/re2/re2/prefilter_tree.o duckdb/third_party/re2/re2/prog.o duckdb/third_party/re2/re2/re2.o duckdb/third_party/re2/re2/regexp.o duckdb/third_party/re2/re2/set.o duckdb/third_party/re2/re2/simplify.o duckdb/third_party/re2/re2/stringpiece.o duckdb/third_party/re2/re2/tostring.o duckdb/third_party/re2/re2/unicode_casefold.o duckdb/third_party/re2/re2/unicode_groups.o duckdb/third_party/re2/util/rune.o duckdb/third_party/re2/util/strutil.o duckdb/third_party/snappy/snappy-sinksource.o duckdb/third_party/snappy/snappy.o duckdb/third_party/thrift/thrift/protocol/TProtocol.o duckdb/third_party/thrift/thrift/transport/TBufferTransports.o duckdb/third_party/thrift/thrift/transport/TTransportException.o duckdb/third_party/utf8proc/utf8proc.o duckdb/third_party/utf8proc/utf8proc_wrapper.o duckdb/amalgamation-8.o -L/usr/lib/R/lib -lR
+installing to /tmp/workdir/duckdb/old/duckdb.Rcheck/00LOCK-duckdb/00new/duckdb/libs
+** R
+** byte-compile and prepare package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** testing if installed package can be loaded from temporary location
+** checking absolute paths in shared objects and dynamic libraries
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (duckdb)
+
+```
 # parsemsf
 
 <details>
@@ -210,7 +177,7 @@ Run `cloud_details(, "mdsr")` for more info
 * GitHub: https://github.com/benjaminjack/parsemsf
 * Source code: https://github.com/cran/parsemsf
 * Date/Publication: 2017-12-09 22:00:10 UTC
-* Number of recursive dependencies: 75
+* Number of recursive dependencies: 79
 
 Run `cloud_details(, "parsemsf")` for more info
 
@@ -245,20 +212,20 @@ Run `cloud_details(, "parsemsf")` for more info
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      no applicable method for 'select_' applied to an object of class "c('tbl_SQLiteConnection', 'tbl_dbi', 'tbl_sql', 'tbl_lazy', 'tbl')"
-      Backtrace:
-        1. parsemsf::make_area_table(parsemsf_example("test_db.msf"))
-        2. dplyr::tbl(my_db, "Events")
-       10. dplyr::select_(...)
+        7.           └─magrittr::freduce(value, `_function_list`)
+        8.             ├─base::withVisible(function_list[[k]](value))
+        9.             └─function_list[[k]](value)
+       10.               └─dplyr::select_(...)
       
       ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 0 | SKIPPED: 0 | WARNINGS: 1 | FAILED: 4 ]
-      1. Error: make_area_table creates a data frame with the correct column names (@test_make_area_table.R#16) 
-      2. Error: make_pep_table creates a data frame with the correct column names (@test_make_pep_table.R#13) 
-      3. Error: map_peptides creates a data frame with the correct column names (@test_map_peptides.R#16) 
-      4. Error: (unknown) 
+      Warning (test_make_area_table.R:16:3): make_area_table creates a data frame with the correct column names
+      ERROR (test_make_area_table.R:16:3): make_area_table creates a data frame with the correct column names
+      ERROR (test_make_pep_table.R:13:3): make_pep_table creates a data frame with the correct column names
+      ERROR (test_map_peptides.R:16:3): map_peptides creates a data frame with the correct column names
+      ERROR (???): (code run outside of `test_that()`)
       
-      Error: testthat unit tests failed
+      [ FAIL 4 | WARN 1 | SKIP 0 | PASS 0 ]
+      Error: Test failures
       Execution halted
     ```
 
@@ -278,7 +245,7 @@ Run `cloud_details(, "parsemsf")` for more info
 * GitHub: https://github.com/rstudio/pool
 * Source code: https://github.com/cran/pool
 * Date/Publication: 2019-10-03 11:30:02 UTC
-* Number of recursive dependencies: 46
+* Number of recursive dependencies: 51
 
 Run `cloud_details(, "pool")` for more info
 
@@ -317,20 +284,20 @@ Run `cloud_details(, "pool")` for more info
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      > 
-      > test_check("pool")
-      ── 1. Error: pool package: can use dplyr syntax to copy table to DB (@test-dplyr
-      no applicable method for 'db_has_table' applied to an object of class "c('SQLiteConnection', 'DBIConnection', 'DBIObject')"
       Backtrace:
-       1. testthat::expect_true(db_has_table(pool, "flights"))
-       5. pool:::db_has_table.Pool(pool, "flights")
-       6. dplyr::db_has_table(db_con, table = table)
+          █
+       1. ├─testthat::expect_true(db_has_table(pool, "flights")) test-dplyr.R:39:6
+       2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
+       3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
+       4. ├─dplyr::db_has_table(pool, "flights")
+       5. └─pool:::db_has_table.Pool(pool, "flights")
+       6.   └─dplyr::db_has_table(db_con, table = table)
       
       ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 234 | SKIPPED: 0 | WARNINGS: 0 | FAILED: 1 ]
-      1. Error: pool package: can use dplyr syntax to copy table to DB (@test-dplyr.R#39) 
+      ERROR (test-dplyr.R:39:7): pool package: can use dplyr syntax to copy table to DB
       
-      Error: testthat unit tests failed
+      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 234 ]
+      Error: Test failures
       Execution halted
     ```
 
@@ -342,7 +309,7 @@ Run `cloud_details(, "pool")` for more info
 * GitHub: https://github.com/prestodb/RPresto
 * Source code: https://github.com/cran/RPresto
 * Date/Publication: 2019-10-18 17:40:03 UTC
-* Number of recursive dependencies: 46
+* Number of recursive dependencies: 50
 
 Run `cloud_details(, "RPresto")` for more info
 
@@ -355,20 +322,20 @@ Run `cloud_details(, "RPresto")` for more info
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
     Last 13 lines of output:
-      ── 1. Error: db_query_fields works with mock  ──────────────────────────────────
-      No mocks for url: http://localhost:8000/v1/statement, request_body: SELECT * FROM ((SELECT 1 AS a, 't' AS b) "a") "q01" WHERE 1 = 0
-      Backtrace:
-       1. dplyr::db_query_fields(...)
-       2. RPresto:::db_query_fields.PrestoConnection(...)
-       4. RPresto::dbGetQuery(con, fields)
-       6. RPresto::dbSendQuery(conn, statement, ...)
-       7. httr::POST(url, body = enc2utf8(statement), config = headers)
+      Reason: Cannot set locale to tr_TR.iso8859-9it is set at: C.UTF-8
+      
+      ── Skip (???): `[[` works for dynamic indices ──────────────────────────────────
+      Reason: Cannot set locale to tr_TR.iso8859-9it is set at: C.UTF-8
+      
+      ── Skipped tests  ──────────────────────────────────────────────────────────────
+      ● Cannot set locale to tr_TR.iso8859-9it is set at: C.UTF-8 (14)
+      ● On CRAN (26)
       
       ══ testthat results  ═══════════════════════════════════════════════════════════
-      [ OK: 229 | SKIPPED: 40 | WARNINGS: 0 | FAILED: 1 ]
-      1. Error: db_query_fields works with mock 
+      ERROR (???): db_query_fields works with mock
       
-      Error: testthat unit tests failed
+      [ FAIL 1 | WARN 0 | SKIP 40 | PASS 229 ]
+      Error: Test failures
       Execution halted
     ```
 

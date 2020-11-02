@@ -1,13 +1,7 @@
-This is a resubmission; I have tried to ensure that unnecessary tests are no longer run on the CRAN check machine.
-
----
-
 ## Test environments
-
-* local: darwin15.6.0-3.5.1
-* travis: 3.1, 3.2, 3.3, oldrel, release, devel
-* r-hub: windows-x86_64-devel, ubuntu-gcc-release, fedora-clang-devel
-* win-builder: windows-x86_64-devel
+* local R installation, R 3.6.3
+* ubuntu 16.04 (on travis-ci), R 3.6.3
+* win-builder (devel)
 
 ## R CMD check results
 
@@ -15,7 +9,9 @@ This is a resubmission; I have tried to ensure that unnecessary tests are no lon
 
 ## revdepcheck results
 
-We checked 51 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 58 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 0 new problems
- * We failed to check 0 packages
+ * We saw 4 new problems: chunked, parsemsf, pool, RPresto
+ * We failed to check 1 packages: duckdb
+
+All maintainers were notified one month ago and two weeks ago, and I prepared patches where possible.
