@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Create an SQL tbl (abstract) — tbl_sql" />
@@ -93,7 +97,7 @@ The default tbl.DBIConnect method should work in most cases." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -112,6 +116,9 @@ The default tbl.DBIConnect method should work in most cases." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -180,12 +187,12 @@ The default tbl.DBIConnect method should work in most cases." />
     </div>
 
     <div class="ref-description">
-    <p>Generally, you should no longer need to provide a custom <code>tbl()</code>
+    <p>Generally, you should no longer need to provide a custom <code><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl()</a></code>
 method.
 The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tbl_sql</span>(<span class='no'>subclass</span>, <span class='no'>src</span>, <span class='no'>from</span>, <span class='no'>...</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>tbl_sql</span><span class='op'>(</span><span class='va'>subclass</span>, <span class='va'>src</span>, <span class='va'>from</span>, <span class='va'>...</span>, vars <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Cache and retrieve an <code>src_sqlite</code> of the Lahman baseball database. — lahman • dbplyr</title>
+<title>Cache and retrieve an src_sqlite of the Lahman baseball database. — lahman • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,9 +43,13 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Cache and retrieve an <code>src_sqlite</code> of the Lahman baseball database. — lahman" />
+
+
+<meta property="og:title" content="Cache and retrieve an src_sqlite of the Lahman baseball database. — lahman" />
 <meta property="og:description" content="This creates an interesting database using data from the Lahman baseball
 data source, provided by Sean Lahman at
 http://www.seanlahman.com/baseball-archive/statistics/, and
@@ -96,7 +100,7 @@ for that package for documentation of the individual tables." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -115,6 +119,9 @@ for that package for documentation of the individual tables." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -191,17 +198,17 @@ Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
 for that package for documentation of the individual tables.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>lahman_sqlite</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>lahman_sqlite</span><span class='op'>(</span>path <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>lahman_postgres</span>(<span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"lahman"</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"localhost"</span>, <span class='no'>...</span>)
+<span class='fu'>lahman_postgres</span><span class='op'>(</span>dbname <span class='op'>=</span> <span class='st'>"lahman"</span>, host <span class='op'>=</span> <span class='st'>"localhost"</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>lahman_mysql</span>(<span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"lahman"</span>, <span class='no'>...</span>)
+<span class='fu'>lahman_mysql</span><span class='op'>(</span>dbname <span class='op'>=</span> <span class='st'>"lahman"</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>copy_lahman</span>(<span class='no'>con</span>, <span class='no'>...</span>)
+<span class='fu'>copy_lahman</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>has_lahman</span>(<span class='no'>type</span>, <span class='no'>...</span>)
+<span class='fu'>has_lahman</span><span class='op'>(</span><span class='va'>type</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>lahman_srcs</span>(<span class='no'>...</span>, <span class='kw'>quiet</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>lahman_srcs</span><span class='op'>(</span><span class='va'>...</span>, quiet <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -228,15 +235,16 @@ connect.</p></td>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Connect to a local sqlite database, if already created</span>
 <span class='co'># \donttest{</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
 
-<span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"sqlite"</span>)) {
-  <span class='fu'>lahman_sqlite</span>()
-  <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'>lahman_sqlite</span>(), <span class='st'>"Batting"</span>)
-  <span class='no'>batting</span>
-}</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Parks</span></div><div class='output co'>#&gt; <span class='message'>Creating table: People</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   table&lt;Batting&gt; [?? x 22]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1
-#&gt; #   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpQLc58m/lahman.sqlite]</span><span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'>has_lahman</span><span class='op'>(</span><span class='st'>"sqlite"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>lahman_sqlite</span><span class='op'>(</span><span class='op'>)</span>
+  <span class='va'>batting</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='fu'>lahman_sqlite</span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"Batting"</span><span class='op'>)</span>
+  <span class='va'>batting</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>Creating table: AllstarFull</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Appearances</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsPlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsShareManagers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: AwardsSharePlayers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Batting</span></div><div class='output co'>#&gt; <span class='message'>Creating table: BattingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: CollegePlaying</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Fielding</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOF</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingOFsplit</span></div><div class='output co'>#&gt; <span class='message'>Creating table: FieldingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HallOfFame</span></div><div class='output co'>#&gt; <span class='message'>Creating table: HomeGames</span></div><div class='output co'>#&gt; <span class='message'>Creating table: LahmanData</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Managers</span></div><div class='output co'>#&gt; <span class='message'>Creating table: ManagersHalf</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Master</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Parks</span></div><div class='output co'>#&gt; <span class='message'>Creating table: People</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Pitching</span></div><div class='output co'>#&gt; <span class='message'>Creating table: PitchingPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Salaries</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Schools</span></div><div class='output co'>#&gt; <span class='message'>Creating table: SeriesPost</span></div><div class='output co'>#&gt; <span class='message'>Creating table: Teams</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsFranchises</span></div><div class='output co'>#&gt; <span class='message'>Creating table: TeamsHalf</span></div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   table&lt;Batting&gt; [?? x 22]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0
+#&gt; #   [/private/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/RtmpMMEsCo/lahman.sqlite]</span><span>
 #&gt;    playerID yearID stint teamID lgID      G    AB     R     H   X2B   X3B    HR
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> abercda…   </span><span style='text-decoration: underline;'>1</span><span>871     1 TRO    NA        1     4     0     0     0     0     0
@@ -252,15 +260,17 @@ connect.</p></td>
 #&gt; </span><span style='color: #555555;'># … with more rows, and 10 more variables: RBI </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, SB </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, CS </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>,</span><span>
 #&gt; </span><span style='color: #555555;'>#   BB </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, SO </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, IBB </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, HBP </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, SH </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, SF </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span style='color: #555555;'>, GIDP </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span></div><div class='input'>
 <span class='co'># Connect to a local postgres database with lahman database, if available</span>
-<span class='kw'>if</span> (<span class='fu'>has_lahman</span>(<span class='st'>"postgres"</span>)) {
-  <span class='fu'>lahman_postgres</span>()
-  <span class='no'>batting</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span>(<span class='fu'>lahman_postgres</span>(), <span class='st'>"Batting"</span>)
-}</div><div class='output co'>#&gt; <span class='message'>Error: could not connect to server: Connection refused</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'>has_lahman</span><span class='op'>(</span><span class='st'>"postgres"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>lahman_postgres</span><span class='op'>(</span><span class='op'>)</span>
+  <span class='va'>batting</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='fu'>lahman_postgres</span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>"Batting"</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span class='message'>Error: could not connect to server: Connection refused</span>
 #&gt; <span class='message'>	Is the server running on host "localhost" (::1) and accepting</span>
 #&gt; <span class='message'>	TCP/IP connections on port 5432?</span>
 #&gt; <span class='message'>could not connect to server: Connection refused</span>
 #&gt; <span class='message'>	Is the server running on host "localhost" (127.0.0.1) and accepting</span>
-#&gt; <span class='message'>	TCP/IP connections on port 5432?</span></div><div class='input'><span class='co'># }</span></div></span></pre>
+#&gt; <span class='message'>	TCP/IP connections on port 5432?</span></div><div class='input'><span class='co'># }</span>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

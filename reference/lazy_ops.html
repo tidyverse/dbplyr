@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Lazy operations — lazy_ops" />
@@ -94,7 +98,7 @@ to evolve in the future." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -113,6 +117,9 @@ to evolve in the future." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -187,21 +194,21 @@ in R from their computation in SQL. This API is very new so is likely
 to evolve in the future.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>op_base</span>(<span class='no'>x</span>, <span class='no'>vars</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+    <pre class="usage"><span class='fu'>op_base</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>vars</span>, class <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>op_single</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
+<span class='fu'>op_single</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>x</span>, dots <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>, args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>add_op_single</span>(<span class='no'>name</span>, <span class='no'>.data</span>, <span class='kw'>dots</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
+<span class='fu'>add_op_single</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>.data</span>, dots <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>, args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>op_double</span>(<span class='no'>name</span>, <span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>args</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>())
+<span class='fu'>op_double</span><span class='op'>(</span><span class='va'>name</span>, <span class='va'>x</span>, <span class='va'>y</span>, args <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>op_grps</span>(<span class='no'>op</span>)
+<span class='fu'>op_grps</span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 
-<span class='fu'>op_vars</span>(<span class='no'>op</span>)
+<span class='fu'>op_vars</span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 
-<span class='fu'>op_sort</span>(<span class='no'>op</span>)
+<span class='fu'>op_sort</span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span>
 
-<span class='fu'>op_frame</span>(<span class='no'>op</span>)</pre>
+<span class='fu'>op_frame</span><span class='op'>(</span><span class='va'>op</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>

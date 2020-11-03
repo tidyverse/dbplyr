@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Database versions of the nycflights13 data — nycflights13" />
@@ -93,7 +97,7 @@ to making joining tables on natural keys efficient." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -112,6 +116,9 @@ to making joining tables on natural keys efficient." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -185,13 +192,13 @@ a local database, for use in examples and vignettes. Indexes are created
 to making joining tables on natural keys efficient.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nycflights13_sqlite</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+    <pre class="usage"><span class='fu'>nycflights13_sqlite</span><span class='op'>(</span>path <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>nycflights13_postgres</span>(<span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"nycflights13"</span>, <span class='no'>...</span>)
+<span class='fu'>nycflights13_postgres</span><span class='op'>(</span>dbname <span class='op'>=</span> <span class='st'>"nycflights13"</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>has_nycflights13</span>(<span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"sqlite"</span>, <span class='st'>"postgresql"</span>), <span class='no'>...</span>)
+<span class='fu'>has_nycflights13</span><span class='op'>(</span>type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"sqlite"</span>, <span class='st'>"postgresql"</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>copy_nycflights13</span>(<span class='no'>con</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>copy_nycflights13</span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -202,7 +209,7 @@ to making joining tables on natural keys efficient.</p>
     </tr>
     <tr>
       <th>dbname, ...</th>
-      <td><p>Arguments passed on to <code>src_postgres()</code></p></td>
+      <td><p>Arguments passed on to <code><a href='https://dplyr.tidyverse.org/reference/src_dbi.html'>src_postgres()</a></code></p></td>
     </tr>
     </table>
 

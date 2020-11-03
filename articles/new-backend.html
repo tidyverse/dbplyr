@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
+<!--optional theme--><link href="../.css" rel="stylesheet">
 <meta property="og:title" content="Adding a new DBI backend">
 <meta property="og:description" content="dbplyr">
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
@@ -49,7 +50,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -69,6 +70,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
+    <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
@@ -127,7 +131,8 @@
 
       
 
-      </header><div class="row">
+      </header><script src="new-backend_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="new-backend_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="new-backend_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Adding a new DBI backend</h1>
@@ -143,46 +148,49 @@
 <p>This document describes how to add a new SQL backend to dbplyr. To begin:</p>
 <ul>
 <li><p>Ensure that you have a DBI compliant database backend. If not, you’ll need to first create it by following the instructions in <code><a href="https://dbi.r-dbi.org/articles/backend.html">vignette("backend", package = "DBI")</a></code>.</p></li>
-<li><p>You’ll need a working knowledge of S3. Make sure that you’re <a href="http://adv-r.had.co.nz/OO-essentials.html#s3">familiar with the basics</a> before you start.</p></li>
+<li><p>You’ll need a working knowledge of S3. Make sure that you’re <a href="https://adv-r.hadley.nz/s3.html">familiar with the basics</a> before you start.</p></li>
 </ul>
 <p>This document is still a work in progress, but it will hopefully get you started. I’d also strongly recommend reading the bundled source code for <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-sqlite.R">SQLite</a>, <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-mysql.R">MySQL</a>, and <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-postgres.R">PostgreSQL</a>.</p>
 <div id="first-steps" class="section level2">
 <h2 class="hasAnchor">
 <a href="#first-steps" class="anchor"></a>First steps</h2>
 <p>For interactive exploitation, attach dplyr and DBI. If you’re creating a package, you’ll need to import dplyr and DBI.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">DBI</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://r-dbi.github.io/DBI">DBI</a></span><span class="op">)</span></pre></div>
 <p>Check that you can create a tbl from a connection, like:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">con</span> <span class="kw">&lt;-</span> <span class="kw pkg">DBI</span><span class="kw ns">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="kw pkg">RSQLite</span><span class="kw ns">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="kw">path</span> <span class="kw">=</span> <span class="st">":memory:"</span>)
-<span class="kw pkg">DBI</span><span class="kw ns">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span>(<span class="no">con</span>, <span class="st">"mtcars"</span>, <span class="no">mtcars</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, path <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span>
+<span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html">dbWriteTable</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span>, <span class="va">mtcars</span><span class="op">)</span>
 
-<span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span>(<span class="no">con</span>, <span class="st">"mtcars"</span>)
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]</span>
-<span class="co">#&gt; # Database: sqlite 3.30.1 []</span>
+<span class="co">#&gt; # Database: sqlite 3.33.0 []</span>
 <span class="co">#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1  21       6   160   110  3.9   2.62  16.5     0     1     4     4</span>
 <span class="co">#&gt; 2  21       6   160   110  3.9   2.88  17.0     0     1     4     4</span>
 <span class="co">#&gt; 3  22.8     4   108    93  3.85  2.32  18.6     1     1     4     1</span>
 <span class="co">#&gt; 4  21.4     6   258   110  3.08  3.22  19.4     1     0     3     1</span>
-<span class="co">#&gt; # … with more rows</span></pre></body></html></div>
-<p>If you can’t, this likely indicates some problem with the DBI methods. Use <a href="https://github.com/rstats-db/DBItest">DBItest</a> to narrow down the problem.</p>
-<p>Now is a good time to implement a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_desc()</a></code>. This should briefly describe the connection, typically formatting the information returned from <code><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html">dbGetInfo()</a></code>. This is what dbplyr does for Postgres connections:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="co">#' @export</span>
-<span class="no">db_desc.PostgreSQLConnection</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
-  <span class="no">info</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetInfo.html">dbGetInfo</a></span>(<span class="no">x</span>)
-  <span class="no">host</span> <span class="kw">&lt;-</span> <span class="kw">if</span> (<span class="no">info</span>$<span class="no">host</span> <span class="kw">==</span> <span class="st">""</span>) <span class="st">"localhost"</span> <span class="kw">else</span> <span class="no">info</span>$<span class="no">host</span>
-
-  <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"postgres "</span>, <span class="no">info</span>$<span class="no">serverVersion</span>, <span class="st">" ["</span>, <span class="no">info</span>$<span class="no">user</span>, <span class="st">"@"</span>,
-    <span class="no">host</span>, <span class="st">":"</span>, <span class="no">info</span>$<span class="no">port</span>, <span class="st">"/"</span>, <span class="no">info</span>$<span class="no">dbname</span>, <span class="st">"]"</span>)
-}</pre></body></html></div>
+<span class="co">#&gt; # … with more rows</span></pre></div>
+<p>If you can’t, this likely indicates some problem with the DBI methods. Use <a href="https://github.com/r-dbi/DBItest">DBItest</a> to narrow down the problem.</p>
+</div>
+<div id="write-your-first-method" class="section level2">
+<h2 class="hasAnchor">
+<a href="#write-your-first-method" class="anchor"></a>Write your first method</h2>
+<p>The first method of your dbplyr backend should always be for the <code><a href="../reference/db-misc.html">dbplyr_edition()</a></code> generic:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="co">#' @importFrom dbplyr dbplyr_edition</span>
+<span class="co">#' @export</span>
+<span class="va">dbplyr_edition.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="fl">2L</span></pre></div>
+<p>This declares that your package uses version 2 of the API, which is the version that this vignette documents.</p>
 </div>
 <div id="copying-computing-collecting-and-collapsing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#copying-computing-collecting-and-collapsing" class="anchor"></a>Copying, computing, collecting and collapsing</h2>
-<p>Next, check that <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collapse()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/compute.html">compute()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> work.</p>
+<p>Next, check that <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collapse()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/compute.html">compute()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> work:</p>
 <ul>
-<li><p>If <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> fails, it’s likely you need a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_write_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_create_indexes()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_analyze()</a></code>.</p></li>
+<li><p>If <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> fails, you probably need a method for <code><a href="../reference/db-sql.html">sql_table_analyze()</a></code> or <code><a href="../reference/db-sql.html">sql_table_index()</a></code>. If <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> fails during creation of the tbl, you may need a method for <code><a href="../reference/db-sql.html">sql_query_fields()</a></code>.</p></li>
 <li><p>If <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collapse()</a></code> fails, your database has a non-standard way of constructing subqueries. Add a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_subquery()</a></code>.</p></li>
 <li><p>If <code><a href="https://dplyr.tidyverse.org/reference/compute.html">compute()</a></code> fails, your database has a non-standard way of saving queries in temporary tables. Add a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_save_query()</a></code>.</p></li>
 </ul>
@@ -197,23 +205,23 @@
 <p>Check that SQL translation for the key verbs work:</p>
 <ul>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> etc: powered by <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_select()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> etc: powered by <code><a href="../reference/db-sql.html">sql_query_select()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/join.html">left_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join()</a></code>: powered by <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_join()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">inner_join()</a></code>: powered by <code><a href="../reference/db-sql.html">sql_query_join()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code>: powered by <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_semi_join()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">anti_join()</a></code>: powered by <code><a href="../reference/db-sql.html">sql_query_semi_join()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/setops.html">union()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/setops.html">intersect()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff()</a></code>: powered by <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_set_op()</a></code>
+<code><a href="https://generics.r-lib.org/reference/setops.html">union()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">intersect()</a></code>, <code><a href="https://generics.r-lib.org/reference/setops.html">setdiff()</a></code>: powered by <code><a href="../reference/db-sql.html">sql_query_set_op()</a></code>
 </li>
 </ul>
 </div>
 <div id="vectors" class="section level3">
 <h3 class="hasAnchor">
 <a href="#vectors" class="anchor"></a>Vectors</h3>
-<p>Finally, you may have to provide custom R -&gt; SQL translation at the vector level by providing a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code>. This function should return an object created by <code><a href="../reference/sql_variant.html">sql_variant()</a></code>. See existing methods for examples.</p>
+<p>Finally, you may have to provide custom R -&gt; SQL translation at the vector level by providing a method for <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code>. This function should return an object created by <code><a href="../reference/sql_substr.html">sql_variant()</a></code>. See existing methods for examples.</p>
 </div>
 </div>
   </div>

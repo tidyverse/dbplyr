@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Flag a character vector as SQL identifiers — ident" />
@@ -94,7 +98,7 @@ for schema.table." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -113,6 +117,9 @@ for schema.table." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -182,16 +189,14 @@ for schema.table." />
 
     <div class="ref-description">
     <p><code>ident()</code> takes unquoted strings and flags them as identifiers.
-<code>ident_q()</code> assumes its input has already been quoted, and ensures
+<code><a href='ident_q.html'>ident_q()</a></code> assumes its input has already been quoted, and ensures
 it does not get quoted again. This is currently used only for
 for <code>schema.table</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ident</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>ident</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>ident_q</span>(<span class='no'>...</span>)
-
-<span class='fu'>is.ident</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>is.ident</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,12 +214,17 @@ for <code>schema.table</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># SQL92 quotes strings with '</span>
-<span class='fu'><a href='escape.html'>escape_ansi</a></span>(<span class='st'>"x"</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; 'x'</div><div class='input'>
+<span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;SQL&gt; 'x'</div><div class='input'>
 <span class='co'># And identifiers with "</span>
-<span class='fu'>ident</span>(<span class='st'>"x"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x</div><div class='input'><span class='fu'><a href='escape.html'>escape_ansi</a></span>(<span class='fu'>ident</span>(<span class='st'>"x"</span>))</div><div class='output co'>#&gt; &lt;SQL&gt; `x`</div><div class='input'>
+<span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;IDENT&gt; x</div><div class='input'><span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;SQL&gt; `x`</div><div class='input'>
 <span class='co'># You can supply multiple inputs</span>
-<span class='fu'>ident</span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"x"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'>ident_q</span>(<span class='kw'>a</span> <span class='kw'>=</span> <span class='st'>"x"</span>, <span class='kw'>b</span> <span class='kw'>=</span> <span class='st'>"y"</span>)</div><div class='output co'>#&gt; &lt;IDENT&gt; x
+<span class='fu'>ident</span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;IDENT&gt; x
+#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'><a href='ident_q.html'>ident_q</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;IDENT&gt; x
 #&gt; &lt;IDENT&gt; y</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

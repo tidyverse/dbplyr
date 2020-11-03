@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Function reference" />
@@ -90,7 +94,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -109,6 +113,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -205,19 +212,25 @@
         <td>
           <p><code><a href="arrange.tbl_lazy.html">arrange(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Arrange rows by variables in a remote database table</p></td>
+        <td><p>Arrange rows by column values</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="copy_to.src_sql.html">copy_to(<i>&lt;src_sql&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Copy a local data frame to a DBI backend.</p></td>
+        <td><p>Copy a local data frame to a remote database</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="collapse.tbl_sql.html">collapse(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">compute(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">collect(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Force computation of query</p></td>
+        <td><p>Compute results of a query</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="distinct.tbl_lazy.html">distinct(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subset distinct/unique rows</p></td>
       </tr><tr>
         
         <td>
@@ -227,9 +240,148 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="filter.tbl_lazy.html">filter(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subset rows using column values</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="head.tbl_lazy.html">head(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subset the first rows</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="group_by.tbl_lazy.html">group_by(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Group by one or more variables</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Join sql tbls.</p></td>
+        <td><p>Join SQL tables</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="intersect.tbl_lazy.html">intersect(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">union(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">union_all(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">setdiff(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>SQL set operations</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="mutate.tbl_lazy.html">mutate(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Create, modify, and delete columns</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pull.tbl_sql.html">pull(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Extract a single column</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="select.tbl_lazy.html">select(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename_with(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">relocate(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subset, rename, and reorder columns using their names</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="dbplyr-slice.html">slice_min(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_max(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_sample(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Subset rows using their positions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summarise.tbl_lazy.html">summarise(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summarise each group to one row</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-built-in-database-backends" class="hasAnchor"><a href="#section-built-in-database-backends" class="anchor"></a>Built-in database backends</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="backend-access.html">simulate_access()</a></code> </p>
+        </td>
+        <td><p>Backend: MS Access</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-hana.html">simulate_hana()</a></code> </p>
+        </td>
+        <td><p>Backend: SAP HANA</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-hive.html">backend-hive</a></code> </p>
+        </td>
+        <td><p>Backend: Hive</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-impala.html">backend-impala</a></code> </p>
+        </td>
+        <td><p>Backend: Impala</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-mssql.html">backend-mssql</a></code> </p>
+        </td>
+        <td><p>Backend: SQL server</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-mysql.html">simulate_mysql()</a></code> </p>
+        </td>
+        <td><p>Backend: MySQL/MariaDB</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-odbc.html">simulate_odbc()</a></code> </p>
+        </td>
+        <td><p>Backend: ODBC</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-oracle.html">simulate_oracle()</a></code> </p>
+        </td>
+        <td><p>Backend: Oracle</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-postgres.html">simulate_postgres()</a></code> </p>
+        </td>
+        <td><p>Backend: PostgreSQL</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-redshift.html">simulate_redshift()</a></code> </p>
+        </td>
+        <td><p>Backend: Redshift</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-sqlite.html">simulate_sqlite()</a></code> </p>
+        </td>
+        <td><p>Backend: SQLite</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="backend-teradata.html">simulate_teradata()</a></code> </p>
+        </td>
+        <td><p>Backend: Teradata</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -289,7 +441,7 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="ident.html">ident()</a></code> <code><a href="ident.html">ident_q()</a></code> <code><a href="ident.html">is.ident()</a></code> </p>
+          <p><code><a href="ident.html">ident()</a></code> <code><a href="ident.html">is.ident()</a></code> </p>
         </td>
         <td><p>Flag a character vector as SQL identifiers</p></td>
       </tr><tr>
@@ -322,6 +474,43 @@
           <p><code><a href="window_order.html">window_order()</a></code> <code><a href="window_order.html">window_frame()</a></code> </p>
         </td>
         <td><p>Override window order and frame</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-dbplyr-backends" class="hasAnchor"><a href="#section-dbplyr-backends" class="anchor"></a>dbplyr Backends</h2>
+          <p class="section-desc"><p>Documentation for authors of new dbplyr backends</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="db-io.html">db_copy_to()</a></code> <code><a href="db-io.html">db_compute()</a></code> <code><a href="db-io.html">db_collect()</a></code> <code><a href="db-io.html">db_table_temporary()</a></code> </p>
+        </td>
+        <td><p>Database I/O generics</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="db-misc.html">db_connection_describe()</a></code> <code><a href="db-misc.html">sql_join_suffix()</a></code> <code><a href="db-misc.html">db_sql_render()</a></code> <code><a href="db-misc.html">dbplyr_edition()</a></code> </p>
+        </td>
+        <td><p>Miscellaneous database generics</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="db-sql.html">sql_expr_matches()</a></code> <code><a href="db-sql.html">sql_translation()</a></code> <code><a href="db-sql.html">sql_table_analyze()</a></code> <code><a href="db-sql.html">sql_table_index()</a></code> <code><a href="db-sql.html">sql_query_explain()</a></code> <code><a href="db-sql.html">sql_query_fields()</a></code> <code><a href="db-sql.html">sql_query_save()</a></code> <code><a href="db-sql.html">sql_query_wrap()</a></code> <code><a href="db-sql.html">sql_query_rows()</a></code> <code><a href="db-sql.html">sql_query_select()</a></code> <code><a href="db-sql.html">sql_query_join()</a></code> <code><a href="db-sql.html">sql_query_semi_join()</a></code> <code><a href="db-sql.html">sql_query_set_op()</a></code> </p>
+        </td>
+        <td><p>SQL generation generics</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="db-quote.html">sql_escape_logical()</a></code> <code><a href="db-quote.html">sql_escape_date()</a></code> <code><a href="db-quote.html">sql_escape_datetime()</a></code> <code><a href="db-quote.html">sql_escape_raw()</a></code> </p>
+        </td>
+        <td><p>SQL escaping/quoting generics</p></td>
       </tr>
     </tbody>
     </table>

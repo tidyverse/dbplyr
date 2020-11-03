@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulate database connections — simulate_dbi • dbplyr</title>
+<title>Simulate database connections — simulate_hive • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,9 +43,13 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Simulate database connections — simulate_dbi" />
+
+
+<meta property="og:title" content="Simulate database connections — simulate_hive" />
 <meta property="og:description" content="These functions generate S3 objects that have been designed to simulate
 the action of a database connection, without actually having the database
 available. Obviously, this simulation can only be incomplete, but most
@@ -95,7 +99,7 @@ actually connecting to it." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -114,6 +118,9 @@ actually connecting to it." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -177,7 +184,7 @@ actually connecting to it." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Simulate database connections</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/simulate.R'><code>R/simulate.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-hive.R'><code>R/backend-hive.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-impala.R'><code>R/backend-impala.R</code></a>, <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-mssql.R'><code>R/backend-mssql.R</code></a>, and 1 more</small>
     <div class="hidden name"><code>simulate_dbi.Rd</code></div>
     </div>
 
@@ -189,27 +196,13 @@ importantly it allows us to simulate SQL generation for any database without
 actually connecting to it.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_dbi</span>(<span class='kw'>class</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span>())
+    <pre class="usage"><span class='fu'>simulate_hive</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>simulate_access</span>()
+<span class='fu'>simulate_impala</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>simulate_hive</span>()
+<span class='fu'>simulate_mssql</span><span class='op'>(</span>version <span class='op'>=</span> <span class='st'>"15.0"</span><span class='op'>)</span>
 
-<span class='fu'>simulate_mysql</span>()
-
-<span class='fu'>simulate_impala</span>()
-
-<span class='fu'>simulate_mssql</span>()
-
-<span class='fu'>simulate_odbc</span>()
-
-<span class='fu'>simulate_oracle</span>()
-
-<span class='fu'>simulate_postgres</span>()
-
-<span class='fu'>simulate_sqlite</span>()
-
-<span class='fu'>simulate_teradata</span>()</pre>
+<span class='fu'>simulate_dbi</span><span class='op'>(</span>class <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>character</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>

@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Create an sql translator — sql_substr" />
@@ -94,7 +98,7 @@ easy." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -113,6 +117,9 @@ easy." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -187,51 +194,55 @@ commands that your tbl provides. These three functions make that
 easy.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sql_substr</span>(<span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>)
+    <pre class="usage"><span class='fu'>sql_substr</span><span class='op'>(</span>f <span class='op'>=</span> <span class='st'>"SUBSTR"</span><span class='op'>)</span>
 
-<span class='fu'>sql_str_sub</span>(<span class='kw'>subset_f</span> <span class='kw'>=</span> <span class='st'>"SUBSTR"</span>, <span class='kw'>length_f</span> <span class='kw'>=</span> <span class='st'>"LENGTH"</span>)
+<span class='fu'>sql_str_sub</span><span class='op'>(</span>subset_f <span class='op'>=</span> <span class='st'>"SUBSTR"</span>, length_f <span class='op'>=</span> <span class='st'>"LENGTH"</span><span class='op'>)</span>
 
-<span class='fu'>sql_paste</span>(<span class='no'>default_sep</span>, <span class='kw'>f</span> <span class='kw'>=</span> <span class='st'>"CONCAT_WS"</span>)
+<span class='fu'>sql_paste</span><span class='op'>(</span><span class='va'>default_sep</span>, f <span class='op'>=</span> <span class='st'>"CONCAT_WS"</span><span class='op'>)</span>
 
-<span class='fu'>sql_paste_infix</span>(<span class='no'>default_sep</span>, <span class='no'>op</span>, <span class='no'>cast</span>)
+<span class='fu'>sql_paste_infix</span><span class='op'>(</span><span class='va'>default_sep</span>, <span class='va'>op</span>, <span class='va'>cast</span><span class='op'>)</span>
 
-<span class='fu'>sql_variant</span>(
-  <span class='kw'>scalar</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
-  <span class='kw'>aggregate</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>(),
-  <span class='kw'>window</span> <span class='kw'>=</span> <span class='fu'>sql_translator</span>()
-)
+<span class='fu'>sql_variant</span><span class='op'>(</span>
+  scalar <span class='op'>=</span> <span class='fu'>sql_translator</span><span class='op'>(</span><span class='op'>)</span>,
+  aggregate <span class='op'>=</span> <span class='fu'>sql_translator</span><span class='op'>(</span><span class='op'>)</span>,
+  window <span class='op'>=</span> <span class='fu'>sql_translator</span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>sql_translator</span>(<span class='no'>...</span>, <span class='kw'>.funs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>.parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span>(<span class='kw'>parent</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span>()))
+<span class='fu'>sql_translator</span><span class='op'>(</span><span class='va'>...</span>, .funs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>, .parent <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>new.env</a></span><span class='op'>(</span>parent <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/environment.html'>emptyenv</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='fu'>sql_infix</span>(<span class='no'>f</span>, <span class='kw'>pad</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>sql_infix</span><span class='op'>(</span><span class='va'>f</span>, pad <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
-<span class='fu'>sql_prefix</span>(<span class='no'>f</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>sql_prefix</span><span class='op'>(</span><span class='va'>f</span>, n <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>sql_aggregate</span>(<span class='no'>f</span>, <span class='kw'>f_r</span> <span class='kw'>=</span> <span class='no'>f</span>)
+<span class='fu'>sql_aggregate</span><span class='op'>(</span><span class='va'>f</span>, f_r <span class='op'>=</span> <span class='va'>f</span><span class='op'>)</span>
 
-<span class='fu'>sql_aggregate_2</span>(<span class='no'>f</span>)
+<span class='fu'>sql_aggregate_2</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
 
-<span class='fu'>sql_not_supported</span>(<span class='no'>f</span>)
+<span class='fu'>sql_aggregate_n</span><span class='op'>(</span><span class='va'>f</span>, f_r <span class='op'>=</span> <span class='va'>f</span><span class='op'>)</span>
 
-<span class='fu'>sql_cast</span>(<span class='no'>type</span>)
+<span class='fu'>sql_not_supported</span><span class='op'>(</span><span class='va'>f</span><span class='op'>)</span>
 
-<span class='fu'>sql_log</span>()
+<span class='fu'>sql_cast</span><span class='op'>(</span><span class='va'>type</span><span class='op'>)</span>
 
-<span class='fu'>sql_cot</span>()
+<span class='fu'>sql_try_cast</span><span class='op'>(</span><span class='va'>type</span><span class='op'>)</span>
 
-<span class='no'>base_scalar</span>
+<span class='fu'>sql_log</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='no'>base_agg</span>
+<span class='fu'>sql_cot</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='no'>base_win</span>
+<span class='va'>base_scalar</span>
 
-<span class='no'>base_no_win</span>
+<span class='va'>base_agg</span>
 
-<span class='no'>base_odbc_scalar</span>
+<span class='va'>base_win</span>
 
-<span class='no'>base_odbc_agg</span>
+<span class='va'>base_no_win</span>
 
-<span class='no'>base_odbc_win</span></pre>
+<span class='va'>base_odbc_scalar</span>
+
+<span class='va'>base_odbc_agg</span>
+
+<span class='va'>base_odbc_win</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -291,27 +302,30 @@ conversion function.</p></div>
     <pre class="examples"><div class='input'><span class='co'># An example of adding some mappings for the statistical functions that</span>
 <span class='co'># postgresql provides: http://bit.ly/K5EdTn</span>
 
-<span class='no'>postgres_agg</span> <span class='kw'>&lt;-</span> <span class='fu'>sql_translator</span>(<span class='kw'>.parent</span> <span class='kw'>=</span> <span class='no'>base_agg</span>,
-  <span class='kw'>cor</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"CORR"</span>),
-  <span class='kw'>cov</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate_2</span>(<span class='st'>"COVAR_SAMP"</span>),
-  <span class='kw'>sd</span> <span class='kw'>=</span>  <span class='fu'>sql_aggregate</span>(<span class='st'>"STDDEV_SAMP"</span>, <span class='st'>"sd"</span>),
-  <span class='kw'>var</span> <span class='kw'>=</span> <span class='fu'>sql_aggregate</span>(<span class='st'>"VAR_SAMP"</span>, <span class='st'>"var"</span>)
-)
+<span class='va'>postgres_agg</span> <span class='op'>&lt;-</span> <span class='fu'>sql_translator</span><span class='op'>(</span>.parent <span class='op'>=</span> <span class='va'>base_agg</span>,
+  cor <span class='op'>=</span> <span class='fu'>sql_aggregate_2</span><span class='op'>(</span><span class='st'>"CORR"</span><span class='op'>)</span>,
+  cov <span class='op'>=</span> <span class='fu'>sql_aggregate_2</span><span class='op'>(</span><span class='st'>"COVAR_SAMP"</span><span class='op'>)</span>,
+  sd <span class='op'>=</span>  <span class='fu'>sql_aggregate</span><span class='op'>(</span><span class='st'>"STDDEV_SAMP"</span>, <span class='st'>"sd"</span><span class='op'>)</span>,
+  var <span class='op'>=</span> <span class='fu'>sql_aggregate</span><span class='op'>(</span><span class='st'>"VAR_SAMP"</span>, <span class='st'>"var"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
 <span class='co'># Next we have to simulate a connection that uses this variant</span>
-<span class='no'>con</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_dbi.html'>simulate_dbi</a></span>(<span class='st'>"TestCon"</span>)
-<span class='no'>sql_translate_env.TestCon</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>x</span>) {
-  <span class='fu'>sql_variant</span>(
-    <span class='no'>base_scalar</span>,
-    <span class='no'>postgres_agg</span>,
-    <span class='no'>base_no_win</span>
-  )
-}
+<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span><span class='op'>(</span><span class='st'>"TestCon"</span><span class='op'>)</span>
+<span class='va'>sql_translation.TestCon</span> <span class='op'>&lt;-</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>sql_variant</span><span class='op'>(</span>
+    <span class='va'>base_scalar</span>,
+    <span class='va'>postgres_agg</span>,
+    <span class='va'>base_no_win</span>
+  <span class='op'>)</span>
+<span class='op'>}</span>
 
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/cor.html'>cor</a></span>(<span class='no'>x</span>, <span class='no'>y</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span>(<span class='no'>income</span> / <span class='no'>years</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/cor.html'>cor</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span>, con <span class='op'>=</span> <span class='va'>con</span>, window <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;SQL&gt; cor(`x`, `y`)</div><div class='input'><span class='fu'><a href='translate_sql.html'>translate_sql</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/sd.html'>sd</a></span><span class='op'>(</span><span class='va'>income</span> <span class='op'>/</span> <span class='va'>years</span><span class='op'>)</span>, con <span class='op'>=</span> <span class='va'>con</span>, window <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;SQL&gt; sd(`income` / `years`)</div><div class='input'>
 <span class='co'># Any functions not explicitly listed in the converter will be translated</span>
 <span class='co'># to sql as is, so you don't need to convert all functions.</span>
-<span class='fu'><a href='translate_sql.html'>translate_sql</a></span>(<span class='fu'>regr_intercept</span>(<span class='no'>y</span>, <span class='no'>x</span>), <span class='kw'>con</span> <span class='kw'>=</span> <span class='no'>con</span>)</div><div class='output co'>#&gt; &lt;SQL&gt; regr_intercept(`y`, `x`)</div></pre>
+<span class='fu'><a href='translate_sql.html'>translate_sql</a></span><span class='op'>(</span><span class='fu'>regr_intercept</span><span class='op'>(</span><span class='va'>y</span>, <span class='va'>x</span><span class='op'>)</span>, con <span class='op'>=</span> <span class='va'>con</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;SQL&gt; regr_intercept(`y`, `x`)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

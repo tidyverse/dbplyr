@@ -43,6 +43,10 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
+
+
 
 
 <meta property="og:title" content="Database src — src_dbi" />
@@ -94,7 +98,7 @@ recommend using src_dbi()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -113,6 +117,9 @@ recommend using src_dbi()." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -183,11 +190,11 @@ recommend using src_dbi()." />
     <div class="ref-description">
     <p><a href='https://www.tidyverse.org/lifecycle/#superseded'><img src='figures/lifecycle-superseded.svg' alt='Superseded lifecycle'></a>
 
-Since can generate a <code>tbl()</code> directly from a DBI connection we no longer
+Since can generate a <code><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl()</a></code> directly from a DBI connection we no longer
 recommend using <code>src_dbi()</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>src_dbi</span>(<span class='no'>con</span>, <span class='kw'>auto_disconnect</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>src_dbi</span><span class='op'>(</span><span class='va'>con</span>, auto_disconnect <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

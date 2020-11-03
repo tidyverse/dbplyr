@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Force computation of query — collapse.tbl_sql • dbplyr</title>
+<title>Compute results of a query — collapse.tbl_sql • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,12 +43,17 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Force computation of query — collapse.tbl_sql" />
-<meta property="og:description" content="collapse() creates a subquery; compute() stores the results in a
-remote table; collect() downloads the results into the current
-R session." />
+
+
+<meta property="og:title" content="Compute results of a query — collapse.tbl_sql" />
+<meta property="og:description" content="These are methods for the dplyr generics collapse(), compute(),
+and collect(). collapse() creates a subquery, compute() stores
+the results in a remote table, and collect() executes the query and
+downloads the data into R." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -93,7 +98,7 @@ R session." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -112,6 +117,9 @@ R session." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -174,40 +182,41 @@ R session." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Force computation of query</h1>
+    <h1>Compute results of a query</h1>
     <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-compute.R'><code>R/verb-compute.R</code></a></small>
     <div class="hidden name"><code>collapse.tbl_sql.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>collapse()</code> creates a subquery; <code>compute()</code> stores the results in a
-remote table; <code>collect()</code> downloads the results into the current
-R session.</p>
+    <p>These are methods for the dplyr generics <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collapse()</a></code>, <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>compute()</a></code>,
+and <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect()</a></code>. <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collapse()</a></code> creates a subquery, <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>compute()</a></code> stores
+the results in a remote table, and <code><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect()</a></code> executes the query and
+downloads the data into R.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_sql</span>
-<span class='fu'>collapse</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collapse</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for tbl_sql</span>
-<span class='fu'>compute</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'>unique_table_name</span>(),
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
-  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
-)
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>compute</a></span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  name <span class='op'>=</span> <span class='fu'>unique_table_name</span><span class='op'>(</span><span class='op'>)</span>,
+  temporary <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  unique_indexes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  indexes <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  analyze <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for tbl_sql</span>
-<span class='fu'>collect</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>n</span> <span class='kw'>=</span> <span class='fl'>Inf</span>, <span class='kw'>warn_incomplete</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span>, n <span class='op'>=</span> <span class='cn'>Inf</span>, warn_incomplete <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A <code>tbl_sql</code></p></td>
+      <td><p>A lazy data frame backed by a database query.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -248,6 +257,16 @@ new table so that the query optimiser has useful information.</p></td>
     </table>
 
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
+<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>4</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, b <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>a</span> <span class='op'>&lt;=</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/compute.html'>collect</a></span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 2 x 2</span><span>
+#&gt;       a     b
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1     2
+#&gt; </span><span style='color: #555555;'>2</span><span>     2    </span><span style='color: #BB0000;'>NA</span><span></div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Copy a local data frame to a DBI backend. — copy_to.src_sql • dbplyr</title>
+<title>Copy a local data frame to a remote database — copy_to.src_sql • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,13 +43,18 @@
 <script src="../pkgdown.js"></script>
 <link href="../tidyverse-2.css" rel="stylesheet">
 
+<!--optional theme-->
+<link href="../.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Copy a local data frame to a DBI backend. — copy_to.src_sql" />
-<meta property="og:description" content="This copy_to() method works for all DBI sources. It is useful for
-copying small amounts of data to a database for examples, experiments,
-and joins. By default, it creates temporary tables which are typically
-only visible to the current connection to the database." />
+
+
+<meta property="og:title" content="Copy a local data frame to a remote database — copy_to.src_sql" />
+<meta property="og:description" content="This is an implementation of the dplyr copy_to() generic and it mostly
+a wrapper around DBI::dbWriteTable().
+It is useful for copying small amounts of data to a database for examples,
+experiments, and joins. By default, it creates temporary tables which are
+only visible within the current connection to the database." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -94,7 +99,7 @@ only visible to the current connection to the database." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -113,6 +118,9 @@ only visible to the current connection to the database." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
     <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
@@ -175,31 +183,33 @@ only visible to the current connection to the database." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Copy a local data frame to a DBI backend.</h1>
+    <h1>Copy a local data frame to a remote database</h1>
     <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-copy-to.R'><code>R/verb-copy-to.R</code></a></small>
     <div class="hidden name"><code>copy_to.src_sql.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This <code>copy_to()</code> method works for all DBI sources. It is useful for
-copying small amounts of data to a database for examples, experiments,
-and joins. By default, it creates temporary tables which are typically
-only visible to the current connection to the database.</p>
+    <p>This is an implementation of the dplyr <code><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to()</a></code> generic and it mostly
+a wrapper around <code><a href='https://dbi.r-dbi.org/reference/dbWriteTable.html'>DBI::dbWriteTable()</a></code>.</p>
+<p>It is useful for copying small amounts of data to a database for examples,
+experiments, and joins. By default, it creates temporary tables which are
+only visible within the current connection to the database.</p>
     </div>
 
     <pre class="usage"><span class='co'># S3 method for src_sql</span>
-<span class='fu'>copy_to</span>(
-  <span class='no'>dest</span>,
-  <span class='no'>df</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/deparse.html'>deparse</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>substitute</a></span>(<span class='no'>df</span>)),
-  <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>types</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>temporary</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>unique_indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>analyze</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
-)</pre>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span>
+  <span class='va'>dest</span>,
+  <span class='va'>df</span>,
+  name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/deparse.html'>deparse</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>substitute</a></span><span class='op'>(</span><span class='va'>df</span><span class='op'>)</span><span class='op'>)</span>,
+  overwrite <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  types <span class='op'>=</span> <span class='cn'>NULL</span>,
+  temporary <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  unique_indexes <span class='op'>=</span> <span class='cn'>NULL</span>,
+  indexes <span class='op'>=</span> <span class='cn'>NULL</span>,
+  analyze <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>,
+  in_transaction <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -228,7 +238,7 @@ exists.</p></td>
     <tr>
       <th>types</th>
       <td><p>a character vector giving variable types to use for the columns.
-See <a href='http://www.sqlite.org/datatype3.html'>http://www.sqlite.org/datatype3.html</a> for available types.</p></td>
+See <a href='https://www.sqlite.org/datatype3.html'>https://www.sqlite.org/datatype3.html</a> for available types.</p></td>
     </tr>
     <tr>
       <th>temporary</th>
@@ -256,45 +266,49 @@ new table so that the query optimiser has useful information.</p></td>
       <th>...</th>
       <td><p>other parameters passed to methods.</p></td>
     </tr>
+    <tr>
+      <th>in_transaction</th>
+      <td><p>Should the table creation be wrapped in a transaction?
+This typically makes things faster, but you may want to suppress if the
+database doesn't support transactions, or you're wrapping in a transaction
+higher up (and your database doesn't support nested transactions.)</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl()</a></code> object (invisibly).</p>
+    <p>Another <code>tbl_lazy</code>. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code> to see the generated
+query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to execute the query
+and return data to R.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>dplyr</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>1014</span>)
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='no'>mtcars</span>$<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>rownames</a></span>(<span class='no'>mtcars</span>)
-<span class='no'>mtcars2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='no'>mtcars</span>, <span class='kw'>indexes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"model"</span>), <span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>model</span> <span class='kw'>==</span> <span class='st'>"Hornet 4 Drive"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 12]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
-#&gt;     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb model       
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       
-#&gt; </span><span style='color: #555555;'>1</span><span>  21.4     6   258   110  3.08  3.22  19.4     1     0     3     1 Hornet 4 Dr…</div><div class='input'>
-<span class='no'>cyl8</span> <span class='kw'>&lt;-</span> <span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span>(<span class='no'>cyl</span> <span class='kw'>==</span> <span class='fl'>8</span>)
-<span class='no'>cyl8_cached</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span>(<span class='fu'><a href='memdb_frame.html'>src_memdb</a></span>(), <span class='no'>cyl8</span>)
-
-<span class='co'># copy_to is called automatically if you set copy = TRUE</span>
+<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, y <span class='op'>=</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>5</span><span class='op'>:</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>
+<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='fu'><a href='memdb_frame.html'>src_memdb</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>df</span><span class='op'>)</span>
+<span class='va'>db</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   table&lt;df&gt; [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0 [:memory:]</span><span>
+#&gt;       x y    
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1 e    
+#&gt; </span><span style='color: #555555;'>2</span><span>     2 d    
+#&gt; </span><span style='color: #555555;'>3</span><span>     3 c    
+#&gt; </span><span style='color: #555555;'>4</span><span>     4 b    
+#&gt; </span><span style='color: #555555;'>5</span><span>     5 a    </div><div class='input'>
+<span class='va'>df2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='st'>"d"</span><span class='op'>)</span>, fruit <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"apple"</span>, <span class='st'>"date"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='co'># copy_to() is called automatically if you set copy = TRUE</span>
 <span class='co'># in the join functions</span>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/reexports.html'>tibble</a></span>(<span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>8</span>))
-<span class='no'>mtcars2</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>semi_join</a></span>(<span class='no'>df</span>, <span class='kw'>copy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='message'>Joining, by = "cyl"</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 12]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.30.1 [:memory:]</span><span>
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb model      
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      
-#&gt; </span><span style='color: #555555;'> 1</span><span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4 Mazda RX4  
-#&gt; </span><span style='color: #555555;'> 2</span><span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4 Mazda RX4 …
-#&gt; </span><span style='color: #555555;'> 3</span><span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1 Hornet 4 D…
-#&gt; </span><span style='color: #555555;'> 4</span><span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2 Hornet Spo…
-#&gt; </span><span style='color: #555555;'> 5</span><span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1 Valiant    
-#&gt; </span><span style='color: #555555;'> 6</span><span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4 Duster 360 
-#&gt; </span><span style='color: #555555;'> 7</span><span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4 Merc 280   
-#&gt; </span><span style='color: #555555;'> 8</span><span>  17.8     6  168.   123  3.92  3.44  18.9     1     0     4     4 Merc 280C  
-#&gt; </span><span style='color: #555555;'> 9</span><span>  16.4     8  276.   180  3.07  4.07  17.4     0     0     3     3 Merc 450SE 
-#&gt; </span><span style='color: #555555;'>10</span><span>  17.3     8  276.   180  3.07  3.73  17.6     0     0     3     3 Merc 450SL 
-#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div></span></pre>
+<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>df2</span>, copy <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Joining, by = "y"</span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 3]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0 [:memory:]</span><span>
+#&gt;       x y     fruit
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1 e     </span><span style='color: #BB0000;'>NA</span><span>   
+#&gt; </span><span style='color: #555555;'>2</span><span>     2 d     date 
+#&gt; </span><span style='color: #555555;'>3</span><span>     3 c     </span><span style='color: #BB0000;'>NA</span><span>   
+#&gt; </span><span style='color: #555555;'>4</span><span>     4 b     </span><span style='color: #BB0000;'>NA</span><span>   
+#&gt; </span><span style='color: #555555;'>5</span><span>     5 a     apple</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

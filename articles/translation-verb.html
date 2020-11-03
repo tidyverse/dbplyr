@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
+<!--optional theme--><link href="../.css" rel="stylesheet">
 <meta property="og:title" content="Verb translation">
 <meta property="og:description" content="dbplyr">
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
@@ -49,7 +50,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.4</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
         </div>
       </div>
     </div>
@@ -69,6 +70,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    </li>
+    <li>
       <a href="../articles/new-backend.html">Adding a new DBI backend</a>
     </li>
     <li>
@@ -127,7 +131,8 @@
 
       
 
-      </header><div class="row">
+      </header><script src="translation-verb_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="translation-verb_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="translation-verb_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Verb translation</h1>
@@ -142,27 +147,30 @@
     
 <p>There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; <code>vignette("translate-function")</code> describes how individual expressions within those verbs are translated.</p>
 <p>All dplyr verbs generate a <code>SELECT</code> statement. To demonstrate we’ll make a temporary database with a couple of tables</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
-<span class="no">con</span> <span class="kw">&lt;-</span> <span class="kw pkg">DBI</span><span class="kw ns">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span>(<span class="kw pkg">RSQLite</span><span class="kw ns">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span>(), <span class="st">":memory:"</span>)
-<span class="no">flights</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="no">con</span>, <span class="kw pkg">nycflights13</span><span class="kw ns">::</span><span class="no"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span>)
-<span class="no">airports</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span>(<span class="no">con</span>, <span class="kw pkg">nycflights13</span><span class="kw ns">::</span><span class="no"><a href="https://rdrr.io/pkg/nycflights13/man/airports.html">airports</a></span>)</pre></body></html></div>
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span>
+<span class="va">flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span><span class="op">)</span>
+<span class="va">airports</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/airports.html">airports</a></span><span class="op">)</span></pre></div>
 <div id="single-table-verbs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#single-table-verbs" class="anchor"></a>Single table verbs</h2>
 <ul>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> modify the <code>SELECT</code> clause:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">flights</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">contains</a></span>(<span class="st">"delay"</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `dep_delay`, `arr_delay`
 ## FROM `nycflights13::flights`</code></pre>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">flights</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">distance</span>, <span class="no">air_time</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">speed</span> <span class="kw">=</span> <span class="no">distance</span> / (<span class="no">air_time</span> / <span class="fl">60</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op">%&gt;%</span>  
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
 ## FROM `nycflights13::flights`</code></pre>
@@ -170,9 +178,10 @@
 </li>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">flights</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">month</span> <span class="kw">==</span> <span class="fl">1</span>, <span class="no">day</span> <span class="kw">==</span> <span class="fl">1</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
 ## FROM `nycflights13::flights`
@@ -180,9 +189,10 @@
 </li>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> generates an <code>ORDER BY</code> clause:</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">flights</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span>(<span class="no">arr_delay</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="va">flights</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
 ## FROM `nycflights13::flights`
@@ -190,15 +200,16 @@
 </li>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> work together to generate a <code>GROUP BY</code> clause:</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">flights</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">month</span>, <span class="no">day</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="kw">delay</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">dep_delay</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span>()</pre></body></html></div>
-<pre><code>## &lt;SQL&gt;</code></pre>
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="va">flights</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning
 ## This warning is displayed only once per session.</code></pre>
-<pre><code>## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
+<pre><code>## &lt;SQL&gt;
+## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`
 ## FROM `nycflights13::flights`
 ## GROUP BY `month`, `day`</code></pre>
 </li>
@@ -218,44 +229,44 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">inner_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">inner_join()</a></code></td>
 <td><code>SELECT * FROM x JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">left_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join()</a></code></td>
 <td><code>SELECT * FROM x LEFT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">right_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join()</a></code></td>
 <td><code>SELECT * FROM x RIGHT JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">full_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join()</a></code></td>
 <td><code>SELECT * FROM x FULL JOIN y ON x.a = y.a</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/join.html">anti_join()</a></code></td>
+<td><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">anti_join()</a></code></td>
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">intersect(x, y)</a></code></td>
+<td><code><a href="https://generics.r-lib.org/reference/setops.html">intersect(x, y)</a></code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">union(x, y)</a></code></td>
+<td><code><a href="https://generics.r-lib.org/reference/setops.html">union(x, y)</a></code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://dplyr.tidyverse.org/reference/setops.html">setdiff(x, y)</a></code></td>
+<td><code><a href="https://generics.r-lib.org/reference/setops.html">setdiff(x, y)</a></code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/join.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
+<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set <code>auto_index = TRUE</code>. That will automatically add an index on the join variables to the temporary table.</p>
 </div>
 <div id="behind-the-scenes" class="section level2">
@@ -263,9 +274,9 @@
 <a href="#behind-the-scenes" class="anchor"></a>Behind the scenes</h2>
 <p>The verb level SQL translation is implemented on top of <code>tbl_lazy</code>, which basically tracks the operations you perform in a pipeline (see <code>lazy-ops.R</code>). Turning that into a SQL query takes place in three steps:</p>
 <ul>
-<li><p><code><a href="../reference/sql_build.html">sql_build()</a></code> recurses over the lazy op data structure building up query objects (<code><a href="../reference/sql_build.html">select_query()</a></code>, <code><a href="../reference/sql_build.html">join_query()</a></code>, <code><a href="../reference/sql_build.html">set_op_query()</a></code> etc) that represent the different subtypes of <code>SELECT</code> queries that we might generate.</p></li>
-<li><p><code><a href="../reference/sql_build.html">sql_optimise()</a></code> takes a pass over these SQL objects, looking for potential optimisations. Currently this only involves removing subqueries where possible.</p></li>
-<li><p><code><a href="../reference/sql_build.html">sql_render()</a></code> calls an SQL generation function (<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_select()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_join()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_subquery()</a></code>, <code>sql_semijoin()</code> etc) to produce the actual SQL. Each of these functions is a generic, taking the connection as an argument, so that the details can be customised for different databases.</p></li>
+<li><p><code><a href="../reference/join_query.html">sql_build()</a></code> recurses over the lazy op data structure building up query objects (<code><a href="../reference/join_query.html">select_query()</a></code>, <code><a href="../reference/join_query.html">join_query()</a></code>, <code><a href="../reference/join_query.html">set_op_query()</a></code> etc) that represent the different subtypes of <code>SELECT</code> queries that we might generate.</p></li>
+<li><p><code><a href="../reference/join_query.html">sql_optimise()</a></code> takes a pass over these SQL objects, looking for potential optimisations. Currently this only involves removing subqueries where possible.</p></li>
+<li><p><code><a href="../reference/join_query.html">sql_render()</a></code> calls an SQL generation function (<code><a href="../reference/db-sql.html">sql_query_select()</a></code>, <code><a href="../reference/db-sql.html">sql_query_join()</a></code>, <code><a href="../reference/db-sql.html">sql_query_semi_join()</a></code>, <code><a href="../reference/db-sql.html">sql_query_set_op()</a></code>, …) to produce the actual SQL. Each of these functions is a generic, taking the connection as an argument, so that the translation can be customised for different databases.</p></li>
 </ul>
 </div>
   </div>
