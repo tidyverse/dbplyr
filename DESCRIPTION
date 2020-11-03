@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.0.0
+Version: 2.0.0.9000
 Authors@R: 
     c(person(given = "Hadley",
              family = "Wickham",
