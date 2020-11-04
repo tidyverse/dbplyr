@@ -55,7 +55,7 @@
         <a class="navbar-brand" href="index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.99.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.0.0.9000</span>
         </div>
       </div>
     </div>
@@ -102,6 +102,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
@@ -171,7 +174,7 @@
 
 <span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span>
 <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">mtcars</span><span class="op">)</span></pre></div>
-<p>Note that you don’t actually need to load dbplyr with <code><a href="https://dbplyr.tidyverse.org/">library(dbplyr)</a></code>; dplyr automatically loads it for you when it sees you working with a database. Database connections are coordinated by the DBI package. Learn more at <a href="http://dbi.r-dbi.org/" class="uri">http://dbi.r-dbi.org/</a></p>
+<p>Note that you don’t actually need to load dbplyr with <code><a href="https://dbplyr.tidyverse.org/">library(dbplyr)</a></code>; dplyr automatically loads it for you when it sees you working with a database. Database connections are coordinated by the DBI package. Learn more at <a href="https://dbi.r-dbi.org/" class="uri">https://dbi.r-dbi.org/</a></p>
 <p>Now you can retrieve a table using <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> (see <code><a href="reference/tbl.src_dbi.html">?tbl_dbi</a></code> for more details). Printing it just retrieves the first few rows:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
 <span class="va">mtcars2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span>

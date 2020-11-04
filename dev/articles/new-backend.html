@@ -51,7 +51,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.99.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.0.0.9000</span>
         </div>
       </div>
     </div>
@@ -98,6 +98,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
@@ -149,7 +152,7 @@
 <p>This document describes how to add a new SQL backend to dbplyr. To begin:</p>
 <ul>
 <li><p>Ensure that you have a DBI compliant database backend. If not, you’ll need to first create it by following the instructions in <code><a href="https://dbi.r-dbi.org/articles/backend.html">vignette("backend", package = "DBI")</a></code>.</p></li>
-<li><p>You’ll need a working knowledge of S3. Make sure that you’re <a href="http://adv-r.had.co.nz/OO-essentials.html#s3">familiar with the basics</a> before you start.</p></li>
+<li><p>You’ll need a working knowledge of S3. Make sure that you’re <a href="https://adv-r.hadley.nz/s3.html">familiar with the basics</a> before you start.</p></li>
 </ul>
 <p>This document is still a work in progress, but it will hopefully get you started. I’d also strongly recommend reading the bundled source code for <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-sqlite.R">SQLite</a>, <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-mysql.R">MySQL</a>, and <a href="https://github.com/tidyverse/dbplyr/blob/master/R/backend-postgres.R">PostgreSQL</a>.</p>
 <div id="first-steps" class="section level2">

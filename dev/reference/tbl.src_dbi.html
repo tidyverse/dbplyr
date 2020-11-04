@@ -99,7 +99,7 @@ results to R. You can see the query with show_query()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.99.0.9000</span>
+          <span class="version version-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">2.0.0.9000</span>
         </div>
       </div>
     </div>
@@ -146,6 +146,9 @@ results to R. You can see the query with show_query()." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
@@ -284,9 +287,8 @@ the data into R.</p>
 <span class='co'># we'll use the Lahman database. lahman_sqlite() takes care of</span>
 <span class='co'># creating the database.</span>
 
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='lahman.html'>has_lahman</a></span><span class='op'>(</span><span class='st'>"sqlite"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='va'>lahman_p</span> <span class='op'>&lt;-</span> <span class='fu'><a href='lahman.html'>lahman_sqlite</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='va'>batting</span> <span class='op'>&lt;-</span> <span class='va'>lahman_p</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='st'>"Batting"</span><span class='op'>)</span>
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"Lahman"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='va'>batting</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'>Lahman</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/Lahman/man/Batting.html'>Batting</a></span><span class='op'>)</span>
 <span class='va'>batting</span>
 
 <span class='co'># Basic data manipulation verbs work in the same way as with a tibble</span>
@@ -319,7 +321,7 @@ the data into R.</p>
 <span class='op'>}</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `playerID`, COUNT(*) AS `n`
-#&gt; FROM `Batting`
+#&gt; FROM `Lahman::Batting`
 #&gt; WHERE (`G` &gt; 0.0)
 #&gt; GROUP BY `playerID`</div></span></pre>
   </div>
