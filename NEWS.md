@@ -1,7 +1,8 @@
 # dbplyr (development version)
 
 # dbplyr 2.0.0
-(To become dbplyr 2.0.0)
+
+* `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
 
 ## dplyr 1.0.0 compatibility
 
