@@ -1,3 +1,76 @@
+#' Pivot data from wide to long
+#'
+#' @description
+#' \Sexpr[results=rd, stage=render]{lifecycle::badge("maturing")}
+#'
+#' `pivot_longer()` "lengthens" data, increasing the number of rows and
+#' decreasing the number of columns. The inverse transformation is
+#' `pivot_wider()`
+#'
+#' Learn more in `vignette("pivot")`.
+#'
+#' @details
+#' `pivot_longer()` is an updated approach to [tidyr::gather()], designed to be both
+#' simpler to use and to handle more use cases. We recommend you use
+#' `pivot_longer()` for new code; `gather()` isn't going away but is no longer
+#' under active development.
+#'
+#' @param data A data frame to pivot.
+#' @param cols Columns to pivot into
+#'   longer format.
+#' @param names_to A string specifying the name of the column to create
+#'   from the data stored in the column names of `data`.
+#'
+#'   Can be a character vector, creating multiple columns, if `names_sep`
+#'   or `names_pattern` is provided. In this case, there are two special
+#'   values you can take advantage of:
+#'
+#'   * `NA` will discard that component of the name.
+#'   * `.value` indicates that component of the name defines the name of the
+#'     column containing the cell values, overriding `values_to`.
+#' @param names_prefix A regular expression used to remove matching text
+#'   from the start of each variable name.
+#' @param names_sep,names_pattern If `names_to` contains multiple values,
+#'   these arguments control how the column name is broken up.
+#'
+#'   `names_sep` takes the same specification as [tidyr::separate()], and can either
+#'   be a numeric vector (specifying positions to break on), or a single string
+#'   (specifying a regular expression to split on).
+#'
+#'   `names_pattern` takes the same specification as [tidyr::extract()], a regular
+#'   expression containing matching groups (`()`).
+#'
+#'   If these arguments do not give you enough control, use
+#'   `pivot_longer_spec()` to create a spec object and process manually as
+#'   needed.
+#' @param names_repair What happens if the output has invalid column names?
+#'   The default, `"check_unique"` is to error if the columns are duplicated.
+#'   Use `"minimal"` to allow duplicates in the output, or `"unique"` to
+#'   de-duplicated by adding numeric suffixes. See [vctrs::vec_as_names()]
+#'   for more options.
+#' @param values_to A string specifying the name of the column to create
+#'   from the data stored in cell values. If `names_to` is a character
+#'   containing the special `.value` sentinel, this value will be ignored,
+#'   and the name of the value column will be derived from part of the
+#'   existing column names.
+#' @param values_drop_na If `TRUE`, will drop rows that contain only `NA`s
+#'   in the `value_to` column. This effectively converts explicit missing values
+#'   to implicit missing values, and should generally be used only when missing
+#'   values in `data` were created by its structure.
+#' @param names_transform,values_transform A list of column name-function pairs.
+#'   Use these arguments if you need to change the type of specific columns.
+#'   For example, `names_transform = list(week = as.integer)` would convert
+#'   a character week variable to an integer.
+#' @param names_ptypes,values_ptypes A list of column name-prototype pairs.
+#'   A prototype (or ptype for short) is a zero-length vector (like `integer()`
+#'   or `numeric()`) that defines the type, class, and attributes of a vector.
+#'   Use these arguments to confirm that the created columns are the types that
+#'   you expect.
+#'
+#'   If not specified, the type of the columns generated from `names_to` will
+#'   be character, and the type of the variables generated from `values_to`
+#'   will be the common type of the input columns used to generate them.
+#' @param ... Additional arguments passed on to methods.
 #' @export
 pivot_longer <- function(data, cols, names_to = "name", names_prefix = NULL,
                          names_sep = NULL, names_pattern = NULL, names_ptypes = list(),
@@ -42,7 +115,8 @@ pivot_longer.tbl_lazy <- function(data,
   )
 }
 
-
+#' @rdname pivot_longer_spec
+#' @export
 build_longer_spec <- function(data, cols,
                               names_to = "name",
                               values_to = "value",
@@ -116,7 +190,24 @@ build_longer_spec <- function(data, cols,
   out
 }
 
-
+#' Pivot data from wide to long using a spec
+#'
+#' This is a low level interface to pivotting, inspired by the cdata package,
+#' that allows you to describe pivotting with a data frame.
+#'
+#' @keywords internal
+#' @export
+#' @inheritParams pivot_longer
+#' @param spec A specification data frame. This is useful for more complex
+#'  pivots because it gives you greater control on how metadata stored in the
+#'  column names turns into columns in the result.
+#'
+#'   Must be a data frame containing character `.name` and `.value` columns.
+#'   Additional columns in `spec` should be named to match columns in the
+#'   long format of the dataset and contain values corresponding to columns
+#'   pivoted from the wide format.
+#'   The special `.seq` variable is used to disambiguate rows internally;
+#'   it is automatically removed after pivotting.
 pivot_longer_spec <- function(data,
                               spec,
                               names_repair = "check_unique",
