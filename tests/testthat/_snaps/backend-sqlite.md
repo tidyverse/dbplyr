@@ -21,6 +21,8 @@
       WHERE (`x` > 2.0)
       
       <PLAN>
-        id parent notused                                              detail
-      1  2      0       0 SEARCH TABLE test USING COVERING INDEX test_x (x>?)
+      # A tibble: 1 x 4
+           id parent notused detail                                             
+        <int>  <int>   <int> <chr>                                              
+      1     2      0       0 SEARCH TABLE test USING COVERING INDEX test_x (x>?)
 
