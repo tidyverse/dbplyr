@@ -143,9 +143,9 @@ pivot_longer_spec <- function(data,
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
   data_long_list <- purrr::map(
     vctrs::vec_seq_along(spec_split),
-    ~ {
-      row <- spec_split$val[[.x]][, 1:2]
-      keys <- spec_split$key[.x, ]
+    function(idx) {
+      row <- spec_split$val[[idx]][, 1:2]
+      keys <- spec_split$key[idx, ]
       keys$.seq <- NULL
 
       transmute(
@@ -159,11 +159,18 @@ pivot_longer_spec <- function(data,
 
   data_long <- purrr::reduce(data_long_list, union_all)
 
+
   if (values_drop_na) {
     value_cols <- unique(spec$.value)
+    # add "." variable locally so that cran doesn't complain about
+    # missing visible binding
+    . <- NULL
 
-    data_long <- data_long %>%
-      dplyr::filter_at(value_cols, dplyr::all_vars(!is.na(.)))
+    data_long <- dplyr::filter_at(
+      data_long,
+      value_cols,
+      dplyr::all_vars(!is.na(.))
+    )
   }
 
   return(data_long)
@@ -248,7 +255,7 @@ str_separate <- function(x, into, sep, convert = FALSE, extra = "warn", fill = "
   names(out) <- as_utf8_character(into)
   out <- out[!is.na(names(out))]
   if (convert) {
-    out[] <- map(out, type.convert, as.is = TRUE)
+    out[] <- purrr::map(out, utils::type.convert, as.is = TRUE)
   }
   as_tibble(out)
 }
@@ -257,13 +264,13 @@ strsep <- function(x, sep) {
   # COPIED FROM tidyr
 
   nchar <- nchar(x)
-  pos <- map(sep, function(i) {
+  pos <- purrr::map(sep, function(i) {
     if (i >= 0) return(i)
     pmax(0, nchar + i)
   })
   pos <- c(list(0), pos, list(nchar))
 
-  map(1:(length(pos) - 1), function(i) {
+  purrr::map(1:(length(pos) - 1), function(i) {
     substr(x, pos[[i]] + 1, pos[[i + 1]])
   })
 }
@@ -323,7 +330,7 @@ str_extract <- function(x, into, regex, convert = FALSE) {
   out <- str_match_first(x, regex)
   if (length(out) != length(into)) {
     stop(
-      "`regex` should define ", length(into), " groups; ", ncol(matches), " found.",
+      "`regex` should define ", length(into), " groups; ", ncol(out), " found.",
       call. = FALSE
     )
   }
@@ -332,7 +339,7 @@ str_extract <- function(x, into, regex, convert = FALSE) {
   if (anyDuplicated(into)) {
     pieces <- split(out, into)
     into <- names(pieces)
-    out <- map(pieces, pmap_chr, paste0, sep = "")
+    out <- purrr::map(pieces, purrr::pmap_chr, paste0, sep = "")
   }
 
   into <- as_utf8_character(into)
@@ -344,7 +351,7 @@ str_extract <- function(x, into, regex, convert = FALSE) {
   out <- as_tibble(out)
 
   if (convert) {
-    out[] <- map(out, type.convert, as.is = TRUE)
+    out[] <- purrr::map(out, utils::type.convert, as.is = TRUE)
   }
 
   out
@@ -398,4 +405,22 @@ group_loc <- function(x) {
   end[no_match] <- NA
 
   list(matches = ncol(start), start = start, end = end)
+}
+
+slice_match <- function(x, i) {
+  structure(
+    x[i],
+    match.length = attr(x, "match.length")[i],
+    index.type = attr(x, "index.type"),
+    useBytes = attr(x, "useBytes")
+  )
+}
+
+
+list_indices <- function(x, max = 20) {
+  if (length(x) > max) {
+    x <- c(x[seq_len(max)], "...")
+  }
+
+  paste(x, collapse = ", ")
 }
