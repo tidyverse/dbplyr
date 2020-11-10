@@ -93,7 +93,6 @@ Collate:
     'db.R'
     'dbplyr.R'
     'explain.R'
-    'extract.R'
     'ident.R'
     'lazy-ops.R'
     'memdb.R'
