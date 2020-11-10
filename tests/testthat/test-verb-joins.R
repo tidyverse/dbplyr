@@ -6,6 +6,17 @@ test_that("complete join pipeline works with SQLite", {
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 })
 
+test_that("full and right join work with SQLite", {
+  df1 <- memdb_frame(x = 1:3)
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+
+  out <- collect(full_join(df1, df2, by = "x"))
+  expect_equal(out, tibble(x = c(1:3, 5), y = c("a", NA, "b", "c")))
+
+  out <- collect(right_join(df2, df1, by = "x"))
+  expect_equal(out, tibble(x = c(1:3), y = c("a", NA, "b")))
+})
+
 test_that("complete semi join works with SQLite", {
   lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
   lf2 <- memdb_frame(x = 1)
