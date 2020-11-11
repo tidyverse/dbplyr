@@ -81,8 +81,8 @@ escape.character <- function(x, parens = NA, collapse = ", ", con = NULL) {
 escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   out <- ifelse(is.wholenumber(x), sprintf("%.1f", x), as.character(x))
 
-  # Special values
-  out[is.na(x)] <- "NULL"
+  # Special values (coerced into double-precision type in SQL when necessary)
+  out[is.na(x)] <- "(NULL * 2e-16)"
   inf <- is.infinite(x)
   out[inf & x > 0] <- "'Infinity'"
   out[inf & x < 0] <- "'-Infinity'"

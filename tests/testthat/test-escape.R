@@ -37,7 +37,7 @@ test_that("missing vaues become null", {
   con <- simulate_dbi()
 
   expect_equal(escape(NA, con = con), sql("NULL"))
-  expect_equal(escape(NA_real_, con = con), sql("NULL"))
+  expect_equal(escape(NA_real_, con = con), sql("(NULL * 2e-16)"))
   expect_equal(escape(NA_integer_, con = con), sql("NULL"))
   expect_equal(escape(NA_character_, con = con), sql("NULL"))
 })
