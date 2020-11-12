@@ -1,29 +1,40 @@
 #' @importFrom tidyr expand
 #' @export
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
-  # TODO sort output?
   # TODO wait for bugfix: distinct() ignores groups
   # https://github.com/tidyverse/dbplyr/issues/535
-  dots <- quos_auto_name(quos(...))
-  dots <- purrr::discard(dots, rlang::quo_is_null)
-  names(dots) <- vctrs::vec_as_names(names(dots), repair = .name_repair)
+  dots <- purrr::discard(quos(...), quo_is_null)
 
   if (is_empty(dots)) {
-    # TODO what should be returned here?
-    abort("No columns selected")
+    abort("Must supply variables in `...`")
   }
 
-  distinct_tables <- purrr::imap(
+  distinct_tbl_vars <- purrr::imap(
     dots,
     ~ {
       # ugly hack to deal with `nesting()`
-      if (rlang::quo_is_call(.x) && rlang::call_name(.x) == "nesting") {
-        x_expr <- rlang::quo_get_expr(.x)
-        args <- rlang::call_args(x_expr)
-        distinct(data, !!!args)
+      if (quo_is_call(.x, name = "nesting")) {
+        x_expr <- quo_get_expr(.x)
+        call_args(x_expr)
       } else {
-        distinct(data, !!.y := !!.x)
+        list(quo_get_expr(.x))
       }
+    }
+  )
+
+  # now that `nesting()` has been unpacked resolve name conflicts
+  out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))
+  out_names_repaired <- vctrs::vec_as_names(out_names, repair = .name_repair)
+
+  ns <- lengths(distinct_tbl_vars)
+  indices <- vec_rep_each(seq_along(distinct_tbl_vars), ns)
+  out_names_list <- vctrs::vec_split(out_names_repaired, indices)$val
+
+  distinct_tables <- purrr::map2(
+    distinct_tbl_vars, out_names_list,
+    ~ {
+      args <- set_names(.x, .y)
+      distinct(data, !!!args)
     }
   )
 
@@ -39,6 +50,6 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
     return(data)
   }
 
-  full <- dplyr::full_join(full, data, by = colnames(full))
+  full <- full_join(full, data, by = colnames(full))
   replace_na(full, replace = fill)
 }
