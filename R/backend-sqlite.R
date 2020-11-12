@@ -135,4 +135,33 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
   build_sql(x, " IS ", y, con = con)
 }
 
+#' @export
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+  # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
+  # see: https://www.sqlite.org/omitted.html
+
+  # Careful: in the right join resp. the second join in the full join do not
+  # name `y` LHS and `x` RHS as it messes up the select query!
+
+  if (type == "full") {
+    join_sql <- build_sql(
+      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
+      "UNION\n",
+      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...),
+      con = con
+    )
+
+    sql_query_select(
+      con,
+      select = ident(vars$alias),
+      from = sql_subquery(con, join_sql),
+      subquery = TRUE
+    )
+  } else if (type == "right") {
+    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...)
+  } else {
+    NextMethod()
+  }
+}
+
 globalVariables(c("datetime", "NUMERIC", "REAL"))

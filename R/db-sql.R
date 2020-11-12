@@ -281,28 +281,6 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     con = con
   )
 }
-#' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
-  if (type == "full") {
-    # workaround as SQLite doesn't support FULL JOIN
-    build_sql(
-      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
-      "UNION\n",
-      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...),
-      con = con
-    )
-  } else if (type == "right") {
-    build_sql(
-      sql_query_join(
-        con, y, x, vars, type = "left", by = by, na_matches = na_matches,
-        ...
-      ),
-      con = con
-    )
-  } else {
-    NextMethod()
-  }
-}
 
 dbplyr_query_join <- function(con, ...) {
   dbplyr_fallback(con, "sql_join", ...)
