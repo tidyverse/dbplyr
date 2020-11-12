@@ -1,7 +1,7 @@
 # dbplyr (development version)
+* `expand()` and `complete()` are now translated (#538, @mgirlich).
 
 # dbplyr 2.0.0
-* `expand()` and `complete()` are now translated (#538, @mgirlich).
 
 ## dplyr 1.0.0 compatibility
 
