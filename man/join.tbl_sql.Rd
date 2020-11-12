@@ -147,6 +147,7 @@ to the following SQL queries:
 \item \code{full_join(x, y)}:  \verb{SELECT * FROM x FULL JOIN y ON x.a = y.a}
 \item \code{semi_join(x, y)}:  \verb{SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)}
 \item \code{anti_join(x, y)}:  \verb{SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)}
+\item For SQLite right and full joins are simulated using left joins.
 }
 }
 \examples{
