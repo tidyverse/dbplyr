@@ -81,3 +81,28 @@ test_that("can explain a query", {
   db <- copy_to_test("sqlite", data.frame(x = 1:5), indexes = list("x"))
   expect_snapshot(db %>% filter(x > 2) %>% explain())
 })
+
+test_that("full and right join work", {
+  df1 <- memdb_frame(x = 1:3, y = c("x", "y", "z"))
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"), z = 11:13)
+
+  expect_equal(
+    collect(full_join(df1, df2, by = "x")),
+    tibble(
+      x = c(1, 2, 3, 5),
+      y.x = c("x", "y", "z", NA),
+      y.y = c("a", NA, "b", "c"),
+      z = c(11, NA, 12, 13)
+    )
+  )
+
+  expect_equal(
+    collect(right_join(df2, df1, by = "x")),
+    tibble(
+      x = c(1, 2, 3),
+      y.x = c("a", NA, "b"),
+      z = c(11, NA, 12),
+      y.y = c("x", "y", "z")
+    )
+  )
+})
