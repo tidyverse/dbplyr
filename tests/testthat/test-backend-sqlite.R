@@ -44,6 +44,21 @@ test_that("custom SQL translation", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
+test_that("full and right join", {
+  df1 <- lazy_frame(
+    x = 1:3, y = c("x", "y", "z"),
+    con = simulate_sqlite()
+  )
+  df2 <- lazy_frame(
+    x = c(1, 3, 5), y = c("a", "b", "c"), z = 11:13,
+    con = simulate_sqlite()
+  )
+
+  expect_snapshot(full_join(df1, df2, by = "x"))
+  expect_snapshot(right_join(df2, df1, by = "x"))
+})
+
+
 # live database -----------------------------------------------------------
 
 test_that("as.numeric()/as.double() get custom translation", {
