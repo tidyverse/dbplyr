@@ -115,8 +115,8 @@ test_that("crossing/nesting/expand respect .name_repair", {
   df <- tibble(x = 1:2)
   expect_named(
     memdb_frame(!!!df) %>%
-      expand(x, x, .name_repair = "unique") %>%
+      expand(x, y = x, z = x, nesting(y = x, x), .name_repair = "unique") %>%
       collect(),
-    c("x...1", "x...2")
+    c("x...1", "y...2", "z", "y...4", "x...5")
   )
 })
