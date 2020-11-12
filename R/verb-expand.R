@@ -25,7 +25,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   out_names_repaired <- vctrs::vec_as_names(out_names, repair = .name_repair)
 
   ns <- lengths(distinct_tbl_vars)
-  indices <- vec_rep_each(seq_along(distinct_tbl_vars), ns)
+  indices <- vctrs::vec_rep_each(seq_along(distinct_tbl_vars), ns)
   out_names_list <- vctrs::vec_split(out_names_repaired, indices)$val
 
   distinct_tables <- purrr::map2(
