@@ -1,3 +1,29 @@
+#' Expand SQL tables to include all possible combinations of values
+#'
+#' @description
+#' These are methods for the [tidyr::expand] generics. It doesn't sort the
+#' result explicitly, so the order might be different to what `expand()`
+#' returns for data frames.
+#'
+#' @param data A pair of lazy data frame backed by database queries.
+#' @param ... Specification of columns to expand. See [tidyr::expand] for
+#' more details.
+#' @inheritParams tibble::as_tibble
+#' @inherit arrange.tbl_lazy return
+#' @examples
+#' fruits <- memdb_frame(
+#'   type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
+#'   year   = c(2010, 2010, 2012, 2010, 2010, 2012),
+#'   size = c("XS", "S",  "M", "S", "S", "M"),
+#'   weights = rnorm(6)
+#' )
+#'
+#' # All possible combinations ---------------------------------------
+#' fruits %>% expand(type)
+#' fruits %>% expand(type, size)
+#'
+#' # Only combinations that already appear in the data ---------------
+#' fruits %>% expand(nesting(type, size))
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   # TODO wait for bugfix: distinct() ignores groups
   # https://github.com/tidyverse/dbplyr/issues/535
