@@ -281,7 +281,6 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     con = con
   )
 }
-
 dbplyr_query_join <- function(con, ...) {
   dbplyr_fallback(con, "sql_join", ...)
 }
