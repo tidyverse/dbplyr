@@ -1,5 +1,6 @@
 # dbplyr (development version)
-* Fix SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
+
+* Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
 
 # dbplyr 2.0.0
 
