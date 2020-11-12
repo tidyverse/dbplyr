@@ -1,4 +1,5 @@
 # dbplyr (development version)
+* `distinct()` now respects grouping (#535, @mgirlich)
 
 # dbplyr 2.0.0
 (To become dbplyr 2.0.0)
