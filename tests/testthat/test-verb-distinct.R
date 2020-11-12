@@ -31,6 +31,11 @@ test_that("distinct doesn't duplicate colum names if grouped (#354)", {
   expect_equal(df %>% group_by(a) %>% distinct() %>% op_vars(), "a")
 })
 
+test_that("distinct respects groups", {
+  df <- memdb_frame(a = 1:2, b = 1) %>% group_by(a)
+  expect_equal(df %>% group_by(a) %>% distinct() %>% op_vars(), c("a", "b"))
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
