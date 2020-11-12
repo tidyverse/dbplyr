@@ -1,5 +1,3 @@
-#' @importFrom tidyr expand
-#' @export
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   # TODO wait for bugfix: distinct() ignores groups
   # https://github.com/tidyverse/dbplyr/issues/535
@@ -41,8 +39,6 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   purrr::reduce(distinct_tables, left_join, by = character())
 }
 
-#' @importFrom tidyr complete
-#' @export
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- expand(data, ...)
 
