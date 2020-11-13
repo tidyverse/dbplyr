@@ -1,6 +1,6 @@
 test_that("expand completes all values", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   expect_equal(
     memdb_frame(x = 1:2, y = 1:2) %>% expand(x, y) %>% collect(),
@@ -12,7 +12,7 @@ test_that("expand completes all values", {
 
 test_that("nesting doesn't expand values", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   df <- tibble(x = 1:2, y = 1:2)
   expect_equal(
@@ -27,7 +27,7 @@ test_that("nesting doesn't expand values", {
 
 test_that("expand accepts expressions", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   df <- lazy_frame(x = 1)
   expect_snapshot(expand(df, round(x / 2)))
@@ -36,7 +36,7 @@ test_that("expand accepts expressions", {
 
 test_that("expand respects groups", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   df <- tibble(
     a = c(1L, 1L, 2L),
@@ -59,14 +59,14 @@ test_that("expand respects groups", {
 
 test_that("NULL inputs", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   expect_snapshot(expand(lazy_frame(x = 1), x, y = NULL))
 })
 
 test_that("expand() errors when expected", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   expect_snapshot_error(expand(memdb_frame(x = 1)))
   expect_snapshot_error(expand(memdb_frame(x = 1), x = NULL))
@@ -74,7 +74,7 @@ test_that("expand() errors when expected", {
 
 test_that("expand respect .name_repair", {
   skip_if_not_installed("tidyr")
-  expand <- tidyr::expand
+  withr::local_package("tidyr")
 
   expect_named(
     memdb_frame(x = integer(), z = integer()) %>%
@@ -88,7 +88,7 @@ test_that("expand respect .name_repair", {
 
 test_that("replace_na replaces missing values", {
   skip_if_not_installed("tidyr")
-  replace_na <- tidyr::replace_na
+  withr::local_package("tidyr")
 
   expect_equal(
     memdb_frame(x = c(1, NA), y = c(NA, "b")) %>%
@@ -107,7 +107,7 @@ test_that("replace_na replaces missing values", {
 
 test_that("replace_na ignores missing columns", {
   skip_if_not_installed("tidyr")
-  replace_na <- tidyr::replace_na
+  withr::local_package("tidyr")
 
   expect_snapshot(lazy_frame(x = 1) %>% replace_na(list(not_there = 0)))
 })
@@ -116,8 +116,7 @@ test_that("replace_na ignores missing columns", {
 
 test_that("complete completes missing combinations", {
   skip_if_not_installed("tidyr")
-  complete <- tidyr::complete
-  replace_na <- tidyr::replace_na
+  withr::local_package("tidyr")
 
   df <- tibble(
     x = 1:2,
