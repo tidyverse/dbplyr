@@ -52,7 +52,8 @@ test_that("expand respects groups", {
       group_by(a)
   )
 
-  expect_snapshot(lazy_frame(!!!df) %>% group_by(a) %>% expand(b, c))
+  df_lazy <- lazy_frame(!!!df)
+  expect_snapshot(df_lazy %>% group_by(a) %>% expand(b, c))
 })
 
 test_that("NULL inputs", {
