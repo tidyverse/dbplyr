@@ -30,19 +30,23 @@ test_that("expand accepts expressions", {
 })
 
 test_that("expand respects groups", {
-  skip("doesn't work because distinct ignores groups")
-  # https://github.com/tidyverse/dbplyr/issues/535
-
   skip_if_not_installed("tidyr")
   expand <- tidyr::expand
 
-  df <- tibble(
+  df <- memdb_frame(
     a = c(1L, 1L, 2L),
     b = c(1L, 2L, 1L),
     c = c("b", "a", "a")
   )
-  out <- df %>% dplyr::group_by(a) %>% expand(b, c)
-  out <- memdb_frame(!!!df) %>% dplyr::group_by(a) %>% expand(b, c)
+  expect_equal(
+    df %>% group_by(a) %>% expand(b, c) %>% collect(),
+    tibble(
+      a = c(1, 1, 1, 1, 2),
+      b = c(1, 1, 2, 2, 1),
+      c = c("b", "a", "b", "a", "a")
+    ) %>%
+      group_by(a)
+  )
 })
 
 test_that("NULL inputs", {
