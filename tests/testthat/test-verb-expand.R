@@ -81,3 +81,32 @@ test_that("expand respect .name_repair", {
     c("x...1", "z...2", "x...3", "z...4")
   )
 })
+
+
+# replace_na --------------------------------------------------------------
+
+test_that("replace_na replaces missing values", {
+  skip_if_not_installed("tidyr")
+  replace_na <- tidyr::replace_na
+
+  expect_equal(
+    memdb_frame(x = c(1, NA), y = c(NA, "b")) %>%
+      replace_na(list(x = 0, y = "unknown")) %>%
+      collect(),
+    tibble(
+      x = c(1, 0),
+      y = c("unknown", "b")
+    )
+  )
+
+  expect_snapshot(
+    lazy_frame(x = 1, y = "a") %>% replace_na(list(x = 0, y = "unknown"))
+  )
+})
+
+test_that("replace_na ignores missing columns", {
+  skip_if_not_installed("tidyr")
+  replace_na <- tidyr::replace_na
+
+  expect_snapshot(lazy_frame(x = 1) %>% replace_na(list(not_there = 0)))
+})
