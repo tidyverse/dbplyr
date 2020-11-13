@@ -34,7 +34,7 @@ query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-These are methods for the \link[tidyr:expand]{tidyr::expand} generics. It doesn't sort the
+This is a method for the \link[tidyr:expand]{tidyr::expand} generics. It doesn't sort the
 result explicitly, so the order might be different to what \code{expand()}
 returns for data frames.
 }
