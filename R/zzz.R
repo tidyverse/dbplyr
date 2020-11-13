@@ -9,6 +9,7 @@
 
   register_s3_method("tidyr", "complete", "tbl_lazy")
   register_s3_method("tidyr", "expand", "tbl_lazy")
+  register_s3_method("tidyr", "replace_na", "tbl_lazy")
 
   if (utils::packageVersion("dplyr") >= "0.8.99") {
     register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")

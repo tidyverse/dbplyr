@@ -1,5 +1,5 @@
 # dbplyr (development version)
-* `expand()` and `complete()` are now translated (#538, @mgirlich).
+* `expand()`, `complete()` and `replace_na()` are now translated (#538, @mgirlich).
 
 # dbplyr 2.0.0
 

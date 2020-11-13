@@ -101,3 +101,40 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- full_join(full, data, by = colnames(full))
   replace_na(full, replace = fill)
 }
+
+#' Replace NAs with specified values
+#'
+#' This is a method for the [tidyr::replace_na()] generic.
+#'
+#' @param data A pair of lazy data frame backed by database queries.
+#' @param replace A list of values, with one value for each column that has NA
+#' values to be replaced.
+#' @param ... Additional arguments for methods. Currently unused.
+#'
+#' @inherit arrange.tbl_lazy return
+#'
+#' @examples
+#' if (require("tidyr", quietly = TRUE)) {
+#'   df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
+#'   df %>% replace_na(list(x = 0, y = "unknown"))
+#' }
+replace_na.tbl_lazy <- function(data, replace = list(), ...) {
+  stopifnot(is_list(replace))
+  replace <- replace[names(replace) %in% colnames(data)]
+
+  if (is_empty(replace)) {
+    return(data)
+  }
+
+  coalesce_expr <- purrr::imap(
+    replace,
+    function(value, col) {
+      quo(coalesce(!!sym(col), !!value))
+    }
+  )
+
+  mutate(
+    data,
+    !!!coalesce_expr
+  )
+}
