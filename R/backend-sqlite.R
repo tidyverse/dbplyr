@@ -8,6 +8,7 @@
 #' * Uses non-standard `LOG()` function
 #' * Date-time extraction functions from lubridate
 #' * Custom median translation
+#' * Right and full joins are simulated using left joins
 #'
 #' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
 #' converting to live access database.

@@ -10,7 +10,6 @@
 #' * `full_join(x, y)`:  `SELECT * FROM x FULL JOIN y ON x.a = y.a`
 #' * `semi_join(x, y)`:  `SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
 #' * `anti_join(x, y)`:  `SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)`
-#' * For SQLite right and full joins are simulated using left joins.
 #'
 #' @param x,y A pair of lazy data frames backed by database queries.
 #' @inheritParams dplyr::join
