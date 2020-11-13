@@ -87,3 +87,21 @@
       SELECT *
       FROM `df`
 
+# complete completes missing combinations
+
+    Code
+      df_lazy %>% complete(x, y, fill = list(z = "c"))
+    Output
+      <SQL>
+      SELECT `x`, `y`, COALESCE(`z`, 'c') AS `z`
+      FROM (SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`, `z`
+      FROM (SELECT `x`, `y`
+      FROM (SELECT DISTINCT `x`
+      FROM `df`) `LHS`
+      LEFT JOIN (SELECT DISTINCT `y`
+      FROM `df`) `RHS`
+      ) `LHS`
+      FULL JOIN `df` AS `RHS`
+      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      ) `q01`
+

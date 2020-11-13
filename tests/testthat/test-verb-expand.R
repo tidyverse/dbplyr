@@ -84,7 +84,6 @@ test_that("expand respect .name_repair", {
   )
 })
 
-
 # replace_na --------------------------------------------------------------
 
 test_that("replace_na replaces missing values", {
@@ -111,4 +110,30 @@ test_that("replace_na ignores missing columns", {
   replace_na <- tidyr::replace_na
 
   expect_snapshot(lazy_frame(x = 1) %>% replace_na(list(not_there = 0)))
+})
+
+# complete ----------------------------------------------------------------
+
+test_that("complete completes missing combinations", {
+  skip_if_not_installed("tidyr")
+  complete <- tidyr::complete
+  replace_na <- tidyr::replace_na
+
+  df <- tibble(
+    x = 1:2,
+    y = 1:2,
+    z = c("a", "b")
+  )
+
+  expect_equal(
+    memdb_frame(!!!df) %>% complete(x, y, fill = list(z = "c")) %>% collect(),
+    tibble(
+      x = c(1, 1, 2, 2),
+      y = c(1, 2, 1, 2),
+      z = c("a", "c", "c", "b")
+    )
+  )
+
+  df_lazy <- lazy_frame(!!!df)
+  expect_snapshot(df_lazy %>% complete(x, y, fill = list(z = "c")))
 })
