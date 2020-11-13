@@ -81,7 +81,6 @@ pivot_longer <- function(data, cols, names_to = "name", names_prefix = NULL,
   UseMethod("pivot_longer")
 }
 
-#' @export
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
                                   names_to = "name",
@@ -97,7 +96,7 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_transform = list(),
                                   ...) {
   cols <- enquo(cols)
-  spec <- build_longer_spec(data, !!cols,
+  dbplyr_spec <- dbplyr_build_longer_spec(data, !!cols,
     names_to = names_to,
     values_to = values_to,
     names_prefix = names_prefix,
@@ -107,7 +106,7 @@ pivot_longer.tbl_lazy <- function(data,
     names_transform = names_transform
   )
 
-  pivot_longer_spec(data, spec,
+  dbplyr_pivot_longer_spec(data, spec,
     names_repair = names_repair,
     values_drop_na = values_drop_na,
     values_ptypes = values_ptypes,
@@ -115,16 +114,16 @@ pivot_longer.tbl_lazy <- function(data,
   )
 }
 
-#' @rdname pivot_longer_spec
-#' @export
-build_longer_spec <- function(data, cols,
-                              names_to = "name",
-                              values_to = "value",
-                              names_prefix = NULL,
-                              names_sep = NULL,
-                              names_pattern = NULL,
-                              names_ptypes = NULL,
-                              names_transform = NULL) {
+# this is a nearly identical copy of `tidyr::build_longer_spec` adapted to
+# work with `tbl_lazy` objects.
+dbplyr_build_longer_spec <- function(data, cols,
+                                     names_to = "name",
+                                     values_to = "value",
+                                     names_prefix = NULL,
+                                     names_sep = NULL,
+                                     names_pattern = NULL,
+                                     names_ptypes = NULL,
+                                     names_transform = NULL) {
   cn_data <- colnames(data)
   data_tmp <- set_names(character(length(cn_data)), cn_data)
   cols <- tidyselect::eval_select(enquo(cols), data_tmp)
@@ -190,30 +189,12 @@ build_longer_spec <- function(data, cols,
   out
 }
 
-#' Pivot data from wide to long using a spec
-#'
-#' This is a low level interface to pivotting, inspired by the cdata package,
-#' that allows you to describe pivotting with a data frame.
-#'
-#' @keywords internal
-#' @export
-#' @inheritParams pivot_longer
-#' @param spec A specification data frame. This is useful for more complex
-#'  pivots because it gives you greater control on how metadata stored in the
-#'  column names turns into columns in the result.
-#'
-#'   Must be a data frame containing character `.name` and `.value` columns.
-#'   Additional columns in `spec` should be named to match columns in the
-#'   long format of the dataset and contain values corresponding to columns
-#'   pivoted from the wide format.
-#'   The special `.seq` variable is used to disambiguate rows internally;
-#'   it is automatically removed after pivotting.
-pivot_longer_spec <- function(data,
-                              spec,
-                              names_repair = "check_unique",
-                              values_drop_na = FALSE,
-                              values_ptypes = list(),
-                              values_transform = list()) {
+dbplyr_pivot_longer_spec <- function(data,
+                                     spec,
+                                     names_repair = "check_unique",
+                                     values_drop_na = FALSE,
+                                     values_ptypes = list(),
+                                     values_transform = list()) {
   spec <- check_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column

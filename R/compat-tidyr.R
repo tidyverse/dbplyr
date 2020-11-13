@@ -1,3 +1,8 @@
+# nocov start
+
+# Functions copied directly from tidyr
+# `tidyr::simplifyPieces()` is written in CPP and here replaced by an R version
+
 str_separate <- function(x, into, sep, convert = FALSE, extra = "warn", fill = "warn") {
   if (!is.character(into)) {
     abort("`into` must be a character vector")
@@ -109,8 +114,6 @@ str_extract <- function(x, into, regex, convert = FALSE) {
 }
 
 simplifyPieces <- function(pieces, p, fillLeft = TRUE) {
-  # HACKED R VERSION OF CPP CODE IN tidyr
-
   n_pieces <- lengths(pieces)
   n <- max(n_pieces)
 
@@ -171,3 +174,5 @@ list_indices <- function(x, max = 20) {
 
   paste(x, collapse = ", ")
 }
+
+# nocov end

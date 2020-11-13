@@ -86,6 +86,7 @@ Collate:
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'
+    'compat-tidyr.R'
     'data-cache.R'
     'data-lahman.R'
     'data-nycflights13.R'
