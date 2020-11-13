@@ -25,15 +25,15 @@ Turns implicit missing values into explicit missing values. This is a method
 for the \code{\link[tidyr:expand]{tidyr::expand()}} generic.
 }
 \examples{
-df <- memdb_frame(
-  group = c(1:2, 1),
-  item_id = c(1:2, 2),
-  item_name = c("a", "b", "b"),
-  value1 = 1:3,
-  value2 = 4:6
-)
-
 if (require("tidyr", quietly = TRUE)) {
+  df <- memdb_frame(
+    group = c(1:2, 1),
+    item_id = c(1:2, 2),
+    item_name = c("a", "b", "b"),
+    value1 = 1:3,
+    value2 = 4:6
+  )
+
   df \%>\% complete(group, nesting(item_id, item_name))
 
   # You can also choose to fill in missing values

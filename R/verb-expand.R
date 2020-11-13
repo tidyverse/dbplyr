@@ -11,19 +11,21 @@
 #' @inheritParams tibble::as_tibble
 #' @inherit arrange.tbl_lazy return
 #' @examples
-#' fruits <- memdb_frame(
-#'   type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
-#'   year   = c(2010, 2010, 2012, 2010, 2010, 2012),
-#'   size = c("XS", "S",  "M", "S", "S", "M"),
-#'   weights = rnorm(6)
-#' )
+#' if (require("tidyr", quietly = TRUE)) {
+#'   fruits <- memdb_frame(
+#'     type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
+#'     year   = c(2010, 2010, 2012, 2010, 2010, 2012),
+#'     size = c("XS", "S",  "M", "S", "S", "M"),
+#'     weights = rnorm(6)
+#'   )
 #'
-#' # All possible combinations ---------------------------------------
-#' fruits %>% expand(type)
-#' fruits %>% expand(type, size)
+#'   # All possible combinations ---------------------------------------
+#'   fruits %>% expand(type)
+#'   fruits %>% expand(type, size)
 #'
-#' # Only combinations that already appear in the data ---------------
-#' fruits %>% expand(nesting(type, size))
+#'   # Only combinations that already appear in the data ---------------
+#'   fruits %>% expand(nesting(type, size))
+#' }
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   # TODO wait for bugfix: distinct() ignores groups
   # https://github.com/tidyverse/dbplyr/issues/535
@@ -77,15 +79,15 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
 #' @inherit arrange.tbl_lazy return
 #'
 #' @examples
-#' df <- memdb_frame(
-#'   group = c(1:2, 1),
-#'   item_id = c(1:2, 2),
-#'   item_name = c("a", "b", "b"),
-#'   value1 = 1:3,
-#'   value2 = 4:6
-#' )
-#'
 #' if (require("tidyr", quietly = TRUE)) {
+#'   df <- memdb_frame(
+#'     group = c(1:2, 1),
+#'     item_id = c(1:2, 2),
+#'     item_name = c("a", "b", "b"),
+#'     value1 = 1:3,
+#'     value2 = 4:6
+#'   )
+#'
 #'   df %>% complete(group, nesting(item_id, item_name))
 #'
 #'   # You can also choose to fill in missing values

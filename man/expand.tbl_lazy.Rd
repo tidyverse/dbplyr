@@ -39,17 +39,19 @@ result explicitly, so the order might be different to what \code{expand()}
 returns for data frames.
 }
 \examples{
-fruits <- memdb_frame(
-  type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
-  year   = c(2010, 2010, 2012, 2010, 2010, 2012),
-  size = c("XS", "S",  "M", "S", "S", "M"),
-  weights = rnorm(6)
-)
+if (require("tidyr", quietly = TRUE)) {
+  fruits <- memdb_frame(
+    type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
+    year   = c(2010, 2010, 2012, 2010, 2010, 2012),
+    size = c("XS", "S",  "M", "S", "S", "M"),
+    weights = rnorm(6)
+  )
 
-# All possible combinations ---------------------------------------
-fruits \%>\% expand(type)
-fruits \%>\% expand(type, size)
+  # All possible combinations ---------------------------------------
+  fruits \%>\% expand(type)
+  fruits \%>\% expand(type, size)
 
-# Only combinations that already appear in the data ---------------
-fruits \%>\% expand(nesting(type, size))
+  # Only combinations that already appear in the data ---------------
+  fruits \%>\% expand(nesting(type, size))
+}
 }
