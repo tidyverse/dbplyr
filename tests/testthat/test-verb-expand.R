@@ -3,9 +3,11 @@ test_that("expand completes all values", {
   expand <- tidyr::expand
 
   expect_equal(
-    memdb_frame(x = 1:2, y = 1:2) %>% expand(df, x, y) %>% collect(),
+    memdb_frame(x = 1:2, y = 1:2) %>% expand(x, y) %>% collect(),
     tibble(x = c(1, 1, 2, 2), y = c(1, 2, 1, 2))
   )
+
+  expect_snapshot(lazy_frame(x = 1, y = 1) %>% expand(x, y))
 })
 
 test_that("nesting doesn't expand values", {
@@ -18,6 +20,8 @@ test_that("nesting doesn't expand values", {
       collect(),
     df
   )
+
+  expect_snapshot(lazy_frame(!!!df) %>% expand(nesting(x, y)))
 })
 
 test_that("expand accepts expressions", {
@@ -33,13 +37,13 @@ test_that("expand respects groups", {
   skip_if_not_installed("tidyr")
   expand <- tidyr::expand
 
-  df <- memdb_frame(
+  df <- tibble(
     a = c(1L, 1L, 2L),
     b = c(1L, 2L, 1L),
     c = c("b", "a", "a")
   )
   expect_equal(
-    df %>% group_by(a) %>% expand(b, c) %>% collect(),
+    memdb_frame(!!!df) %>% group_by(a) %>% expand(b, c) %>% collect(),
     tibble(
       a = c(1, 1, 1, 1, 2),
       b = c(1, 1, 2, 2, 1),
@@ -47,6 +51,8 @@ test_that("expand respects groups", {
     ) %>%
       group_by(a)
   )
+
+  expect_snapshot(lazy_frame(!!!df) %>% group_by(a) %>% expand(b, c))
 })
 
 test_that("NULL inputs", {
