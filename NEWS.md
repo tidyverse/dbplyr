@@ -1,5 +1,6 @@
 # dbplyr (development version)
 * `expand()`, `complete()` and `replace_na()` are now translated (#538, @mgirlich).
+* `distinct()` now respects grouping (#535, @mgirlich)
 
 # dbplyr 2.0.0
 

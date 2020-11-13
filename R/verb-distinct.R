@@ -23,7 +23,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
       )
     }
 
-    .data <- transmute(.data, ...)
+    .data <- transmute(.data, !!!syms(op_grps(.data)), ...)
   }
 
   add_op_single("distinct", .data, dots = list())
