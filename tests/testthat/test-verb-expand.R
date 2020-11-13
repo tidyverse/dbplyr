@@ -21,7 +21,8 @@ test_that("nesting doesn't expand values", {
     df
   )
 
-  expect_snapshot(lazy_frame(!!!df) %>% expand(nesting(x, y)))
+  df_lazy <- lazy_frame(!!!df)
+  expect_snapshot(df_lazy %>% expand(nesting(x, y)))
 })
 
 test_that("expand accepts expressions", {
