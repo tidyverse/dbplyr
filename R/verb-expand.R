@@ -1,7 +1,7 @@
 #' Expand SQL tables to include all possible combinations of values
 #'
 #' @description
-#' These are methods for the [tidyr::expand] generics. It doesn't sort the
+#' This is a method for the [tidyr::expand] generics. It doesn't sort the
 #' result explicitly, so the order might be different to what `expand()`
 #' returns for data frames.
 #'
@@ -65,6 +65,32 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   purrr::reduce(distinct_tables, left_join, by = character())
 }
 
+#' Complete a SQL table with missing combinations of data
+#'
+#' Turns implicit missing values into explicit missing values. This is a method
+#' for the [tidyr::expand()] generic.
+#'
+#' @inheritParams expand.tbl_lazy
+#' @param fill A named list that for each variable supplies a single value to
+#' use instead of NA for missing combinations.
+#'
+#' @inherit arrange.tbl_lazy return
+#'
+#' @examples
+#' df <- memdb_frame(
+#'   group = c(1:2, 1),
+#'   item_id = c(1:2, 2),
+#'   item_name = c("a", "b", "b"),
+#'   value1 = 1:3,
+#'   value2 = 4:6
+#' )
+#'
+#' if (require("tidyr", quietly = TRUE)) {
+#'   df %>% complete(group, nesting(item_id, item_name))
+#'
+#'   # You can also choose to fill in missing values
+#'   df %>% complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+#' }
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- expand(data, ...)
 
