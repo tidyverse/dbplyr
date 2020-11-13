@@ -62,7 +62,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     }
   )
 
-  purrr::reduce(distinct_tables, left_join, by = character())
+  purrr::reduce(distinct_tables, left_join, by = group_vars(data))
 }
 
 #' Complete a SQL table with missing combinations of data
