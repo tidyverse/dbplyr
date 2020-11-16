@@ -5,7 +5,7 @@
 #'
 #' `pivot_longer()` "lengthens" data, increasing the number of rows and
 #' decreasing the number of columns. The inverse transformation is
-#' [pivot_wider.tbl_lazy()]
+#' `tidyr::pivot_wider()]
 #'
 #' Learn more in `vignette("pivot", "tidyr")`.
 #'

@@ -4,7 +4,7 @@
 \alias{pivot_longer.tbl_lazy}
 \title{Pivot data from wide to long}
 \usage{
-\method{pivot_longer}{tbl_lazy}(
+pivot_longer.tbl_lazy(
   data,
   cols,
   names_to = "name",
@@ -24,8 +24,7 @@
 \arguments{
 \item{data}{A data frame to pivot.}
 
-\item{cols}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Columns to pivot into
-longer format.}
+\item{cols}{Columns to pivot into longer format.}
 
 \item{names_to}{A string specifying the name of the column to create
 from the data stored in the column names of \code{data}.}
@@ -60,7 +59,7 @@ in the \code{value_to} column.}
 
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and
 decreasing the number of columns. The inverse transformation is
-\code{\link[=pivot_wider.tbl_lazy]{pivot_wider.tbl_lazy()}}
+`tidyr::pivot_wider()]
 
 Learn more in \code{vignette("pivot", "tidyr")}.
 
