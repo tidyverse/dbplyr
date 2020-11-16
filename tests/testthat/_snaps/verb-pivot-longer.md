@@ -5,10 +5,10 @@
     Output
       <SQL>
       SELECT 'x' AS `name`, `x` AS `value`
-      FROM `dbplyr_001`
+      FROM `dbplyr_090`
       UNION ALL
       SELECT 'y' AS `name`, `y` AS `value`
-      FROM `dbplyr_001`
+      FROM `dbplyr_090`
 
 # can add multiple columns from spec
 
