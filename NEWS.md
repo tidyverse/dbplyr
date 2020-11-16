@@ -1,4 +1,5 @@
 # dbplyr (development version)
+
 * `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
 
 * `distinct()` now respects grouping (#535, @mgirlich)
