@@ -76,74 +76,55 @@ test_that("can handle missing combinations", {
   expect_equal(pv$y, c(NA, NA, "a", "b"))
 })
 
-test_that("mixed columns are automatically coerced", {
-  skip("not yet implemented")
-  df <- memdb_frame(x = factor("a"), y = factor("b"))
-  pv <- pivot_longer(df, x:y) %>% collect()
-
-  expect_equal(pv$value, factor(c("a", "b")))
-})
-
 test_that("can override default output column type", {
-  skip("not yet implemented")
-  df <- tibble(x = "x", y = 1L)
-  pv <- pivot_longer(df, x:y, values_transform = list(value = as.list))
-  pv <- pivot_longer(df, x:y, values_transform = list(value = as.character))
-  expect_equal(pv$value, list("x", 1))
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
+  expect_snapshot(
+    lazy_frame(x = 1) %>%
+      pivot_longer(x, values_transform = list(value = as.character))
+  )
 })
 
 test_that("can pivot to multiple measure cols", {
-  df <- tibble::tibble(x = "x", y = 1)
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
+  df <- lazy_frame(x = "x", y = 1)
   sp <- tibble::tribble(
     ~.name, ~.value, ~row,
     "x", "X", 1,
     "y", "Y", 1,
   )
-  pv <- pivot_longer_spec(memdb_frame(!!!df), sp) %>% collect()
 
-  expect_named(pv, c("row", "X", "Y"))
-  expect_equal(pv$X, "x")
-  expect_equal(pv$Y, 1)
+  pv <- dbplyr_pivot_longer_spec(df, sp)
+  expect_equal(colnames(pv), c("row", "X", "Y"))
+  expect_snapshot(pv)
 })
 
 test_that("original col order is preserved", {
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
   df <- tibble::tribble(
     ~id, ~z_1, ~y_1, ~x_1, ~z_2,  ~y_2, ~x_2,
     "A",    1,    2,    3,     4,    5,    6,
     "B",    7,    8,    9,    10,   11,   12,
+  ) %>%
+    tbl_lazy()
+
+  expect_equal(
+    df %>%
+      pivot_longer(-id, names_to = c(".value", "n"), names_sep = "_") %>%
+      colnames(),
+    c("id", "n", "z", "y", "x")
   )
-  df <- memdb_frame(!!!df)
-  pv <- pivot_longer(df, -id, names_to = c(".value", "n"), names_sep = "_") %>%
-    collect()
-  expect_named(pv, c("id", "n", "z", "y", "x"))
-})
-
-test_that("handles duplicated column names", {
-  skip("duplicate column names not allowed in db?")
-  df <- memdb_frame(x = 1, a = 1, a = 2, b = 3, b = 4, .name_repair = "minimal")
-  pv <- pivot_longer(df, -x)
-
-  expect_named(pv, c("x", "name", "value"))
-  expect_equal(pv$name, c("a", "a", "b", "b"))
-  expect_equal(pv$value, 1:4)
-})
-
-test_that("can pivot duplicated names to .value", {
-  df <- memdb_frame(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4)
-  pv1 <- pivot_longer(df, -x, names_to = c(".value", NA), names_sep = "_") %>%
-    collect()
-  pv2 <- pivot_longer(df, -x, names_to = c(".value", NA), names_pattern = "(.)_(.)") %>%
-    collect()
-  pv3 <- pivot_longer(df, -x, names_to = ".value", names_pattern = "(.)_.") %>%
-    collect()
-
-  expect_named(pv1, c("x", "a", "b"))
-  expect_equal(pv1$a, c(1, 2))
-  expect_equal(pv2, pv1)
-  expect_equal(pv3, pv1)
 })
 
 test_that(".value can be at any position in `names_to`", {
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
   samp <- tibble(
     i = 1:4,
     y_t1 = rnorm(4),
@@ -152,37 +133,39 @@ test_that(".value can be at any position in `names_to`", {
     z_t2 = rep(-2, 4),
   )
 
-  value_first <- pivot_longer(memdb_frame(!!!samp), -i,
-                              names_to = c(".value", "time"), names_sep = "_") %>%
-    collect()
+  value_first <- pivot_longer(
+    lazy_frame(!!!samp), -i,
+    names_to = c(".value", "time"), names_sep = "_"
+  )
+
+  expect_snapshot(value_first)
 
   samp2 <- dplyr::rename(samp, t1_y = y_t1,
                                t2_y = y_t2,
                                t1_z = z_t1,
                                t2_z = z_t2)
 
-  value_second <- pivot_longer(memdb_frame(!!!samp2), -i,
-                               names_to = c("time", ".value"), names_sep = "_") %>%
-    collect()
+  value_second <- pivot_longer(
+    lazy_frame(!!!samp2), -i,
+    names_to = c("time", ".value"), names_sep = "_"
+  )
 
-  expect_identical(value_first, value_second)
-})
+  expect_snapshot(value_second)
 
-test_that("type error message use variable names", {
-  skip("not yet implemented")
-  df <- memdb_frame(abc = 1, xyz = "b")
-  err <- capture_error(pivot_longer(df, everything()))
-  expect_s3_class(err, "vctrs_error_incompatible_type")
-  expect_equal(err$x_arg, "abc")
-  expect_equal(err$y_arg, "xyz")
+  cols <- c("i", "time", "y", "z")
+  expect_equal(colnames(value_first), cols)
+  expect_equal(colnames(value_second), cols)
 })
 
 test_that("grouping is preserved", {
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(g = 1, x1 = 1, x2 = 2)
   out <- df %>%
-    dplyr::group_by(g) %>%
+    group_by(g) %>%
     pivot_longer(x1:x2, names_to = "x", values_to = "v")
-  expect_equal(dplyr::group_vars(out), "g")
+  expect_equal(group_vars(out), "g")
 })
 
 # spec --------------------------------------------------------------------

@@ -221,11 +221,28 @@ dbplyr_pivot_longer_spec <- function(data,
       keys <- spec_split$key[idx, ]
       keys$.seq <- NULL
 
+      # idea copied from `partial_eval_across`
+      measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
+
+      measure_cols <- set_names(syms(row$.name), row[[".value"]])
+      measure_cols_exprs <- purrr::imap(
+        measure_cols,
+        ~ {
+          f_trans <- measure_funs[[.y]]
+
+          if (is_null(f_trans)) {
+            .x
+          } else {
+            expr((!!f_trans)(!!.x))
+          }
+        }
+      )
+
       transmute(
         data,
         !!!id_cols,
         !!!keys,
-        !!!set_names(syms(row$.name), row$.value)
+        !!!measure_cols_exprs
       )
     }
   )
