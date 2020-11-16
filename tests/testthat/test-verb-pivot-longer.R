@@ -179,7 +179,7 @@ test_that("grouping is preserved", {
 
 test_that("validates inputs", {
   df <- memdb_frame(x = 1)
-  expect_error(build_longer_spec(df, x, values_to = letters[1:2]),
+  expect_error(dbplyr_build_longer_spec(df, x, values_to = letters[1:2]),
     class = "vctrs_error_assert"
   )
 })
@@ -187,7 +187,7 @@ test_that("validates inputs", {
 test_that("no names doesn't generate names", {
   df <- memdb_frame(x = 1)
   expect_equal(
-    colnames(build_longer_spec(df, x, names_to = character())),
+    colnames(dbplyr_build_longer_spec(df, x, names_to = character())),
     c(".name", ".value")
   )
 })
@@ -195,12 +195,12 @@ test_that("no names doesn't generate names", {
 test_that("multiple names requires names_sep/names_pattern", {
   df <- memdb_frame(x_y = 1)
   expect_error(
-    build_longer_spec(df, x_y, names_to = c("a", "b")),
+    dbplyr_build_longer_spec(df, x_y, names_to = c("a", "b")),
     "multiple names"
   )
 
   expect_error(
-    build_longer_spec(df, x_y,
+    dbplyr_build_longer_spec(df, x_y,
       names_to = c("a", "b"),
       names_sep = "x",
       names_pattern = "x"
@@ -211,7 +211,7 @@ test_that("multiple names requires names_sep/names_pattern", {
 
 test_that("names_sep generates correct spec", {
   df <- memdb_frame(x_y = 1)
-  sp <- build_longer_spec(df, x_y, names_to = c("a", "b"), names_sep = "_")
+  sp <- dbplyr_build_longer_spec(df, x_y, names_to = c("a", "b"), names_sep = "_")
 
   expect_equal(sp$a, "x")
   expect_equal(sp$b, "y")
@@ -219,36 +219,36 @@ test_that("names_sep generates correct spec", {
 
 test_that("names_sep fails with single name", {
   df <- memdb_frame(x_y = 1)
-  expect_error(build_longer_spec(df, x_y, names_to = "x", names_sep = "_"), "`names_sep`")
+  expect_error(dbplyr_build_longer_spec(df, x_y, names_to = "x", names_sep = "_"), "`names_sep`")
 })
 
 test_that("names_pattern generates correct spec", {
   df <- memdb_frame(zx_y = 1)
-  sp <- build_longer_spec(df, zx_y, names_to = c("a", "b"), names_pattern = "z(.)_(.)")
+  sp <- dbplyr_build_longer_spec(df, zx_y, names_to = c("a", "b"), names_pattern = "z(.)_(.)")
   expect_equal(sp$a, "x")
   expect_equal(sp$b, "y")
 
-  sp <- build_longer_spec(df, zx_y, names_to = "a", names_pattern = "z(.)")
+  sp <- dbplyr_build_longer_spec(df, zx_y, names_to = "a", names_pattern = "z(.)")
   expect_equal(sp$a, "x")
 })
 
 test_that("names_to can override value_to", {
   df <- memdb_frame(x_y = 1)
-  sp <- build_longer_spec(df, x_y, names_to = c("a", ".value"), names_sep = "_")
+  sp <- dbplyr_build_longer_spec(df, x_y, names_to = c("a", ".value"), names_sep = "_")
 
   expect_equal(sp$.value, "y")
 })
 
 test_that("names_prefix strips off from beginning", {
   df <- memdb_frame(zzyz = 1)
-  sp <- build_longer_spec(df, zzyz, names_prefix = "z")
+  sp <- dbplyr_build_longer_spec(df, zzyz, names_prefix = "z")
 
   expect_equal(sp$name, "zyz")
 })
 
 test_that("can cast to custom type", {
   df <- memdb_frame(w1 = 1)
-  sp <- build_longer_spec(df, w1,
+  sp <- dbplyr_build_longer_spec(df, w1,
     names_prefix = "w",
     names_transform = list(name = as.integer)
   )
@@ -257,5 +257,27 @@ test_that("can cast to custom type", {
 })
 
 test_that("Error if the `col` can't be selected.", {
-  expect_error(pivot_longer(memdb_frame(!!!iris), matches("foo")), "select at least one")
+  expect_error(
+    dbplyr_build_longer_spec(tbl_lazy(iris), matches("foo")),
+    "select at least one"
+  )
+})
+
+test_that("can pivot duplicated names to .value", {
+  df <- memdb_frame(x = 1, a_1 = 1, a_2 = 2, b_1 = 3, b_2 = 4)
+
+  spec1 <- dbplyr_build_longer_spec(df, -x, names_to = c(".value", NA), names_sep = "_")
+  spec2 <- dbplyr_build_longer_spec(df, -x, names_to = c(".value", NA), names_pattern = "(.)_(.)")
+  spec3 <- dbplyr_build_longer_spec(df, -x, names_to = ".value", names_pattern = "(.)_.")
+
+  expect_equal(
+    spec1,
+    tibble(
+      .name = c("a_1", "a_2", "b_1", "b_2"),
+      .value = c("a", "a", "b", "b")
+    )
+  )
+
+  expect_equal(spec2, spec1)
+  expect_equal(spec3, spec1)
 })
