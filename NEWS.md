@@ -1,9 +1,9 @@
 # dbplyr (development version)
+* `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
+
 * `distinct()` now respects grouping (#535, @mgirlich)
 
 * Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
-
-* `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
 
 # dbplyr 2.0.0
 
