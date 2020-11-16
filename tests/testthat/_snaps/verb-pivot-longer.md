@@ -48,6 +48,20 @@
       FROM `df`)) `q01`
       WHERE (NOT(((`value`) IS NULL)))
 
+# can handle missing combinations
+
+    Code
+      pv_db
+    Output
+      # Source:   lazy query [?? x 4]
+      # Database: sqlite 3.33.0 [:memory:]
+        id    n         x y    
+        <chr> <chr> <dbl> <chr>
+      1 A     1         1 <NA> 
+      2 B     1         3 <NA> 
+      3 A     2         2 a    
+      4 B     2         4 b    
+
 # can override default output column type
 
     Code
