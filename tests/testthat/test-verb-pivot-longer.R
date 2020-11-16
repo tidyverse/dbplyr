@@ -1,57 +1,70 @@
 test_that("can pivot all cols to long", {
-  df <- tibble(x = 1:2, y = 3:4)
-  pv <- pivot_longer(memdb_frame(!!!df), x:y) %>% collect()
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
 
-  expect_named(pv, c("name", "value"))
-  expect_equal(pv$name, rep(colnames(df), each = 2))
-  expect_equal(pv$value, c(1, 2, 3, 4))
-})
+  pv <- memdb_frame(x = 1:2, y = 3:4) %>%
+    pivot_longer(x:y)
 
-test_that("values interleaved correctly", {
-  skip("should this be implemented in db?")
-  df <- memdb_frame(
-    x = c(1, 2),
-    y = c(10, 20),
-    z = c(100, 200),
+  expect_equal(
+    pv %>% collect(),
+    tibble(
+      name = c("x", "x", "y", "y"),
+      value = 1:4
+    )
   )
-  pv <- pivot_longer(df, 1:3) %>% collect()
 
-  expect_equal(pv$value, c(1, 10, 100, 2, 20, 200))
+  expect_snapshot(pv %>% show_query())
 })
 
 test_that("can add multiple columns from spec", {
-  df <- memdb_frame(x = 1:2, y = 3:4)
-  sp <- tibble(.name = c("x", "y"), .value = "v", a = 1, b = 2)
-  pv <- pivot_longer_spec(df, spec = sp) %>% collect()
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
 
-  expect_named(pv, c("a", "b", "v"))
+  # add columns `a` and `b`
+  sp <- tibble(
+    .name = c("x", "y"),
+    .value = "v",
+    a = 11:12,
+    b = 13:14
+  )
+  pv <- lazy_frame(x = 1:2, y = 3:4) %>%
+    dbplyr_pivot_longer_spec(df_db, spec = sp)
+
+  expect_equal(colnames(pv), c("a", "b", "v"))
+  expect_snapshot(pv)
 })
 
 test_that("preserves original keys", {
-  df <- tibble(x = 1:2, y = 2, z = 1:2)
-  pv <- pivot_longer(memdb_frame(!!!df), y:z) %>% collect()
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
 
-  expect_named(pv, c("x", "name", "value"))
-  expect_equal(pv$x, rep(df$x, 2))
+  # preserves `x`
+  pv <- lazy_frame(x = 1:2, y = 2, z = 1:2) %>%
+    pivot_longer(y:z)
+
+  expect_equal(colnames(pv), c("x", "name", "value"))
+  expect_snapshot(pv)
 })
 
 test_that("can drop missing values", {
-  df <- data.frame(x = c(1, NA), y = c(NA, 2))
-  pv <- pivot_longer(memdb_frame(df), x:y, values_drop_na = TRUE) %>%
-    collect()
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
 
-  expect_equal(pv$name, c("x", "y"))
-  expect_equal(pv$value, c(1, 2))
+  expect_snapshot(
+    lazy_frame(x = c(1, NA), y = c(NA, 2)) %>%
+      pivot_longer(x:y, values_drop_na = TRUE)
+  )
 })
 
 test_that("can handle missing combinations", {
+  skip("not yet adapted to dbplyr")
   df <- tibble::tribble(
     ~id, ~x_1, ~x_2, ~y_2,
     "A",    1,    2,  "a",
     "B",    3,    4,  "b",
   )
   pv <- pivot_longer(
-    memdb_frame(!!!df),
+    memdb_frame(df),
     -id,
     names_to = c(".value", "n"),
     names_sep = "_"
