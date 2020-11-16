@@ -8,6 +8,7 @@
 #' * Uses non-standard `LOG()` function
 #' * Date-time extraction functions from lubridate
 #' * Custom median translation
+#' * Right and full joins are simulated using left joins
 #'
 #' Use `simulate_sqlite()` with `lazy_frame()` to see simulated SQL without
 #' converting to live access database.
@@ -133,6 +134,35 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_na
 sql_expr_matches.SQLiteConnection <- function(con, x, y) {
   # https://sqlite.org/lang_expr.html#isisnot
   build_sql(x, " IS ", y, con = con)
+}
+
+#' @export
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+  # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
+  # see: https://www.sqlite.org/omitted.html
+
+  # Careful: in the right join resp. the second join in the full join do not
+  # name `y` LHS and `x` RHS as it messes up the select query!
+
+  if (type == "full") {
+    join_sql <- build_sql(
+      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
+      "UNION\n",
+      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...),
+      con = con
+    )
+
+    sql_query_select(
+      con,
+      select = ident(vars$alias),
+      from = sql_subquery(con, join_sql),
+      subquery = TRUE
+    )
+  } else if (type == "right") {
+    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...)
+  } else {
+    NextMethod()
+  }
 }
 
 globalVariables(c("datetime", "NUMERIC", "REAL"))
