@@ -92,11 +92,14 @@ pivot_longer.tbl_lazy <- function(data,
                                   names_repair = "check_unique",
                                   values_to = "value",
                                   values_drop_na = FALSE,
-                                  values_ptypes = list(),
+                                  values_ptypes,
                                   values_transform = list(),
                                   ...) {
+  if (!is_missing(values_ptypes)) {
+    abort("The `values_ptypes` argument is not supported for remote back-ends")
+  }
   cols <- enquo(cols)
-  dbplyr_spec <- dbplyr_build_longer_spec(data, !!cols,
+  spec <- dbplyr_build_longer_spec(data, !!cols,
     names_to = names_to,
     values_to = values_to,
     names_prefix = names_prefix,
@@ -109,7 +112,6 @@ pivot_longer.tbl_lazy <- function(data,
   dbplyr_pivot_longer_spec(data, spec,
     names_repair = names_repair,
     values_drop_na = values_drop_na,
-    values_ptypes = values_ptypes,
     values_transform = values_transform
   )
 }
@@ -193,7 +195,6 @@ dbplyr_pivot_longer_spec <- function(data,
                                      spec,
                                      names_repair = "check_unique",
                                      values_drop_na = FALSE,
-                                     values_ptypes = list(),
                                      values_transform = list()) {
   spec <- check_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
