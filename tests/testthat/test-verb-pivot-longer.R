@@ -57,23 +57,30 @@ test_that("can drop missing values", {
 })
 
 test_that("can handle missing combinations", {
-  skip("not yet adapted to dbplyr")
+  skip_if_not_installed("tidyr")
+  withr::local_package("tidyr")
+
   df <- tibble::tribble(
     ~id, ~x_1, ~x_2, ~y_2,
     "A",    1,    2,  "a",
     "B",    3,    4,  "b",
   )
-  pv <- pivot_longer(
-    memdb_frame(df),
+
+  df_db <- memdb_frame(!!!df)
+
+  pv_db <- pivot_longer(
+    df_db,
     -id,
     names_to = c(".value", "n"),
     names_sep = "_"
-  ) %>%
-    collect()
+  )
+  pv <- pv_db %>% collect()
 
   expect_named(pv, c("id", "n", "x", "y"))
   expect_equal(pv$x, c(1, 3, 2, 4))
   expect_equal(pv$y, c(NA, NA, "a", "b"))
+
+  expect_snapshot(pv_db)
 })
 
 test_that("can override default output column type", {
