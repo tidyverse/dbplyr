@@ -74,6 +74,15 @@ dbplyr_build_wider_spec <- function(data,
                                     names_sep = "_",
                                     names_glue = NULL,
                                     names_sort = FALSE) {
+  if (!inherits(data, "tbl_sql")) {
+    error_message <- c(
+      "`dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.",
+      i = "Use `memdb_frame()` together with `show_query()` to see the SQL code."
+    )
+
+    abort(error_message)
+  }
+
   cn_data <- colnames(data)
   data_tmp <- set_names(character(length(cn_data)), cn_data)
   names_from <- names(tidyselect::eval_select(enquo(names_from), data_tmp))
