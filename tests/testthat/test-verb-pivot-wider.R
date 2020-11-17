@@ -1,4 +1,7 @@
 test_that("can pivot all cols to wide", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(key = c("x", "y", "z"), val = 1:3)
   pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
 
@@ -7,6 +10,9 @@ test_that("can pivot all cols to wide", {
 })
 
 test_that("non-pivoted cols are preserved", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(a = 1, key = c("x", "y"), val = 1:2)
   pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
 
@@ -15,6 +21,9 @@ test_that("non-pivoted cols are preserved", {
 })
 
 test_that("implicit missings turn into explicit missings", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2)
   pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
 
@@ -37,6 +46,9 @@ test_that("error when overwriting existing column", {
 })
 
 test_that("grouping is preserved", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(g = 1, k = "x", v = 2)
   out <- df %>%
     dplyr::group_by(g) %>%
@@ -47,6 +59,9 @@ test_that("grouping is preserved", {
 
 # https://github.com/tidyverse/tidyr/issues/804
 test_that("column with `...j` name can be used as `names_from`", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(...8 = c("x", "y", "z"), val = 1:3)
   pv <- pivot_wider(df, names_from = ...8, values_from = val) %>% collect()
   expect_named(pv, c("x", "y", "z"))
@@ -57,6 +72,9 @@ test_that("column with `...j` name can be used as `names_from`", {
 # column names -------------------------------------------------------------
 
 test_that("names_glue affects output names", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(
     x = c("X", "Y"),
     y = 1:2,
@@ -69,6 +87,9 @@ test_that("names_glue affects output names", {
 })
 
 test_that("can sort column names", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(
     int = c(1, 3, 2),
     fac = c("Mon", "Wed", "Tue")
@@ -84,6 +105,9 @@ test_that("can sort column names", {
 # keys ---------------------------------------------------------
 
 test_that("can override default keys", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tribble(
     ~row, ~name, ~var, ~value,
     1,    "Sam", "age", 10,
@@ -113,7 +137,9 @@ test_that("duplicated keys produce list column with warning", {
 })
 
 test_that("warning suppressed by supplying values_fn", {
-  skip("not yet implemented")
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = 1:3)
   expect_warning(
     pv <- pivot_wider(df,
@@ -151,6 +177,9 @@ test_that("values_summarize applied even when no-duplicates", {
 # can fill missing cells --------------------------------------------------
 
 test_that("can fill in missing cells", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- memdb_frame(g = c(1, 2), var = c("x", "y"), val = c(1, 2))
 
   widen <- function(...) {
@@ -163,7 +192,9 @@ test_that("can fill in missing cells", {
 })
 
 test_that("values_fill only affects missing cells", {
-  # df <- memdb_frame(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
   out <- pivot_wider(df, names_from = names, values_from = value, values_fill = 0) %>%
     collect()
@@ -173,6 +204,9 @@ test_that("values_fill only affects missing cells", {
 # multiple values ----------------------------------------------------------
 
 test_that("can pivot from multiple measure cols", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
   sp <- build_wider_spec(df, names_from = var, values_from = c(a, b))
   pv <- pivot_wider_spec(df, sp)
@@ -183,6 +217,9 @@ test_that("can pivot from multiple measure cols", {
 })
 
 test_that("can pivot from multiple measure cols using all keys", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tibble(var = c("x", "y"), a = 1:2, b = 3:4)
   sp <- build_wider_spec(df, names_from = var, values_from = c(a, b))
   pv <- pivot_wider_spec(df, sp)
@@ -193,6 +230,9 @@ test_that("can pivot from multiple measure cols using all keys", {
 })
 
 test_that("column order in output matches spec", {
+  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
+  withr::local_package("tidyr")
+
   df <- tribble(
     ~hw,   ~name,  ~mark,   ~pr,
     "hw1", "anna",    95,  "ok",
