@@ -117,21 +117,33 @@ dbplyr_pivot_wider_spec <- function(data,
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
-  value_specs <- unname(split(spec, spec$.value))
-  # value_specs <- vctrs::vec_split(spec, spec$.value)
+  value_cols <- unique(spec[[".value"]])
+  values_fn <- values_fn %||% max
+  if (is.function(values_fn)) {
+    values_fn <- find_fun(values_fn)
+    values_fn <- set_names(rep_along(value_cols, values_fn), value_cols)
+  } else if (is.list(values_fn)) {
+    values_fn <- purrr::map_chr(values_fn, find_fun)
+    # TODO error if aggregate function is missing for some cols
+  } else if (is.character(values_fn)) {
+    # as is
+    values_fn <- set_names(rep_along(value_cols, values_fn), value_cols)
+  } else {
+    abort("Unsupported `.fns` for dbplyr::across()")
+  }
 
   pivot_exprs <- purrr::map(
     vctrs::vec_seq_along(spec),
     function(row) {
       key <- spec[[3]][row]
       key_col <- sym(names(spec)[3])
-      values_col <- sym(spec[[".value"]][row])
+      values_col <- spec[[".value"]][row]
 
       fill_value <- values_fill[[values_col]]
 
-      # TODO
-      # values_fn -> ???
-      expr(max(ifelse(!!key_col == !!key, !!values_col, !!fill_value), na.rm = TRUE))
+      agg_fn <- values_fn[[values_col]]
+      case_expr <- expr(ifelse(!!key_col == !!key, !!sym(values_col), !!fill_value))
+      expr((!!agg_fn)(!!case_expr, na.rm = TRUE))
     }
   ) %>%
     set_names(spec$.name)
@@ -141,14 +153,6 @@ dbplyr_pivot_wider_spec <- function(data,
     summarise(!!!pivot_exprs) %>%
     ungroup() %>%
     group_by(!!!syms(group_vars(data)))
-  #
-  # # recreate desired column order
-  # # https://github.com/r-lib/vctrs/issues/227
-  # if (all(spec$.name %in% names(out))) {
-  #   out <- out[c(names(rows), spec$.name)]
-  # }
-  #
-  # reconstruct_tibble(data, out)
 }
 
 globalVariables(c("name", "value"))
