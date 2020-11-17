@@ -1,9 +1,63 @@
 #' Pivot data from long to wide
 #'
-#' @details
-#' * always needs to use a `values_fn` -> no warning/error on duplicate keys
+#' `pivot_wider()` "widens" data, increasing the number of columns and
+#' decreasing the number of rows. The inverse transformation is
+#' `pivot_longer()`.
+#' Learn more in `vignette("pivot", "tidyr")`.
 #'
-#' @param data
+#' @details
+#' The big difference to `pivot_wider()` for local data frames is that
+#' `values_fn` is a required argument. By default it is `max()` which yields
+#' the same results as for local data frames if the combination of `id_cols`
+#' and `value` column uniquely identify an observation.
+#' Mind that you also do not get a warning if an observation is not uniquely
+#' identified.
+#'
+#' The translation to SQL code basically works as follows:
+#'
+#' 1. Get unique keys in `names_from` column.
+#' 2. For each key value generate an expression of the form:
+#'
+#' ```sql
+#' value_fn(
+#'   CASE WHEN (`names from column` == `key value`) THEN (`value column`)
+#' ) AS `output column`
+#' ```
+#'
+#' 3. Group data by id columns.
+#' 4. Summarise the grouped data with the expressions from step 2.
+#'
+#' For example the following R code
+#'
+#' ```
+#' memdb_frame(
+#'   id_column = 1,
+#'   key = c("x", "y"),
+#'   value = 1:2
+#' ) %>%
+#'   pivot_wider(
+#'     id_cols = id_column,
+#'     names_from = key,
+#'     values_from = value
+#'   ) %>%
+#'   show_query()
+#' ```
+#'
+#' translates to this SQL code
+#'
+#' ```sql
+#' SELECT `id_column`,
+#'        MAX(CASE
+#'                WHEN (`key` = 'x') THEN (`val`)
+#'            END) AS `x`,
+#'        MAX(CASE
+#'                WHEN (`key` = 'y') THEN (`val`)
+#'            END) AS `y`
+#' FROM `df`
+#' GROUP BY `id_column`
+#' ```
+#'
+#' @param data A lazy data frame backed by a database query.
 #' @param id_cols A set of columns that uniquely identifies each observation.
 #' @param names_from,values_from A pair of
 #'   arguments describing which column (or columns) to get the name of the
@@ -25,7 +79,7 @@
 #' @param values_fill Optionally, a (scalar) value that specifies what each
 #'   `value` should be filled in with when missing.
 #' @param values_fn A function applied to the `value` in each cell
-#'   in the output.
+#'   in the output. It is required (unlike for local data frames).
 #' @param ... Not supported.
 #'
 #' @examples
