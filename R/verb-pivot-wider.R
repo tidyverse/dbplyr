@@ -93,7 +93,7 @@ dbplyr_build_wider_spec <- function(data,
   if (length(values_from) == 1) {
     out$.value <- names(values_from)
   } else {
-    out <- vctrs::vec_repeat(out, times = vctrs::vec_size(values_from))
+    out <- vctrs::vec_rep(out, times = vctrs::vec_size(values_from))
     out$.value <- vctrs::vec_repeat(names(values_from), each = vctrs::vec_size(row_ids))
     out$.name <- paste0(out$.value, names_sep, out$.name)
 
