@@ -245,11 +245,20 @@ sql_cast <- function(type) {
 
 #' @rdname sql_variant
 #' @export
-sql_try_cast <- function(type) {
-  type <- sql(type)
-  function(x) {
-    sql_expr(try_cast(!!x %as% !!type))
-    # try_cast available in MSSQL 2012+
+sql_try_cast <- function(type1, type2 = NULL) {
+  type1 <- sql(type1)
+  if (is.null(type2)) {
+    function(x) {
+      sql_expr(try_cast(!!x %as% !!type1))
+      # try_cast available in MSSQL 2012+
+    }
+  } else {
+    type2 <- sql(type2)
+    # if type2 is defined, then double-cast ('type1' then 'type2')
+    function(x) {
+      sql_expr(try_cast(try_cast(!!x %as% !!type1) %as% !!type2))
+      # try_cast available in MSSQL 2012+
+    }
   }
 }
 

@@ -204,8 +204,9 @@ simulate_mssql <- function(version = "15.0") {
       as.POSIXct = sql_try_cast("TIMESTAMP"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
-      as.integer = sql_try_cast("NUMERIC"),
-      # in MSSQL, NUMERIC converts to integer
+      as.integer = sql_try_cast("NUMERIC", "INT"),
+      # in MSSQL, NUMERIC rounds to integer
+      # and does not drop entire columns if invalid value
       as.integer64 = sql_try_cast("BIGINT"),
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
