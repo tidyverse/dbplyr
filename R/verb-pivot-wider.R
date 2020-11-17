@@ -43,7 +43,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  names_repair = "check_unique",
                                  values_from = value,
                                  values_fill = NULL,
-                                 values_fn = NULL,
+                                 values_fn = max,
                                  ...
                                  ) {
   ellipsis::check_dots_empty()
@@ -123,13 +123,18 @@ dbplyr_pivot_wider_spec <- function(data,
                                     id_cols = NULL,
                                     values_fill = NULL,
                                     values_fn = NULL) {
+  # TODO add check_spec
   # spec <- check_spec(spec)
 
+  if (is.null(values_fn)) {
+    abort(c(
+      "`values_fn` must not be NULL",
+      i = "`values_fn` must be a function or a named list of functions"
+    ))
+  }
   if (is.function(values_fn)) {
     values_fn <- rep_named(unique(spec$.value), list(values_fn))
-  }
-  if (!is.null(values_fn) && !is.list(values_fn)) {
-    abort("`values_fn` must be a NULL, a function, or a named list")
+    values_fn <- purrr::map_chr(values_fn, find_fun)
   }
 
   if (is_scalar(values_fill)) {
@@ -150,21 +155,6 @@ dbplyr_pivot_wider_spec <- function(data,
     key_vars <- tbl_vars(data)
   }
   key_vars <- setdiff(key_vars, spec_cols)
-
-  value_cols <- unique(spec[[".value"]])
-  values_fn <- values_fn %||% max
-  if (is.function(values_fn)) {
-    values_fn <- find_fun(values_fn)
-    values_fn <- set_names(rep_along(value_cols, values_fn), value_cols)
-  } else if (is.list(values_fn)) {
-    values_fn <- purrr::map_chr(values_fn, find_fun)
-    # TODO error if aggregate function is missing for some cols
-  } else if (is.character(values_fn)) {
-    # as is
-    values_fn <- set_names(rep_along(value_cols, values_fn), value_cols)
-  } else {
-    abort("Unsupported `.fns` for dbplyr::across()")
-  }
 
   pivot_exprs <- purrr::map(
     vctrs::vec_seq_along(spec),
