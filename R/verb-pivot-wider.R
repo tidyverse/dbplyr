@@ -1,3 +1,38 @@
+#' Pivot data from long to wide
+#'
+#' @details
+#' * always needs to use a `values_fn` -> no warning/error on duplicate keys
+#'
+#' @param data
+#' @param id_cols A set of columns that uniquely identifies each observation.
+#' @param names_from,values_from A pair of
+#'   arguments describing which column (or columns) to get the name of the
+#'   output column (`names_from`), and which column (or columns) to get the
+#'   cell values from (`values_from`).
+#'
+#'   If `values_from` contains multiple values, the value will be added to the
+#'   front of the output column.
+#' @param names_prefix String added to the start of every variable name.
+#' @param names_sep If `names_from` or `values_from` contains multiple
+#'   variables, this will be used to join their values together into a single
+#'   string to use as a column name.
+#' @param names_glue Instead of `names_sep` and `names_prefix`, you can supply
+#'   a glue specification that uses the `names_from` columns (and special
+#'   `.value`) to create custom column names.
+#' @param names_sort Should the column names be sorted? If `FALSE`, the default,
+#'   column names are ordered by first appearance.
+#' @param names_repair TODO
+#' @param values_fill Optionally, a (scalar) value that specifies what each
+#'   `value` should be filled in with when missing.
+#' @param values_fn A function applied to the `value` in each cell
+#'   in the output.
+#' @param ... Not supported.
+#'
+#' @examples
+#' if (require("tidyr", quietly = TRUE)) {
+#'   tbl_memdb(us_rent_income) %>%
+#'     pivot_wider(names_from = variable, values_from = c(estimate, moe))
+#' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
                                  names_from = name,
@@ -11,6 +46,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_fn = NULL,
                                  ...
                                  ) {
+  ellipsis::check_dots_empty()
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 
