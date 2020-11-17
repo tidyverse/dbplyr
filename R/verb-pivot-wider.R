@@ -94,10 +94,10 @@ dbplyr_build_wider_spec <- function(data,
     out$.value <- names(values_from)
   } else {
     out <- vctrs::vec_rep(out, times = vctrs::vec_size(values_from))
-    out$.value <- vctrs::vec_repeat(names(values_from), each = vctrs::vec_size(row_ids))
+    out$.value <- vctrs::vec_rep_each(names(values_from), times = vctrs::vec_size(row_ids))
     out$.name <- paste0(out$.value, names_sep, out$.name)
 
-    row_ids <- vctrs::vec_repeat(row_ids, times = vctrs::vec_size(values_from))
+    row_ids <- vctrs::vec_rep(row_ids, times = vctrs::vec_size(values_from))
   }
 
   out <- vctrs::vec_cbind(out, as_tibble(row_ids), .name_repair = "minimal")
