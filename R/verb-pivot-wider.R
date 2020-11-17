@@ -173,10 +173,19 @@ dbplyr_pivot_wider_spec <- function(data,
   ) %>%
     set_names(spec$.name)
 
-  data %>%
-    group_by(!!!syms(key_vars)) %>%
+  data_grouped <- group_by(data, !!!syms(key_vars), .add = TRUE)
+
+  group_names <- group_vars(data_grouped)
+  out_nms <- c(group_names, names(pivot_exprs))
+  out_nms_repaired <- vctrs::vec_as_names(out_nms, repair = names_repair)
+
+  if (!is_empty(group_names)) {
+    out_nms_repaired <- out_nms_repaired[-(1:length(group_names))]
+  }
+  pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
+
+  data_grouped %>%
     summarise(!!!pivot_exprs) %>%
-    ungroup() %>%
     group_by(!!!syms(group_vars(data)))
 }
 
