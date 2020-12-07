@@ -134,6 +134,7 @@ Collate:
     'verb-set-ops.R'
     'verb-slice.R'
     'verb-summarise.R'
+    'verb-uncount.R'
     'verb-window.R'
     'zzz.R'
 RdMacros: lifecycle
