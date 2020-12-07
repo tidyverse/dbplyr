@@ -46,15 +46,14 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     copy = TRUE
   )
 
+  cols_to_remove <- weights_col
   if (is_null(.id)) {
-    data_uncounted <- select(data_uncounted, -!!row_id_col, -!!weights_col)
-  } else {
-    data_uncounted <- select(data_uncounted, -!!weights_col)
+    cols_to_remove <- c(cols_to_remove, row_id_col)
   }
 
   if (is_true(.remove) && quo_is_symbol(weights_quo)) {
-    data_uncounted <- select(data_uncounted, -quo_name(weights_quo))
+    cols_to_remove <- c(cols_to_remove, quo_name(weights_quo))
   }
 
-  data_uncounted
+  select(data_uncounted, -all_of(cols_to_remove))
 }
