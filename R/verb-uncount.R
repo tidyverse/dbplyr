@@ -22,11 +22,18 @@
 #' dbplyr_uncount(df, 2 / n)
 dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   weights_quo <- enquo(weights)
-  weights_col <- "..dbplyr_weight_col"
-  data <- mutate(
-    data,
-    !!weights_col := !!weights_quo,
-  )
+  weights_is_col <- quo_is_symbol(weights_quo) &&
+    quo_name(weights_quo) %in% colnames(data)
+
+  if (weights_is_col) {
+    weights_col <- quo_name(weights_quo)
+  } else {
+    weights_col <- "..dbplyr_weight_col"
+    data <- mutate(
+      data,
+      !!weights_col := !!weights_quo,
+    )
+  }
 
   n_max <- summarise(ungroup(data), max(!!sym(weights_col), na.rm = TRUE)) %>% pull()
   n_max <- vctrs::vec_cast(n_max, integer(), x_arg = "weights")
@@ -46,13 +53,13 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     copy = TRUE
   )
 
-  cols_to_remove <- weights_col
+  cols_to_remove <- character()
   if (is_null(.id)) {
     cols_to_remove <- c(cols_to_remove, row_id_col)
   }
 
-  if (is_true(.remove) && quo_is_symbol(weights_quo)) {
-    cols_to_remove <- c(cols_to_remove, quo_name(weights_quo))
+  if (!weights_is_col || (weights_is_col && .remove)) {
+    cols_to_remove <- c(cols_to_remove, weights_col)
   }
 
   select(data_uncounted, -all_of(cols_to_remove))
