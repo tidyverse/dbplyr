@@ -37,7 +37,8 @@ Imports:
     tidyselect (>= 0.2.4),
     blob (>= 1.2.0),
     utils,
-    withr
+    withr,
+    vctrs
 Suggests:
     bit64,
     covr,
