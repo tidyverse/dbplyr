@@ -66,7 +66,7 @@ test_that("can rename with a function", {
 
 test_that("select preserves grouping vars", {
   mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
-  out <- mf %>% select(a) %>% collect()
+  expect_message(out <- mf %>% select(a) %>% collect())
 
   expect_named(out, c("b", "a"))
 })
