@@ -29,17 +29,16 @@ test_that("works with groups", {
   expect_equal(group_vars(dbplyr_uncount(df, w)), "g")
 })
 
-test_that("doesn't remove grouping variable", {
+test_that("grouping variable are removed", {
   df <- memdb_frame(g = 1, x = 1, w = 1) %>% dplyr::group_by(g)
 
-  expect_equal(dbplyr_uncount(df, g) %>% collect(), df %>% collect())
+  expect_equal(dbplyr_uncount(df, g) %>% colnames(), c("x", "w"))
 })
 
 test_that("must evaluate to integer", {
   df <- memdb_frame(x = 1, w = 1/2)
   expect_error(dbplyr_uncount(df, w), class = "vctrs_error_cast_lossy")
 
-  df <- memdb_frame(x = 1)
   expect_error(dbplyr_uncount(df, "W"), class = "vctrs_error_incompatible_type")
 })
 

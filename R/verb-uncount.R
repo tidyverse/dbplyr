@@ -58,9 +58,16 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     cols_to_remove <- c(cols_to_remove, row_id_col)
   }
 
+  grps <- group_vars(data_uncounted)
   if (!weights_is_col || (weights_is_col && .remove)) {
     cols_to_remove <- c(cols_to_remove, weights_col)
+    # need to regroup to be able to remove weights_col
+    grps <- setdiff(grps, weights_col)
   }
 
-  select(data_uncounted, -all_of(cols_to_remove))
+
+  data_uncounted %>%
+    ungroup() %>%
+    select(-all_of(cols_to_remove)) %>%
+    group_by(!!!syms(grps))
 }
