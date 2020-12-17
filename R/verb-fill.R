@@ -141,7 +141,6 @@ dbplyr_fill_int.DBIConnection <- function(.con,
     ~ win_over(
       last_value_sql(.con, .x),
       partition = if (!is_empty(grps)) escape(ident(op_grps(.data)), con = .con),
-      # TODO is order necessary even if we arrange later?
       order = translate_sql(!!order_by_cols, con = .con),
       con = .con
     )
