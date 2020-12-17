@@ -9,7 +9,7 @@ dbplyr_fill(.data, ..., order_by, .direction = c("down", "up"))
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
-\item{...}{<\code{\link[=tidyr_tidy_select]{tidy-select}}> Columns to fill.}
+\item{...}{Columns to fill.}
 
 \item{order_by}{Columns to order by before filling the values.}
 
