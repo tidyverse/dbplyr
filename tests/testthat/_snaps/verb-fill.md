@@ -16,7 +16,6 @@
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id`) AS `n1`
       FROM `df`
-      ORDER BY -`id`
 
 # up-direction works with descending
 
@@ -36,7 +35,6 @@
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id` DESC) AS `n1`
       FROM `df`
-      ORDER BY -`id` DESC
 
 # groups are respected
 
@@ -56,5 +54,4 @@
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (PARTITION BY `group` ORDER BY `id`) AS `n1`
       FROM `df`
-      ORDER BY `id`
 
