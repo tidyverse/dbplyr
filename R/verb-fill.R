@@ -153,8 +153,7 @@ dbplyr_fill_int.DBIConnection <- function(.con,
     transmute(
       !!!syms(colnames(.data)),
       !!!fill_sql
-    ) %>%
-    arrange(!!order_by_cols)
+    )
 }
 
 last_value_sql <- function(con, x) {
