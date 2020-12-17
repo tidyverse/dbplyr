@@ -124,6 +124,7 @@ Collate:
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'
+    'verb-fill.R'
     'verb-filter.R'
     'verb-group_by.R'
     'verb-head.R'
