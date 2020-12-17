@@ -55,6 +55,10 @@ dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
   order_by_cols <- enquo(order_by)
   .direction <- arg_match0(.direction, c("down", "up"))
 
+  if (.direction == "up") {
+    order_by_cols <- quo(-!!order_by_cols)
+  }
+
   dbplyr_fill_int(
     .con = remote_con(.data),
     .data = .data,
@@ -74,10 +78,6 @@ dbplyr_fill_int.SQLiteConnection <- function(.con,
                                              cols_to_fill,
                                              order_by_cols,
                                              .direction) {
-  if (.direction == "up") {
-    order_by_cols <- quo(-!!order_by_cols)
-  }
-
   partition_sql <- purrr::map(
     cols_to_fill,
     ~ translate_sql(
@@ -134,10 +134,6 @@ dbplyr_fill_int.DBIConnection <- function(.con,
                                           cols_to_fill,
                                           order_by_cols,
                                           .direction) {
-  if (.direction == "up") {
-    order_by_cols <- quo(-!!order_by_cols)
-  }
-
   grps <- op_grps(.data)
 
   fill_sql <- purrr::map(
