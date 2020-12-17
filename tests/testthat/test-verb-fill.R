@@ -41,6 +41,7 @@ test_that("fill works", {
          6,      2,      NA,   5,    6,
     ) %>%
       group_by(group) %>%
+      # workaround as `select.tbl_lazy()` selects group variables first
       select(group, everything())
   )
 })
