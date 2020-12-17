@@ -78,18 +78,21 @@ dbplyr_fill_int.SQLiteConnection <- function(.con,
     order_by_cols <- quo(-!!order_by_cols)
   }
 
-  partition_quos <- purrr::map(
+  partition_sql <- purrr::map(
     cols_to_fill,
-    ~ quo(cumsum(ifelse(is.na(!!.x), 0L, 1L)))
+    ~ translate_sql(
+      cumsum(ifelse(is.na(!!.x), 0L, 1L)),
+      vars_order = translate_sql(!!order_by_cols, con = .con),
+      vars_group = op_grps(.data),
+    )
   ) %>%
     set_names(paste0("..dbplyr_partion_", seq_along(cols_to_fill)))
 
   dp <- .data %>%
-    window_order(order_by_cols) %>%
-    mutate(!!!partition_quos)
+    mutate(!!!partition_sql)
 
   fill_sql <- purrr::map2(
-    cols_to_fill, names(partition_quos),
+    cols_to_fill, names(partition_sql),
     ~ translate_sql(
       max(!!.x, na.rm = TRUE),
       con = .con,
