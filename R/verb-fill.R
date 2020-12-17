@@ -14,7 +14,7 @@
 #' Fill in missing values with previous or next value
 #'
 #' @inheritParams arrange.tbl_lazy
-#' @param ... <[`tidy-select`][tidyr_tidy_select]> Columns to fill.
+#' @param ... Columns to fill.
 #' @param order_by Columns to order by before filling the values.
 #' @param .direction Direction in which to fill missing values. Currently
 #'   either "down" (the default) or "up".
