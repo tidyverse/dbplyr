@@ -1,6 +1,6 @@
 # slice, head and tail aren't available
 
-    slice() is not suppoted on database backends
+    slice() is not supported on database backends
 
 ---
 
