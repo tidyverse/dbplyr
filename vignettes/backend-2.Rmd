@@ -83,6 +83,7 @@ A number of other generics have been renamed:
 -   `dplyr::sql_semi_join()` -\> `dbplyr::sql_query_semi_join()`
 -   `dplyr::sql_set_op()` -\> `dbplyr::sql_query_set_op()`
 -   `dplyr::sql_subquery()` -\> `dbplyr::sql_query_wrap()`
+-   `dplyr::sql_translate_env()` -\> `dbplyr::sql_translation()`
 -   `dplyr::db_desc()` -\> `dbplyr::db_connection_describe()`
 
 If you have methods for any of these generics, you'll need to rename.
