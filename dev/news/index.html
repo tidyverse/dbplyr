@@ -164,7 +164,7 @@
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -189,12 +189,15 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
+<ul>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct()</a></code> now respects grouping (<a href='https://github.com/tidyverse/dbplyr/issues/535'>#535</a>, <a href='https://github.com/mgirlich'>@mgirlich</a>)</p></li>
+<li><p>Add custom SQLite translation of <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">full_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join()</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/536'>#536</a>, <a href='https://github.com/mgirlich'>@mgirlich</a>).</p></li>
+</ul>
 </div>
     <div id="dbplyr-200" class="section level1">
 <h1 class="page-header" data-toc-text="2.0.0">
 <a href="#dbplyr-200" class="anchor"></a>dbplyr 2.0.0<small> 2020-11-03 </small>
 </h1>
-<p>(To become dbplyr 2.0.0)</p>
 <div id="dplyr-100-compatibility" class="section level2">
 <h2 class="hasAnchor">
 <a href="#dplyr-100-compatibility" class="anchor"></a>dplyr 1.0.0 compatibility</h2>
@@ -700,14 +703,15 @@
 <ul>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> now work directly with DBI connections (<a href='https://github.com/tidyverse/dbplyr/issues/2423'>#2423</a>, <a href='https://github.com/tidyverse/dbplyr/issues/2576'>#2576</a>), so there is no longer a need to generate a dplyr src.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
 <span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span>
 <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">mtcars</span><span class="op">)</span>
 
 <span class="va">mtcars2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span>
-<span class="va">mtcars2</span></pre></div>
+<span class="va">mtcars2</span></code></pre></div>
 </li>
 <li><p><code><a href="https://tibble.tidyverse.org/reference/glimpse.html">glimpse()</a></code> now works with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2665'>#2665</a>)</p></li>
 <li><p>dplyr has gained a basic SQL optimiser, which collapses certain nested SELECT queries into a single query (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). This will improve query execution performance for databases with less sophisticated query optimisers, and fixes certain problems with ordering and limits in subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). A big thanks goes to <a href='https://github.com/hhoeflin'>@hhoeflin</a> for figuring out this optimisation.</p></li>

@@ -121,7 +121,7 @@
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -135,8 +135,7 @@
 
       
 
-      </header><script src="dbplyr_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="dbplyr_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="dbplyr_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="dbplyr_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to dbplyr</h1>
@@ -160,8 +159,8 @@
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
 <p>To use databases with dplyr you need to first install dbplyr:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"dbplyr"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"dbplyr"</span><span class="op">)</span></code></pre></div>
 <p>You’ll also need to install a DBI backend package. The DBI package provides a common interface that allows dplyr to work with many different databases using the same code. DBI is automatically installed with dbplyr, but you need to install a specific backend for the database that you want to connect to.</p>
 <p>Five commonly used backends are:</p>
 <ul>
@@ -178,21 +177,21 @@
 <h2 class="hasAnchor">
 <a href="#connecting-to-the-database" class="anchor"></a>Connecting to the database</h2>
 <p>To work with a database in dplyr, you must first connect to it, using <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">DBI::dbConnect()</a></code>. We’re not going to go into the details of the DBI package here, but it’s the foundation upon which dbplyr is built. You’ll need to learn more about if you need to do things to the database that are beyond the scope of dplyr.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span></code></pre></div>
 <p>The arguments to <code><a href="https://dbi.r-dbi.org/reference/dbConnect.html">DBI::dbConnect()</a></code> vary from database to database, but the first argument is always the database backend. It’s <code><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">RSQLite::SQLite()</a></code> for RSQLite, <code><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">RMariaDB::MariaDB()</a></code> for RMariaDB, <code><a href="https://rpostgres.r-dbi.org/reference/Postgres.html">RPostgres::Postgres()</a></code> for RPostgres, <code><a href="https://rdrr.io/pkg/odbc/man/odbc.html">odbc::odbc()</a></code> for odbc, and <code>bigrquery::bigquery()</code> for BigQuery. SQLite only needs one other argument: the path to the database. Here we use the special string <code>":memory:"</code> which causes SQLite to make a temporary in-memory database.</p>
 <p>Most existing databases don’t live in a file, but instead live on another server. That means in real-life that your code will look more like this:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>, 
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RMariaDB</span><span class="fu">::</span><span class="fu"><a href="https://rmariadb.r-dbi.org/reference/dbConnect-MariaDBDriver-method.html">MariaDB</a></span><span class="op">(</span><span class="op">)</span>, 
   host <span class="op">=</span> <span class="st">"database.rstudio.com"</span>,
   user <span class="op">=</span> <span class="st">"hadley"</span>,
   password <span class="op">=</span> <span class="fu">rstudioapi</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rstudioapi/man/askForPassword.html">askForPassword</a></span><span class="op">(</span><span class="st">"Database password"</span><span class="op">)</span>
-<span class="op">)</span></pre></div>
+<span class="op">)</span></code></pre></div>
 <p>(If you’re not using RStudio, you’ll need some other way to securely retrieve your password. You should never record it in your analysis scripts or type it into the console. <a href="https://db.rstudio.com/best-practices/managing-credentials">Securing Credentials</a> provides some best practices.)</p>
 <p>Our temporary database has no data in it, so we’ll start by copying over <code><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">nycflights13::flights</a></code> using the convenient <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> function. This is a quick and dirty way of getting data into a database and is useful primarily for demos and other small jobs.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span>, <span class="st">"flights"</span>,
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span>, <span class="st">"flights"</span>,
   temporary <span class="op">=</span> <span class="cn">FALSE</span>, 
   indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
     <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"month"</span>, <span class="st">"day"</span><span class="op">)</span>, 
@@ -200,14 +199,14 @@
     <span class="st">"tailnum"</span>,
     <span class="st">"dest"</span>
   <span class="op">)</span>
-<span class="op">)</span></pre></div>
+<span class="op">)</span></code></pre></div>
 <p>As you can see, the <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> operation has an additional argument that allows you to supply indexes for the table. Here we set up indexes that will allow us to quickly process the data by day, carrier, plane, and destination. Creating the right indices is key to good database performance, but is unfortunately beyond the scope of this article.</p>
 <p>Now that we’ve copied the data, we can use <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl()</a></code> to take a reference to it:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">flights_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights"</span><span class="op">)</span></code></pre></div>
 <p>When you print it out, you’ll notice that it mostly looks like a regular tibble:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">flights_db</span> 
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights_db</span> 
 <span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span>
 <span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time</span>
@@ -220,7 +219,7 @@
 <span class="co">#&gt; 6  2013     1     1      554            558        -4      740            728</span>
 <span class="co">#&gt; # … with more rows, and 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,</span>
 <span class="co">#&gt; #   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></pre></div>
+<span class="co">#&gt; #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span></code></pre></div>
 <p>The main difference is that you can see that it’s a remote source in a SQLite database.</p>
 </div>
 <div id="generating-queries" class="section level2">
@@ -228,8 +227,8 @@
 <a href="#generating-queries" class="anchor"></a>Generating queries</h2>
 <p>To interact with a database you usually use SQL, the Structured Query Language. SQL is over 40 years old, and is used by pretty much every database in existence. The goal of dbplyr is to automatically generate SQL for you so that you’re not forced to use it. However, SQL is a very large language and dbplyr doesn’t do everything. It focusses on <code>SELECT</code> statements, the SQL you write most often as an analyst.</p>
 <p>Most of the time you don’t need to know anything about SQL, and you can continue to use the dplyr verbs that you’re already familiar with:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="va">flights_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">flights_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 5]</span>
 <span class="co">#&gt; # Database: sqlite 3.33.0 [:memory:]</span>
 <span class="co">#&gt;    year month   day dep_delay arr_delay</span>
@@ -273,7 +272,7 @@
 <span class="co">#&gt; 4 ANC   1635.</span>
 <span class="co">#&gt; 5 ATL   1293.</span>
 <span class="co">#&gt; 6 AUS   1521.</span>
-<span class="co">#&gt; # … with more rows</span></pre></div>
+<span class="co">#&gt; # … with more rows</span></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="https://www.sqlite.org/queryplanner.html">how indexes work in SQLite</a> and <a href="https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
@@ -281,18 +280,18 @@
 <li><p>It delays doing any work until the last possible moment: it collects together everything you want to do and then sends it to the database in one step.</p></li>
 </ul>
 <p>For example, take the following code:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="va">tailnum_delay_db</span> <span class="op">&lt;-</span> <span class="va">flights_db</span> <span class="op">%&gt;%</span> 
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tailnum_delay_db</span> <span class="op">&lt;-</span> <span class="va">flights_db</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">tailnum</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>
     delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span>,
     n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span>
   <span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;</span> <span class="fl">100</span><span class="op">)</span></pre></div>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">&gt;</span> <span class="fl">100</span><span class="op">)</span></code></pre></div>
 <p>Surprisingly, this sequence of operations never touches the database. It’s not until you ask for the data (e.g. by printing <code>tailnum_delay</code>) that dplyr generates the SQL and requests the results from the database. Even then it tries to do as little work as possible and only pulls down a few rows.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="va">tailnum_delay_db</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tailnum_delay_db</span>
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; ℹ Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="co">#&gt; # Source:     lazy query [?? x 3]</span>
@@ -306,10 +305,10 @@
 <span class="co">#&gt; 4 N10575  20.7    289</span>
 <span class="co">#&gt; 5 N11106  14.9    129</span>
 <span class="co">#&gt; 6 N11107  15.0    148</span>
-<span class="co">#&gt; # … with more rows</span></pre></div>
+<span class="co">#&gt; # … with more rows</span></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="va">tailnum_delay_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tailnum_delay_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; ℹ Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
@@ -317,11 +316,11 @@
 <span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`</span>
 <span class="co">#&gt; FROM `flights`</span>
 <span class="co">#&gt; GROUP BY `tailnum`)</span>
-<span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></pre></div>
+<span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></code></pre></div>
 <p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> to pull all the data down into a local tibble:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="va">tailnum_delay</span> <span class="op">&lt;-</span> <span class="va">tailnum_delay_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">tailnum_delay</span> <span class="op">&lt;-</span> <span class="va">tailnum_delay_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; ℹ Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="va">tailnum_delay</span>
@@ -334,18 +333,18 @@
 <span class="co">#&gt; 4 N10575  20.7    289</span>
 <span class="co">#&gt; 5 N11106  14.9    129</span>
 <span class="co">#&gt; 6 N11107  15.0    148</span>
-<span class="co">#&gt; # … with 1,195 more rows</span></pre></div>
+<span class="co">#&gt; # … with 1,195 more rows</span></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> requires that database does some work, so it may take a long time to complete. Otherwise, dplyr tries to prevent you from accidentally performing expensive query operations:</p>
 <ul>
 <li><p>Because there’s generally no way to determine how many rows a query will return unless you actually run it, <code><a href="https://rdrr.io/r/base/nrow.html">nrow()</a></code> is always <code>NA</code>.</p></li>
 <li><p>Because you can’t find the last few rows without executing the whole query, you can’t use <code><a href="https://rdrr.io/r/utils/head.html">tail()</a></code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
 <span class="co">#&gt; [1] NA</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
-<span class="co">#&gt; Error: tail() is not supported by sql sources</span></pre></div>
+<span class="co">#&gt; Error: tail() is not supported by sql sources</span></code></pre></div>
 <p>You can also ask the database how it plans to execute the query with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">explain()</a></code>. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute the query efficiently, or if you need to create new indices.</p>
 </div>
 <div id="creating-your-own-database" class="section level2">
