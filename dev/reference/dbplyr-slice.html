@@ -281,14 +281,14 @@ the first n rows.</p></td>
 <span class='co'># than you expect</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>     1     1
 #&gt; </span><span style='color: #555555;'>2</span><span>     2     1</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -296,7 +296,7 @@ the first n rows.</p></td>
 <span class='co'># Non-integer group sizes are rounded down</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
