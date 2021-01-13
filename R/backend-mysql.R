@@ -41,7 +41,7 @@ db_connection_describe.MariaDBConnection <- function(con) {
 
   paste0(
     "mysql ", info$serverVersion, " [",
-    info$user, "@", info$host, ":", info$port, "/", info$dbname,
+    info$username, "@", info$host, ":", info$port, "/", info$dbname,
     "]"
   )
 }

@@ -38,7 +38,7 @@ db_connection_describe.PqConnection <- function(con) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
-  paste0("postgres ", info$serverVersion, " [", info$user, "@",
+  paste0("postgres ", info$serverVersion, " [", info$username, "@",
     host, ":", info$port, "/", info$dbname, "]")
 }
 #' @export
