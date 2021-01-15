@@ -4,6 +4,10 @@
 
 * Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
 
+* `select()` now does not relocate grouping variables to the front (#568, @mgirlich).
+
+* `select()` informs when adding missing grouping variables (#559, @mgirlich).
+
 # dbplyr 2.0.0
 
 ## dplyr 1.0.0 compatibility
