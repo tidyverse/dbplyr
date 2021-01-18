@@ -37,7 +37,8 @@ Imports:
     tidyselect (>= 0.2.4),
     blob (>= 1.2.0),
     utils,
-    withr
+    withr,
+    vctrs
 Suggests:
     bit64,
     covr,
@@ -50,7 +51,8 @@ Suggests:
     RPostgres (>= 1.1.3),
     RPostgreSQL,
     RSQLite (>= 2.1.0),
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyr
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
@@ -124,6 +126,7 @@ Collate:
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'
+    'verb-expand.R'
     'verb-filter.R'
     'verb-group_by.R'
     'verb-head.R'
