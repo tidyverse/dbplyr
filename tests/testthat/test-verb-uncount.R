@@ -7,7 +7,11 @@ test_that("symbols weights are dropped in output", {
 
 test_that("can request to preserve symbols", {
   df <- memdb_frame(x = 1, w = 1)
-  expect_equal(dbplyr_uncount(df, w, .remove = FALSE) %>% collect(), df %>% collect())
+
+  expect_equal(
+    dbplyr_uncount(df, w, .remove = FALSE) %>% colnames(),
+    c("x", "w")
+  )
 })
 
 test_that("unique identifiers created on request", {
