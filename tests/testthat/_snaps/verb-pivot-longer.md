@@ -1,14 +1,14 @@
 # can pivot all cols to long
 
     Code
-      pv %>% show_query()
+      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y)
     Output
       <SQL>
-      SELECT 'x' AS `name`, `x` AS `value`
-      FROM `dbplyr_093`
+      (SELECT 'x' AS `name`, `x` AS `value`
+      FROM `df`)
       UNION ALL
-      SELECT 'y' AS `name`, `y` AS `value`
-      FROM `dbplyr_093`
+      (SELECT 'y' AS `name`, `y` AS `value`
+      FROM `df`)
 
 # can add multiple columns from spec
 

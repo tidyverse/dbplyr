@@ -10,7 +10,10 @@ test_that("can pivot all cols to long", {
     )
   )
 
-  expect_snapshot(pv %>% show_query())
+  expect_snapshot(
+    lazy_frame(x = 1:2, y = 3:4) %>%
+      tidyr::pivot_longer(x:y)
+  )
 })
 
 test_that("can add multiple columns from spec", {
