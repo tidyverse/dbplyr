@@ -110,7 +110,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #'
 #' @param data A pair of lazy data frame backed by database queries.
 #' @param replace A list of values, with one value for each column that has NA
-#' values to be replaced.
+#'   values to be replaced.
 #' @param ... Additional arguments for methods. Currently unused.
 #'
 #' @inherit arrange.tbl_lazy return
