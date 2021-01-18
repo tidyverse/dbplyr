@@ -22,6 +22,17 @@
 #' # Or expressions
 #' dbplyr_uncount(df, 2 / n)
 dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
+  # Overview of the strategy:
+  # 1. calculate `n_max`, the max weight
+  # 2. create a temporary db table with ids from 1 to `n_max`
+  # 3. duplicate data by inner joining with this temporary table under the
+  #    condition that data$weight <= tmp$id
+  #
+  # An alternative approach would be to use a recursive CTE but this requires
+  # more code and testing across backends.
+  # See https://stackoverflow.com/questions/33327837/repeat-rows-n-times-according-to-column-value
+
+
   weights_quo <- enquo(weights)
   weights_is_col <- quo_is_symbol(weights_quo) &&
     quo_name(weights_quo) %in% colnames(data)
