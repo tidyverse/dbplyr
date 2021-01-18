@@ -5,7 +5,7 @@
 #' result explicitly, so the order might be different to what `expand()`
 #' returns for data frames.
 #'
-#' @param data A pair of lazy data frame backed by database queries.
+#' @param data A lazy data frame backed by a database query.
 #' @param ... Specification of columns to expand. See [tidyr::expand] for
 #' more details.
 #' @inheritParams tibble::as_tibble
@@ -109,9 +109,9 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' This is a method for the [tidyr::replace_na()] generic.
 #'
 #' @param data A pair of lazy data frame backed by database queries.
-#' @param replace A list of values, with one value for each column that has NA
-#' values to be replaced.
-#' @param ... Additional arguments for methods. Currently unused.
+#' @param replace A named list of values, with one value for each column that
+#' has NA values to be replaced.
+#' @param ... Unused; included for compatibility with generic.
 #'
 #' @inherit arrange.tbl_lazy return
 #'
@@ -122,6 +122,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' }
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   stopifnot(is_list(replace))
+  stopifnot(is_named(replace))
   replace <- replace[names(replace) %in% colnames(data)]
 
   if (is_empty(replace)) {
@@ -135,10 +136,7 @@ replace_na.tbl_lazy <- function(data, replace = list(), ...) {
     }
   )
 
-  mutate(
-    data,
-    !!!coalesce_expr
-  )
+  mutate(data, !!!coalesce_expr)
 }
 
 globalVariables(c("coalesce", "expand", "replace_na"))
