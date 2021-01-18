@@ -121,21 +121,10 @@ dbplyr_pivot_longer_spec <- function(data,
       keys <- spec_split$key[idx, ]
       keys$.seq <- NULL
 
-      # idea copied from `partial_eval_across`
-      measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
-
-      measure_cols <- set_names(syms(row$.name), row[[".value"]])
-      measure_cols_exprs <- purrr::imap(
-        measure_cols,
-        ~ {
-          f_trans <- measure_funs[[.y]]
-
-          if (is_null(f_trans)) {
-            .x
-          } else {
-            expr((!!f_trans)(!!.x))
-          }
-        }
+      measure_cols_exprs <- get_measure_column_exprs(
+        row[[".name"]],
+        row[[".value"]],
+        values_transform
       )
 
       transmute(
@@ -152,9 +141,6 @@ dbplyr_pivot_longer_spec <- function(data,
 
   if (values_drop_na) {
     value_cols <- unique(spec$.value)
-    # add "." variable locally so that cran doesn't complain about
-    # missing visible binding
-    . <- NULL
 
     data_long <- dplyr::filter_at(
       data_long,
@@ -163,7 +149,26 @@ dbplyr_pivot_longer_spec <- function(data,
     )
   }
 
-  return(data_long)
+  data_long
+}
+
+get_measure_column_exprs <- function(name, value, values_transform) {
+  # idea copied from `partial_eval_across`
+  measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
+
+  measure_cols <- set_names(syms(name), value)
+  purrr::imap(
+    measure_cols,
+    ~ {
+      f_trans <- measure_funs[[.y]]
+
+      if (is_null(f_trans)) {
+        .x
+      } else {
+        expr((!!f_trans)(!!.x))
+      }
+    }
+  )
 }
 
 # The following is copy-pasted from tidyr
@@ -226,3 +231,5 @@ deduplicate_spec <- function(spec, df) {
   spec$.seq <- copy
   spec
 }
+
+globalVariables(".")
