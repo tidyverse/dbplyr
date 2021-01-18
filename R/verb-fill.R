@@ -52,6 +52,9 @@ dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
   .direction <- arg_match0(.direction, c("down", "up"))
 
   if (.direction == "up") {
+    # `desc()` cannot be used here because one gets invalid SQL if a variable
+    # is already wrapped in `desc()`
+    # i.e. `desc(desc(x))` produces `x DESC DESC`
     order_by_cols <- quo(-!!order_by_cols)
   }
 
