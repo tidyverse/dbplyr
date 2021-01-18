@@ -1,10 +1,12 @@
 # dbplyr (development version)
-* `expand()`, `complete()` and `replace_na()` are now translated (#538, @mgirlich).
-* `distinct()` now respects grouping (#535, @mgirlich)
-* `distinct()` now respects grouping (#535, @mgirlich)
-* fix partial match in `db_connection_describe()` (#564, @mgirlich).
 
-* Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
+* `distinct()` now respects grouping (@mgirlich, #535).
+
+* fix partial match in `db_connection_describe()` (@mgirlich, #564).
+
+* Add custom SQLite translation of `full_join()` and `right_join()` (@mgirlich, #536).
+
+* `expand()`, `complete()` and `replace_na()` are now translated (@mgirlich, #538).
 
 # dbplyr 2.0.0
 
