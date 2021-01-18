@@ -1,7 +1,7 @@
 # up-direction works
 
     Code
-      dbplyr_fill(df_lazy_ns, n1, order_by = id, .direction = "up")
+      df_lazy_ns %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
@@ -11,7 +11,7 @@
 ---
 
     Code
-      dbplyr_fill(df_lazy_std, n1, order_by = id, .direction = "up")
+      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id`) AS `n1`
@@ -20,7 +20,7 @@
 # up-direction works with descending
 
     Code
-      dbplyr_fill(df_lazy_ns, n1, order_by = desc(id), .direction = "up")
+      df_lazy_ns %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
@@ -30,7 +30,7 @@
 ---
 
     Code
-      dbplyr_fill(df_lazy_std, n1, order_by = desc(id), .direction = "up")
+      df_lazy_std %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id` DESC) AS `n1`
@@ -39,7 +39,7 @@
 # groups are respected
 
     Code
-      dbplyr_fill(group_by(df_lazy_ns, group), n1, order_by = id)
+      group_by(df_lazy_ns, group) %>% window_order(id) %>% tidyr::fill(n1)
     Output
       <SQL>
       SELECT `group`, `id`, MAX(`n1`) OVER (PARTITION BY `group`, `..dbplyr_partion_1`) AS `n1`
@@ -49,7 +49,7 @@
 ---
 
     Code
-      dbplyr_fill(group_by(df_lazy_std, group), n1, order_by = id)
+      group_by(df_lazy_std, group) %>% window_order(id) %>% tidyr::fill(n1)
     Output
       <SQL>
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (PARTITION BY `group` ORDER BY `id`) AS `n1`

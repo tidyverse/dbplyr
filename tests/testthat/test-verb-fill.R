@@ -24,12 +24,9 @@ df_lazy_std <- tbl_lazy(df)
 test_that("fill works", {
   expect_equal(
     df_db %>%
+      window_order(id) %>%
       group_by(group) %>%
-      dbplyr_fill(
-        n1,
-        n2,
-        order_by = c(id)
-      ) %>%
+      tidyr::fill(n1, n2) %>%
       collect(),
     tibble::tribble(
       ~ id, ~group, ~letter, ~n1, ~ n2,
@@ -47,29 +44,41 @@ test_that("fill works", {
 })
 
 test_that("up-direction works", {
-  expect_snapshot(dbplyr_fill(df_lazy_ns, n1, order_by = id, .direction = "up"))
-  expect_snapshot(dbplyr_fill(df_lazy_std, n1, order_by = id, .direction = "up"))
+  expect_snapshot(
+    df_lazy_ns %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "up")
+  )
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "up")
+  )
 })
 
 test_that("up-direction works with descending", {
-  expect_snapshot(dbplyr_fill(df_lazy_ns, n1, order_by = desc(id), .direction = "up"))
-  expect_snapshot(dbplyr_fill(df_lazy_std, n1, order_by = desc(id), .direction = "up"))
+  expect_snapshot(
+    df_lazy_ns %>%
+      window_order(desc(id)) %>%
+      tidyr::fill(n1, .direction = "up")
+  )
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(desc(id)) %>%
+      tidyr::fill(n1, .direction = "up")
+  )
 })
 
 test_that("groups are respected", {
   expect_snapshot(
-    dbplyr_fill(
-      group_by(df_lazy_ns, group),
-      n1,
-      order_by = id
-    )
+    group_by(df_lazy_ns, group) %>%
+      window_order(id) %>%
+      tidyr::fill(n1)
   )
 
   expect_snapshot(
-    dbplyr_fill(
-      group_by(df_lazy_std, group),
-      n1,
-      order_by = id
-    )
+    group_by(df_lazy_std, group) %>%
+      window_order(id) %>%
+      tidyr::fill(n1)
   )
 })

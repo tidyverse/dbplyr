@@ -45,17 +45,26 @@
 #'   n_squirrels2,
 #'   order_by = c(id)
 #' )
-dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
+fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   sim_data <- simulate_vars(.data)
   cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
-  order_by_cols <- enquo(order_by)
+  order_by_cols <- op_sort(.data)
   .direction <- arg_match0(.direction, c("down", "up"))
+
+  if (is_empty(order_by_cols)) {
+    abort(
+      c(
+        x = "`.data` does not have explicit order.",
+        i = "Please use arrange() or window_order() to make determinstic."
+      )
+    )
+  }
 
   if (.direction == "up") {
     # `desc()` cannot be used here because one gets invalid SQL if a variable
     # is already wrapped in `desc()`
     # i.e. `desc(desc(x))` produces `x DESC DESC`
-    order_by_cols <- quo(-!!order_by_cols)
+    order_by_cols <- purrr::map(order_by_cols, ~ quo(-!!.x))
   }
 
   dbplyr_fill0(
@@ -93,7 +102,7 @@ dbplyr_fill0.DBIConnection <- function(.con,
     ~ win_over(
       last_value_sql(.con, .x),
       partition = if (!is_empty(grps)) escape(ident(op_grps(.data)), con = .con),
-      order = translate_sql(!!order_by_cols, con = .con),
+      order = translate_sql(!!!order_by_cols, con = .con),
       con = .con
     )
   ) %>%
@@ -124,7 +133,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
     cols_to_fill,
     ~ translate_sql(
       cumsum(ifelse(is.na(!!.x), 0L, 1L)),
-      vars_order = translate_sql(!!order_by_cols, con = .con),
+      vars_order = translate_sql(!!!order_by_cols, con = .con),
       vars_group = op_grps(.data),
     )
   ) %>%
