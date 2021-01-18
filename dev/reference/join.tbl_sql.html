@@ -408,14 +408,14 @@ and return data to R.</p>
 <span class='va'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>db2</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "x"</span></div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `LHS`.`x` AS `x`, `y`
-#&gt; FROM `dbplyr_012` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
+#&gt; FROM `dbplyr_014` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_015` AS `RHS`
 #&gt; ON (`LHS`.`x` = `RHS`.`x`)
 #&gt; </div><div class='input'><span class='va'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>db2</span>, sql_on <span class='op'>=</span> <span class='st'>"LHS.x &lt; RHS.x"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`
-#&gt; FROM `dbplyr_012` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
+#&gt; FROM `dbplyr_014` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_015` AS `RHS`
 #&gt; ON (LHS.x &lt; RHS.x)
 #&gt; </div></span></pre>
   </div>

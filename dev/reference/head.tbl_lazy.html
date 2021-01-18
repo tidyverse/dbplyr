@@ -238,7 +238,7 @@ and return data to R.</p>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *
-#&gt; FROM `dbplyr_008`
+#&gt; FROM `dbplyr_010`
 #&gt; LIMIT 6</div><div class='input'>
 <span class='co'># Pretend we have data in a SQL server database</span>
 <span class='va'>db2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span>, con <span class='op'>=</span> <span class='fu'><a href='simulate_hive.html'>simulate_mssql</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>

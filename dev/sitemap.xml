@@ -49,6 +49,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/collapse.tbl_sql.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/complete.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/copy_to.src_sql.html</loc>
   </url>
   <url>
@@ -77,6 +80,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/escape.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/expand.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/filter.tbl_lazy.html</loc>
@@ -131,6 +137,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/remote_name.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/replace_na.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/select.tbl_lazy.html</loc>
