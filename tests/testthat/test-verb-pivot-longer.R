@@ -75,7 +75,13 @@ test_that("can handle missing combinations", {
   expect_equal(pv$x, c(1, 3, 2, 4))
   expect_equal(pv$y, c(NA, NA, "a", "b"))
 
-  expect_snapshot(pv_db)
+  sql <- pivot_longer(
+    lazy_frame(!!!df),
+    -id,
+    names_to = c(".value", "n"),
+    names_sep = "_"
+  )
+  expect_snapshot(sql)
 })
 
 test_that("can override default output column type", {
