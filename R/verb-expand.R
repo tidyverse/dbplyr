@@ -27,26 +27,23 @@
 #'   fruits %>% expand(nesting(type, size))
 #' }
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
-  # TODO wait for bugfix: distinct() ignores groups
-  # https://github.com/tidyverse/dbplyr/issues/535
   dots <- purrr::discard(quos(...), quo_is_null)
 
   if (is_empty(dots)) {
     abort("Must supply variables in `...`")
   }
 
-  distinct_tbl_vars <- purrr::imap(
-    dots,
-    ~ {
-      # ugly hack to deal with `nesting()`
-      if (quo_is_call(.x, name = "nesting")) {
-        x_expr <- quo_get_expr(.x)
-        call_args(x_expr)
-      } else {
-        list(quo_get_expr(.x))
-      }
+  extract_dot_vars <- function(.x) {
+    # ugly hack to deal with `nesting()`
+    if (quo_is_call(.x, name = "nesting")) {
+      x_expr <- quo_get_expr(.x)
+      call_args(x_expr)
+    } else {
+      list(quo_get_expr(.x))
     }
-  )
+  }
+
+  distinct_tbl_vars <- purrr::map(dots, extract_dot_vars)
 
   # now that `nesting()` has been unpacked resolve name conflicts
   out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))
