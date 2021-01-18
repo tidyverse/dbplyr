@@ -1,52 +1,38 @@
 test_that("expand completes all values", {
-  suppressPackageStartupMessages(library(tidyr))
-
   expect_equal(
-    memdb_frame(x = 1:2, y = 1:2) %>% expand(x, y) %>% collect(),
+    memdb_frame(x = 1:2, y = 1:2) %>% tidyr::expand(x, y) %>% collect(),
     tibble(x = c(1, 1, 2, 2), y = c(1, 2, 1, 2))
   )
 
-  expect_snapshot(lazy_frame(x = 1, y = 1) %>% expand(x, y))
-
-  detach("package:tidyr")
+  expect_snapshot(lazy_frame(x = 1, y = 1) %>% tidyr::expand(x, y))
 })
 
 test_that("nesting doesn't expand values", {
-  suppressPackageStartupMessages(library(tidyr))
-
   df <- tibble(x = 1:2, y = 1:2)
   expect_equal(
-    expand(memdb_frame(!!!df), nesting(x, y)) %>%
+    tidyr::expand(memdb_frame(!!!df), nesting(x, y)) %>%
       collect(),
     df
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% expand(nesting(x, y)))
-
-  detach("package:tidyr")
+  expect_snapshot(df_lazy %>% tidyr::expand(nesting(x, y)))
 })
 
 test_that("expand accepts expressions", {
-  suppressPackageStartupMessages(library(tidyr))
-
   df <- lazy_frame(x = 1)
-  expect_snapshot(expand(df, round(x / 2)))
-  expect_snapshot(expand(df, nesting(x_half = round(x / 2), x1 = x + 1)))
-
-  detach("package:tidyr")
+  expect_snapshot(tidyr::expand(df, round(x / 2)))
+  expect_snapshot(tidyr::expand(df, nesting(x_half = round(x / 2), x1 = x + 1)))
 })
 
 test_that("expand respects groups", {
-  suppressPackageStartupMessages(library(tidyr))
-
   df <- tibble(
     a = c(1L, 1L, 2L),
     b = c(1L, 2L, 1L),
     c = c("b", "a", "a")
   )
   expect_equal(
-    memdb_frame(!!!df) %>% group_by(a) %>% expand(b, c) %>% collect(),
+    memdb_frame(!!!df) %>% group_by(a) %>% tidyr::expand(b, c) %>% collect(),
     tibble(
       a = c(1, 1, 1, 1, 2),
       b = c(1, 1, 2, 2, 1),
@@ -56,50 +42,34 @@ test_that("expand respects groups", {
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% group_by(a) %>% expand(b, c))
-
-  detach("package:tidyr")
+  expect_snapshot(df_lazy %>% group_by(a) %>% tidyr::expand(b, c))
 })
 
 test_that("NULL inputs", {
-  suppressPackageStartupMessages(library(tidyr))
-
-  expect_snapshot(expand(lazy_frame(x = 1), x, y = NULL))
-
-  detach("package:tidyr")
+  expect_snapshot(tidyr::expand(lazy_frame(x = 1), x, y = NULL))
 })
 
 test_that("expand() errors when expected", {
-  suppressPackageStartupMessages(library(tidyr))
-
-  expect_snapshot_error(expand(memdb_frame(x = 1)))
-  expect_snapshot_error(expand(memdb_frame(x = 1), x = NULL))
-
-  detach("package:tidyr")
+  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1)))
+  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1), x = NULL))
 })
 
 test_that("expand respect .name_repair", {
-  suppressPackageStartupMessages(library(tidyr))
-
   vars <- suppressMessages(
     memdb_frame(x = integer(), z = integer()) %>%
-      expand(x, z = x, nesting(x), nesting(z), .name_repair = "unique") %>%
+      tidyr::expand(x, z = x, nesting(x), nesting(z), .name_repair = "unique") %>%
       op_vars()
   )
 
   expect_equal(vars, c("x...1", "z...2", "x...3", "z...4"))
-
-  detach("package:tidyr")
 })
 
 # replace_na --------------------------------------------------------------
 
 test_that("replace_na replaces missing values", {
-  suppressPackageStartupMessages(library(tidyr))
-
   expect_equal(
     memdb_frame(x = c(1, NA), y = c(NA, "b")) %>%
-      replace_na(list(x = 0, y = "unknown")) %>%
+      tidyr::replace_na(list(x = 0, y = "unknown")) %>%
       collect(),
     tibble(
       x = c(1, 0),
@@ -108,25 +78,17 @@ test_that("replace_na replaces missing values", {
   )
 
   expect_snapshot(
-    lazy_frame(x = 1, y = "a") %>% replace_na(list(x = 0, y = "unknown"))
+    lazy_frame(x = 1, y = "a") %>% tidyr::replace_na(list(x = 0, y = "unknown"))
   )
-
-  detach("package:tidyr")
 })
 
 test_that("replace_na ignores missing columns", {
-  suppressPackageStartupMessages(library(tidyr))
-
-  expect_snapshot(lazy_frame(x = 1) %>% replace_na(list(not_there = 0)))
-
-  detach("package:tidyr")
+  expect_snapshot(lazy_frame(x = 1) %>% tidyr::replace_na(list(not_there = 0)))
 })
 
 # complete ----------------------------------------------------------------
 
 test_that("complete completes missing combinations", {
-  suppressPackageStartupMessages(library(tidyr))
-
   df <- tibble(
     x = 1:2,
     y = 1:2,
@@ -134,7 +96,7 @@ test_that("complete completes missing combinations", {
   )
 
   expect_equal(
-    memdb_frame(!!!df) %>% complete(x, y, fill = list(z = "c")) %>% collect(),
+    memdb_frame(!!!df) %>% tidyr::complete(x, y, fill = list(z = "c")) %>% collect(),
     tibble(
       x = c(1, 1, 2, 2),
       y = c(1, 2, 1, 2),
@@ -143,7 +105,5 @@ test_that("complete completes missing combinations", {
   )
 
   df_lazy <- lazy_frame(!!!df)
-  expect_snapshot(df_lazy %>% complete(x, y, fill = list(z = "c")))
-
-  detach("package:tidyr")
+  expect_snapshot(df_lazy %>% tidyr::complete(x, y, fill = list(z = "c")))
 })

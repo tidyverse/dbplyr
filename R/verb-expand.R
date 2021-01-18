@@ -91,14 +91,14 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
 #'   df %>% complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 #' }
 complete.tbl_lazy <- function(data, ..., fill = list()) {
-  full <- expand(data, ...)
+  full <- tidyr::expand(data, ...)
 
   if (is_empty(full)) {
     return(data)
   }
 
   full <- full_join(full, data, by = colnames(full))
-  replace_na(full, replace = fill)
+  tidyr::replace_na(full, replace = fill)
 }
 
 #' Replace NAs with specified values
