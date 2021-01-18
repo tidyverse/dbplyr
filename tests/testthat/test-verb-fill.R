@@ -39,6 +39,7 @@ test_that("fill works", {
     ) %>%
       group_by(group) %>%
       # workaround as `select.tbl_lazy()` selects group variables first
+      # TODO remove when https://github.com/tidyverse/dbplyr/pull/560 is merged
       select(group, everything())
   )
 })
