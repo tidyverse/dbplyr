@@ -1,5 +1,4 @@
 test_that("can pivot all cols to long", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   pv <- memdb_frame(x = 1:2, y = 3:4) %>%
@@ -17,7 +16,6 @@ test_that("can pivot all cols to long", {
 })
 
 test_that("can add multiple columns from spec", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   # add columns `a` and `b`
@@ -35,7 +33,6 @@ test_that("can add multiple columns from spec", {
 })
 
 test_that("preserves original keys", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   # preserves `x`
@@ -47,7 +44,6 @@ test_that("preserves original keys", {
 })
 
 test_that("can drop missing values", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   expect_snapshot(
@@ -57,7 +53,6 @@ test_that("can drop missing values", {
 })
 
 test_that("can handle missing combinations", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   df <- tibble::tribble(
@@ -84,7 +79,6 @@ test_that("can handle missing combinations", {
 })
 
 test_that("can override default output column type", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   expect_snapshot(
@@ -94,7 +88,6 @@ test_that("can override default output column type", {
 })
 
 test_that("can pivot to multiple measure cols", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   df <- lazy_frame(x = "x", y = 1)
@@ -110,7 +103,6 @@ test_that("can pivot to multiple measure cols", {
 })
 
 test_that("original col order is preserved", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   df <- tibble::tribble(
@@ -129,7 +121,6 @@ test_that("original col order is preserved", {
 })
 
 test_that(".value can be at any position in `names_to`", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   samp <- tibble(
@@ -165,7 +156,6 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("grouping is preserved", {
-  skip_if_not_installed("tidyr")
   withr::local_package("tidyr")
 
   df <- memdb_frame(g = 1, x1 = 1, x2 = 2)
