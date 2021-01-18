@@ -19,8 +19,6 @@
 #' @param .direction Direction in which to fill missing values. Currently
 #'   either "down" (the default) or "up".
 #'
-#' @export
-#'
 #' @examples
 #' squirrels <- tibble::tribble(
 #'   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
