@@ -119,7 +119,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' }
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   stopifnot(is_list(replace))
-  stopifnot(is_named(replace))
+  stopifnot(is_empty(replace) || is_named(replace))
   replace <- replace[names(replace) %in% colnames(data)]
 
   if (is_empty(replace)) {
