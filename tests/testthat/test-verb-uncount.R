@@ -1,4 +1,6 @@
 test_that("symbols weights are dropped in output", {
+  # workaround so that sql snapshot is always the same
+  withr::local_options(list(dbplyr_table_name = 2000))
   df <- memdb_frame(x = 1, w = 1)
   expect_equal(dbplyr_uncount(df, w) %>% collect(), tibble(x = 1))
 

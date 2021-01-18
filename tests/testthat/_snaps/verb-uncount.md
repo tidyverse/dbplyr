@@ -6,8 +6,8 @@
       <SQL>
       SELECT `x`
       FROM (SELECT `x`, `w`, `..dbplyr_row_id`
-      FROM `dbplyr_120` AS `LHS`
-      INNER JOIN `dbplyr_122` AS `RHS`
+      FROM `dbplyr_2001` AS `LHS`
+      INNER JOIN `dbplyr_2003` AS `RHS`
       ON (`RHS`.`..dbplyr_row_id` <= `LHS`.`w`)
       )
 
