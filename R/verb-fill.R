@@ -58,7 +58,7 @@ dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
     order_by_cols <- quo(-!!order_by_cols)
   }
 
-  dbplyr_fill_int(
+  dbplyr_fill0(
     .con = remote_con(.data),
     .data = .data,
     cols_to_fill = cols_to_fill,
@@ -67,12 +67,12 @@ dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
   )
 }
 
-dbplyr_fill_int <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
-  UseMethod("dbplyr_fill_int")
+dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
+  UseMethod("dbplyr_fill0")
 }
 
 #' @export
-dbplyr_fill_int.DBIConnection <- function(.con,
+dbplyr_fill0.DBIConnection <- function(.con,
                                           .data,
                                           cols_to_fill,
                                           order_by_cols,
@@ -107,7 +107,7 @@ dbplyr_fill_int.DBIConnection <- function(.con,
 }
 
 #' @export
-dbplyr_fill_int.SQLiteConnection <- function(.con,
+dbplyr_fill0.SQLiteConnection <- function(.con,
                                              .data,
                                              cols_to_fill,
                                              order_by_cols,
@@ -152,22 +152,22 @@ dbplyr_fill_int.SQLiteConnection <- function(.con,
 }
 
 #' @export
-dbplyr_fill_int.PostgreSQL <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.PostgreSQL <- dbplyr_fill0.SQLiteConnection
 #' @export
-dbplyr_fill_int.PqConnection <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.PqConnection <- dbplyr_fill0.SQLiteConnection
 
 #' @export
-dbplyr_fill_int.HDB <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.HDB <- dbplyr_fill0.SQLiteConnection
 
 #' @export
-dbplyr_fill_int.ACCESS <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.ACCESS <- dbplyr_fill0.SQLiteConnection
 
 #' @export
-dbplyr_fill_int.MariaDBConnection <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
-dbplyr_fill_int.MySQLConnection <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
-dbplyr_fill_int.MySQL <- dbplyr_fill_int.SQLiteConnection
+dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
 
 
 last_value_sql <- function(con, x) {
