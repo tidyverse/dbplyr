@@ -67,7 +67,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
 #' Complete a SQL table with missing combinations of data
 #'
 #' Turns implicit missing values into explicit missing values. This is a method
-#' for the [tidyr::expand()] generic.
+#' for the [tidyr::complete()] generic.
 #'
 #' @inheritParams expand.tbl_lazy
 #' @param fill A named list that for each variable supplies a single value to
