@@ -83,7 +83,8 @@ pivot_longer.tbl_lazy <- function(data,
   ellipsis::check_dots_empty()
 
   cols <- enquo(cols)
-  spec <- dbplyr_build_longer_spec(data, !!cols,
+
+  spec <- tidyr::build_longer_spec(simulate_vars(data), !!cols,
     names_to = names_to,
     values_to = values_to,
     names_prefix = names_prefix,
@@ -98,81 +99,6 @@ pivot_longer.tbl_lazy <- function(data,
     values_drop_na = values_drop_na,
     values_transform = values_transform
   )
-}
-
-# this is a nearly identical copy of `tidyr::build_longer_spec` adapted to
-# work with `tbl_lazy` objects.
-dbplyr_build_longer_spec <- function(data, cols,
-                                     names_to = "name",
-                                     values_to = "value",
-                                     names_prefix = NULL,
-                                     names_sep = NULL,
-                                     names_pattern = NULL,
-                                     names_ptypes = NULL,
-                                     names_transform = NULL) {
-  cn_data <- colnames(data)
-  data_tmp <- set_names(character(length(cn_data)), cn_data)
-  cols <- tidyselect::eval_select(enquo(cols), data_tmp)
-
-  if (length(cols) == 0) {
-    abort(glue::glue("`cols` must select at least one column."))
-  }
-
-  if (is.null(names_prefix)) {
-    names <- names(cols)
-  } else {
-    names <- gsub(paste0("^", names_prefix), "", names(cols))
-  }
-
-  if (length(names_to) > 1) {
-    if (!xor(is.null(names_sep), is.null(names_pattern))) {
-      abort(glue::glue(
-        "If you supply multiple names in `names_to` you must also supply one",
-        " of `names_sep` or `names_pattern`."
-      ))
-    }
-
-    if (!is.null(names_sep)) {
-      names <- str_separate(names, names_to, sep = names_sep)
-    } else {
-      names <- str_extract(names, names_to, regex = names_pattern)
-    }
-  } else if (length(names_to) == 0) {
-    names <- tibble::new_tibble(x = list(), nrow = length(names))
-  } else {
-    if (!is.null(names_sep)) {
-      abort("`names_sep` can not be used with length-1 `names_to`")
-    }
-    if (!is.null(names_pattern)) {
-      names <- str_extract(names, names_to, regex = names_pattern)[[1]]
-    }
-
-    names <- tibble(!!names_to := names)
-  }
-
-  if (".value" %in% names_to) {
-    values_to <- NULL
-  } else {
-    vctrs::vec_assert(values_to, ptype = character(), size = 1)
-  }
-
-  # optionally, cast variables generated from columns
-  cast_cols <- intersect(names(names), names(names_ptypes))
-  for (col in cast_cols) {
-    names[[col]] <- vctrs::vec_cast(names[[col]], names_ptypes[[col]])
-  }
-
-  # transform cols
-  coerce_cols <- intersect(names(names), names(names_transform))
-  for (col in coerce_cols) {
-    f <- as_function(names_transform[[col]])
-    names[[col]] <- f(names[[col]])
-  }
-
-  out <- tibble(.name = names(cols))
-  out[[".value"]] <- values_to
-  out <- vctrs::vec_cbind(out, names)
-  out
 }
 
 dbplyr_pivot_longer_spec <- function(data,
