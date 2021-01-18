@@ -45,12 +45,20 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   }
   sql_on_expr <- expr(RHS[[!!row_id_col]] <= LHS[[!!weights_col]])
 
+  con <- remote_con(data)
+  helper_table <- db_copy_to(
+    con = con,
+    table = unique_table_name(),
+    values = tibble(!!row_id_col := seq2(1, n_max)),
+    temporary = TRUE,
+    in_transaction = FALSE
+  )
+
   data_uncounted <- inner_join(
     data,
-    tibble(!!row_id_col := seq2(1, n_max)),
+    tbl(con, helper_table),
     by = character(),
-    sql_on = translate_sql(!!sql_on_expr, con = remote_con(data)),
-    copy = TRUE
+    sql_on = translate_sql(!!sql_on_expr, con = con)
   )
 
   cols_to_remove <- character()
