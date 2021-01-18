@@ -1,6 +1,7 @@
 #' "Uncount" a database table
 #'
-#' This is a method for the tidyr `uncount()` generic.
+#' This is a method for the tidyr `uncount()` generic. It uses a temporary
+#' table, so your database user needs permissions to create one.
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @param weights A vector of weights. Evaluated in the context of `data`;
