@@ -15,7 +15,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @param ... Columns to fill.
-#' @param order_by Columns to order by before filling the values.
 #' @param .direction Direction in which to fill missing values. Currently
 #'   either "down" (the default) or "up".
 #'
@@ -37,12 +36,14 @@
 #' )
 #' squirrels$id <- 1:12
 #'
-#' dbplyr_fill(
-#'   tbl_memdb(squirrels),
-#'   n_squirrels,
-#'   n_squirrels2,
-#'   order_by = c(id)
-#' )
+#' if (require("tidyr", quietly = TRUE)) {
+#'   tbl_memdb(squirrels) %>%
+#'     window_order(id) %>%
+#'     tidyr::fill(
+#'       n_squirrels,
+#'       n_squirrels2,
+#'     )
+#' }
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   sim_data <- simulate_vars(.data)
   cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
@@ -190,3 +191,5 @@ last_value_sql.DBIConnection <- function(con, x) {
 last_value_sql.Hive <- function(con, x) {
   translate_sql(last_value(!!x, TRUE), con = con)
 }
+
+globalVariables("last_value")

@@ -13,8 +13,6 @@ fill.tbl_lazy(.data, ..., .direction = c("down", "up"))
 
 \item{.direction}{Direction in which to fill missing values. Currently
 either "down" (the default) or "up".}
-
-\item{order_by}{Columns to order by before filling the values.}
 }
 \description{
 Fill in missing values with previous or next value
@@ -37,10 +35,12 @@ squirrels <- tibble::tribble(
 )
 squirrels$id <- 1:12
 
-dbplyr_fill(
-  tbl_memdb(squirrels),
-  n_squirrels,
-  n_squirrels2,
-  order_by = c(id)
-)
+if (require("tidyr", quietly = TRUE)) {
+  tbl_memdb(squirrels) \%>\%
+    window_order(id) \%>\%
+    tidyr::fill(
+      n_squirrels,
+      n_squirrels2,
+    )
+}
 }
