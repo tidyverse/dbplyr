@@ -1,5 +1,6 @@
 # dbplyr (development version)
 * `distinct()` now respects grouping (#535, @mgirlich)
+* fix partial match in `db_connection_describe()` (#564, @mgirlich).
 
 * Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
 
