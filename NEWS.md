@@ -4,6 +4,8 @@
 
 * Add custom SQLite translation of `full_join()` and `right_join()` (#536, @mgirlich).
 
+* Add `dbplyr_fill()`, the database equivalent of `tidyr::fill()` (@mgirlich, #566).
+
 # dbplyr 2.0.0
 
 ## dplyr 1.0.0 compatibility
