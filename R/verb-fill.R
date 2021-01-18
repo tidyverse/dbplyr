@@ -46,10 +46,6 @@
 #'   order_by = c(id)
 #' )
 dbplyr_fill <- function(.data, ..., order_by, .direction = c("down", "up")) {
-  # Sources
-  # * https://www.xspdf.com/resolution/51601218.html
-  # * https://dzone.com/articles/how-to-fill-sparse-data-with-the-previous-non-empt
-
   sim_data <- simulate_vars(.data)
   cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
   order_by_cols <- enquo(order_by)
@@ -73,11 +69,54 @@ dbplyr_fill_int <- function(.con, .data, cols_to_fill, order_by_cols, .direction
 }
 
 #' @export
+dbplyr_fill_int.DBIConnection <- function(.con,
+                                          .data,
+                                          cols_to_fill,
+                                          order_by_cols,
+                                          .direction) {
+  # strategy:
+  # 1. construct a window
+  # * from the first row to the current row
+  # * ordered by `order_by_cols`
+  # * partitioned by groups if any
+  # 2. in this window use the last value ignoring nulls; in SQL this is (usually)
+  #    `LAST_VALUE(<column> IGNORE NULLS)`
+  #
+  # Source: https://dzone.com/articles/how-to-fill-sparse-data-with-the-previous-non-empt
+  grps <- op_grps(.data)
+
+  fill_sql <- purrr::map(
+    cols_to_fill,
+    ~ win_over(
+      last_value_sql(.con, .x),
+      partition = if (!is_empty(grps)) escape(ident(op_grps(.data)), con = .con),
+      order = translate_sql(!!order_by_cols, con = .con),
+      con = .con
+    )
+  ) %>%
+    set_names(as.character(cols_to_fill))
+
+  .data %>%
+    transmute(
+      !!!syms(colnames(.data)),
+      !!!fill_sql
+    )
+}
+
+#' @export
 dbplyr_fill_int.SQLiteConnection <- function(.con,
                                              .data,
                                              cols_to_fill,
                                              order_by_cols,
                                              .direction) {
+  # strategy:
+  # for each column to fill:
+  # 1. generate a helper column `....dbplyr_partion_x`. It creates one partition
+  #    per non-NA value and all following NA (in the order of `order_by_cols`),
+  #    i.e. each partition has exactly one non-NA value and any number of NA.
+  # 2. use the non-NA value in each partition (`max()` is just the simplest
+  #    way to do that reliable among databases).
+  # 3. remove the helper column again.
   partition_sql <- purrr::map(
     cols_to_fill,
     ~ translate_sql(
@@ -127,31 +166,6 @@ dbplyr_fill_int.MySQLConnection <- dbplyr_fill_int.SQLiteConnection
 #' @export
 dbplyr_fill_int.MySQL <- dbplyr_fill_int.SQLiteConnection
 
-#' @export
-dbplyr_fill_int.DBIConnection <- function(.con,
-                                          .data,
-                                          cols_to_fill,
-                                          order_by_cols,
-                                          .direction) {
-  grps <- op_grps(.data)
-
-  fill_sql <- purrr::map(
-    cols_to_fill,
-    ~ win_over(
-      last_value_sql(.con, .x),
-      partition = if (!is_empty(grps)) escape(ident(op_grps(.data)), con = .con),
-      order = translate_sql(!!order_by_cols, con = .con),
-      con = .con
-    )
-  ) %>%
-    set_names(as.character(cols_to_fill))
-
-  .data %>%
-    transmute(
-      !!!syms(colnames(.data)),
-      !!!fill_sql
-    )
-}
 
 last_value_sql <- function(con, x) {
   UseMethod("last_value_sql")
