@@ -96,7 +96,6 @@ dbplyr_fill_int.SQLiteConnection <- function(.con,
     ~ translate_sql(
       max(!!.x, na.rm = TRUE),
       con = .con,
-      vars_order = translate_sql(!!order_by_cols, con = .con),
       vars_group = c(op_grps(.data), .y),
     )
   ) %>%
