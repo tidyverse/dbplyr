@@ -37,7 +37,8 @@
 # can drop missing values
 
     Code
-      lazy_frame(x = c(1, NA), y = c(NA, 2)) %>% pivot_longer(x:y, values_drop_na = TRUE)
+      lazy_frame(x = c(1, NA), y = c(NA, 2)) %>% tidyr::pivot_longer(x:y,
+      values_drop_na = TRUE)
     Output
       <SQL>
       SELECT *
@@ -64,7 +65,7 @@
 # can override default output column type
 
     Code
-      lazy_frame(x = 1) %>% pivot_longer(x, values_transform = list(value = as.character))
+      lazy_frame(x = 1) %>% tidyr::pivot_longer(x, values_transform = list(value = as.character))
     Output
       <SQL>
       SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`

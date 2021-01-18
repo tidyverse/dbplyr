@@ -1,8 +1,6 @@
 test_that("can pivot all cols to long", {
-  withr::local_package("tidyr")
-
   pv <- memdb_frame(x = 1:2, y = 3:4) %>%
-    pivot_longer(x:y)
+    tidyr::pivot_longer(x:y)
 
   expect_equal(
     pv %>% collect(),
@@ -16,8 +14,6 @@ test_that("can pivot all cols to long", {
 })
 
 test_that("can add multiple columns from spec", {
-  withr::local_package("tidyr")
-
   # add columns `a` and `b`
   sp <- tibble(
     .name = c("x", "y"),
@@ -33,28 +29,22 @@ test_that("can add multiple columns from spec", {
 })
 
 test_that("preserves original keys", {
-  withr::local_package("tidyr")
-
   # preserves `x`
   pv <- lazy_frame(x = 1:2, y = 2, z = 1:2) %>%
-    pivot_longer(y:z)
+    tidyr::pivot_longer(y:z)
 
   expect_equal(colnames(pv), c("x", "name", "value"))
   expect_snapshot(pv)
 })
 
 test_that("can drop missing values", {
-  withr::local_package("tidyr")
-
   expect_snapshot(
     lazy_frame(x = c(1, NA), y = c(NA, 2)) %>%
-      pivot_longer(x:y, values_drop_na = TRUE)
+      tidyr::pivot_longer(x:y, values_drop_na = TRUE)
   )
 })
 
 test_that("can handle missing combinations", {
-  withr::local_package("tidyr")
-
   df <- tibble::tribble(
     ~id, ~x_1, ~x_2, ~y_2,
     "A",    1,    2,  "a",
@@ -63,7 +53,7 @@ test_that("can handle missing combinations", {
 
   df_db <- memdb_frame(!!!df)
 
-  pv_db <- pivot_longer(
+  pv_db <- tidyr::pivot_longer(
     df_db,
     -id,
     names_to = c(".value", "n"),
@@ -75,7 +65,7 @@ test_that("can handle missing combinations", {
   expect_equal(pv$x, c(1, 3, 2, 4))
   expect_equal(pv$y, c(NA, NA, "a", "b"))
 
-  sql <- pivot_longer(
+  sql <- tidyr::pivot_longer(
     lazy_frame(!!!df),
     -id,
     names_to = c(".value", "n"),
@@ -85,17 +75,13 @@ test_that("can handle missing combinations", {
 })
 
 test_that("can override default output column type", {
-  withr::local_package("tidyr")
-
   expect_snapshot(
     lazy_frame(x = 1) %>%
-      pivot_longer(x, values_transform = list(value = as.character))
+      tidyr::pivot_longer(x, values_transform = list(value = as.character))
   )
 })
 
 test_that("can pivot to multiple measure cols", {
-  withr::local_package("tidyr")
-
   df <- lazy_frame(x = "x", y = 1)
   sp <- tibble::tribble(
     ~.name, ~.value, ~row,
@@ -109,8 +95,6 @@ test_that("can pivot to multiple measure cols", {
 })
 
 test_that("original col order is preserved", {
-  withr::local_package("tidyr")
-
   df <- tibble::tribble(
     ~id, ~z_1, ~y_1, ~x_1, ~z_2,  ~y_2, ~x_2,
     "A",    1,    2,    3,     4,    5,    6,
@@ -120,15 +104,13 @@ test_that("original col order is preserved", {
 
   expect_equal(
     df %>%
-      pivot_longer(-id, names_to = c(".value", "n"), names_sep = "_") %>%
+      tidyr::pivot_longer(-id, names_to = c(".value", "n"), names_sep = "_") %>%
       colnames(),
     c("id", "n", "z", "y", "x")
   )
 })
 
 test_that(".value can be at any position in `names_to`", {
-  withr::local_package("tidyr")
-
   samp <- tibble(
     i = 1:4,
     y_t1 = rnorm(4),
@@ -137,7 +119,7 @@ test_that(".value can be at any position in `names_to`", {
     z_t2 = rep(-2, 4),
   )
 
-  value_first <- pivot_longer(
+  value_first <- tidyr::pivot_longer(
     lazy_frame(!!!samp), -i,
     names_to = c(".value", "time"), names_sep = "_"
   )
@@ -149,7 +131,7 @@ test_that(".value can be at any position in `names_to`", {
                                t1_z = z_t1,
                                t2_z = z_t2)
 
-  value_second <- pivot_longer(
+  value_second <- tidyr::pivot_longer(
     lazy_frame(!!!samp2), -i,
     names_to = c("time", ".value"), names_sep = "_"
   )
@@ -162,11 +144,9 @@ test_that(".value can be at any position in `names_to`", {
 })
 
 test_that("grouping is preserved", {
-  withr::local_package("tidyr")
-
   df <- memdb_frame(g = 1, x1 = 1, x2 = 2)
   out <- df %>%
     group_by(g) %>%
-    pivot_longer(x1:x2, names_to = "x", values_to = "v")
+    tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
   expect_equal(group_vars(out), "g")
 })
