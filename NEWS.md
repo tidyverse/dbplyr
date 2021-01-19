@@ -8,6 +8,8 @@
 
 * `expand()`, `complete()` and `replace_na()` are now translated (@mgirlich, #538).
 
+* Add `dbplyr_fill()`, the database equivalent of `tidyr::fill()` (@mgirlich, #566).
+
 # dbplyr 2.0.0
 
 ## dplyr 1.0.0 compatibility
