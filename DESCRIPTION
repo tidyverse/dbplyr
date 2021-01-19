@@ -38,7 +38,8 @@ Imports:
     blob (>= 1.2.0),
     utils,
     withr,
-    vctrs
+    vctrs,
+    ellipsis
 Suggests:
     bit64,
     covr,
