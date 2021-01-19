@@ -7,7 +7,7 @@
 complete.tbl_lazy(data, ..., fill = list())
 }
 \arguments{
-\item{data}{A pair of lazy data frame backed by database queries.}
+\item{data}{A lazy data frame backed by a database query.}
 
 \item{...}{Specification of columns to expand. See \link[tidyr:expand]{tidyr::expand} for
 more details.}
@@ -22,7 +22,7 @@ and return data to R.
 }
 \description{
 Turns implicit missing values into explicit missing values. This is a method
-for the \code{\link[tidyr:expand]{tidyr::expand()}} generic.
+for the \code{\link[tidyr:complete]{tidyr::complete()}} generic.
 }
 \examples{
 if (require("tidyr", quietly = TRUE)) {

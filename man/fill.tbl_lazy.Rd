@@ -12,7 +12,10 @@ fill.tbl_lazy(.data, ..., .direction = c("down", "up"))
 \item{...}{Columns to fill.}
 
 \item{.direction}{Direction in which to fill missing values. Currently
-either "down" (the default) or "up".}
+either "down" (the default) or "up". Note that "up" does not work when
+\code{.data} is sorted by non-numeric columns. As a workaround revert the order
+yourself beforehand; for example replace \code{arrange(x, desc(y))} by
+\code{arrange(desc(x), y)}.}
 }
 \description{
 Fill in missing values with previous or next value
