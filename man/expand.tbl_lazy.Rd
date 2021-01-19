@@ -7,7 +7,7 @@
 expand.tbl_lazy(data, ..., .name_repair = "check_unique")
 }
 \arguments{
-\item{data}{A pair of lazy data frame backed by database queries.}
+\item{data}{A lazy data frame backed by a database query.}
 
 \item{...}{Specification of columns to expand. See \link[tidyr:expand]{tidyr::expand} for
 more details.}

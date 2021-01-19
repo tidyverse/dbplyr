@@ -1,3 +1,10 @@
+# select preserves grouping vars
+
+    Code
+      out <- mf %>% select(a) %>% collect()
+    Message <message>
+      Adding missing grouping variables: `b`
+
 # multiple selects are collapsed
 
     Code

@@ -45,15 +45,16 @@ a glue specification that uses the \code{names_from} columns (and special
 \item{names_sort}{Should the column names be sorted? If \code{FALSE}, the default,
 column names are ordered by first appearance.}
 
-\item{names_repair}{TODO}
+\item{names_repair}{What happens if the output has invalid column names?}
 
 \item{values_fill}{Optionally, a (scalar) value that specifies what each
 \code{value} should be filled in with when missing.}
 
-\item{values_fn}{A function applied to the \code{value} in each cell
-in the output. It is required (unlike for local data frames).}
+\item{values_fn}{A function, the default is \code{max()}, applied to the \code{value}
+in each cell in the output. In contrast to local data frames it must not be
+\code{NULL}.}
 
-\item{...}{Not supported.}
+\item{...}{Unused; included for compatibility with generic.}
 }
 \description{
 \code{pivot_wider()} "widens" data, increasing the number of columns and
@@ -63,7 +64,7 @@ Learn more in \code{vignette("pivot", "tidyr")}.
 }
 \details{
 The big difference to \code{pivot_wider()} for local data frames is that
-\code{values_fn} is a required argument. By default it is \code{max()} which yields
+\code{values_fn} must not be \code{NULL}. By default it is \code{max()} which yields
 the same results as for local data frames if the combination of \code{id_cols}
 and \code{value} column uniquely identify an observation.
 Mind that you also do not get a warning if an observation is not uniquely

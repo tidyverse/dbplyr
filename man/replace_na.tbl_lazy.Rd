@@ -9,10 +9,10 @@ replace_na.tbl_lazy(data, replace = list(), ...)
 \arguments{
 \item{data}{A pair of lazy data frame backed by database queries.}
 
-\item{replace}{A list of values, with one value for each column that has NA
-values to be replaced.}
+\item{replace}{A named list of values, with one value for each column that
+has NA values to be replaced.}
 
-\item{...}{Additional arguments for methods. Currently unused.}
+\item{...}{Unused; included for compatibility with generic.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
