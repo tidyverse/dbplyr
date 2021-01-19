@@ -8,6 +8,7 @@
   register_s3_method("dplyr", "filter", "tbl_lazy")
 
   register_s3_method("tidyr", "pivot_longer", "tbl_lazy")
+  register_s3_method("tidyr", "fill", "tbl_lazy")
   register_s3_method("tidyr", "complete", "tbl_lazy")
   register_s3_method("tidyr", "expand", "tbl_lazy")
   register_s3_method("tidyr", "replace_na", "tbl_lazy")
