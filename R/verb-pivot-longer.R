@@ -171,8 +171,9 @@ get_measure_column_exprs <- function(name, value, values_transform) {
   )
 }
 
-# The following is copy-pasted from tidyr
-# with the exception of `simplifyPieces()` which I have quickly hacked in R
+# The following is copy-pasted from `tidyr`
+# `check_spec()` can be removed once it is exported by `tidyr`
+# see https://github.com/tidyverse/tidyr/issues/1087
 
 check_spec <- function(spec) {
   # COPIED FROM tidyr
