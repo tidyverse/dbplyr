@@ -138,38 +138,29 @@ dbplyr_build_wider_spec <- function(data,
     abort(error_message)
   }
 
-  cn_data <- colnames(data)
-  data_tmp <- set_names(character(length(cn_data)), cn_data)
-  names_from <- names(tidyselect::eval_select(enquo(names_from), data_tmp))
-  values_from <- tidyselect::eval_select(enquo(values_from), data_tmp)
+  # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
+  # 1. create a tibble with unique values in the `names_from` column
+  # row_ids <- vec_unique(data[names_from])
+  sim_data <- simulate_vars(data)
+  names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
+  distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
-  row_ids <- collect(distinct(data, !!!syms(names_from)))
-  if (names_sort) {
-    row_ids <- vctrs::vec_sort(row_ids)
-  }
-
-  row_names <- exec(paste, !!!row_ids, sep = names_sep)
-
-  out <- tibble(
-    .name = paste0(names_prefix, row_names)
+  # 2. add `values_from` column
+  values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
+  dummy_data <- vctrs::vec_cbind(
+    distinct_data,
+    !!!rlang::rep_named(values_from, list(TRUE)),
+    .name_repair = "check_unique"
   )
 
-  if (length(values_from) == 1) {
-    out$.value <- names(values_from)
-  } else {
-    out <- vctrs::vec_rep(out, times = vctrs::vec_size(values_from))
-    out$.value <- vctrs::vec_rep_each(names(values_from), times = vctrs::vec_size(row_ids))
-    out$.name <- paste0(out$.value, names_sep, out$.name)
-
-    row_ids <- vctrs::vec_rep(row_ids, times = vctrs::vec_size(values_from))
-  }
-
-  out <- vctrs::vec_cbind(out, as_tibble(row_ids), .name_repair = "minimal")
-  if (!is.null(names_glue)) {
-    out$.name <- as.character(glue::glue_data(out, names_glue))
-  }
-
-  out
+  tidyr::build_wider_spec(dummy_data,
+    names_from = !!enquo(names_from),
+    values_from = !!enquo(values_from),
+    names_prefix = names_prefix,
+    names_sep = names_sep,
+    names_glue = names_glue,
+    names_sort = names_sort
+  )
 }
 
 dbplyr_pivot_wider_spec <- function(data,
@@ -177,9 +168,8 @@ dbplyr_pivot_wider_spec <- function(data,
                                     names_repair = "check_unique",
                                     id_cols = NULL,
                                     values_fill = NULL,
-                                    values_fn = NULL) {
-  # TODO add check_spec
-  # spec <- check_spec(spec)
+                                    values_fn = max) {
+  spec <- check_spec(spec)
 
   if (is.null(values_fn)) {
     abort(c(
@@ -258,4 +248,18 @@ is_scalar <- function(x) {
   } else {
     length(x) == 1
   }
+}
+
+# TODO remove when `pivot_longer.tbl_lazy()` is merged
+# https://github.com/tidyverse/dbplyr/pull/533
+check_spec <- function (spec) {
+  if (!is.data.frame(spec)) {
+    stop("`spec` must be a data frame", call. = FALSE)
+  }
+  if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
+    stop("`spec` must have `.name` and `.value` columns",
+         call. = FALSE)
+  }
+  vars <- union(c(".name", ".value"), names(spec))
+  spec[vars]
 }
