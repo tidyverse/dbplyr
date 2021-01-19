@@ -175,6 +175,7 @@ get_measure_column_exprs <- function(name, value, values_transform) {
 # `check_spec()` can be removed once it is exported by `tidyr`
 # see https://github.com/tidyverse/tidyr/issues/1087
 
+# nocov start
 check_spec <- function(spec) {
   # COPIED FROM tidyr
 
@@ -232,5 +233,6 @@ deduplicate_spec <- function(spec, df) {
   spec$.seq <- copy
   spec
 }
+# nocov end
 
 globalVariables(".")
