@@ -1,7 +1,21 @@
 # dbplyr (development version)
 
+* `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
+
+* `distinct()` now respects grouping (#535, @mgirlich)
+* fix partial match in `db_connection_describe()` (#564, @mgirlich).
+
+* `distinct()` now respects grouping (@mgirlich, #535).
+
+* fix partial match in `db_connection_describe()` (@mgirlich, #564).
+
+* Add custom SQLite translation of `full_join()` and `right_join()` (@mgirlich, #536).
+
+* `expand()`, `complete()` and `replace_na()` are now translated (@mgirlich, #538).
+
+* Add `dbplyr_fill()`, the database equivalent of `tidyr::fill()` (@mgirlich, #566).
+
 # dbplyr 2.0.0
-(To become dbplyr 2.0.0)
 
 ## dplyr 1.0.0 compatibility
 

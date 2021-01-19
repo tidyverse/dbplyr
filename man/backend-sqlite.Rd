@@ -14,6 +14,7 @@ are:
 \item Uses non-standard \code{LOG()} function
 \item Date-time extraction functions from lubridate
 \item Custom median translation
+\item Right and full joins are simulated using left joins
 }
 
 Use \code{simulate_sqlite()} with \code{lazy_frame()} to see simulated SQL without

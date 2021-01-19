@@ -49,7 +49,7 @@ NULL
 #' @importFrom dplyr slice
 #' @export
 slice.tbl_lazy <- function(.data, ...) {
-  abort("slice() is not suppoted on database backends")
+  abort("slice() is not supported on database backends")
 }
 
 #' @importFrom dplyr slice_head
