@@ -16,7 +16,10 @@
 #' @inheritParams arrange.tbl_lazy
 #' @param ... Columns to fill.
 #' @param .direction Direction in which to fill missing values. Currently
-#'   either "down" (the default) or "up".
+#'   either "down" (the default) or "up". Note that "up" does not work when
+#'   `.data` is sorted by non-numeric columns. As a workaround revert the order
+#'   yourself beforehand; for example replace `arrange(x, desc(y))` by
+#'   `arrange(desc(x), y)`.
 #'
 #' @examples
 #' squirrels <- tibble::tribble(
