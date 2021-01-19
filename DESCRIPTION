@@ -38,8 +38,7 @@ Imports:
     blob (>= 1.2.0),
     utils,
     withr,
-    vctrs,
-    ellipsis
+    vctrs
 Suggests:
     bit64,
     covr,
@@ -127,6 +126,7 @@ Collate:
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'
+    'verb-expand.R'
     'verb-filter.R'
     'verb-group_by.R'
     'verb-head.R'
