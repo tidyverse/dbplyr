@@ -1,38 +1,58 @@
+spec <- tibble(
+  .name = c("x", "y"),
+  .value = "val",
+  key = c("x", "y")
+)
+
+spec1 <- tibble(.name = "x", .value = "val", key = "x")
+
 test_that("can pivot all cols to wide", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
+  expect_equal(
+    memdb_frame(key = c("x", "y", "z"), val = 1:3) %>%
+      tidyr::pivot_wider(names_from = key, values_from = val) %>%
+      collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
 
-  df <- memdb_frame(key = c("x", "y", "z"), val = 1:3)
-  pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
+  spec <- tibble(
+    .name = c("x", "y", "z"),
+    .value = "val",
+    key = c("x", "y", "z")
+  )
 
-  expect_named(pv, c("x", "y", "z"))
-  expect_equal(nrow(pv), 1)
+  expect_snapshot(
+    lazy_frame(key = c("x", "y", "z"), val = 1:3) %>%
+      dbplyr_pivot_wider_spec(spec)
+  )
 })
 
 test_that("non-pivoted cols are preserved", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
+  df <- lazy_frame(a = 1, key = c("x", "y"), val = 1:2)
 
-  df <- memdb_frame(a = 1, key = c("x", "y"), val = 1:2)
-  pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
-
-  expect_named(pv, c("a", "x", "y"))
-  expect_equal(nrow(pv), 1)
+  expect_equal(
+    dbplyr_pivot_wider_spec(df, spec) %>% op_vars(),
+    c("a", "x", "y")
+  )
 })
 
 test_that("implicit missings turn into explicit missings", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
   df <- memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2)
-  pv <- pivot_wider(df, names_from = key, values_from = val) %>% collect()
 
-  expect_equal(pv$a, c(1, 2))
-  expect_equal(pv$x, c(1, NA))
-  expect_equal(pv$y, c(NA, 2))
+  expect_equal(
+    memdb_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>%
+      tidyr::pivot_wider(names_from = key, values_from = val) %>%
+      collect(),
+    tibble(a = 1:2, x = c(1, NA), y = c(NA, 2))
+  )
+
+  expect_snapshot(
+    lazy_frame(a = 1:2, key = c("x", "y"), val = 1:2) %>%
+      dbplyr_pivot_wider_spec(spec)
+  )
 })
 
 test_that("error when overwriting existing column", {
+  # TODO
   skip("not yet implemented")
   df <- memdb_frame(
     a = c(1, 1),
@@ -46,35 +66,28 @@ test_that("error when overwriting existing column", {
 })
 
 test_that("grouping is preserved", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
+  df <- lazy_frame(a = 1, key = "x", val = 2)
 
-  df <- memdb_frame(g = 1, k = "x", v = 2)
-  out <- df %>%
-    dplyr::group_by(g) %>%
-    pivot_wider(names_from = k, values_from = v) %>%
-    collect()
-  expect_equal(dplyr::group_vars(out), "g")
+  expect_equal(
+    df %>%
+      dplyr::group_by(a) %>%
+      dbplyr_pivot_wider_spec(spec1) %>%
+      group_vars(),
+    "a"
+  )
 })
 
 # https://github.com/tidyverse/tidyr/issues/804
 test_that("column with `...j` name can be used as `names_from`", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
   df <- memdb_frame(...8 = c("x", "y", "z"), val = 1:3)
-  pv <- pivot_wider(df, names_from = ...8, values_from = val) %>% collect()
+  pv <- tidyr::pivot_wider(df, names_from = ...8, values_from = val) %>% collect()
   expect_named(pv, c("x", "y", "z"))
-  expect_equal(nrow(pv), 1)
 })
 
 
 # column names -------------------------------------------------------------
 
-test_that("names_glue affects output names", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
+test_that("dbplyr_build_wider_spec can handle multiple columns", {
   df <- memdb_frame(
     x = c("X", "Y"),
     y = 1:2,
@@ -82,121 +95,89 @@ test_that("names_glue affects output names", {
     b = 1:2
   )
 
-  spec <- dbplyr_build_wider_spec(df, x:y, a:b, names_glue = '{x}{y}_{.value}')
-  expect_equal(spec$.name, c("X1_a", "Y2_a", "X1_b", "Y2_b"))
-})
-
-test_that("can sort column names", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- memdb_frame(
-    int = c(1, 3, 2),
-    fac = c("Mon", "Wed", "Tue")
+  expect_equal(
+    dbplyr_build_wider_spec(df, x:y, a:b),
+    tibble::tribble(
+      ~.name, ~.value,  ~x, ~y,
+      "a_X_1",     "a", "X", 1L,
+      "a_Y_2",     "a", "Y", 2L,
+      "b_X_1",     "b", "X", 1L,
+      "b_Y_2",     "b", "Y", 2L
+    )
   )
-  spec <- dbplyr_build_wider_spec(df,
-    names_from = fac,
-    values_from = int,
-    names_sort = TRUE
-  )
-  expect_equal(spec$.name, c("Mon", "Tue", "Wed"))
 })
 
 # keys ---------------------------------------------------------
 
 test_that("can override default keys", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tribble(
+  df <- tibble::tribble(
     ~row, ~name, ~var, ~value,
     1,    "Sam", "age", 10,
     2,    "Sam", "height", 1.5,
     3,    "Bob", "age", 20,
   )
 
-  pv <- memdb_frame(!!!df) %>%
-    pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
-    collect()
-  expect_equal(nrow(pv), 2)
+  df_db <- memdb_frame(!!!df)
+
+  expect_equal(
+    df_db %>%
+      tidyr::pivot_wider(id_cols = name, names_from = var, values_from = value) %>%
+      collect(),
+    tibble::tribble(
+      ~name, ~age, ~height,
+      "Bob",   20,      NA,
+      "Sam",   10,     1.5
+    )
+  )
 })
 
 
 # non-unqiue keys ---------------------------------------------------------
 
-test_that("duplicated keys produce list column with warning", {
-  skip("not yet implemented")
-  df <- memdb_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = 1:3)
-  expect_warning(
-    pv <- pivot_wider(df, names_from = key, values_from = val),
-    "list-col"
-  )
-
-  expect_equal(pv$a, c(1, 2))
-  expect_equal(as.list(pv$x), list(c(1L, 2L), 3L))
-})
-
-test_that("warning suppressed by supplying values_fn", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tibble(a = c(1, 1, 2), key = c("x", "x", "x"), val = 1:3)
-  expect_warning(
-    pv <- pivot_wider(df,
-      names_from = key,
-      values_from = val,
-      values_fn = list(val = list)
-    ),
-    NA
-  )
-  expect_equal(pv$a, c(1, 2))
-  expect_equal(as.list(pv$x), list(c(1L, 2L), 3L))
-})
+# TODO check error if `values_fn = NULL`
 
 test_that("values_fn can be a single function", {
-  skip("not yet implemented")
-  df <- memdb_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
-  pv <- pivot_wider(df, names_from = key, values_from = val, values_fn = sum)
-  expect_equal(pv$x, c(11, 100))
+  df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
+
+  expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
 })
 
-test_that("values_summarize applied even when no-duplicates", {
-  skip("not yet implemented")
-  df <- tibble(a = c(1, 2), key = c("x", "x"), val = 1:2)
-  pv <- pivot_wider(df,
-    names_from = key,
-    values_from = val,
-    values_fn = list(val = list)
+test_that("values_fn cannot be NULL", {
+  df <- lazy_frame(a = 1, key = "x", val = 1)
+
+  expect_snapshot(
+    expect_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
   )
-
-  expect_equal(pv$a, c(1, 2))
-  expect_equal(as.list(pv$x), list(1L, 2L))
 })
-
 
 # can fill missing cells --------------------------------------------------
 
 test_that("can fill in missing cells", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
+  df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
+  df_lazy <- lazy_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
 
-  df <- memdb_frame(g = c(1, 2), var = c("x", "y"), val = c(1, 2))
+  expect_equal(tidyr::pivot_wider(df) %>% pull(x), c(1, NA))
 
-  widen <- function(...) {
-    df %>% pivot_wider(names_from = var, values_from = val, ...) %>% collect()
-  }
+  expect_equal(tidyr::pivot_wider(df, values_fill = 0) %>% pull(x), c(1, 0))
+  expect_snapshot(dbplyr_pivot_wider_spec(df_lazy, spec, values_fill = 0))
 
-  expect_equal(widen()$x, c(1, NA))
-  expect_equal(widen(values_fill = 0)$x, c(1, 0))
-  expect_equal(widen(values_fill = list(val = 0))$x, c(1, 0))
+  expect_equal(
+    tidyr::pivot_wider(df, values_fill = list(value = 0)) %>%
+      pull(x),
+    c(1, 0)
+  )
+  expect_snapshot(
+    dbplyr_pivot_wider_spec(
+      df_lazy,
+      spec,
+      values_fill = list(value = 0)
+    )
+  )
 })
 
 test_that("values_fill only affects missing cells", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tibble(g = c(1, 2), names = c("x", "y"), value = c(1, NA))
-  out <- pivot_wider(df, names_from = names, values_from = value, values_fill = 0) %>%
+  df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
+  out <- tidyr::pivot_wider(df, values_fill = 0) %>%
     collect()
   expect_equal(out$y, c(0, NA))
 })
@@ -204,43 +185,24 @@ test_that("values_fill only affects missing cells", {
 # multiple values ----------------------------------------------------------
 
 test_that("can pivot from multiple measure cols", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tibble(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
-  sp <- build_wider_spec(df, names_from = var, values_from = c(a, b))
-  pv <- pivot_wider_spec(df, sp)
+  df <- memdb_frame(row = 1, var = c("x", "y"), a = 1:2, b = 3:4)
+  pv <- tidyr::pivot_wider(df, names_from = var, values_from = c(a, b)) %>%
+    collect()
 
   expect_named(pv, c("row", "a_x", "a_y", "b_x", "b_y"))
   expect_equal(pv$a_x, 1)
   expect_equal(pv$b_y, 4)
 })
 
-test_that("can pivot from multiple measure cols using all keys", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tibble(var = c("x", "y"), a = 1:2, b = 3:4)
-  sp <- build_wider_spec(df, names_from = var, values_from = c(a, b))
-  pv <- pivot_wider_spec(df, sp)
-
-  expect_named(pv, c("a_x", "a_y", "b_x", "b_y"))
-  expect_equal(pv$a_x, 1)
-  expect_equal(pv$b_y, 4)
-})
-
 test_that("column order in output matches spec", {
-  skip_if_not_installed("tidyr", minimum_version = "1.0.0")
-  withr::local_package("tidyr")
-
-  df <- tribble(
+  df <- tibble::tribble(
     ~hw,   ~name,  ~mark,   ~pr,
     "hw1", "anna",    95,  "ok",
     "hw2", "anna",    70, "meh",
   )
 
   # deliberately create weird order
-  sp <- tribble(
+  sp <- tibble::tribble(
     ~hw, ~.value,  ~.name,
     "hw1", "mark", "hw1_mark",
     "hw1", "pr",   "hw1_pr",
@@ -248,6 +210,6 @@ test_that("column order in output matches spec", {
     "hw2", "mark", "hw2_mark",
   )
 
-  pv <- pivot_wider_spec(df, sp)
-  expect_named(pv, c("name", sp$.name))
+  pv <- dbplyr_pivot_wider_spec(lazy_frame(!!!df), sp)
+  expect_equal(pv %>% op_vars(), c("name", sp$.name))
 })
