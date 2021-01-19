@@ -73,6 +73,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/dbplyr-slice.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/dbplyr_uncount.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/distinct.tbl_lazy.html</loc>
   </url>
   <url>
