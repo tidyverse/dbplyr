@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* `pivot_longer()` from the `tidyr` package can now be used (#532, @mgirlich).
+
+* `distinct()` now respects grouping (#535, @mgirlich)
+* fix partial match in `db_connection_describe()` (#564, @mgirlich).
+
 * `distinct()` now respects grouping (@mgirlich, #535).
 
 * fix partial match in `db_connection_describe()` (@mgirlich, #564).

@@ -38,6 +38,7 @@ Imports:
     blob (>= 1.2.0),
     utils,
     withr,
+    ellipsis,
     vctrs
 Suggests:
     bit64,
@@ -133,6 +134,7 @@ Collate:
     'verb-head.R'
     'verb-joins.R'
     'verb-mutate.R'
+    'verb-pivot-longer.R'
     'verb-pull.R'
     'verb-select.R'
     'verb-set-ops.R'
