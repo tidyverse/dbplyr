@@ -58,7 +58,6 @@ right_join(x, y): SELECT * FROM x RIGHT JOIN y ON x.a = y.a
 full_join(x, y):  SELECT * FROM x FULL JOIN y ON x.a = y.a
 semi_join(x, y):  SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)
 anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)
-For SQLite right and full joins are simulated using left joins.
 
 " />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
@@ -206,7 +205,6 @@ to the following SQL queries:</p><ul>
 <li><p><code><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>full_join(x, y)</a></code>:  <code>SELECT * FROM x FULL JOIN y ON x.a = y.a</code></p></li>
 <li><p><code><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>semi_join(x, y)</a></code>:  <code>SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></p></li>
 <li><p><code><a href='https://dplyr.tidyverse.org/reference/filter-joins.html'>anti_join(x, y)</a></code>:  <code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></p></li>
-<li><p>For SQLite right and full joins are simulated using left joins.</p></li>
 </ul>
 
     </div>

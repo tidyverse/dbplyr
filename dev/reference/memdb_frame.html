@@ -233,18 +233,18 @@ unlikely to conflict with an existing table.</p></td>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_016&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.0 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
-#&gt;           x     y
-#&gt;       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.000</span><span style='text-decoration: underline;'>958</span><span> 0.265
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.007</span><span style='text-decoration: underline;'>07</span><span>  0.846
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.021</span><span style='text-decoration: underline;'>8</span><span>   0.867
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.027</span><span style='text-decoration: underline;'>6</span><span>   0.658
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.029</span><span style='text-decoration: underline;'>9</span><span>   0.181
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.059</span><span style='text-decoration: underline;'>1</span><span>   0.801
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.064</span><span style='text-decoration: underline;'>9</span><span>   0.161
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.068</span><span style='text-decoration: underline;'>2</span><span>   0.679
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.075</span><span style='text-decoration: underline;'>3</span><span>   0.154
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.077</span><span style='text-decoration: underline;'>6</span><span>   0.993
+#&gt;          x     y
+#&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.007</span><span style='text-decoration: underline;'>07</span><span> 0.846
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.029</span><span style='text-decoration: underline;'>9</span><span>  0.181
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.043</span><span style='text-decoration: underline;'>6</span><span>  0.149
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.064</span><span style='text-decoration: underline;'>9</span><span>  0.161
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.068</span><span style='text-decoration: underline;'>2</span><span>  0.679
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.075</span><span style='text-decoration: underline;'>3</span><span>  0.154
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.077</span><span style='text-decoration: underline;'>6</span><span>  0.993
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.080</span><span style='text-decoration: underline;'>1</span><span>  0.663
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.099</span><span style='text-decoration: underline;'>8</span><span>  0.961
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.111   0.709
 #&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'><span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *

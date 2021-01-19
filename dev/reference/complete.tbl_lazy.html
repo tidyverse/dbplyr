@@ -51,7 +51,7 @@
 
 <meta property="og:title" content="Complete a SQL table with missing combinations of data — complete.tbl_lazy" />
 <meta property="og:description" content="Turns implicit missing values into explicit missing values. This is a method
-for the tidyr::expand() generic." />
+for the tidyr::complete() generic." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -190,7 +190,7 @@ for the tidyr::expand() generic." />
 
     <div class="ref-description">
     <p>Turns implicit missing values into explicit missing values. This is a method
-for the <code><a href='https://tidyr.tidyverse.org/reference/expand.html'>tidyr::expand()</a></code> generic.</p>
+for the <code><a href='https://tidyr.tidyverse.org/reference/complete.html'>tidyr::complete()</a></code> generic.</p>
     </div>
 
     <pre class="usage"><span class='fu'>complete.tbl_lazy</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>...</span>, fill <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
@@ -200,7 +200,7 @@ for the <code><a href='https://tidyr.tidyverse.org/reference/expand.html'>tidyr:
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A pair of lazy data frame backed by database queries.</p></td>
+      <td><p>A lazy data frame backed by a database query.</p></td>
     </tr>
     <tr>
       <th>...</th>
