@@ -7,7 +7,7 @@
 #'
 #' @details
 #' The big difference to `pivot_wider()` for local data frames is that
-#' `values_fn` is a required argument. By default it is `max()` which yields
+#' `values_fn` must not be `NULL`. By default it is `max()` which yields
 #' the same results as for local data frames if the combination of `id_cols`
 #' and `value` column uniquely identify an observation.
 #' Mind that you also do not get a warning if an observation is not uniquely
@@ -75,12 +75,13 @@
 #'   `.value`) to create custom column names.
 #' @param names_sort Should the column names be sorted? If `FALSE`, the default,
 #'   column names are ordered by first appearance.
-#' @param names_repair TODO
+#' @param names_repair What happens if the output has invalid column names?
 #' @param values_fill Optionally, a (scalar) value that specifies what each
 #'   `value` should be filled in with when missing.
-#' @param values_fn A function applied to the `value` in each cell
-#'   in the output. It is required (unlike for local data frames).
-#' @param ... Not supported.
+#' @param values_fn A function, the default is `max()`, applied to the `value`
+#' in each cell in the output. In contrast to local data frames it must not be
+#' `NULL`.
+#' @param ... Unused; included for compatibility with generic.
 #'
 #' @examples
 #' if (require("tidyr", quietly = TRUE)) {
