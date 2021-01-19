@@ -83,3 +83,9 @@ test_that("groups are respected", {
       tidyr::fill(n1)
   )
 })
+
+test_that("fill errors on unsorted data", {
+  expect_snapshot({
+    expect_error(df_db %>% tidyr::fill(n1))
+  })
+})

@@ -55,3 +55,8 @@
       SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (PARTITION BY `group` ORDER BY `id`) AS `n1`
       FROM `df`
 
+# fill errors on unsorted data
+
+    Code
+      expect_error(df_db %>% tidyr::fill(n1))
+
