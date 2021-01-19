@@ -1,16 +1,3 @@
-# ignore nulls
-# * hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics
-# * impala: https://docs.cloudera.com/documentation/enterprise/5-11-x/topics/impala_analytic_functions.html
-# * mssql: https://docs.microsoft.com/en-us/sql/t-sql/functions/first-value-transact-sql?view=sql-server-ver15
-# * oracle: https://oracle-base.com/articles/misc/first-value-and-last-value-analytic-functions
-# * redshift: https://docs.aws.amazon.com/redshift/latest/dg/r_WF_first_value.html
-# * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
-#
-# no ignore nulls
-# * access: https://www.techonthenet.com/access/functions/
-# * hana: https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/2.0.04/en-US/e7ef7cc478f14a408e1af27fc1a78624.html
-# * mysql: https://dev.mysql.com/doc/refman/8.0/en/window-function-descriptions.html
-
 #' Fill in missing values with previous or next value
 #'
 #' @inheritParams arrange.tbl_lazy
@@ -66,6 +53,7 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     # `desc()` cannot be used here because one gets invalid SQL if a variable
     # is already wrapped in `desc()`
     # i.e. `desc(desc(x))` produces `x DESC DESC`
+    # but this implies that "up" does not work for sorting non-numeric columns!
     order_by_cols <- purrr::map(order_by_cols, ~ quo(-!!.x))
   }
 
@@ -82,6 +70,13 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
   UseMethod("dbplyr_fill0")
 }
 
+# databases with support for `IGNORE NULLS`
+# * hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics
+# * impala: https://docs.cloudera.com/documentation/enterprise/5-11-x/topics/impala_analytic_functions.html
+# * mssql: https://docs.microsoft.com/en-us/sql/t-sql/functions/first-value-transact-sql?view=sql-server-ver15
+# * oracle: https://oracle-base.com/articles/misc/first-value-and-last-value-analytic-functions
+# * redshift: https://docs.aws.amazon.com/redshift/latest/dg/r_WF_first_value.html
+# * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
 #' @export
 dbplyr_fill0.DBIConnection <- function(.con,
                                           .data,
@@ -117,12 +112,22 @@ dbplyr_fill0.DBIConnection <- function(.con,
     )
 }
 
+# databases without support for `IGNORE NULLS`
+# * sqlite
+# * access: https://www.techonthenet.com/access/functions/
+# * hana: https://help.sap.com/viewer/4fe29514fd584807ac9f2a04f6754767/2.0.04/en-US/e7ef7cc478f14a408e1af27fc1a78624.html
+# * mysql: https://dev.mysql.com/doc/refman/8.0/en/window-function-descriptions.html
+# * mariadb
+# * postgres: https://www.postgresql.org/docs/13/functions-window.html
 #' @export
 dbplyr_fill0.SQLiteConnection <- function(.con,
                                              .data,
                                              cols_to_fill,
                                              order_by_cols,
                                              .direction) {
+  # this strategy is used for databases that don't support `IGNORE NULLS` in
+  # `LAST_VALUE()`.
+  #
   # strategy:
   # for each column to fill:
   # 1. generate a helper column `....dbplyr_partion_x`. It creates one partition
