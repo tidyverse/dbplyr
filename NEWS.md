@@ -5,6 +5,10 @@
 * `distinct()` now respects grouping (#535, @mgirlich)
 * fix partial match in `db_connection_describe()` (#564, @mgirlich).
 
+* `select()` now does not relocate grouping variables to the front (@mgirlich, #568).
+
+* `select()` informs when adding missing grouping variables (@mgirlich, #559).
+
 * `distinct()` now respects grouping (@mgirlich, #535).
 
 * fix partial match in `db_connection_describe()` (@mgirlich, #564).
