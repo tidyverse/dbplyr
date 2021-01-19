@@ -37,7 +37,8 @@ Imports:
     tidyselect (>= 0.2.4),
     blob (>= 1.2.0),
     utils,
-    withr
+    withr,
+    vctrs
 Suggests:
     bit64,
     covr,
@@ -125,6 +126,7 @@ Collate:
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'
+    'verb-expand.R'
     'verb-fill.R'
     'verb-filter.R'
     'verb-group_by.R'
