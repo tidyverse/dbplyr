@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* @mgirlich is now a dbplyr author in recognition of his significant and
+  sustained contributions.
+
 * Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
   `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
   `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
