@@ -17,13 +17,13 @@
 #'
 #' 1. Get unique keys in `names_from` column.
 #' 2. For each key value generate an expression of the form:
-#'
-#' ```sql
-#' value_fn(
-#'   CASE WHEN (`names from column` == `key value`) THEN (`value column`)
-#' ) AS `output column`
-#' ```
-#'
+#'     ```sql
+#'     value_fn(
+#'       CASE WHEN (`names from column` == `key value`)
+#'       THEN (`value column`)
+#'       END
+#'     ) AS `output column`
+#'     ```
 #' 3. Group data by id columns.
 #' 4. Summarise the grouped data with the expressions from step 2.
 #'
