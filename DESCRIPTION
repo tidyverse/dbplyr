@@ -135,6 +135,7 @@ Collate:
     'verb-joins.R'
     'verb-mutate.R'
     'verb-pivot-longer.R'
+    'verb-pivot-wider.R'
     'verb-pull.R'
     'verb-select.R'
     'verb-set-ops.R'

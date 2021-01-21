@@ -19,7 +19,8 @@ then this column is removed.}
 identifier for each created row.}
 }
 \description{
-This is a method for the tidyr \code{uncount()} generic.
+This is a method for the tidyr \code{uncount()} generic. It uses a temporary
+table, so your database user needs permissions to create one.
 }
 \examples{
 df <- memdb_frame(x = c("a", "b"), n = c(1, 2))
