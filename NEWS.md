@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
+
 * Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
   `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
   `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
