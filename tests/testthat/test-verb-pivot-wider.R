@@ -213,3 +213,7 @@ test_that("column order in output matches spec", {
   pv <- dbplyr_pivot_wider_spec(lazy_frame(!!!df), sp)
   expect_equal(pv %>% op_vars(), c("name", sp$.name))
 })
+
+test_that("cannot pivot lazy frames", {
+  expect_snapshot_error(tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
+})
