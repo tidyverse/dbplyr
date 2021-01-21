@@ -284,60 +284,35 @@ Mind that you also do not get a warning if an observation is not uniquely
 identified.</p>
 <p>The translation to SQL code basically works as follows:</p><ol>
 <li><p>Get unique keys in <code>names_from</code> column.</p></li>
-<li><p>For each key value generate an expression of the form:</p></li>
-</ol><p><div class="sql"></p><pre>value_fn(
-  CASE WHEN (`names from column` == `key value`) THEN (`value column`)
+<li><p>For each key value generate an expression of the form:<div class="sql"></p><pre>value_fn(
+  CASE WHEN (`names from column` == `key value`)
+  THEN (`value column`)
+  END
 ) AS `output column`
-</pre><p></div></p><ol>
+</pre><p></div></p></li>
 <li><p>Group data by id columns.</p></li>
 <li><p>Summarise the grouped data with the expressions from step 2.</p></li>
 </ol>
 
-<p>For example the following R code</p><pre><span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>
-  id_column <span class='op'>=</span> <span class='fl'>1</span>,
-  key <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span>,
-  value <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>
-<span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_wider.html'>pivot_wider</a></span><span class='op'>(</span>
-    id_cols <span class='op'>=</span> <span class='va'>id_column</span>,
-    names_from <span class='op'>=</span> <span class='va'>key</span>,
-    values_from <span class='op'>=</span> <span class='va'>value</span>
-  <span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</pre>
-
-<p>translates to this SQL code<div class="sql"></p><pre>SELECT `id_column`,
-       MAX(CASE
-               WHEN (`key` = 'x') THEN (`val`)
-           END) AS `x`,
-       MAX(CASE
-               WHEN (`key` = 'y') THEN (`val`)
-           END) AS `y`
-FROM `df`
-GROUP BY `id_column`
-</pre><p></div></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://tidyr.tidyverse.org'>"tidyr"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'><a href='memdb_frame.html'>tbl_memdb</a></span><span class='op'>(</span><span class='va'>us_rent_income</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-    <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_wider.html'>pivot_wider</a></span><span class='op'>(</span>names_from <span class='op'>=</span> <span class='va'>variable</span>, values_from <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>estimate</span>, <span class='va'>moe</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>
+  id <span class='op'>=</span> <span class='fl'>1</span>,
+  key <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span>,
+  value <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>
+<span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>tidyr</span><span class='fu'>::</span><span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_wider.html'>pivot_wider</a></span><span class='op'>(</span>
+    id_cols <span class='op'>=</span> <span class='va'>id</span>,
+    names_from <span class='op'>=</span> <span class='va'>key</span>,
+    values_from <span class='op'>=</span> <span class='va'>value</span>
+  <span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 6]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 3]</span><span>
 #&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.0 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Groups:   GEOID</span><span>
-#&gt;    GEOID NAME                 estimate_income estimate_rent moe_income moe_rent
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 01    Alabama                        </span><span style='text-decoration: underline;'>24</span><span>476           747        136        3
-#&gt; </span><span style='color: #555555;'> 2</span><span> 02    Alaska                         </span><span style='text-decoration: underline;'>32</span><span>940          </span><span style='text-decoration: underline;'>1</span><span>200        508       13
-#&gt; </span><span style='color: #555555;'> 3</span><span> 04    Arizona                        </span><span style='text-decoration: underline;'>27</span><span>517           972        148        4
-#&gt; </span><span style='color: #555555;'> 4</span><span> 05    Arkansas                       </span><span style='text-decoration: underline;'>23</span><span>789           709        165        5
-#&gt; </span><span style='color: #555555;'> 5</span><span> 06    California                     </span><span style='text-decoration: underline;'>29</span><span>454          </span><span style='text-decoration: underline;'>1</span><span>358        109        3
-#&gt; </span><span style='color: #555555;'> 6</span><span> 08    Colorado                       </span><span style='text-decoration: underline;'>32</span><span>401          </span><span style='text-decoration: underline;'>1</span><span>125        109        5
-#&gt; </span><span style='color: #555555;'> 7</span><span> 09    Connecticut                    </span><span style='text-decoration: underline;'>35</span><span>326          </span><span style='text-decoration: underline;'>1</span><span>123        195        5
-#&gt; </span><span style='color: #555555;'> 8</span><span> 10    Delaware                       </span><span style='text-decoration: underline;'>31</span><span>560          </span><span style='text-decoration: underline;'>1</span><span>076        247       10
-#&gt; </span><span style='color: #555555;'> 9</span><span> 11    District of Columbia           </span><span style='text-decoration: underline;'>43</span><span>198          </span><span style='text-decoration: underline;'>1</span><span>424        681       17
-#&gt; </span><span style='color: #555555;'>10</span><span> 12    Florida                        </span><span style='text-decoration: underline;'>25</span><span>952          </span><span style='text-decoration: underline;'>1</span><span>077         70        3
-#&gt; </span><span style='color: #555555;'># … with more rows</span><span></div></span></pre>
+#&gt;      id     x     y
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>     1     1     2</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
