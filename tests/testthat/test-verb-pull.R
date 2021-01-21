@@ -15,3 +15,10 @@ test_that("extracts correct column from grouped tbl", {
 
   expect_equal(pull(mf, value), 42)
 })
+
+test_that("doesn't unnecessarily select", {
+  mf <- memdb_frame(x = c(3, 1, 2))
+  # no warning about select after arrange
+  expect_warning(out <- mf %>% arrange(x) %>% pull(), NA)
+  expect_equal(out, 1:3)
+})

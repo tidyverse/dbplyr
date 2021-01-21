@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `pull()` no longer `select()`s the result when there's already only 
+  one variable (#562).
+
 * MS SQL translation assumes a boolean context inside of `[` (#546)
 
 * `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
