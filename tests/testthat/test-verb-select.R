@@ -66,9 +66,14 @@ test_that("can rename with a function", {
 
 test_that("select preserves grouping vars", {
   mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
-  out <- mf %>% select(a) %>% collect()
+  expect_snapshot(out <- mf %>% select(a) %>% collect())
 
   expect_named(out, c("b", "a"))
+})
+
+test_that("select doesn't relocate grouping vars to the front", {
+  mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
+  expect_equal(mf %>% select(a, b) %>% op_vars(), c("a", "b"))
 })
 
 test_that("relocate works", {

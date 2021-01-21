@@ -38,8 +38,8 @@ Imports:
     blob (>= 1.2.0),
     utils,
     withr,
-    vctrs,
-    ellipsis
+    ellipsis,
+    vctrs
 Suggests:
     bit64,
     covr,
@@ -128,17 +128,23 @@ Collate:
     'verb-do-query.R'
     'verb-do.R'
     'verb-expand.R'
+    'verb-fill.R'
     'verb-filter.R'
     'verb-group_by.R'
     'verb-head.R'
     'verb-joins.R'
     'verb-mutate.R'
+<<<<<<< HEAD
     'verb-pivot-wider.R'
+=======
+    'verb-pivot-longer.R'
+>>>>>>> 57e17887f0eef3873f7fdff26caac16150d8d6b8
     'verb-pull.R'
     'verb-select.R'
     'verb-set-ops.R'
     'verb-slice.R'
     'verb-summarise.R'
+    'verb-uncount.R'
     'verb-window.R'
     'zzz.R'
 RdMacros: lifecycle
