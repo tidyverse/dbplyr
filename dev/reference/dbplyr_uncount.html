@@ -50,7 +50,8 @@
 
 
 <meta property="og:title" content=""Uncount" a database table — dbplyr_uncount" />
-<meta property="og:description" content="This is a method for the tidyr uncount() generic." />
+<meta property="og:description" content="This is a method for the tidyr uncount() generic. It uses a temporary
+table, so your database user needs permissions to create one." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -188,7 +189,8 @@
     </div>
 
     <div class="ref-description">
-    <p>This is a method for the tidyr <code><a href='https://tidyr.tidyverse.org/reference/uncount.html'>uncount()</a></code> generic.</p>
+    <p>This is a method for the tidyr <code><a href='https://tidyr.tidyverse.org/reference/uncount.html'>uncount()</a></code> generic. It uses a temporary
+table, so your database user needs permissions to create one.</p>
     </div>
 
     <pre class="usage"><span class='fu'>dbplyr_uncount</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>weights</span>, .remove <span class='op'>=</span> <span class='cn'>TRUE</span>, .id <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>

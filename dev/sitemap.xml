@@ -139,6 +139,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/pivot_longer.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/pivot_wider.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/pull.tbl_sql.html</loc>
   </url>
   <url>
