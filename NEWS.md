@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `across()` implementation has been rewritten to support more inputs:
+  it now translates formulas (#525), works with SQL functions that don't have
+  R translations (#534), and work with `NULL` (#554)
+
 * `pull()` no longer `select()`s the result when there's already only 
   one variable (#562).
 
