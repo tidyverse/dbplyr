@@ -249,17 +249,3 @@ is_scalar <- function(x) {
     length(x) == 1
   }
 }
-
-# TODO remove when `pivot_longer.tbl_lazy()` is merged
-# https://github.com/tidyverse/dbplyr/pull/533
-check_spec <- function (spec) {
-  if (!is.data.frame(spec)) {
-    stop("`spec` must be a data frame", call. = FALSE)
-  }
-  if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
-    stop("`spec` must have `.name` and `.value` columns",
-         call. = FALSE)
-  }
-  vars <- union(c(".name", ".value"), names(spec))
-  spec[vars]
-}
