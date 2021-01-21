@@ -27,36 +27,6 @@
 #' 3. Group data by id columns.
 #' 4. Summarise the grouped data with the expressions from step 2.
 #'
-#' For example the following R code
-#'
-#' ```
-#' memdb_frame(
-#'   id_column = 1,
-#'   key = c("x", "y"),
-#'   value = 1:2
-#' ) %>%
-#'   pivot_wider(
-#'     id_cols = id_column,
-#'     names_from = key,
-#'     values_from = value
-#'   ) %>%
-#'   show_query()
-#' ```
-#'
-#' translates to this SQL code
-#'
-#' ```sql
-#' SELECT `id_column`,
-#'        MAX(CASE
-#'                WHEN (`key` = 'x') THEN (`val`)
-#'            END) AS `x`,
-#'        MAX(CASE
-#'                WHEN (`key` = 'y') THEN (`val`)
-#'            END) AS `y`
-#' FROM `df`
-#' GROUP BY `id_column`
-#' ```
-#'
 #' @param data A lazy data frame backed by a database query.
 #' @param id_cols A set of columns that uniquely identifies each observation.
 #' @param names_from,values_from A pair of
@@ -85,8 +55,16 @@
 #'
 #' @examples
 #' if (require("tidyr", quietly = TRUE)) {
-#'   tbl_memdb(us_rent_income) %>%
-#'     pivot_wider(names_from = variable, values_from = c(estimate, moe))
+#' memdb_frame(
+#'   id = 1,
+#'   key = c("x", "y"),
+#'   value = 1:2
+#' ) %>%
+#'   tidyr::pivot_wider(
+#'     id_cols = id,
+#'     names_from = key,
+#'     values_from = value
+#'   )
 #' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
@@ -234,9 +212,6 @@ dbplyr_pivot_wider_spec <- function(data,
 }
 
 globalVariables(c("name", "value"))
-
-
-# move to other file ------------------------------------------------------
 
 is_scalar <- function(x) {
   if (is.null(x)) {
