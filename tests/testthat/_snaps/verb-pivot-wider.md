@@ -18,6 +18,12 @@
       FROM `df`
       GROUP BY `a`
 
+# error when overwriting existing column
+
+    Names must be unique.
+    x These names are duplicated:
+      * "a" at locations 1 and 2.
+
 # values_fn can be a single function
 
     Code
@@ -30,8 +36,8 @@
 
 # values_fn cannot be NULL
 
-    Code
-      expect_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
+    `values_fn` must not be NULL
+    i `values_fn` must be a function or a named list of functions
 
 # can fill in missing cells
 
@@ -52,4 +58,9 @@
       SELECT `g`, `name`, `value`, MAX(CASE WHEN (`key` = 'x') THEN (`val`) END) AS `x`, MAX(CASE WHEN (`key` = 'y') THEN (`val`) END) AS `y`
       FROM `df`
       GROUP BY `g`, `name`, `value`
+
+# cannot pivot lazy frames
+
+    `dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.
+    i Use `memdb_frame()` together with `show_query()` to see the SQL code.
 

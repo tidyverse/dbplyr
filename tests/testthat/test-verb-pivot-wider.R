@@ -52,16 +52,13 @@ test_that("implicit missings turn into explicit missings", {
 })
 
 test_that("error when overwriting existing column", {
-  # TODO
-  skip("not yet implemented")
   df <- memdb_frame(
     a = c(1, 1),
     key = c("a", "b"),
     val = c(1, 2)
   )
-  expect_error(
-    pivot_wider(df, names_from = key, values_from = val),
-    "bad names"
+  expect_snapshot_error(
+    tidyr::pivot_wider(df, names_from = key, values_from = val)
   )
 })
 
@@ -134,8 +131,6 @@ test_that("can override default keys", {
 
 # non-unqiue keys ---------------------------------------------------------
 
-# TODO check error if `values_fn = NULL`
-
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
@@ -145,9 +140,7 @@ test_that("values_fn can be a single function", {
 test_that("values_fn cannot be NULL", {
   df <- lazy_frame(a = 1, key = "x", val = 1)
 
-  expect_snapshot(
-    expect_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
-  )
+  expect_snapshot_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
 })
 
 # can fill missing cells --------------------------------------------------
