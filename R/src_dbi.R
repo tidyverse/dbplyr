@@ -88,7 +88,8 @@ tbl.src_dbi <- function(src, from, ...) {
 #' Database src
 #'
 #' @description
-#' \Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+#' `r lifecycle::badge("superseded")`
+#'
 #' Since can generate a `tbl()` directly from a DBI connection we no longer
 #' recommend using `src_dbi()`.
 #'

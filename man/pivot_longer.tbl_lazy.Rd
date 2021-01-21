@@ -55,8 +55,6 @@ in the \code{value_to} column.}
 \item{...}{Additional arguments passed on to methods.}
 }
 \description{
-\Sexpr[results=rd, stage=render]{lifecycle::badge("maturing")}
-
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and
 decreasing the number of columns. The inverse transformation is
 `tidyr::pivot_wider()]
