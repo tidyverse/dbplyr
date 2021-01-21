@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* MS SQL translation assumes a boolean context inside of `[` (#546)
+
 * `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
 
 * Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
