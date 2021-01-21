@@ -73,43 +73,27 @@ identified.
 The translation to SQL code basically works as follows:
 \enumerate{
 \item Get unique keys in \code{names_from} column.
-\item For each key value generate an expression of the form:
-}\if{html}{\out{<div class="sql">}}\preformatted{value_fn(
-  CASE WHEN (`names from column` == `key value`) THEN (`value column`)
+\item For each key value generate an expression of the form:\if{html}{\out{<div class="sql">}}\preformatted{value_fn(
+  CASE WHEN (`names from column` == `key value`)
+  THEN (`value column`)
+  END
 ) AS `output column`
 }\if{html}{\out{</div>}}
-\enumerate{
 \item Group data by id columns.
 \item Summarise the grouped data with the expressions from step 2.
 }
-
-For example the following R code\preformatted{memdb_frame(
-  id_column = 1,
-  key = c("x", "y"),
-  value = 1:2
-) \%>\%
-  pivot_wider(
-    id_cols = id_column,
-    names_from = key,
-    values_from = value
-  ) \%>\%
-  show_query()
-}
-
-translates to this SQL code\if{html}{\out{<div class="sql">}}\preformatted{SELECT `id_column`,
-       MAX(CASE
-               WHEN (`key` = 'x') THEN (`val`)
-           END) AS `x`,
-       MAX(CASE
-               WHEN (`key` = 'y') THEN (`val`)
-           END) AS `y`
-FROM `df`
-GROUP BY `id_column`
-}\if{html}{\out{</div>}}
 }
 \examples{
 if (require("tidyr", quietly = TRUE)) {
-  tbl_memdb(us_rent_income) \%>\%
-    pivot_wider(names_from = variable, values_from = c(estimate, moe))
+memdb_frame(
+  id = 1,
+  key = c("x", "y"),
+  value = 1:2
+) \%>\%
+  tidyr::pivot_wider(
+    id_cols = id,
+    names_from = key,
+    values_from = value
+  )
 }
 }
