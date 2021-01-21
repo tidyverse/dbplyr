@@ -134,11 +134,8 @@ Collate:
     'verb-head.R'
     'verb-joins.R'
     'verb-mutate.R'
-<<<<<<< HEAD
     'verb-pivot-wider.R'
-=======
     'verb-pivot-longer.R'
->>>>>>> 57e17887f0eef3873f7fdff26caac16150d8d6b8
     'verb-pull.R'
     'verb-select.R'
     'verb-set-ops.R'
