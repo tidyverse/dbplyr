@@ -112,6 +112,11 @@ simulate_mssql <- function(version = "15.0") {
       `|`            = mssql_infix_boolean("|", "%OR%"),
       `||`           = mssql_infix_boolean("|", "%OR%"),
 
+      `[` = function(x, i) {
+        i <- with_mssql_bool(i)
+        build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+      },
+
       bitwShiftL     = sql_not_supported("bitwShiftL"),
       bitwShiftR     = sql_not_supported("bitwShiftR"),
 
@@ -342,8 +347,7 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL) {
 }
 
 mssql_case_when <- function(...) {
-  local_context(list(clause = ""))
-  sql_case_when(...)
+  with_mssql_bool(sql_case_when(...))
 }
 
 #' @export

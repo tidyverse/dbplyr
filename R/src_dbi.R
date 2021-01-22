@@ -18,7 +18,7 @@
 #' @param from Either a string (giving a table name),
 #'   a fully qualified table name created by [in_schema()]
 #'   or a literal [sql()] string.
-#' @param ... Needed for compatibility with generic; currently ignored.
+#' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples
 #' library(dplyr)
@@ -82,13 +82,14 @@
 #' @aliases tbl_dbi
 tbl.src_dbi <- function(src, from, ...) {
   subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
-  tbl_sql(c(subclass, "dbi"), src = src, from = from)
+  tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
 }
 
 #' Database src
 #'
 #' @description
-#' \Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+#' `r lifecycle::badge("superseded")`
+#'
 #' Since can generate a `tbl()` directly from a DBI connection we no longer
 #' recommend using `src_dbi()`.
 #'

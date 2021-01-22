@@ -180,7 +180,7 @@ sql_context$group_by <- NULL
 sql_context$order_by <- NULL
 sql_context$con <- NULL
 # Used to carry additional information needed for special cases
-sql_context$context <- ""
+sql_context$context <- list()
 
 
 set_current_con <- function(con) {

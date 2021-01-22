@@ -32,7 +32,7 @@ test_that("Results respect select", {
     z = 4:1
   ) %>% group_by(g)
 
-  out <- mf %>% select(x) %>% do(ncol = ncol(.))
+  expect_message(out <- mf %>% select(x) %>% do(ncol = ncol(.)))
   expect_equal(out$g, c(1, 2))
   expect_equal(out$ncol, list(2L, 2L))
 })

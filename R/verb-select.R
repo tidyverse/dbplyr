@@ -20,15 +20,33 @@
 #' db %>% rename(first = x, last = z) %>% show_query()
 select.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
-  loc <- tidyselect::eval_select(
-    expr(c(...)), sim_data,
-    include = op_grps(.data$ops)
-  )
+  sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
+  loc <- tidyselect::eval_select(expr(c(...)), sim_data)
+  loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
   .data
 }
+
+ensure_group_vars <- function(loc, data, notify = TRUE) {
+  group_loc <- match(group_vars(data), colnames(data))
+  missing <- setdiff(group_loc, loc)
+
+  if (length(missing) > 0) {
+    vars <- names(data)[missing]
+    if (notify) {
+      inform(glue(
+        "Adding missing grouping variables: ",
+        paste0("`", names(data)[missing], "`", collapse = ", ")
+      ))
+    }
+    loc <- c(set_names(missing, vars), loc)
+  }
+
+  loc
+}
+
 
 #' @rdname select.tbl_lazy
 #' @importFrom dplyr rename

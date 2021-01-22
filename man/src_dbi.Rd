@@ -19,7 +19,8 @@ when this happens.}
 An S3 object with class \code{src_dbi}, \code{src_sql}, \code{src}.
 }
 \description{
-\Sexpr[results=rd, stage=render]{lifecycle::badge("superseded")}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#superseded'><img src='figures/lifecycle-superseded.svg' alt='Superseded lifecycle'></a>}}{\strong{Superseded}}
+
 Since can generate a \code{tbl()} directly from a DBI connection we no longer
 recommend using \code{src_dbi()}.
 }
