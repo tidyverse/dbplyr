@@ -57,7 +57,26 @@ sql_translation.RedshiftConnection <- function(con) {
       }
     ),
     sql_translator(.parent = postgres$aggregate),
-    sql_translator(.parent = postgres$window)
+    sql_translator(.parent = postgres$window,
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
+      lag = function(x, n = 1L, order_by = NULL) {
+        win_over(
+          sql_expr(LAG(!!x, !!as.integer(n))),
+          win_current_group(),
+          order_by %||% win_current_order(),
+          win_current_frame()
+        )
+      },
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LEAD.html
+      lead = function(x, n = 1L, order_by = NULL) {
+        win_over(
+          sql_expr(LEAD(!!x, !!n)),
+          win_current_group(),
+          order_by %||% win_current_order(),
+          win_current_frame()
+        )
+      },
+    )
   )
 }
 
@@ -68,4 +87,4 @@ sql_paste_redshift <- function(sep) {
   sql_paste_infix(sep, "||", function(x) sql_expr(cast(!!x %as% text)))
 }
 
-globalVariables(c("REGEXP_REPLACE"))
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD"))

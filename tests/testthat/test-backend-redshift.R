@@ -23,3 +23,13 @@ test_that("numeric translations", {
   expect_equal(translate_sql(as.numeric(x)), sql("CAST(`x` AS FLOAT)"))
   expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
 })
+
+test_that("lag and lead translation", {
+  local_con(simulate_redshift())
+
+  expect_equal(translate_sql(lead(x)), sql("LEAD(`x`, 1) OVER ()"))
+  expect_equal(translate_sql(lag(x)), sql("LAG(`x`, 1) OVER ()"))
+
+  expect_error(translate_sql(lead(x, default = y)), "unused argument")
+  expect_error(translate_sql(lag(x, default = y)), "unused argument")
+})

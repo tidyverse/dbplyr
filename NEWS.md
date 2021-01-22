@@ -29,6 +29,9 @@
 * Added custom SQLite translation of `full_join()` and `right_join()` 
   (@mgirlich, #536).
 
+* Redshift translation of `lag()` and `lead()` lose the `default` parameter 
+  since its not supported (@hdplsa, #548).
+
 # dbplyr 2.0.0
 
 ## dplyr 1.0.0 compatibility
