@@ -11,12 +11,18 @@ dbplyr_edition.PostgreSQLConnection <- function(con) {
 db_write_table.PostgreSQLConnection <- function(con, table, types, values,
                                                 temporary = TRUE, overwrite = FALSE, ....) {
 
+  if (!isFALSE(temporary)) {
+    abort(c(
+      "RPostgreSQL backend does not support creation of temporary tables`",
+      i = "Either set `temporary = FALSE` or switch to RPostgres"
+    ))
+  }
+
   dbWriteTable(
     con,
     name = table,
     value = values,
     field.types = types,
-    temporary = temporary,
     overwrite = overwrite,
     row.names = FALSE
   )
