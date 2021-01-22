@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
+  not supported by `RPostgres::dbWriteTable()` (#574).
+
 * @mgirlich is now a dbplyr author in recognition of his significant and
   sustained contributions.
 
