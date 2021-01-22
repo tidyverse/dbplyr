@@ -24,7 +24,7 @@ test_that("numeric translations", {
   expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
 })
 
-test_that("lag and lead tests", {
+test_that("lag and lead translation", {
   local_con(simulate_redshift())
 
   expect_equal(translate_sql(lead(x)), sql("LEAD(`x`, 1) OVER ()"))
@@ -32,5 +32,4 @@ test_that("lag and lead tests", {
 
   expect_error(translate_sql(lead(x, default = y)), "unused argument")
   expect_error(translate_sql(lag(x, default = y)), "unused argument")
-
 })
