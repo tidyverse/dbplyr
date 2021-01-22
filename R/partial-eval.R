@@ -176,25 +176,14 @@ partial_eval_across <- function(call, vars, env) {
   tbl <- as_tibble(rep_named(vars, list(logical())))
   cols <- syms(vars)[tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)]
 
-  .fns <- eval(call$.fns, env)
-
-  if (is.function(.fns)) {
-    .fns <- find_fun(.fns)
-  } else if (is.list(.fns)) {
-    .fns <- purrr::map_chr(.fns, find_fun)
-  } else if (is.character(.fns)) {
-    # as is
-  } else {
-    abort("Unsupported `.fns` for dbplyr::across()")
-  }
-  funs <- set_names(syms(.fns), .fns)
+  funs <- across_funs(call$.fns, env)
 
   # Generate grid of expressions
-  out <- vector("list", length(cols) * length(.fns))
+  out <- vector("list", length(cols) * length(funs))
   k <- 1
   for (i in seq_along(cols)) {
     for (j in seq_along(funs)) {
-      out[[k]] <- expr((!!funs[[j]])(!!cols[[i]], !!!call$...))
+      out[[k]] <- exec(funs[[j]], cols[[i]], !!!call$...)
       k <- k + 1
     }
   }
@@ -202,6 +191,54 @@ partial_eval_across <- function(call, vars, env) {
   .names <- eval(call$.names, env)
   names(out) <- across_names(cols, names(funs), .names, env)
   out
+}
+
+across_funs <- function(funs, env = caller_env()) {
+  if (is.null(funs)) {
+    list(function(x, ...) x)
+  } else if (is_symbol(funs)) {
+    set_names(list(across_fun(funs, env)), as.character(funs))
+  } else if (is.character(funs)) {
+    names(funs)[names2(funs) == ""] <- funs
+    lapply(funs, across_fun, env)
+  } else if (is_call(funs, "~")) {
+    set_names(list(across_fun(funs, env)), expr_name(f_rhs(funs)))
+  } else if (is_call(funs, "list")) {
+    args <- rlang::exprs_auto_name(funs[-1])
+    lapply(args, across_fun, env)
+  } else if (!is.null(env)) {
+    # Try evaluating once, just in case
+    funs <- eval(funs, env)
+    across_funs(funs, NULL)
+  } else {
+    abort("`.fns` argument to dbplyr::across() must be a NULL, a function name, formula, or list")
+  }
+}
+
+across_fun <- function(fun, env) {
+  if (is_symbol(fun) || is_string(fun)) {
+    function(x, ...) call2(fun, x, ...)
+  } else if (is_call(fun, "~")) {
+    fun <- across_formula_fn(f_rhs(fun))
+    function(x, ...) expr_interp(fun, child_env(emptyenv(), .x = x))
+  } else {
+    abort(c(
+      ".fns argument to dbplyr::across() contain a function name or a formula",
+      x = paste0("Problem with ", expr_deparse(fun))
+    ))
+  }
+}
+
+
+across_formula_fn <- function(x) {
+  if (is_symbol(x, ".") || is_symbol(x, ".x")) {
+    quote(!!.x)
+  } else if (is_call(x)) {
+    x[-1] <- lapply(x[-1], across_formula_fn)
+    x
+  } else {
+    x
+  }
 }
 
 across_names <- function(cols, funs, names = NULL, env = parent.frame()) {

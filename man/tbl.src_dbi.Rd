@@ -14,7 +14,7 @@
 a fully qualified table name created by \code{\link[=in_schema]{in_schema()}}
 or a literal \code{\link[=sql]{sql()}} string.}
 
-\item{...}{Needed for compatibility with generic; currently ignored.}
+\item{...}{Passed on to \code{\link[=tbl_sql]{tbl_sql()}}}
 }
 \description{
 All data manipulation on SQL tbls are lazy: they will not actually

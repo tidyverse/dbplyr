@@ -3,6 +3,17 @@
 * @mgirlich is now a dbplyr author in recognition of his significant and
   sustained contributions.
 
+* `across()` implementation has been rewritten to support more inputs:
+  it now translates formulas (#525), works with SQL functions that don't have
+  R translations (#534), and work with `NULL` (#554)
+
+* `pull()` no longer `select()`s the result when there's already only 
+  one variable (#562).
+
+* MS SQL translation assumes a boolean context inside of `[` (#546)
+
+* `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
+
 * Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
   `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
   `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
