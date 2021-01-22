@@ -30,7 +30,7 @@ test_that("lag and lead tests", {
   expect_equal(translate_sql(lead(x)), sql("LEAD(`x`, 1) OVER ()"))
   expect_equal(translate_sql(lag(x)), sql("LAG(`x`, 1) OVER ()"))
 
-  expect_error(translate_sql(lead(x, default = y)), "Redshift does not support")
-  expect_error(translate_sql(lag(x, default = y)), "Redshift does not support")
+  expect_error(translate_sql(lead(x, default = y)), "unused argument")
+  expect_error(translate_sql(lag(x, default = y)), "unused argument")
 
 })

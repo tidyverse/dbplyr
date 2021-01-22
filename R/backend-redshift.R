@@ -59,10 +59,7 @@ sql_translation.RedshiftConnection <- function(con) {
     sql_translator(.parent = postgres$aggregate),
     sql_translator(.parent = postgres$window,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
-      lag = function(x, n = 1L, default = NA, order_by = NULL) {
-        if (!is.na(default)) {
-          stop("Redshift does not support `default` values in LAG. By design `default` is always NULL.")
-        }
+      lag = function(x, n = 1L, order_by = NULL) {
         win_over(
           sql_expr(LAG(!!x, !!as.integer(n))),
           win_current_group(),
@@ -71,10 +68,7 @@ sql_translation.RedshiftConnection <- function(con) {
         )
       },
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LEAD.html
-      lead = function(x, n = 1L, default = NA, order_by = NULL) {
-        if (!is.na(default)) {
-          stop("Redshift does not support `default` values in LEAD. By design `default` is always NULL.")
-        }
+      lead = function(x, n = 1L, order_by = NULL) {
         win_over(
           sql_expr(LEAD(!!x, !!n)),
           win_current_group(),
