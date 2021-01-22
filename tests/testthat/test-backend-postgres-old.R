@@ -9,7 +9,9 @@ test_that("RPostgreSQL backend", {
     host = "127.0.0.1"
   )
 
-  copy_to(src, mtcars, "mtcars", overwrite = TRUE)
+  copy_to(src, mtcars, "mtcars", overwrite = TRUE, temporary = FALSE)
+  withr::defer(DBI::dbRemoveTable(src, "mtcars"))
+
   expect_identical(colnames(tbl(src, "mtcars")), colnames(mtcars))
 
   src_cyl <- tbl(src, "mtcars") %>% select(cyl) %>% collect()
