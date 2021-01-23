@@ -59,7 +59,7 @@ sql_not_supported(f)
 
 sql_cast(type)
 
-sql_try_cast(type1, type2 = NULL)
+sql_try_cast(type)
 
 sql_log()
 

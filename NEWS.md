@@ -1,6 +1,8 @@
 # dbplyr 2.0.0
 (To become dbplyr 2.0.0)
 
+* Use double cast for MSSQL `as.integer()` and `as.integer64()` translations (@DavidPatShuiFong, #496)
+
 ## dplyr 1.0.0 compatibility
 
 * `across()` is now translated into individual SQL statements (#480).

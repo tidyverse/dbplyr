@@ -204,10 +204,19 @@ simulate_mssql <- function(version = "15.0") {
       as.POSIXct = sql_try_cast("TIMESTAMP"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
-      as.integer = sql_try_cast("NUMERIC", "INT"),
-      # in MSSQL, NUMERIC rounds to integer
-      # and does not drop entire columns if invalid value
-      as.integer64 = sql_try_cast("BIGINT"),
+      as.integer = function(x) {
+        sql_expr(try_cast(try_cast(!!x %as% NUMERIC) %as% INT))
+      },
+      # in MSSQL, 'try_cast' directly to INT or BIGINT returns NA for an entire column
+      #  if a single row has an invalid value
+      # in MSSQL, 'try_cast' to NUMERIC rounds to integer, returns a double
+      #  and does not return NA for an entire column
+      #  if a single row has an invalid value.
+      #  to return INT need to try_cast again to INT
+      as.integer64 = function(x) {
+        bignumeric <- sql("NUMERIC(38,0)") # 38-digit precision
+        sql_expr(try_cast(try_cast(!!x %as% !!bignumeric) %as% BIGINT))
+      },
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
       as_datetime = sql_try_cast("DATETIME2")
