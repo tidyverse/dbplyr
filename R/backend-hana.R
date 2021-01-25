@@ -45,6 +45,7 @@ sql_translation.HDB <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
+      # https://help.sap.com/viewer/7c78579ce9b14a669c1f3295b0d8ca16/Cloud/en-US/20e8341275191014a4cfdcd3c830fc98.html
       substr = sql_substr("SUBSTRING"),
       substring = sql_substr("SUBSTRING"),
       str_sub = sql_str_sub("SUBSTRING"),

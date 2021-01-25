@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `str_sub()` and `substring()` get better translations when start is negative,
+  and work on MS SQL when `end = -1` (#577).
+
 * RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
   not supported by `RPostgres::dbWriteTable()` (#574).
 
