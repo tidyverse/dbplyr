@@ -374,7 +374,7 @@ and return data to R.</p>
 <span class='va'>band_db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='fu'>dplyr</span><span class='fu'>::</span><span class='va'><a href='https://dplyr.tidyverse.org/reference/band_members.html'>band_instruments</a></span>, copy <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "name"</span></div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 3]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;   name  band    plays 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
 #&gt; </span><span style='color: #555555;'>1</span><span> Mick  Stones  </span><span style='color: #BB0000;'>NA</span><span>    
@@ -385,7 +385,7 @@ and return data to R.</p>
 <span class='va'>label</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='cn'>NA</span><span class='op'>)</span>, label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"one"</span>, <span class='st'>"missing"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>label</span>, by <span class='op'>=</span> <span class='st'>"x"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;       x label
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>     1 one  
@@ -393,7 +393,7 @@ and return data to R.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span>    </span><span style='color: #BB0000;'>NA</span><span> </span><span style='color: #BB0000;'>NA</span><span>   </div><div class='input'><span class='co'># But you can activate R's usual behaviour with the na_matches argument</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>label</span>, by <span class='op'>=</span> <span class='st'>"x"</span>, na_matches <span class='op'>=</span> <span class='st'>"na"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;       x label  
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  
 #&gt; </span><span style='color: #555555;'>1</span><span>     1 one    
