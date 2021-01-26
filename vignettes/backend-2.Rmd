@@ -35,7 +35,7 @@ A number of generics are no longer used so you can delete the corresponding meth
 
 -   `db_write_table()` calls `DBI::dbWriteTable()` instead of nine individual generics: `db_create_indexes()`, `db_begin()`, `db_rollback()`, `db_commit()`, `db_list_tables()`, `db_drop_table()`, `db_has_table()`, `db_create_table()`, and `db_data_types()`.
 
--   `sql_escape_ident()` and `sql_escape_string()` are no longer used in favour of calling `dbQuoteIdentifer()` and `dbQuoteString()` directly.
+-   `sql_escape_ident()` and `sql_escape_string()` are no longer used in favour of calling `dbQuoteIdentifier()` and `dbQuoteString()` directly.
 
 -   `db_query_rows()` was never actually used.
 
@@ -68,7 +68,7 @@ These have been replaced by dbplyr generics that just generate the SQL (and dbpl
 
 -   `dplyr::db_analyze()` -\> `dbplyr::sql_table_analyze()`
 -   `dplyr::db_create_index()` -\> `dbplyr::sql_table_index()`
--   `dplyr::db_explain()` -\> `dbplyr::sql_queriy_explain()`
+-   `dplyr::db_explain()` -\> `dbplyr::sql_query_explain()`
 -   `dplyr::db_query_fields()` -\> `dbplyr::sql_query_fields()`
 -   `dplyr::db_save_query()` -\> `dbplyr::sql_query_save()`
 
@@ -83,6 +83,7 @@ A number of other generics have been renamed:
 -   `dplyr::sql_semi_join()` -\> `dbplyr::sql_query_semi_join()`
 -   `dplyr::sql_set_op()` -\> `dbplyr::sql_query_set_op()`
 -   `dplyr::sql_subquery()` -\> `dbplyr::sql_query_wrap()`
+-   `dplyr::sql_translate_env()` -\> `dbplyr::sql_translation()`
 -   `dplyr::db_desc()` -\> `dbplyr::db_connection_describe()`
 
 If you have methods for any of these generics, you'll need to rename.

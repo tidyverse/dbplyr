@@ -1,5 +1,41 @@
+# dbplyr (development version)
+
+* RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
+  not supported by `RPostgres::dbWriteTable()` (#574).
+
+* @mgirlich is now a dbplyr author in recognition of his significant and
+  sustained contributions.
+
+* `across()` implementation has been rewritten to support more inputs:
+  it now translates formulas (#525), works with SQL functions that don't have
+  R translations (#534), and work with `NULL` (#554)
+
+* `pull()` no longer `select()`s the result when there's already only 
+  one variable (#562).
+
+* MS SQL translation assumes a boolean context inside of `[` (#546)
+
+* `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
+
+* Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
+  `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
+  `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
+
+* `select()` now does not relocate grouping variables to the front 
+   (@mgirlich, #568). and informs when adding missing grouping variables 
+   (@mgirlich, #559).
+
+* `distinct()` now respects grouping (@mgirlich, #535).
+
+* Fix partial match in `db_connection_describe()` (@mgirlich, #564).
+
+* Added custom SQLite translation of `full_join()` and `right_join()` 
+  (@mgirlich, #536).
+
+* Redshift translation of `lag()` and `lead()` lose the `default` parameter 
+  since its not supported (@hdplsa, #548).
+
 # dbplyr 2.0.0
-(To become dbplyr 2.0.0)
 
 * Use double cast for MSSQL `as.integer()` and `as.integer64()` translations (@DavidPatShuiFong, #496)
 

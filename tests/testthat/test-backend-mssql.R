@@ -22,6 +22,13 @@ test_that("custom scalar translated correctly", {
   expect_error(translate_sql(bitwShiftR(x, 2L)), sql("not available"))
 })
 
+test_that("contents of [ have bool context", {
+  local_con(simulate_mssql())
+  local_context(list(clause = "SELECT"))
+
+  expect_equal(translate_sql(x[x > y]), sql("CASE WHEN (`x` > `y`) THEN (`x`) END"))
+})
+
 test_that("custom stringr functions translated correctly", {
   local_con(simulate_mssql())
 

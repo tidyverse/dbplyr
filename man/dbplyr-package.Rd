@@ -28,6 +28,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Maximilian Girlich
   \item Edgar Ruiz
 }
 

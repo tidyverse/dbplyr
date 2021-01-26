@@ -16,11 +16,13 @@
 #'   mutate(z = x + y * 2) %>%
 #'   pull()
 pull.tbl_sql <- function(.data, var = -1) {
-  expr <- enquo(var)
-  var <- tidyselect::vars_pull(tbl_vars(.data), {{ var }})
+  vars <- tbl_vars(.data)
+  if (length(vars) > 1 || !missing(var)) {
+    var <- tidyselect::vars_pull(vars, {{ var }})
+    .data <- ungroup(.data)
+    .data <- select(.data, !! sym(var))
+  }
 
-  .data <- ungroup(.data)
-  .data <- select(.data, !! sym(var))
   .data <- collect(.data)
   .data[[1]]
 }
