@@ -204,18 +204,17 @@ simulate_mssql <- function(version = "15.0") {
       as.POSIXct = sql_try_cast("TIMESTAMP"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
+
+      # In SQL server, CAST (even with TRY) of INTEGER and BIGINT appears
+      # fill entire columns with NULL if parsing single value fails:
+      # https://gist.github.com/DavidPatShuiFong/7b47a9804a497b605e477f1bf6c38b37
+      # So we parse to NUMERIC (which doesn't have this problem), then to the
+      # target type
       as.integer = function(x) {
         sql_expr(try_cast(try_cast(!!x %as% NUMERIC) %as% INT))
       },
-      # in MSSQL, 'try_cast' directly to INT or BIGINT returns NA for an entire column
-      #  if a single row has an invalid value
-      # in MSSQL, 'try_cast' to NUMERIC rounds to integer, returns a double
-      #  and does not return NA for an entire column
-      #  if a single row has an invalid value.
-      #  to return INT need to try_cast again to INT
       as.integer64 = function(x) {
-        bignumeric <- sql("NUMERIC(38,0)") # 38-digit precision
-        sql_expr(try_cast(try_cast(!!x %as% !!bignumeric) %as% BIGINT))
+        sql_expr(try_cast(try_cast(!!x %as% NUMERIC(38L, 0L)) %as% BIGINT))
       },
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
