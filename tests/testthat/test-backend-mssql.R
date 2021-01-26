@@ -173,3 +173,20 @@ test_that("bit conversion works for important cases", {
   # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
 
 })
+
+test_that("as.integer and as.integer64 translations if parsing failures", {
+  df <- data.frame(x = c("1.3", "2x"))
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+
+  out <- db %>%
+    mutate(
+      integer = as.integer(x),
+      integer64 = as.integer64(x),
+      numeric = as.numeric(x),
+    ) %>%
+    collect()
+
+  expect_identical(out$integer, c(1L, NA))
+  expect_identical(out$integer64, bit64::as.integer64(c(1L, NA)))
+  expect_identical(out$numeric, c(1.3, NA))
+})
