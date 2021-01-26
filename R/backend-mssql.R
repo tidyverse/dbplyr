@@ -209,9 +209,18 @@ simulate_mssql <- function(version = "15.0") {
       as.POSIXct = sql_try_cast("TIMESTAMP"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
-      as.integer = sql_try_cast("NUMERIC"),
-      # in MSSQL, NUMERIC converts to integer
-      as.integer64 = sql_try_cast("BIGINT"),
+
+      # In SQL server, CAST (even with TRY) of INTEGER and BIGINT appears
+      # fill entire columns with NULL if parsing single value fails:
+      # https://gist.github.com/DavidPatShuiFong/7b47a9804a497b605e477f1bf6c38b37
+      # So we parse to NUMERIC (which doesn't have this problem), then to the
+      # target type
+      as.integer = function(x) {
+        sql_expr(try_cast(try_cast(!!x %as% NUMERIC) %as% INT))
+      },
+      as.integer64 = function(x) {
+        sql_expr(try_cast(try_cast(!!x %as% NUMERIC(38L, 0L)) %as% BIGINT))
+      },
       as.character = sql_try_cast("VARCHAR(MAX)"),
       as_date = sql_try_cast("DATE"),
       as_datetime = sql_try_cast("DATETIME2")
@@ -361,4 +370,4 @@ mssql_case_when <- function(...) {
   y
 }
 
-globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR"))
+globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))

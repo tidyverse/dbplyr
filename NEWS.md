@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* MS SQL translation of `as.integer()` and `as.integer64()` translations casts
+  first to `NUMERIC` to avoid CASTing weirdness (@DavidPatShuiFong, #496).
+
 * RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
   not supported by `RPostgres::dbWriteTable()` (#574).
 
