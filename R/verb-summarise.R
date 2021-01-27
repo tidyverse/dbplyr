@@ -21,11 +21,22 @@
 #'   group_by(g) %>%
 #'   summarise(n()) %>%
 #'   show_query()
-summarise.tbl_lazy <- function(.data, ...) {
+summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   check_summarise_vars(dots)
-  add_op_single("summarise", .data, dots = dots)
+
+  if (!is_null(.groups) && !.groups %in% c("drop_last", "drop", "keep")) {
+    abort(c(
+      paste0(
+        "`.groups` can't be ", as_label(.groups),
+        if (.groups == "rowwise") " for lazy tables"
+      ),
+      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+    ))
+  }
+
+  add_op_single("summarise", .data, dots = dots, args = list(.groups = .groups))
 }
 
 # For each expression, check if it uses any newly created variables
@@ -45,6 +56,20 @@ check_summarise_vars <- function(dots) {
   }
 }
 
+summarise_verbose <- function(.groups, .env) {
+  is.null(.groups) &&
+    # TODO not sure whether this is correct
+    is_reference(asNamespace("dbplyr"), topenv(.env)) &&
+    # is_reference(topenv(.env), global_env()) &&
+    !identical(getOption("dplyr.summarise.inform"), FALSE)
+}
+
+summarise_inform <- function(..., .env = parent.frame()) {
+  inform(paste0(
+    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
+  ))
+}
+
 #' @export
 op_vars.op_summarise <- function(op) {
   c(op_grps(op$x), names(op$dots))
@@ -53,10 +78,19 @@ op_vars.op_summarise <- function(op) {
 #' @export
 op_grps.op_summarise <- function(op) {
   grps <- op_grps(op$x)
-  if (length(grps) == 1) {
+  .groups <- op$args$.groups %||% "drop_last"
+
+  if (identical(.groups, "drop_last")) {
+    n <- length(grps)
+    if (n == 1) {
+      character()
+    } else {
+      grps[-n]
+    }
+  } else if (identical(.groups, "keep")) {
+    grps
+  } else if(identical(.groups, "drop")) {
     character()
-  } else {
-    grps[-length(grps)]
   }
 }
 
@@ -66,8 +100,21 @@ op_sort.op_summarise <- function(op) NULL
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
   select_vars <- translate_sql_(op$dots, con, window = FALSE, context = list(clause = "SELECT"))
-  group_vars <- c.sql(ident(op_grps(op$x)), con = con)
+  group_vars <- op_grps(op$x)
+  n <- length(group_vars)
 
+  .groups <- op$args$.groups
+  verbose <- summarise_verbose(.groups, caller_env())
+  # we cannot automatically infer "keep" as for local frames
+  # -> use `drop_last` as it was historically
+  .groups <- .groups %||% "drop_last"
+
+  if (verbose && identical(.groups, "drop_last") && n > 1) {
+    new_groups <- glue::glue_collapse(paste0("'", group_vars[-n], "'"), sep = ", ")
+    summarise_inform("has grouped output by {new_groups}")
+  }
+
+  group_vars <- c.sql(ident(group_vars), con = con)
   select_query(
     sql_build(op$x, con),
     select = c.sql(group_vars, select_vars, con = con),

@@ -24,6 +24,19 @@ test_that("can't refer to freshly created variables", {
   )
 })
 
+test_that("summarise(.groups=)", {
+  df <- lazy_frame(x = 1, y = 2) %>% group_by(x, y)
+
+  expect_snapshot(df %>% summarise())
+
+  expect_equal(df %>% summarise() %>% group_vars(), "x")
+  expect_equal(df %>% summarise(.groups = "drop_last") %>% group_vars(), "x")
+  expect_equal(df %>% summarise(.groups = "drop") %>% group_vars(), character())
+  expect_equal(df %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
+
+  expect_snapshot_error(df %>% summarise(.groups = "rowwise"))
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {

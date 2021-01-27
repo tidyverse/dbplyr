@@ -38,6 +38,8 @@
 * Redshift translation of `lag()` and `lead()` lose the `default` parameter 
   since its not supported (@hdplsa, #548).
 
+* `summarise()` now supports argument `.groups` (@mgirlich, #584).
+
 # dbplyr 2.0.0
 
 ## dplyr 1.0.0 compatibility
