@@ -3,7 +3,7 @@
 \name{translate_sql}
 \alias{translate_sql}
 \alias{translate_sql_}
-\title{Translate an expression to sql.}
+\title{Translate an expression to sql}
 \usage{
 translate_sql(
   ...,
@@ -45,27 +45,21 @@ SQL for a grouped summary.}
 \item{context}{Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.}
 }
 \description{
-Translate an expression to sql.
+Translate an expression to sql
 }
 \section{Base translation}{
 
-The base translator, \code{base_sql},
-provides custom mappings for \code{!} (to NOT), \code{&&} and \code{&} to
-\code{AND}, \code{||} and \code{|} to \code{OR}, \code{^} to \code{POWER},
-\verb{\%>\%} to \verb{\%}, \code{ceiling} to \code{CEIL}, \code{mean} to
-\code{AVG}, \code{var} to \code{VARIANCE}, \code{tolower} to \code{LOWER},
-\code{toupper} to \code{UPPER} and \code{nchar} to \code{LENGTH}.
-
-\code{c()} and \code{:} keep their usual R behaviour so you can easily create
-vectors that are passed to sql.
+The base translator, \code{base_sql}, provides custom mappings for for
+commonly used base functions including logical (\code{!}, \code{&}, \code{|}),
+arithmetic (\code{^}), and comparison (\code{!=}) operators, as well as common
+summary (\code{mean()}, \code{var()}) and manipulation functions.
 
 All other functions will be preserved as is. R's infix functions
-(e.g. \verb{\%like\%}) will be converted to their SQL equivalents
-(e.g. \code{LIKE}). You can use this to access SQL string concatenation:
-\code{||} is mapped to \code{OR}, but \verb{\%||\%} is mapped to \code{||}.
-To suppress this behaviour, and force errors immediately when dplyr doesn't
-know how to translate a function it encounters, using set the
-\code{dplyr.strict_sql} option to \code{TRUE}.
+(e.g. \verb{\%like\%}) will be converted to their SQL equivalents (e.g. \code{LIKE}).
+You can use this to access SQL string concatenation: \code{||} is mapped to
+\code{OR}, but \verb{\%||\%} is mapped to \code{||}. To suppress this behaviour, and force
+errors immediately when dplyr doesn't know how to translate a function it
+encounters, using set the \code{dplyr.strict_sql} option to \code{TRUE}.
 
 You can also use \code{\link[=sql]{sql()}} to insert a raw sql string.
 }
