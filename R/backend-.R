@@ -180,7 +180,8 @@ base_scalar <- sql_translator(
   pmin = sql_aggregate_n("LEAST", "pmin"),
   pmax = sql_aggregate_n("GREATEST", "pmax"),
 
-  `%>%` = `%>%`,
+  # Copied onLoad
+  `%>%` = NULL,
 
   # lubridate ---------------------------------------------------------------
   # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
