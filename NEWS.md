@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New `count()` method provides closer match to dplyr semantics (#347).
+
 * MS SQL translation of `as.integer()` and `as.integer64()` translations casts
   first to `NUMERIC` to avoid CASTing weirdness (@DavidPatShuiFong, #496).
 

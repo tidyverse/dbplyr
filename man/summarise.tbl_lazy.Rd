@@ -18,7 +18,6 @@ variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending
 only supported option before version 1.0.0.
 \item "drop": All levels of grouping are dropped.
 \item "keep": Same grouping structure as \code{.data}.
-\item "rowwise": This is not possible for lazy data frames.
 }
 
 When \code{.groups} is not specified, it defaults to "drop_last".
