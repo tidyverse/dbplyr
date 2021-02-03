@@ -1,19 +1,23 @@
 test_that("sql_substr works as expected", {
-  expect_equal(translate_sql(substr(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
-  expect_equal(translate_sql(substr(x, 3, 3)), sql("SUBSTR(`x`, 3, 1)"))
-  expect_equal(translate_sql(substr(x, 3, 2)), sql("SUBSTR(`x`, 3, 0)"))
-  expect_equal(translate_sql(substr(x, 3, 1)), sql("SUBSTR(`x`, 3, 0)"))
+  local_con(simulate_dbi())
+  x <- ident("x")
+  substr <- sql_substr("SUBSTR")
 
-  expect_equal(translate_sql(substr(x, 0, 1)), sql("SUBSTR(`x`, 1, 1)"))
-  expect_equal(translate_sql(substr(x, -1, 1)), sql("SUBSTR(`x`, 1, 1)"))
+  expect_equal(substr(x, 3, 4), sql("SUBSTR(`x`, 3, 2)"))
+  expect_equal(substr(x, 3, 3), sql("SUBSTR(`x`, 3, 1)"))
+  expect_equal(substr(x, 3, 2), sql("SUBSTR(`x`, 3, 0)"))
+  expect_equal(substr(x, 3, 1), sql("SUBSTR(`x`, 3, 0)"))
+
+  expect_equal(substr(x, 0, 1), sql("SUBSTR(`x`, 1, 1)"))
+  expect_equal(substr(x, -1, 1), sql("SUBSTR(`x`, 1, 1)"))
 
   # Missing arguments
-  expect_snapshot(error = TRUE, translate_sql(substr("test")))
-  expect_snapshot(error = TRUE, translate_sql(substr("test", 0)))
+  expect_snapshot(error = TRUE, substr("test"))
+  expect_snapshot(error = TRUE, substr("test", 0))
 
   # Wrong types
-  expect_snapshot(error = TRUE, translate_sql(substr("test", "x", 1)))
-  expect_snapshot(error = TRUE, translate_sql(substr("test", 1, "x")))
+  expect_snapshot(error = TRUE, substr("test", "x", 1))
+  expect_snapshot(error = TRUE, substr("test", 1, "x"))
 })
 
 test_that("substring is also translated", {
