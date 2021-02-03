@@ -9,9 +9,8 @@
 
 ## revdepcheck results
 
-We checked 58 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 60 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 4 new problems: chunked, parsemsf, pool, RPresto
- * We failed to check 1 packages: duckdb
+ * We saw 0 new problems
+ * We failed to check 0 packages
 
-All maintainers were notified one month ago and two weeks ago, and I prepared patches where possible.

@@ -19,7 +19,7 @@
 
 * All backends: `str_sub()`, `substr()` and `substring()` get better 
   translations (#577). Most importantly, the results of using negative 
-  locations should match the underlying R implementations more closely.
+    locations should match the underlying R implementations more closely.
 
 * MS SQL:
 
