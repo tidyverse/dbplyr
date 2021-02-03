@@ -17,9 +17,9 @@
 
 ## SQL translation
 
-* All backends: `str_sub()` and `substring()` get better translations (#577).
-  Most importantly, the results of using negative locations should match the
-  underlying R implementations more closely.
+* All backends: `str_sub()`, `substr()` and `substring()` get better 
+  translations (#577). Most importantly, the results of using negative 
+  locations should match the underlying R implementations more closely.
 
 * MS SQL:
 
@@ -27,6 +27,8 @@
      to avoid CASTing weirdness (@DavidPatShuiFong, #496).
      
   * Assumes a boolean context inside of `[` (#546)
+  
+  * `str_sub()` with `end = -1` now works (#577).
 
 * Redshift: `lag()` and `lead()` lose the `default` parameter  since it's 
   not supported (@hdplsa, #548).
