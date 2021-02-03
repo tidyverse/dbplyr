@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 2.1.0
 
 ## New features
 
