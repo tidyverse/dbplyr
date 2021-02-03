@@ -110,8 +110,6 @@ sql_build.op_summarise <- function(op, con, ...) {
 
   .groups <- op$args$.groups
   verbose <- summarise_verbose(.groups, op$args$env_caller)
-  # we cannot automatically infer "keep" as for local frames
-  # -> use `drop_last` as it was historically
   .groups <- .groups %||% "drop_last"
 
   if (verbose && n > 1) {
