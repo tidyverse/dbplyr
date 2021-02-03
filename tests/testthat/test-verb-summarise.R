@@ -27,7 +27,21 @@ test_that("can't refer to freshly created variables", {
 test_that("summarise(.groups=)", {
   df <- lazy_frame(x = 1, y = 2) %>% group_by(x, y)
 
-  expect_snapshot(df %>% summarise())
+  # should produce a message when called directly by user
+  expect_message(eval_bare(
+    expr(lazy_frame(x = 1, y = 2) %>% group_by(x, y) %>% summarise() %>% remote_query()),
+    env(global_env())
+  ))
+  expect_snapshot(eval_bare(
+    expr(lazy_frame(x = 1, y = 2) %>% group_by(x, y) %>% summarise() %>% remote_query()),
+    env(global_env())
+  ))
+
+  # should be silent when called in another package
+  expect_silent(eval_bare(
+    expr(lazy_frame(x = 1, y = 2) %>% group_by(x, y) %>% summarise() %>% remote_query()),
+    asNamespace("testthat")
+  ))
 
   expect_equal(df %>% summarise() %>% group_vars(), "x")
   expect_equal(df %>% summarise(.groups = "drop_last") %>% group_vars(), "x")

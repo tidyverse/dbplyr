@@ -1,12 +1,12 @@
 # summarise(.groups=)
 
     Code
-      df %>% summarise()
+      eval_bare(expr(lazy_frame(x = 1, y = 2) %>% group_by(x, y) %>% summarise() %>%
+        remote_query()), env(global_env()))
     Message <message>
       `summarise()` has grouped output by 'x'. You can override using the `.groups` argument.
     Output
-      <SQL>
-      SELECT `x`, `y`
+      <SQL> SELECT `x`, `y`
       FROM `df`
       GROUP BY `x`, `y`
 

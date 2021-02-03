@@ -39,7 +39,12 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   check_summarise_vars(dots)
   check_groups(.groups)
 
-  add_op_single("summarise", .data, dots = dots, args = list(.groups = .groups))
+  add_op_single(
+    "summarise",
+    .data,
+    dots = dots,
+    args = list(.groups = .groups, env_caller = caller_env())
+  )
 }
 
 # For each expression, check if it uses any newly created variables
@@ -98,7 +103,7 @@ sql_build.op_summarise <- function(op, con, ...) {
   n <- length(group_vars)
 
   .groups <- op$args$.groups
-  verbose <- summarise_verbose(.groups, caller_env())
+  verbose <- summarise_verbose(.groups, op$args$env_caller)
   # we cannot automatically infer "keep" as for local frames
   # -> use `drop_last` as it was historically
   .groups <- .groups %||% "drop_last"
@@ -118,9 +123,7 @@ sql_build.op_summarise <- function(op, con, ...) {
 
 summarise_verbose <- function(.groups, .env) {
   is.null(.groups) &&
-    # TODO not sure whether this is correct
-    is_reference(asNamespace("dbplyr"), topenv(.env)) &&
-    # is_reference(topenv(.env), global_env()) &&
+    is_reference(topenv(.env), global_env()) &&
     !identical(getOption("dplyr.summarise.inform"), FALSE)
 }
 
