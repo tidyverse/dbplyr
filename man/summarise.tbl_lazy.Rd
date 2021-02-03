@@ -4,13 +4,27 @@
 \alias{summarise.tbl_lazy}
 \title{Summarise each group to one row}
 \usage{
-\method{summarise}{tbl_lazy}(.data, ...)
+\method{summarise}{tbl_lazy}(.data, ..., .groups = NULL)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+
+\item{.groups}{\Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.
+\itemize{
+\item "drop_last": dropping the last level of grouping. This was the
+only supported option before version 1.0.0.
+\item "drop": All levels of grouping are dropped.
+\item "keep": Same grouping structure as \code{.data}.
+}
+
+When \code{.groups} is not specified, it defaults to "drop_last".
+
+In addition, a message informs you of that choice, unless the result is ungrouped,
+the option "dplyr.summarise.inform" is set to \code{FALSE},
+or when \code{summarise()} is called from a function in a package.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated

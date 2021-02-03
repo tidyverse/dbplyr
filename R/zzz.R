@@ -21,6 +21,8 @@
     methods::setOldClass(c("ident", "character"), ident())
     methods::setOldClass(c("sql", "character"), sql())
   }
+
+  base_scalar$`%>%` <- magrittr::`%>%`
 }
 
 # Silence R CMD check note:

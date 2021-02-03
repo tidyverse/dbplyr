@@ -5,6 +5,8 @@ test_that("custom scalar translated correctly", {
 
   expect_equal(translate_sql(as.logical(x)),   sql("TRY_CAST(`x` AS BIT)"))
   expect_equal(translate_sql(as.numeric(x)),   sql("TRY_CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(as.integer(x)),   sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT)"))
+  expect_equal(translate_sql(as.integer64(x)), sql("TRY_CAST(TRY_CAST(`x` AS NUMERIC(38, 0)) AS BIGINT)"))
   expect_equal(translate_sql(as.double(x)),    sql("TRY_CAST(`x` AS FLOAT)"))
   expect_equal(translate_sql(as.character(x)), sql("TRY_CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(translate_sql(log(x)),          sql("LOG(`x`)"))
@@ -177,4 +179,21 @@ test_that("bit conversion works for important cases", {
   # expect_equal(db %>% mutate(z = !x) %>% pull(), c(FALSE, TRUE, TRUE))
   # expect_equal(db %>% mutate(z = x & y) %>% pull(), c(TRUE, FALSE, FALSE))
 
+})
+
+test_that("as.integer and as.integer64 translations if parsing failures", {
+  df <- data.frame(x = c("1.3", "2x"))
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+
+  out <- db %>%
+    mutate(
+      integer = as.integer(x),
+      integer64 = as.integer64(x),
+      numeric = as.numeric(x),
+    ) %>%
+    collect()
+
+  expect_identical(out$integer, c(1L, NA))
+  expect_identical(out$integer64, bit64::as.integer64(c(1L, NA)))
+  expect_identical(out$numeric, c(1.3, NA))
 })

@@ -5,6 +5,11 @@
 
 * RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
   not supported by `RPostgres::dbWriteTable()` (#574).
+## New features
+
+* Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
+  `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
+  `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
 
 * @mgirlich is now a dbplyr author in recognition of his significant and
   sustained contributions.
@@ -13,30 +18,42 @@
   it now translates formulas (#525), works with SQL functions that don't have
   R translations (#534), and work with `NULL` (#554)
 
-* `pull()` no longer `select()`s the result when there's already only 
-  one variable (#562).
+* `summarise()` now supports argument `.groups` (@mgirlich, #584).
 
-* MS SQL translation assumes a boolean context inside of `[` (#546)
+## SQL translation
 
-* `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
+* MS SQL:
 
-* Thanks to @mgirlich, dbplyr gains support for key verbs from tidyr:
-  `pivot_longer()` (#532), `pivot_wider()` (#543), `expand()` (#538), 
-  `complete()` (#538), `replace_na()` (#538), `fill()` (#566).
+  * `as.integer()` and `as.integer64()` translations cast first to `NUMERIC` 
+     to avoid CASTing weirdness (@DavidPatShuiFong, #496).
+     
+  * Assumes a boolean context inside of `[` (#546)
 
-* `select()` now does not relocate grouping variables to the front 
-   (@mgirlich, #568). and informs when adding missing grouping variables 
-   (@mgirlich, #559).
+* Redshift: `lag()` and `lead()` lose the `default` parameter  since it's 
+  not supported (@hdplsa, #548).
+
+* SQLite: custom translation of `full_join()` and `right_join()` 
+  (@mgirlich, #536).
+
+## Minor improvements and bug fixes
+
+* RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
+  not supported by `RPostgres::dbWriteTable()` (#574).
+
+* `count()` method provides closer match to dplyr semantics (#347).
 
 * `distinct()` now respects grouping (@mgirlich, #535).
 
-* Fix partial match in `db_connection_describe()` (@mgirlich, #564).
+* `db_connection_describe()` no longer uses partial matching (@mgirlich, #564).
 
-* Added custom SQLite translation of `full_join()` and `right_join()` 
-  (@mgirlich, #536).
+* `pull()` no longer `select()`s the result when there's already only 
+  one variable (#562).
 
-* Redshift translation of `lag()` and `lead()` lose the `default` parameter 
-  since its not supported (@hdplsa, #548).
+* `select()` no longer relocates grouping variables to the front 
+  (@mgirlich, #568). and informs when adding missing grouping variables 
+  (@mgirlich, #559).
+
+* `tbl.src_dbi(...)` now passed on to `tbl_sql()` (#530).
 
 # dbplyr 2.0.0
 

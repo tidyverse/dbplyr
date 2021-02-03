@@ -1,23 +1,17 @@
-#' Translate an expression to sql.
+#' Translate an expression to sql
 #'
 #' @section Base translation:
-#' The base translator, `base_sql`,
-#' provides custom mappings for `!` (to NOT), `&&` and `&` to
-#' `AND`, `||` and `|` to `OR`, `^` to `POWER`,
-#' `%>%` to `%`, `ceiling` to `CEIL`, `mean` to
-#' `AVG`, `var` to `VARIANCE`, `tolower` to `LOWER`,
-#' `toupper` to `UPPER` and `nchar` to `LENGTH`.
-#'
-#' `c()` and `:` keep their usual R behaviour so you can easily create
-#' vectors that are passed to sql.
+#' The base translator, `base_sql`, provides custom mappings for for
+#' commonly used base functions including logical (`!`, `&`, `|`),
+#' arithmetic (`^`), and comparison (`!=`) operators, as well as common
+#' summary (`mean()`, `var()`) and manipulation functions.
 #'
 #' All other functions will be preserved as is. R's infix functions
-#' (e.g. `%like%`) will be converted to their SQL equivalents
-#' (e.g. `LIKE`). You can use this to access SQL string concatenation:
-#' `||` is mapped to `OR`, but `%||%` is mapped to `||`.
-#' To suppress this behaviour, and force errors immediately when dplyr doesn't
-#' know how to translate a function it encounters, using set the
-#' `dplyr.strict_sql` option to `TRUE`.
+#' (e.g. `%like%`) will be converted to their SQL equivalents (e.g. `LIKE`).
+#' You can use this to access SQL string concatenation: `||` is mapped to
+#' `OR`, but `%||%` is mapped to `||`. To suppress this behaviour, and force
+#' errors immediately when dplyr doesn't know how to translate a function it
+#' encounters, using set the `dplyr.strict_sql` option to `TRUE`.
 #'
 #' You can also use [sql()] to insert a raw sql string.
 #'

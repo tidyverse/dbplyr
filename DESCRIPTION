@@ -30,7 +30,7 @@ Imports:
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.0),
+    dplyr (>= 1.0.3),
     ellipsis,
     glue (>= 1.2.0),
     lifecycle,
@@ -128,6 +128,7 @@ Collate:
     'verb-arrange.R'
     'verb-compute.R'
     'verb-copy-to.R'
+    'verb-count.R'
     'verb-distinct.R'
     'verb-do-query.R'
     'verb-do.R'

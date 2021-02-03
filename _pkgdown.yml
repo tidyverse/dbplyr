@@ -17,6 +17,7 @@ reference:
   - arrange.tbl_lazy
   - copy_to.src_sql
   - collapse.tbl_sql
+  - count.tbl_lazy
   - distinct.tbl_lazy
   - do.tbl_sql
   - filter.tbl_lazy
