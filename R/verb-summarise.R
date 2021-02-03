@@ -12,7 +12,6 @@
 #'   only supported option before version 1.0.0.
 #'   * "drop": All levels of grouping are dropped.
 #'   * "keep": Same grouping structure as `.data`.
-#'   * "rowwise": This is not possible for lazy data frames.
 #'
 #'   When `.groups` is not specified, it defaults to "drop_last".
 #'
@@ -38,16 +37,7 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   check_summarise_vars(dots)
-
-  if (!is_null(.groups) && !.groups %in% c("drop_last", "drop", "keep")) {
-    abort(c(
-      paste0(
-        "`.groups` can't be ", as_label(.groups),
-        if (.groups == "rowwise") " for lazy tables"
-      ),
-      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-    ))
-  }
+  check_groups(.groups)
 
   add_op_single("summarise", .data, dots = dots, args = list(.groups = .groups))
 }
@@ -69,18 +59,16 @@ check_summarise_vars <- function(dots) {
   }
 }
 
-summarise_verbose <- function(.groups, .env) {
-  is.null(.groups) &&
-    # TODO not sure whether this is correct
-    is_reference(asNamespace("dbplyr"), topenv(.env)) &&
-    # is_reference(topenv(.env), global_env()) &&
-    !identical(getOption("dplyr.summarise.inform"), FALSE)
-}
-
-summarise_inform <- function(..., .env = parent.frame()) {
-  inform(paste0(
-    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
-  ))
+check_groups <- function(.groups) {
+  if (!is_null(.groups) && !.groups %in% c("drop_last", "drop", "keep")) {
+    abort(c(
+      paste0(
+        "`.groups` can't be ", as_label(.groups),
+        if (.groups == "rowwise") " for lazy tables"
+      ),
+      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+    ))
+  }
 }
 
 #' @export
@@ -93,18 +81,11 @@ op_grps.op_summarise <- function(op) {
   grps <- op_grps(op$x)
   .groups <- op$args$.groups %||% "drop_last"
 
-  if (identical(.groups, "drop_last")) {
-    n <- length(grps)
-    if (n == 1) {
-      character()
-    } else {
-      grps[-n]
-    }
-  } else if (identical(.groups, "keep")) {
-    grps
-  } else if(identical(.groups, "drop")) {
-    character()
-  }
+  switch(.groups,
+    drop_last = grps[-length(grps)],
+    keep = grps,
+    drop = character()
+  )
 }
 
 #' @export
@@ -122,7 +103,7 @@ sql_build.op_summarise <- function(op, con, ...) {
   # -> use `drop_last` as it was historically
   .groups <- .groups %||% "drop_last"
 
-  if (verbose && identical(.groups, "drop_last") && n > 1) {
+  if (verbose && n > 1) {
     new_groups <- glue::glue_collapse(paste0("'", group_vars[-n], "'"), sep = ", ")
     summarise_inform("has grouped output by {new_groups}")
   }
@@ -133,4 +114,18 @@ sql_build.op_summarise <- function(op, con, ...) {
     select = c.sql(group_vars, select_vars, con = con),
     group_by = group_vars
   )
+}
+
+summarise_verbose <- function(.groups, .env) {
+  is.null(.groups) &&
+    # TODO not sure whether this is correct
+    is_reference(asNamespace("dbplyr"), topenv(.env)) &&
+    # is_reference(topenv(.env), global_env()) &&
+    !identical(getOption("dplyr.summarise.inform"), FALSE)
+}
+
+summarise_inform <- function(..., .env = parent.frame()) {
+  inform(paste0(
+    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
+  ))
 }
