@@ -55,6 +55,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/copy_to.src_sql.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/count.tbl_lazy.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/db-io.html</loc>
   </url>
   <url>

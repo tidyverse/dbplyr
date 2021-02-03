@@ -230,25 +230,25 @@ unlikely to conflict with an existing table.</p></td>
     <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
 <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>memdb_frame</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_021&gt; [?? x 2]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     table&lt;dbplyr_022&gt; [?? x 2]</span><span>
 #&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
 #&gt;          x      y
 #&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.002</span><span style='text-decoration: underline;'>40</span><span> 0.286 
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.014</span><span style='text-decoration: underline;'>6</span><span>  0.813 
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.019</span><span style='text-decoration: underline;'>4</span><span>  0.769 
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.020</span><span style='text-decoration: underline;'>2</span><span>  0.208 
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.021</span><span style='text-decoration: underline;'>5</span><span>  0.481 
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.022</span><span style='text-decoration: underline;'>8</span><span>  0.645 
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.025</span><span style='text-decoration: underline;'>1</span><span>  0.345 
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.036</span><span style='text-decoration: underline;'>1</span><span>  0.088</span><span style='text-decoration: underline;'>3</span><span>
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.050</span><span style='text-decoration: underline;'>2</span><span>  0.712 
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.060</span><span style='text-decoration: underline;'>1</span><span>  0.520 
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.008</span><span style='text-decoration: underline;'>42</span><span> 0.435 
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.020</span><span style='text-decoration: underline;'>2</span><span>  0.208 
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.021</span><span style='text-decoration: underline;'>5</span><span>  0.481 
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.022</span><span style='text-decoration: underline;'>8</span><span>  0.645 
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.025</span><span style='text-decoration: underline;'>1</span><span>  0.345 
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.036</span><span style='text-decoration: underline;'>1</span><span>  0.088</span><span style='text-decoration: underline;'>3</span><span>
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.060</span><span style='text-decoration: underline;'>1</span><span>  0.520 
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.061</span><span style='text-decoration: underline;'>7</span><span>  0.709 
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.064</span><span style='text-decoration: underline;'>6</span><span>  0.469 
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.065</span><span style='text-decoration: underline;'>4</span><span>  0.151 
 #&gt; </span><span style='color: #555555;'># … with more rows</span><span></div><div class='input'><span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT *
-#&gt; FROM `dbplyr_021`
+#&gt; FROM `dbplyr_022`
 #&gt; ORDER BY `x`</div><div class='input'>
 <span class='va'>mtcars_db</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_memdb</span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span>
 <span class='va'>mtcars_db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>cyl</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>

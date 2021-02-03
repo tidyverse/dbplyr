@@ -218,7 +218,6 @@ variables. Use <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>d
 only supported option before version 1.0.0.</p></li>
 <li><p>"drop": All levels of grouping are dropped.</p></li>
 <li><p>"keep": Same grouping structure as <code>.data</code>.</p></li>
-<li><p>"rowwise": This is not possible for lazy data frames.</p></li>
 </ul>
 
 <p>When <code>.groups</code> is not specified, it defaults to "drop_last".</p>
@@ -243,14 +242,14 @@ and return data to R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_028`</div><div class='input'>
+#&gt; FROM `dbplyr_029`</div><div class='input'>
 <span class='va'>db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>g</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `g`, COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_028`
+#&gt; FROM `dbplyr_029`
 #&gt; GROUP BY `g`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

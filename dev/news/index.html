@@ -190,6 +190,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p>New <code><a href="https://dplyr.tidyverse.org/reference/count.html">count()</a></code> method provides closer match to dplyr semantics (<a href='https://github.com/tidyverse/dbplyr/issues/347'>#347</a>).</p></li>
 <li><p>MS SQL translation of <code><a href="https://rdrr.io/r/base/integer.html">as.integer()</a></code> and <code>as.integer64()</code> translations casts first to <code>NUMERIC</code> to avoid CASTing weirdness (<a href='https://github.com/DavidPatShuiFong'>@DavidPatShuiFong</a>, <a href='https://github.com/tidyverse/dbplyr/issues/496'>#496</a>).</p></li>
 <li><p>RPostgreSQL backend warns if <code>temporary = TRUE</code> since temporary tables are not supported by <code>RPostgres::dbWriteTable()</code> (<a href='https://github.com/tidyverse/dbplyr/issues/574'>#574</a>).</p></li>
 <li><p>@mgirlich is now a dbplyr author in recognition of his significant and sustained contributions.</p></li>
