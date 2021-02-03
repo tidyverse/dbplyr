@@ -32,8 +32,8 @@ sql_str_sub <- function(
   ) {
   function(string, start = 1L, end = -1L) {
     stopifnot(length(start) == 1L, length(end) == 1L)
-    start <- as.integer(start)
-    end <- as.integer(end)
+    start <- check_integer(start, "start")
+    end <- check_integer(end, "stop")
 
     start_sql <- start_pos(string, start, length_f)
 
