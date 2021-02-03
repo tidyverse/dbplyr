@@ -207,7 +207,7 @@ dbplyr_pivot_wider_spec <- function(data,
   pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
 
   data_grouped %>%
-    summarise(!!!pivot_exprs) %>%
+    summarise(!!!pivot_exprs, .groups = "drop") %>%
     group_by(!!!syms(group_vars(data)))
 }
 

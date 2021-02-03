@@ -6,6 +6,18 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::summarise
+#' @param .groups \Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.
+#'
+#'   * "drop_last": dropping the last level of grouping. This was the
+#'   only supported option before version 1.0.0.
+#'   * "drop": All levels of grouping are dropped.
+#'   * "keep": Same grouping structure as `.data`.
+#'
+#'   When `.groups` is not specified, it defaults to "drop_last".
+#'
+#'   In addition, a message informs you of that choice, unless the result is ungrouped,
+#'   the option "dplyr.summarise.inform" is set to `FALSE`,
+#'   or when `summarise()` is called from a function in a package.
 #' @inherit arrange.tbl_lazy return
 #' @importFrom dplyr summarise
 #' @export
@@ -21,11 +33,18 @@
 #'   group_by(g) %>%
 #'   summarise(n()) %>%
 #'   show_query()
-summarise.tbl_lazy <- function(.data, ...) {
+summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   dots <- quos(..., .named = TRUE)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   check_summarise_vars(dots)
-  add_op_single("summarise", .data, dots = dots)
+  check_groups(.groups)
+
+  add_op_single(
+    "summarise",
+    .data,
+    dots = dots,
+    args = list(.groups = .groups, env_caller = caller_env())
+  )
 }
 
 # For each expression, check if it uses any newly created variables
@@ -45,6 +64,24 @@ check_summarise_vars <- function(dots) {
   }
 }
 
+check_groups <- function(.groups) {
+  if (is_null(.groups)) {
+    return()
+  }
+
+  if (.groups %in% c("drop_last", "drop", "keep")) {
+    return()
+  }
+
+  abort(c(
+    paste0(
+      "`.groups` can't be ", as_label(.groups),
+      if (.groups == "rowwise") " in dbplyr"
+    ),
+    i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+  ))
+}
+
 #' @export
 op_vars.op_summarise <- function(op) {
   c(op_grps(op$x), names(op$dots))
@@ -53,11 +90,13 @@ op_vars.op_summarise <- function(op) {
 #' @export
 op_grps.op_summarise <- function(op) {
   grps <- op_grps(op$x)
-  if (length(grps) == 1) {
-    character()
-  } else {
-    grps[-length(grps)]
-  }
+  .groups <- op$args$.groups %||% "drop_last"
+
+  switch(.groups,
+    drop_last = grps[-length(grps)],
+    keep = grps,
+    drop = character()
+  )
 }
 
 #' @export
@@ -66,11 +105,34 @@ op_sort.op_summarise <- function(op) NULL
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
   select_vars <- translate_sql_(op$dots, con, window = FALSE, context = list(clause = "SELECT"))
-  group_vars <- c.sql(ident(op_grps(op$x)), con = con)
+  group_vars <- op_grps(op$x)
+  n <- length(group_vars)
 
+  .groups <- op$args$.groups
+  verbose <- summarise_verbose(.groups, op$args$env_caller)
+  .groups <- .groups %||% "drop_last"
+
+  if (verbose && n > 1) {
+    new_groups <- glue::glue_collapse(paste0("'", group_vars[-n], "'"), sep = ", ")
+    summarise_inform("has grouped output by {new_groups}")
+  }
+
+  group_vars <- c.sql(ident(group_vars), con = con)
   select_query(
     sql_build(op$x, con),
     select = c.sql(group_vars, select_vars, con = con),
     group_by = group_vars
   )
+}
+
+summarise_verbose <- function(.groups, .env) {
+  is.null(.groups) &&
+    is_reference(topenv(.env), global_env()) &&
+    !identical(getOption("dplyr.summarise.inform"), FALSE)
+}
+
+summarise_inform <- function(..., .env = parent.frame()) {
+  inform(paste0(
+    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
+  ))
 }
