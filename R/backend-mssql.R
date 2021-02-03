@@ -147,8 +147,8 @@ simulate_mssql <- function(version = "15.0") {
       nchar = sql_prefix("LEN"),
       paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
-      substr = sql_substr("SUBSTRING", "LEN"),
-      substring = sql_substr("SUBSTRING", "LEN"),
+      substr = sql_substr("SUBSTRING"),
+      substring = sql_substr("SUBSTRING"),
 
       # stringr functions
       str_length = sql_prefix("LEN"),

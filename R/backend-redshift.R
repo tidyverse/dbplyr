@@ -46,8 +46,8 @@ sql_translation.RedshiftConnection <- function(con) {
       str_c = sql_paste_redshift(""),
 
       # https://docs.aws.amazon.com/redshift/latest/dg/r_SUBSTRING.html
-      substr = sql_substr("SUBSTRING", "LEN"),
-      substring = sql_substr("SUBSTRING", "LEN"),
+      substr = sql_substr("SUBSTRING"),
+      substring = sql_substr("SUBSTRING"),
       str_sub = sql_str_sub("SUBSTRING", "LEN"),
 
       # https://docs.aws.amazon.com/redshift/latest/dg/REGEXP_REPLACE.html

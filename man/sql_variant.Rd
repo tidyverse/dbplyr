@@ -29,7 +29,7 @@
 \alias{base_odbc_win}
 \title{Create an sql translator}
 \usage{
-sql_substr(f = "SUBSTR", length_f = "LENGTH")
+sql_substr(f = "SUBSTR")
 
 sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
 

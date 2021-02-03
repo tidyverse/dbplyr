@@ -3,14 +3,21 @@
 # https://www.postgresql.org/docs/current/functions-string.html
 #' @export
 #' @rdname sql_variant
-sql_substr <- function(f = "SUBSTR", length_f = "LENGTH") {
+sql_substr <- function(f = "SUBSTR") {
   function(x, start, stop) {
-    start <- as.integer(start)
-    length <- pmax(as.integer(stop) - start + 1L, 0L)
-    start <- start_pos(x, start, length_f)
+    start <- max(check_integer(start, "start"), 1L)
+    stop <- max(check_integer(stop, "stop"), 1L)
+    length <- max(stop - start + 1L, 0L)
 
     sql_call2(f, x, start, length)
   }
+}
+
+check_integer <- function(x, arg) {
+  if (length(x) != 1 || !is.numeric(x)) {
+    abort(paste0("`", arg, "` must be a single number"))
+  }
+  as.integer(x)
 }
 
 # str_sub(x, start, end) - start and end can be negative
