@@ -65,15 +65,21 @@ check_summarise_vars <- function(dots) {
 }
 
 check_groups <- function(.groups) {
-  if (!is_null(.groups) && !.groups %in% c("drop_last", "drop", "keep")) {
-    abort(c(
-      paste0(
-        "`.groups` can't be ", as_label(.groups),
-        if (.groups == "rowwise") " for lazy tables"
-      ),
-      i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-    ))
+  if (is_null(.groups)) {
+    return()
   }
+
+  if (.groups %in% c("drop_last", "drop", "keep")) {
+    return()
+  }
+
+  abort(c(
+    paste0(
+      "`.groups` can't be ", as_label(.groups),
+      if (.groups == "rowwise") " in dbplyr"
+    ),
+    i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
+  ))
 }
 
 #' @export

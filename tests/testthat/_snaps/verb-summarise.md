@@ -12,7 +12,7 @@
 
 ---
 
-    `.groups` can't be "rowwise" for lazy tables
+    `.groups` can't be "rowwise" in dbplyr
     i Possible values are NULL (default), "drop_last", "drop", and "keep"
 
 # quoting for rendering summarized grouped table
