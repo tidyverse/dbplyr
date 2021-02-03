@@ -203,11 +203,13 @@
 <h2 class="hasAnchor">
 <a href="#sql-translation" class="anchor"></a>SQL translation</h2>
 <ul>
+<li><p>All backends: <code>str_sub()</code>, <code><a href="https://rdrr.io/r/base/substr.html">substr()</a></code> and <code><a href="https://rdrr.io/r/base/substr.html">substring()</a></code> get better translations (<a href='https://github.com/tidyverse/dbplyr/issues/577'>#577</a>). Most importantly, the results of using negative locations should match the underlying R implementations more closely.</p></li>
 <li>
 <p>MS SQL:</p>
 <ul>
 <li><p><code><a href="https://rdrr.io/r/base/integer.html">as.integer()</a></code> and <code>as.integer64()</code> translations cast first to <code>NUMERIC</code> to avoid CASTing weirdness (<a href='https://github.com/DavidPatShuiFong'>@DavidPatShuiFong</a>, <a href='https://github.com/tidyverse/dbplyr/issues/496'>#496</a>).</p></li>
 <li><p>Assumes a boolean context inside of <code><a href="https://rdrr.io/r/base/Extract.html">[</a></code> (<a href='https://github.com/tidyverse/dbplyr/issues/546'>#546</a>)</p></li>
+<li><p><code>str_sub()</code> with <code>end = -1</code> now works (<a href='https://github.com/tidyverse/dbplyr/issues/577'>#577</a>).</p></li>
 </ul>
 </li>
 <li><p>Redshift: <code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lag()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html">lead()</a></code> lose the <code>default</code> parameter since it’s not supported (<a href='https://github.com/hdplsa'>@hdplsa</a>, <a href='https://github.com/tidyverse/dbplyr/issues/548'>#548</a>).</p></li>
