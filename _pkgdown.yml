@@ -31,6 +31,16 @@ reference:
   - slice_min.tbl_lazy
   - summarise.tbl_lazy
 
+- title: tidyr verbs
+  contents:
+  - complete.tbl_lazy
+  - dbplyr_uncount
+  - expand.tbl_lazy
+  - fill.tbl_lazy
+  - pivot_longer.tbl_lazy
+  - pivot_wider.tbl_lazy
+  - replace_na.tbl_lazy
+
 - title: Built-in database backends
   contents:
   - starts_with("backend")
