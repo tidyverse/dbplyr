@@ -31,7 +31,7 @@
 \usage{
 sql_substr(f = "SUBSTR")
 
-sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH")
+sql_str_sub(subset_f = "SUBSTR", length_f = "LENGTH", optional_length = TRUE)
 
 sql_paste(default_sep, f = "CONCAT_WS")
 

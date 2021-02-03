@@ -155,7 +155,8 @@ simulate_mssql <- function(version = "15.0") {
       str_c = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       # no built in function: https://stackoverflow.com/questions/230138
       str_to_title = sql_not_supported("str_to_title()"),
-      str_sub = sql_str_sub("SUBSTRING", "LEN"),
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
+      str_sub = sql_str_sub("SUBSTRING", "LEN", optional_length = FALSE),
 
       # lubridate ---------------------------------------------------------------
       # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions

@@ -5,11 +5,19 @@
 #' @rdname sql_variant
 sql_substr <- function(f = "SUBSTR") {
   function(x, start, stop) {
-    start <- as.integer(start)
-    length <- pmax(as.integer(stop) - start + 1L, 0L)
+    start <- max(check_integer(start, "start"), 1L)
+    stop <- max(check_integer(stop, "stop"), 1L)
+    length <- max(stop - start + 1L, 0L)
 
     sql_call2(f, x, start, length)
   }
+}
+
+check_integer <- function(x, arg) {
+  if (length(x) != 1 || !is.numeric(x)) {
+    abort(paste0("`", arg, "` must be a single number"))
+  }
+  as.integer(x)
 }
 
 # str_sub(x, start, end) - start and end can be negative
@@ -17,24 +25,45 @@ sql_substr <- function(f = "SUBSTR") {
 
 #' @export
 #' @rdname sql_variant
-sql_str_sub <- function(subset_f = "SUBSTR", length_f = "LENGTH") {
+sql_str_sub <- function(
+                        subset_f = "SUBSTR",
+                        length_f = "LENGTH",
+                        optional_length = TRUE
+  ) {
   function(string, start = 1L, end = -1L) {
     stopifnot(length(start) == 1L, length(end) == 1L)
-    start <- as.integer(start)
-    end <- as.integer(end)
+    start <- check_integer(start, "start")
+    end <- check_integer(end, "stop")
 
-    if (end == -1L) {
-      sql_call2(subset_f, string, start)
+    start_sql <- start_pos(string, start, length_f)
+
+    if (optional_length && end == -1L) {
+      sql_call2(subset_f, string, start_sql)
     } else {
       if (end == 0L) {
-        length <- 0L
+        length_sql <- 0L
       } else if(start > 0 && end < 0) {
-        length <- sql_expr(!!sql_call2(length_f, string) - !!(start - end - 2L))
+        n <- start - end - 2L
+        if (n == 0) {
+          length_sql <- sql_call2(length_f, string)
+        } else {
+          length_sql <- sql_expr(!!sql_call2(length_f, string) - !!n)
+        }
       } else {
-        length <- pmax(end - start + 1L, 0L)
+        length_sql <- pmax(end - start + 1L, 0L)
       }
-      sql_call2(subset_f, string, start, length)
+      sql_call2(subset_f, string, start_sql, length_sql)
     }
+  }
+}
+
+start_pos <- function(string, start, length_f) {
+  if (start == -1) {
+    sql_call2(length_f, string)
+  } else if (start < 0) {
+    sql_expr(!!sql_call2(length_f, string) - !!abs(start + 1L))
+  } else {
+    start
   }
 }
 
