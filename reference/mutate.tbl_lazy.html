@@ -97,7 +97,7 @@ the SQL query." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -145,6 +145,9 @@ the SQL query." />
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -164,7 +167,7 @@ the SQL query." />
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -224,7 +227,7 @@ and return data to R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`, (`x` + `y`) / 2.0 AS `a`, SQRT(POWER(`x`, 2) + POWER(`y`, 2)) AS `b`
-#&gt; FROM `dbplyr_015`</div><div class='input'>
+#&gt; FROM `dbplyr_023`</div><div class='input'>
 <span class='co'># dbplyr automatically creates subqueries as needed</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>x1 <span class='op'>=</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fl'>1</span>, x2 <span class='op'>=</span> <span class='va'>x1</span> <span class='op'>*</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
@@ -232,7 +235,7 @@ and return data to R.</p>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`, `x1`, `x1` * 2.0 AS `x2`
 #&gt; FROM (SELECT `x`, `y`, `x` + 1.0 AS `x1`
-#&gt; FROM `dbplyr_015`)</div></pre>
+#&gt; FROM `dbplyr_023`)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -249,7 +252,7 @@ and return data to R.</p>
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>

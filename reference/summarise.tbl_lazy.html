@@ -97,7 +97,7 @@ group_by()." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -145,6 +145,9 @@ group_by()." />
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -164,7 +167,7 @@ group_by()." />
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -193,7 +196,7 @@ group_by()." />
     </div>
 
     <pre class="usage"><span class='co'># S3 method for tbl_lazy</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span><span class='va'>.data</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span><span class='va'>.data</span>, <span class='va'>...</span>, .groups <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -206,6 +209,21 @@ group_by()." />
       <th>...</th>
       <td><p>&lt;<code><a href='https://dplyr.tidyverse.org/reference/dplyr_data_masking.html'>data-masking</a></code>&gt; Variables, or functions or
 variables. Use <code><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc()</a></code> to sort a variable in descending order.</p></td>
+    </tr>
+    <tr>
+      <th>.groups</th>
+      <td><p><a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>
+ Grouping structure of the result.</p><ul>
+<li><p>"drop_last": dropping the last level of grouping. This was the
+only supported option before version 1.0.0.</p></li>
+<li><p>"drop": All levels of grouping are dropped.</p></li>
+<li><p>"keep": Same grouping structure as <code>.data</code>.</p></li>
+</ul>
+
+<p>When <code>.groups</code> is not specified, it defaults to "drop_last".</p>
+<p>In addition, a message informs you of that choice, unless the result is ungrouped,
+the option "dplyr.summarise.inform" is set to <code>FALSE</code>,
+or when <code><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise()</a></code> is called from a function in a package.</p></td>
     </tr>
     </table>
 
@@ -224,14 +242,14 @@ and return data to R.</p>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_018`</div><div class='input'>
+#&gt; FROM `dbplyr_029`</div><div class='input'>
 <span class='va'>db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>g</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `g`, COUNT(*) AS `n()`
-#&gt; FROM `dbplyr_018`
+#&gt; FROM `dbplyr_029`
 #&gt; GROUP BY `g`</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -249,7 +267,7 @@ and return data to R.</p>
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>

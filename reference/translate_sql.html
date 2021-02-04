@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Translate an expression to sql. — translate_sql • dbplyr</title>
+<title>Translate an expression to sql — translate_sql • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,8 +49,8 @@
 
 
 
-<meta property="og:title" content="Translate an expression to sql. — translate_sql" />
-<meta property="og:description" content="Translate an expression to sql." />
+<meta property="og:title" content="Translate an expression to sql — translate_sql" />
+<meta property="og:description" content="Translate an expression to sql" />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -95,7 +95,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -143,6 +143,9 @@
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -162,7 +165,7 @@
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,13 +182,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Translate an expression to sql.</h1>
+    <h1>Translate an expression to sql</h1>
     <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/translate-sql.R'><code>R/translate-sql.R</code></a></small>
     <div class="hidden name"><code>translate_sql.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Translate an expression to sql.</p>
+    <p>Translate an expression to sql</p>
     </div>
 
     <pre class="usage"><span class='fu'>translate_sql</span><span class='op'>(</span>
@@ -247,21 +250,16 @@ SQL for a grouped summary.</p></td>
 
     
 
-<p>The base translator, <code>base_sql</code>,
-provides custom mappings for <code><a href='https://rdrr.io/r/base/Logic.html'>!</a></code> (to NOT), <code>&amp;&amp;</code> and <code>&amp;</code> to
-<code>AND</code>, <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code> and <code><a href='https://rdrr.io/r/base/Logic.html'>|</a></code> to <code>OR</code>, <code><a href='https://rdrr.io/r/base/Arithmetic.html'>^</a></code> to <code>POWER</code>,
-<code>%&gt;%</code> to <code>%</code>, <code>ceiling</code> to <code>CEIL</code>, <code>mean</code> to
-<code>AVG</code>, <code>var</code> to <code>VARIANCE</code>, <code>tolower</code> to <code>LOWER</code>,
-<code>toupper</code> to <code>UPPER</code> and <code>nchar</code> to <code>LENGTH</code>.</p>
-<p><code><a href='https://rdrr.io/r/base/c.html'>c()</a></code> and <code><a href='https://rdrr.io/r/base/Colon.html'>:</a></code> keep their usual R behaviour so you can easily create
-vectors that are passed to sql.</p>
+<p>The base translator, <code>base_sql</code>, provides custom mappings for for
+commonly used base functions including logical (<code><a href='https://rdrr.io/r/base/Logic.html'>!</a></code>, <code>&amp;</code>, <code><a href='https://rdrr.io/r/base/Logic.html'>|</a></code>),
+arithmetic (<code><a href='https://rdrr.io/r/base/Arithmetic.html'>^</a></code>), and comparison (<code><a href='https://rdrr.io/r/base/Comparison.html'>!=</a></code>) operators, as well as common
+summary (<code><a href='https://rdrr.io/r/base/mean.html'>mean()</a></code>, <code><a href='https://rdrr.io/r/stats/cor.html'>var()</a></code>) and manipulation functions.</p>
 <p>All other functions will be preserved as is. R's infix functions
-(e.g. <code>%like%</code>) will be converted to their SQL equivalents
-(e.g. <code>LIKE</code>). You can use this to access SQL string concatenation:
-<code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code> is mapped to <code>OR</code>, but <code>%||%</code> is mapped to <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code>.
-To suppress this behaviour, and force errors immediately when dplyr doesn't
-know how to translate a function it encounters, using set the
-<code>dplyr.strict_sql</code> option to <code>TRUE</code>.</p>
+(e.g. <code>%like%</code>) will be converted to their SQL equivalents (e.g. <code>LIKE</code>).
+You can use this to access SQL string concatenation: <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code> is mapped to
+<code>OR</code>, but <code>%||%</code> is mapped to <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code>. To suppress this behaviour, and force
+errors immediately when dplyr doesn't know how to translate a function it
+encounters, using set the <code>dplyr.strict_sql</code> option to <code>TRUE</code>.</p>
 <p>You can also use <code><a href='sql.html'>sql()</a></code> to insert a raw sql string.</p>
     <h2 class="hasAnchor" id="sqlite-translation"><a class="anchor" href="#sqlite-translation"></a>SQLite translation</h2>
 
@@ -335,7 +333,7 @@ from <code><a href='https://rdrr.io/r/stats/sd.html'>sd()</a></code> to the SQL 
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>

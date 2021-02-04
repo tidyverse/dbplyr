@@ -102,7 +102,7 @@ value of x in each group." />
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -150,6 +150,9 @@ value of x in each group." />
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -169,7 +172,7 @@ value of x in each group." />
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -256,36 +259,36 @@ the first n rows.</p></td>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`
 #&gt; FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x`) AS `q01`
-#&gt; FROM `dbplyr_004`)
+#&gt; FROM `dbplyr_006`)
 #&gt; WHERE (`q01` &lt;= 1)</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_max</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`
 #&gt; FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x` DESC) AS `q01`
-#&gt; FROM `dbplyr_004`)
+#&gt; FROM `dbplyr_006`)
 #&gt; WHERE (`q01` &lt;= 1)</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_sample</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`
 #&gt; FROM (SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY random()) AS `q01`
-#&gt; FROM `dbplyr_004`)
+#&gt; FROM `dbplyr_006`)
 #&gt; WHERE (`q01` &lt;= 1)</div><div class='input'>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `x`, `y`
 #&gt; FROM (SELECT `x`, `y`, RANK() OVER (PARTITION BY `y` ORDER BY `x`) AS `q01`
-#&gt; FROM `dbplyr_004`)
+#&gt; FROM `dbplyr_006`)
 #&gt; WHERE (`q01` &lt;= 1)</div><div class='input'>
 <span class='co'># By default, ties are includes so you may get more rows</span>
 <span class='co'># than you expect</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>     1     1
 #&gt; </span><span style='color: #555555;'>2</span><span>     2     1</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -293,7 +296,7 @@ the first n rows.</p></td>
 <span class='co'># Non-integer group sizes are rounded down</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
 #&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
 #&gt;       x     y
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -314,7 +317,7 @@ the first n rows.</p></td>
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>

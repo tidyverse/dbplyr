@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Backend: ODBC — backend-odbc • dbplyr</title>
+<title>Replace NAs with specified values — replace_na.tbl_lazy • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,12 +49,8 @@
 
 
 
-<meta property="og:title" content="Backend: ODBC — backend-odbc" />
-<meta property="og:description" content="See vignette(&quot;translate-function&quot;) and vignette(&quot;translate-verb&quot;) for
-details of overall translation technology. Key differences for this backend
-are minor translations for common data types.
-Use simulate_odbc() with lazy_frame() to see simulated SQL without
-converting to live access database." />
+<meta property="og:title" content="Replace NAs with specified values — replace_na.tbl_lazy" />
+<meta property="og:description" content="This is a method for the tidyr::replace_na() generic." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -186,37 +182,53 @@ converting to live access database." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Backend: ODBC</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-odbc.R'><code>R/backend-odbc.R</code></a></small>
-    <div class="hidden name"><code>backend-odbc.Rd</code></div>
+    <h1>Replace NAs with specified values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-expand.R'><code>R/verb-expand.R</code></a></small>
+    <div class="hidden name"><code>replace_na.tbl_lazy.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>See <code>vignette("translate-function")</code> and <code>vignette("translate-verb")</code> for
-details of overall translation technology. Key differences for this backend
-are minor translations for common data types.</p>
-<p>Use <code>simulate_odbc()</code> with <code><a href='tbl_lazy.html'>lazy_frame()</a></code> to see simulated SQL without
-converting to live access database.</p>
+    <p>This is a method for the <code><a href='https://tidyr.tidyverse.org/reference/replace_na.html'>tidyr::replace_na()</a></code> generic.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_odbc</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>replace_na.tbl_lazy</span><span class='op'>(</span><span class='va'>data</span>, replace <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>data</th>
+      <td><p>A pair of lazy data frame backed by database queries.</p></td>
+    </tr>
+    <tr>
+      <th>replace</th>
+      <td><p>A named list of values, with one value for each column that
+has NA values to be replaced.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Unused; included for compatibility with generic.</p></td>
+    </tr>
+    </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Another <code>tbl_lazy</code>. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code> to see the generated
+query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to execute the query
+and return data to R.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='va'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='cn'>TRUE</span>, b <span class='op'>=</span> <span class='fl'>1</span>, d <span class='op'>=</span> <span class='fl'>2</span>, c <span class='op'>=</span> <span class='st'>"z"</span>, con <span class='op'>=</span> <span class='fu'>simulate_odbc</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS DOUBLE) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/integer.html'>as.integer</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS INT) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS STRING) AS `x`
-#&gt; FROM `df`</div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://tidyr.tidyverse.org'>"tidyr"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='cn'>NA</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='cn'>NA</span>, <span class='st'>"b"</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/replace_na.html'>replace_na</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>0</span>, y <span class='op'>=</span> <span class='st'>"unknown"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
+#&gt;       x y      
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  
+#&gt; </span><span style='color: #555555;'>1</span><span>     1 a      
+#&gt; </span><span style='color: #555555;'>2</span><span>     2 unknown
+#&gt; </span><span style='color: #555555;'>3</span><span>     0 b      </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

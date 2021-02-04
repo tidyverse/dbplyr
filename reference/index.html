@@ -94,7 +94,7 @@
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -142,6 +142,9 @@
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -161,7 +164,7 @@
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -225,6 +228,12 @@
           <p><code><a href="collapse.tbl_sql.html">collapse(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">compute(<i>&lt;tbl_sql&gt;</i>)</a></code> <code><a href="collapse.tbl_sql.html">collect(<i>&lt;tbl_sql&gt;</i>)</a></code> </p>
         </td>
         <td><p>Compute results of a query</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="count.tbl_lazy.html">count(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="count.tbl_lazy.html">tally(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Count observations by group</p></td>
       </tr><tr>
         
         <td>
@@ -297,6 +306,61 @@
           <p><code><a href="summarise.tbl_lazy.html">summarise(<i>&lt;tbl_lazy&gt;</i>)</a></code> </p>
         </td>
         <td><p>Summarise each group to one row</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-tidyr-verbs" class="hasAnchor"><a href="#section-tidyr-verbs" class="anchor"></a>tidyr verbs</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="complete.tbl_lazy.html">complete.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Complete a SQL table with missing combinations of data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="dbplyr_uncount.html">dbplyr_uncount()</a></code> </p>
+        </td>
+        <td><p>"Uncount" a database table</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="expand.tbl_lazy.html">expand.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Expand SQL tables to include all possible combinations of values</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="fill.tbl_lazy.html">fill.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Fill in missing values with previous or next value</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pivot_longer.tbl_lazy.html">pivot_longer.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Pivot data from wide to long</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pivot_wider.tbl_lazy.html">pivot_wider.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Pivot data from long to wide</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="replace_na.tbl_lazy.html">replace_na.tbl_lazy()</a></code> </p>
+        </td>
+        <td><p>Replace NAs with specified values</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -467,7 +531,7 @@
         <td>
           <p><code><a href="translate_sql.html">translate_sql()</a></code> <code><a href="translate_sql.html">translate_sql_()</a></code> </p>
         </td>
-        <td><p>Translate an expression to sql.</p></td>
+        <td><p>Translate an expression to sql</p></td>
       </tr><tr>
         
         <td>
@@ -531,7 +595,7 @@
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>

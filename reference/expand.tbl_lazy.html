@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Backend: ODBC — backend-odbc • dbplyr</title>
+<title>Expand SQL tables to include all possible combinations of values — expand.tbl_lazy • dbplyr</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -49,12 +49,10 @@
 
 
 
-<meta property="og:title" content="Backend: ODBC — backend-odbc" />
-<meta property="og:description" content="See vignette(&quot;translate-function&quot;) and vignette(&quot;translate-verb&quot;) for
-details of overall translation technology. Key differences for this backend
-are minor translations for common data types.
-Use simulate_odbc() with lazy_frame() to see simulated SQL without
-converting to live access database." />
+<meta property="og:title" content="Expand SQL tables to include all possible combinations of values — expand.tbl_lazy" />
+<meta property="og:description" content="This is a method for the tidyr::expand generics. It doesn't sort the
+result explicitly, so the order might be different to what expand()
+returns for data frames." />
 <meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png" />
 <meta name="twitter:card" content="summary" />
 
@@ -186,37 +184,80 @@ converting to live access database." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Backend: ODBC</h1>
-    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/backend-odbc.R'><code>R/backend-odbc.R</code></a></small>
-    <div class="hidden name"><code>backend-odbc.Rd</code></div>
+    <h1>Expand SQL tables to include all possible combinations of values</h1>
+    <small class="dont-index">Source: <a href='https://github.com/tidyverse/dbplyr/blob/master/R/verb-expand.R'><code>R/verb-expand.R</code></a></small>
+    <div class="hidden name"><code>expand.tbl_lazy.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>See <code>vignette("translate-function")</code> and <code>vignette("translate-verb")</code> for
-details of overall translation technology. Key differences for this backend
-are minor translations for common data types.</p>
-<p>Use <code>simulate_odbc()</code> with <code><a href='tbl_lazy.html'>lazy_frame()</a></code> to see simulated SQL without
-converting to live access database.</p>
+    <p>This is a method for the <a href='https://tidyr.tidyverse.org/reference/expand.html'>tidyr::expand</a> generics. It doesn't sort the
+result explicitly, so the order might be different to what <code><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand()</a></code>
+returns for data frames.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_odbc</span><span class='op'>(</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>expand.tbl_lazy</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>...</span>, .name_repair <span class='op'>=</span> <span class='st'>"check_unique"</span><span class='op'>)</span></pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>data</th>
+      <td><p>A lazy data frame backed by a database query.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Specification of columns to expand. See <a href='https://tidyr.tidyverse.org/reference/expand.html'>tidyr::expand</a> for
+more details.</p></td>
+    </tr>
+    <tr>
+      <th>.name_repair</th>
+      <td><p>Treatment of problematic column names:</p><ul>
+<li><p><code>"minimal"</code>: No name repair or checks, beyond basic existence,</p></li>
+<li><p><code>"unique"</code>: Make sure names are unique and not empty,</p></li>
+<li><p><code>"check_unique"</code>: (default value), no name repair, but check they are
+<code>unique</code>,</p></li>
+<li><p><code>"universal"</code>: Make the names <code>unique</code> and syntactic</p></li>
+<li><p>a function: apply custom name repair (e.g., <code>.name_repair = make.names</code>
+for names in the style of base R).</p></li>
+<li><p>A purrr-style anonymous function, see <code><a href='https://rlang.r-lib.org/reference/as_function.html'>rlang::as_function()</a></code></p></li>
+</ul>
 
+<p>This argument is passed on as <code>repair</code> to <code><a href='https://vctrs.r-lib.org/reference/vec_as_names.html'>vctrs::vec_as_names()</a></code>.
+See there for more details on these terms and the strategies used
+to enforce them.</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Another <code>tbl_lazy</code>. Use <code><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query()</a></code> to see the generated
+query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to execute the query
+and return data to R.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://tidyr.tidyverse.org'>"tidyr"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='va'>fruits</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>
+    type   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"apple"</span>, <span class='st'>"orange"</span>, <span class='st'>"apple"</span>, <span class='st'>"orange"</span>, <span class='st'>"orange"</span>, <span class='st'>"orange"</span><span class='op'>)</span>,
+    year   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2010</span>, <span class='fl'>2010</span>, <span class='fl'>2012</span>, <span class='fl'>2010</span>, <span class='fl'>2010</span>, <span class='fl'>2012</span><span class='op'>)</span>,
+    size <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"XS"</span>, <span class='st'>"S"</span>,  <span class='st'>"M"</span>, <span class='st'>"S"</span>, <span class='st'>"S"</span>, <span class='st'>"M"</span><span class='op'>)</span>,
+    weights <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>6</span><span class='op'>)</span>
+  <span class='op'>)</span>
 
-<span class='va'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='cn'>TRUE</span>, b <span class='op'>=</span> <span class='fl'>1</span>, d <span class='op'>=</span> <span class='fl'>2</span>, c <span class='op'>=</span> <span class='st'>"z"</span>, con <span class='op'>=</span> <span class='fu'>simulate_odbc</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS DOUBLE) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/integer.html'>as.integer</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS INT) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(`b` AS STRING) AS `x`
-#&gt; FROM `df`</div></pre>
+  <span class='co'># All possible combinations ---------------------------------------</span>
+  <span class='va'>fruits</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand</a></span><span class='op'>(</span><span class='va'>type</span><span class='op'>)</span>
+  <span class='va'>fruits</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand</a></span><span class='op'>(</span><span class='va'>type</span>, <span class='va'>size</span><span class='op'>)</span>
+
+  <span class='co'># Only combinations that already appear in the data ---------------</span>
+  <span class='va'>fruits</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand</a></span><span class='op'>(</span><span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>type</span>, <span class='va'>size</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
+#&gt;   type   size 
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> apple  XS   
+#&gt; </span><span style='color: #555555;'>2</span><span> orange S    
+#&gt; </span><span style='color: #555555;'>3</span><span> apple  M    
+#&gt; </span><span style='color: #555555;'>4</span><span> orange M    </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

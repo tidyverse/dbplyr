@@ -104,7 +104,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
         <a class="navbar-brand" href="../index.html">dbplyr</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of the <a href="https://tidyverse.org">tidyverse</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.0</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.0</span>
         </div>
       </div>
     </div>
@@ -152,6 +152,9 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Release notes</li>
     <li>
+      <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
+    </li>
+    <li>
       <a href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
     </li>
     <li>
@@ -171,7 +174,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
 </li>
         <li>
   <a href="https://github.com/tidyverse/dbplyr/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -371,7 +374,7 @@ and return data to R.</p>
 <span class='va'>band_db</span> <span class='op'>%&gt;%</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='fu'>dplyr</span><span class='fu'>::</span><span class='va'><a href='https://dplyr.tidyverse.org/reference/band_members.html'>band_instruments</a></span>, copy <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "name"</span></div><div class='output co'>#&gt; <span style='color: #555555;'># Source:   lazy query [?? x 3]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;   name  band    plays 
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> 
 #&gt; </span><span style='color: #555555;'>1</span><span> Mick  Stones  </span><span style='color: #BB0000;'>NA</span><span>    
@@ -382,7 +385,7 @@ and return data to R.</p>
 <span class='va'>label</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='cn'>NA</span><span class='op'>)</span>, label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"one"</span>, <span class='st'>"missing"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>label</span>, by <span class='op'>=</span> <span class='st'>"x"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;       x label
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>     1 one  
@@ -390,7 +393,7 @@ and return data to R.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span>    </span><span style='color: #BB0000;'>NA</span><span> </span><span style='color: #BB0000;'>NA</span><span>   </div><div class='input'><span class='co'># But you can activate R's usual behaviour with the na_matches argument</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>label</span>, by <span class='op'>=</span> <span class='st'>"x"</span>, na_matches <span class='op'>=</span> <span class='st'>"na"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database: sqlite 3.33.0 [:memory:]</span><span>
+#&gt; </span><span style='color: #555555;'># Database: sqlite 3.34.1 [:memory:]</span><span>
 #&gt;       x label  
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  
 #&gt; </span><span style='color: #555555;'>1</span><span>     1 one    
@@ -403,14 +406,14 @@ and return data to R.</p>
 <span class='va'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>db2</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = "x"</span></div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `LHS`.`x` AS `x`, `y`
-#&gt; FROM `dbplyr_012` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
+#&gt; FROM `dbplyr_020` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_021` AS `RHS`
 #&gt; ON (`LHS`.`x` = `RHS`.`x`)
 #&gt; </div><div class='input'><span class='va'>db1</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>db2</span>, sql_on <span class='op'>=</span> <span class='st'>"LHS.x &lt; RHS.x"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; &lt;SQL&gt;
 #&gt; SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`
-#&gt; FROM `dbplyr_012` AS `LHS`
-#&gt; LEFT JOIN `dbplyr_013` AS `RHS`
+#&gt; FROM `dbplyr_020` AS `LHS`
+#&gt; LEFT JOIN `dbplyr_021` AS `RHS`
 #&gt; ON (LHS.x &lt; RHS.x)
 #&gt; </div></span></pre>
   </div>
@@ -429,7 +432,7 @@ and return data to R.</p>
 
 <div class="author">
   <p>
-    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
+    Developed by <a href='http://hadley.nz'>Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
