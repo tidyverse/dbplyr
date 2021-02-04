@@ -42,7 +42,7 @@
 ## Minor improvements and bug fixes
 
 * RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
-  not supported by `RPostgres::dbWriteTable()` (#574).
+  not supported by `RPostgreSQL::dbWriteTable()` (#574).
 
 * `count()` method provides closer match to dplyr semantics (#347).
 
