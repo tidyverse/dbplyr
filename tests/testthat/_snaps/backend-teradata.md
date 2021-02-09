@@ -1,9 +1,9 @@
 # generates custom sql
 
     Code
-      sql_table_analyze(con, ident("table"))
+      sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> COLLECT STATISTICS `table`
+      <SQL> COLLECT STATISTICS `schema`.`tbl`
 
 # head translated to TOP
 

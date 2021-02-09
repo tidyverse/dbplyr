@@ -112,7 +112,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  build_sql("ANALYZE ", as.sql(table), con = con)
+  build_sql("ANALYZE ", as.sql(table, con = con), con = con)
 }
 
 #' @rdname db-sql
@@ -128,8 +128,8 @@ sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
-    " ON ", as.sql(table), " ", fields,
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name, con = con),
+    " ON ", as.sql(table, con = con), " ", fields,
     con = con
   )
 }
@@ -165,7 +165,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name), " AS ", sql,
+    as.sql(name, con), " AS ", sql,
     con = con
   )
 }

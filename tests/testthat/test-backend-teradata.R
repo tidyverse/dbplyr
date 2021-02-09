@@ -48,7 +48,7 @@ test_that("custom window functions translated correctly", {
 test_that("generates custom sql", {
   con <- simulate_teradata()
 
-  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 })
 
 # verb translation --------------------------------------------------------

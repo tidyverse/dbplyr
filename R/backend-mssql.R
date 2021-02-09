@@ -274,7 +274,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  build_sql("UPDATE STATISTICS ", as.sql(table), con = con)
+  build_sql("UPDATE STATISTICS ", as.sql(table, con = con), con = con)
 }
 
 # SQL server does not use CREATE TEMPORARY TABLE and instead prefixes
@@ -298,7 +298,7 @@ mssql_version <- function(con) {
 
   # https://stackoverflow.com/q/16683758/946850
   build_sql(
-    "SELECT * INTO ", as.sql(name), " ",
+    "SELECT * INTO ", as.sql(name, con), " ",
     "FROM (", sql, ") AS temp",
     con = con
   )

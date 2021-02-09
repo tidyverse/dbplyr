@@ -136,12 +136,12 @@ test_that("logical escaping depends on context", {
 test_that("generates custom sql", {
   con <- simulate_mssql()
 
-  expect_snapshot(sql_table_analyze(con, ident("table")))
+  expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 
   # Creates the same SQL since there's no temporary CLAUSE
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table")))
-  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE))
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
+  expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
 })
 
 # Live database -----------------------------------------------------------

@@ -100,7 +100,7 @@ sql_translation.Teradata <- function(con) {
 #' @export
 sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
-  build_sql("COLLECT STATISTICS ", as.sql(table) , con = con)
+  build_sql("COLLECT STATISTICS ", as.sql(table, con = con) , con = con)
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR"))

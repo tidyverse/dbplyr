@@ -9,5 +9,5 @@ test_that("custom scalar & string functions translated correctly", {
 })
 
 test_that("generates custom sql", {
-  expect_snapshot(sql_table_analyze(simulate_hive(), ident("tbl")))
+  expect_snapshot(sql_table_analyze(simulate_hive(), in_schema("schema", "tbl")))
 })

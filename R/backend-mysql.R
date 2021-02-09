@@ -101,7 +101,7 @@ sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
-  build_sql("ANALYZE TABLE ", as.sql(table), con = con)
+  build_sql("ANALYZE TABLE ", as.sql(table, con = con), con = con)
 }
 #' @export
 sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
