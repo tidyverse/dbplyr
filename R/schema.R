@@ -38,6 +38,9 @@ as.sql.dbplyr_schema <- function(x, con) {
   ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
 }
 
+#' @export
+is.schema <- function(x) inherits(x, "dbplyr_schema")
+
 # Support for DBI::Id() ---------------------------------------------------
 
 #' @export

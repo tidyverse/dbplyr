@@ -123,7 +123,7 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
 #' @export
 sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
                                            unique = FALSE, ...) {
-  assert_that(is_string(table), is.character(columns))
+  assert_that(is_string(table) | is.schema(table), is.character(columns))
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
@@ -178,6 +178,8 @@ sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
 sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
+  } else if (is.schema(from)) {
+    setNames(as.sql(from, con), name)
   } else {
     build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
