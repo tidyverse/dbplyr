@@ -119,3 +119,41 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
+# if_all/any works in filter()
+
+    Code
+      lf %>% filter(if_all(a:b, ~. > 0))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` > 0.0 AND `b` > 0.0)
+
+---
+
+    Code
+      lf %>% filter(if_any(a:b, ~. > 0))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` > 0.0 OR `b` > 0.0)
+
+# if_all/any works in mutate()
+
+    Code
+      lf %>% mutate(c = if_all(a:b, ~. > 0))
+    Output
+      <SQL>
+      SELECT `a`, `b`, `a` > 0.0 AND `b` > 0.0 AS `c`
+      FROM `df`
+
+---
+
+    Code
+      lf %>% mutate(c = if_any(a:b, ~. > 0))
+    Output
+      <SQL>
+      SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
+      FROM `df`
+
