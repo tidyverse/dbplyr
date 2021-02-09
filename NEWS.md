@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `if_any()` and `if_all()` are now translated.
+
 # dbplyr 2.1.0
 
 ## New features
