@@ -63,7 +63,7 @@ sql_translation.Hive <- function(con) {
 sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
   build_sql(
-    "ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS",
+    "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",
     con = con
   )
 }

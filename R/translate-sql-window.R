@@ -23,7 +23,7 @@
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
 win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
   if (length(partition) > 0) {
-    partition <- as.sql(partition)
+    partition <- as.sql(partition, con = con)
 
     partition <- build_sql(
       "PARTITION BY ",
@@ -38,7 +38,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
   }
 
   if (length(order) > 0) {
-    order <- as.sql(order)
+    order <- as.sql(order, con = con)
 
     order <- build_sql(
       "ORDER BY ",

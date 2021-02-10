@@ -101,7 +101,7 @@ sql_query_explain.Oracle <- function(con, sql, ...) {
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  build_sql("ANALYZE TABLE ", as.sql(table), " COMPUTE STATISTICS", con = con)
+  build_sql("ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS", con = con)
 }
 
 #' @export

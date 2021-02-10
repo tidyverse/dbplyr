@@ -31,9 +31,9 @@
 # DDL operations generate expected SQL
 
     Code
-      sql_table_analyze(con, ident("table"))
+      sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> ANALYZE `table`
+      <SQL> ANALYZE `schema`.`tbl`
 
 ---
 
@@ -52,29 +52,36 @@
 ---
 
     Code
+      sql_query_wrap(con, in_schema("schema", "tbl"))
+    Output
+      <IDENT> `schema`.`tbl`
+
+---
+
+    Code
       sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> (SELECT * FROM foo) `q02`
+      <SQL> (SELECT * FROM foo) `q03`
 
 ---
 
     Code
-      sql_table_index(con, ident("table"), c("a", "b"))
+      sql_table_index(con, in_schema("schema", "tbl"), c("a", "b"))
     Output
-      <SQL> CREATE INDEX `table_a_b` ON `table` (`a`, `b`)
+      <SQL> CREATE INDEX `schema_tbl_a_b` ON `schema`.`tbl` (`a`, `b`)
 
 ---
 
     Code
-      sql_table_index(con, ident("table"), "c", unique = TRUE)
+      sql_table_index(con, in_schema("schema", "tbl"), "c", unique = TRUE)
     Output
-      <SQL> CREATE UNIQUE INDEX `table_c` ON `table` (`c`)
+      <SQL> CREATE UNIQUE INDEX `schema_tbl_c` ON `schema`.`tbl` (`c`)
 
 ---
 
     Code
-      sql_query_save(con, ident("table"), sql("SELECT * FROM foo"))
+      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("temp", "tbl"))
     Output
       <SQL> CREATE TEMPORARY TABLE 
-      SELECT * FROM foo AS `table`
+      `temp`.`tbl` AS SELECT * FROM foo
 

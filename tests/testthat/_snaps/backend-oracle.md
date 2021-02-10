@@ -11,9 +11,9 @@
 # generates custom sql
 
     Code
-      sql_table_analyze(con, ident("table"))
+      sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> ANALYZE TABLE `table` COMPUTE STATISTICS
+      <SQL> ANALYZE TABLE `schema`.`tbl` COMPUTE STATISTICS
 
 ---
 

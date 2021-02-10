@@ -112,7 +112,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  build_sql("ANALYZE ", as.sql(table), con = con)
+  build_sql("ANALYZE ", as.sql(table, con = con), con = con)
 }
 
 #' @rdname db-sql
@@ -123,13 +123,13 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
 #' @export
 sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
                                            unique = FALSE, ...) {
-  assert_that(is_string(table), is.character(columns))
+  assert_that(is_string(table) | is.schema(table), is.character(columns))
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name),
-    " ON ", as.sql(table), " ", fields,
+    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name, con = con),
+    " ON ", as.sql(table, con = con), " ", fields,
     con = con
   )
 }
@@ -165,7 +165,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name), " AS ", sql,
+    as.sql(name, con), " AS ", sql,
     con = con
   )
 }
@@ -178,6 +178,8 @@ sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
 sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
   if (is.ident(from)) {
     setNames(from, name)
+  } else if (is.schema(from)) {
+    setNames(as.sql(from, con), name)
   } else {
     build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }

@@ -165,21 +165,22 @@
 # generates custom sql
 
     Code
-      sql_table_analyze(con, ident("table"))
+      sql_table_analyze(con, in_schema("schema", "tbl"))
     Output
-      <SQL> UPDATE STATISTICS `table`
+      <SQL> UPDATE STATISTICS `schema`.`tbl`
 
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), ident("table"))
+      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> SELECT * INTO `table` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
 
 ---
 
     Code
-      sql_query_save(con, sql("SELECT * FROM foo"), ident("table"), temporary = FALSE)
+      sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
+      temporary = FALSE)
     Output
-      <SQL> SELECT * INTO `table` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
 
