@@ -153,6 +153,10 @@ partial_eval_call <- function(call, vars, env) {
     } else {
       eval_bare(idx, env)
     }
+  }  else if (is_call(call, "if_any")) {
+    db_squash_if(call, env, vars, reduce = "|")
+  } else if (is_call(call, "if_all")) {
+    db_squash_if(call, env, vars, reduce = "&")
   } else if (is_call(call, "across")) {
     partial_eval_across(call, vars, env)
   } else {
@@ -191,6 +195,28 @@ partial_eval_across <- function(call, vars, env) {
   .names <- eval(call$.names, env)
   names(out) <- across_names(cols, names(funs), .names, env)
   out
+}
+
+capture_if_all <- function(data, x) {
+  x <- enquo(x)
+  db_squash_if(get_expr(x), get_env(x), colnames(data))
+}
+
+db_squash_if <- function(call, env, vars, reduce = "&") {
+  call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
+
+  tbl <- as_tibble(rep_named(vars, list(logical())))
+  locs <- tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)
+  cols <- syms(names(tbl))[locs]
+
+  fun <- across_fun(call$.fns, env)
+
+  out <- vector("list", length(cols))
+  for (i in seq_along(cols)) {
+    out[[i]] <- exec(fun, cols[[i]], !!!call$...)
+  }
+
+  Reduce(function(x, y) call2(reduce, x, y), out)
 }
 
 across_funs <- function(funs, env = caller_env()) {

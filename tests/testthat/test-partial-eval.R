@@ -92,3 +92,36 @@ test_that("old _at functions continue to work", {
   expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), sum))
   expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.)))
 })
+
+
+# if_all ------------------------------------------------------------------
+
+test_that("if_all translations names, strings, and formulas", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(capture_if_all(lf, if_all(a, is.na)), expr(is.na(a)))
+  expect_equal(capture_if_all(lf, if_all(a, "is.na")), expr(is.na(a)))
+  expect_equal(capture_if_all(lf, if_all(a, ~ is.na(.))), expr(is.na(a)))
+})
+
+test_that("if_all collapses multiple expresions", {
+  lf <- lazy_frame(data.frame(a = 1,  b = 2))
+  expect_equal(
+    capture_if_all(lf, if_all(everything(), is.na)),
+    expr(is.na(a) & is.na(b))
+  )
+})
+
+test_that("if_all/any works in filter()", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_snapshot(lf %>% filter(if_all(a:b, ~ . > 0)))
+  expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
+})
+
+test_that("if_all/any works in mutate()", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_snapshot(lf %>% mutate(c = if_all(a:b, ~ . > 0)))
+  expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
+})

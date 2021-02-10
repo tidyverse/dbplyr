@@ -3,6 +3,8 @@
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
+* `if_any()` and `if_all()` are now translated.
+
 # dbplyr 2.1.0
 
 ## New features
