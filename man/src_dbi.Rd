@@ -19,7 +19,7 @@ when this happens.}
 An S3 object with class \code{src_dbi}, \code{src_sql}, \code{src}.
 }
 \description{
-\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#superseded'><img src='figures/lifecycle-superseded.svg' alt='Superseded lifecycle'></a>}}{\strong{Superseded}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
 
 Since can generate a \code{tbl()} directly from a DBI connection we no longer
 recommend using \code{src_dbi()}.

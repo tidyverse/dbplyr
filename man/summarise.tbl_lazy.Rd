@@ -9,7 +9,7 @@
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
-\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
+\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
 
 \item{.groups}{\Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.

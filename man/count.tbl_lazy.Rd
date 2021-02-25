@@ -13,7 +13,7 @@
 \item{x}{A data frame, data frame extension (e.g. a tibble), or a
 lazy data frame (e.g. from dbplyr or dtplyr).}
 
-\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions or
+\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
 
 \item{wt}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Frequency weights.

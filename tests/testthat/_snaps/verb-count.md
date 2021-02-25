@@ -33,7 +33,6 @@
 
     Code
       db <- lazy_frame(g = 1, x = 2)
-    Code
       db %>% count(g, name = "g")
     Error <rlang_error>
       'g' already present in output

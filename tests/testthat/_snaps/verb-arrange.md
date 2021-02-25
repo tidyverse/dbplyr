@@ -11,11 +11,8 @@
 
     Code
       # # arrange renders correctly
-    Code
       lf <- lazy_frame(a = 1:3, b = 3:1)
-    Code
       # basic
-    Code
       lf %>% arrange(a)
     Output
       <SQL>
@@ -24,7 +21,6 @@
       ORDER BY `a`
     Code
       # double arrange
-    Code
       lf %>% arrange(a) %>% arrange(b)
     Warning <warning>
       ORDER BY is ignored in subqueries without LIMIT
@@ -36,7 +32,6 @@
       ORDER BY `b`
     Code
       # remove ordered by
-    Code
       lf %>% arrange(a) %>% select(-a)
     Output
       <SQL>
@@ -55,7 +50,6 @@
       ORDER BY `b`
     Code
       # un-arrange
-    Code
       lf %>% arrange(a) %>% arrange()
     Output
       <SQL>
@@ -71,7 +65,6 @@
       ORDER BY `a`
     Code
       # use order
-    Code
       lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
     Output
       <SQL>
@@ -83,9 +76,7 @@
 
     Code
       lf <- lazy_frame(a = 1:3, b = 3:1)
-    Code
       # head
-    Code
       lf %>% head(1) %>% arrange(a)
     Output
       <SQL>
@@ -114,7 +105,6 @@
       ORDER BY `b`
     Code
       # mutate
-    Code
       lf %>% mutate(a = b) %>% arrange(a)
     Output
       <SQL>
@@ -123,7 +113,6 @@
       ORDER BY `a`
     Code
       # complex mutate
-    Code
       lf %>% arrange(a) %>% mutate(a = b) %>% arrange(a)
     Output
       <SQL>
@@ -155,11 +144,8 @@
 
     Code
       lf <- lazy_frame(a = 1:3, b = 3:1)
-    Code
       rf <- lazy_frame(a = 1:3, c = 4:6)
-    Code
       # warn if arrange before join
-    Code
       lf %>% arrange(a) %>% left_join(rf)
     Message <message>
       Joining, by = "a"
@@ -201,7 +187,6 @@
       FROM `df`)
     Code
       # can arrange after join
-    Code
       lf %>% left_join(rf) %>% arrange(a)
     Message <message>
       Joining, by = "a"
