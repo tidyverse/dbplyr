@@ -167,5 +167,22 @@ sql_escape_logical.ACCESS <- function(con, x) {
   y[is.na(x)] <- "NULL"
   y
 }
+                   
+#' @export                   
+sql_escape_date.ACCESS <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  # Access delimits dates using octothorpes, and uses YYYY-MM-DD
+  y <- format(x, "#%F#")
+  y[is.na(x)] <- "NULL"
+  y
+}
+
+#' @export
+sql_escape_datetime.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
+  # Access delimits datetimes using octothorpes, and uses YYYY-MM-DD HH:MM:SS
+  # Timezones are not supported in Access
+  y <- format(x, "#%F %T#")
+  y[is.na(x)] <- "NULL"
+  y
+}                   
 
 globalVariables(c("CStr", "iif", "isnull", "text"))
