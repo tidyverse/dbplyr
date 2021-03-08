@@ -177,7 +177,7 @@ sql_escape_date.ACCESS <- function(x, parens = NA, collapse = ", ", con = NULL) 
 }
 
 #' @export
-sql_escape_datetime.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
+sql_escape_datetime.ACCESS <- function(x, parens = NA, collapse = ", ", con = NULL) {
   # Access delimits datetimes using octothorpes, and uses YYYY-MM-DD HH:MM:SS
   # Timezones are not supported in Access
   y <- format(x, "#%F %T#")
