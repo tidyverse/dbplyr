@@ -31,3 +31,6 @@ sql_translation.Snowflake <- function(con) {
 #' @export
 #' @rdname backend-snowflake
 simulate_snowflake <- function() simulate_dbi("Snowflake")
+
+#' @export
+sql_table_analyze.Snowflake <- function(con, table, ...) {}
