@@ -32,5 +32,8 @@ sql_translation.Snowflake <- function(con) {
 #' @rdname backend-snowflake
 simulate_snowflake <- function() simulate_dbi("Snowflake")
 
+# There seems to be no concept of ANALYZE TABLE in Snowflake.  I searched for
+# functions that performed similar operations, and found none.
+# Link to full list: https://docs.snowflake.com/en/sql-reference/sql-all.html
 #' @export
 sql_table_analyze.Snowflake <- function(con, table, ...) {}
