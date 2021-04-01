@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Adds support for Snowflake databases (@edgararuiz)
+
 * `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
   (@mgirlich, #615).
 
