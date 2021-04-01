@@ -44,6 +44,13 @@ test_that("group_by can perform mutate", {
   expect_equal(out, tibble(z = 4L, n = 3L))
 })
 
+test_that("group_by handles empty dots", {
+  lf <- lazy_frame(x = 1) %>% group_by(x)
+
+  expect_equal(lf %>% group_by() %>% group_vars(), character())
+  expect_equal(lf %>% group_by(.add = TRUE) %>% group_vars(), c("x"))
+})
+
 
 # sql_build ---------------------------------------------------------------
 
