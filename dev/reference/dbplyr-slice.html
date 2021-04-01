@@ -109,6 +109,12 @@ value of x in each group." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
+  <a href="../index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
@@ -148,7 +154,10 @@ value of x in each group." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li class="dropdown-header">Release notes</li>
+    <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     </li>
@@ -166,7 +175,7 @@ value of x in each group." />
     </li>
     <li class="divider"></li>
     <li>
-      <a href="../news/index.html">Change log</a>
+      <a href="../news/index.html">Changelog</a>
     </li>
   </ul>
 </li>
@@ -280,27 +289,27 @@ the first n rows.</p></td>
 <span class='co'># By default, ties are includes so you may get more rows</span>
 <span class='co'># than you expect</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #949494;'># Database:   sqlite 3.35.2 [:memory:]</span><span>
+#&gt; </span><span style='color: #949494;'># Ordered by: y</span><span>
 #&gt;       x     y
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1     1
-#&gt; </span><span style='color: #555555;'>2</span><span>     2     1</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: y</span><span>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1     1
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     2     1</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># Source:     lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #949494;'># Database:   sqlite 3.35.2 [:memory:]</span><span>
+#&gt; </span><span style='color: #949494;'># Ordered by: y</span><span>
 #&gt;       x     y
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1     1</div><div class='input'>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1     1</div><div class='input'>
 <span class='co'># Non-integer group sizes are rounded down</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># Source:     lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #555555;'># Database:   sqlite 3.34.1 [:memory:]</span><span>
-#&gt; </span><span style='color: #555555;'># Ordered by: x</span><span>
+</div><div class='output co'>#&gt; </span><span style='color: #949494;'># Source:     lazy query [?? x 2]</span><span>
+#&gt; </span><span style='color: #949494;'># Database:   sqlite 3.35.2 [:memory:]</span><span>
+#&gt; </span><span style='color: #949494;'># Ordered by: x</span><span>
 #&gt;       x     y
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>     1     1</div></span></pre>
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1     1</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

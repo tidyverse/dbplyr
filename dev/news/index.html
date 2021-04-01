@@ -101,6 +101,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
+  <a href="../index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
@@ -140,7 +146,10 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li class="dropdown-header">Release notes</li>
+    <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     </li>
@@ -158,7 +167,7 @@
     </li>
     <li class="divider"></li>
     <li>
-      <a href="../news/index.html">Change log</a>
+      <a href="../news/index.html">Changelog</a>
     </li>
   </ul>
 </li>
@@ -190,6 +199,7 @@
 <a href="#dbplyr-development-version" class="anchor"></a>dbplyr (development version)<small> Unreleased </small>
 </h1>
 <ul>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> now ungroups when the dots argument is empty and <code>.add</code> is <code>FALSE</code> (<a href='https://github.com/mgirlich'>@mgirlich</a>, <a href='https://github.com/tidyverse/dbplyr/issues/615'>#615</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/compute.html">compute()</a></code>, <code><a href="../reference/db-sql.html">sql_table_index()</a></code>, and <code><a href="../reference/db-sql.html">sql_query_wrap()</a></code> now work with schemas (<a href='https://github.com/mgirlich'>@mgirlich</a>, <a href='https://github.com/tidyverse/dbplyr/issues/595'>#595</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html">if_any()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html">if_all()</a></code> are now translated.</p></li>
 </ul>
@@ -758,7 +768,7 @@
 <span class="va">mtcars2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span>
 <span class="va">mtcars2</span></code></pre></div>
 </li>
-<li><p><code><a href="https://tibble.tidyverse.org/reference/glimpse.html">glimpse()</a></code> now works with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2665'>#2665</a>)</p></li>
+<li><p><code><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse()</a></code> now works with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2665'>#2665</a>)</p></li>
 <li><p>dplyr has gained a basic SQL optimiser, which collapses certain nested SELECT queries into a single query (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). This will improve query execution performance for databases with less sophisticated query optimisers, and fixes certain problems with ordering and limits in subqueries (<a href='https://github.com/tidyverse/dbplyr/issues/1979'>#1979</a>). A big thanks goes to <a href='https://github.com/hhoeflin'>@hhoeflin</a> for figuring out this optimisation.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/compute.html">compute()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collapse()</a></code> now preserve the “ordering” of rows. This only affects the computation of window functions, as the rest of SQL does not care about row order (<a href='https://github.com/tidyverse/dbplyr/issues/2281'>#2281</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to()</a></code> gains an <code>overwrite</code> argument which allows you to overwrite an existing table. Use with care! (<a href='https://github.com/tidyverse/dbplyr/issues/2296'>#2296</a>)</p></li>
@@ -861,7 +871,7 @@
 <li><p><code>print.tbl_sql()</code> displays ordering (<a href='https://github.com/tidyverse/dbplyr/issues/2287'>#2287</a>) and prints table name, if known.</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/print.html">print(df, n = Inf)</a></code> and <code><a href="https://rdrr.io/r/utils/head.html">head(df, n = Inf)</a></code> now work with remote tables (<a href='https://github.com/tidyverse/dbplyr/issues/2580'>#2580</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">db_desc()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html">sql_translate_env()</a></code> get defaults for DBIConnection.</p></li>
-<li><p>Formatting now works by overriding the <code><a href="https://tibble.tidyverse.org/reference/tbl_sum.html">tbl_sum()</a></code> generic instead of <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>. This means that the output is more consistent with tibble, and that <code><a href="https://rdrr.io/r/base/format.html">format()</a></code> is now supported also for SQL sources (tidyverse/dbplyr<a href='https://github.com/tidyverse/dbplyr/issues/14'>#14</a>).</p></li>
+<li><p>Formatting now works by overriding the <code><a href="https://pillar.r-lib.org/reference/tbl_sum.html">tbl_sum()</a></code> generic instead of <code><a href="https://rdrr.io/r/base/print.html">print()</a></code>. This means that the output is more consistent with tibble, and that <code><a href="https://rdrr.io/r/base/format.html">format()</a></code> is now supported also for SQL sources (tidyverse/dbplyr<a href='https://github.com/tidyverse/dbplyr/issues/14'>#14</a>).</p></li>
 </ul>
 </div>
 <div id="lazy-ops" class="section level2">

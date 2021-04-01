@@ -58,6 +58,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
 <li>
+  <a href="../index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
@@ -97,7 +103,10 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-<li class="dropdown-header">Release notes</li>
+<li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     </li>
@@ -115,7 +124,7 @@
     </li>
     <li class="divider">
     <li>
-      <a href="../news/index.html">Change log</a>
+      <a href="../news/index.html">Changelog</a>
     </li>
   </ul>
 </li>
@@ -168,7 +177,7 @@
 <code class="sourceCode R"><span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">mf</span>
 <span class="co">#&gt; # Source:   table&lt;dbplyr_001&gt; [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.34.1 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.35.2 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt;</span>
 <span class="co">#&gt; 1     1     1     5</span>
@@ -181,7 +190,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html">summarise_all</a></span><span class="op">(</span><span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.34.1 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.35.2 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1     1   1.5   4.5</span>

@@ -106,6 +106,12 @@ queries." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li>
+  <a href="../index.html">
+    <span class="fas fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../articles/dbplyr.html">Get started</a>
 </li>
 <li>
@@ -145,7 +151,10 @@ queries." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li class="dropdown-header">Release notes</li>
+    <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
+    </li>
     <li>
       <a href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     </li>
@@ -163,7 +172,7 @@ queries." />
     </li>
     <li class="divider"></li>
     <li>
-      <a href="../news/index.html">Change log</a>
+      <a href="../news/index.html">Changelog</a>
     </li>
   </ul>
 </li>
@@ -219,8 +228,8 @@ queries.</p>
     <pre class="examples"><div class='input'><span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='fu'>sql_escape_logical</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>TRUE</span>, <span class='cn'>FALSE</span>, <span class='cn'>NA</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "TRUE"  "FALSE" "NULL" </div><div class='input'><span class='fu'>sql_escape_date</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "'2021-02-10'"</div><div class='input'><span class='fu'>sql_escape_date</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "'2021-02-10 07:06:02'"</div><div class='input'><span class='fu'>sql_escape_raw</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/rawConversion.html'>charToRaw</a></span><span class='op'>(</span><span class='st'>"hi"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "'2021-04-01'"</div><div class='input'><span class='fu'>sql_escape_date</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "'2021-04-01 17:21:56'"</div><div class='input'><span class='fu'>sql_escape_raw</span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/rawConversion.html'>charToRaw</a></span><span class='op'>(</span><span class='st'>"hi"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "X'6869'"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
