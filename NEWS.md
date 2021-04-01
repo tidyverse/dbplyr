@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Added `sql_escape_date.ACCESS()` and `sql_escape_datetime.ACCESS`  to properly escape dates when using MS Access (@erikvona, #608).
+
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
