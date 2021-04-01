@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Adds support for Snowflake databases (@edgararuiz)
+
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
