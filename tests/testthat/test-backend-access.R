@@ -47,6 +47,20 @@ test_that("custom aggregators translated correctly", {
   expect_error(translate_sql(n_distinct(x), window = FALSE), "not available")
 })
 
+test_that("custom escaping works as expected", {
+  con <- simulate_access()
+
+  expect_equal(escape(TRUE, con = con), sql("-1"))
+  expect_equal(escape(FALSE, con = con), sql("0"))
+  expect_equal(escape(NA, con = con), sql("NULL"))
+
+  expect_equal(escape(as.Date("2020-01-01"), con = con), sql("#2020-01-01#"))
+  expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
+
+  expect_equal(escape(as.POSIXct("2020-01-01"), con = con), sql("#2020-01-01 00:00:00#"))
+  expect_equal(escape(as.POSIXct(NA), con = con), sql("NULL"))
+})
+
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_access())
   expect_snapshot(mf %>% head())

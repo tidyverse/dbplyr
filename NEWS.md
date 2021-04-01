@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+
+* Added `sql_escape_date.ACCESS()` and `sql_escape_datetime.ACCESS`  to properly escape dates when using MS Access (@erikvona, #608).
+
 * Adds support for Snowflake databases (@edgararuiz)
 
 * `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
