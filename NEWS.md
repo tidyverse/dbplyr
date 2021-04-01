@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
+  (@mgirlich, #615).
+
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
