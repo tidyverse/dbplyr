@@ -16,7 +16,7 @@ sql_quantile <- function(f,
     )
 
     if (window) {
-      sql <- win_over(sql,
+      sql <- win_over_impl(sql,
         partition = win_current_group(),
         frame = win_current_frame()
       )

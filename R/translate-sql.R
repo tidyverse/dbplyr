@@ -108,6 +108,43 @@ translate_sql_ <- function(dots,
                            vars_frame = NULL,
                            window = TRUE,
                            context = list()) {
+  pieces <- translate_sql2_(
+    dots,
+    con = con,
+    vars_group = vars_group,
+    vars_order = vars_order,
+    vars_frame = vars_frame,
+    window = window,
+    context = context
+  )
+
+  finalize_translate_sql(pieces, con = con)
+}
+
+finalize_translate_sql <- function(pieces, con) {
+  pieces <- lapply(
+    pieces,
+    function(x) {
+      if (is.null(x)) {
+        NULL
+      } else if (is.list(x)) {
+        escape(build_sql(x$expr, " OVER ", x$window, con = con), con = con)
+      } else {
+        escape(x, con = con)
+      }
+    }
+  )
+
+  sql(unlist(pieces))
+}
+
+translate_sql2_ <- function(dots,
+                            con = NULL,
+                            vars_group = NULL,
+                            vars_order = NULL,
+                            vars_frame = NULL,
+                            window = TRUE,
+                            context = list()) {
 
   if (length(dots) == 0) {
     return(sql())
@@ -138,18 +175,16 @@ translate_sql_ <- function(dots,
   }
 
   variant <- dbplyr_sql_translation(con)
-  pieces <- lapply(dots, function(x) {
+  lapply(dots, function(x) {
     if (is_null(get_expr(x))) {
       NULL
     } else if (is_atomic(get_expr(x))) {
-      escape(get_expr(x), con = con)
+      get_expr(x)
     } else {
       mask <- sql_data_mask(x, variant, con = con, window = window)
-      escape(eval_tidy(x, mask), con = con)
+      eval_tidy(x, mask)
     }
   })
-
-  sql(unlist(pieces))
 }
 
 sql_data_mask <- function(expr, variant, con, window = FALSE,

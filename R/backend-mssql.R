@@ -71,6 +71,7 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_query_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
+                                             windows = NULL,
                                              order_by = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
@@ -82,6 +83,7 @@ simulate_mssql <- function(version = "15.0") {
     where     = sql_clause_where(con, where),
     group_by  = sql_clause_group_by(con, group_by),
     having    = sql_clause_having(con, having),
+    windows   = sql_clause_windows(con, windows),
     order_by  = sql_clause_order_by(con, order_by, subquery, limit)
   )
 }
@@ -246,7 +248,7 @@ simulate_mssql <- function(version = "15.0") {
       cor           = win_absent("cor"),
       cov           = win_absent("cov"),
       str_flatten = function(x, collapse = "") {
-        win_over(
+        win_over_impl(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
           order = win_current_order()

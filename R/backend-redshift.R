@@ -60,7 +60,7 @@ sql_translation.RedshiftConnection <- function(con) {
     sql_translator(.parent = postgres$window,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
       lag = function(x, n = 1L, order_by = NULL) {
-        win_over(
+        win_over_impl(
           sql_expr(LAG(!!x, !!as.integer(n))),
           win_current_group(),
           order_by %||% win_current_order(),
@@ -69,7 +69,7 @@ sql_translation.RedshiftConnection <- function(con) {
       },
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LEAD.html
       lead = function(x, n = 1L, order_by = NULL) {
-        win_over(
+        win_over_impl(
           sql_expr(LEAD(!!x, !!n)),
           win_current_group(),
           order_by %||% win_current_order(),

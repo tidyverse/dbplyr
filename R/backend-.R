@@ -319,7 +319,7 @@ base_win <- sql_translator(
   percent_rank = win_rank("PERCENT_RANK"),
   cume_dist    = win_rank("CUME_DIST"),
   ntile        = function(order_by, n) {
-    win_over(
+    win_over_impl(
       sql_expr(NTILE(!!as.integer(n))),
       win_current_group(),
       order_by %||% win_current_order()
@@ -328,7 +328,7 @@ base_win <- sql_translator(
 
   # Variants that take more arguments
   first = function(x, order_by = NULL) {
-    win_over(
+    win_over_impl(
       sql_expr(FIRST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order(),
@@ -336,7 +336,7 @@ base_win <- sql_translator(
     )
   },
   last = function(x, order_by = NULL) {
-    win_over(
+    win_over_impl(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order(),
@@ -344,7 +344,7 @@ base_win <- sql_translator(
     )
   },
   nth = function(x, n, order_by = NULL) {
-    win_over(
+    win_over_impl(
       sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
       win_current_group(),
       order_by %||% win_current_order(),
@@ -353,7 +353,7 @@ base_win <- sql_translator(
   },
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
-    win_over(
+    win_over_impl(
       sql_expr(LEAD(!!x, !!n, !!default)),
       win_current_group(),
       order_by %||% win_current_order(),
@@ -361,7 +361,7 @@ base_win <- sql_translator(
     )
   },
   lag = function(x, n = 1L, default = NA, order_by = NULL) {
-    win_over(
+    win_over_impl(
       sql_expr(LAG(!!x, !!as.integer(n), !!default)),
       win_current_group(),
       order_by %||% win_current_order(),
@@ -382,10 +382,10 @@ base_win <- sql_translator(
 
   # Counts
   n     = function() {
-    win_over(sql("COUNT(*)"), win_current_group())
+    win_over_impl(sql("COUNT(*)"), win_current_group())
   },
   n_distinct = function(x) {
-    win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
+    win_over_impl(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
   },
 
   # Cumulative function are like recycled aggregates except that R names

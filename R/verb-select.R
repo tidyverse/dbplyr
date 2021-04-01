@@ -155,8 +155,12 @@ op_grps.op_select <- function(op) {
 
 #' @export
 sql_build.op_select <- function(op, con, ...) {
-
-  new_vars <- translate_sql_(
+  # 1. `win_over()` doesn't return fully resolved SQL but base unwindowed SQL + window
+  # 2. in `sql_build.op_select()` count the windows
+  #    -> if used more than once: name it
+  #    -> otherwise directly translate window
+  # 3. in `select_query()` add the named windows
+  new_vars <- translate_sql2_(
     op$args$vars, con,
     vars_group = op_grps(op),
     vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
@@ -164,8 +168,53 @@ sql_build.op_select <- function(op, con, ...) {
     context = list(clause = "SELECT")
   )
 
+  # browser()
+  # find windows worth replacing
+  windows <- lapply(
+    new_vars,
+    function(x) {
+      if (is.list(x)) {
+        x$window
+      } else {
+        NULL
+      }
+    }
+  )
+
+  windows <- sql(unlist(windows))
+  window_map <- vctrs::vec_count(windows) %>%
+    dplyr::filter(count > 1) %>%
+    dplyr::mutate(name = paste0("win_", dplyr::row_number())) %>%
+    dplyr::select(name, key) %>%
+    tibble::deframe()
+
+  # resolve windows
+  new_vars <- lapply(
+    new_vars,
+    function(x) {
+      if (is.list(x) && x$window %in% window_map) {
+        window_name <- names(window_map)[window_map == x$window]
+        x$window <- escape(ident(window_name), con = con)
+      }
+
+      x
+    }
+  )
+
+  new_vars <- finalize_translate_sql(new_vars, con = con)
+
   select_query(
     sql_build(op$x, con),
-    select = new_vars
+    select = new_vars,
+    windows = window_map
+  )
+}
+
+new_window <- function(vars_group, vars_order, vars_frame, name = "win") {
+  list(
+    group = vars_group,
+    order = vars_order,
+    frame = vars_frame,
+    name = name
   )
 }

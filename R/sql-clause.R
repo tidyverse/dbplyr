@@ -4,6 +4,7 @@ sql_select_clauses <- function(con,
                                where,
                                group_by,
                                having,
+                               windows,
                                order_by,
                                limit = NULL) {
   out <- list(
@@ -12,6 +13,7 @@ sql_select_clauses <- function(con,
     where = where,
     group_by = group_by,
     having = having,
+    windows = windows,
     order_by = order_by,
     limit = limit
   )
@@ -57,6 +59,23 @@ sql_clause_group_by <- function(con, group_by) {
 
 sql_clause_having <- function(con, having) {
   sql_clause_generic(con, "HAVING", having)
+}
+
+sql_clause_windows <- function(con, window) {
+  if (length(window) == 0L) {
+    return()
+  }
+
+  assert_that(is.character(window))
+  names_esc <- sql_escape_ident(con, names(window))
+  window_sql <- sql_vector(
+    sql(paste0(names_esc, " AS ", window)),
+    collapse = ", ",
+    parens = FALSE,
+    con = con
+  )
+
+  build_sql("WINDOW ", window_sql, con = con)
 }
 
 sql_clause_order_by <- function(con, order_by, subquery = FALSE, limit = NULL) {

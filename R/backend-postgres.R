@@ -199,7 +199,7 @@ sql_translation.PqConnection <- function(con) {
       all = win_aggregate("BOOL_AND"),
       any = win_aggregate("BOOL_OR"),
       str_flatten = function(x, collapse) {
-        win_over(
+        win_over_impl(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
           order = win_current_order()

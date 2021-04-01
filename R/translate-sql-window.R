@@ -22,6 +22,18 @@
 #' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
 win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
+  sql <- win_over_impl(
+    expr = expr,
+    partition = partition,
+    order = order,
+    frame = frame,
+    con = con
+  )
+
+  finalize_translate_sql(list(sql), con = con)
+}
+
+win_over_impl <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
 
@@ -65,9 +77,10 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
   }
 
   over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE, con = con)
-  sql <- build_sql(expr, " OVER ", over, con = con)
-
-  sql
+  list(
+    expr = expr,
+    window = over
+  )
 }
 
 rows <- function(from = -Inf, to = 0) {
@@ -93,7 +106,7 @@ rows <- function(from = -Inf, to = 0) {
 win_rank <- function(f) {
   force(f)
   function(order = NULL) {
-    win_over(
+    win_over_impl(
       build_sql(sql(f), list()),
       partition = win_current_group(),
       order = order %||% win_current_order(),
@@ -111,7 +124,7 @@ win_aggregate <- function(f) {
     warned <<- check_na_rm(f, na.rm, warned)
     frame <- win_current_frame()
 
-    win_over(
+    win_over_impl(
       build_sql(sql(f), list(x)),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
@@ -127,7 +140,7 @@ win_aggregate_2 <- function(f) {
   function(x, y) {
     frame <- win_current_frame()
 
-    win_over(
+    win_over_impl(
       build_sql(sql(f), list(x, y)),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
@@ -147,7 +160,7 @@ win_recycled <- win_aggregate
 win_cumulative <- function(f) {
   force(f)
   function(x, order = NULL) {
-    win_over(
+    win_over_impl(
       build_sql(sql(f), list(x)),
       partition = win_current_group(),
       order = order %||% win_current_order(),
@@ -218,6 +231,7 @@ set_win_current_frame <- function(frame) {
   sql_context$frame <- frame
   invisible(old)
 }
+
 #' @export
 #' @rdname win_over
 win_current_group <- function() sql_context$group_by
