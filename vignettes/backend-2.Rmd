@@ -23,9 +23,9 @@ The current timeline is something like this:
 -   dbplyr 2.0.0 adds a new interface for database backends.
     The old interface remains so all existing backends continue to work, but new packages should use the new interface, and existing backends should start the update process. 
 
--   dbplyr 2.1.0 (to be released \>= 6 months after dplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.
+-   dbplyr 2.1.0 (to be released \>= 6 months after dbplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.
 
--   dbplyr 2.2.0 (to be released \>= 12 months after dplyr 2.0.0) removes the old interface so user must upgrade backends.
+-   dbplyr 2.2.0 (to be released \>= 12 months after dbplyr 2.0.0) removes the old interface so user must upgrade backends.
 
 -   A future version of dplyr will deprecate then remove the database generics.
 

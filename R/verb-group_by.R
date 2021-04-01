@@ -38,7 +38,11 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (length(dots) == 0) {
-    return(.data)
+    if (.add) {
+      return(.data)
+    } else {
+      return(dplyr::ungroup(.data))
+    }
   }
 
   if (".add" %in% names(formals("group_by"))) {
