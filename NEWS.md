@@ -1,17 +1,17 @@
 # dbplyr (development version)
 
-
-* Added `sql_escape_date.ACCESS()` and `sql_escape_datetime.ACCESS`  to properly escape dates when using MS Access (@erikvona, #608).
-
-* Adds support for Snowflake databases (@edgararuiz)
-
-* `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
-  (@mgirlich, #615).
+* New support for Snowflake (@edgararuiz)
 
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
 * `if_any()` and `if_all()` are now translated.
+
+* `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
+  (@mgirlich, #615).
+
+* `sql_escape_date()` and `sql_escape_datetime` gain methods for MS Access 
+  (@erikvona, #608).
 
 # dbplyr 2.1.0
 
