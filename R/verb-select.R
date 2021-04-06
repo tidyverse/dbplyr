@@ -160,17 +160,6 @@ sql_build.op_select <- function(op, con, ...) {
   on.exit(win_reset())
   on.exit(win_register_deactivate(), add = TRUE)
 
-  translate_sql_(
-    op$args$vars, con,
-    vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
-    vars_frame = op_frame(op),
-    context = list(clause = "SELECT")
-  )
-
-  # translate and use registered windows names
-  named_windows <- win_register_names()
-  win_register_deactivate()
   new_vars <- translate_sql_(
     op$args$vars, con,
     vars_group = op_grps(op),
@@ -179,8 +168,19 @@ sql_build.op_select <- function(op, con, ...) {
     context = list(clause = "SELECT")
   )
 
-  # build window sql
+  named_windows <- win_register_names()
   if (nrow(named_windows) > 0) {
+    # need to translate again and use registered windows names
+    win_register_deactivate()
+    new_vars <- translate_sql_(
+      op$args$vars, con,
+      vars_group = op_grps(op),
+      vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
+      vars_frame = op_frame(op),
+      context = list(clause = "SELECT")
+    )
+
+    # build window sql
     names_esc <- sql_escape_ident(con, named_windows$name)
     window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
   } else {
