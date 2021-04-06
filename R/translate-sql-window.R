@@ -109,7 +109,7 @@ win_get <- function(over, con) {
 
   if (vctrs::vec_in(over, windows$key)) {
     id <- vctrs::vec_match(over, windows$key)
-    build_sql("(", ident(windows$name[[id]]), ")", con = con)
+    ident(windows$name[[id]])
   } else {
     over
   }
