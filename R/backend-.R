@@ -231,7 +231,6 @@ base_scalar <- sql_translator(
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
 
-  str_c = sql_not_supported("str_c()"),
   str_conv = sql_not_supported("str_conv()"),
   str_count = sql_not_supported("str_count()"),
   str_detect = sql_not_supported("str_detect()"),

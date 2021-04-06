@@ -88,6 +88,7 @@ Collate:
     'backend-postgres.R'
     'backend-postgres-old.R'
     'backend-redshift.R'
+    'backend-snowflake.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'

@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+
+* Added `sql_escape_date.ACCESS()` and `sql_escape_datetime.ACCESS`  to properly escape dates when using MS Access (@erikvona, #608).
+
+* Adds support for Snowflake databases (@edgararuiz)
+
+* `group_by()` now ungroups when the dots argument is empty and `.add` is `FALSE`
+  (@mgirlich, #615).
+
 * `compute()`, `sql_table_index()`, and `sql_query_wrap()` now work with
   schemas (@mgirlich, #595).
 
@@ -47,7 +55,7 @@
 ## Minor improvements and bug fixes
 
 * RPostgreSQL backend warns if `temporary = TRUE` since temporary tables are 
-  not supported by `RPostgres::dbWriteTable()` (#574).
+  not supported by `RPostgreSQL::dbWriteTable()` (#574).
 
 * `count()` method provides closer match to dplyr semantics (#347).
 
