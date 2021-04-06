@@ -203,6 +203,7 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
 #' @export
 sql_query_select <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
+                             window = NULL,
                              order_by = NULL,
                              limit = NULL,
                              distinct = FALSE,
