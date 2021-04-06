@@ -1,3 +1,5 @@
+# dbplyr (development version)
+
 # dbplyr 2.1.1
 
 * New support for Snowflake (@edgararuiz)
