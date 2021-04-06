@@ -89,7 +89,7 @@ win_register <- function(over) {
 }
 
 win_register_names <- function() {
-  windows <- sql_context$windows %||%
+  windows <- sql_context$windows %||% character()
 
   window_count <- vctrs::vec_count(windows)
   window_count <- vctrs::vec_slice(window_count, window_count$count > 1)
