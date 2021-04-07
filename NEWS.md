@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The SQL translation of `quantile()` now doesn't error anymore when using
+  `na.rm = TRUE` (@mgirlich, #600).
+
 # dbplyr 2.1.1
 
 * New support for Snowflake (@edgararuiz)
