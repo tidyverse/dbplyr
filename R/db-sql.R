@@ -182,14 +182,14 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
     setNames(as.sql(from, con), name)
   } else {
     ident_name <- ident(name %||% unique_subquery_name())
-    build_sql(ident_subquery(from, con), " ", ident_name, con = con)
+    build_sql(ident_subquery(from, con, level), " ", ident_name, con = con)
   }
 }
 
-ident_subquery <- function(from, con) {
+ident_subquery <- function(from, con, level) {
   # TODO allow better control via option
   if (getOption("dbplyr_break_subquery", FALSE)) {
-    build_sql("(\n", from, "\n)", con = con)
+    build_sql("(\n", from, "\n", !!lvl_indent(level), ")", con = con)
   } else {
     build_sql("(", from, ")", con = con)
   }
