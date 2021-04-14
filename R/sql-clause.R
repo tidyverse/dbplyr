@@ -97,14 +97,11 @@ sql_clause_kw <- function(..., lvl) {
 }
 
 build_sql_wrap <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
-  sql(
-    paste0(
-      "(", if (getOption("dbplyr_break_subquery", FALSE)) "\n",
-      build_sql(..., con = con, .env = .env),
-      if (getOption("dbplyr_break_subquery", FALSE)) paste0("\n", get_clause_indent(lvl)),
-      ")"
-    )
-  )
+  if (getOption("dbplyr_break_subquery", FALSE)) {
+    build_sql("(\n", ..., "\n", !!get_clause_indent(lvl), ")", con = con, .env = .env)
+  } else {
+    build_sql("(", ..., ")", con = con, .env = .env)
+  }
 }
 
 lvl_indent <- function(times, char = "  ") {

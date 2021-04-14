@@ -187,13 +187,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 }
 
 ident_subquery <- function(from, con, lvl) {
-  # TODO allow better control via option
-  # TODO basically the same as `sql_wrap()`???
-  if (getOption("dbplyr_break_subquery", FALSE)) {
-    build_sql("(\n", from, "\n", !!lvl_indent(lvl), ")", con = con)
-  } else {
-    build_sql("(", from, ")", con = con)
-  }
+  build_sql_wrap(from, con = con, lvl = lvl)
 }
 
 #' @rdname db-sql
@@ -288,12 +282,11 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   on <- sql_join_tbls(con, by, na_matches = na_matches, lvl = lvl)
 
   # Wrap with SELECT since callers assume a valid query is returned
-  # TODO remove superfluous line break appears in subquery
   build_sql(
     sql_clause_select(con, select, lvl = lvl), "\n",
     sql_clause_from(con, x, lvl = lvl), "\n",
     sql_clause_generic(con, JOIN, y, lvl = lvl), "\n",
-    sql_clause_generic(con, "ON", on, lvl = lvl), if (!is.null(on)) sql("\n") else NULL,
+    sql_clause_generic(con, "ON", on, lvl = lvl),
     con = con
   )
 }
@@ -326,8 +319,6 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
   # lvl + 1 because it is in the `EXISTS` subquery
   on <- sql_join_tbls(con, by, lvl = lvl + 1)
 
-  # TODO move this pattern into a function
-  # TODO "subquery" in EXISTS
   indent <- get_clause_indent(lvl)
   build_sql(
     !!indent, "SELECT * FROM ", x, "\n",
@@ -356,8 +347,6 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
   build_sql(
-    # TODO extract into function
-    # TODO legacy mode doesn't work
     !!get_clause_indent(lvl), build_sql_wrap(x, con = con, lvl = lvl),
     "\n", sql_clause_kw(method, if (all) " ALL", lvl = lvl), "\n",
     !!get_clause_indent(lvl), build_sql_wrap(y, con = con, lvl = lvl),
