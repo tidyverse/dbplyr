@@ -138,7 +138,7 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
 }
 
 #' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., level = 0) {
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
@@ -147,20 +147,22 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
 
   if (type == "full") {
     join_sql <- build_sql(
-      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
-      "UNION\n",
-      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...),
+      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., level = level + 1),
+      !!get_clause_indent(level + 1), "UNION\n",
+      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., level = level + 1),
       con = con
     )
 
     sql_query_select(
       con,
       select = ident(vars$alias),
-      from = sql_subquery(con, join_sql),
-      subquery = TRUE
+      # TODO this should probably be `dbplyr_sql_subquery`
+      from = sql_subquery(con, join_sql, level = level),
+      subquery = TRUE,
+      level = level
     )
   } else if (type == "right") {
-    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...)
+    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., level = level)
   } else {
     NextMethod()
   }
