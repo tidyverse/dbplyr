@@ -181,7 +181,13 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
   } else if (is.schema(from)) {
     setNames(as.sql(from, con), name)
   } else {
-    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
+    ident_name <- ident(name %||% unique_subquery_name())
+    # TODO allow better control via option
+    if (getOption("dbplyr_break_subquery", FALSE)) {
+      build_sql("(\n", from, "\n) ", ident_name, con = con)
+    } else {
+      build_sql("(", from, ") ", ident_name, con = con)
+    }
   }
 }
 
