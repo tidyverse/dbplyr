@@ -43,12 +43,12 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 }
 
 #' @export
-sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE, level = 0) {
+sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   # SQLite does not allow parentheses
   build_sql(
     # TODO extract into function?
     x,
-    "\n", !!get_clause_indent(level), sql(method), if (all) sql(" ALL"), "\n",
+    "\n", !!get_clause_indent(lvl), sql(method), if (all) sql(" ALL"), "\n",
     y,
     con = con
   )
@@ -119,15 +119,15 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ..., level = 0) {
+sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
 
     if (is.null(name)) {
-      build_sql(ident_subquery(from, con, level), con = con)
+      build_sql(ident_subquery(from, con, lvl), con = con)
     } else {
-      build_sql(ident_subquery(from, con, level), " AS ", ident(name), con = con)
+      build_sql(ident_subquery(from, con, lvl), " AS ", ident(name), con = con)
     }
   }
 }
@@ -139,7 +139,7 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
 }
 
 #' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., level = 0) {
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
@@ -148,9 +148,9 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
 
   if (type == "full") {
     join_sql <- build_sql(
-      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., level = level + 1),
-      !!get_clause_indent(level + 1), "UNION\n",
-      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., level = level + 1),
+      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1),
+      !!get_clause_indent(lvl + 1), "UNION\n",
+      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1),
       con = con
     )
 
@@ -158,13 +158,13 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
       con,
       select = ident(vars$alias),
       # TODO this should probably be `dbplyr_sql_subquery`
-      from = sql_subquery(con, join_sql, level = level),
+      from = sql_subquery(con, join_sql, lvl = lvl),
       subquery = TRUE,
-      level = level
+      lvl = lvl
     )
   } else if (type == "right") {
     # TODO remove superfluous line break
-    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., level = level)
+    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl)
   } else {
     NextMethod()
   }

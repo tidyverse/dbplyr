@@ -41,18 +41,18 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              distinct = FALSE,
                              ...,
                              subquery = FALSE,
-                             level = 0) {
+                             lvl = 0) {
 
   sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, level = level),
-    from      = sql_clause_from(con, from, level = level),
-    where     = sql_clause_where(con, where, level = level),
-    group_by  = sql_clause_group_by(con, group_by, level = level),
-    having    = sql_clause_having(con, having, level = level),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit, level = level),
+    select    = sql_clause_select(con, select, distinct, lvl = lvl),
+    from      = sql_clause_from(con, from, lvl = lvl),
+    where     = sql_clause_where(con, where, lvl = lvl),
+    group_by  = sql_clause_group_by(con, group_by, lvl = lvl),
+    having    = sql_clause_having(con, having, lvl = lvl),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit, lvl = lvl),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
-      # TODO respect level here
+      # TODO respect lvl here
       build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
     }
   )
@@ -107,12 +107,12 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ..., level = 0) {
+sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
-    build_sql(ident_subquery(from, con, level), " ", ident(name %||% unique_subquery_name()), con = con)
+    build_sql(ident_subquery(from, con, lvl), " ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 

@@ -29,18 +29,18 @@ print.join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, level = 0) {
+sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
   from_x <- dbplyr_sql_subquery(
     con,
-    sql_render(query$x, con, ..., subquery = TRUE, level = level + 1),
+    sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1),
     name = "LHS",
-    level = level
+    lvl = lvl
   )
   from_y <- dbplyr_sql_subquery(
     con,
-    sql_render(query$y, con, ..., subquery = TRUE, level = level + 1),
+    sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1),
     name = "RHS",
-    level = level
+    lvl = lvl
   )
 
   dbplyr_query_join(con, from_x, from_y,
@@ -48,14 +48,14 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, leve
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
-    level = level
+    lvl = lvl
   )
 }
 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, level = 0) {
+sql_join_vars <- function(con, vars, lvl = 0) {
   join_vars_list <- mapply(
     FUN = sql_join_var,
     alias = vars$alias,
@@ -87,7 +87,7 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y) {
   }
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never", level = 0) {
+sql_join_tbls <- function(con, by, na_matches = "never", lvl = 0) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   on <- NULL
@@ -104,7 +104,7 @@ sql_join_tbls <- function(con, by, na_matches = "never", level = 0) {
     }
 
     # TODO line break after "(" and before ")" and indent before ")"
-    coll <- get_field_separator(compare, sep = " AND", level)
+    coll <- get_field_separator(compare, sep = " AND", lvl)
     on <- sql_vector(compare, collapse = coll, parens = TRUE, con = con)
   } else if (length(by$on) > 0) {
     # TODO needs indent
