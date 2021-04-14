@@ -56,20 +56,17 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, leve
 
 
 sql_join_vars <- function(con, vars, level = 0) {
-  sql_vector(
-    mapply(
-      FUN = sql_join_var,
-      alias = vars$alias,
-      x = vars$x,
-      y = vars$y,
-      MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y),
-      SIMPLIFY = FALSE,
-      USE.NAMES = TRUE
-    ),
-    parens = FALSE,
-    collapse = get_field_separator(compare, sep = ",", level),
-    con = con
+  join_vars_list <- mapply(
+    FUN = sql_join_var,
+    alias = vars$alias,
+    x = vars$x,
+    y = vars$y,
+    MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y),
+    SIMPLIFY = FALSE,
+    USE.NAMES = TRUE
   )
+
+  sql(unlist(join_vars_list))
 }
 
 sql_join_var <- function(con, alias, x, y, all_x, all_y) {

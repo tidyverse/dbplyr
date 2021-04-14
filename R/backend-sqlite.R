@@ -162,6 +162,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
       level = level
     )
   } else if (type == "right") {
+    # TODO remove superfluous line break
     sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., level = level)
   } else {
     NextMethod()

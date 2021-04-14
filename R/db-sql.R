@@ -292,6 +292,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     sql_clause_select(con, select, level = level), "\n",
     sql_clause_from(con, x, level = level), "\n",
     !!get_clause_indent(level), JOIN, " ", y, "\n",
+    # TODO probably this can be done via `sql_clause_generic()`
     if (!is.null(on)) build_sql(!!get_clause_indent(level), "ON ", on, "\n", con = con) else NULL,
     con = con
   )
