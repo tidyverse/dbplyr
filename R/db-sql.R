@@ -171,11 +171,11 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 }
 #' @export
 #' @rdname db-sql
-sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap <- function(con, from, name = unique_subquery_name(), ..., level = 0) {
   UseMethod("sql_query_wrap")
 }
 #' @export
-sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., level = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else if (is.schema(from)) {
@@ -207,7 +207,8 @@ sql_query_select <- function(con, select, from, where = NULL,
                              limit = NULL,
                              distinct = FALSE,
                              ...,
-                             subquery = FALSE) {
+                             subquery = FALSE,
+                             level = 0) {
   UseMethod("sql_query_select")
 }
 
@@ -218,15 +219,16 @@ sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
                                limit = NULL,
                                distinct = FALSE,
                                ...,
-                               subquery = FALSE) {
+                               subquery = FALSE,
+                               level = 0) {
   sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
-    limit     = sql_clause_limit(con, limit)
+    select    = sql_clause_select(con, select, distinct, level = level),
+    from      = sql_clause_from(con, from, level = level),
+    where     = sql_clause_where(con, where, level = level),
+    group_by  = sql_clause_group_by(con, group_by, level = level),
+    having    = sql_clause_having(con, having, level = level),
+    order_by  = sql_clause_order_by(con, order_by, subquery, limit, level = level),
+    limit     = sql_clause_limit(con, limit, level = level)
   )
 }
 dbplyr_query_select <- function(con, ...) {
@@ -417,6 +419,6 @@ dbplyr_sql_subquery <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
-  sql_query_wrap(con, from = from, name = name, ...)
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., level = 0) {
+  sql_query_wrap(con, from = from, name = name, ..., level = level)
 }
