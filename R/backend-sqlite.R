@@ -122,10 +122,11 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_na
   if (is.ident(from)) {
     setNames(from, name)
   } else {
+
     if (is.null(name)) {
-      build_sql("(", from, ")", con = con)
+      build_sql(ident_subquery(from, con), con = con)
     } else {
-      build_sql("(", from, ") AS ", ident(name), con = con)
+      build_sql(ident_subquery(from, con), " AS ", ident(name), con = con)
     }
   }
 }
