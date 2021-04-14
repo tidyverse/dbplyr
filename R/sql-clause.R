@@ -69,7 +69,7 @@ sql_clause_order_by <- function(con, order_by, subquery = FALSE, limit = NULL, l
 sql_clause_limit <- function(con, limit, level = 0){
   if (!is.null(limit) && !identical(limit, Inf)) {
     build_sql(
-      "LIMIT ", sql(format(limit, scientific = FALSE)),
+      !!get_clause_indent(level), "LIMIT ", sql(format(limit, scientific = FALSE)),
       con = con
     )
   }
