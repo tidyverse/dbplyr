@@ -25,8 +25,10 @@ print.set_op_query <- function(x, ...) {
 
 #' @export
 sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE, level = 0) {
-  from_x <- sql_render(query$x, con, ..., subquery = FALSE, , level = level)
-  from_y <- sql_render(query$y, con, ..., subquery = FALSE, , level = level)
+  # TODO improve this hack a little
+  sub_level <- level + !inherits(con, "SQLiteConnection")
+  from_x <- sql_render(query$x, con, ..., subquery = FALSE, level = sub_level)
+  from_y <- sql_render(query$y, con, ..., subquery = FALSE, level = sub_level)
 
   if (dbplyr_edition(con) >= 2) {
     sql_query_set_op(con, from_x, from_y, method = query$type, all = query$all, level = level)

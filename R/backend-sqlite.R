@@ -43,11 +43,12 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 }
 
 #' @export
-sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE) {
+sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE, level = 0) {
   # SQLite does not allow parentheses
   build_sql(
+    # TODO extract into function?
     x,
-    "\n", sql(method), if (all) sql(" ALL"), "\n",
+    "\n", !!get_clause_indent(level), sql(method), if (all) sql(" ALL"), "\n",
     y,
     con = con
   )

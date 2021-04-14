@@ -348,15 +348,17 @@ sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...,
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ..., all = FALSE) {
+sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, level = 0) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE) {
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, level) {
   build_sql(
-    "(", x, ")",
-    "\n", sql(method), if (all) sql(" ALL"), "\n",
-    "(", y, ")",
+    # TODO extract into function
+    # TODO legacy mode doesn't work
+    !!get_clause_indent(level), "(\n", x, "\n", !!get_clause_indent(level), ")",
+    "\n", !!get_clause_indent(level), sql(method), if (all) sql(" ALL"), "\n",
+    !!get_clause_indent(level), "(\n", y, "\n", !!get_clause_indent(level), ")",
     con = con
   )
 }
