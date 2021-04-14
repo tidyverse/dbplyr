@@ -188,6 +188,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 
 ident_subquery <- function(from, con, lvl) {
   # TODO allow better control via option
+  # TODO basically the same as `sql_wrap()`???
   if (getOption("dbplyr_break_subquery", FALSE)) {
     build_sql("(\n", from, "\n", !!lvl_indent(lvl), ")", con = con)
   } else {
@@ -291,9 +292,8 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   build_sql(
     sql_clause_select(con, select, lvl = lvl), "\n",
     sql_clause_from(con, x, lvl = lvl), "\n",
-    !!get_clause_indent(lvl), JOIN, " ", y, "\n",
-    # TODO probably this can be done via `sql_clause_generic()`
-    if (!is.null(on)) build_sql(!!get_clause_indent(lvl), "ON ", on, "\n", con = con) else NULL,
+    sql_clause_generic(con, JOIN, y, lvl = lvl), "\n",
+    sql_clause_generic(con, "ON", on, lvl = lvl), if (!is.null(on)) sql("\n") else NULL,
     con = con
   )
 }
@@ -327,13 +327,15 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
   on <- sql_join_tbls(con, by, lvl = lvl + 1)
 
   # TODO move this pattern into a function
+  # TODO "subquery" in EXISTS
+  indent <- get_clause_indent(lvl)
   build_sql(
-    !!get_clause_indent(lvl), "SELECT * FROM ", x, "\n",
-    !!get_clause_indent(lvl), "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
+    !!indent, "SELECT * FROM ", x, "\n",
+    !!indent, "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
     # needs `lvl_indent(1)` regardless of option
-    !!get_clause_indent(lvl), !!lvl_indent(1), "SELECT 1 FROM ", y, "\n",
-    !!get_clause_indent(lvl), !!lvl_indent(1), "WHERE ", on, "\n",
-    !!get_clause_indent(lvl), ")",
+    !!indent, !!lvl_indent(1), "SELECT 1 FROM ", y, "\n",
+    !!indent, !!lvl_indent(1), "WHERE ", on, "\n",
+    !!indent, ")",
     con = con
   )
 }
@@ -356,9 +358,9 @@ sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, 
   build_sql(
     # TODO extract into function
     # TODO legacy mode doesn't work
-    !!get_clause_indent(lvl), "(\n", x, "\n", !!get_clause_indent(lvl), ")",
-    "\n", !!get_clause_indent(lvl), sql(method), if (all) sql(" ALL"), "\n",
-    !!get_clause_indent(lvl), "(\n", y, "\n", !!get_clause_indent(lvl), ")",
+    !!get_clause_indent(lvl), build_sql_wrap(x, con = con, lvl = lvl),
+    "\n", sql_clause_kw(method, if (all) " ALL", lvl = lvl), "\n",
+    !!get_clause_indent(lvl), build_sql_wrap(y, con = con, lvl = lvl),
     con = con
   )
 }

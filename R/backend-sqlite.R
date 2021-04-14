@@ -46,9 +46,8 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   # SQLite does not allow parentheses
   build_sql(
-    # TODO extract into function?
     x,
-    "\n", !!get_clause_indent(lvl), sql(method), if (all) sql(" ALL"), "\n",
+    "\n", sql_clause_kw(method, if (all) " ALL", lvl = lvl), "\n",
     y,
     con = con
   )
@@ -149,7 +148,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   if (type == "full") {
     join_sql <- build_sql(
       sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1),
-      !!get_clause_indent(lvl + 1), "UNION\n",
+      sql_clause_kw("UNION", lvl = lvl + 1), "\n",
       sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1),
       con = con
     )

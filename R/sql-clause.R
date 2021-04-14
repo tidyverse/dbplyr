@@ -68,9 +68,10 @@ sql_clause_order_by <- function(con, order_by, subquery = FALSE, limit = NULL, l
 
 sql_clause_limit <- function(con, limit, lvl = 0){
   if (!is.null(limit) && !identical(limit, Inf)) {
-    build_sql(
-      !!get_clause_indent(lvl), "LIMIT ", sql(format(limit, scientific = FALSE)),
-      con = con
+    build_sql_line(
+      "LIMIT ", sql(format(limit, scientific = FALSE)),
+      con = con,
+      lvl = lvl
     )
   }
 }
@@ -83,15 +84,39 @@ sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",") {
   }
 
   assert_that(is.character(fields))
-  build_sql(
-    !!get_clause_indent(lvl), sql(clause), !!get_clause_separator(fields, lvl),
+  build_sql_line(
+    sql(clause), !!get_clause_separator(fields, lvl),
     escape(fields, collapse = get_field_separator(fields, sep = sep, lvl), con = con),
-    con = con
+    con = con,
+    lvl = lvl
+  )
+}
+
+sql_clause_kw <- function(..., lvl) {
+  sql(paste0(get_clause_indent(lvl), ...))
+}
+
+build_sql_wrap <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
+  sql(
+    paste0(
+      "(", if (getOption("dbplyr_break_subquery", FALSE)) "\n",
+      build_sql(..., con = con, .env = .env),
+      if (getOption("dbplyr_break_subquery", FALSE)) paste0("\n", get_clause_indent(lvl)),
+      ")"
+    )
   )
 }
 
 lvl_indent <- function(times, char = "  ") {
   paste(rep.int(char, times), collapse = "")
+}
+
+build_sql_line <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
+  build_sql(
+    !!get_clause_indent(lvl), ...,
+    .env = .env,
+    con = con
+  )
 }
 
 get_clause_indent <- function(lvl) {
@@ -119,11 +144,9 @@ get_field_separator <- function(fields, sep, lvl) {
 }
 
 break_after_clause <- function(fields) {
-  # TODO add option to always break or not break at all
   getOption("dbplyr_indent_fields", FALSE) && length(fields) > 1
 }
 
 break_between_fields <- function(fields) {
-  # TODO improve option to control
   getOption("dbplyr_indent_fields", FALSE)
 }
