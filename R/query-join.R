@@ -53,7 +53,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, leve
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars) {
+sql_join_vars <- function(con, vars, level = 0) {
   sql_vector(
     mapply(
       FUN = sql_join_var,
@@ -65,7 +65,7 @@ sql_join_vars <- function(con, vars) {
       USE.NAMES = TRUE
     ),
     parens = FALSE,
-    collapse = ", ",
+    collapse = get_field_separator(compare, sep = ",", level),
     con = con
   )
 }
@@ -88,7 +88,7 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y) {
   }
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never") {
+sql_join_tbls <- function(con, by, na_matches = "never", level = 0) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   on <- NULL
@@ -104,8 +104,11 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
       compare <- paste0(lhs, " = ", rhs)
     }
 
-    on <- sql_vector(compare, collapse = " AND ", parens = TRUE, con = con)
+    # TODO line break after "(" and before ")" and indent before ")"
+    coll <- get_field_separator(compare, sep = " AND", level)
+    on <- sql_vector(compare, collapse = coll, parens = TRUE, con = con)
   } else if (length(by$on) > 0) {
+    # TODO needs indent
     on <- build_sql("(", by$on, ")", con = con)
   }
 

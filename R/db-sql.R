@@ -268,11 +268,11 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
 
 #' @rdname db-sql
 #' @export
-sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., level = 0) {
   UseMethod("sql_query_join")
 }
 #' @export
-sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., level = 0) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -283,51 +283,56 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     stop("Unknown join type:", type, call. = FALSE)
   )
 
-  select <- sql_join_vars(con, vars)
-  on <- sql_join_tbls(con, by, na_matches = na_matches)
+  select <- sql_join_vars(con, vars, level = level)
+  on <- sql_join_tbls(con, by, na_matches = na_matches, level = level)
 
   # Wrap with SELECT since callers assume a valid query is returned
+  # TODO remove superfluous line break appears in subquery
   build_sql(
-    "SELECT ", select, "\n",
-    "FROM ", x, "\n",
-    JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("ON ", on, "\n", con = con) else NULL,
+    sql_clause_select(con, select, level = level), "\n",
+    sql_clause_from(con, x, level = level), "\n",
+    !!get_clause_indent(level), JOIN, " ", y, "\n",
+    if (!is.null(on)) build_sql(!!get_clause_indent(level), "ON ", on, "\n", con = con) else NULL,
     con = con
   )
 }
-dbplyr_query_join <- function(con, ...) {
-  dbplyr_fallback(con, "sql_join", ...)
+dbplyr_query_join <- function(con, ..., level = 0) {
+  dbplyr_fallback(con, "sql_join", ..., level = level)
 }
 #' @export
 #' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., level = 0) {
   sql_query_join(
     con, x, y, vars,
     type = type,
     by = by,
     na_matches = na_matches,
-    ...
+    ...,
+    level = level
   )
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., level = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., level = 0) {
   lhs <- escape(ident("LHS"), con = con)
   rhs <- escape(ident("RHS"), con = con)
 
-  on <- sql_join_tbls(con, by)
+  # level + 1 because it is in the `EXISTS` subquery
+  on <- sql_join_tbls(con, by, level = level + 1)
 
+  # TODO move this pattern into a function
   build_sql(
-    "SELECT * FROM ", x, "\n",
-    "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
-    "  SELECT 1 FROM ", y, "\n",
-    "  WHERE ", on, "\n",
-    ")",
+    !!get_clause_indent(level), "SELECT * FROM ", x, "\n",
+    !!get_clause_indent(level), "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
+    # needs `lvl_indent(1)` regardless of option
+    !!get_clause_indent(level), !!lvl_indent(1), "SELECT 1 FROM ", y, "\n",
+    !!get_clause_indent(level), !!lvl_indent(1), "WHERE ", on, "\n",
+    !!get_clause_indent(level), ")",
     con = con
   )
 }
@@ -336,8 +341,8 @@ dbplyr_query_semi_join <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  sql_query_semi_join(con, x, y, anti = anti, by = by, ...)
+sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., level = 0) {
+  sql_query_semi_join(con, x, y, anti = anti, by = by, ..., level = level)
 }
 
 #' @rdname db-sql
