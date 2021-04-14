@@ -32,12 +32,14 @@ sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE,
   from_x <- dbplyr_sql_subquery(
     con,
     sql_render(query$x, con, ..., subquery = TRUE, level = level + 1),
-    name = "LHS"
+    name = "LHS",
+    level = level
   )
   from_y <- dbplyr_sql_subquery(
     con,
     sql_render(query$y, con, ..., subquery = TRUE, level = level + 1),
-    name = "RHS"
+    name = "RHS",
+    level = level
   )
 
   dbplyr_query_semi_join(con, from_x, from_y, anti = query$anti, by = query$by, level = level)
