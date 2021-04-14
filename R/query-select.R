@@ -100,9 +100,9 @@ select_query_clauses <- function(x, subquery = FALSE) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
+sql_render.select_query <- function(query, con, ..., subquery = FALSE, level = 0) {
   from <- dbplyr_sql_subquery(con,
-    sql_render(query$from, con, ..., subquery = TRUE),
+    sql_render(query$from, con, ..., subquery = TRUE, level = level + 1),
     name = NULL
   )
 
@@ -115,7 +115,8 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
     limit = query$limit,
     distinct = query$distinct,
     ...,
-    subquery = subquery
+    subquery = subquery,
+    level = level
   )
 }
 

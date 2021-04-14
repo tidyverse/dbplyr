@@ -29,15 +29,15 @@ print.join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
+sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, level = 0) {
   from_x <- dbplyr_sql_subquery(
     con,
-    sql_render(query$x, con, ..., subquery = TRUE),
+    sql_render(query$x, con, ..., subquery = TRUE, level = level + 1),
     name = "LHS"
   )
   from_y <- dbplyr_sql_subquery(
     con,
-    sql_render(query$y, con, ..., subquery = TRUE),
+    sql_render(query$y, con, ..., subquery = TRUE, level = level + 1),
     name = "RHS"
   )
 
@@ -45,7 +45,8 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
     vars = query$vars,
     type = query$type,
     by = query$by,
-    na_matches = query$na_matches
+    na_matches = query$na_matches,
+    level = level
   )
 }
 

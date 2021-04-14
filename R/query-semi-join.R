@@ -28,17 +28,17 @@ print.semi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE) {
+sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE, level = 0) {
   from_x <- dbplyr_sql_subquery(
     con,
-    sql_render(query$x, con, ..., subquery = TRUE),
+    sql_render(query$x, con, ..., subquery = TRUE, level = level + 1),
     name = "LHS"
   )
   from_y <- dbplyr_sql_subquery(
     con,
-    sql_render(query$y, con, ..., subquery = TRUE),
+    sql_render(query$y, con, ..., subquery = TRUE, level = level + 1),
     name = "RHS"
   )
 
-  dbplyr_query_semi_join(con, from_x, from_y, anti = query$anti, by = query$by)
+  dbplyr_query_semi_join(con, from_x, from_y, anti = query$anti, by = query$by, level = level)
 }
