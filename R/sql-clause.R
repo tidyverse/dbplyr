@@ -97,10 +97,13 @@ sql_clause_kw <- function(..., lvl) {
 }
 
 build_sql_wrap <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
-  if (getOption("dbplyr_break_subquery", FALSE)) {
-    build_sql("(\n", ..., "\n", !!get_clause_indent(lvl), ")", con = con, .env = .env)
+  inner_sql <- build_sql(..., con = con, .env = .env)
+
+  multi_line <- grepl(x = inner_sql, pattern = "\\r\\n|\\r|\\n")
+  if (getOption("dbplyr_break_subquery", FALSE) && multi_line) {
+    build_sql("(\n", inner_sql, "\n", !!get_clause_indent(lvl), ")", con = con)
   } else {
-    build_sql("(", ..., ")", con = con, .env = .env)
+    build_sql("(", inner_sql, ")", con = con)
   }
 }
 
