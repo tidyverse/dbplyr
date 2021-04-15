@@ -21,11 +21,13 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
+      SELECT
+        `LHS`.`x` AS `x`,
+        `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
+      ON (`LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -35,11 +37,13 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
+      SELECT
+        `LHS`.`x` AS `x`,
+        `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
+      ON (`LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -49,11 +53,13 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `RHS`.`x` AS `x`, `RHS`.`y` AS `y`
+      SELECT
+        `RHS`.`x` AS `x`,
+        `RHS`.`y` AS `y`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
+      ON (`LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -63,11 +69,13 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
+      SELECT
+        COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+        COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
+      ON (`LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`)
 
 # only disambiguates shared variables
 
@@ -77,11 +85,13 @@
       Joining, by = "x"
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `y`, `z`
+      SELECT
+        `LHS`.`x` AS `x`,
+        `y`,
+        `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x`)
-      
 
 ---
 
@@ -89,11 +99,13 @@
       left_join(lf1, lf2, by = c(y = "z"))
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`
+      SELECT
+        `LHS`.`x` AS `x.x`,
+        `y`,
+        `RHS`.`x` AS `x.y`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`y` = `RHS`.`z`)
-      
 
 # sql_on query doesn't change unexpectedly
 
@@ -101,11 +113,14 @@
       inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      SELECT
+        `LHS`.`x` AS `x.x`,
+        `y`,
+        `RHS`.`x` AS `x.y`,
+        `z`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -113,11 +128,14 @@
       left_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      SELECT
+        `LHS`.`x` AS `x.x`,
+        `y`,
+        `RHS`.`x` AS `x.y`,
+        `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -125,11 +143,14 @@
       right_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      SELECT
+        `LHS`.`x` AS `x.x`,
+        `y`,
+        `RHS`.`x` AS `x.y`,
+        `z`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -137,11 +158,14 @@
       full_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      SELECT
+        `LHS`.`x` AS `x.x`,
+        `y`,
+        `RHS`.`x` AS `x.y`,
+        `z`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
