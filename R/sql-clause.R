@@ -166,7 +166,7 @@ sql_clause_kw <- function(..., lvl) {
 }
 
 rep_char <- function(times, char) {
-  paste(rep.int(char, times), collapse = "")
+  strrep(char, times)
 }
 
 lvl_indent <- function(times, char = "  ") {
