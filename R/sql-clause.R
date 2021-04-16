@@ -91,7 +91,7 @@ sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",", parens =
     kw = clause,
     con = con,
     parens = parens,
-    strategy = getOption("dbplyr_indent_strategy", "minimal")
+    strategy = get_indent_strategy()
   )
   sql <- build_sql(
     sql_kw(clause),
@@ -121,9 +121,10 @@ sql_kw <- function(kw) {
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = FALSE)))
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = TRUE)))
 #' cat(paste0("SELECT", field_indent(conds, " AND", lvl = 0, con = con)))
-format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, strategy = c("minimal", "align", "indent")) {
+format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, strategy = c("minimal", "align", "indent", "legacy")) {
   strategy <- match.arg(strategy)
   field_string <- switch(strategy,
+    legacy = field_minimal(x, field_sep, con = con, parens = parens),
     minimal = field_minimal(x, field_sep, con = con, parens = parens),
     align = field_align(x, field_sep, kw = kw, lvl = lvl, con = con, parens = parens),
     indent = field_indent(x, field_sep, lvl = lvl, con = con, parens = parens)
@@ -173,33 +174,21 @@ lvl_indent <- function(times, char = "  ") {
 }
 
 indent_lvl <- function(x, lvl) {
-  if (getOption("dbplyr_break_subquery", FALSE)) {
-    sql(paste0(lvl_indent(lvl), x))
+  if (is_legacy_strategy()) {
+    sql(x)
   } else {
-    x
+    sql(paste0(lvl_indent(lvl), x))
   }
 }
 
 get_clause_indent <- function(lvl) {
-  if (getOption("dbplyr_break_subquery", FALSE)) {
-    sql(lvl_indent(lvl))
-  } else {
-    sql("")
-  }
+  indent_lvl("", lvl)
 }
 
-get_field_separator <- function(fields, sep, lvl) {
-  if (break_between_fields(fields)) {
-    paste0(sep, "\n", lvl_indent(lvl + 1))
-  } else {
-    paste0(sep, " ")
-  }
+get_indent_strategy <- function() {
+  getOption("dbplyr_indent_strategy", "minimal")
 }
 
-break_after_clause <- function(fields) {
-  getOption("dbplyr_indent_fields", FALSE) && length(fields) > 1
-}
-
-break_between_fields <- function(fields) {
-  getOption("dbplyr_indent_fields", FALSE)
+is_legacy_strategy <- function() {
+  get_indent_strategy() == "legacy"
 }

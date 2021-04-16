@@ -26,8 +26,7 @@
 
   op <- options()
   op.dbplyr <- list(
-    dbplyr_indent_fields = TRUE,
-    dbplyr_break_subquery = TRUE
+    dbplyr_indent_strategy = "indent"
   )
   toset <- !(names(op.dbplyr) %in% names(op))
   if (any(toset)) options(op.dbplyr[toset])

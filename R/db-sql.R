@@ -188,7 +188,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 
 ident_subquery <- function(from, con, lvl) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
-  if (getOption("dbplyr_break_subquery", FALSE) && multi_line) {
+  if (!is_legacy_strategy() && multi_line) {
     build_sql("(\n", from, "\n", get_clause_indent(lvl), ")", con = con)
   } else {
     build_sql("(", from, ")", con = con)
