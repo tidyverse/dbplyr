@@ -219,6 +219,7 @@ sql_query_select <- function(con, select, from, where = NULL,
                              ...,
                              subquery = FALSE,
                              lvl = 0) {
+  # TODO should check that all arguments are sql or ident?
   UseMethod("sql_query_select")
 }
 
@@ -284,14 +285,14 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   )
 
   select <- sql_join_vars(con, vars, lvl = lvl)
-  on <- sql_join_tbls(con, by, na_matches = na_matches, lvl = lvl)
+  on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
   build_sql(
     sql_clause_select(con, select, lvl = lvl), "\n",
     sql_clause_from(con, x, lvl = lvl), "\n",
     sql_clause_generic(con, JOIN, y, lvl = lvl), "\n",
-    sql_clause_generic(con, "ON", on, lvl = lvl),
+    sql_clause_generic(con, "ON", on, sep = " AND", lvl = lvl, parens = TRUE),
     con = con
   )
 }
@@ -322,16 +323,16 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
   rhs <- escape(ident("RHS"), con = con)
 
   # lvl + 1 because it is in the `EXISTS` subquery
-  on <- sql_join_tbls(con, by, lvl = lvl + 1)
+  on <- sql_join_tbls(con, by)
 
   indent <- get_clause_indent(lvl)
   build_sql(
-    !!indent, "SELECT * FROM ", x, "\n",
-    !!indent, "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
+    indent, "SELECT * FROM ", x, "\n",
+    indent, "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
     # needs `lvl_indent(1)` regardless of option
-    !!indent, !!lvl_indent(1), "SELECT 1 FROM ", y, "\n",
-    !!indent, !!lvl_indent(1), "WHERE ", on, "\n",
-    !!indent, ")",
+    indent, sql(lvl_indent(1)), "SELECT 1 FROM ", y, "\n",
+    sql_clause_where(con, on, lvl = lvl + 1), "\n",
+    indent, ")",
     con = con
   )
 }

@@ -79,15 +79,23 @@ sql_clause_limit <- function(con, limit, lvl = 0){
 
 # helpers -----------------------------------------------------------------
 
-sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",") {
+sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",", parens = FALSE) {
   if (length(fields) == 0L) {
     return()
   }
 
   assert_that(is.character(fields))
+  fields_formatted <- format_fields(
+    fields, sep,
+    lvl = lvl,
+    kw = clause,
+    con = con,
+    parens = parens,
+    strategy = getOption("dbplyr_indent_strategy", "minimal")
+  )
   sql <- build_sql(
     sql_kw(clause),
-    format_fields(fields, sep, lvl = lvl, kw = clause, con = con, strategy = "indent"),
+    fields_formatted,
     con = con
   )
 
@@ -124,7 +132,7 @@ format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, strategy =
 }
 
 field_minimal <- function(x, field_sep, con, parens) {
-  paste0(" ", if (parens) "(", escape(x, collapse = paste0(" ", field_sep), con = con), if (parens) ")")
+  paste0(" ", if (parens) "(", escape(x, collapse = paste0(field_sep, " "), con = con), if (parens) ")")
 }
 
 field_align <- function(x, field_sep, lvl, kw, con, parens) {
@@ -140,13 +148,13 @@ field_align <- function(x, field_sep, lvl, kw, con, parens) {
 
 field_indent <- function(x, field_sep, lvl, con, parens) {
   if (length(x) == 1) {
-    return(paste0(if (parens) "(" else " ", escape(x, con = con), if (parens) ")"))
+    return(paste0(" ", if (parens) "(", escape(x, con = con), if (parens) ")"))
   }
 
   indent <- lvl_indent(lvl + 1)
   collapse <- paste0(field_sep, "\n", indent)
   paste0(
-    if (parens) "(", "\n",
+    if (parens) " (", "\n",
     indent, escape(x, collapse = collapse, con = con),
     if (parens) paste0("\n", indent_lvl(")", lvl))
   )

@@ -87,7 +87,7 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y) {
   }
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never", lvl = 0) {
+sql_join_tbls <- function(con, by, na_matches = "never") {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   on <- NULL
@@ -103,15 +103,10 @@ sql_join_tbls <- function(con, by, na_matches = "never", lvl = 0) {
       compare <- paste0(lhs, " = ", rhs)
     }
 
-    # TODO line break after "(" and before ")" and indent before ")"
-    coll <- get_field_separator(compare, sep = " AND", lvl)
-    on <- sql_vector(compare, collapse = coll, parens = TRUE, con = con)
+    sql(compare)
   } else if (length(by$on) > 0) {
-    # TODO needs indent
-    on <- build_sql("(", by$on, ")", con = con)
+    by$on
   }
-
-  on
 }
 
 sql_table_prefix <- function(con, var, table = NULL) {
