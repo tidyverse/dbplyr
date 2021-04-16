@@ -35,9 +35,6 @@ airports <- copy_to(con, nycflights13::airports)
       show_query()
     ```
     
-    (As you can see here, the generated SQL isn't always as minimal as you
-    might generate by hand.)
-    
 *  `filter()` generates a `WHERE` clause:
     
     ```{r}
