@@ -52,7 +52,8 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
     order_by  = sql_clause_order_by(con, order_by, subquery, limit, lvl = lvl),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
-      build_sql_line("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con, lvl = lvl)
+      sql <- build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
+      indent_lvl(sql, lvl)
     }
   )
 }

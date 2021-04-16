@@ -187,7 +187,12 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 }
 
 ident_subquery <- function(from, con, lvl) {
-  build_sql_wrap(from, con = con, lvl = lvl)
+  multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
+  if (getOption("dbplyr_break_subquery", FALSE) && multi_line) {
+    build_sql("(\n", from, "\n", get_clause_indent(lvl), ")", con = con)
+  } else {
+    build_sql("(", from, ")", con = con)
+  }
 }
 
 #' @rdname db-sql
@@ -346,10 +351,11 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
 }
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
+  method <- paste0(method, if (all) " ALL")
   build_sql(
-    !!get_clause_indent(lvl), build_sql_wrap(x, con = con, lvl = lvl),
-    "\n", sql_clause_kw(method, if (all) " ALL", lvl = lvl), "\n",
-    !!get_clause_indent(lvl), build_sql_wrap(y, con = con, lvl = lvl),
+    indent_lvl(ident_subquery(x, con = con, lvl = lvl), lvl),
+    "\n", indent_lvl(sql_kw(method), lvl = lvl), "\n",
+    indent_lvl(ident_subquery(y, con = con, lvl = lvl), lvl),
     con = con
   )
 }

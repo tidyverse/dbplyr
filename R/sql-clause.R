@@ -26,9 +26,9 @@ sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0
   }
 
   clause <- build_sql(
-    "SELECT",
-    if (distinct) sql(" DISTINCT"),
-    if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
+    sql_kw("SELECT"),
+    if (distinct) sql_kw(" DISTINCT"),
+    if (!is.null(top)) build_sql(sql_kw(" TOP "), as.integer(top), con = con),
     con = con
   )
 
@@ -68,11 +68,12 @@ sql_clause_order_by <- function(con, order_by, subquery = FALSE, limit = NULL, l
 
 sql_clause_limit <- function(con, limit, lvl = 0){
   if (!is.null(limit) && !identical(limit, Inf)) {
-    build_sql_line(
-      "LIMIT ", sql(format(limit, scientific = FALSE)),
-      con = con,
-      lvl = lvl
+    sql <- build_sql(
+      sql_kw("LIMIT"), " ", sql(format(limit, scientific = FALSE)),
+      con = con
     )
+
+    indent_lvl(sql, lvl)
   }
 }
 
@@ -84,54 +85,98 @@ sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",") {
   }
 
   assert_that(is.character(fields))
-  build_sql_line(
-    sql(clause), !!get_clause_separator(fields, lvl),
-    escape(fields, collapse = get_field_separator(fields, sep = sep, lvl), con = con),
-    con = con,
-    lvl = lvl
+  sql <- build_sql(
+    sql_kw(clause),
+    format_fields(fields, sep, lvl = lvl, kw = clause, con = con, strategy = "indent"),
+    con = con
+  )
+
+  indent_lvl(sql, lvl)
+}
+
+sql_kw <- function(kw) {
+  sql(kw)
+}
+
+#' @noRd
+#' @examples
+#' con <- simulate_dbi()
+#' cols <- ident("mpg", "cyl", "gear")
+#' conds <- sql("`mpg` > 0", "`cyl` = 6")
+#'
+#' cat(paste0("SELECT", field_minimal(cols, ",", con = con)))
+#' cat(paste0("SELECT", field_minimal(conds, " AND", con = con)))
+#'
+#' cat(paste0("SELECT", field_align(cols, ",", lvl = 0, kw = "SELECT", con = con)))
+#' cat(paste0("SELECT", field_align(conds, " AND", lvl = 0, kw = "SELECT", con = con)))
+#'
+#' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = FALSE)))
+#' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = TRUE)))
+#' cat(paste0("SELECT", field_indent(conds, " AND", lvl = 0, con = con)))
+format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, strategy = c("minimal", "align", "indent")) {
+  strategy <- match.arg(strategy)
+  field_string <- switch(strategy,
+    minimal = field_minimal(x, field_sep, con = con, parens = parens),
+    align = field_align(x, field_sep, kw = kw, lvl = lvl, con = con, parens = parens),
+    indent = field_indent(x, field_sep, lvl = lvl, con = con, parens = parens)
+  )
+  sql(field_string)
+}
+
+field_minimal <- function(x, field_sep, con, parens) {
+  paste0(" ", if (parens) "(", escape(x, collapse = paste0(" ", field_sep), con = con), if (parens) ")")
+}
+
+field_align <- function(x, field_sep, lvl, kw, con, parens) {
+  if (length(x) == 1) {
+    return(paste0(if (parens) "(" else " ", escape(x, con = con), if (parens) ")"))
+  }
+
+  kw_indent <- rep_char(nchar(kw) + (parens == TRUE), " ")
+  collapse <- paste0(field_sep, "\n", " ", lvl_indent(lvl), kw_indent)
+  # TODO should this really look like this??
+  paste0(" ", if (parens) "(", escape(x, collapse = collapse, con = con), if (parens) ")")
+}
+
+field_indent <- function(x, field_sep, lvl, con, parens) {
+  if (length(x) == 1) {
+    return(paste0(if (parens) "(" else " ", escape(x, con = con), if (parens) ")"))
+  }
+
+  indent <- lvl_indent(lvl + 1)
+  collapse <- paste0(field_sep, "\n", indent)
+  paste0(
+    if (parens) "(", "\n",
+    indent, escape(x, collapse = collapse, con = con),
+    if (parens) paste0("\n", indent_lvl(")", lvl))
   )
 }
 
 sql_clause_kw <- function(..., lvl) {
-  sql(paste0(get_clause_indent(lvl), ...))
+  sql_kw(paste0(get_clause_indent(lvl), ...))
 }
 
-build_sql_wrap <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
-  inner_sql <- build_sql(..., con = con, .env = .env)
-
-  multi_line <- grepl(x = inner_sql, pattern = "\\r\\n|\\r|\\n")
-  if (getOption("dbplyr_break_subquery", FALSE) && multi_line) {
-    build_sql("(\n", inner_sql, "\n", !!get_clause_indent(lvl), ")", con = con)
-  } else {
-    build_sql("(", inner_sql, ")", con = con)
-  }
-}
-
-lvl_indent <- function(times, char = "  ") {
+rep_char <- function(times, char) {
   paste(rep.int(char, times), collapse = "")
 }
 
-build_sql_line <- function(..., .env = parent.frame(), con = sql_current_con(), lvl = 0) {
-  build_sql(
-    !!get_clause_indent(lvl), ...,
-    .env = .env,
-    con = con
-  )
+lvl_indent <- function(times, char = "  ") {
+  rep_char(times, char)
+}
+
+indent_lvl <- function(x, lvl) {
+  if (getOption("dbplyr_break_subquery", FALSE)) {
+    sql(paste0(lvl_indent(lvl), x))
+  } else {
+    x
+  }
 }
 
 get_clause_indent <- function(lvl) {
   if (getOption("dbplyr_break_subquery", FALSE)) {
-    lvl_indent(lvl)
+    sql(lvl_indent(lvl))
   } else {
-    ""
-  }
-}
-
-get_clause_separator <- function(fields, lvl) {
-  if (break_after_clause(fields)) {
-    field_collapse <- paste0("\n", lvl_indent(lvl + 1))
-  } else {
-    field_collapse <- " "
+    sql("")
   }
 }
 
