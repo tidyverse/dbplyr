@@ -26,8 +26,10 @@
         `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND
-        `LHS`.`y` = `RHS`.`y`)
+      ON (
+        `LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`
+      )
 
 ---
 
@@ -42,8 +44,10 @@
         `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND
-        `LHS`.`y` = `RHS`.`y`)
+      ON (
+        `LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`
+      )
 
 ---
 
@@ -58,8 +62,10 @@
         `RHS`.`y` AS `y`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND
-        `LHS`.`y` = `RHS`.`y`)
+      ON (
+        `LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`
+      )
 
 ---
 
@@ -74,8 +80,10 @@
         COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND
-        `LHS`.`y` = `RHS`.`y`)
+      ON (
+        `LHS`.`x` = `RHS`.`x` AND
+        `LHS`.`y` = `RHS`.`y`
+      )
 
 # only disambiguates shared variables
 
