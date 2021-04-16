@@ -6,6 +6,7 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::count
+#' @param .drop Not supported for lazy tables.
 #' @importFrom dplyr count
 #' @export
 #' @examples
@@ -28,10 +29,11 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 
 #' @rdname count.tbl_lazy
 #' @importFrom dplyr add_count
+#' @importFrom lifecycle deprecated
 #' @export
 add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = deprecated()) {
   if (!missing(.drop)) {
-    lifecycle::deprecate_warn("1.0.0", "add_count(.drop = )")
+    abort("`.drop` argument not supported for lazy tables.")
   }
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)
@@ -39,7 +41,7 @@ add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .d
   else {
     out <- x
   }
-  out <- add_tally(out, wt = !!enquo(wt), sort = sort, name = name)
+  out <- dplyr::add_tally(out, wt = !!enquo(wt), sort = sort, name = name)
   group_by(out, !!!syms(group_vars(x)))
 }
 
