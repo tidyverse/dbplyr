@@ -102,22 +102,24 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
+      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
+      subquery = TRUE)
     Warning <warning>
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
-      <SQL> SELECT 'x'
-      FROM 'y'
+      <SQL> SELECT `x`
+      FROM `y`
 
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
+      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"),
+      limit = 10)
     Output
-      <SQL> SELECT TOP 10 'x'
-      FROM 'y'
-      ORDER BY 'z'
+      <SQL> SELECT TOP 10 `x`
+      FROM `y`
+      ORDER BY `z`
 
 # custom escapes translated correctly
 
