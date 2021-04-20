@@ -8,14 +8,7 @@
 \usage{
 \method{count}{tbl_lazy}(x, ..., wt = NULL, sort = FALSE, name = NULL)
 
-add_count.tbl_lazy(
-  x,
-  ...,
-  wt = NULL,
-  sort = FALSE,
-  name = NULL,
-  .drop = deprecated()
-)
+\method{add_count}{tbl_lazy}(x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = deprecated())
 
 \method{tally}{tbl_lazy}(x, wt = NULL, sort = FALSE, name = NULL)
 }
