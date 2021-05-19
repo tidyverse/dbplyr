@@ -79,12 +79,20 @@ cte_render <- function(query_list, con) {
 
 cte_wrap <- function(query_list, sql, render = TRUE) {
   if (is.list(query_list)) {
-    if (render) {
-      name <- unique_subquery_name()
+    id <- vctrs::vec_match(as.character(sql), purrr::map_chr(query_list, "query"))
+
+    if (!is.na(id)) {
+      query_entry <- query_list[[id]]
+      query_entry$render <- FALSE
     } else {
-      name <- NULL
+      if (is.ident(sql)) {
+        name <- sql
+      } else {
+        name <- unique_subquery_name()
+      }
+      query_entry <- list(query = sql, name = name, render = render)
     }
-    query_entry <- list(query = sql, name = name, render = render)
+
     append(query_list, list(query_entry))
   } else {
     sql
@@ -94,24 +102,17 @@ cte_wrap <- function(query_list, sql, render = TRUE) {
 query_list_from <- function(query_list, con, name = NULL) {
   if (is.list(query_list)) {
     last_query <- dplyr::last(query_list)
-    if (last_query$render) {
-      out <- ident(last_query$name)
-    } else {
-      out <- last_query$query
-    }
-
-    purrr::set_names(out, name)
+    purrr::set_names(maybe_ident(last_query$name), name)
   } else {
     dbplyr_sql_subquery(con, query_list, name = name)
   }
 }
 
-query_list_query <- function(query_list, con) {
-  if (is.list(query_list)) {
-    last_query <- dplyr::last(query_list)
-    last_query$query
+maybe_ident <- function(x) {
+  if (is.ident(x)) {
+    x
   } else {
-    query_list
+    ident(x)
   }
 }
 
