@@ -36,6 +36,9 @@ base_scalar <- sql_translator(
         sql_expr(-!!x)
       }
     } else {
+      x <- escape_infix_expr(enquo(x))
+      y <- escape_infix_expr(enquo(y))
+
       sql_expr(!!x - !!y)
     }
   },
