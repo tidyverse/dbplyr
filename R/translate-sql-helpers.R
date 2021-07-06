@@ -180,8 +180,8 @@ sql_infix <- function(f, pad = TRUE) {
 }
 
 escape_infix_expr <- function(x) {
-  par_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (quo_is_call(x, n = 2) && call_name(x) %in% par_calls) {
+  infix_calls <- c("+", "-", "*", "/", "%%", "^")
+  if (quo_is_call(x, n = 2) && call_name(x) %in% infix_calls) {
     build_sql("(", eval_tidy(x), ")")
   } else {
     eval_tidy(x)
