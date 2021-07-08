@@ -211,6 +211,8 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         na_matches = "never",
                         lhs_as = "LHS",
                         rhs_as = "RHS") {
+  vctrs::vec_assert(lhs_as, character(), size = 1)
+  vctrs::vec_assert(rhs_as, character(), size = 1)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -245,6 +247,9 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never",
                              lhs_as = "LHS", rhs_as = "RHS") {
+  vctrs::vec_assert(lhs_as, character(), size = 1)
+  vctrs::vec_assert(rhs_as, character(), size = 1)
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
