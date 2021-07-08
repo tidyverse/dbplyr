@@ -1,11 +1,12 @@
 # complete join pipeline works with SQLite and table alias
 
     Code
-      remote_query(out)
+      left_join(lf1, lf2, by = "x", lhs_as = "df1", rhs_as = "df2")
     Output
-      <SQL> SELECT `df1`.`x` AS `x`, `y`
-      FROM `dbplyr_068` AS `df1`
-      LEFT JOIN `dbplyr_069` AS `df2`
+      <SQL>
+      SELECT `df1`.`x` AS `x`, `y`
+      FROM `df` AS `df1`
+      LEFT JOIN `df` AS `df2`
       ON (`df1`.`x` = `df2`.`x`)
       
 

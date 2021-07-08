@@ -10,9 +10,12 @@ test_that("complete join pipeline works with SQLite and table alias", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
 
-  out <- left_join(df1, df2, by = "x", lhs_as = "df1", rhs_as = "df2")
-  expect_snapshot(remote_query(out))
-  expect_equal(collect(out), tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+  out <- left_join(df1, df2, by = "x", lhs_as = "df1", rhs_as = "df2") %>% collect()
+  expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+
+  lf1 <- lazy_frame(x = 1:5)
+  lf2 <- lazy_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+  expect_snapshot(left_join(lf1, lf2, by = "x", lhs_as = "df1", rhs_as = "df2"))
 })
 
 test_that("complete semi join works with SQLite", {
