@@ -41,7 +41,8 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
       <SQL> CREATE GLOBAL TEMPORARY TABLE 
-      `schema`.`tbl` AS SELECT * FROM foo
+      `schema`.`tbl` AS
+      SELECT * FROM foo
 
 ---
 
@@ -50,5 +51,6 @@
       temporary = FALSE)
     Output
       <SQL> CREATE TABLE 
-      `schema`.`tbl` AS SELECT * FROM foo
+      `schema`.`tbl` AS
+      SELECT * FROM foo
 

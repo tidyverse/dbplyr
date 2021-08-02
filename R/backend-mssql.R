@@ -299,7 +299,7 @@ mssql_version <- function(con) {
   # https://stackoverflow.com/q/16683758/946850
   build_sql(
     "SELECT * INTO ", as.sql(name, con), " ",
-    "FROM (", sql, ") AS temp",
+    "FROM (\n  ", sql, "\n) AS temp",
     con = con
   )
 }
