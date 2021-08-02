@@ -59,8 +59,6 @@ sql_translation.MariaDBConnection <- function(con) {
       },
       as.character = sql_cast("CHAR"),
 
-      random = function() sql_expr(RAND()),
-
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
       paste0 = sql_paste(""),
@@ -132,6 +130,15 @@ sql_expr_matches.MariaDBConnection <- function(con, x, y) {
 sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
+
+#' @export
+sql_random.MariaDBConnection <- function(con) {
+  sql_expr(RAND())
+}
+
+#' @export
+sql_random.MySQLConnection <- sql_random.MariaDBConnection
+sql_random.MySQL <- sql_random.MariaDBConnection
 
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
 

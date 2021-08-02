@@ -143,8 +143,6 @@ simulate_mssql <- function(version = "15.0") {
       is.null       = mssql_is_null,
       is.na         = mssql_is_null,
 
-      random = function() sql_expr(RAND()),
-
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
       paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
@@ -304,6 +302,11 @@ mssql_version <- function(con) {
     "FROM (", sql, ") AS temp",
     con = con
   )
+}
+
+#' @export
+`sql_random.Microsoft SQL Server` <- function(con) {
+  sql_expr(RAND())
 }
 
 # Bit vs boolean ----------------------------------------------------------
