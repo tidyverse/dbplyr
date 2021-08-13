@@ -356,7 +356,7 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
   if (is.null(missing)) {
     sql_expr(IIF(!!cond, !!if_true, !!if_false))
   } else {
-    sql_if(con, if_true, if_false, missing)
+    sql_if(cond, if_true, if_false, missing)
   }
 }
 
