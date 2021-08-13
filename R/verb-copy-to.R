@@ -89,6 +89,14 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
 
 #' @export
 db_values <- function(con, df, name = deparse(substitute(df))) {
+  if (ncol(df) == 0) {
+    abort("`df` needs at least one column.")
+  }
+
+  if (!inherits(df, "data.frame")) {
+    abort("`df` needs to be a data.frame.")
+  }
+
   tbl(
     src = con,
     from = sql_values(con, df),
@@ -130,9 +138,15 @@ sql_values_clause <- function(con, df, row = FALSE) {
 
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE)
+  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE false", con = con)
+
+  if (nrow(df) == 0) {
+    return(null_row_clause)
+  }
+
   value_clause <- sql_vector(rows, collapse = ",\n  ", con = con, parens = FALSE)
   build_sql(
-    "SELECT ", cols_clause, " WHERE false\n",
+    null_row_clause, "\n",
     "UNION ALL\n",
     "VALUES\n  ", value_clause,
     con = con

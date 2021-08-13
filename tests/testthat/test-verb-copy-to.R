@@ -52,3 +52,32 @@ test_that("can create a new table in non-default schema", {
   db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
   expect_equal(collect(db2), df2)
 })
+
+# db_values() -------------------------------------------------------------
+
+test_that("can translate a table", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  df <- tibble(dbl = 1.5, int = 1L, chr = "a", dtt = as.POSIXct("2020-01-01 01:23:45"))
+
+  expect_snapshot(db_values(con, df, name = "db_values_1") %>% remote_query())
+
+  expect_equal(
+    db_values(con, df, name = "db_values_1") %>% collect(),
+    tibble(dbl = 1.5, int = 1L, chr = "a", dtt = "2020-01-01T01:23:45Z")
+  )
+})
+
+test_that("zero row table works", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  expect_snapshot(
+    db_values(con, tibble(dbl = numeric(), chr = character())) %>%
+      remote_query()
+  )
+})
+
+test_that("checks inputs", {
+  expect_snapshot(expect_error(db_values(simulate_dbi(), tibble())))
+  expect_snapshot(expect_error(db_values(simulate_dbi(), lazy_frame(a = 1))))
+})
