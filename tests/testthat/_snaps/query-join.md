@@ -167,3 +167,51 @@
         WHERE (LHS.y < RHS.z)
       )
 
+# CTEs work with join
+
+    Code
+      inner_join(lf1, lf2, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> SELECT `LHS`.`x` AS `x`, `y`, `z`
+      FROM `df1` AS `LHS`
+      INNER JOIN `df2` AS `RHS`
+      ON (`LHS`.`x` = `RHS`.`x`)
+      
+
+---
+
+    Code
+      inner_join(lf1_f, lf2_f, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q01` AS (
+      SELECT *
+      FROM `df1`
+      WHERE (`x` = 1.0)
+      ),
+      `q02` AS (
+      SELECT *
+      FROM `df2`
+      WHERE (`x` = 1.0)
+      )
+      SELECT `LHS`.`x` AS `x`, `y`, `z`
+      FROM `q01` AS `LHS`
+      INNER JOIN `q02` AS `RHS`
+      ON (`LHS`.`x` = `RHS`.`x`)
+      
+
+---
+
+    Code
+      inner_join(lf1_f, lf1_f, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q01` AS (
+      SELECT *
+      FROM `df1`
+      WHERE (`x` = 1.0)
+      )
+      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y.x`, `RHS`.`y` AS `y.y`
+      FROM `q01` AS `LHS`
+      INNER JOIN `q01` AS `RHS`
+      ON (`LHS`.`x` = `RHS`.`x`)
+      
+

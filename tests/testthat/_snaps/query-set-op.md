@@ -87,3 +87,22 @@
       (SELECT *
       FROM `df`)
 
+# CTEs work with set ops
+
+    Code
+      union(lf1, lf2) %>% remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q01` AS (
+      SELECT `x`, `y`, NULL AS `z`
+      FROM `df1`
+      ),
+      `q02` AS (
+      SELECT `x`, NULL AS `y`, `z`
+      FROM `df2`
+      )
+      (SELECT *
+      FROM `q01`)
+      UNION
+      (SELECT *
+      FROM `q02`)
+

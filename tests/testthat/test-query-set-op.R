@@ -14,3 +14,10 @@ test_that("generated sql doesn't change unexpectedly", {
   expect_snapshot(setdiff(lf, lf, all = TRUE))
   expect_snapshot(intersect(lf, lf, all = TRUE))
 })
+
+test_that("CTEs work with set ops", {
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "df1")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "df2")
+
+  expect_snapshot(union(lf1, lf2) %>% remote_query(cte = TRUE))
+})

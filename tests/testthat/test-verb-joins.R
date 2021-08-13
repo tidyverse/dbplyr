@@ -129,6 +129,21 @@ test_that("join functions error on column not found for SQL sources #1928", {
   )
 })
 
+test_that("CTEs work with join", {
+  df1 <- memdb_frame(x = 1:3, y = 2) %>% filter(x > 1)
+  df2 <- memdb_frame(x = 1:3, z = 3) %>% filter(x < 3)
+
+  expect_equal(
+    left_join(df1, df2, by = "x") %>% collect(),
+    tibble(x = 2:3, y = 2, z = c(3, NA))
+  )
+
+  expect_equal(
+    semi_join(df1, df2, by = "x") %>% collect(),
+    tibble(x = 2L, y = 2)
+  )
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {

@@ -41,3 +41,51 @@
         WHERE (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       )
 
+# CTEs work with join
+
+    Code
+      semi_join(lf1, lf2, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> SELECT * FROM `df1` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df2` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      semi_join(lf1_f, lf2_f, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q01` AS (
+      SELECT *
+      FROM `df1`
+      WHERE (`x` = 1.0)
+      ),
+      `q02` AS (
+      SELECT *
+      FROM `df2`
+      WHERE (`x` = 1.0)
+      )
+      SELECT * FROM `q01` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `q02` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      semi_join(lf1_f, lf1_f, by = "x") %>% remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q01` AS (
+      SELECT *
+      FROM `df1`
+      WHERE (`x` = 1.0)
+      )
+      SELECT * FROM `q01` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `q01` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+

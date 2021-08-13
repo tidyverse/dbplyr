@@ -16,3 +16,18 @@
       <SQL> SELECT `x`
       FROM `df`
 
+# CTEs work with select
+
+    Code
+      lazy_frame(x = 1:3, y = 2) %>% filter(x < 3) %>% filter(x >= mean(x, na.rm = TRUE)) %>%
+        remote_query(cte = TRUE)
+    Output
+      <SQL> WITH `q02` AS (
+      SELECT `x`, `y`, AVG(`x`) OVER () AS `q01`
+      FROM `df`
+      WHERE (`x` < 3.0)
+      )
+      SELECT `x`, `y`
+      FROM `q02`
+      WHERE (`x` >= `q01`)
+
