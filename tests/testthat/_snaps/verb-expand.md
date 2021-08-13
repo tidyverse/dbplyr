@@ -38,6 +38,15 @@
       SELECT DISTINCT ROUND(`x` / 2.0, 0) AS `x_half`, `x` + 1.0 AS `x1`
       FROM `df`
 
+# works with tidyr::nesting
+
+    Code
+      df_lazy %>% tidyr::expand(tidyr::nesting(x, y))
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y`
+      FROM `df`
+
 # expand respects groups
 
     Code

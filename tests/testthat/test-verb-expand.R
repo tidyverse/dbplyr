@@ -25,6 +25,11 @@ test_that("expand accepts expressions", {
   expect_snapshot(tidyr::expand(df, nesting(x_half = round(x / 2), x1 = x + 1)))
 })
 
+test_that("works with tidyr::nesting", {
+  df_lazy <- lazy_frame(x = 1:2, y = 1:2)
+  expect_snapshot(df_lazy %>% tidyr::expand(tidyr::nesting(x, y)))
+})
+
 test_that("expand respects groups", {
   df <- tibble(
     a = c(1L, 1L, 2L),
