@@ -113,14 +113,6 @@ sql_values.DBIConnection <- function(con, df) {
   sql_values_clause(con, df)
 }
 
-#' @export
-sql_values.MySQLConnection <- function(con, df) {
-  sql_values_clause(con, df, row = TRUE)
-}
-
-#' @export
-sql_values.MariaDBConnection <- sql_values.MySQLConnection
-
 sql_values_clause <- function(con, df, row = FALSE) {
   values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
   rows <- purrr::pmap(

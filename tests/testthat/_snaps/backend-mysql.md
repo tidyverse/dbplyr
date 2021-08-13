@@ -24,6 +24,16 @@
       ON (`LHS`.`x` <=> `RHS`.`x`)
       
 
+---
+
+    Code
+      sql_values(con, tibble(x = 1, y = "a"))
+    Output
+      <SQL> SELECT NULL AS `x`, NULL AS `y` WHERE false
+      UNION ALL
+      VALUES
+        ROW(1.0, 'a')
+
 # can explain
 
     Code

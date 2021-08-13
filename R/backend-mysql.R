@@ -131,5 +131,15 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
+#' @export
+sql_values.MariaDBConnection <- function(con, df) {
+  sql_values_clause(con, df, row = TRUE)
+}
+
+#' @export
+sql_values.MySQL <- sql_values.MariaDBConnection
+#' @export
+sql_values.MySQLConnection <- sql_values.MariaDBConnection
+
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
 
