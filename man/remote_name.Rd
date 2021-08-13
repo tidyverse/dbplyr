@@ -14,12 +14,14 @@ remote_src(x)
 
 remote_con(x)
 
-remote_query(x)
+remote_query(x, cte = FALSE)
 
 remote_query_plan(x)
 }
 \arguments{
 \item{x}{Remote table, currently must be a \link{tbl_sql}.}
+
+\item{cte}{Use common table expression instead of subqueries.}
 }
 \value{
 The value, or \code{NULL} if not remote table, or not applicable.

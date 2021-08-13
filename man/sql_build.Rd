@@ -38,7 +38,7 @@ set_op_query(x, y, type = type, all = FALSE)
 
 sql_build(op, con = NULL, ...)
 
-sql_render(query, con = NULL, ..., subquery = FALSE)
+sql_render(query, con = NULL, ..., subquery = FALSE, query_list = NULL)
 
 sql_optimise(x, con = NULL, ..., subquery = FALSE)
 }
