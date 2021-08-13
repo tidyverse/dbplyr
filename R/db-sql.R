@@ -165,7 +165,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " AS ", sql,
+    as.sql(name, con), " AS\n", sql,
     con = con
   )
 }
