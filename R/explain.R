@@ -1,7 +1,8 @@
 #' @importFrom dplyr show_query
 #' @export
-show_query.tbl_lazy <- function(x, ..., cte = TRUE) {
+show_query.tbl_lazy <- function(x, ..., cte = FALSE) {
   sql <- remote_query(x, cte = cte)
+  unique_subquery_name_reset()
   cat_line("<SQL>")
   cat_line(sql)
   invisible(x)

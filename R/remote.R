@@ -43,6 +43,7 @@ remote_con <- function(x) {
 #' @export
 #' @rdname remote_name
 remote_query <- function(x, cte = FALSE) {
+  unique_subquery_name_reset()
   if (cte) {
     query_list <- db_sql_render(remote_con(x), x, query_list = list())
     cte_render(query_list, remote_con(x))
