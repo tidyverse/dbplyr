@@ -299,28 +299,28 @@ and return data to R.</p>
 <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, y <span class='op'>=</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>5</span><span class='op'>:</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>
 <span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='fu'><a href='memdb_frame.html'>src_memdb</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='va'>df</span><span class='op'>)</span>
 <span class='va'>db</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;df&gt; [?? x 2]</span><span>
-#&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.2 [:memory:]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;df&gt; [?? x 2]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
 #&gt;       x y    
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1 e    
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     2 d    
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     3 c    
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>     4 b    
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>     5 a    </div><div class='input'>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span>     1 e    
+#&gt; <span style='color: #BCBCBC;'>2</span>     2 d    
+#&gt; <span style='color: #BCBCBC;'>3</span>     3 c    
+#&gt; <span style='color: #BCBCBC;'>4</span>     4 b    
+#&gt; <span style='color: #BCBCBC;'>5</span>     5 a    </div><div class='input'>
 <span class='va'>df2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='st'>"d"</span><span class='op'>)</span>, fruit <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"apple"</span>, <span class='st'>"date"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'># copy_to() is called automatically if you set copy = TRUE</span>
 <span class='co'># in the join functions</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>df2</span>, copy <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Joining, by = "y"</span></div><div class='output co'>#&gt; </span><span style='color: #949494;'># Source:   lazy query [?? x 3]</span><span>
-#&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.2 [:memory:]</span><span>
+</div><div class='output co'>#&gt; <span class='message'>Joining, by = "y"</span></div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 3]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
 #&gt;       x y     fruit
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1 e     </span><span style='color: #BB0000;'>NA</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     2 d     date 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     3 c     </span><span style='color: #BB0000;'>NA</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>     4 b     </span><span style='color: #BB0000;'>NA</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>     5 a     apple</div></span></pre>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span>     1 e     <span style='color: #BB0000;'>NA</span>   
+#&gt; <span style='color: #BCBCBC;'>2</span>     2 d     date 
+#&gt; <span style='color: #BCBCBC;'>3</span>     3 c     <span style='color: #BB0000;'>NA</span>   
+#&gt; <span style='color: #BCBCBC;'>4</span>     4 b     <span style='color: #BB0000;'>NA</span>   
+#&gt; <span style='color: #BCBCBC;'>5</span>     5 a     apple</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

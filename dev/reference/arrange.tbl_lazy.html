@@ -253,25 +253,25 @@ can override this behaviour by explicitly sorting on <code><a href='https://rdrr
 #&gt; ORDER BY `a`</div><div class='input'>
 <span class='co'># Note that NAs are sorted first</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
-#&gt; </span><span style='color: #949494;'># Database:   sqlite 3.35.2 [:memory:]</span><span>
-#&gt; </span><span style='color: #949494;'># Ordered by: b</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span>
+#&gt; <span style='color: #949494;'># Database:   sqlite 3.35.5 [:memory:]</span>
+#&gt; <span style='color: #949494;'># Ordered by: b</span>
 #&gt;       a     b
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     2    </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     4     1
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     1     2
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>     3     5</div><div class='input'><span class='co'># override by sorting on is.na() first</span>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span>     2    <span style='color: #BB0000;'>NA</span>
+#&gt; <span style='color: #BCBCBC;'>2</span>     4     1
+#&gt; <span style='color: #BCBCBC;'>3</span>     1     2
+#&gt; <span style='color: #BCBCBC;'>4</span>     3     5</div><div class='input'><span class='co'># override by sorting on is.na() first</span>
 <span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span>, <span class='va'>b</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span><span>
-#&gt; </span><span style='color: #949494;'># Database:   sqlite 3.35.2 [:memory:]</span><span>
-#&gt; </span><span style='color: #949494;'># Ordered by: is.na(b), b</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     table&lt;dbplyr_001&gt; [?? x 2]</span>
+#&gt; <span style='color: #949494;'># Database:   sqlite 3.35.5 [:memory:]</span>
+#&gt; <span style='color: #949494;'># Ordered by: is.na(b), b</span>
 #&gt;       a     b
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     4     1
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     1     2
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     3     5
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>     2    </span><span style='color: #BB0000;'>NA</span><span></div></span></pre>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span>     4     1
+#&gt; <span style='color: #BCBCBC;'>2</span>     1     2
+#&gt; <span style='color: #BCBCBC;'>3</span>     3     5
+#&gt; <span style='color: #BCBCBC;'>4</span>     2    <span style='color: #BB0000;'>NA</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

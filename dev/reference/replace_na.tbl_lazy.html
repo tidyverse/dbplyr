@@ -231,13 +231,13 @@ and return data to R.</p>
   <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span>, <span class='cn'>NA</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='cn'>NA</span>, <span class='st'>"b"</span><span class='op'>)</span><span class='op'>)</span>
   <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/replace_na.html'>replace_na</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>0</span>, y <span class='op'>=</span> <span class='st'>"unknown"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.2 [:memory:]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 2]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
 #&gt;       x y      
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>     1 a      
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>     2 unknown
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>     0 b      </div></span></pre>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  
+#&gt; <span style='color: #BCBCBC;'>1</span>     1 a      
+#&gt; <span style='color: #BCBCBC;'>2</span>     2 unknown
+#&gt; <span style='color: #BCBCBC;'>3</span>     0 b      </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

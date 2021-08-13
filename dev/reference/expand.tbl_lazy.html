@@ -259,14 +259,14 @@ and return data to R.</p>
   <span class='co'># Only combinations that already appear in the data ---------------</span>
   <span class='va'>fruits</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand</a></span><span class='op'>(</span><span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>type</span>, <span class='va'>size</span><span class='op'>)</span><span class='op'>)</span>
 <span class='op'>}</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 2]</span><span>
-#&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.2 [:memory:]</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 2]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
 #&gt;   type   size 
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> apple  XS   
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> orange S    
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> apple  M    
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> orange M    </div></span></pre>
+#&gt;   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span> apple  XS   
+#&gt; <span style='color: #BCBCBC;'>2</span> orange S    
+#&gt; <span style='color: #BCBCBC;'>3</span> apple  M    
+#&gt; <span style='color: #BCBCBC;'>4</span> orange M    </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
