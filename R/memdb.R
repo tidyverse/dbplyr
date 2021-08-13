@@ -23,8 +23,8 @@ memdb_frame <- function(..., .name = unique_table_name()) {
 
 #' @rdname memdb_frame
 #' @export
-tbl_memdb <- function(df, name = deparse(substitute(df))) {
-  copy_to(src_memdb(), df, name = name)
+tbl_memdb <- function(df, .name = deparse(substitute(df))) {
+  copy_to(src_memdb(), df, .name = .name)
 }
 
 #' @rdname memdb_frame

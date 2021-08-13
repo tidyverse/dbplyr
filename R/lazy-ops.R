@@ -29,8 +29,13 @@ op_base <- function(x, vars, class = character()) {
   )
 }
 
-op_base_local <- function(df) {
-  op_base(df, names(df), class = "local")
+op_base_local <- function(df, name) {
+  if (!is.ident(name)) {
+    vctrs::vec_assert(name, character(), size = 1)
+    name <- ident(name)
+  }
+
+  op_base(list(data = df, name = name), names(df), class = "local")
 }
 
 op_base_remote <- function(x, vars) {
@@ -50,7 +55,7 @@ print.op_base_remote <- function(x, ...) {
 
 #' @export
 print.op_base_local <- function(x, ...) {
-  cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
+  cat("<Local data frame> ", dplyr::dim_desc(x$x$data), "\n", sep = "")
 }
 
 #' @export
@@ -60,7 +65,7 @@ sql_build.op_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.op_base_local <- function(op, con, ...) {
-  ident("df")
+  op$x$name
 }
 
 # Operators ---------------------------------------------------------------
