@@ -3,6 +3,10 @@
 * The SQL translation of `quantile()` now doesn't error anymore when using
   the `na.rm` argument (@mgirlich, #600).
 
+* `compute()` now works with `temporary = TRUE` for Oracle (@mgirlich, #621).
+
+* `if_else()` now supports the `missing` argument (@mgirlich, #641).
+
 # dbplyr 2.1.1
 
 * New support for Snowflake (@edgararuiz)
