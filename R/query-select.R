@@ -104,7 +104,7 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE, query_lis
   query_list <- sql_render(query$from, con, ..., subquery = TRUE, query_list = query_list)
 
   select_sql <- dbplyr_query_select(
-    con, query$select, query_list_from(query_list, con),
+    con, query$select, query_list_from(query_list, con, subquery = TRUE),
     where = query$where,
     group_by = query$group_by,
     having = query$having,

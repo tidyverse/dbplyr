@@ -31,9 +31,9 @@ print.join_query <- function(x, ...) {
 #' @export
 sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, query_list = NULL) {
   from_x_query_list <- sql_render(query$x, con, ..., subquery = TRUE, query_list = query_list)
-  from_x <- query_list_from(from_x_query_list, con, "LHS")
+  from_x <- query_list_from(from_x_query_list, con, "LHS", subquery = TRUE)
   from_y_query_list <- sql_render(query$y, con, ..., subquery = TRUE, query_list = from_x_query_list)
-  from_y <- query_list_from(from_y_query_list, con, "RHS")
+  from_y <- query_list_from(from_y_query_list, con, "RHS", subquery = TRUE)
 
   join_sql <- dbplyr_query_join(con, from_x, from_y,
     vars = query$vars,

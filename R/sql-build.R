@@ -99,12 +99,21 @@ cte_wrap <- function(query_list, sql, render = TRUE) {
   }
 }
 
-query_list_from <- function(query_list, con, name = NULL) {
+query_list_from <- function(query_list, con, name = NULL, subquery = FALSE) {
   if (is.list(query_list)) {
     last_query <- dplyr::last(query_list)
-    purrr::set_names(maybe_ident(last_query$name), name)
+    query <- purrr::set_names(maybe_ident(last_query$name), name)
+    if (subquery) {
+      query
+    } else {
+      dbplyr_query_select(con, sql("*"), query)
+    }
   } else {
-    dbplyr_sql_subquery(con, query_list, name = name)
+    if (subquery) {
+      dbplyr_sql_subquery(con, query_list, name = name)
+    } else {
+      query_list
+    }
   }
 }
 
