@@ -101,6 +101,10 @@ simulate_vars <- function(x) {
 # op_select ---------------------------------------------------------------
 
 op_select <- function(x, vars) {
+  if (can_select_return_early(x, vars)) {
+    return(x)
+  }
+
   if (inherits(x, "op_select")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
@@ -125,6 +129,18 @@ op_select <- function(x, vars) {
   }
 
   new_op_select(x, vars)
+}
+
+can_select_return_early <- function(x, vars) {
+  if (!all(vapply(vars, is_symbol, logical(1)))) {
+    return(FALSE)
+  }
+
+  if (!identical(op_vars(x), names(vars))) {
+    return(FALSE)
+  }
+
+  identical(syms(op_vars(x)), unname(vars))
 }
 
 # SELECT in the SQL sense - powers select(), rename(), mutate(), and transmute()
