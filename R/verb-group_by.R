@@ -83,15 +83,12 @@ can_group_by_can_return_early <- function(data_old, data_new, groups_new) {
 #' @importFrom dplyr ungroup
 #' @export
 ungroup.tbl_lazy <- function(x, ...) {
-  add_op_single("ungroup", x)
-}
-
-#' @export
-op_grps.op_ungroup <- function(op) {
-  character()
-}
-
-#' @export
-sql_build.op_ungroup <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  if (missing(...)) {
+    group_by(x)
+  } else {
+    old_groups <- group_vars(x)
+    to_remove <- tidyselect::vars_select(op_vars(x), ...)
+    new_groups <- setdiff(old_groups, to_remove)
+    group_by(x, !!!syms(new_groups))
+  }
 }
