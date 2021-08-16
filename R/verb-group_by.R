@@ -37,11 +37,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
     stop("`.drop` is not supported with database backends", call. = FALSE)
   }
 
-  if (".add" %in% names(formals("group_by"))) {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
-  } else {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, add = .add)
-  }
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
 
   if (can_group_by_can_return_early(.data, groups$data, groups$groups)) {
