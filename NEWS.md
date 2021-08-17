@@ -9,6 +9,7 @@
 
 * `if_else()` now supports the `missing` argument (@mgirlich, #641).
 
+* `pivot_wider()` works with multiple `names_from` columns (@mgirlich, #693).
 
 # dbplyr 2.1.1
 

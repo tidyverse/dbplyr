@@ -210,3 +210,23 @@ test_that("column order in output matches spec", {
 test_that("cannot pivot lazy frames", {
   expect_snapshot_error(tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
 })
+
+# multiple names ----------------------------------------------------------
+
+test_that("", {
+  x <- tibble(
+    seq = c(1, 1, 2, 2),
+    name = rep(c("id", "name"), 2),
+    value = c("01", "curie", "02", "arrhenius")
+  )
+
+  expect_equal(
+    memdb_frame(x) %>%
+      tidyr::pivot_wider(
+        names_from = c(name, seq),
+        values_from = value
+      ) %>%
+      collect(),
+    tibble(id_1 = "01", name_1 = "curie", id_2 = "02", name_2 = "arrhenius")
+  )
+})
