@@ -213,7 +213,7 @@ test_that("cannot pivot lazy frames", {
 
 # multiple names ----------------------------------------------------------
 
-test_that("", {
+test_that("can pivot multiple from multiple names", {
   x <- tibble(
     seq = c(1, 1, 2, 2),
     name = rep(c("id", "name"), 2),
