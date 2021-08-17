@@ -9,6 +9,7 @@
 
 * `if_else()` now supports the `missing` argument (@mgirlich, #641).
 
+* `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692).
 
 # dbplyr 2.1.1
 

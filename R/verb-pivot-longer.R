@@ -112,6 +112,16 @@ dbplyr_pivot_longer_spec <- function(data,
   id_cols <- syms(setdiff(colnames(data), spec$.name))
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
+  nms_map <- tibble(
+    name = colnames(spec_split$key),
+    name_mapped = ifelse(
+      name %in% unlist(spec_split$key),
+      paste0("..", name),
+      name
+    )
+  )
+  spec_split$key <- set_names(spec_split$key, nms_map$name_mapped)
+
   data_long_list <- purrr::map(
     vctrs::vec_seq_along(spec_split),
     function(idx) {
@@ -145,6 +155,13 @@ dbplyr_pivot_longer_spec <- function(data,
       value_cols,
       dplyr::all_vars(!is.na(.))
     )
+  }
+
+  # TODO remove if clause after `select()` gets early return
+  # https://github.com/tidyverse/dbplyr/pull/691
+  if (any(nms_map$name != nms_map$name_mapped)) {
+    data_long <- data_long %>%
+      rename(!!!tibble::deframe(nms_map))
   }
 
   data_long

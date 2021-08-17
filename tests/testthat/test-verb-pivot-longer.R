@@ -25,7 +25,7 @@ test_that("can add multiple columns from spec", {
     b = 13:14
   )
   pv <- lazy_frame(x = 1:2, y = 3:4) %>%
-    dbplyr_pivot_longer_spec(df_db, spec = sp)
+    dbplyr_pivot_longer_spec(spec = sp)
 
   expect_equal(colnames(pv), c("a", "b", "v"))
   expect_snapshot(pv)
@@ -152,4 +152,18 @@ test_that("grouping is preserved", {
     group_by(g) %>%
     tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
   expect_equal(group_vars(out), "g")
+})
+
+test_that("can pivot column with name equal to `names_to`", {
+  df <- memdb_frame(id = 1:2, name2 = c("x", "y"))
+  expect_equal(
+    df %>%
+      tidyr::pivot_longer(name2, names_to = "name2") %>%
+      collect(),
+    tibble(
+      id = 1:2,
+      name2 = "name2",
+      value = c("x", "y")
+    )
+  )
 })
