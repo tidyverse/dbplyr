@@ -110,6 +110,9 @@ dbplyr_pivot_longer_spec <- function(data,
   spec <- deduplicate_spec(spec, data)
 
   id_cols <- syms(setdiff(colnames(data), spec$.name))
+  repair_info <- apply_name_repair_pivot_longer(id_cols, spec, names_repair)
+  id_cols <- repair_info$id_cols
+  spec <- repair_info$spec
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
   nms_map <- tibble(
@@ -184,6 +187,26 @@ get_measure_column_exprs <- function(name, value, values_transform) {
       }
     }
   )
+}
+
+apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
+  nms_map_df <- vctrs::vec_rbind(
+    tibble(from = "id_cols", name = as.character(id_cols)),
+    tibble(from = "measure_cols", name = colnames(spec)[-(1:2)]),
+    tibble(from = "value_cols", name = unique(spec[[".value"]]))
+  ) %>%
+    mutate(name_rep = vctrs::vec_as_names(name, repair = names_repair))
+  nms_map <- split(nms_map_df, nms_map_df$from)
+
+  id_cols <- purrr::set_names(id_cols, nms_map$id_cols$name_rep)
+  colnames(spec)[-(1:2)] <- nms_map$measure_cols$name_rep
+  value_nms_map <- purrr::set_names(
+    nms_map$value_cols$name_rep,
+    nms_map$value_cols$name
+  )
+  spec$.value <- dplyr::recode(spec$.value, !!!value_nms_map)
+
+  list(id_cols = id_cols, spec = spec)
 }
 
 # The following is copy-pasted from `tidyr`

@@ -167,3 +167,21 @@ test_that("can pivot column with name equal to `names_to`", {
     )
   )
 })
+
+test_that("can repair names", {
+  df <- memdb_frame(id = 1, x = "a", y = "r", name = "nm", value = "val")
+
+  expect_snapshot(out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique"))
+  expect_equal(colnames(out), c("id", "name...2", "value...3", "name...4", "value...5"))
+
+  expect_equal(
+    collect(out),
+    tibble(
+      id = 1,
+      name...2 = "nm",
+      value...3 = "val",
+      name...4 = c("x", "y"),
+      value...5 = c("a", "r")
+    )
+  )
+})

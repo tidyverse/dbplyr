@@ -11,6 +11,8 @@
 
 * `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692).
 
+* `pivot_longer()` can now repair names (@mgirlich, #694).
+
 # dbplyr 2.1.1
 
 * New support for Snowflake (@edgararuiz)
