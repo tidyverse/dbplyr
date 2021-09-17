@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
+
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
 
 * The SQL translation of `quantile()` now doesn't error anymore when using
