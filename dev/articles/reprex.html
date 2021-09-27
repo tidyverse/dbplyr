@@ -177,7 +177,7 @@
 <code class="sourceCode R"><span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">mf</span>
 <span class="co">#&gt; # Source:   table&lt;dbplyr_001&gt; [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt;</span>
 <span class="co">#&gt; 1     1     1     5</span>
@@ -185,12 +185,11 @@
 <span class="co">#&gt; 3     2     3     3</span>
 <span class="co">#&gt; 4     2     4     2</span>
 <span class="co">#&gt; 5     2     5     1</span>
-
 <span class="va">mf</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise_all.html">summarise_all</a></span><span class="op">(</span><span class="va">mean</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;       g     x     y</span>
 <span class="co">#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1     1   1.5   4.5</span>
@@ -221,7 +220,6 @@
 <span class="co">#&gt; SELECT *</span>
 <span class="co">#&gt; FROM `df`</span>
 <span class="co">#&gt; LIMIT 5</span>
-
 <span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/simulate_hive.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span>

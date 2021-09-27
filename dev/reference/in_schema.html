@@ -231,7 +231,7 @@ quoted; use <code><a href='sql.html'>sql()</a></code> to pass a raw name that wo
 
 <span class='va'>con</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='st'>"df"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;df&gt; [?? x 5]</span>
-#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span>
 #&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 #&gt;           <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  
 #&gt; <span style='color: #BCBCBC;'> 1</span>          5.1         3.5          1.4         0.2 setosa 
@@ -246,7 +246,7 @@ quoted; use <code><a href='sql.html'>sql()</a></code> to pass a raw name that wo
 #&gt; <span style='color: #BCBCBC;'>10</span>          4.9         3.1          1.5         0.1 setosa 
 #&gt; <span style='color: #949494;'># … with more rows</span></div><div class='input'><span class='va'>con</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"aux"</span>, <span class='st'>"df"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;`aux`.`df`&gt; [?? x 11]</span>
-#&gt; <span style='color: #949494;'># Database: sqlite 3.35.5 [:memory:]</span>
+#&gt; <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span>
 #&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #&gt;    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
 #&gt; <span style='color: #BCBCBC;'> 1</span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4

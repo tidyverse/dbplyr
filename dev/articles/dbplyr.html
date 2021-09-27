@@ -217,7 +217,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_db</span> 
 <span class="co">#&gt; # Source:   table&lt;flights&gt; [?? x 19]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;</span>
 <span class="co">#&gt; 1  2013     1     1      517            515         2      830            819</span>
@@ -239,7 +239,7 @@
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 5]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;    year month   day dep_delay arr_delay</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
 <span class="co">#&gt; 1  2013     1     1         2        11</span>
@@ -249,10 +249,9 @@
 <span class="co">#&gt; 5  2013     1     1        -6       -25</span>
 <span class="co">#&gt; 6  2013     1     1        -4        12</span>
 <span class="co">#&gt; # … with more rows</span>
-
 <span class="va">flights_db</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 19]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;</span>
 <span class="co">#&gt; 1  2013     1     1      848           1835       853     1001           1950</span>
@@ -264,7 +263,6 @@
 <span class="co">#&gt; # … with more rows, and 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;,</span>
 <span class="co">#&gt; #   flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;</span>
-
 <span class="va">flights_db</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dep_time</span><span class="op">)</span><span class="op">)</span>
@@ -272,7 +270,7 @@
 <span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span>
 <span class="co">#&gt; This warning is displayed only once per session.</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 2]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;   dest  delay</span>
 <span class="co">#&gt;   &lt;chr&gt; &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 ABQ   2006.</span>
@@ -304,7 +302,7 @@
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; ℹ Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="co">#&gt; # Source:     lazy query [?? x 3]</span>
-<span class="co">#&gt; # Database:   sqlite 3.35.5 [:memory:]</span>
+<span class="co">#&gt; # Database:   sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt; # Ordered by: desc(delay)</span>
 <span class="co">#&gt;   tailnum delay     n</span>
 <span class="co">#&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;</span>
@@ -351,7 +349,6 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
 <span class="co">#&gt; [1] NA</span>
-
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
 <span class="co">#&gt; Error: tail() is not supported by sql sources</span></code></pre></div>
 <p>You can also ask the database how it plans to execute the query with <code><a href="https://dplyr.tidyverse.org/reference/explain.html">explain()</a></code>. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute the query efficiently, or if you need to create new indices.</p>
