@@ -40,8 +40,9 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
 
-  if (can_group_by_can_return_early(.data, groups$data, groups$groups)) {
-    return(.data)
+  group_by_can_return_early <- setequal(groups$group_names, group_vars(.data))
+  if (group_by_can_return_early) {
+    return(groups$data)
   }
 
   add_op_single("group_by",
@@ -68,10 +69,6 @@ op_grps.op_group_by <- function(op) {
 #' @export
 sql_build.op_group_by <- function(op, con, ...) {
   sql_build(op$x, con, ...)
-}
-
-can_group_by_can_return_early <- function(data_old, data_new, groups_new) {
-  setequal(data_new, data_old) && setequal(groups_new, group_vars(data_old))
 }
 
 # ungroup -----------------------------------------------------------------
