@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `expand()` now works in DuckDB (@mgirlich, #712).
+
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
 
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
