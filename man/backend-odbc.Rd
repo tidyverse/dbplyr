@@ -7,7 +7,7 @@
 simulate_odbc()
 }
 \description{
-See \code{vignette("translate-function")} and \code{vignette("translate-verb")} for
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology. Key differences for this backend
 are minor translations for common data types.
 
