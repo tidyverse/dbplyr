@@ -4,13 +4,27 @@
 \alias{mutate.tbl_lazy}
 \title{Create, modify, and delete columns}
 \usage{
-\method{mutate}{tbl_lazy}(.data, ...)
+\method{mutate}{tbl_lazy}(.data, ..., .keep = c("all", "used", "unused", "none"))
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+
+\item{.keep}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
+This is an experimental argument that allows you to control which columns
+from \code{.data} are retained in the output:
+\itemize{
+\item \code{"all"}, the default, retains all variables.
+\item \code{"used"} keeps any variables used to make new variables; it's useful
+for checking your work as it displays inputs and outputs side-by-side.
+\item \code{"unused"} keeps only existing variables \strong{not} used to make new
+variables.
+\item \code{"none"}, only keeps grouping keys (like \code{\link[dplyr:mutate]{transmute()}}).
+}
+
+Grouping variables are always kept, unconditional to \code{.keep}.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated

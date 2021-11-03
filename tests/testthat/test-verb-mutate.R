@@ -76,6 +76,104 @@ test_that("supports overwriting variables (#3222)", {
   expect_equal(df, tibble(x = 1, y = 5))
 })
 
+test_that("can simplify layers", {
+  # inner query should only select `y`
+  expect_snapshot(
+    lazy_frame(x = 1, y = 2) %>%
+      transmute(y = y + 1, y = y + 1)
+  )
+})
+
+
+# .keep -------------------------------------------------------------------
+
+test_that(".keep = 'unused' keeps variables explicitly mentioned", {
+  df <- lazy_frame(x = 1, y = 2)
+  out <- mutate(df, x1 = x + 1, y = y, .keep = "unused")
+  expect_equal(op_vars(out), c("y", "x1"))
+})
+
+test_that(".keep = 'used' not affected by across()", {
+  df <- lazy_frame(x = 1, y = 2, z = 3, a = "a", b = "b", c = "c")
+
+  # This must evaluate every column in order to figure out if should
+  # be included in the set or not, but that shouldn't be counted for
+  # the purposes of "used" variables
+  out <- mutate(df, across(c("x", "y", "z"), identity), .keep = "unused")
+  expect_equal(op_vars(out), op_vars(df))
+})
+
+test_that(".keep = 'used' keeps variables used in expressions", {
+  df <- lazy_frame(a = 1, b = 2, c = 3, x = 1, y = 2)
+  out <- mutate(df, xy = x + y, .keep = "used")
+  expect_equal(op_vars(out), c("x", "y", "xy"))
+})
+
+test_that(".keep = 'none' only keeps grouping variables", {
+  df <- lazy_frame(x = 1, y = 2)
+  gf <- group_by(df, x)
+
+  expect_equal(op_vars(mutate(df, z = 1, .keep = "none")), "z")
+  expect_equal(op_vars(mutate(gf, z = 1, .keep = "none")), c("x", "z"))
+})
+
+test_that(".keep = 'none' retains original ordering (#5967)", {
+  df <- lazy_frame(x = 1, y = 2)
+  expect_equal(
+    df %>% mutate(y = 1, x = 2, .keep = "none") %>% op_vars(),
+    c("x", "y")
+  )
+
+  # even when grouped
+  gf <- group_by(df, x)
+  expect_equal(
+    gf %>% mutate(y = 1, x = 2, .keep = "none") %>% op_vars(),
+    c("x", "y")
+  )
+})
+
+test_that("dropping column with `NULL` then readding it retains original location", {
+  df <- lazy_frame(x = 1, y = 2, z = 3, a = 4)
+  df <- group_by(df, z)
+
+  expect_equal(
+    mutate(df, y = NULL, y = 3, .keep = "all") %>% op_vars(),
+    c("x", "y", "z", "a")
+  )
+  expect_equal(
+    mutate(df, b = a, y = NULL, y = 3, .keep = "used") %>% op_vars(),
+    c("y", "z", "a", "b")
+  )
+  expect_equal(
+    mutate(df, b = a, y = NULL, y = 3, .keep = "unused") %>% op_vars(),
+    c("x", "y", "z", "b")
+  )
+
+  skip("`.before` not yet supported")
+  # It isn't treated as a "new" column
+  expect_equal(mutate(df, y = NULL, y = 3, .keep = "all", .before = x) %>% op_vars(), c("x", "y", "z", "a"))
+})
+
+test_that(".keep= always retains grouping variables (#5582)", {
+  df <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(z)
+  expect_equal(
+    df %>% mutate(a = x + 1, .keep = "none") %>% op_vars(),
+    c("z", "a")
+  )
+  expect_equal(
+    df %>% mutate(a = x + 1, .keep = "all") %>% op_vars(),
+    c("x", "y", "z", "a")
+  )
+  expect_equal(
+    df %>% mutate(a = x + 1, .keep = "used") %>% op_vars(),
+    c("x", "z", "a")
+  )
+  expect_equal(
+    df %>% mutate(a = x + 1, .keep = "unused") %>% op_vars(),
+    c("y", "z", "a")
+  )
+})
+
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {

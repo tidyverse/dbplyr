@@ -21,53 +21,116 @@
 #' db %>%
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
-mutate.tbl_lazy <- function(.data, ...) {
+mutate.tbl_lazy <- function(.data, ..., .keep = c("all", "used", "unused", "none")) {
+  keep <- arg_match(.keep)
+
   dots <- quos(..., .named = TRUE)
+  if (!is_null(dots[[".before"]])) {
+    abort("`mutate()` for lazy tables does not support the `.before` argument")
+  }
+  if (!is_null(dots[[".after"]])) {
+    abort("`mutate()` for lazy tables does not support the `.after` argument")
+  }
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
 
-  nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
+  cols_data <- op_vars(.data)
+  cols_group <- group_vars(.data)
+
+  cols_expr <- names(dots)
+  cols_expr_modified <- intersect(cols_expr, cols_data)
+
+  cols_used <- setdiff(get_expr_vars(dots), c(cols_group, cols_expr_modified))
+  cols_unused <- setdiff(cols_data, c(cols_group, cols_expr_modified, get_expr_vars(dots)))
+
+  cols_out <- union(cols_data, cols_expr)
+  if (keep == "all") {
+    cols_retain <- cols_out
+  } else if (keep == "used") {
+    cols_retain <- setdiff(cols_out, cols_unused)
+  } else if (keep == "unused") {
+    cols_retain <- setdiff(cols_out, cols_used)
+  } else if (keep == "none") {
+    cols_retain <- setdiff(cols_out, c(cols_used, cols_unused))
+  }
+
+  layers <- get_mutate_layers(dots, cols_data, cols_retain)
+
+  for (layer in layers) {
+    .data$ops <- op_select(.data$ops, layer)
+  }
+
+  .data
 }
 
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- dbplyr_check_transmute_args(...)
+  mutate(.data, !!!dots, .keep = "none")
+}
 
-  missing_group_vars <- syms(setdiff(group_vars(.data), names(dots)))
-  dots <- c(set_names(missing_group_vars), dots)
-
-  nest_vars(.data, dots, character())
+# copy of `dplyr:::check_transmute_args()`
+dbplyr_check_transmute_args <- function (..., .keep, .before, .after) {
+  if (!missing(.keep)) {
+    abort("`transmute()` does not support the `.keep` argument")
+  }
+  if (!missing(.before)) {
+    abort("`transmute()` does not support the `.before` argument")
+  }
+  if (!missing(.after)) {
+    abort("`transmute()` does not support the `.after` argument")
+  }
+  enquos(...)
 }
 
 # helpers -----------------------------------------------------------------
 
-# TODO: refactor to remove `.data` argument and return a list of layers.
-nest_vars <- function(.data, dots, all_vars) {
-  # For each expression, check if it uses any newly created variables.
-  # If so, nest the mutate()
-  new_vars <- character()
-  init <- 0L
+get_expr_vars <- function(dots) {
+  used_vars <- character()
+
   for (i in seq_along(dots)) {
-    cur_var <- names(dots)[[i]]
-    used_vars <- all_names(get_expr(dots[[i]]))
+    cur_used_vars <- all_names(get_expr(dots[[i]]))
+    used_vars <- c(used_vars, cur_used_vars)
+  }
+
+  unique(used_vars)
+}
+
+get_mutate_layers <- function(dots, all_vars, vars_out) {
+  # For each expression, check if it uses any newly created variables.
+  # If so, create a new layer
+  new_vars <- character()
+  layers <- list()
+  cur_layer <- set_names(syms(all_vars), all_vars)
+
+  for (i in seq_along(dots)) {
+    used_vars <- get_expr_vars(dots[i])
 
     if (any(used_vars %in% new_vars)) {
-      new_actions <- dots[seq2(init, length(dots))][new_vars]
-      .data$ops <- op_select(.data$ops, carry_over(union(all_vars, used_vars), new_actions))
+      layers <- append(layers, list(cur_layer))
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
-      new_vars <- cur_var
-      init <- i
-    } else {
-      new_vars <- c(new_vars, cur_var)
+      cur_layer <- set_names(syms(all_vars), all_vars)
+      new_vars <- character()
     }
+
+    cur_var <- names(dots)[[i]]
+    cur_layer[[cur_var]] <- dots[[i]]
+    new_vars <- c(new_vars, cur_var)
   }
 
-  if (init != 0L) {
-    dots <- dots[-seq2(1L, init - 1)]
+  layers <- append(layers, list(cur_layer))
+  simplify_mutate_layers(layers, vars_out)
+}
+
+simplify_mutate_layers <- function(layers, vars_out) {
+  # In each layer only keep the vars actually required
+  vars_required <- vars_out
+  for (i in rev(seq_along(layers))) {
+    layers[[i]] <- layers[[i]][vars_required]
+    vars_required <- get_expr_vars(layers[[i]])
   }
-  .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
-  .data
+
+  layers
 }
 
 # Combine a selection (passed through from subquery)

@@ -2,6 +2,8 @@
 
 * `transmute()` now keeps grouping variables (@mgirlich, #670).
 
+* `mutate()` now supports the `.keep` argument (@mgirlich, #671).
+
 # dbplyr 2.1.1
 
 * New support for Snowflake (@edgararuiz)

@@ -28,6 +28,16 @@
       SELECT `x`, 1.0 AS `z`
       FROM `df`
 
+# can simplify layers
+
+    Code
+      lazy_frame(x = 1, y = 2) %>% transmute(y = y + 1, y = y + 1)
+    Output
+      <SQL>
+      SELECT `y` + 1.0 AS `y`
+      FROM (SELECT `y` + 1.0 AS `y`
+      FROM `df`) `q01`
+
 # mutate generates subqueries as needed
 
     Code
