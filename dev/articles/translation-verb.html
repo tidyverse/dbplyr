@@ -172,16 +172,16 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> modify the <code>SELECT</code> clause:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"delay"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `dep_delay`, `arr_delay`
 ## FROM `nycflights13::flights`</code></pre>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op">%&gt;%</span>  
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">distance</span>, <span class="va">air_time</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>  
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>speed <span class="op">=</span> <span class="va">distance</span> <span class="op">/</span> <span class="op">(</span><span class="va">air_time</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`
@@ -191,8 +191,8 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code> generates a <code>WHERE</code> clause:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">1</span>, <span class="va">day</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
@@ -202,8 +202,8 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code> generates an <code>ORDER BY</code> clause:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">carrier</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">arr_delay</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## &lt;SQL&gt;
 ## SELECT *
@@ -213,9 +213,9 @@
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by()</a></code> work together to generate a <code>GROUP BY</code> clause:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">flights</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning: Missing values are always removed in SQL.
 ## Use `mean(x, na.rm = TRUE)` to silence this warning
@@ -266,20 +266,20 @@
 <td><code>SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://generics.r-lib.org/reference/setops.html">intersect(x, y)</a></code></td>
+<td><code>intersect(x, y)</code></td>
 <td><code>SELECT * FROM x INTERSECT SELECT * FROM y</code></td>
 </tr>
 <tr class="even">
-<td><code><a href="https://generics.r-lib.org/reference/setops.html">union(x, y)</a></code></td>
+<td><code>union(x, y)</code></td>
 <td><code>SELECT * FROM x UNION SELECT * FROM y</code></td>
 </tr>
 <tr class="odd">
-<td><code><a href="https://generics.r-lib.org/reference/setops.html">setdiff(x, y)</a></code></td>
+<td><code>setdiff(x, y)</code></td>
 <td><code>SELECT * FROM x EXCEPT SELECT * FROM y</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html">semi_join(x, y, copy = TRUE)</a></code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
+<p><code>x</code> and <code>y</code> don’t have to be tables in the same database. If you specify <code>copy = TRUE</code>, dplyr will copy the <code>y</code> table into the same location as the <code>x</code> variable. This is useful if you’ve downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use <code>semi_join(x, y, copy = TRUE)</code> to upload the indices of interest to a temporary table in the same database as <code>x</code>, and then perform a efficient semi join in the database.</p>
 <p>If you’re working with large data, it maybe also be helpful to set <code>auto_index = TRUE</code>. That will automatically add an index on the join variables to the temporary table.</p>
 </div>
 <div id="behind-the-scenes" class="section level2">

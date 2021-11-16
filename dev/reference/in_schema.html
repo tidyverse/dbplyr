@@ -214,52 +214,57 @@ quoted; use <code><a href='sql.html'>sql()</a></code> to pass a raw name that wo
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"my_schema"</span>, <span class='st'>"my_table"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SCHEMA&gt; `my_schema`.`my_table`</div><div class='input'><span class='co'># eliminate quotes</span>
-<span class='fu'>in_schema</span><span class='op'>(</span><span class='fu'><a href='sql.html'>sql</a></span><span class='op'>(</span><span class='st'>"my_schema"</span><span class='op'>)</span>, <span class='fu'><a href='sql.html'>sql</a></span><span class='op'>(</span><span class='st'>"my_table"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SCHEMA&gt; my_schema.my_table</div><div class='input'>
-<span class='co'># Example using schemas with SQLite</span>
-<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span><span class='op'>(</span><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>":memory:"</span><span class='op'>)</span>
-
-<span class='co'># Add auxilary schema</span>
-<span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbExecute.html'>dbExecute</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"ATTACH '"</span>, <span class='va'>tmp</span>, <span class='st'>"' AS aux"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>iris</span>, <span class='st'>"df"</span>, temporary <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-<span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>mtcars</span>, <span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"aux"</span>, <span class='st'>"df"</span><span class='op'>)</span>, temporary <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='va'>con</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='st'>"df"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;df&gt; [?? x 5]</span>
-#&gt; <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span>
-#&gt;    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-#&gt;           <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  
-#&gt; <span style='color: #BCBCBC;'> 1</span>          5.1         3.5          1.4         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 2</span>          4.9         3            1.4         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 3</span>          4.7         3.2          1.3         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 4</span>          4.6         3.1          1.5         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 5</span>          5           3.6          1.4         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 6</span>          5.4         3.9          1.7         0.4 setosa 
-#&gt; <span style='color: #BCBCBC;'> 7</span>          4.6         3.4          1.4         0.3 setosa 
-#&gt; <span style='color: #BCBCBC;'> 8</span>          5           3.4          1.5         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'> 9</span>          4.4         2.9          1.4         0.2 setosa 
-#&gt; <span style='color: #BCBCBC;'>10</span>          4.9         3.1          1.5         0.1 setosa 
-#&gt; <span style='color: #949494;'># … with more rows</span></div><div class='input'><span class='va'>con</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"aux"</span>, <span class='st'>"df"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;`aux`.`df`&gt; [?? x 11]</span>
-#&gt; <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span>
-#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
-#&gt;    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'> 1</span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4
-#&gt; <span style='color: #BCBCBC;'> 2</span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4
-#&gt; <span style='color: #BCBCBC;'> 3</span>  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1
-#&gt; <span style='color: #BCBCBC;'> 4</span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1
-#&gt; <span style='color: #BCBCBC;'> 5</span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2
-#&gt; <span style='color: #BCBCBC;'> 6</span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1
-#&gt; <span style='color: #BCBCBC;'> 7</span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4
-#&gt; <span style='color: #BCBCBC;'> 8</span>  24.4     4  147.    62  3.69  3.19  20       1     0     4     2
-#&gt; <span style='color: #BCBCBC;'> 9</span>  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2
-#&gt; <span style='color: #BCBCBC;'>10</span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4
-#&gt; <span style='color: #949494;'># … with more rows</span></div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"my_schema"</span>, <span class='st'>"my_table"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SCHEMA&gt; `my_schema`.`my_table`</span>
+<span class='r-in'><span class='co'># eliminate quotes</span></span>
+<span class='r-in'><span class='fu'>in_schema</span><span class='op'>(</span><span class='fu'><a href='sql.html'>sql</a></span><span class='op'>(</span><span class='st'>"my_schema"</span><span class='op'>)</span>, <span class='fu'><a href='sql.html'>sql</a></span><span class='op'>(</span><span class='st'>"my_table"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SCHEMA&gt; my_schema.my_table</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Example using schemas with SQLite</span></span>
+<span class='r-in'><span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbConnect.html'>dbConnect</a></span><span class='op'>(</span><span class='fu'>RSQLite</span><span class='fu'>::</span><span class='fu'><a href='https://rsqlite.r-dbi.org/reference/SQLite.html'>SQLite</a></span><span class='op'>(</span><span class='op'>)</span>, <span class='st'>":memory:"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Add auxilary schema</span></span>
+<span class='r-in'><span class='va'>tmp</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbExecute.html'>dbExecute</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"ATTACH '"</span>, <span class='va'>tmp</span>, <span class='st'>"' AS aux"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>iris</span>, <span class='st'>"df"</span>, temporary <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://dplyr.tidyverse.org/reference/copy_to.html'>copy_to</a></span><span class='op'>(</span><span class='va'>con</span>, <span class='va'>mtcars</span>, <span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"aux"</span>, <span class='st'>"df"</span><span class='op'>)</span>, temporary <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>con</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='st'>"df"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:   table&lt;df&gt; [?? x 5]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    Sepal.Length Sepal.Width Petal.Length Petal.Width Species</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>        <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>       <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span>          5.1         3.5          1.4         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span>          4.9         3            1.4         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span>          4.7         3.2          1.3         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span>          4.6         3.1          1.5         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span>          5           3.6          1.4         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span>          5.4         3.9          1.7         0.4 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>          4.6         3.4          1.4         0.3 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span>          5           3.4          1.5         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span>          4.4         2.9          1.4         0.2 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>          4.9         3.1          1.5         0.1 setosa </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with more rows</span></span>
+<span class='r-in'><span class='va'>con</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/tbl.html'>tbl</a></span><span class='op'>(</span><span class='fu'>in_schema</span><span class='op'>(</span><span class='st'>"aux"</span>, <span class='st'>"df"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:   table&lt;`aux`.`df`&gt; [?? x 11]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span>  21       6  160    110  3.9   2.62  16.5     0     1     4     4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span>  21       6  160    110  3.9   2.88  17.0     0     1     4     4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span>  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span>  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span>  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span>  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span>  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span>  24.4     4  147.    62  3.69  3.19  20       1     0     4     2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span>  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span>  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with more rows</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

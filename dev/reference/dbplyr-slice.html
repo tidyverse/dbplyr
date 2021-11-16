@@ -210,7 +210,7 @@ window functions (<code>ROWNUMBER</code>, <code>MIN_RANK</code>, or <code>CUME_D
 arguments). <code><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice()</a></code>, <code><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_head()</a></code>, and <code><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_tail()</a></code> are not supported
 since database tables have no intrinsic order.</p>
 <p>If data is grouped, the operation will be performed on each group so that
-(e.g.) <code><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min(db, x, n = 3)</a></code> will select the three rows with the smallest
+(e.g.) <code>slice_min(db, x, n = 3)</code> will select the three rows with the smallest
 value of <code>x</code> in each group.</p>
     </div>
 
@@ -261,55 +261,62 @@ the first n rows.</p></td>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`
-#&gt; FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x`) AS `q01`
-#&gt; FROM `dbplyr_006`)
-#&gt; WHERE (`q01` &lt;= 1)</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_max</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`
-#&gt; FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x` DESC) AS `q01`
-#&gt; FROM `dbplyr_006`)
-#&gt; WHERE (`q01` &lt;= 1)</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_sample</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`
-#&gt; FROM (SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY random()) AS `q01`
-#&gt; FROM `dbplyr_006`)
-#&gt; WHERE (`q01` &lt;= 1)</div><div class='input'>
-<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`
-#&gt; FROM (SELECT `x`, `y`, RANK() OVER (PARTITION BY `y` ORDER BY `x`) AS `q01`
-#&gt; FROM `dbplyr_006`)
-#&gt; WHERE (`q01` &lt;= 1)</div><div class='input'>
-<span class='co'># By default, ties are includes so you may get more rows</span>
-<span class='co'># than you expect</span>
-<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     lazy query [?? x 2]</span>
-#&gt; <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span>
-#&gt; <span style='color: #949494;'># Ordered by: y</span>
-#&gt;       x     y
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>     1     1
-#&gt; <span style='color: #BCBCBC;'>2</span>     2     1</div><div class='input'><span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     lazy query [?? x 2]</span>
-#&gt; <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span>
-#&gt; <span style='color: #949494;'># Ordered by: y</span>
-#&gt;       x     y
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>     1     1</div><div class='input'>
-<span class='co'># Non-integer group sizes are rounded down</span>
-<span class='va'>db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     lazy query [?? x 2]</span>
-#&gt; <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span>
-#&gt; <span style='color: #949494;'># Ordered by: x</span>
-#&gt;       x     y
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>     1     1</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x`) AS `q01`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_006`)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> WHERE (`q01` &lt;= 1)</span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_max</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM (SELECT `x`, `y`, RANK() OVER (ORDER BY `x` DESC) AS `q01`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_006`)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> WHERE (`q01` &lt;= 1)</span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_sample</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM (SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY random()) AS `q01`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_006`)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> WHERE (`q01` &lt;= 1)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM (SELECT `x`, `y`, RANK() OVER (PARTITION BY `y` ORDER BY `x`) AS `q01`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_006`)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> WHERE (`q01` &lt;= 1)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># By default, ties are includes so you may get more rows</span></span>
+<span class='r-in'><span class='co'># than you expect</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:     lazy query [?? x 2]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Ordered by: y</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       x     y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>     1     1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span>     2     1</span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>y</span>, n <span class='op'>=</span> <span class='fl'>1</span>, with_ties <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:     lazy query [?? x 2]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Ordered by: y</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       x     y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>     1     1</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Non-integer group sizes are rounded down</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice_min</a></span><span class='op'>(</span><span class='va'>x</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:     lazy query [?? x 2]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Ordered by: x</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       x     y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>     1     1</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

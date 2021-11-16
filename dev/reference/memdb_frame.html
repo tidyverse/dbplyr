@@ -236,35 +236,38 @@ unlikely to conflict with an existing table.</p></td>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>memdb_frame</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:     table&lt;dbplyr_022&gt; [?? x 2]</span>
-#&gt; <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span>
-#&gt; <span style='color: #949494;'># Ordered by: x</span>
-#&gt;          x      y
-#&gt;      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'> 1</span> 0.008<span style='text-decoration: underline;'>42</span> 0.435 
-#&gt; <span style='color: #BCBCBC;'> 2</span> 0.020<span style='text-decoration: underline;'>2</span>  0.208 
-#&gt; <span style='color: #BCBCBC;'> 3</span> 0.021<span style='text-decoration: underline;'>5</span>  0.481 
-#&gt; <span style='color: #BCBCBC;'> 4</span> 0.022<span style='text-decoration: underline;'>8</span>  0.645 
-#&gt; <span style='color: #BCBCBC;'> 5</span> 0.025<span style='text-decoration: underline;'>1</span>  0.345 
-#&gt; <span style='color: #BCBCBC;'> 6</span> 0.036<span style='text-decoration: underline;'>1</span>  0.088<span style='text-decoration: underline;'>3</span>
-#&gt; <span style='color: #BCBCBC;'> 7</span> 0.060<span style='text-decoration: underline;'>1</span>  0.520 
-#&gt; <span style='color: #BCBCBC;'> 8</span> 0.061<span style='text-decoration: underline;'>7</span>  0.709 
-#&gt; <span style='color: #BCBCBC;'> 9</span> 0.064<span style='text-decoration: underline;'>6</span>  0.469 
-#&gt; <span style='color: #BCBCBC;'>10</span> 0.065<span style='text-decoration: underline;'>4</span>  0.151 
-#&gt; <span style='color: #949494;'># … with more rows</span></div><div class='input'><span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT *
-#&gt; FROM `dbplyr_022`
-#&gt; ORDER BY `x`</div><div class='input'>
-<span class='va'>mtcars_db</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_memdb</span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span>
-<span class='va'>mtcars_db</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>cyl</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `cyl`, COUNT(*) AS `n`
-#&gt; FROM `mtcars`
-#&gt; GROUP BY `cyl`</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>memdb_frame</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:     table&lt;dbplyr_022&gt; [?? x 2]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database:   sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Ordered by: x</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          x      y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span> 0.008<span style='text-decoration: underline;'>42</span> 0.435 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span> 0.020<span style='text-decoration: underline;'>2</span>  0.208 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span> 0.021<span style='text-decoration: underline;'>5</span>  0.481 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span> 0.022<span style='text-decoration: underline;'>8</span>  0.645 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span> 0.025<span style='text-decoration: underline;'>1</span>  0.345 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span> 0.036<span style='text-decoration: underline;'>1</span>  0.088<span style='text-decoration: underline;'>3</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span> 0.060<span style='text-decoration: underline;'>1</span>  0.520 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span> 0.061<span style='text-decoration: underline;'>7</span>  0.709 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span> 0.064<span style='text-decoration: underline;'>6</span>  0.469 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span> 0.065<span style='text-decoration: underline;'>4</span>  0.151 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with more rows</span></span>
+<span class='r-in'><span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT *</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_022`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ORDER BY `x`</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>mtcars_db</span> <span class='op'>&lt;-</span> <span class='fu'>tbl_memdb</span><span class='op'>(</span><span class='va'>mtcars</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>mtcars_db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>cyl</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `cyl`, COUNT(*) AS `n`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `mtcars`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GROUP BY `cyl`</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

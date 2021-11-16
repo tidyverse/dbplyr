@@ -260,13 +260,13 @@ SQL for a grouped summary.</p></td>
     
 
 <p>The base translator, <code>base_sql</code>, provides custom mappings for for
-commonly used base functions including logical (<code><a href='https://rdrr.io/r/base/Logic.html'>!</a></code>, <code>&amp;</code>, <code><a href='https://rdrr.io/r/base/Logic.html'>|</a></code>),
-arithmetic (<code><a href='https://rdrr.io/r/base/Arithmetic.html'>^</a></code>), and comparison (<code><a href='https://rdrr.io/r/base/Comparison.html'>!=</a></code>) operators, as well as common
+commonly used base functions including logical (<code>!</code>, <code>&amp;</code>, <code>|</code>),
+arithmetic (<code>^</code>), and comparison (<code>!=</code>) operators, as well as common
 summary (<code><a href='https://rdrr.io/r/base/mean.html'>mean()</a></code>, <code><a href='https://rdrr.io/r/stats/cor.html'>var()</a></code>) and manipulation functions.</p>
 <p>All other functions will be preserved as is. R's infix functions
 (e.g. <code>%like%</code>) will be converted to their SQL equivalents (e.g. <code>LIKE</code>).
-You can use this to access SQL string concatenation: <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code> is mapped to
-<code>OR</code>, but <code>%||%</code> is mapped to <code><a href='https://rdrr.io/r/base/Logic.html'>||</a></code>. To suppress this behaviour, and force
+You can use this to access SQL string concatenation: <code>||</code> is mapped to
+<code>OR</code>, but <code>%||%</code> is mapped to <code>||</code>. To suppress this behaviour, and force
 errors immediately when dplyr doesn't know how to translate a function it
 encounters, using set the <code>dplyr.strict_sql</code> option to <code>TRUE</code>.</p>
 <p>You can also use <code><a href='sql.html'>sql()</a></code> to insert a raw sql string.</p>
@@ -278,54 +278,74 @@ encounters, using set the <code>dplyr.strict_sql</code> option to <code>TRUE</co
 from <code><a href='https://rdrr.io/r/stats/sd.html'>sd()</a></code> to the SQL aggregation function <code>STDEV</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Regular maths is translated in a very straightforward way</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>+</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x` + 1.0</div><div class='input'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>tan</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; SIN(`x`) + TAN(`y`)</div><div class='input'>
-<span class='co'># Note that all variable names are escaped</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>like</span> <span class='op'>==</span> <span class='st'>"x"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `like` = 'x'</div><div class='input'><span class='co'># In ANSI SQL: "" quotes variable _names_, '' quotes strings</span>
-
-<span class='co'># Logical operators are converted to their sql equivalents</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>&lt;</span> <span class='fl'>5</span> <span class='op'>&amp;</span> <span class='op'>!</span><span class='op'>(</span><span class='va'>y</span> <span class='op'>&gt;=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x` &lt; 5.0 AND NOT((`y` &gt;= 5.0))</div><div class='input'><span class='co'># xor() doesn't have a direct SQL equivalent</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Logic.html'>xor</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x` OR `y` AND NOT (`x` AND `y`)</div><div class='input'>
-<span class='co'># If is translated into case when</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'>&gt;</span> <span class='fl'>5</span><span class='op'>)</span> <span class='st'>"big"</span> <span class='kw'>else</span> <span class='st'>"small"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') END</div><div class='input'>
-<span class='co'># Infix functions are passed onto SQL with % removed</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'>%like%</span> <span class='st'>"Had%"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `first` like 'Had%'</div><div class='input'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'>%is%</span> <span class='cn'>NA</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `first` is NULL</div><div class='input'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"John"</span>, <span class='st'>"Roger"</span>, <span class='st'>"Robert"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `first` IN ('John', 'Roger', 'Robert')</div><div class='input'>
-<span class='co'># And be careful if you really want integers</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>==</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x` = 1.0</div><div class='input'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>==</span> <span class='fl'>1L</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x` = 1</div><div class='input'>
-<span class='co'># If you have an already quoted object, use translate_sql_:</span>
-<span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>+</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>t</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>translate_sql_</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>, con <span class='op'>=</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `y` + 1.0 / SIN(`t`)</div><div class='input'>
-<span class='co'># Windowed translation --------------------------------------------</span>
-<span class='co'># Known window functions automatically get OVER()</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
-#&gt; <span class='warning'>This warning is displayed only once per session.</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER ()</div><div class='input'>
-<span class='co'># Suppress this with window = FALSE</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, window <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Missing values are always removed in SQL.</span>
-#&gt; <span class='warning'>Use `mean(x, na.rm = TRUE)` to silence this warning</span>
-#&gt; <span class='warning'>This warning is displayed only once per session.</span></div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`)</div><div class='input'>
-<span class='co'># vars_group controls partition:</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, vars_group <span class='op'>=</span> <span class='st'>"cyl"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER (PARTITION BY `cyl`)</div><div class='input'>
-<span class='co'># and vars_order controls ordering for those functions that need it</span>
-<span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Windowed expression 'SUM(`mpg`)' does not have explicit order.</span>
-#&gt; <span class='warning'>Please use arrange() or window_order() to make determinstic.</span></div><div class='output co'>#&gt; &lt;SQL&gt; SUM(`mpg`) OVER (ROWS UNBOUNDED PRECEDING)</div><div class='input'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, vars_order <span class='op'>=</span> <span class='st'>"mpg"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; SUM(`mpg`) OVER (ORDER BY `mpg` ROWS UNBOUNDED PRECEDING)</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># Regular maths is translated in a very straightforward way</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>+</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x` + 1.0</span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>+</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>tan</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; SIN(`x`) + TAN(`y`)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Note that all variable names are escaped</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>like</span> <span class='op'>==</span> <span class='st'>"x"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `like` = 'x'</span>
+<span class='r-in'><span class='co'># In ANSI SQL: "" quotes variable _names_, '' quotes strings</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Logical operators are converted to their sql equivalents</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>&lt;</span> <span class='fl'>5</span> <span class='op'>&amp;</span> <span class='op'>!</span><span class='op'>(</span><span class='va'>y</span> <span class='op'>&gt;=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x` &lt; 5.0 AND NOT((`y` &gt;= 5.0))</span>
+<span class='r-in'><span class='co'># xor() doesn't have a direct SQL equivalent</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Logic.html'>xor</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x` OR `y` AND NOT (`x` AND `y`)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># If is translated into case when</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='kw'>if</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'>&gt;</span> <span class='fl'>5</span><span class='op'>)</span> <span class='st'>"big"</span> <span class='kw'>else</span> <span class='st'>"small"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; CASE WHEN (`x` &gt; 5.0) THEN ('big') WHEN NOT(`x` &gt; 5.0) THEN ('small') END</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Infix functions are passed onto SQL with % removed</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'>%like%</span> <span class='st'>"Had%"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `first` like 'Had%'</span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'>%is%</span> <span class='cn'>NA</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `first` is NULL</span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>first</span> <span class='op'><a href='https://rdrr.io/r/base/match.html'>%in%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"John"</span>, <span class='st'>"Roger"</span>, <span class='st'>"Robert"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `first` IN ('John', 'Roger', 'Robert')</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># And be careful if you really want integers</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>==</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x` = 1.0</span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>==</span> <span class='fl'>1L</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x` = 1</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># If you have an already quoted object, use translate_sql_:</span></span>
+<span class='r-in'><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/substitute.html'>quote</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>+</span> <span class='fl'>1</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/Trig.html'>sin</a></span><span class='op'>(</span><span class='va'>t</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>translate_sql_</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>, con <span class='op'>=</span> <span class='fu'><a href='simulate_hive.html'>simulate_dbi</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `y` + 1.0 / SIN(`t`)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Windowed translation --------------------------------------------</span></span>
+<span class='r-in'><span class='co'># Known window functions automatically get OVER()</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Missing values are always removed in SQL.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> This warning is displayed only once per session.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER ()</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Suppress this with window = FALSE</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, window <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Missing values are always removed in SQL.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Use `mean(x, na.rm = TRUE)` to silence this warning</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> This warning is displayed only once per session.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `mpg` &gt; AVG(`mpg`)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># vars_group controls partition:</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>&gt;</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, vars_group <span class='op'>=</span> <span class='st'>"cyl"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER (PARTITION BY `cyl`)</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># and vars_order controls ordering for those functions that need it</span></span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Windowed expression 'SUM(`mpg`)' does not have explicit order.</span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> Please use arrange() or window_order() to make determinstic.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; SUM(`mpg`) OVER (ROWS UNBOUNDED PRECEDING)</span>
+<span class='r-in'><span class='fu'>translate_sql</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/cumsum.html'>cumsum</a></span><span class='op'>(</span><span class='va'>mpg</span><span class='op'>)</span>, vars_order <span class='op'>=</span> <span class='st'>"mpg"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; SUM(`mpg`) OVER (ORDER BY `mpg` ROWS UNBOUNDED PRECEDING)</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

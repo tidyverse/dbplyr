@@ -261,30 +261,35 @@ from time to time.</p><ul>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='va'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='cn'>TRUE</span>, b <span class='op'>=</span> <span class='fl'>1</span>, c <span class='op'>=</span> <span class='fl'>2</span>, d <span class='op'>=</span> <span class='st'>"z"</span>, con <span class='op'>=</span> <span class='fu'><a href='simulate_hive.html'>simulate_mssql</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT TOP 6 *
-#&gt; FROM `df`</div><div class='input'><span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>b</span>, <span class='va'>c</span>, <span class='va'>d</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `b` + ' ' + `c` + ' ' + `d` AS `x`
-#&gt; FROM `df`</div><div class='input'>
-<span class='co'># Can use boolean as is:</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT *
-#&gt; FROM `df`
-#&gt; WHERE (`c` &gt; `d`)</div><div class='input'><span class='co'># Need to convert from boolean to bit:</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT CAST(IIF(`c` &gt; `d`, 1, 0) AS BIT) AS `x`
-#&gt; FROM `df`</div><div class='input'><span class='co'># Can use boolean as is:</span>
-<span class='va'>lf</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span>, <span class='st'>"c"</span>, <span class='st'>"d"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT IIF(`c` &gt; `d`, 'c', 'd') AS `x`
-#&gt; FROM `df`</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='tbl_lazy.html'>lazy_frame</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='cn'>TRUE</span>, b <span class='op'>=</span> <span class='fl'>1</span>, c <span class='op'>=</span> <span class='fl'>2</span>, d <span class='op'>=</span> <span class='st'>"z"</span>, con <span class='op'>=</span> <span class='fu'><a href='simulate_hive.html'>simulate_mssql</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT TOP 6 *</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `df`</span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='va'>b</span>, <span class='va'>c</span>, <span class='va'>d</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `b` + ' ' + `c` + ' ' + `d` AS `x`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `df`</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Can use boolean as is:</span></span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT *</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `df`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> WHERE (`c` &gt; `d`)</span>
+<span class='r-in'><span class='co'># Need to convert from boolean to bit:</span></span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT CAST(IIF(`c` &gt; `d`, 1, 0) AS BIT) AS `x`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `df`</span>
+<span class='r-in'><span class='co'># Can use boolean as is:</span></span>
+<span class='r-in'><span class='va'>lf</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>transmute</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='va'>c</span> <span class='op'>&gt;</span> <span class='va'>d</span>, <span class='st'>"c"</span>, <span class='st'>"d"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT IIF(`c` &gt; `d`, 'c', 'd') AS `x`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `df`</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

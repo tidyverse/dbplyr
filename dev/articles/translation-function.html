@@ -215,7 +215,7 @@
 <h3 class="hasAnchor">
 <a href="#mathematics" class="anchor"></a>Mathematics</h3>
 <ul>
-<li>basic math operators: <code><a href="https://rdrr.io/r/base/Arithmetic.html">+</a></code>, <code><a href="https://rdrr.io/r/base/Arithmetic.html">-</a></code>, <code><a href="https://rdrr.io/r/base/Arithmetic.html">*</a></code>, <code><a href="https://rdrr.io/r/base/Arithmetic.html">/</a></code>, <code><a href="https://rdrr.io/r/base/Arithmetic.html">^</a></code>
+<li>basic math operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>
 </li>
 <li>trigonometry: <code><a href="https://rdrr.io/r/base/Trig.html">acos()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">asin()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">atan()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">atan2()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">cos()</a></code>, <code>cot()</code>, <code><a href="https://rdrr.io/r/base/Trig.html">tan()</a></code>, <code><a href="https://rdrr.io/r/base/Trig.html">sin()</a></code>
 </li>
@@ -231,7 +231,7 @@
 <div id="modulo-arithmetic" class="section level2">
 <h2 class="hasAnchor">
 <a href="#modulo-arithmetic" class="anchor"></a>Modulo arithmetic</h2>
-<p>dbplyr translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></code> to the SQL equivalents but note that it’s not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
+<p>dbplyr translates <code>%%</code> to the SQL equivalents but note that it’s not precisely the same: most databases use truncated division where the modulo operator takes the sign of the dividend, where R using the mathematically preferred floored division with the modulo sign taking the sign of the divisor.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
   x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">10L</span>, <span class="fl">10L</span>, <span class="op">-</span><span class="fl">10L</span>, <span class="op">-</span><span class="fl">10L</span><span class="op">)</span>, 
@@ -239,7 +239,7 @@
 <span class="op">)</span>
 <span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
 
-<span class="va">df</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%%</span> <span class="va">y</span><span class="op">)</span>
+<span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></span> <span class="va">y</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 4 × 3</span>
 <span class="co">#&gt;       x     y `x%%y`</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt;</span>
@@ -247,7 +247,7 @@
 <span class="co">#&gt; 2    10    -3     -2</span>
 <span class="co">#&gt; 3   -10     3      2</span>
 <span class="co">#&gt; 4   -10    -3     -1</span>
-<span class="va">mf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%%</span> <span class="va">y</span><span class="op">)</span>
+<span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></span> <span class="va">y</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 3]</span>
 <span class="co">#&gt; # Database: sqlite 3.36.0 [:memory:]</span>
 <span class="co">#&gt;       x     y `x%%y`</span>
@@ -256,14 +256,14 @@
 <span class="co">#&gt; 2    10    -3      1</span>
 <span class="co">#&gt; 3   -10     3     -1</span>
 <span class="co">#&gt; 4   -10    -3     -1</span></code></pre></div>
-<p>dbplyr no longer translates <code><a href="https://rdrr.io/r/base/Arithmetic.html">%/%</a></code> because there’s no robust cross-database translation available.</p>
+<p>dbplyr no longer translates <code>%/%</code> because there’s no robust cross-database translation available.</p>
 <div id="logical-comparisons" class="section level3">
 <h3 class="hasAnchor">
 <a href="#logical-comparisons" class="anchor"></a>Logical comparisons</h3>
 <ul>
-<li>logical comparisons: <code><a href="https://rdrr.io/r/base/Comparison.html">&lt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&lt;=</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">!=</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&gt;=</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&gt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code>, <code><a href="https://rdrr.io/r/base/match.html">%in%</a></code>
+<li>logical comparisons: <code>&lt;</code>, <code>&lt;=</code>, <code>!=</code>, <code>&gt;=</code>, <code>&gt;</code>, <code>==</code>, <code>%in%</code>
 </li>
-<li>boolean operations: <code><a href="https://rdrr.io/r/base/Logic.html">&amp;</a></code>, <code><a href="https://rdrr.io/r/base/Logic.html">&amp;&amp;</a></code>, <code><a href="https://rdrr.io/r/base/Logic.html">|</a></code>, <code><a href="https://rdrr.io/r/base/Logic.html">||</a></code>, <code><a href="https://rdrr.io/r/base/Logic.html">!</a></code>, <code><a href="https://rdrr.io/r/base/Logic.html">xor()</a></code>
+<li>boolean operations: <code>&amp;</code>, <code>&amp;&amp;</code>, <code>|</code>, <code>||</code>, <code>!</code>, <code><a href="https://rdrr.io/r/base/Logic.html">xor()</a></code>
 </li>
 </ul>
 </div>
@@ -358,7 +358,7 @@
 <span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></code></pre></div>
 <p>There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you’re using:</p>
 <ul>
-<li><p>For ranking functions, the ordering variable is the first argument: <code><a href="https://rdrr.io/r/base/rank.html">rank(x)</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html">ntile(y, 2)</a></code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
+<li><p>For ranking functions, the ordering variable is the first argument: <code>rank(x)</code>, <code>ntile(y, 2)</code>. If omitted or <code>NULL</code>, will use the default ordering associated with the tbl (as set by <code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>).</p></li>
 <li><p>Accumulating aggregates only take a single argument (the vector to aggregate). To control ordering, use <code><a href="https://dplyr.tidyverse.org/reference/order_by.html">order_by()</a></code>.</p></li>
 <li><p>Aggregates implemented in dplyr (<code>lead</code>, <code>lag</code>, <code>nth_value</code>, <code>first_value</code>, <code>last_value</code>) have an <code>order_by</code> argument. Supply it to override the default ordering.</p></li>
 </ul>

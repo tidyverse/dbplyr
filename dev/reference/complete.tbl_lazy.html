@@ -230,28 +230,29 @@ query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to exe
 and return data to R.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://tidyr.tidyverse.org'>"tidyr"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>
-    group <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='fl'>1</span><span class='op'>)</span>,
-    item_id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='fl'>2</span><span class='op'>)</span>,
-    item_name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"b"</span><span class='op'>)</span>,
-    value1 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>,
-    value2 <span class='op'>=</span> <span class='fl'>4</span><span class='op'>:</span><span class='fl'>6</span>
-  <span class='op'>)</span>
-
-  <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/complete.html'>complete</a></span><span class='op'>(</span><span class='va'>group</span>, <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>item_id</span>, <span class='va'>item_name</span><span class='op'>)</span><span class='op'>)</span>
-
-  <span class='co'># You can also choose to fill in missing values</span>
-  <span class='va'>df</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/complete.html'>complete</a></span><span class='op'>(</span><span class='va'>group</span>, <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>item_id</span>, <span class='va'>item_name</span><span class='op'>)</span>, fill <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>value1 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 5]</span>
-#&gt; <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span>
-#&gt;   group item_id item_name value1 value2
-#&gt;   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span>     1       1 a              1      4
-#&gt; <span style='color: #BCBCBC;'>2</span>     1       2 b              3      6
-#&gt; <span style='color: #BCBCBC;'>3</span>     2       1 a              0     <span style='color: #BB0000;'>NA</span>
-#&gt; <span style='color: #BCBCBC;'>4</span>     2       2 b              2      5</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='st'><a href='https://tidyr.tidyverse.org'>"tidyr"</a></span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span></span>
+<span class='r-in'>    group <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='fl'>1</span><span class='op'>)</span>,</span>
+<span class='r-in'>    item_id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, <span class='fl'>2</span><span class='op'>)</span>,</span>
+<span class='r-in'>    item_name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"a"</span>, <span class='st'>"b"</span>, <span class='st'>"b"</span><span class='op'>)</span>,</span>
+<span class='r-in'>    value1 <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span>,</span>
+<span class='r-in'>    value2 <span class='op'>=</span> <span class='fl'>4</span><span class='op'>:</span><span class='fl'>6</span></span>
+<span class='r-in'>  <span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/complete.html'>complete</a></span><span class='op'>(</span><span class='va'>group</span>, <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>item_id</span>, <span class='va'>item_name</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>  <span class='co'># You can also choose to fill in missing values</span></span>
+<span class='r-in'>  <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/complete.html'>complete</a></span><span class='op'>(</span><span class='va'>group</span>, <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>nesting</a></span><span class='op'>(</span><span class='va'>item_id</span>, <span class='va'>item_name</span><span class='op'>)</span>, fill <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>value1 <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Source:   lazy query [?? x 5]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># Database: sqlite 3.36.0 [:memory:]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   group item_id item_name value1 value2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span>      <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;int&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>     1       1 a              1      4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span>     1       2 b              3      6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span>     2       1 a              0     <span style='color: #BB0000;'>NA</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>4</span>     2       2 b              2      5</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

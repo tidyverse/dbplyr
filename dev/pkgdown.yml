@@ -9,7 +9,7 @@ articles:
   sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2021-09-27T06:08Z
+last_built: 2021-11-16T13:07Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles

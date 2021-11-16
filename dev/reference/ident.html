@@ -225,19 +225,24 @@ for <code>schema.table</code>.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># SQL92 quotes strings with '</span>
-<span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; 'x'</div><div class='input'>
-<span class='co'># And identifiers with "</span>
-<span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IDENT&gt; x</div><div class='input'><span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt; `x`</div><div class='input'>
-<span class='co'># You can supply multiple inputs</span>
-<span class='fu'>ident</span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div><div class='input'><span class='fu'><a href='ident_q.html'>ident_q</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;IDENT&gt; x
-#&gt; &lt;IDENT&gt; y</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># SQL92 quotes strings with '</span></span>
+<span class='r-in'><span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; 'x'</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># And identifiers with "</span></span>
+<span class='r-in'><span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IDENT&gt; x</span>
+<span class='r-in'><span class='fu'><a href='escape.html'>escape_ansi</a></span><span class='op'>(</span><span class='fu'>ident</span><span class='op'>(</span><span class='st'>"x"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt; `x`</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># You can supply multiple inputs</span></span>
+<span class='r-in'><span class='fu'>ident</span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IDENT&gt; x</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IDENT&gt; y</span>
+<span class='r-in'><span class='fu'><a href='ident_q.html'>ident_q</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='st'>"x"</span>, b <span class='op'>=</span> <span class='st'>"y"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IDENT&gt; x</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;IDENT&gt; y</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -228,23 +228,25 @@ query, and use <code><a href='collapse.tbl_sql.html'>collect()</a></code> to exe
 and return data to R.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, y <span class='op'>=</span> <span class='fl'>5</span><span class='op'>:</span><span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>db</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'>+</span> <span class='va'>y</span><span class='op'>)</span> <span class='op'>/</span> <span class='fl'>2</span>, b <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>^</span><span class='fl'>2L</span> <span class='op'>+</span> <span class='va'>y</span><span class='op'>^</span><span class='fl'>2L</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`, (`x` + `y`) / 2.0 AS `a`, SQRT(POWER(`x`, 2) + POWER(`y`, 2)) AS `b`
-#&gt; FROM `dbplyr_023`</div><div class='input'>
-<span class='co'># dbplyr automatically creates subqueries as needed</span>
-<span class='va'>db</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>x1 <span class='op'>=</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fl'>1</span>, x2 <span class='op'>=</span> <span class='va'>x1</span> <span class='op'>*</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;SQL&gt;
-#&gt; SELECT `x`, `y`, `x1`, `x1` * 2.0 AS `x2`
-#&gt; FROM (SELECT `x`, `y`, `x` + 1.0 AS `x1`
-#&gt; FROM `dbplyr_023`)</div></pre>
+    <pre class="examples"><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span>, warn.conflicts <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'>&lt;-</span> <span class='fu'><a href='memdb_frame.html'>memdb_frame</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span>, y <span class='op'>=</span> <span class='fl'>5</span><span class='op'>:</span><span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>a <span class='op'>=</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'>+</span> <span class='va'>y</span><span class='op'>)</span> <span class='op'>/</span> <span class='fl'>2</span>, b <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>^</span><span class='fl'>2L</span> <span class='op'>+</span> <span class='va'>y</span><span class='op'>^</span><span class='fl'>2L</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`, (`x` + `y`) / 2.0 AS `a`, SQRT(POWER(`x`, 2) + POWER(`y`, 2)) AS `b`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_023`</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># dbplyr automatically creates subqueries as needed</span></span>
+<span class='r-in'><span class='va'>db</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>x1 <span class='op'>=</span> <span class='va'>x</span> <span class='op'>+</span> <span class='fl'>1</span>, x2 <span class='op'>=</span> <span class='va'>x1</span> <span class='op'>*</span> <span class='fl'>2</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span class='r-in'>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/explain.html'>show_query</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;SQL&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> SELECT `x`, `y`, `x1`, `x1` * 2.0 AS `x2`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM (SELECT `x`, `y`, `x` + 1.0 AS `x1`</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> FROM `dbplyr_023`)</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
