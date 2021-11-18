@@ -66,7 +66,23 @@ mutate.tbl_lazy <- function(.data, ..., .keep = c("all", "used", "unused", "none
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
   dots <- dbplyr_check_transmute_args(...)
-  mutate(.data, !!!dots, .keep = "none")
+  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+
+  # # Retain expression columns in order of their appearance
+  cols_expr <- unique(names(dots))
+
+  # Retain untouched group variables up front
+  cols_group <- group_vars(.data)
+  cols_group <- setdiff(cols_group, cols_expr)
+
+  cols_retain <- c(cols_group, cols_expr)
+
+  layers <- get_mutate_layers(dots, op_vars(.data), cols_retain)
+  for (layer in layers) {
+    .data$ops <- op_select(.data$ops, layer)
+  }
+
+  .data
 }
 
 # copy of `dplyr:::check_transmute_args()`
@@ -80,7 +96,7 @@ dbplyr_check_transmute_args <- function (..., .keep, .before, .after) {
   if (!missing(.after)) {
     abort("`transmute()` does not support the `.after` argument")
   }
-  enquos(...)
+  quos(..., .named = TRUE)
 }
 
 # helpers -----------------------------------------------------------------
