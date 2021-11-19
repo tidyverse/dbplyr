@@ -8,6 +8,13 @@
       VALUES
         (1.5, 1, 'a', '2020-01-01T01:23:45Z')
 
+# can translate 1-column tables
+
+    Code
+      db_values(con, tibble(dbl = numeric())) %>% remote_query()
+    Output
+      <SQL> SELECT NULL AS `dbl` WHERE false
+
 # zero row table works
 
     Code

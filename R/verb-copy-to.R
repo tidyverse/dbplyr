@@ -114,20 +114,6 @@ sql_values.DBIConnection <- function(con, df) {
 }
 
 sql_values_clause <- function(con, df, row = FALSE) {
-  values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
-  rows <- purrr::pmap(
-    unname(values),
-    function(...) {
-      dots <- list(...)
-      out <- sql_vector(dots, con = con, collapse = ", ")
-      if (row) {
-        out <- sql(paste0("ROW", out))
-      }
-
-      out
-    }
-  )
-
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE)
   null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE false", con = con)
@@ -135,6 +121,20 @@ sql_values_clause <- function(con, df, row = FALSE) {
   if (nrow(df) == 0) {
     return(null_row_clause)
   }
+
+  values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+  rows <- purrr::pmap(
+    unname(values),
+    function(...) {
+      dots <- list(...)
+      out <- sql_vector(dots, con = con, collapse = ", ", parens = TRUE)
+      if (row) {
+        out <- sql(paste0("ROW", out))
+      }
+
+      out
+    }
+  )
 
   value_clause <- sql_vector(rows, collapse = ",\n  ", con = con, parens = FALSE)
   build_sql(

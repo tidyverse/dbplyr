@@ -68,6 +68,15 @@ test_that("can translate a table", {
   )
 })
 
+test_that("can translate 1-column tables", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  expect_snapshot(
+    db_values(con, tibble(dbl = numeric())) %>%
+      remote_query()
+  )
+})
+
 test_that("zero row table works", {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
