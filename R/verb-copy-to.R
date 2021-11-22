@@ -116,7 +116,7 @@ sql_values.DBIConnection <- function(con, df) {
 sql_values_clause <- function(con, df, row = FALSE) {
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE)
-  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE false", con = con)
+  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE 0 = 1", con = con)
 
   if (nrow(df) == 0) {
     return(null_row_clause)
