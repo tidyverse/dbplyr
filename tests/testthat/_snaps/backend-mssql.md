@@ -174,7 +174,9 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
 
 ---
 
@@ -182,5 +184,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
 
