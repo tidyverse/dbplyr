@@ -222,6 +222,8 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
+  by$lhs_as <- lhs_as
+  by$rhs_as <- rhs_as
 
   y <- auto_copy(
     x, y,
@@ -237,9 +239,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type = type,
     by = by,
     suffix = suffix,
-    na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as
+    na_matches = na_matches
   ))
   x
 }
@@ -255,6 +255,8 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
   } else {
     by <- dplyr::common_by(by, x, y)
   }
+  by$lhs_as <- lhs_as
+  by$rhs_as <- rhs_as
 
   y <- auto_copy(
     x, y, copy,
@@ -264,9 +266,7 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
   x$ops <- op_double("semi_join", x, y, args = list(
     anti = anti,
     by = by,
-    na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as
+    na_matches = na_matches
   ))
   x
 }
@@ -347,9 +347,7 @@ sql_build.op_join <- function(op, con, ...) {
     type = op$args$type,
     by = op$args$by,
     suffix = op$args$suffix,
-    na_matches = op$args$na_matches,
-    lhs_as = op$args$lhs_as,
-    rhs_as = op$args$rhs_as
+    na_matches = op$args$na_matches
   )
 }
 
@@ -359,8 +357,6 @@ sql_build.op_semi_join <- function(op, con, ...) {
     op$x, op$y,
     anti = op$args$anti,
     by = op$args$by,
-    na_matches = op$args$na_matches,
-    lhs_as = op$args$lhs_as,
-    rhs_as = op$args$rhs_as
+    na_matches = op$args$na_matches
   )
 }

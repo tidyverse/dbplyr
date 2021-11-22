@@ -10,8 +10,8 @@ test_that("complete join pipeline works with SQLite and table alias", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
 
-  out <- left_join(df1, df2, by = "x", lhs_as = "df1", rhs_as = "df2") %>% collect()
-  expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+  out <- left_join(df1, df2, by = "x", lhs_as = "df1", rhs_as = "df2")
+  expect_equal(out %>% collect(), tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 
   lf1 <- lazy_frame(x = 1:5)
   lf2 <- lazy_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
@@ -27,6 +27,18 @@ test_that("complete semi join works with SQLite", {
 
   out <- collect(lf3)
   expect_equal(out, tibble(x = 1, y = 2))
+})
+
+test_that("complete semi join works with SQLite and table alias", {
+  df1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
+  df2 <- memdb_frame(x = 1)
+
+  out <- inner_join(df1, df2, by = "x", lhs_as = "df1", rhs_as = "df2")
+  expect_equal(out %>% collect(), tibble(x = 1, y = 2))
+
+  lf1 <- lazy_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- lazy_frame(x = 1)
+  expect_snapshot(inner_join(lf1, lf2, by = "x", lhs_as = "df1", rhs_as = "df2"))
 })
 
 test_that("joins with non by variables gives cross join", {

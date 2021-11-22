@@ -10,6 +10,18 @@
       ON (`df1`.`x` = `df2`.`x`)
       
 
+# complete semi join works with SQLite and table alias
+
+    Code
+      inner_join(lf1, lf2, by = "x", lhs_as = "df1", rhs_as = "df2")
+    Output
+      <SQL>
+      SELECT `df1`.`x` AS `x`, `y`
+      FROM `df` AS `df1`
+      INNER JOIN `df` AS `df2`
+      ON (`df1`.`x` = `df2`.`x`)
+      
+
 # join check `lhs_as` and `rhs_as`
 
     Code

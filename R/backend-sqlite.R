@@ -137,7 +137,7 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
 }
 
 #' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, lhs_as = "LHS", rhs_as = "RHS", ...) {
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
@@ -155,13 +155,15 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   )
   by_right <- list(
     x = by$y,
-    y = by$x
+    y = by$x,
+    lhs_as = by$rhs_as,
+    rhs_as = by$lhs_as
   )
-  right_join_sql <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, lhs_as = rhs_as, rhs_as = lhs_as, ...)
+  right_join_sql <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ...)
 
   if (type == "full") {
     join_sql <- build_sql(
-      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, lhs_as = lhs_as, rhs_as = rhs_as, ...),
+      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
       "UNION\n",
       right_join_sql,
       con = con

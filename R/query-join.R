@@ -1,6 +1,6 @@
 #' @export
 #' @rdname sql_build
-join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE, lhs_as = "LHS", rhs_as = "RHS") {
+join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
   structure(
     list(
       x = x,
@@ -8,9 +8,7 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
       vars = vars,
       type = type,
       by = by,
-      na_matches = na_matches,
-      lhs_as = lhs_as,
-      rhs_as = rhs_as
+      na_matches = na_matches
     ),
     class = c("join_query", "query")
   )
@@ -39,9 +37,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
     vars = query$vars,
     type = query$type,
     by = query$by,
-    na_matches = query$na_matches,
-    lhs_as = query$lhs_as,
-    rhs_as = query$rhs_as
+    na_matches = query$na_matches
   )
 }
 
@@ -83,13 +79,13 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y, lhs_as, rhs_as) {
   }
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never", lhs_as = "LHS", rhs_as = "RHS") {
+sql_join_tbls <- function(con, by, na_matches = "never") {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   on <- NULL
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, lhs_as)
-    rhs <- sql_table_prefix(con, by$y, rhs_as)
+    lhs <- sql_table_prefix(con, by$x, by$lhs_as)
+    rhs <- sql_table_prefix(con, by$y, by$rhs_as)
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {

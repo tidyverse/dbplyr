@@ -1,15 +1,13 @@
 #' @export
 #' @rdname sql_build
-semi_join_query <- function(x, y, anti = FALSE, by = NULL, na_matches = FALSE, lhs_as = "LHS", rhs_as = "RHS") {
+semi_join_query <- function(x, y, anti = FALSE, by = NULL, na_matches = FALSE) {
   structure(
     list(
       x = x,
       y = y,
       anti = anti,
       by = by,
-      na_matches = na_matches,
-      lhs_as = lhs_as,
-      rhs_as = rhs_as
+      na_matches = na_matches
     ),
     class = c("semi_join_query", "query")
   )
@@ -36,8 +34,6 @@ sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE)
 
   dbplyr_query_semi_join(con, from_x, from_y,
     anti = query$anti,
-    by = query$by,
-    lhs_as = query$lhs_as,
-    rhs_as = query$rhs_as
+    by = query$by
   )
 }
