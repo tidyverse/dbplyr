@@ -88,7 +88,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
 }
 
 #' @export
-db_values <- function(con, df, name = deparse(substitute(df))) {
+db_values <- function(con, df) {
   if (ncol(df) == 0) {
     abort("`df` needs at least one column.")
   }
@@ -114,35 +114,91 @@ sql_values.DBIConnection <- function(con, df) {
 }
 
 sql_values_clause <- function(con, df, row = FALSE) {
+  # The query consists of two parts:
+  # * An outer select which converts the values to the correct types
+  # * A subquery which provides:
+  #   * named NULLs (needed as e.g. SQLite cannot name `VALUES`)
+  #   * the actual values without names
+
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE)
-  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE false", con = con)
+  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE 0 = 1", con = con)
 
-  if (nrow(df) == 0) {
-    return(null_row_clause)
+  empty_df <- nrow(df) == 0L
+  if (empty_df) {
+    subquery <- null_row_clause
+  } else {
+    escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+    rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
+    values_clause <- sql(paste0(if (row) "ROW", "(", rows, ")", collapse = ",\n  "))
+
+    union_query <- set_op_query(
+      null_row_clause,
+      build_sql("VALUES\n  ", values_clause, con = con),
+      type = "UNION ALL"
+    )
+
+    subquery <- sql_render(union_query, con = con)
   }
 
-  values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
-  rows <- purrr::pmap(
-    unname(values),
-    function(...) {
-      dots <- list(...)
-      out <- sql_vector(dots, con = con, collapse = ", ", parens = TRUE)
-      if (row) {
-        out <- sql(paste0("ROW", out))
-      }
 
-      out
-    }
-  )
+  typed_cols <- purrr::map2_chr(df, colnames(df), ~ select_typed_col(.x, ident(.y), con = con))
+  select_clause <- sql_vector(typed_cols, parens = FALSE, collapse = ", ", con = con)
 
-  value_clause <- sql_vector(rows, collapse = ",\n  ", con = con, parens = FALSE)
   build_sql(
-    null_row_clause, "\n",
-    "UNION ALL\n",
-    "VALUES\n  ", value_clause,
+    "SELECT ", select_clause, "\n",
+    "FROM ", sql_subquery(con, subquery, name = "values_table"),
     con = con
   )
+}
+
+select_typed_col <- function(type, col, con) {
+  UseMethod("select_typed_col")
+}
+
+#' @export
+select_typed_col.default <- function(type, col, con) {
+  translate_sql(!!col, con = con)
+}
+
+#' @export
+select_typed_col.character <- function(type, col, con) {
+  translate_sql(!!col, con = con)
+}
+
+#' @export
+select_typed_col.factor <- function(type, col, con) {
+  translate_sql(!!col, con = con)
+}
+
+#' @export
+select_typed_col.integer <- function(type, col, con) {
+  translate_sql(as.integer(!!col), con = con)
+}
+
+#' @export
+select_typed_col.numeric <- function(type, col, con) {
+  translate_sql(as.numeric(!!col), con = con)
+}
+
+#' @export
+select_typed_col.logical <- function(type, col, con) {
+  translate_sql(as.logical(!!col), con = con)
+}
+
+#' @export
+select_typed_col.Date <- function(type, col, con) {
+  translate_sql(as.Date(!!col), con = con)
+}
+
+#' @export
+select_typed_col.POSIXt <- function(type, col, con) {
+  translate_sql(as.POSIXct(!!col), con = con)
+}
+
+#' @export
+select_typed_col.integer64 <- function(type, col, con) {
+  translate_sql(as.integer64(!!col), con = con)
 }
 
 #' @importFrom dplyr auto_copy

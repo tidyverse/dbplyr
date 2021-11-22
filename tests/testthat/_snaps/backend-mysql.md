@@ -29,10 +29,11 @@
     Code
       sql_values(con, tibble(x = 1, y = "a"))
     Output
-      <SQL> SELECT NULL AS `x`, NULL AS `y` WHERE false
+      <SQL> SELECT CAST(`x` AS NUMERIC) AS `x`, `y`
+      FROM ((SELECT NULL AS `x`, NULL AS `y` WHERE 0 = 1)
       UNION ALL
-      VALUES
-        ROW(1.0, 'a')
+      (VALUES
+        ROW(1.0, 'a'))) `values_table`
 
 # can explain
 

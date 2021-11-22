@@ -60,10 +60,10 @@ test_that("can translate a table", {
   on.exit(DBI::dbDisconnect(con), add = TRUE)
   df <- tibble(dbl = 1.5, int = 1L, chr = "a", dtt = as.POSIXct("2020-01-01 01:23:45"))
 
-  expect_snapshot(db_values(con, df, name = "db_values_1") %>% remote_query())
+  expect_snapshot(db_values(con, df) %>% remote_query())
 
   expect_equal(
-    db_values(con, df, name = "db_values_1") %>% collect(),
+    db_values(con, df) %>% collect(),
     tibble(dbl = 1.5, int = 1L, chr = "a", dtt = "2020-01-01T01:23:45Z")
   )
 })
@@ -72,7 +72,7 @@ test_that("can translate 1-column tables", {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
   expect_snapshot(
-    db_values(con, tibble(dbl = numeric())) %>%
+    db_values(con, tibble(dbl = 1.5)) %>%
       remote_query()
   )
 })
@@ -82,6 +82,11 @@ test_that("zero row table works", {
   on.exit(DBI::dbDisconnect(con), add = TRUE)
   expect_snapshot(
     db_values(con, tibble(dbl = numeric(), chr = character())) %>%
+      remote_query()
+  )
+
+  expect_snapshot(
+    db_values(con, tibble(dbl = numeric())) %>%
       remote_query()
   )
 })
