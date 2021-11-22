@@ -99,6 +99,17 @@ test_that("can simplify layers", {
     lazy_frame(x = 1, y = 2) %>%
       transmute(y = y + 1, y = y + 1)
   )
+
+  # should only be two queries
+  expect_snapshot(
+    lazy_frame(x = 1, y = 2) %>%
+      mutate(
+        x = x + 1,
+        x = x + 1,
+        y = y + 1,
+        y = y + 1
+      )
+  )
 })
 
 

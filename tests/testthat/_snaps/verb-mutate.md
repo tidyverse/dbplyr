@@ -38,6 +38,16 @@
       FROM (SELECT `y` + 1.0 AS `y`
       FROM `df`) `q01`
 
+---
+
+    Code
+      lazy_frame(x = 1, y = 2) %>% mutate(x = x + 1, x = x + 1, y = y + 1, y = y + 1)
+    Output
+      <SQL>
+      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
+      FROM (SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
+      FROM `df`) `q01`
+
 # mutate generates subqueries as needed
 
     Code
