@@ -52,6 +52,7 @@ nest_vars <- function(.data, dots, all_vars) {
     if (any(used_vars %in% new_vars)) {
       new_actions <- dots[seq2(init, length(dots))][new_vars]
       .data$ops <- op_select(.data$ops, carry_over(union(all_vars, used_vars), new_actions))
+      .data$lazy_query <- add_mutate(.data, carry_over(union(all_vars, used_vars), new_actions))
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
@@ -64,7 +65,18 @@ nest_vars <- function(.data, dots, all_vars) {
     dots <- dots[-seq2(1L, init - 1)]
   }
   .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
+  .data$lazy_query <- add_mutate(.data, carry_over(all_vars, dots))
   .data
+}
+
+add_mutate <- function(.data, vars) {
+  lazy_query <- .data$lazy_query
+
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "mutate",
+    select = vars
+  )
 }
 
 # Combine a selection (passed through from subquery)
