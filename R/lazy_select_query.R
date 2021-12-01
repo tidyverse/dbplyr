@@ -167,39 +167,50 @@ op_desc.lazy_query <- function(x) {
 
 #' @export
 sql_build.lazy_query <- function(x, con, ...) {
-  if (x$select_operation == "summarise") {
-    select_expr <- set_names(x$select$expr, x$select$name)
-    select_sql <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
-  } else {
-    select_sql <- purrr::pmap(
-      x$select %>% transmute(
-        dots = set_names(expr, name),
-        vars_group = group_vars,
-        vars_order = order_vars,
-        vars_frame = frame
-      ),
-      function(dots, vars_group, vars_order, vars_frame) {
-        translate_sql_(
-          list(dots), con,
-          vars_group = vars_group,
-          vars_order = translate_sql_(vars_order, con, context = list(clause = "ORDER")),
-          vars_frame = vars_frame,
-          context = list(clause = "SELECT")
-        )
-      }
-    )
-
-    select_sql <- sql(unlist(select_sql))
-  }
-
+  select_sql <- get_select_sql(x$select, x$select_operation, op_vars(x$from), con)
   where_sql <- translate_sql_(x$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
     from = sql_build(x$from, con),
-    select = sql(unlist(select_sql)),
+    select = select_sql,
     where = where_sql,
-    group_by = translate_sql_(x$group_by, con = con)
+    group_by = translate_sql_(x$group_by, con = con),
+    order_by = translate_sql_(x$order_by, con = con)
   )
+}
+
+get_select_sql <- function(select, select_operation, in_vars, con) {
+  if (select_operation == "summarise") {
+    select_expr <- set_names(select$expr, select$name)
+    select_sql <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
+    return(select_sql)
+  }
+
+  if (identical(select$name, in_vars) &&
+      purrr::every(select$expr, is_symbol) &&
+      identical(syms(select$name), select$expr)) {
+    return(sql("*"))
+  }
+
+  select_sql <- purrr::pmap(
+    select %>% transmute(
+      dots = set_names(expr, name),
+      vars_group = group_vars,
+      vars_order = order_vars,
+      vars_frame = frame
+    ),
+    function(dots, vars_group, vars_order, vars_frame) {
+      translate_sql_(
+        list(dots), con,
+        vars_group = translate_sql_(unname(vars_group), con),
+        vars_order = translate_sql_(vars_order, con, context = list(clause = "ORDER")),
+        vars_frame = vars_frame,
+        context = list(clause = "SELECT")
+      )
+    }
+  )
+
+  sql(unlist(select_sql))
 }
 
 #' @export
