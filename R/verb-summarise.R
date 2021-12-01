@@ -39,6 +39,12 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   check_summarise_vars(dots)
   check_groups(.groups)
 
+  .data$lazy_query <- add_summarise(
+    .data, dots,
+    .groups = .groups,
+    env_caller = caller_env()
+  )
+
   add_op_single(
     "summarise",
     .data,
@@ -80,6 +86,28 @@ check_groups <- function(.groups) {
     ),
     i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
   ))
+}
+
+add_summarise <- function(.data, dots, .groups, env_caller) {
+  # TODO when should this inform about the new groups?
+  lazy_query <- .data$lazy_query
+
+  grps <- syms(set_names(names(lazy_query$group_vars)))
+  .groups <- .groups %||% "drop_last"
+  groups_out <- switch(.groups,
+    drop_last = grps[-length(grps)],
+    keep = grps,
+    drop = character()
+  )
+
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "summarise",
+    select = c(grps, dots),
+    group_by = syms(unname(grps)),
+    group_vars = groups_out,
+    select_operation = "summarise"
+  )
 }
 
 #' @export
