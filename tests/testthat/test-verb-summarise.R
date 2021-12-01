@@ -125,7 +125,8 @@ test_that("can handle rename", {
       last_op = "summarise",
       select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
       group_by = syms("ax"),
-      select_operation = "summarise"
+      select_operation = "summarise",
+      group_vars = set_names(list())
     ),
     ignore_formula_env = TRUE
   )

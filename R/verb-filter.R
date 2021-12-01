@@ -36,8 +36,7 @@ add_filter <- function(.data, dots) {
       from = lazy_query,
       last_op = "filter",
       select = syms(set_names(vars)),
-      where = dots,
-      group_vars = lazy_query$group_vars
+      where = dots
     )
   } else {
     # Do partial evaluation, then extract out window functions
@@ -50,16 +49,14 @@ add_filter <- function(.data, dots) {
       from = lazy_query,
       last_op = "mutate",
       select = carry_over(vars, where$comp),
-      select_operation = "mutate",
-      group_vars = lazy_query$group_vars
+      select_operation = "mutate"
     )
 
     lazy_select_query(
       from = mutated,
       last_op = "filter",
       select = syms(set_names(vars)),
-      where = where$expr,
-      group_vars = lazy_query$group_vars
+      where = where$expr
     )
   }
 }

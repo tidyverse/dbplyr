@@ -8,8 +8,8 @@ lazy_select_query <- function(from,
                               order_by = NULL,
                               limit = NULL,
                               distinct = FALSE,
-                              group_vars = purrr::set_names(list()),
-                              order_vars = purrr::set_names(list()),
+                              group_vars = NULL,
+                              order_vars = NULL,
                               frame = NULL,
                               select_operation = c("mutate", "summarise")) {
 
@@ -26,10 +26,31 @@ lazy_select_query <- function(from,
   # frame
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
+  if (is_null(group_vars)) {
+    group_vars <- op_grps(from)
+  }
+  if (is_null(order_vars)) {
+    order_vars <- op_sort(from)
+  }
+  if (is_null(frame)) {
+    frame <- op_frame(from)
+  }
+
+  if (last_op == "mutate") {
+    select <- new_lazy_select(
+      select,
+      group_vars = group_vars,
+      order_vars = order_vars,
+      frame = frame
+    )
+  } else {
+    select <- new_lazy_select(select)
+  }
+
   structure(
     list(
       from = from,
-      select = new_lazy_select(select),
+      select = select,
       where = where,
       group_by = group_by,
       order_by = order_by,
@@ -45,7 +66,7 @@ lazy_select_query <- function(from,
   )
 }
 
-new_lazy_select <- function(vars) {
+new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = NULL) {
   if (!is_null(vars)) {
     vctrs::vec_as_names(names2(vars), repair = "check_unique")
   }
@@ -56,9 +77,9 @@ new_lazy_select <- function(vars) {
   tibble(
     name = var_names %||% character(),
     expr = vars %||% list(),
-    group_vars = rep_along(vars, list(NULL)),
-    order_vars = rep_along(vars, list(NULL)),
-    frame = rep_along(vars, list(NULL))
+    group_vars = rep_along(vars, list(group_vars)),
+    order_vars = rep_along(vars, list(order_vars)),
+    frame = rep_along(vars, list(frame))
   )
 }
 
@@ -78,6 +99,12 @@ update_lazy_select <- function(lazy_query, vars) {
   idx <- vctrs::vec_match(group_vars_out, vars)
   names(group_vars)[group_vars_out %in% vars] <- names(vars[idx])
   lazy_query$group_vars <- group_vars
+
+  order_vars <- lazy_query$order_vars
+  order_vars_out <- syms(names(order_vars))
+  idx <- vctrs::vec_match(order_vars_out, vars)
+  names(order_vars)[order_vars_out %in% vars] <- names(vars[idx])
+  lazy_query$order_vars <- order_vars
 
   lazy_query
 }
