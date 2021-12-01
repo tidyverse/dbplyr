@@ -26,6 +26,7 @@ window_order <- function(.data, ...) {
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
+  .data$lazy_query$order_vars <- dots
   add_op_order(.data, dots)
 }
 
@@ -58,6 +59,8 @@ sql_build.op_order <- function(op, con, ...) {
 window_frame <- function(.data, from = -Inf, to = Inf) {
   stopifnot(is.numeric(from), length(from) == 1)
   stopifnot(is.numeric(to), length(to) == 1)
+
+  .data$lazy_query$frame <- list(range = c(from, to))
 
   add_op_single("frame", .data, args = list(range = c(from, to)))
 }

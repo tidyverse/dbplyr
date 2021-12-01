@@ -34,11 +34,29 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
+  .data$lazy_query <- add_arrange(.data, dots, .by_group)
   add_op_single(
     "arrange",
     .data,
     dots = dots,
     args = list(.by_group = .by_group)
+  )
+}
+
+add_arrange <- function(.data, dots, .by_group) {
+  lazy_query <- .data$lazy_query
+
+  if (.by_group) {
+    dots <- c(op_grps(lazy_query), set_names(dots))
+  }
+
+  vars <- op_vars(lazy_query)
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "arrange",
+    select = syms(set_names(vars)),
+    order_by = dots,
+    order_vars = dots
   )
 }
 
