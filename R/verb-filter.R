@@ -22,7 +22,46 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
 
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  .data$lazy_query <- add_filter(.data, dots)
   add_op_single("filter", .data, dots = dots)
+}
+
+add_filter <- function(.data, dots) {
+  con <- remote_con(.data)
+  lazy_query <- .data$lazy_query
+
+  vars <- op_vars(.data)
+  if (!uses_window_fun(dots, con)) {
+    lazy_select_query(
+      from = lazy_query,
+      last_op = "filter",
+      select = syms(set_names(vars)),
+      where = dots,
+      group_vars = lazy_query$group_vars
+    )
+  } else {
+    # Do partial evaluation, then extract out window functions
+    where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))
+
+    # Convert where$expr back to a lazy dots object, and then
+    # create mutate operation
+    # TODO should call `mutate()` to actually use `group_vars`
+    mutated <- lazy_select_query(
+      from = lazy_query,
+      last_op = "mutate",
+      select = carry_over(vars, where$comp),
+      select_operation = "mutate",
+      group_vars = lazy_query$group_vars
+    )
+
+    lazy_select_query(
+      from = mutated,
+      last_op = "filter",
+      select = syms(set_names(vars)),
+      where = where$expr,
+      group_vars = lazy_query$group_vars
+    )
+  }
 }
 
 #' @export

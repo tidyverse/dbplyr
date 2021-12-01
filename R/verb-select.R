@@ -26,6 +26,7 @@ select.tbl_lazy <- function(.data, ...) {
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -59,6 +60,7 @@ rename.tbl_lazy <- function(.data, ...) {
   names(new_vars)[loc] <- names(loc)
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -75,6 +77,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -83,14 +86,15 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
-  vars <- simulate_vars(.data)
   new_vars <- dplyr::relocate(
-    simulate_vars(.data),
+    simulate_vars2(.data),
     ...,
     .before = {{.before}},
     .after = {{.after}}
   )
+
   .data$ops <- op_select(.data$ops, syms(set_names(names(new_vars))))
+  .data$lazy_query <- add_select(.data, unlist(new_vars))
   .data
 }
 
@@ -98,7 +102,59 @@ simulate_vars <- function(x) {
   as_tibble(rep_named(op_vars(x), list(logical())))
 }
 
+simulate_vars2 <- function(x) {
+  vars <- op_vars(x)
+  vars_list <- as.list(vars)
+  as_tibble(set_names(vars_list, vars))
+}
+
 # op_select ---------------------------------------------------------------
+
+add_select <- function(.data, vars) {
+  con <- remote_con(.data)
+  lazy_query <- .data$lazy_query
+  vars <- syms(vars)
+
+  if (lazy_query$last_op == "select") {
+    # Special optimisation when applied to pure projection() - this is
+    # conservative and we could expand to any op_select() if combined with
+    # the logic in nest_vars()
+    select <- lazy_query$select
+
+    if (purrr::every(vars, is.symbol)) {
+      # if current operation is pure projection
+      # we can just subset the previous selection
+      sel_vars <- purrr::map_chr(vars, as_string)
+      lazy_query <- update_lazy_select(lazy_query, sel_vars)
+
+      return(lazy_query)
+    }
+
+    prev_vars <- select$expr
+    if (purrr::every(prev_vars, is.symbol)) {
+      # if previous operation is pure projection
+      sel_vars <- purrr::map_chr(prev_vars, as_string)
+      if (all(select$name == sel_vars)) {
+        # and there's no renaming
+        # we can just ignore the previous step
+        lazy_query <- update_lazy_select(lazy_query, vars)
+        return(lazy_query)
+      }
+    }
+  }
+
+  if (inherits(lazy_query$from, "op_base")) {
+    lazy_query <- update_lazy_select(lazy_query, vars)
+    return(lazy_query)
+  }
+
+  lazy_select_query(
+    from = lazy_query$lazy_query,
+    last_op = "select",
+    select = syms(set_names(vars)),
+    select_operation = "mutate"
+  )
+}
 
 op_select <- function(x, vars) {
   if (inherits(x, "op_select")) {

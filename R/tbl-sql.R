@@ -20,6 +20,17 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   ops <- op_base_remote(from, vars)
 
   dplyr::make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
+
+  dplyr::make_tbl(
+    c(subclass, "sql", "lazy"),
+    src = src,
+    ops = ops,
+    lazy_query = lazy_select_query(
+      from = ops,
+      last_op = "base_remote",
+      select = syms(set_names(vars))
+    )
+  )
 }
 
 #' @importFrom dplyr same_src
