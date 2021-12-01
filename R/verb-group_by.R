@@ -92,7 +92,7 @@ ungroup.tbl_lazy <- function(x, ...) {
 
 #' @export
 op_grps.op_ungroup <- function(op) {
-  character()
+  set_names(character())
 }
 
 #' @export

@@ -120,7 +120,7 @@ op_vars.lazy_query <- function(x) {
 
 #' @export
 op_grps.lazy_query <- function(x) {
-  x$group_vars
+  syms(set_names(names(x$group_vars)))
 }
 
 #' @export

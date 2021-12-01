@@ -128,7 +128,7 @@ op_grps.op_summarise <- function(op) {
 }
 
 #' @export
-op_sort.op_summarise <- function(op) NULL
+op_sort.op_summarise <- function(op) set_names(character())
 
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
