@@ -26,7 +26,18 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
     .data <- transmute(.data, !!!syms(op_grps(.data)), ...)
   }
 
+  .data$lazy_query <- add_distinct(.data)
   add_op_single("distinct", .data, dots = list())
+}
+
+add_distinct <- function(.data) {
+  lazy_query <- .data$lazy_query
+
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "distinct",
+    distinct = TRUE
+  )
 }
 
 #' @export
