@@ -175,7 +175,8 @@ sql_build.lazy_query <- function(x, con, ...) {
     select = select_sql,
     where = where_sql,
     group_by = translate_sql_(x$group_by, con = con),
-    order_by = translate_sql_(x$order_by, con = con)
+    order_by = translate_sql_(x$order_by, con = con),
+    distinct = x$distinct
   )
 }
 
