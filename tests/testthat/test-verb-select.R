@@ -204,6 +204,7 @@ test_that("renaming handles groups correctly", {
   )
 
   expect_equal(result$group_vars, "x")
+  expect_equal(op_grps(result), "ax")
 
   result <- lf %>%
     rename(x = ax) %>%
@@ -215,4 +216,5 @@ test_that("renaming handles groups correctly", {
   )
 
   expect_equal(result$group_vars, "x")
+  expect_equal(op_grps(result), "x")
 })
