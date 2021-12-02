@@ -26,8 +26,28 @@ window_order <- function(.data, ...) {
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
-  .data$lazy_query$order_vars <- dots
-  add_op_order(.data, dots)
+  lazy_query <- add_order(.data, dots)
+  out <- add_op_order(.data, dots)
+
+  out$lazy_query <- lazy_query
+  out
+}
+
+add_order <- function(.data, dots) {
+  lazy_query <- .data$lazy_query
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    out <- lazy_select_query(
+      from = lazy_query,
+      last_op = "window_order",
+      select = syms(set_names(op_vars(lazy_query))),
+      order_vars = dots
+    )
+
+    return(out)
+  }
+
+  lazy_query$order_vars <- dots
+  lazy_query
 }
 
 # We want to preserve this ordering (for window functions) without
