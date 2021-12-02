@@ -114,7 +114,7 @@ add_select <- function(.data, vars) {
   lazy_query <- .data$lazy_query
   vars <- syms(vars)
 
-  if (identical(lazy_query$last_op, "select")) {
+  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in nest_vars()

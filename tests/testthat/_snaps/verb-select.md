@@ -11,7 +11,7 @@
       lf %>% select(2:1) %>% select(2:1)
     Output
       <SQL>
-      SELECT `x`, `y`
+      SELECT *
       FROM `df`
 
 ---
