@@ -149,7 +149,7 @@ add_select <- function(.data, vars) {
   }
 
   lazy_select_query(
-    from = lazy_query$lazy_query,
+    from = lazy_query,
     last_op = "select",
     select = syms(set_names(vars)),
     select_operation = "mutate"
