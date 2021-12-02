@@ -70,7 +70,7 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
   }
 }
 
-partial_eval_dots <- function(dots, vars) {
+partial_eval_dots <- function(dots, vars, named = FALSE) {
   stopifnot(inherits(dots, "quosures"))
 
   dots <- lapply(dots, partial_eval_quo, vars = vars)
@@ -80,7 +80,12 @@ partial_eval_dots <- function(dots, vars) {
   dots[!is_list] <- lapply(dots[!is_list], list)
   names(dots)[is_list] <- ""
 
-  unlist(dots, recursive = FALSE)
+  out <- unlist(dots, recursive = FALSE)
+  if (named) {
+    out <- quos_auto_name(out)
+  }
+
+  out
 }
 
 partial_eval_quo <- function(x, vars) {
