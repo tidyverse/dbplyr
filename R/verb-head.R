@@ -36,7 +36,36 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
   } else {
     x$ops <- op_single("head", x = x$ops, args = list(n = n))
   }
+  x$lazy_query <- add_head(x, n)
+
   x
+}
+
+add_head <- function(x, n) {
+  lazy_query <- x$lazy_query
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "head",
+      select = syms(set_names(op_vars(lazy_query))),
+      limit = n
+    )
+
+    return(lazy_query)
+  }
+
+  if (identical(x$last_op, "head")) {
+    lazy_query$limit <- n
+  } else {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "head",
+      select = syms(set_names(op_vars(lazy_query))),
+      limit = n
+    )
+  }
+
+  lazy_query
 }
 
 #' @export
