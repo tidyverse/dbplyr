@@ -103,6 +103,7 @@ Collate:
     'ident.R'
     'lazy-join-query.R'
     'lazy-ops.R'
+    'lazy-set-op-query.R'
     'lazy_select_query.R'
     'memdb.R'
     'partial-eval.R'

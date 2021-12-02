@@ -136,9 +136,7 @@ op_vars.op_single <- function(op) op_vars(op$x)
 #' @export
 op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
 #' @export
-op_vars.tbl_lazy <- function(op) op_vars(op$ops)
-# op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
-# TODO
+op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
 
 # op_sort -----------------------------------------------------------------
 
