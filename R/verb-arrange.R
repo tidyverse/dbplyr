@@ -46,8 +46,11 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
 add_arrange <- function(.data, dots, .by_group) {
   lazy_query <- .data$lazy_query
 
+  # multiple arranges combine
+  dots <- c(op_sort(.data), dots)
+
   if (.by_group) {
-    dots <- c(op_grps(lazy_query), set_names(dots))
+    dots <- c(syms(op_grps(lazy_query)), dots)
   }
 
   vars <- op_vars(lazy_query)

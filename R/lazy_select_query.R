@@ -21,8 +21,9 @@ lazy_select_query <- function(from,
   # stopifnot(is.character(order_by))
   stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
-  # stopifnot(is.character(group_vars))
-  # stopifnot(is.character(order_vars))
+  stopifnot(is.null(group_vars) || (is.character(group_vars) && is.null(names(group_vars))))
+  stopifnot(is.null(order_vars) || is.list(order_vars) || is_quosures(order_vars))
+  stopifnot(is.null(names(order_vars)))
   # frame
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
@@ -93,19 +94,6 @@ update_lazy_select <- function(lazy_query, vars) {
   select$name <- names(vars)
   lazy_query$select <- select
 
-
-  group_vars <- lazy_query$group_vars
-  group_vars_out <- syms(names(group_vars))
-  idx <- vctrs::vec_match(group_vars_out, vars)
-  names(group_vars)[group_vars_out %in% vars] <- names(vars[idx])
-  lazy_query$group_vars <- group_vars
-
-  order_vars <- lazy_query$order_vars
-  order_vars_out <- syms(names(order_vars))
-  idx <- vctrs::vec_match(order_vars_out, vars)
-  names(order_vars)[order_vars_out %in% vars] <- names(vars[idx])
-  lazy_query$order_vars <- order_vars
-
   lazy_query
 }
 
@@ -147,11 +135,23 @@ op_vars.lazy_query <- function(x) {
 
 #' @export
 op_grps.lazy_query <- function(x) {
-  syms(set_names(names(x$group_vars)))
+  # Find renamed variables
+  vars <- purrr::set_names(x$select$expr, x$select$name)
+  symbols <- purrr::keep(vars, is_symbol)
+  new2old <- purrr::map_chr(symbols, as_string)
+  old2new <- set_names(names(new2old), new2old)
+
+  grps <- x$group_vars
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
+  grps
 }
 
 #' @export
 op_sort.lazy_query <- function(x) {
+  # TODO `$order_vars` must be a list of quosures and variables needed in sorting
+  # can be dropped (unlike grouping variables).
+  # => renaming doesn't make sense
   x$order_vars
 }
 

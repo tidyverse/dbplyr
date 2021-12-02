@@ -18,7 +18,7 @@ collapse.tbl_sql <- function(x, ...) {
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%
-    add_op_order(op_sort(x))
+    arrange.tbl_lazy(!!!op_sort(x))
 }
 
 # compute -----------------------------------------------------------------
@@ -55,7 +55,7 @@ compute.tbl_sql <- function(x,
 
   tbl(x$src, name) %>%
     group_by(!!! syms(op_grps(x))) %>%
-    add_op_order(op_sort(x))
+    arrange.tbl_lazy(!!!op_sort(x))
 }
 
 # collect -----------------------------------------------------------------

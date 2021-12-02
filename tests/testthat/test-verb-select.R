@@ -203,10 +203,7 @@ test_that("renaming handles groups correctly", {
     new_lazy_select(exprs(ax = x, y = y))
   )
 
-  expect_equal(
-    result$group_vars,
-    syms(c(ax = "x"))
-  )
+  expect_equal(result$group_vars, "x")
 
   result <- lf %>%
     rename(x = ax) %>%
@@ -217,8 +214,5 @@ test_that("renaming handles groups correctly", {
     new_lazy_select(exprs(x = x, y = y))
   )
 
-  expect_equal(
-    result$group_vars,
-    syms(c(x = "x"))
-  )
+  expect_equal(result$group_vars, "x")
 })

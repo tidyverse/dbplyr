@@ -108,7 +108,7 @@ test_that("generates correct lazy_select_query", {
     lazy_select_query(
       from = lf$lazy_query,
       last_op = "mutate",
-      select = list(x = sym("x"), y = sym("y"), q01 = expr(mean(x, na.rm = TRUE)))
+      select = list(x = sym("x"), y = sym("y"), q01 = quo(mean(x, na.rm = TRUE)))
     ),
     ignore_formula_env = TRUE
   )

@@ -116,7 +116,7 @@ op_double <- function(name, x, y, args = list()) {
 #' @rdname lazy_ops
 op_grps <- function(op) UseMethod("op_grps")
 #' @export
-op_grps.op_base <- function(op) set_names(character())
+op_grps.op_base <- function(op) character()
 #' @export
 op_grps.op_single <- function(op) op_grps(op$x)
 #' @export
@@ -137,6 +137,8 @@ op_vars.op_single <- function(op) op_vars(op$x)
 op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
 #' @export
 op_vars.tbl_lazy <- function(op) op_vars(op$ops)
+# TODO
+# op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
 
 # op_sort -----------------------------------------------------------------
 
@@ -144,13 +146,14 @@ op_vars.tbl_lazy <- function(op) op_vars(op$ops)
 #' @rdname lazy_ops
 op_sort <- function(op) UseMethod("op_sort")
 #' @export
-op_sort.op_base <- function(op) set_names(character())
+op_sort.op_base <- function(op) NULL
 #' @export
 op_sort.op_single <- function(op) op_sort(op$x)
 #' @export
 op_sort.op_double <- function(op) op_sort(op$x)
 #' @export
-op_sort.tbl_lazy <- function(op) op_sort(op$ops)
+op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
+# op_sort.tbl_lazy <- function(op) op_sort(op$ops)
 
 # op_frame ----------------------------------------------------------------
 

@@ -92,7 +92,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   # TODO when should this inform about the new groups?
   lazy_query <- .data$lazy_query
 
-  grps <- syms(set_names(names(lazy_query$group_vars)))
+  grps <- op_grps(lazy_query)
   .groups <- .groups %||% "drop_last"
   groups_out <- switch(.groups,
     drop_last = grps[-length(grps)],
@@ -103,8 +103,8 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_select_query(
     from = lazy_query,
     last_op = "summarise",
-    select = c(grps, dots),
-    group_by = syms(unname(grps)),
+    select = c(syms(set_names(grps)), dots),
+    group_by = syms(grps),
     group_vars = groups_out,
     select_operation = "summarise"
   )
@@ -128,7 +128,7 @@ op_grps.op_summarise <- function(op) {
 }
 
 #' @export
-op_sort.op_summarise <- function(op) set_names(character())
+op_sort.op_summarise <- function(op) NULL
 
 #' @export
 sql_build.op_summarise <- function(op, con, ...) {
