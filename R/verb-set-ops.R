@@ -30,7 +30,7 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  lazy_query <- add_set_op(x, y, "UNION ALL", copy = copy, ..., all = all)
+  lazy_query <- add_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
 
   out <- add_op_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
   out$lazy_query <- lazy_query
