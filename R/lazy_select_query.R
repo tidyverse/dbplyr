@@ -204,7 +204,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     function(dots, vars_group, vars_order, vars_frame) {
       translate_sql_(
         list(dots), con,
-        vars_group = translate_sql_(unname(vars_group), con),
+        vars_group = translate_sql_(syms(vars_group), con),
         vars_order = translate_sql_(vars_order, con, context = list(clause = "ORDER")),
         vars_frame = vars_frame,
         context = list(clause = "SELECT")
