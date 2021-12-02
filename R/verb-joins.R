@@ -69,6 +69,17 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_join(
+    x, y,
+    "inner",
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    suffix = suffix,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_join(
     x, y,
@@ -90,6 +101,17 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_join(
+    x, y,
+    "left",
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    suffix = suffix,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_join(
     x, y,
@@ -111,6 +133,17 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_join(
+    x, y,
+    "right",
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    suffix = suffix,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_join(
     x, y,
@@ -132,6 +165,17 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_join(
+    x, y,
+    "full",
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    suffix = suffix,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_join(
     x, y,
@@ -152,6 +196,16 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_semi_join(
+    x, y,
+    anti = FALSE,
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_semi_join(
     x, y,
@@ -171,6 +225,16 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na")) {
+  x$lazy_query <- add_semi_join(
+    x, y,
+    anti = TRUE,
+    by = by,
+    sql_on = sql_on,
+    copy = copy,
+    auto_index = auto_index,
+    na_matches = na_matches,
+    ...
+  )
 
   add_op_semi_join(
     x, y,
@@ -196,7 +260,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type <- "cross"
     by <- list(x = character(0), y = character(0))
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- suppressMessages(dplyr::common_by(by, x, y))
   }
 
   y <- auto_copy(
@@ -218,12 +282,45 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   x
 }
 
+add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
+                     suffix = NULL,
+                     auto_index = FALSE,
+                     na_matches = "never") {
+
+  if (!is.null(sql_on)) {
+    by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else if (identical(type, "full") && identical(by, character())) {
+    type <- "cross"
+    by <- list(x = character(0), y = character(0))
+  } else {
+    by <- dplyr::common_by(by, x, y)
+  }
+
+  y <- auto_copy(
+    x, y,
+    copy = copy,
+    indexes = if (auto_index) list(by$y)
+  )
+
+  suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
+
+  lazy_join_query(
+    x, y,
+    vars = vars,
+    type = type,
+    by = by,
+    suffix = suffix,
+    na_matches = na_matches
+  )
+}
+
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never") {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- suppressMessages(dplyr::common_by(by, x, y))
   }
 
   y <- auto_copy(
@@ -237,6 +334,27 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
     na_matches = na_matches
   ))
   x
+}
+
+add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
+                             auto_index = FALSE, na_matches = "never") {
+  if (!is.null(sql_on)) {
+    by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else {
+    by <- dplyr::common_by(by, x, y)
+  }
+
+  y <- auto_copy(
+    x, y, copy,
+    indexes = if (auto_index) list(by$y)
+  )
+
+  lazy_semi_join_query(
+    x, y,
+    anti = anti,
+    by = by,
+    na_matches = na_matches
+  )
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
