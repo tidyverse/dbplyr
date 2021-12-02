@@ -122,7 +122,7 @@ op_grps.op_single <- function(op) op_grps(op$x)
 #' @export
 op_grps.op_double <- function(op) op_grps(op$x)
 #' @export
-op_grps.tbl_lazy <- function(op) op_grps(op$ops)
+op_grps.tbl_lazy <- function(op) op_grps(op$lazy_query)
 
 # op_vars -----------------------------------------------------------------
 
@@ -137,8 +137,8 @@ op_vars.op_single <- function(op) op_vars(op$x)
 op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
 #' @export
 op_vars.tbl_lazy <- function(op) op_vars(op$ops)
-# TODO
 # op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
+# TODO
 
 # op_sort -----------------------------------------------------------------
 
@@ -153,7 +153,6 @@ op_sort.op_single <- function(op) op_sort(op$x)
 op_sort.op_double <- function(op) op_sort(op$x)
 #' @export
 op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
-# op_sort.tbl_lazy <- function(op) op_sort(op$ops)
 
 # op_frame ----------------------------------------------------------------
 
@@ -167,7 +166,7 @@ op_frame.op_single <- function(op) op_frame(op$x)
 #' @export
 op_frame.op_double <- function(op) op_frame(op$x)
 #' @export
-op_frame.tbl_lazy <- function(op) op_frame(op$ops)
+op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
 
 # Description -------------------------------------------------------------
 
