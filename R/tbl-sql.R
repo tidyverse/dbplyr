@@ -25,11 +25,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
     c(subclass, "sql", "lazy"),
     src = src,
     ops = ops,
-    lazy_query = lazy_select_query(
-      from = ops,
-      last_op = "base_remote",
-      select = syms(set_names(vars))
-    )
+    lazy_query = lazy_query_remote(from, vars)
   )
 }
 

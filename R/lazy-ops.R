@@ -37,6 +37,26 @@ op_base_remote <- function(x, vars) {
   op_base(x, vars, class = "remote")
 }
 
+lazy_query_base <- function(x, vars, class = character()) {
+  stopifnot(is.character(vars))
+
+  structure(
+    list(
+      x = x,
+      vars = vars
+    ),
+    class = c(paste0("lazy_query_base_", class), "lazy_query_base", "lazy_query")
+  )
+}
+
+lazy_query_local <- function(df) {
+  lazy_query_base(df, names(df), class = "local")
+}
+
+lazy_query_remote <- function(x, vars) {
+  lazy_query_base(x, vars, class = "remote")
+}
+
 #' @export
 print.op_base_remote <- function(x, ...) {
   if (inherits(x$x, "ident")) {
@@ -60,6 +80,16 @@ sql_build.op_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.op_base_local <- function(op, con, ...) {
+  ident("df")
+}
+
+#' @export
+sql_build.lazy_query_base_remote <- function(op, con, ...) {
+  op$x
+}
+
+#' @export
+sql_build.lazy_query_base_local <- function(op, con, ...) {
   ident("df")
 }
 
@@ -123,6 +153,8 @@ op_grps.op_single <- function(op) op_grps(op$x)
 op_grps.op_double <- function(op) op_grps(op$x)
 #' @export
 op_grps.tbl_lazy <- function(op) op_grps(op$lazy_query)
+#' @export
+op_grps.lazy_query_base <- function(op) character()
 
 # op_vars -----------------------------------------------------------------
 
@@ -137,6 +169,8 @@ op_vars.op_single <- function(op) op_vars(op$x)
 op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
 #' @export
 op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
+#' @export
+op_vars.lazy_query_base <- function(op) op$vars
 
 # op_sort -----------------------------------------------------------------
 
@@ -151,6 +185,8 @@ op_sort.op_single <- function(op) op_sort(op$x)
 op_sort.op_double <- function(op) op_sort(op$x)
 #' @export
 op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
+#' @export
+op_sort.lazy_query_base <- function(op) NULL
 
 # op_frame ----------------------------------------------------------------
 
@@ -165,6 +201,8 @@ op_frame.op_single <- function(op) op_frame(op$x)
 op_frame.op_double <- function(op) op_frame(op$x)
 #' @export
 op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
+#' @export
+op_frame.lazy_query_base <- function(op) NULL
 
 # Description -------------------------------------------------------------
 
