@@ -44,16 +44,11 @@ add_filter <- function(.data, dots) {
 
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
-    # TODO should call `mutate()` to actually use `group_vars`
-    mutated <- lazy_select_query(
-      from = lazy_query,
-      last_op = "mutate",
-      select = carry_over(vars, where$comp),
-      select_operation = "mutate"
-    )
+    mutated <- .data %>%
+      mutate(!!!where$comp)
 
     lazy_select_query(
-      from = mutated,
+      from = mutated$lazy_query,
       last_op = "filter",
       select = syms(set_names(vars)),
       where = where$expr
