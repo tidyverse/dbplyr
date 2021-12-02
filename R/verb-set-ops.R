@@ -107,8 +107,7 @@ fill_vars <- function(x, vars) {
     }
   })
 
-  x$ops <- op_select(x$ops, new_vars)
-  x
+  transmute(x, !!!new_vars)
 }
 
 #' @export
