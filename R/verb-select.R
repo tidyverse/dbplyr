@@ -111,11 +111,10 @@ simulate_vars2 <- function(x) {
 # op_select ---------------------------------------------------------------
 
 add_select <- function(.data, vars) {
-  con <- remote_con(.data)
   lazy_query <- .data$lazy_query
   vars <- syms(vars)
 
-  if (lazy_query$last_op == "select") {
+  if (identical(lazy_query$last_op, "select")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in nest_vars()
@@ -143,15 +142,10 @@ add_select <- function(.data, vars) {
     }
   }
 
-  if (inherits(lazy_query$from, "op_base")) {
-    lazy_query <- update_lazy_select(lazy_query, vars)
-    return(lazy_query)
-  }
-
   lazy_select_query(
     from = lazy_query,
     last_op = "select",
-    select = syms(set_names(vars)),
+    select = syms(vars),
     select_operation = "mutate"
   )
 }
