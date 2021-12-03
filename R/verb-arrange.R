@@ -46,11 +46,6 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
 add_arrange <- function(.data, dots, .by_group) {
   lazy_query <- .data$lazy_query
 
-  # TODO should this be active or not?
-  # https://github.com/tidyverse/dbplyr/pull/672
-  # multiple arranges combine
-  # dots <- c(op_sort(.data), dots)
-
   if (.by_group) {
     dots <- c(syms(op_grps(lazy_query)), dots)
   }
