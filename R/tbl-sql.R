@@ -17,14 +17,10 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   from <- as.sql(from, con = src$con)
 
   vars <- vars %||% dbplyr_query_fields(src$con, from)
-  ops <- op_base_remote(from, vars)
-
-  dplyr::make_tbl(c(subclass, "sql", "lazy"), src = src, ops = ops)
 
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
     src = src,
-    ops = ops,
     lazy_query = lazy_query_remote(from, vars)
   )
 }

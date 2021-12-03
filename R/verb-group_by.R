@@ -53,31 +53,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   names <- purrr::map_chr(groups$groups, as_string)
 
   groups$data$lazy_query <- add_group_by(groups$data, names)
-
-  add_op_single("group_by",
-    groups$data,
-    dots = set_names(groups$groups, names),
-    args = list(add = FALSE)
-  )
-}
-
-#' @export
-op_desc.op_group_by <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
-  }
-}
-
-#' @export
-sql_build.op_group_by <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  groups$data
 }
 
 # ungroup -----------------------------------------------------------------
@@ -86,18 +62,7 @@ sql_build.op_group_by <- function(op, con, ...) {
 #' @export
 ungroup.tbl_lazy <- function(x, ...) {
   x$lazy_query <- add_group_by(x, character())
-
-  add_op_single("ungroup", x)
-}
-
-#' @export
-op_grps.op_ungroup <- function(op) {
-  character()
-}
-
-#' @export
-sql_build.op_ungroup <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  x
 }
 
 add_group_by <- function(.data, group_vars) {

@@ -23,7 +23,6 @@ tbl_lazy <- function(df, con = NULL, src = NULL) {
 
   dplyr::make_tbl(
     purrr::compact(c(subclass, "lazy")),
-    ops = op_base_local(df),
     lazy_query = lazy_query_local(df),
     src = src_dbi(con)
   )

@@ -27,7 +27,7 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   }
 
   .data$lazy_query <- add_distinct(.data)
-  add_op_single("distinct", .data, dots = list())
+  .data
 }
 
 add_distinct <- function(.data) {
@@ -37,19 +37,6 @@ add_distinct <- function(.data) {
     from = lazy_query,
     last_op = "distinct",
     select = syms(set_names(op_vars(lazy_query))),
-    distinct = TRUE
-  )
-}
-
-#' @export
-op_vars.op_distinct <- function(op) {
-  union(op_grps(op$x), op_vars(op$x))
-}
-
-#' @export
-sql_build.op_distinct <- function(op, con, ...) {
-  select_query(
-    sql_build(op$x, con),
     distinct = TRUE
   )
 }

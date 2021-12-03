@@ -44,13 +44,7 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
     .groups = .groups,
     env_caller = caller_env()
   )
-
-  add_op_single(
-    "summarise",
-    .data,
-    dots = dots,
-    args = list(.groups = .groups, env_caller = caller_env())
-  )
+  .data
 }
 
 # For each expression, check if it uses any newly created variables
@@ -112,23 +106,6 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   )
 }
 
-#' @export
-op_vars.op_summarise <- function(op) {
-  c(op_grps(op$x), names(op$dots))
-}
-
-#' @export
-op_grps.op_summarise <- function(op) {
-  grps <- op_grps(op$x)
-  .groups <- op$args$.groups %||% "drop_last"
-
-  switch(.groups,
-    drop_last = grps[-length(grps)],
-    keep = grps,
-    drop = character()
-  )
-}
-
 summarise_message <- function(grps, .groups, env_caller) {
   verbose <- summarise_verbose(.groups, env_caller)
   n <- length(grps)
@@ -142,40 +119,8 @@ summarise_message <- function(grps, .groups, env_caller) {
   )
 }
 
-#' @export
-op_sort.op_summarise <- function(op) NULL
-
-#' @export
-sql_build.op_summarise <- function(op, con, ...) {
-  select_vars <- translate_sql_(op$dots, con, window = FALSE, context = list(clause = "SELECT"))
-  group_vars <- op_grps(op$x)
-  n <- length(group_vars)
-
-  .groups <- op$args$.groups
-  verbose <- summarise_verbose(.groups, op$args$env_caller)
-  .groups <- .groups %||% "drop_last"
-
-  if (verbose && n > 1) {
-    new_groups <- glue::glue_collapse(paste0("'", group_vars[-n], "'"), sep = ", ")
-    summarise_inform("has grouped output by {new_groups}")
-  }
-
-  group_vars <- c.sql(ident(group_vars), con = con)
-  select_query(
-    sql_build(op$x, con),
-    select = c.sql(group_vars, select_vars, con = con),
-    group_by = group_vars
-  )
-}
-
 summarise_verbose <- function(.groups, .env) {
   is.null(.groups) &&
     is_reference(topenv(.env), global_env()) &&
     !identical(getOption("dplyr.summarise.inform"), FALSE)
-}
-
-summarise_inform <- function(..., .env = parent.frame()) {
-  inform(paste0(
-    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
-  ))
 }

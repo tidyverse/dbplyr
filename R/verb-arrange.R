@@ -35,12 +35,7 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   names(dots) <- NULL
 
   .data$lazy_query <- add_arrange(.data, dots, .by_group)
-  add_op_single(
-    "arrange",
-    .data,
-    dots = dots,
-    args = list(.by_group = .by_group)
-  )
+  .data
 }
 
 add_arrange <- function(.data, dots, .by_group) {
@@ -73,28 +68,4 @@ add_arrange <- function(.data, dots, .by_group) {
   lazy_query$order_vars <- dots
   lazy_query$order_by <- dots
   lazy_query
-}
-
-#' @export
-op_sort.op_arrange <- function(op) {
-  c(op_sort(op$x), op$dots)
-}
-
-#' @export
-op_desc.op_arrange <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-sql_build.op_arrange <- function(op, con, ...) {
-  order_vars <- translate_sql_(op$dots, con, context = list(clause = "ORDER"))
-
-  if (op$args$.by_group) {
-    order_vars <- c.sql(ident(op_grps(op$x)), order_vars, con = con)
-  }
-
-  select_query(
-    sql_build(op$x, con),
-    order_by = order_vars
-  )
 }
