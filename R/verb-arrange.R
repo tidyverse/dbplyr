@@ -55,14 +55,29 @@ add_arrange <- function(.data, dots, .by_group) {
     dots <- c(syms(op_grps(lazy_query)), dots)
   }
 
+  # `dots` must be an empty list so that `arrange()` removes the `order_vars`
+  dots <- dots %||% list()
+
   vars <- op_vars(lazy_query)
-  lazy_select_query(
+  new_lazy_query <- lazy_select_query(
     from = lazy_query,
     last_op = "arrange",
     select = syms(set_names(vars)),
     order_by = dots,
-    order_vars = dots %||% list()
+    order_vars = dots
   )
+
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(new_lazy_query)
+  }
+
+  if (!is.null(lazy_query$limit)) {
+    return(new_lazy_query)
+  }
+
+  lazy_query$order_vars <- dots
+  lazy_query$order_by <- dots
+  lazy_query
 }
 
 #' @export
