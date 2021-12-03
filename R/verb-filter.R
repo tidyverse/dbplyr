@@ -44,8 +44,7 @@ add_filter <- function(.data, dots) {
 
     # Convert where$expr back to a lazy dots object, and then
     # create mutate operation
-    mutated <- .data %>%
-      mutate(!!!where$comp)
+    mutated <- mutate(.data, !!!where$comp)
 
     lazy_select_query(
       from = mutated$lazy_query,

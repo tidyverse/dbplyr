@@ -62,7 +62,6 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
   x <- fill_vars(x, vars)
   y <- fill_vars(y, vars)
 
-  # lazy_set_op_query(x, y, type = type, all = all)
   lazy_set_op_query(x$lazy_query, y$lazy_query, type = type, all = all)
 }
 

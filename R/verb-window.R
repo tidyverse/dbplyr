@@ -47,6 +47,7 @@ add_order <- function(.data, dots) {
     return(out)
   }
 
+  # `window_order()` does not produce an `ORDER BY` clause
   lazy_query$order_vars <- dots
   lazy_query
 }

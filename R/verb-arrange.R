@@ -61,6 +61,7 @@ add_arrange <- function(.data, dots, .by_group) {
     return(new_lazy_query)
   }
 
+  # Needed because `ORDER BY` is evaluated before `LIMIT`
   if (!is.null(lazy_query$limit)) {
     return(new_lazy_query)
   }
