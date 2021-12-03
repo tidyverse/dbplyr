@@ -127,10 +127,8 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
-  lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)
-  out <- add_op_set_op(x, y, "MINUS", copy = copy, ...)
-  out$lazy_query <- lazy_query
-  out
+  x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)
+  x
 }
 
 #' @export
