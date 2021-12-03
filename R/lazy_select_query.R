@@ -11,7 +11,8 @@ lazy_select_query <- function(from,
                               group_vars = NULL,
                               order_vars = NULL,
                               frame = NULL,
-                              select_operation = c("mutate", "summarise")) {
+                              select_operation = c("mutate", "summarise"),
+                              message_summarise = NULL) {
 
   stopifnot(is_string(last_op))
   # TODO check arguments
@@ -61,7 +62,8 @@ lazy_select_query <- function(from,
       order_vars = order_vars,
       frame = frame,
       select_operation = select_operation,
-      last_op = last_op
+      last_op = last_op,
+      message_summarise = message_summarise
     ),
     class = c("lazy_select_query", "lazy_query")
   )
@@ -167,6 +169,10 @@ op_desc.lazy_query <- function(x) {
 
 #' @export
 sql_build.lazy_query <- function(x, con, ...) {
+  if (!is.null(x$message_summarise)) {
+    inform(x$message_summarise)
+  }
+
   select_sql <- get_select_sql(x$select, x$select_operation, op_vars(x$from), con)
   where_sql <- translate_sql_(x$where, con = con, context = list(clause = "WHERE"))
 
