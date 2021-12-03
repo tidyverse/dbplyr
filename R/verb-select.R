@@ -114,6 +114,9 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   op <- match.arg(op, c("select", "mutate"))
   lazy_query <- .data$lazy_query
 
+  # drop NULLs
+  vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
+
   if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with

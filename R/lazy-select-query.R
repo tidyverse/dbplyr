@@ -171,7 +171,7 @@ op_desc.lazy_query <- function(x) {
 }
 
 #' @export
-sql_build.lazy_query <- function(x, con, ...) {
+sql_build.lazy_select_query <- function(x, con, ...) {
   if (!is.null(x$message_summarise)) {
     inform(x$message_summarise)
   }
@@ -193,7 +193,8 @@ sql_build.lazy_query <- function(x, con, ...) {
 get_select_sql <- function(select, select_operation, in_vars, con) {
   if (select_operation == "summarise") {
     select_expr <- set_names(select$expr, select$name)
-    select_sql <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
+    select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
+    select_sql <- sql_vector(select_sql_list, parens = FALSE, collapse = NULL, con = con)
     return(select_sql)
   }
 

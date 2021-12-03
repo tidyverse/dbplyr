@@ -43,7 +43,7 @@ compute.tbl_sql <- function(x,
   assert_that(all(unlist(unique_indexes) %in% vars))
 
   x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$src$con, x_aliased$ops)
+  sql <- db_sql_render(x$src$con, x_aliased$lazy_query)
 
   name <- db_compute(x$src$con, name, sql,
     temporary = temporary,

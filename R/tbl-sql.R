@@ -76,8 +76,8 @@ as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
 #' @export
 #' @importFrom tibble tbl_sum
 tbl_sum.tbl_sql <- function(x) {
-  grps <- op_grps(x$ops)
-  sort <- op_sort(x$ops)
+  grps <- op_grps(x$lazy_query)
+  sort <- op_sort(x$lazy_query)
   c(
     "Source" = tbl_desc(x),
     "Database" = dbplyr_connection_describe(x$src$con),
@@ -88,11 +88,11 @@ tbl_sum.tbl_sql <- function(x) {
 
 tbl_desc <- function(x) {
   paste0(
-    op_desc(x$ops),
+    op_desc(x$lazy_query),
     " [",
-    op_rows(x$ops),
+    op_rows(x$lazy_query),
     " x ",
-    big_mark(op_cols(x$ops)),
+    big_mark(op_cols(x$lazy_query)),
     "]"
   )
 }

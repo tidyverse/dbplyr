@@ -31,7 +31,7 @@ sql_build <- function(op, con = NULL, ...) {
 #' @export
 sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
   # only used for testing
-  qry <- sql_build(op$ops, con = con, ...)
+  qry <- sql_build(op$lazy_query, con = con, ...)
   sql_optimise(qry, con = con, ...)
 }
 

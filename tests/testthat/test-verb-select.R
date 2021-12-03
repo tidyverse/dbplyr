@@ -122,7 +122,7 @@ test_that("select renames variables", {
 
 test_that("select can refer to variables in local env", {
   vars <- c("x", "y")
-  out <- lazy_frame(x = 1, y = 1) %>%
+  out <- lazy_frame(x = 1, y = 1, z = 1) %>%
     select(dplyr::one_of(vars)) %>%
     sql_build()
 

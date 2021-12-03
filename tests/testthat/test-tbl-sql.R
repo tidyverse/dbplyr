@@ -22,7 +22,7 @@ test_that("same_src distinguishes srcs", {
 
 test_that("can generate sql tbls with raw sql", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
 
   expect_equal(collect(mf1), collect(mf2))
 })

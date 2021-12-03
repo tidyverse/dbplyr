@@ -13,6 +13,6 @@
     Code
       lf_render
     Output
-      <SQL> SELECT `x`
+      <SQL> SELECT *
       FROM `df`
 

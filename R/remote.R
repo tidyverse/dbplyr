@@ -22,10 +22,10 @@
 #' remote_con(mf2)
 #' remote_query(mf2)
 remote_name <- function(x) {
-  if (!inherits(x$ops, "op_base"))
+  if (!inherits(x$lazy_query, "lazy_query_base"))
     return()
 
-  x$ops$x
+  x$lazy_query$x
 }
 
 #' @export
@@ -49,5 +49,5 @@ remote_query <- function(x) {
 #' @export
 #' @rdname remote_name
 remote_query_plan <- function(x) {
-  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$ops))
+  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$lazy_query))
 }
