@@ -52,7 +52,7 @@ nest_vars <- function(.data, dots, all_vars) {
     if (any(used_vars %in% new_vars)) {
       new_actions <- dots[seq2(init, length(dots))][new_vars]
       .data$ops <- op_select(.data$ops, carry_over(union(all_vars, used_vars), new_actions))
-      .data$lazy_query <- add_mutate(.data, carry_over(union(all_vars, used_vars), new_actions))
+      .data$lazy_query <- add_select(.data, carry_over(union(all_vars, used_vars), new_actions), "mutate")
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
@@ -65,53 +65,8 @@ nest_vars <- function(.data, dots, all_vars) {
     dots <- dots[-seq2(1L, init - 1)]
   }
   .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
-  .data$lazy_query <- add_mutate(.data, carry_over(all_vars, dots))
+  .data$lazy_query <- add_select(.data, carry_over(all_vars, dots), "mutate")
   .data
-}
-
-add_mutate <- function(.data, vars) {
-  lazy_query <- .data$lazy_query
-
-  # TODO avoid code duplication with `add_select()`
-  if (identical(lazy_query$last_op, "select")) {
-    # Special optimisation when applied to pure projection() - this is
-    # conservative and we could expand to any op_select() if combined with
-    # the logic in nest_vars()
-    select <- lazy_query$select
-
-    if (purrr::every(vars, is.symbol)) {
-      # if current operation is pure projection
-      # we can just subset the previous selection
-      sel_vars <- purrr::map_chr(vars, as_string)
-      lazy_query <- update_lazy_select(lazy_query, sel_vars)
-
-      return(lazy_query)
-    }
-
-    prev_vars <- select$expr
-    if (purrr::every(prev_vars, is.symbol)) {
-      # if previous operation is pure projection
-      sel_vars <- purrr::map_chr(prev_vars, as_string)
-      if (all(select$name == sel_vars)) {
-        # and there's no renaming
-        # we can just ignore the previous step
-        lazy_query$select <- new_lazy_select(
-          vars,
-          group_vars = op_grps(lazy_query),
-          order_vars = op_sort(lazy_query),
-          frame = op_frame(lazy_query)
-        )
-        # lazy_query <- update_lazy_select(lazy_query, vars)
-        return(lazy_query)
-      }
-    }
-  }
-
-  lazy_select_query(
-    from = lazy_query,
-    last_op = "mutate",
-    select = vars
-  )
 }
 
 # Combine a selection (passed through from subquery)

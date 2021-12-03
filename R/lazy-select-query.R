@@ -2,7 +2,7 @@
 #' @rdname sql_build
 lazy_select_query <- function(from,
                               last_op,
-                              select = NULL,
+                              select,
                               where = NULL,
                               group_by = NULL,
                               order_by = NULL,
@@ -13,30 +13,27 @@ lazy_select_query <- function(from,
                               frame = NULL,
                               select_operation = c("mutate", "summarise"),
                               message_summarise = NULL) {
-
+  stopifnot(inherits(from, "lazy_query"))
   stopifnot(is_string(last_op))
-  # TODO check arguments
-  # stopifnot(is.character(select))
-  # stopifnot(is.character(where))
+  stopifnot(!is.null(select), is_lazy_sql_part(select))
+  stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
-  # stopifnot(is.character(order_by))
+  stopifnot(is_lazy_sql_part(order_by))
   stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
-  stopifnot(is.null(group_vars) || (is.character(group_vars) && is.null(names(group_vars))))
-  stopifnot(is.null(order_vars) || is.list(order_vars) || is_quosures(order_vars))
-  stopifnot(is.null(names(order_vars)))
-  # frame
+
+  # stopifnot(is.null(group_vars) || (is.character(group_vars) && is.null(names(group_vars))))
+  stopifnot(is_lazy_sql_part(order_vars), is.null(names(order_vars)))
+  stopifnot(is.null(frame) || is_integerish(frame, n = 2, finite = TRUE))
+
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
-  if (is_null(group_vars)) {
-    group_vars <- op_grps(from)
-  }
-  if (is_null(order_vars)) {
-    order_vars <- op_sort(from)
-  }
-  if (is_null(frame)) {
-    frame <- op_frame(from)
-  }
+  stopifnot(is.null(message_summarise) || is_string(message_summarise))
+
+  # inherit `group_vars`, `order_vars`, and `frame` from `from`
+  group_vars <- group_vars %||% op_grps(from)
+  order_vars <- order_vars %||% op_sort(from)
+  frame <- frame %||% op_frame(from)
 
   if (last_op == "mutate") {
     select <- new_lazy_select(
@@ -69,10 +66,16 @@ lazy_select_query <- function(from,
   )
 }
 
+is_lazy_sql_part <- function(x) {
+  if (is.null(x)) return(TRUE)
+  if (is_quosures(x)) return(TRUE)
+
+  if (!is.list(x)) return(FALSE)
+  purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_expression(.x))
+}
+
 new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = NULL) {
-  if (!is_null(vars)) {
-    vctrs::vec_as_names(names2(vars), repair = "check_unique")
-  }
+  vctrs::vec_as_names(names2(vars), repair = "check_unique")
 
   var_names <- names(vars)
   vars <- unname(vars)
@@ -219,9 +222,4 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   )
 
   sql(unlist(select_sql))
-}
-
-#' @export
-sql_build.select_query <- function(x, con, ...) {
-  "select_query"
 }

@@ -26,7 +26,7 @@ select.tbl_lazy <- function(.data, ...) {
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -60,7 +60,7 @@ rename.tbl_lazy <- function(.data, ...) {
   names(new_vars)[loc] <- names(loc)
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -77,7 +77,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
 
   .data$ops <- op_select(.data$ops, syms(new_vars))
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -94,7 +94,7 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   )
 
   .data$ops <- op_select(.data$ops, syms(set_names(names(new_vars))))
-  .data$lazy_query <- add_select(.data, unlist(new_vars))
+  .data$lazy_query <- add_select(.data, syms(unlist(new_vars)))
   .data
 }
 
@@ -110,9 +110,9 @@ simulate_vars2 <- function(x) {
 
 # op_select ---------------------------------------------------------------
 
-add_select <- function(.data, vars) {
+add_select <- function(.data, vars, op = c("select", "mutate")) {
+  op <- match.arg(op, c("select", "mutate"))
   lazy_query <- .data$lazy_query
-  vars <- syms(vars)
 
   if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
@@ -136,7 +136,16 @@ add_select <- function(.data, vars) {
       if (all(select$name == sel_vars)) {
         # and there's no renaming
         # we can just ignore the previous step
-        lazy_query <- update_lazy_select(lazy_query, vars)
+        if (op == "select") {
+          lazy_query <- update_lazy_select(lazy_query, vars)
+        } else {
+          lazy_query$select <- new_lazy_select(
+            vars,
+            group_vars = op_grps(lazy_query),
+            order_vars = op_sort(lazy_query),
+            frame = op_frame(lazy_query)
+          )
+        }
         return(lazy_query)
       }
     }
@@ -144,9 +153,8 @@ add_select <- function(.data, vars) {
 
   lazy_select_query(
     from = lazy_query,
-    last_op = "select",
-    select = syms(vars),
-    select_operation = "mutate"
+    last_op = op,
+    select = vars
   )
 }
 
