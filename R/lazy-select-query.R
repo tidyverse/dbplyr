@@ -151,9 +151,9 @@ op_grps.lazy_query <- function(x) {
 
 #' @export
 op_sort.lazy_query <- function(x) {
-  # TODO `$order_vars` must be a list of quosures and variables needed in sorting
-  # can be dropped (unlike grouping variables).
-  # => renaming doesn't make sense
+  # Renaming (like for groups) cannot be done because:
+  # * `order_vars` is a list of quosures
+  # * variables needed in sorting can be dropped
   x$order_vars
 }
 
