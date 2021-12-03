@@ -120,6 +120,13 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
 }
 
 warn_drop_order_by <- function() {
+  # Rules according to SQLite: https://sqlite.org/forum/forumpost/878ca7a9be0862af?t=h
+  # 1. There is no LIMIT clause in the subquery
+  # 3. The subquery is not part of the FROM clause in an UPDATE-FROM statement
+  # 4. The outer query does not use any aggregate functions other than the built-in count(), min(), and/or max() functions.
+  # 5. Either the outer query has its own ORDER BY clause or else the subquery is one term of a join.
+  #
+  # (2. and 6. are left out as they are SQLite internal)
   warn(c(
     "ORDER BY is ignored in subqueries without LIMIT",
     i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"
