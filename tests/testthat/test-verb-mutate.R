@@ -165,10 +165,10 @@ test_that("mutate generates simple expressions", {
 
 test_that("mutate can drop variables with NULL", {
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate(y = NULL) %>%
-    sql_build()
+    mutate(y = NULL)
 
-  expect_named(out$select, "x")
+  expect_named(sql_build(out)$select, "x")
+  expect_equal(op_vars(out), "x")
 })
 
 test_that("mutate_all generates correct sql", {
