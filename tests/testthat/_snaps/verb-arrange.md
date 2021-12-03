@@ -22,9 +22,6 @@
     Code
       # double arrange
       lf %>% arrange(a) %>% arrange(b)
-    Warning <warning>
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT *
@@ -55,7 +52,6 @@
       <SQL>
       SELECT *
       FROM `df`
-      ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange()
     Output
