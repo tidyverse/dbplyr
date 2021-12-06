@@ -17,7 +17,7 @@ NULL
 
 #' @export
 #' @rdname lazy_ops
-lazy_query_base <- function(x, vars, class = character()) {
+lazy_query_base <- function(x, vars, name = NULL, class = character()) {
   stopifnot(is.character(vars))
 
   structure(
@@ -29,8 +29,12 @@ lazy_query_base <- function(x, vars, class = character()) {
   )
 }
 
-lazy_query_local <- function(df) {
-  lazy_query_base(df, names(df), class = "local")
+lazy_query_local <- function(df, name = NULL) {
+  # if (!is.ident(name)) {
+  #   vctrs::vec_assert(name, character(), size = 1)
+  #   name <- ident(name)
+  # }
+  lazy_query_base(df, names(df), name = name, class = "local")
 }
 
 lazy_query_remote <- function(x, vars) {
@@ -60,7 +64,9 @@ sql_build.lazy_query_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_query_base_local <- function(op, con, ...) {
+  # TODO
   ident("df")
+  # op$name
 }
 
 # op_grps -----------------------------------------------------------------

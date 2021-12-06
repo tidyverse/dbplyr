@@ -52,12 +52,12 @@ sql_join_suffix.DBIConnection <- function(con, ...) {
 
 #' @rdname db-misc
 #' @export
-db_sql_render <- function(con, sql, ...) {
+db_sql_render <- function(con, sql, ..., cte = FALSE) {
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ...) {
-  sql_render(sql, con = con, ...)
+db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE) {
+  sql_render(sql, con = con, ..., cte = cte)
 }
 
 #' @rdname db-misc

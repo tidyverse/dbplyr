@@ -48,20 +48,105 @@ sql_build.ident <- function(op, con = NULL, ...) {
 #' @param subquery Is this SQL going to be used in a subquery?
 #'   This is important because you can place a bare table name in a subquery
 #'   and  ORDER BY does not work in subqueries.
-sql_render <- function(query, con = NULL, ..., subquery = FALSE) {
+sql_render <- function(query, con = NULL, ..., subquery = FALSE, cte = FALSE) {
   UseMethod("sql_render")
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE) {
-  sql_render(query$lazy_query, con = con, ..., subquery = subquery)
+sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE, cte = FALSE) {
+  sql_render(query$lazy_query, con = con, ..., subquery = subquery, cte = cte)
 }
 
 #' @export
-sql_render.lazy_query <- function(query, con = NULL, ..., subquery = FALSE) {
+sql_render.lazy_query <- function(query, con = NULL, ..., subquery = FALSE, cte = FALSE) {
   qry <- sql_build(query, con = con, ...)
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
-  sql_render(qry, con = con, ..., subquery = subquery)
+
+  if (cte) {
+    query_list <- flatten_query(qry, list(queries = list(), name = NULL))
+    queries <- purrr::map(
+      query_list$queries,
+      ~ sql_render(.x, con = con, ..., subquery = subquery)
+    )
+
+    cte_render(queries, con)
+  } else {
+    sql_render(qry, con = con, ..., subquery = subquery)
+  }
+}
+
+cte_render <- function(query_list, con) {
+  n <- length(query_list)
+  if (n == 1) {
+    return(query_list[[1]])
+  }
+
+  ctes <- purrr::imap(query_list[-n],
+    function(query, name) {
+      build_sql(ident(name), " AS (\n", sql(query), "\n)", con = con)
+    }
+  )
+  cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
+
+  build_sql("WITH ", cte_query, "\n", query_list[[n]], con = con)
+}
+
+get_subquery_name <- function(x, query_list) {
+  if (is.ident(x)) return(x)
+
+  ident(query_list$name)
+}
+
+flatten_query <- function(qry, query_list) {
+  UseMethod("flatten_query")
+}
+
+#' @export
+flatten_query.select_query <- function(qry, query_list) {
+  from <- qry$from
+  query_list <- flatten_query(from, query_list)
+
+  qry$from <- get_subquery_name(from, query_list)
+  id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
+
+  if (!is.na(id)) {
+    query_list$name <- names(query_list$queries)[[id]]
+  } else {
+    name <- unique_subquery_name()
+    wrapped_query <- set_names(list(qry), name)
+    query_list$queries <- c(query_list$queries, wrapped_query)
+    query_list$name <- name
+  }
+
+  query_list
+}
+
+#' @export
+flatten_query.join_query <- function(qry, query_list) {
+  x <- qry$x
+  query_list_x <- flatten_query(x, query_list)
+  qry$x <- get_subquery_name(x, query_list_x)
+
+  y <- qry$y
+  query_list_y <- flatten_query(y, query_list_x)
+  qry$y <- get_subquery_name(y, query_list_y)
+
+  name <- unique_subquery_name()
+  wrapped_query <- set_names(list(qry), name)
+
+  query_list$queries <- c(query_list_y$queries, wrapped_query)
+  query_list$name <- name
+  query_list
+}
+
+#' @export
+flatten_query.semi_join_query <- flatten_query.join_query
+#' @export
+flatten_query.set_op_query <- flatten_query.join_query
+
+#' @export
+flatten_query.ident <- function(qry, query_list) {
+  query_list
 }
 
 #' @export

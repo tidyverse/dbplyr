@@ -17,10 +17,10 @@ print.set_op_query <- function(x, ...) {
   cat_line("<SQL ", toupper(x$type), ">")
 
   cat_line("X:")
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(sql_build(x$x, con = simulate_dbi())))
 
   cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y)))
+  cat_line(indent_print(sql_build(x$y, con = simulate_dbi())))
 }
 
 #' @export
