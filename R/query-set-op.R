@@ -24,6 +24,14 @@ print.set_op_query <- function(x, ...) {
 }
 
 #' @export
+sql_optimise.set_op_query <- function(x, con = NULL, ..., subquery = FALSE) {
+  x$x <- sql_optimise(x$x, con, subquery = FALSE)
+  x$y <- sql_optimise(x$y, con, subquery = FALSE)
+
+  x
+}
+
+#' @export
 sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE) {
   from_x <- sql_render(query$x, con, ..., subquery = FALSE)
   from_y <- sql_render(query$y, con, ..., subquery = FALSE)
