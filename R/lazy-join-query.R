@@ -40,10 +40,10 @@ print.lazy_join_query <- function(x, ...) {
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
 
   cat_line("X:")
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y)))
+  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
 }
 
 #' @export
@@ -54,31 +54,10 @@ print.lazy_semi_join_query <- function(x, ...) {
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
 
   cat_line("X:")
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y)))
-}
-
-#' @export
-sql_render.lazy_join_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$x, con, ..., subquery = TRUE),
-    name = "LHS"
-  )
-  from_y <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$y, con, ..., subquery = TRUE),
-    name = "RHS"
-  )
-
-  dbplyr_query_join(con, from_x, from_y,
-    vars = query$vars,
-    type = query$type,
-    by = query$by,
-    na_matches = query$na_matches
-  )
+  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
 }
 
 #' @export
@@ -97,47 +76,24 @@ op_grps.lazy_semi_join_query <- function(op) op_grps(op$x)
 
 #' @export
 sql_build.lazy_join_query <- function(op, con, ...) {
-  op
+  join_query(
+    sql_optimise(sql_build(op$x, con), con),
+    sql_optimise(sql_build(op$y, con), con),
+    op$vars,
+    type = op$type,
+    by = op$by,
+    suffix = op$suffix,
+    na_matches = op$na_matches
+  )
 }
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
-  op
-}
-
-#' @export
-sql_render.lazy_join_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$x, con, ..., subquery = TRUE),
-    name = "LHS"
+    semi_join_query(
+    sql_optimise(sql_build(op$x, con), con),
+    sql_optimise(sql_build(op$y, con), con),
+    anti = op$anti,
+    by = op$by,
+    na_matches = op$na_matches
   )
-  from_y <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$y, con, ..., subquery = TRUE),
-    name = "RHS"
-  )
-
-  dbplyr_query_join(con, from_x, from_y,
-    vars = query$vars,
-    type = query$type,
-    by = query$by,
-    na_matches = query$na_matches
-  )
-}
-
-#' @export
-sql_render.lazy_semi_join_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$x, con, ..., subquery = TRUE),
-    name = "LHS"
-  )
-  from_y <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$y, con, ..., subquery = TRUE),
-    name = "RHS"
-  )
-
-  dbplyr_query_semi_join(con, from_x, from_y, anti = query$anti, by = query$by)
 }

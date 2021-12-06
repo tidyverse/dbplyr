@@ -171,9 +171,7 @@ test_that("join captures both tables", {
 
   out <- inner_join(lf1, lf2, by = "x") %>% sql_build()
 
-  expect_s3_class(out, "lazy_join_query")
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
+  expect_s3_class(out, "join_query")
   expect_equal(out$type, "inner")
 })
 
@@ -183,8 +181,6 @@ test_that("semi join captures both tables", {
 
   out <- semi_join(lf1, lf2, by = "x") %>% sql_build()
 
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
   expect_equal(out$anti, FALSE)
 })
 

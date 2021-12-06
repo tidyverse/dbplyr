@@ -24,21 +24,6 @@ print.lazy_set_op_query <- function(x, ..., con = NULL) {
 }
 
 #' @export
-sql_render.lazy_set_op_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- sql_render(query$x, con, ..., subquery = FALSE)
-  from_y <- sql_render(query$y, con, ..., subquery = FALSE)
-
-  if (dbplyr_edition(con) >= 2) {
-    sql_query_set_op(con, from_x, from_y, method = query$type, all = query$all)
-  } else {
-    if (isTRUE(query$all)) {
-      abort("`all` argument not supported by this backend")
-    }
-    dbplyr_query_set_op(con, from_x, from_y, method = query$type)
-  }
-}
-
-#' @export
 op_vars.lazy_set_op_query <- function(op) {
   union(op_vars(op$x), op_vars(op$y))
 }
@@ -56,5 +41,10 @@ op_sort.lazy_set_op_query <- function(op) {
 #' @export
 sql_build.lazy_set_op_query <- function(op, con, ...) {
   # add_op_set_op() ensures that both have same variables
-  op
+  set_op_query(
+    sql_optimise(sql_build(op$x, con), con),
+    sql_optimise(sql_build(op$y, con), con),
+    type = op$type,
+    all = op$all
+  )
 }
