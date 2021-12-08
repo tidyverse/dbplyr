@@ -61,6 +61,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
+Config/needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
