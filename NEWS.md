@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `expand()` now works in DuckDB (@mgirlich, #712).
+
 * `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
 
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
