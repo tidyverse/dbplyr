@@ -2,6 +2,8 @@
 
 * `expand()` now works in DuckDB (@mgirlich, #712).
 
+* `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
 
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
@@ -12,6 +14,8 @@
 * `compute()` now works with `temporary = TRUE` for Oracle (@mgirlich, #621).
 
 * `if_else()` now supports the `missing` argument (@mgirlich, #641).
+
+* `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
 
 
 # dbplyr 2.1.1

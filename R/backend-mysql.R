@@ -1,7 +1,7 @@
 #' Backend: MySQL/MariaDB
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -58,6 +58,8 @@ sql_translation.MariaDBConnection <- function(con) {
         sql_expr(IF(x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
+
+      random = function() sql_expr(RAND()),
 
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
@@ -130,6 +132,16 @@ sql_expr_matches.MariaDBConnection <- function(con, x, y) {
 sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
+
+#' @export
+sql_random.MariaDBConnection <- function(con) {
+  sql_expr(RAND())
+}
+
+#' @export
+sql_random.MySQLConnection <- sql_random.MariaDBConnection
+#' @export
+sql_random.MySQL <- sql_random.MariaDBConnection
 
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
 
