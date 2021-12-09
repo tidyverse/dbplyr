@@ -66,7 +66,7 @@ test_that("na_if is translated to NULLIF (#211)", {
 })
 
 test_that("connection affects quoting character", {
-  lf <- lazy_frame(field1 = 1, con = simulate_sqlite())
+  lf <- lazy_frame(field1 = 1, field2 = 2, con = simulate_sqlite())
   out <- select(lf, field1)
   expect_match(sql_render(out), "^SELECT `field1`\nFROM `df`$")
 })

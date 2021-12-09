@@ -1,7 +1,7 @@
 #' Backend: SQL server
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -302,6 +302,11 @@ mssql_version <- function(con) {
     "FROM (\n  ", sql, "\n) AS temp",
     con = con
   )
+}
+
+#' @export
+`sql_random.Microsoft SQL Server` <- function(con) {
+  sql_expr(RAND())
 }
 
 # Bit vs boolean ----------------------------------------------------------
