@@ -98,8 +98,8 @@ test_that("shiny objects give useful errors", {
   input <- structure(list(), class = "reactivevalues")
   x <- structure(function() "y", class = "reactive")
 
-  expect_snapshot_error(lf %>% filter(mpg == input$x) %>% show_query())
-  expect_snapshot_error(lf %>% filter(mpg == x()) %>% show_query())
+  expect_snapshot_error(lf %>% filter(a == input$x) %>% show_query())
+  expect_snapshot_error(lf %>% filter(a == x()) %>% show_query())
 })
 
 # names_to_as() -----------------------------------------------------------

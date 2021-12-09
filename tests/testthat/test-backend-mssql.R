@@ -17,6 +17,10 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1, 2)"))
   expect_equal(translate_sql(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
   expect_equal(translate_sql(paste(x, y)),     sql("`x` + ' ' + `y`"))
+  expect_equal(
+    translate_sql(if_else(x, "true", "false", "missing")),
+    sql("CASE WHEN (`x`) THEN ('true') WHEN NOT(`x`) THEN ('false') WHEN ((`x`) IS NULL) THEN ('missing') END")
+  )
 
   expect_error(translate_sql(bitwShiftL(x, 2L)), sql("not available"))
   expect_error(translate_sql(bitwShiftR(x, 2L)), sql("not available"))
@@ -142,6 +146,9 @@ test_that("generates custom sql", {
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+
+  lf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  expect_snapshot(lf %>% slice_sample(x))
 })
 
 # Live database -----------------------------------------------------------

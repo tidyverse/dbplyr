@@ -135,7 +135,7 @@ base_scalar <- sql_translator(
   },
 
   `if` = sql_if,
-  if_else = function(condition, true, false) sql_if(condition, true, false),
+  if_else = function(condition, true, false, missing = NULL) sql_if(condition, true, false, missing),
   ifelse = function(test, yes, no) sql_if(test, yes, no),
 
   switch = function(x, ...) sql_switch(x, ...),
@@ -439,3 +439,8 @@ base_no_win <- sql_translator(
   str_flatten  = win_absent("STR_FLATTEN"),
   count        = win_absent("COUNT")
 )
+
+#' @export
+sql_random.DBIConnection <- function(con) {
+  sql_expr(RANDOM())
+}

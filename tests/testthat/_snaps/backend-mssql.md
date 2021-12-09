@@ -174,7 +174,9 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
 
 ---
 
@@ -182,5 +184,18 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
+
+---
+
+    Code
+      lf %>% slice_sample(x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+      FROM `df`) `q01`
+      WHERE (`q01` <= 1)
 
