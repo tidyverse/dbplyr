@@ -32,7 +32,6 @@ test_that("each argument gets implicit parens", {
 test_that("only add step if necessary", {
   lf <- lazy_frame(x = 1:3, y = 1:3)
   expect_equal(lf %>% filter(), lf)
-  expect_equal(lf %>% filter(!!!list()), lf)
 })
 
 

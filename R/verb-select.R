@@ -101,7 +101,7 @@ simulate_vars <- function(x) {
 # op_select ---------------------------------------------------------------
 
 op_select <- function(x, vars) {
-  if (can_select_return_early(x, vars)) {
+  if (selects_same_variables(x, vars)) {
     return(x)
   }
 
@@ -131,7 +131,7 @@ op_select <- function(x, vars) {
   new_op_select(x, vars)
 }
 
-can_select_return_early <- function(x, vars) {
+selects_same_variables <- function(x, vars) {
   if (!all(vapply(vars, is_symbol, logical(1)))) {
     return(FALSE)
   }

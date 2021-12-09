@@ -79,7 +79,6 @@ test_that("can combine arrange with dual table verbs", {
 test_that("only add step if necessary", {
   lf <- lazy_frame(x = 1:3, y = 1:3)
   expect_equal(lf %>% arrange(), lf)
-  expect_equal(lf %>% filter(!!!list()), lf)
 })
 
 # sql_build ---------------------------------------------------------------
