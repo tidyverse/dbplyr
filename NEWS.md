@@ -4,6 +4,9 @@
   translated. For example `translate_sql(!!expr(2 - 1) * x)` now works
   (@mgirlich, #634).
 
+* Expressions with a unary plus do not produce an error anymore. For example
+  `lazy_frame(x = 1) %>% filter(x == +1)` now works (@mgirlich, #674).
+
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
 
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
