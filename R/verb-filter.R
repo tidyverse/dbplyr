@@ -22,6 +22,11 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
 
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
+
+  if (is_empty(dots)) {
+    return(.data)
+  }
+
   add_op_single("filter", .data, dots = dots)
 }
 
