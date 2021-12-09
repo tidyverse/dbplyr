@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix incorrect SQL in `fill()` translation for SQL Server (#651, @mgirlich).
+
 * Joins now disambiguates columns that only differ in case (@mgirlich, #702).
 
 * `expand()` now works in DuckDB (@mgirlich, #712).

@@ -84,6 +84,10 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(translate_sql(quarter(x, fiscal_start = 5)))
 })
 
+test_that("last_value_sql() translated correctly", {
+  expect_equal(last_value_sql(simulate_mssql(), "x"), sql("LAST_VALUE(`x`) IGNORE NULLS"))
+})
+
 # verb translation --------------------------------------------------------
 
 test_that("convert between bit and boolean as needed", {
