@@ -15,8 +15,9 @@
 
 * `if_else()` now supports the `missing` argument (@mgirlich, #641).
 
-* `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
+* `pivot_wider()` works with multiple `names_from` columns (@mgirlich, #693).
 
+* `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
 
 # dbplyr 2.1.1
 
