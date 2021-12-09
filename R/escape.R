@@ -132,7 +132,7 @@ escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 
 #' @export
 escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
-  error_embed("shiny inputs", "inputs$x")
+  error_embed("shiny inputs", "input$x")
 }
 
 # Also used in default_ops() for reactives
