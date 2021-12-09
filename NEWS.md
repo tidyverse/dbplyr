@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Joins now disambiguates columns that only differ in case (@mgirlich, #702).
+
 * `expand()` now works in DuckDB (@mgirlich, #712).
 
 * `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
