@@ -33,17 +33,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     abort("Must supply variables in `...`")
   }
 
-  extract_dot_vars <- function(.x) {
-    # ugly hack to deal with `nesting()`
-    if (quo_is_call(.x, name = "nesting")) {
-      x_expr <- quo_get_expr(.x)
-      call_args(x_expr)
-    } else {
-      list(quo_get_expr(.x))
-    }
-  }
-
-  distinct_tbl_vars <- purrr::map(dots, extract_dot_vars)
+  distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars)
 
   # now that `nesting()` has been unpacked resolve name conflicts
   out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))
@@ -61,7 +51,33 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     }
   )
 
-  purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  by <- group_vars(data)
+  if (is_empty(by)) {
+    # We want a cross join if `by` is empty which is done with
+    # a `full_join()` and `by = character()`
+    purrr::reduce(distinct_tables, full_join, by = character())
+  } else {
+    # In this case a `full_join()` and a `left_join()` produce the same result
+    # but a `left_join()` produces much nicer SQL for SQLite
+    purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  }
+}
+
+extract_expand_dot_vars <- function(dot) {
+  # ugly hack to deal with `nesting()`
+  if (!quo_is_call(dot, name = "nesting", ns = c("", "tidyr"))) {
+    return(list(quo_get_expr(dot)))
+  }
+
+  x_expr <- quo_get_expr(dot)
+  args <- call_args(x_expr)
+
+  repair <- args[[".name_repair"]] %||% "check_unique"
+  args[[".name_repair"]] <- NULL
+
+  args_named <- exprs_auto_name(args)
+  nms <- vctrs::vec_as_names(names(args_named), repair = repair)
+  exprs(!!!set_names(args_named, nms))
 }
 
 #' Complete a SQL table with missing combinations of data

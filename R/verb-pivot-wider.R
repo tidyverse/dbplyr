@@ -179,15 +179,23 @@ dbplyr_pivot_wider_spec <- function(data,
   }
   key_vars <- setdiff(key_vars, spec_cols)
 
-  key_col <- sym(names(spec)[3])
+  key_cols <- syms(names(spec)[-(1:2)])
   pivot_exprs <- purrr::map(
     vctrs::vec_seq_along(spec),
     function(row) {
-      key <- spec[[3]][row]
       values_col <- spec[[".value"]][row]
-
       fill_value <- values_fill[[values_col]]
-      case_expr <- expr(ifelse(!!key_col == !!key, !!sym(values_col), !!fill_value))
+
+      keys <- vctrs::vec_slice(spec[, -(1:2)], row)
+      keys_cond <- purrr::imap(
+        keys,
+        function(value, name) {
+          expr(!!sym(name) == !!value)
+        }
+      ) %>%
+        purrr::reduce(~ expr(!!.x & !!.y))
+
+      case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
       agg_fn <- values_fn[[values_col]]
       expr((!!agg_fn)(!!case_expr, na.rm = TRUE))

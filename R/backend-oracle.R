@@ -1,7 +1,7 @@
 #' Backend: Oracle
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -112,6 +112,15 @@ sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ...)
   } else {
     build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
   }
+}
+
+#' @export
+sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
+    as.sql(name, con), " AS\n", sql,
+    con = con
+  )
 }
 
 # registered onLoad located in the zzz.R script

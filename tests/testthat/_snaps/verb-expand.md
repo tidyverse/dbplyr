@@ -7,7 +7,7 @@
       SELECT `x`, `y`
       FROM (SELECT DISTINCT `x`
       FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
+      CROSS JOIN (SELECT DISTINCT `y`
       FROM `df`) `RHS`
       
 
@@ -36,6 +36,15 @@
     Output
       <SQL>
       SELECT DISTINCT ROUND(`x` / 2.0, 0) AS `x_half`, `x` + 1.0 AS `x1`
+      FROM `df`
+
+# works with tidyr::nesting
+
+    Code
+      df_lazy %>% tidyr::expand(tidyr::nesting(x, y))
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y`
       FROM `df`
 
 # expand respects groups
@@ -69,6 +78,12 @@
 
     Must supply variables in `...`
 
+# nesting() respects .name_repair
+
+    Names must be unique.
+    x These names are duplicated:
+      * "x" at locations 1 and 2.
+
 # replace_na replaces missing values
 
     Code
@@ -98,7 +113,7 @@
       FROM (SELECT `x`, `y`
       FROM (SELECT DISTINCT `x`
       FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
+      CROSS JOIN (SELECT DISTINCT `y`
       FROM `df`) `RHS`
       ) `LHS`
       FULL JOIN `df` AS `RHS`

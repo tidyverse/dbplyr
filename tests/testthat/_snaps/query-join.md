@@ -95,6 +95,18 @@
       ON (`LHS`.`y` = `RHS`.`z`)
       
 
+# disambiguate variables that only differ in case
+
+    Code
+      left_join(lf1, lf2, by = "y")
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`X` AS `X`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+      ON (`LHS`.`y` = `RHS`.`y`)
+      
+
 # sql_on query doesn't change unexpectedly
 
     Code
