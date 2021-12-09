@@ -3,7 +3,7 @@
 \name{backend-hive}
 \title{Backend: Hive}
 \description{
-See \code{vignette("translate-function")} and \code{vignette("translate-verb")} for
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology. Key differences for this backend
 are a scattering of custom translations provided by users.
 
