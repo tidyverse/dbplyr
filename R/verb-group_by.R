@@ -40,8 +40,8 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
 
-  group_by_can_return_early <- setequal(groups$group_names, group_vars(.data))
-  if (group_by_can_return_early) {
+  same_groups <- setequal(groups$group_names, group_vars(.data))
+  if (same_groups) {
     return(groups$data)
   }
 
