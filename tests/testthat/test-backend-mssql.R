@@ -146,6 +146,9 @@ test_that("generates custom sql", {
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+
+  lf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  expect_snapshot(lf %>% slice_sample(x))
 })
 
 # Live database -----------------------------------------------------------

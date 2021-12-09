@@ -304,6 +304,11 @@ mssql_version <- function(con) {
   )
 }
 
+#' @export
+`sql_random.Microsoft SQL Server` <- function(con) {
+  sql_expr(RAND())
+}
+
 # Bit vs boolean ----------------------------------------------------------
 
 mssql_needs_bit <- function() {

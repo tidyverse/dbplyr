@@ -439,3 +439,8 @@ base_no_win <- sql_translator(
   str_flatten  = win_absent("STR_FLATTEN"),
   count        = win_absent("COUNT")
 )
+
+#' @export
+sql_random.DBIConnection <- function(con) {
+  sql_expr(RANDOM())
+}

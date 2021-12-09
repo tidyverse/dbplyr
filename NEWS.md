@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
 
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
