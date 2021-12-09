@@ -76,6 +76,11 @@ test_that("can combine arrange with dual table verbs", {
   })
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% arrange(), lf)
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("arrange generates order_by", {
@@ -120,12 +125,3 @@ test_that("arranges captures DESC", {
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list(quote(desc(x))))
 })
-
-test_that("multiple arranges combine", {
-  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
-  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
-
-  sort <- lapply(op_sort(out), get_expr)
-  expect_equal(sort, list(quote(x), quote(y)))
-})
-

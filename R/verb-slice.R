@@ -110,7 +110,7 @@ slice_sample.tbl_lazy <- function(.data, ..., n, prop, weight_by = NULL, replace
     abort("Sampling with replacement is not supported on database backends")
   }
 
-  slice_by(.data, random(), size, with_ties = FALSE)
+  slice_by(.data, !!sql_random(remote_con(.data)), size, with_ties = FALSE)
 }
 
 slice_by <- function(.data, order_by, size, with_ties = FALSE) {
@@ -160,6 +160,10 @@ check_slice_size <- function(n, prop) {
   } else {
     abort("Must supply exactly one of `n` and `prop` arguments.")
   }
+}
+
+sql_random <- function(con) {
+  UseMethod("sql_random")
 }
 
 globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "random"))

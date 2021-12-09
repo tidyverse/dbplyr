@@ -85,6 +85,18 @@ test_that("relocate works", {
   expect_named(out2, c("b", "c", "a"))
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% select(everything()), lf)
+  expect_equal(lf %>% select(x, y), lf)
+
+  expect_equal(lf %>% rename(x = x), lf)
+  expect_equal(lf %>% rename(), lf)
+
+  expect_equal(lf %>% relocate(x, y), lf)
+  expect_equal(lf %>% relocate(), lf)
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
@@ -122,7 +134,7 @@ test_that("select renames variables", {
 
 test_that("select can refer to variables in local env", {
   vars <- c("x", "y")
-  out <- lazy_frame(x = 1, y = 1) %>%
+  out <- lazy_frame(x = 1, y = 1, z = 1) %>%
     select(dplyr::one_of(vars)) %>%
     sql_build()
 

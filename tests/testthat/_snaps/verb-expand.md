@@ -7,7 +7,7 @@
       SELECT `x`, `y`
       FROM (SELECT DISTINCT `x`
       FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
+      CROSS JOIN (SELECT DISTINCT `y`
       FROM `df`) `RHS`
       
 
@@ -113,7 +113,7 @@
       FROM (SELECT `x`, `y`
       FROM (SELECT DISTINCT `x`
       FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
+      CROSS JOIN (SELECT DISTINCT `y`
       FROM `df`) `RHS`
       ) `LHS`
       FULL JOIN `df` AS `RHS`
