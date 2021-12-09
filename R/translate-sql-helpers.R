@@ -132,32 +132,13 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @param pad If `TRUE`, the default, pad the infix operator with spaces.
 #' @export
 sql_infix <- function(f, pad = TRUE) {
-  # (x1 <- expr((2 - 1) * x))
-  # #> (2 - 1) * x
+  # Unquoting involving infix operators easily create abstract syntax trees
+  # without parantheses where they are needed for printing and translation.
+  # For example `expr(!!expr(2 - 1) * x))`
   #
-  # (x2 <- expr(!!expr(2 - 1) * x))
-  # #> (2 - 1) * x
+  # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast
+  # for more information.
   #
-  # `x1` and `x2` look the same when printed but their AST (abstract syntax tree)
-  # is different:
-  # lobstr::ast(expr((2 - 1) * x))
-  # #> █─expr
-  # #> └─█─`*`
-  # #>   ├─█─`(`
-  # #>   │ └─█─`-`
-  # #>   │   ├─2
-  # #>   │   └─1
-  # #>   └─x
-  #
-  # lobstr::ast(expr(!!expr(2 - 1) * x))
-  # #> █─expr
-  # #> └─█─`*`
-  # #>   ├─█─`-`
-  # #>   │ ├─2
-  # #>   │ └─1
-  # #>   └─x
-  #
-  # the missing paranthese "(" is an issue when translating infix expression.
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   assert_that(is_string(f))
