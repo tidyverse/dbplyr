@@ -157,9 +157,6 @@ op_grps.op_select <- function(op) {
 sql_build.op_select <- function(op, con, ...) {
   # translate once just to register windows
   win_register_activate()
-  on.exit(win_reset())
-  on.exit(win_register_deactivate(), add = TRUE)
-
   new_vars <- translate_sql_(
     op$args$vars, con,
     vars_group = op_grps(op),
@@ -186,6 +183,10 @@ sql_build.op_select <- function(op, con, ...) {
   } else {
     window_sql <- character()
   }
+
+  # Remove known windows before building the next query
+  win_reset()
+  win_register_deactivate()
 
   select_query(
     sql_build(op$x, con),
