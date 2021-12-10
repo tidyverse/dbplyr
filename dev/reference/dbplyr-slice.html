@@ -184,7 +184,7 @@ the first n rows.</p></dd>
 <span class="r-in"><span class="va">db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SELECT `x`, `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> FROM (SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY random()) AS `q01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> FROM (SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY RANDOM()) AS `q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FROM `dbplyr_006`)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> WHERE (`q01` &lt;= 1)</span>
 <span class="r-in"></span>
