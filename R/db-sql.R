@@ -284,7 +284,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     stop("Unknown join type:", type, call. = FALSE)
   )
 
-  select <- sql_join_vars(con, vars, lvl = lvl)
+  select <- sql_join_vars(con, vars)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned

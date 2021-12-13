@@ -55,7 +55,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, lvl = 0) {
+sql_join_vars <- function(con, vars) {
   join_vars_list <- mapply(
     FUN = sql_join_var,
     alias = vars$alias,
