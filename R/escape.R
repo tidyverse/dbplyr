@@ -31,7 +31,7 @@
 #' escape_ansi("X")
 #' escape_ansi(escape_ansi("X"))
 #' escape_ansi(escape_ansi(escape_ansi("X")))
-escape <- function(x, parens = NA, collapse = " ", con = NULL, align_as = FALSE) {
+escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
     stop("`con` must not be NULL", call. = FALSE)
   }
@@ -46,39 +46,39 @@ escape_ansi <- function(x, parens = NA, collapse = "") {
 }
 
 #' @export
-escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   y <- sql_escape_ident(con, x)
-  sql_vector(names_to_as(y, names2(x), con = con, align_as = align_as), parens, collapse, con = con)
+  sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
 }
 
 #' @export
-escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.logical <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_logical(con, x), parens, collapse, con = con)
 }
 
 #' @export
-escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.factor <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x <- as.character(x)
   escape.character(x, parens = parens, collapse = collapse, con = con)
 }
 
 #' @export
-escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.Date <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_date(con, x), parens, collapse, con = con)
 }
 
 #' @export
-escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.POSIXt <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_datetime(con, x), parens, collapse, con = con)
 }
 
 #' @export
-escape.character <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.character <- function(x, parens = NA, collapse = ", ", con = NULL) {
   sql_vector(sql_escape_string(con, x), parens, collapse, con = con)
 }
 
 #' @export
-escape.double <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   out <- ifelse(is.wholenumber(x), sprintf("%.1f", x), as.character(x))
 
   # Special values
@@ -91,47 +91,47 @@ escape.double <- function(x, parens = NA, collapse = ", ", con = NULL, align_as 
 }
 
 #' @export
-escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.integer <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x[is.na(x)] <- "NULL"
   sql_vector(x, parens, collapse, con = con)
 }
 
 #' @export
-escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.integer64 <- function(x, parens = NA, collapse = ", ", con = NULL) {
   x <- as.character(x)
   x[is.na(x)] <- "NULL"
   sql_vector(x, parens, collapse, con = con)
 }
 
 #' @export
-escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
   pieces <- vapply(x, sql_escape_raw, character(1), con = con)
   sql_vector(pieces, isTRUE(parens) || length(pieces) > 1, collapse, con = con)
 }
 
 #' @export
-escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL, align_as = FALSE) {
+escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
   sql("NULL")
 }
 
 #' @export
-escape.sql <- function(x, parens = NULL, collapse = NULL, con = NULL, align_as = FALSE) {
-  sql_vector(x, isTRUE(parens), collapse, con = con, align_as = align_as)
+escape.sql <- function(x, parens = NULL, collapse = NULL, con = NULL) {
+  sql_vector(x, isTRUE(parens), collapse, con = con)
 }
 
 #' @export
-escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   pieces <- vapply(x, escape, character(1), con = con)
   sql_vector(pieces, parens, collapse, con = con)
 }
 
 #' @export
-escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   error_embed("a data.frame", "df$x")
 }
 
 #' @export
-escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL, align_as = FALSE) {
+escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   error_embed("shiny inputs", "inputs$x")
 }
 
@@ -145,7 +145,7 @@ error_embed <- function(type, expr) {
 
 #' @export
 #' @rdname escape
-sql_vector <- function(x, parens = NA, collapse = " ", con = NULL, align_as = FALSE) {
+sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
     stop("`con` must not be NULL", call. = FALSE)
   }
@@ -162,23 +162,19 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL, align_as = FA
     parens <- length(x) > 1L
   }
 
-  x <- names_to_as(x, con = con, align_as = align_as)
+  x <- names_to_as(x, con = con)
   x <- paste(x, collapse = collapse)
   if (parens) x <- paste0("(", x, ")")
   sql(x)
 }
 
-names_to_as <- function(x, names = names2(x), con = NULL, align_as = FALSE) {
+names_to_as <- function(x, names = names2(x), con = NULL) {
   if (length(x) == 0) {
     return(character())
   }
 
   names_esc <- sql_escape_ident(con, names)
   as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
-  if (is_true(align_as)) {
-    n <- max(nchar(x))
-    x <- paste0(x, rep_char(n - nchar(x), " "))
-  }
 
   paste0(x, as)
 }

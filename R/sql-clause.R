@@ -144,7 +144,7 @@ field_align <- function(x, field_sep, lvl, kw, con, parens) {
   kw_indent <- rep_char(nchar(kw) + (parens == TRUE), " ")
   collapse <- paste0(field_sep, "\n", " ", lvl_indent(lvl), kw_indent)
   # TODO should this really look like this??
-  paste0(" ", if (parens) "(", escape(x, collapse = collapse, con = con, align_as = should_align_as()), if (parens) ")")
+  paste0(" ", if (parens) "(", escape(x, collapse = collapse, con = con), if (parens) ")")
 }
 
 field_indent <- function(x, field_sep, lvl, con, parens) {
@@ -156,7 +156,7 @@ field_indent <- function(x, field_sep, lvl, con, parens) {
   collapse <- paste0(field_sep, "\n", indent)
   paste0(
     if (parens) " (", "\n",
-    indent, escape(x, collapse = collapse, con = con, align_as = should_align_as()),
+    indent, escape(x, collapse = collapse, con = con),
     if (parens) paste0("\n", indent_lvl(")", lvl))
   )
 }
@@ -191,8 +191,4 @@ get_indent_strategy <- function() {
 
 is_legacy_strategy <- function() {
   get_indent_strategy() == "legacy"
-}
-
-should_align_as <- function() {
-  getOption("dbplyr_indent_align_as", FALSE)
 }
