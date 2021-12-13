@@ -145,28 +145,32 @@ sql_infix <- function(f, pad = TRUE) {
 
   if (pad) {
     function(x, y) {
-      x <- escape_infix_expr(enquo(x))
-      y <- escape_infix_expr(enquo(y))
+      x <- escape_infix_expr(enexpr(x), x)
+      y <- escape_infix_expr(enexpr(y), y)
 
       build_sql(x, " ", sql(f), " ", y)
     }
   } else {
     function(x, y) {
-      x <- escape_infix_expr(enquo(x))
-      y <- escape_infix_expr(enquo(y))
+      x <- escape_infix_expr(enexpr(x), x)
+      y <- escape_infix_expr(enexpr(y), y)
 
       build_sql(x, sql(f), y)
     }
   }
 }
 
-escape_infix_expr <- function(x) {
+escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (quo_is_call(x, infix_calls, n = 2)) {
-    build_sql("(", eval_tidy(x), ")")
-  } else {
-    eval_tidy(x)
+  if (is_call(xq, infix_calls, n = 2)) {
+    return(build_sql("(", x, ")"))
   }
+
+  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
+    return(build_sql("(", x, ")"))
+  }
+
+  x
 }
 
 #' @rdname sql_variant
