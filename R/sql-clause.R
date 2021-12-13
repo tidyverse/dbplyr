@@ -111,15 +111,9 @@ sql_kw <- function(kw) {
 #' cols <- ident("mpg", "cyl", "gear")
 #' conds <- sql("`mpg` > 0", "`cyl` = 6")
 #'
-#' cat(paste0("SELECT", field_minimal(cols, ",", con = con)))
-#' cat(paste0("SELECT", field_minimal(conds, " AND", con = con)))
-#'
-#' cat(paste0("SELECT", field_align(cols, ",", lvl = 0, kw = "SELECT", con = con)))
-#' cat(paste0("SELECT", field_align(conds, " AND", lvl = 0, kw = "SELECT", con = con)))
-#'
-#' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = FALSE)))
-#' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = TRUE)))
-#' cat(paste0("SELECT", field_indent(conds, " AND", lvl = 0, con = con)))
+#' cat(paste0("SELECT", format_fields(cols, ",", lvl = 0, kw = "SELECT", con = con, parens = FALSE)))
+#' cat(paste0("SELECT", format_fields(cols, ",", lvl = 0, kw = "SELECT", con = con, parens = TRUE)))
+#' cat(paste0("SELECT", format_fields(conds, " AND", lvl = 0, kw = "SELECT", con = con)))
 format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, nchar_max = 80) {
   # check length without starting a new line
   fields_same_line <- escape(x, collapse = paste0(field_sep, " "), con = con)
