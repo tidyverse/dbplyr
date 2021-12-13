@@ -120,7 +120,7 @@ sql_kw <- function(kw) {
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = FALSE)))
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = TRUE)))
 #' cat(paste0("SELECT", field_indent(conds, " AND", lvl = 0, con = con)))
-format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE) {
+format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, nchar_max = 80) {
   # check length without starting a new line
   fields_same_line <- escape(x, collapse = paste0(field_sep, " "), con = con)
   if (parens) {
@@ -128,10 +128,9 @@ format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE) {
   } else {
     fields_same_line <- paste0(" ", fields_same_line)
   }
-  nchar_same_line <- nchar(kw) + nchar(fields_same_line)
-  max_length <- 80L
+  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(kw) + nchar(fields_same_line)
 
-  if (length(x) == 1 || nchar_same_line <= max_length) {
+  if (length(x) == 1 || nchar_same_line <= nchar_max) {
     return(sql(fields_same_line))
   }
 
