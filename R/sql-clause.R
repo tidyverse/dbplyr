@@ -90,8 +90,7 @@ sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",", parens =
     lvl = lvl,
     kw = clause,
     con = con,
-    parens = parens,
-    strategy = get_indent_strategy()
+    parens = parens
   )
   sql <- build_sql(
     sql_kw(clause),
@@ -121,44 +120,31 @@ sql_kw <- function(kw) {
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = FALSE)))
 #' cat(paste0("SELECT", field_indent(cols, ",", lvl = 0, con = con, parens = TRUE)))
 #' cat(paste0("SELECT", field_indent(conds, " AND", lvl = 0, con = con)))
-format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, strategy = c("minimal", "align", "indent", "legacy")) {
-  strategy <- match.arg(strategy)
-  field_string <- switch(strategy,
-    legacy = field_minimal(x, field_sep, con = con, parens = parens),
-    minimal = field_minimal(x, field_sep, con = con, parens = parens),
-    align = field_align(x, field_sep, kw = kw, lvl = lvl, con = con, parens = parens),
-    indent = field_indent(x, field_sep, lvl = lvl, con = con, parens = parens)
-  )
-  sql(field_string)
-}
-
-field_minimal <- function(x, field_sep, con, parens) {
-  paste0(" ", if (parens) "(", escape(x, collapse = paste0(field_sep, " "), con = con), if (parens) ")")
-}
-
-field_align <- function(x, field_sep, lvl, kw, con, parens) {
-  if (length(x) == 1) {
-    return(paste0(if (parens) "(" else " ", escape(x, con = con), if (parens) ")"))
+format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE) {
+  # check length without starting a new line
+  fields_same_line <- escape(x, collapse = paste0(field_sep, " "), con = con)
+  if (parens) {
+    fields_same_line <- paste0(" (", fields_same_line, ")")
+  } else {
+    fields_same_line <- paste0(" ", fields_same_line)
   }
+  nchar_same_line <- nchar(kw) + nchar(fields_same_line)
+  max_length <- 80L
 
-  kw_indent <- rep_char(nchar(kw) + (parens == TRUE), " ")
-  collapse <- paste0(field_sep, "\n", " ", lvl_indent(lvl), kw_indent)
-  # TODO should this really look like this??
-  paste0(" ", if (parens) "(", escape(x, collapse = collapse, con = con), if (parens) ")")
-}
-
-field_indent <- function(x, field_sep, lvl, con, parens) {
-  if (length(x) == 1) {
-    return(paste0(" ", if (parens) "(", escape(x, con = con), if (parens) ")"))
+  if (length(x) == 1 || nchar_same_line <= max_length) {
+    return(sql(fields_same_line))
   }
 
   indent <- lvl_indent(lvl + 1)
   collapse <- paste0(field_sep, "\n", indent)
-  paste0(
+
+  field_string <- paste0(
     if (parens) " (", "\n",
     indent, escape(x, collapse = collapse, con = con),
     if (parens) paste0("\n", indent_lvl(")", lvl))
   )
+
+  sql(field_string)
 }
 
 sql_clause_kw <- function(..., lvl) {
@@ -174,21 +160,9 @@ lvl_indent <- function(times, char = "  ") {
 }
 
 indent_lvl <- function(x, lvl) {
-  if (is_legacy_strategy()) {
-    sql(x)
-  } else {
-    sql(paste0(lvl_indent(lvl), x))
-  }
+  sql(paste0(lvl_indent(lvl), x))
 }
 
 get_clause_indent <- function(lvl) {
   indent_lvl("", lvl)
-}
-
-get_indent_strategy <- function() {
-  getOption("dbplyr_indent_strategy", "minimal")
-}
-
-is_legacy_strategy <- function() {
-  get_indent_strategy() == "legacy"
 }
