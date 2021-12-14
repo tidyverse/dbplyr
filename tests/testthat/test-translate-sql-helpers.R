@@ -50,7 +50,6 @@ test_that("can translate infix expression without parantheses", {
 })
 
 test_that("unary minus works with expressions", {
-  expect_equal(translate_sql(-!!rlang::expr(x+2)), sql("-(`x` + 2.0)"))
-
+  expect_equal(translate_sql(-!!expr(x+2)), sql("-(`x` + 2.0)"))
   expect_equal(translate_sql(--x), sql("-(-`x`)"))
 })
