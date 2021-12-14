@@ -8,7 +8,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`x` IS `RHS`.`x`)
-      
 
 # full and right join
 
@@ -17,15 +16,23 @@
     Output
       <SQL>
       SELECT `x`, `y.x`, `y.y`, `z`
-      FROM (SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, `LHS`.`y` AS `y.x`, `RHS`.`y` AS `y.y`, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x`)
-      UNION
-      SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, `LHS`.`y` AS `y.x`, `RHS`.`y` AS `y.y`, `z`
-      FROM `df` AS `RHS`
-      LEFT JOIN `df` AS `LHS`
-      ON (`LHS`.`x` = `RHS`.`x`)
+      FROM (
+        SELECT
+          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          `LHS`.`y` AS `y.x`,
+          `RHS`.`y` AS `y.y`,
+          `z`
+        FROM `df` AS `LHS`
+        LEFT JOIN `df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)  UNION
+        SELECT
+          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          `LHS`.`y` AS `y.x`,
+          `RHS`.`y` AS `y.y`,
+          `z`
+        FROM `df` AS `RHS`
+        LEFT JOIN `df` AS `LHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
       ) AS `q01`
 
 ---
@@ -38,7 +45,6 @@
       FROM `df` AS `RHS`
       LEFT JOIN `df` AS `LHS`
       ON (`LHS`.`x` = `RHS`.`x`)
-      
 
 # can explain a query
 

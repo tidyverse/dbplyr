@@ -5,10 +5,14 @@
     Output
       <SQL>
       SELECT `x`, `y`
-      FROM (SELECT DISTINCT `x`
-      FROM `df`) `LHS`
-      CROSS JOIN (SELECT DISTINCT `y`
-      FROM `df`) `RHS`
+      FROM (
+        SELECT DISTINCT `x`
+        FROM `df`
+      ) `LHS`
+      CROSS JOIN (
+        SELECT DISTINCT `y`
+        FROM `df`
+      ) `RHS`
       
 
 # nesting doesn't expand values
@@ -54,12 +58,15 @@
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `b`, `c`
-      FROM (SELECT DISTINCT `a`, `b`
-      FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `a`, `c`
-      FROM `df`) `RHS`
+      FROM (
+        SELECT DISTINCT `a`, `b`
+        FROM `df`
+      ) `LHS`
+      LEFT JOIN (
+        SELECT DISTINCT `a`, `c`
+        FROM `df`
+      ) `RHS`
       ON (`LHS`.`a` = `RHS`.`a`)
-      
 
 # NULL inputs
 
@@ -109,14 +116,24 @@
     Output
       <SQL>
       SELECT `x`, `y`, COALESCE(`z`, 'c') AS `z`
-      FROM (SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`, `z`
-      FROM (SELECT `x`, `y`
-      FROM (SELECT DISTINCT `x`
-      FROM `df`) `LHS`
-      CROSS JOIN (SELECT DISTINCT `y`
-      FROM `df`) `RHS`
-      ) `LHS`
-      FULL JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      FROM (
+        SELECT
+          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`,
+          `z`
+        FROM (
+          SELECT `x`, `y`
+          FROM (
+            SELECT DISTINCT `x`
+            FROM `df`
+          ) `LHS`
+          CROSS JOIN (
+            SELECT DISTINCT `y`
+            FROM `df`
+          ) `RHS`
+      
+        ) `LHS`
+        FULL JOIN `df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       ) `q01`
 

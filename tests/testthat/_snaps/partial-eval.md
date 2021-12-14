@@ -49,7 +49,11 @@
       lf %>% summarise(across(a:b, list(log, exp)))
     Output
       <SQL>
-      SELECT LN(`a`) AS `a_log`, EXP(`a`) AS `a_exp`, LN(`b`) AS `b_log`, EXP(`b`) AS `b_exp`
+      SELECT
+        LN(`a`) AS `a_log`,
+        EXP(`a`) AS `a_exp`,
+        LN(`b`) AS `b_log`,
+        EXP(`b`) AS `b_exp`
       FROM `df`
 
 # untranslatable functions are preserved

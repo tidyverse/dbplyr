@@ -25,7 +25,6 @@
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
 
 ---
 
@@ -39,7 +38,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
 
 ---
 
@@ -53,7 +51,6 @@
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
 
 ---
 
@@ -63,11 +60,12 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
+      SELECT
+        COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+        COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
-      
 
 # only disambiguates shared variables
 
@@ -81,7 +79,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`x` = `RHS`.`x`)
-      
 
 ---
 
@@ -93,7 +90,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`y` = `RHS`.`z`)
-      
 
 # disambiguate variables that only differ in case
 
@@ -105,7 +101,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (`LHS`.`y` = `RHS`.`y`)
-      
 
 # sql_on query doesn't change unexpectedly
 
@@ -117,7 +112,6 @@
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -129,7 +123,6 @@
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -141,7 +134,6 @@
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 
@@ -153,7 +145,6 @@
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
       ON (LHS.y < RHS.z)
-      
 
 ---
 

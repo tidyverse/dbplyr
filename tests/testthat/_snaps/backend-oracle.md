@@ -33,7 +33,6 @@
       FROM (`df`) `LHS`
       LEFT JOIN (`df`) `RHS`
       ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
-      
 
 ---
 
