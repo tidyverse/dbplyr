@@ -29,6 +29,11 @@ test_that("each argument gets implicit parens", {
   expect_equal_tbl(mf1, mf2)
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% filter(), lf)
+})
+
 
 # SQL generation --------------------------------------------------------
 

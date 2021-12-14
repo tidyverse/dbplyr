@@ -84,6 +84,10 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(translate_sql(quarter(x, fiscal_start = 5)))
 })
 
+test_that("last_value_sql() translated correctly", {
+  expect_equal(last_value_sql(simulate_mssql(), "x"), sql("LAST_VALUE(`x`) IGNORE NULLS"))
+})
+
 # verb translation --------------------------------------------------------
 
 test_that("convert between bit and boolean as needed", {
@@ -146,6 +150,9 @@ test_that("generates custom sql", {
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+
+  lf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  expect_snapshot(lf %>% slice_sample(x))
 })
 
 # Live database -----------------------------------------------------------

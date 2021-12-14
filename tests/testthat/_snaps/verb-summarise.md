@@ -1,3 +1,9 @@
+# can't refer to freshly created variables
+
+    In `dbplyr` you cannot use a variable created in the same summarise.
+    x `z` refers to `y` which was created earlier in this summarise().
+    i You need an extra mutate() step to use it.
+
 # summarise(.groups=)
 
     Code

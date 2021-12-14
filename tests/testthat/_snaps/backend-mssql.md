@@ -188,3 +188,14 @@
         SELECT * FROM foo
       ) AS temp
 
+---
+
+    Code
+      lf %>% slice_sample(x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+      FROM `df`) `q01`
+      WHERE (`q01` <= 1)
+
