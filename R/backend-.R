@@ -22,13 +22,27 @@ sql_translation.DBIConnection <- function(con) {
 #' @rdname sql_variant
 #' @format NULL
 base_scalar <- sql_translator(
-  `+`    = sql_infix("+"),
+  `+`    = function(x, y = NULL) {
+    x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
+    if (is.null(y)) {
+      if (is.numeric(x)) {
+        x
+      } else {
+        sql_expr(!!x)
+      }
+    } else {
+      y <- escape_infix_expr(enexpr(y), y)
+
+      sql_expr(!!x + !!y)
+    }
+  },
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
   `%/%`  = sql_not_supported("%/%"),
   `%%`   = sql_infix("%"),
   `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {
+    x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
     if (is.null(y)) {
       if (is.numeric(x)) {
         -x
@@ -36,6 +50,8 @@ base_scalar <- sql_translator(
         sql_expr(-!!x)
       }
     } else {
+      y <- escape_infix_expr(enexpr(y), y)
+
       sql_expr(!!x - !!y)
     }
   },

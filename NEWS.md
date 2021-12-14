@@ -1,5 +1,12 @@
 # dbplyr (development version)
 
+* Partially evaluated expressions with infix operations are now correctly
+  translated. For example `translate_sql(!!expr(2 - 1) * x)` now works
+  (@mgirlich, #634).
+
+* Expressions with a unary plus do not produce an error anymore. For example
+  `lazy_frame(x = 1) %>% filter(x == +1)` now works (@mgirlich, #674).
+
 * Fix incorrect SQL in `fill()` translation for SQL Server (#651, @mgirlich).
 
 * Joins now disambiguates columns that only differ in case (@mgirlich, #702).
