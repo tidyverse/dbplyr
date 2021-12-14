@@ -13,7 +13,6 @@
         SELECT DISTINCT `y`
         FROM `df`
       ) `RHS`
-      
 
 # nesting doesn't expand values
 
@@ -131,7 +130,6 @@
             SELECT DISTINCT `y`
             FROM `df`
           ) `RHS`
-      
         ) `LHS`
         FULL JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)

@@ -40,12 +40,13 @@ sql_query_select.Teradata <- function(con, select, from, where = NULL,
                                              lvl = 0) {
 
   sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, top = limit, lvl = lvl),
-    from      = sql_clause_from(con, from, lvl = lvl),
-    where     = sql_clause_where(con, where, lvl = lvl),
-    group_by  = sql_clause_group_by(con, group_by, lvl = lvl),
-    having    = sql_clause_having(con, having, lvl = lvl),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit, lvl = lvl)
+    select    = sql_clause_select(con, select, distinct, top = limit),
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    lvl       = lvl
   )
 }
 

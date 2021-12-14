@@ -24,7 +24,8 @@
           `z`
         FROM `df` AS `LHS`
         LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)  UNION
+        ON (`LHS`.`x` = `RHS`.`x`)
+        UNION
         SELECT
           COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
           `LHS`.`y` AS `y.x`,

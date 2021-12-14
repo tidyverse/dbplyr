@@ -234,13 +234,14 @@ sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
                                subquery = FALSE,
                                lvl = 0) {
   sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, lvl = lvl),
-    from      = sql_clause_from(con, from, lvl = lvl),
-    where     = sql_clause_where(con, where, lvl = lvl),
-    group_by  = sql_clause_group_by(con, group_by, lvl = lvl),
-    having    = sql_clause_having(con, having, lvl = lvl),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit, lvl = lvl),
-    limit     = sql_clause_limit(con, limit, lvl = lvl)
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    limit     = sql_clause_limit(con, limit),
+    lvl       = lvl
   )
 }
 dbplyr_query_select <- function(con, ...) {
@@ -289,13 +290,13 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
-  build_sql(
-    sql_clause_select(con, select, lvl = lvl), "\n",
-    sql_clause_from(con, x, lvl = lvl), "\n",
-    sql_clause_generic(con, JOIN, y, lvl = lvl), "\n",
-    sql_clause_generic(con, "ON", on, sep = " AND", lvl = lvl, parens = TRUE),
-    con = con
+  clauses <- list(
+    sql_clause_select(con, select),
+    sql_clause_from(x),
+    sql_clause(JOIN, y),
+    sql_clause("ON", on, sep = " AND", parens = TRUE)
   )
+  sql_format_clauses(clauses, lvl, con)
 }
 dbplyr_query_join <- function(con, ..., lvl = 0) {
   dbplyr_fallback(con, "sql_join", ..., lvl = lvl)
@@ -323,20 +324,20 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
   lhs <- escape(ident("LHS"), con = con)
   rhs <- escape(ident("RHS"), con = con)
 
-  # lvl + 1 because it is in the `EXISTS` subquery
   on <- sql_join_tbls(con, by)
 
-  indent <- get_clause_indent(lvl)
-  build_sql(
-    indent, "SELECT * FROM ", x, "\n",
-    indent, "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
-    # needs `lvl_indent(1)` regardless of option
-    indent, sql(lvl_indent(1)), "SELECT 1 FROM ", y, "\n",
-    sql_clause_where(con, on, lvl = lvl + 1), "\n",
-    indent, ")",
-    con = con
+  # TODO
+  lines <- list(
+    build_sql("SELECT * FROM ", x, con = con),
+    build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", y, lvl = 1),
+    sql_clause_where(on, lvl = 1),
+    sql(")")
   )
+  sql_format_clauses(lines, lvl, con)
 }
+
 dbplyr_query_semi_join <- function(con, ...) {
   dbplyr_fallback(con, "sql_semi_join", ...)
 }
@@ -354,12 +355,12 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
   method <- paste0(method, if (all) " ALL")
-  build_sql(
-    indent_lvl(ident_subquery(x, con = con, lvl = lvl), lvl),
-    "\n", indent_lvl(sql_kw(method), lvl = lvl), "\n",
-    indent_lvl(ident_subquery(y, con = con, lvl = lvl), lvl),
-    con = con
+  lines <- list(
+    ident_subquery(x, con = con, lvl = lvl),
+    sql_kw(method),
+    ident_subquery(y, con = con, lvl = lvl)
   )
+  sql_format_clauses(lines, lvl, con)
 }
 dbplyr_query_set_op <- function(con, ...) {
   dbplyr_fallback(con, "sql_set_op", ...)

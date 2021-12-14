@@ -5,7 +5,8 @@ sql_select_clauses <- function(con,
                                group_by,
                                having,
                                order_by,
-                               limit = NULL) {
+                               limit = NULL,
+                               lvl) {
   out <- list(
     select = select,
     from = from,
@@ -15,8 +16,17 @@ sql_select_clauses <- function(con,
     order_by = order_by,
     limit = limit
   )
-  out <- purrr::compact(out)
-  escape(unname(out), collapse = "\n", parens = FALSE, con = con)
+  sql_format_clauses(out, lvl, con)
+}
+
+sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
+  list(
+    kw = kw,
+    parts = parts,
+    sep = sep,
+    parens = parens,
+    lvl = lvl
+  )
 }
 
 sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0) {
@@ -32,77 +42,80 @@ sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0
     con = con
   )
 
-  sql_clause_generic(con, clause, select, lvl = lvl)
+  sql_clause(clause, select)
 }
 
-sql_clause_from  <- function(con, from, lvl = 0) {
-  sql_clause_generic(con, "FROM", from, lvl = lvl)
+sql_clause_from  <- function(from, lvl = 0) {
+  sql_clause("FROM", from, lvl = lvl)
 }
 
-sql_clause_where <- function(con, where, lvl = 0) {
+sql_clause_where <- function(where, lvl = 0) {
   if (length(where) == 0L) {
     return()
   }
 
   assert_that(is.character(where))
-  where_paren <- escape(where, parens = TRUE, con = con)
-  sql_clause_generic(con, "WHERE", where_paren, lvl = lvl, sep = " AND")
+  where_paren <- sql(paste0("(", where, ")"))
+  sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
 }
 
-sql_clause_group_by <- function(con, group_by, lvl = 0) {
-  sql_clause_generic(con, "GROUP BY", group_by, lvl = lvl)
+sql_clause_group_by <- function(group_by, lvl = 0) {
+  sql_clause("GROUP BY", group_by)
 }
 
-sql_clause_having <- function(con, having, lvl = 0) {
-  sql_clause_generic(con, "HAVING", having, lvl = lvl)
+sql_clause_having <- function(having, lvl = 0) {
+  sql_clause("HAVING", having)
 }
 
-sql_clause_order_by <- function(con, order_by, subquery = FALSE, limit = NULL, lvl = 0) {
+sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 0) {
   if (subquery && length(order_by) > 0 && is.null(limit)) {
     warn_drop_order_by()
     NULL
   } else {
-    sql_clause_generic(con, "ORDER BY", order_by, lvl = lvl)
+    sql_clause("ORDER BY", order_by)
   }
 }
 
 sql_clause_limit <- function(con, limit, lvl = 0){
   if (!is.null(limit) && !identical(limit, Inf)) {
-    sql <- build_sql(
-      sql_kw("LIMIT"), " ", sql(format(limit, scientific = FALSE)),
-      con = con
-    )
-
-    indent_lvl(sql, lvl)
+    sql_clause(sql_kw("LIMIT"), sql(format(limit, scientific = FALSE)))
   }
 }
 
 # helpers -----------------------------------------------------------------
 
-sql_clause_generic <- function(con, clause, fields, lvl = 0, sep = ",", parens = FALSE) {
-  if (length(fields) == 0L) {
-    return()
-  }
-
-  assert_that(is.character(fields))
-  fields_formatted <- format_fields(
-    fields, sep,
-    lvl = lvl,
-    kw = clause,
-    con = con,
-    parens = parens
-  )
-  sql <- build_sql(
-    sql_kw(clause),
-    fields_formatted,
-    con = con
-  )
-
-  indent_lvl(sql, lvl)
-}
-
 sql_kw <- function(kw) {
   sql(kw)
+}
+
+sql_format_clauses <- function(clauses, lvl, con) {
+  clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
+
+  out <- purrr::map(clauses, sql_format_clause, lvl = lvl, con = con)
+  out <- purrr::map2(
+    out, purrr::map_dbl(clauses, ~ purrr::pluck(.x, "lvl", .default = 0)),
+    ~ indent_lvl(.x, lvl = lvl + .y)
+  )
+
+  escape(unname(out), collapse = "\n", parens = FALSE, con = con)
+}
+
+sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
+  if (is.sql(x)) {
+    return(x)
+  }
+
+  parts_sql <- format_fields(
+    x$parts,
+    field_sep = x$sep,
+    lvl = lvl + x$lvl,
+    kw = x$kw,
+    con = con,
+    parens = x$parens,
+    nchar_max = nchar_max
+  )
+
+  sql(paste0(x$kw, parts_sql))
 }
 
 #' @noRd

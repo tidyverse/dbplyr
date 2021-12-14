@@ -44,17 +44,17 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              lvl = 0) {
 
   sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, lvl = lvl),
-    from      = sql_clause_from(con, from, lvl = lvl),
-    where     = sql_clause_where(con, where, lvl = lvl),
-    group_by  = sql_clause_group_by(con, group_by, lvl = lvl),
-    having    = sql_clause_having(con, having, lvl = lvl),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit, lvl = lvl),
+    select    = sql_clause_select(con, select, distinct),
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
-      sql <- build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
-      indent_lvl(sql, lvl)
-    }
+      build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
+    },
+    lvl = lvl
   )
 }
 
