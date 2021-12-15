@@ -89,15 +89,14 @@ sql_kw <- function(kw) {
 }
 
 sql_format_clauses <- function(clauses, lvl, con) {
+  clauses <- unname(clauses)
   clauses <- purrr::discard(clauses, ~ !is.sql(.x) && is_empty(.x$parts))
 
-  out <- purrr::map(clauses, sql_format_clause, lvl = lvl, con = con)
-  out <- purrr::map2(
-    out, purrr::map_dbl(clauses, ~ purrr::pluck(.x, "lvl", .default = 0)),
-    ~ indent_lvl(.x, lvl = lvl + .y)
-  )
+  formatted_clauses <- purrr::map(clauses, sql_format_clause, lvl = lvl, con = con)
+  clause_level <- purrr::map_dbl(clauses, "lvl", .default = 0)
+  out <- indent_lvl(formatted_clauses, lvl + clause_level)
 
-  escape(unname(out), collapse = "\n", parens = FALSE, con = con)
+  sql_vector(out, collapse = "\n", parens = FALSE, con = con)
 }
 
 sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
@@ -105,70 +104,36 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
     return(x)
   }
 
-  parts_sql <- format_fields(
-    x$parts,
-    field_sep = x$sep,
-    lvl = lvl + x$lvl,
-    kw = x$kw,
-    con = con,
-    parens = x$parens,
-    nchar_max = nchar_max
-  )
+  lvl <- lvl + x$lvl
 
-  sql(paste0(x$kw, parts_sql))
-}
-
-#' @noRd
-#' @examples
-#' con <- simulate_dbi()
-#' cols <- ident("mpg", "cyl", "gear")
-#' conds <- sql("`mpg` > 0", "`cyl` = 6")
-#'
-#' cat(paste0("SELECT", format_fields(cols, ",", lvl = 0, kw = "SELECT", con = con, parens = FALSE)))
-#' cat(paste0("SELECT", format_fields(cols, ",", lvl = 0, kw = "SELECT", con = con, parens = TRUE)))
-#' cat(paste0("SELECT", format_fields(conds, " AND", lvl = 0, kw = "SELECT", con = con)))
-format_fields <- function(x, field_sep, lvl, kw, con, parens = FALSE, nchar_max = 80) {
   # check length without starting a new line
-  fields_same_line <- escape(x, collapse = paste0(field_sep, " "), con = con)
-  if (parens) {
-    fields_same_line <- paste0(" (", fields_same_line, ")")
-  } else {
-    fields_same_line <- paste0(" ", fields_same_line)
+  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
+  if (x$parens) {
+    fields_same_line <- paste0("(", fields_same_line, ")")
   }
-  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(kw) + nchar(fields_same_line)
+  same_line_clause <- paste0(x$kw, " ", fields_same_line)
+  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(same_line_clause)
 
-  if (length(x) == 1 || nchar_same_line <= nchar_max) {
-    return(sql(fields_same_line))
+  if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
+    return(sql(same_line_clause))
   }
 
   indent <- lvl_indent(lvl + 1)
-  collapse <- paste0(field_sep, "\n", indent)
+  collapse <- paste0(x$sep, "\n", indent)
 
   field_string <- paste0(
-    if (parens) " (", "\n",
-    indent, escape(x, collapse = collapse, con = con),
-    if (parens) paste0("\n", indent_lvl(")", lvl))
+    x$kw, if (x$parens) " (", "\n",
+    indent, escape(x$parts, collapse = collapse, con = con),
+    if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 
   sql(field_string)
 }
 
-sql_clause_kw <- function(..., lvl) {
-  sql_kw(paste0(get_clause_indent(lvl), ...))
-}
-
-rep_char <- function(times, char) {
-  strrep(char, times)
-}
-
 lvl_indent <- function(times, char = "  ") {
-  rep_char(times, char)
+  strrep(char, times)
 }
 
 indent_lvl <- function(x, lvl) {
   sql(paste0(lvl_indent(lvl), x))
-}
-
-get_clause_indent <- function(lvl) {
-  indent_lvl("", lvl)
 }

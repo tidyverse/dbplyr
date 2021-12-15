@@ -162,8 +162,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
     sql_query_select(
       con,
       select = ident(vars$alias),
-      # TODO this should probably be `dbplyr_sql_subquery`
-      from = sql_subquery(con, join_sql, lvl = lvl),
+      from = dbplyr_sql_subquery(con, join_sql, lvl = lvl),
       subquery = TRUE,
       lvl = lvl
     )

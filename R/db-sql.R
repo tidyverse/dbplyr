@@ -190,7 +190,12 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 ident_subquery <- function(from, con, lvl) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
   if (multi_line) {
-    build_sql("(\n", from, "\n", get_clause_indent(lvl), ")", con = con)
+    build_sql(
+      "(\n",
+      from, "\n",
+      indent_lvl(")", lvl),
+      con = con
+    )
   } else {
     build_sql("(", from, ")", con = con)
   }
@@ -220,7 +225,6 @@ sql_query_select <- function(con, select, from, where = NULL,
                              ...,
                              subquery = FALSE,
                              lvl = 0) {
-  # TODO should check that all arguments are sql or ident?
   UseMethod("sql_query_select")
 }
 
@@ -326,7 +330,6 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
 
   on <- sql_join_tbls(con, by)
 
-  # TODO
   lines <- list(
     build_sql("SELECT * FROM ", x, con = con),
     build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
