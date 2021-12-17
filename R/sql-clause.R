@@ -20,13 +20,16 @@ sql_select_clauses <- function(con,
 }
 
 sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
-  list(
+  clause <- list(
     kw = kw,
     parts = parts,
     sep = sep,
     parens = parens,
     lvl = lvl
   )
+
+  class(clause) <- "sql_clause"
+  clause
 }
 
 sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0) {
