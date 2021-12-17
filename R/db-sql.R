@@ -183,11 +183,13 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
     setNames(as.sql(from, con), name)
   } else {
     ident_name <- ident(name %||% unique_subquery_name())
-    build_sql(ident_subquery(from, con, lvl), " ", ident_name, con = con)
+    build_sql(sql_indent_subquery(from, con, lvl), " ", ident_name, con = con)
   }
 }
 
-ident_subquery <- function(from, con, lvl) {
+#' @export
+#' @rdname db-sql
+sql_indent_subquery <- function(from, con, lvl) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
   if (multi_line) {
     build_sql(
@@ -359,9 +361,9 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
   method <- paste0(method, if (all) " ALL")
   lines <- list(
-    ident_subquery(x, con = con, lvl = lvl),
+    sql_indent_subquery(x, con = con, lvl = lvl),
     sql_kw(method),
-    ident_subquery(y, con = con, lvl = lvl)
+    sql_indent_subquery(y, con = con, lvl = lvl)
   )
   sql_format_clauses(lines, lvl, con)
 }

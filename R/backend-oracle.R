@@ -112,7 +112,7 @@ sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ...,
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
-    build_sql(ident_subquery(from, con, lvl), " ", ident(name %||% unique_subquery_name()), con = con)
+    build_sql(sql_indent_subquery(from, con, lvl), " ", ident(name %||% unique_subquery_name()), con = con)
   }
 }
 
