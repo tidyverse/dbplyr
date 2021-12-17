@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `if_any()` and `if_all()` default to `everything()` when `.cols` is not
+  provided. If `.fns` is not provided they work like like a parallel
+  version of `any()` respectively `all()` (@mgirlich, #734).
+
 * Partially evaluated expressions with infix operations are now correctly
   translated. For example `translate_sql(!!expr(2 - 1) * x)` now works
   (@mgirlich, #634).
