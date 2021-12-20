@@ -33,6 +33,10 @@
 #' * `sql_query_wrap(con, from)` generates SQL for wrapping a query into a
 #'   subquery.
 #'
+#' Query indentation:
+#'
+#' * `sql_indent_subquery(from, con, lvl)` helps indenting a subquery.
+#'
 #' Query generation:
 #'
 #' * `sql_query_select()` generate SQL for a `SELECT` query
