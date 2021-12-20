@@ -150,9 +150,15 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  `if` = sql_if,
-  if_else = function(condition, true, false, missing = NULL) sql_if(condition, true, false, missing),
-  ifelse = function(test, yes, no) sql_if(test, yes, no),
+  `if` = function(cond, if_true, if_false = NULL) sql_if(
+    enexpr(cond), enexpr(if_true), enexpr(if_false)
+  ),
+  if_else = function(condition, true, false, missing = NULL) sql_if(
+    enexpr(condition), enexpr(true), enexpr(false), enexpr(missing)
+  ),
+  ifelse = function(test, yes, no) sql_if(
+    enexpr(test), enexpr(yes), enexpr(no)
+  ),
 
   switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),

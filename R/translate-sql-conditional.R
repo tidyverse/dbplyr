@@ -1,14 +1,23 @@
 sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
-  build_sql(
-    "CASE WHEN (", cond, ")", " THEN (", if_true, ")",
-    if (!is.null(if_false))
-      build_sql(" WHEN NOT(", cond, ") THEN (", if_false, ")"),
-    if (!is.null(missing)) {
-      missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
-      build_sql(" WHEN ", missing_cond, " THEN (", missing, ")")
-    },
-    " END"
-  )
+  out <- build_sql("CASE WHEN ", enpar(cond), " THEN ", enpar(if_true))
+
+  if (!is.null(if_false) && identical(if_false, missing)) {
+    out <- paste0(out, " ELSE ", enpar(if_false), " END")
+    return(sql(out))
+  }
+
+  if (!is.null(if_false)) {
+    false_sql <- build_sql(" WHEN NOT ", enpar(cond), " THEN ", enpar(if_false))
+    out <- paste0(out, false_sql)
+  }
+
+  if (!is.null(missing)) {
+    missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
+    missing_sql <- build_sql(" WHEN ", missing_cond, " THEN ", enpar(missing))
+    out <- paste0(out, missing_sql)
+  }
+
+  sql(paste0(out, " END"))
 }
 
 sql_case_when <- function(...) {
@@ -28,15 +37,21 @@ sql_case_when <- function(...) {
     f <- formulas[[i]]
 
     env <- environment(f)
-    query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
-    value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
+    query[[i]] <- enpar(expr(!!f[[2]]))
+    value[[i]] <- enpar(expr(!!f[[3]]))
   }
 
-  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
   if (query[[n]] == "TRUE") {
-    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+    clauses[[n]] <- paste0("ELSE ", value[[n]])
   }
+
+  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
+  if (nchar(same_line_sql) <= 80) {
+    return(same_line_sql)
+  }
+
   sql(paste0(
     "CASE\n",
     paste0(clauses, collapse = "\n"),
@@ -66,5 +81,18 @@ sql_switch <- function(x, ...) {
 }
 
 sql_is_null <- function(x) {
-  sql_expr((((!!x)) %is% NULL))
+  x_expr <- enexpr(x)
+  if (is_call(x_expr)) {
+    sql_expr((((!!x)) %is% NULL))
+  } else {
+    sql_expr((!!x %is% NULL))
+  }
+}
+
+enpar <- function(x) {
+  if (is_call(x)) {
+    build_sql("(", translate_sql(!!x), ")")
+  } else {
+    translate_sql(!!x)
+  }
 }

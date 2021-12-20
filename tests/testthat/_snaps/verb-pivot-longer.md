@@ -47,7 +47,7 @@
       UNION ALL
       (SELECT 'y' AS `name`, `y` AS `value`
       FROM `df`)) `q01`
-      WHERE (NOT(((`value`) IS NULL)))
+      WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
 

@@ -3,25 +3,19 @@
     Code
       translate_sql(case_when(x > 1L ~ "a"))
     Output
-      <SQL> CASE
-      WHEN (`x` > 1) THEN ('a')
-      END
+      <SQL> CASE WHEN (`x` > 1) THEN 'a' END
 
 # even inside mutate
 
     Code
       out$select[[2]]
     Output
-      [1] "CASE\nWHEN (`x` > 1) THEN ('a')\nEND"
+      [1] "CASE WHEN (`x` > 1) THEN 'a' END"
 
 # case_when translates correctly to ELSE when TRUE ~ is used 2
 
     Code
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"))
     Output
-      <SQL> CASE
-      WHEN (`x` = 1) THEN ('yes')
-      WHEN (`x` = 0) THEN ('no')
-      ELSE ('undefined')
-      END
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
 

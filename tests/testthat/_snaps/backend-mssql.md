@@ -43,9 +43,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `x`, CASE
-      WHEN (`x` = 1) THEN (1)
-      END AS `z`
+      SELECT `x`, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---

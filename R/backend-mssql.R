@@ -120,9 +120,23 @@ simulate_mssql <- function(version = "15.0") {
       bitwShiftL     = sql_not_supported("bitwShiftL"),
       bitwShiftR     = sql_not_supported("bitwShiftR"),
 
-      `if`           = mssql_sql_if,
-      if_else        = function(condition, true, false, missing = NULL) mssql_sql_if(condition, true, false, missing),
-      ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
+      `if`           = function(condition, true, false = NULL, missing = NULL) mssql_sql_if(
+        condition, enexpr(condition),
+        true, enexpr(true),
+        false, enexpr(false),
+        missing, enexpr(missing)
+      ),
+      if_else        = function(condition, true, false, missing = NULL) mssql_sql_if(
+        condition, enexpr(condition),
+        true, enexpr(true),
+        false, enexpr(false),
+        missing, enexpr(missing)
+      ),
+      ifelse         = function(test, yes, no) mssql_sql_if(
+        test, enexpr(test),
+        yes, enexpr(yes),
+        no, enexpr(no)
+      ),
       case_when      = mssql_case_when,
 
       as.logical    = sql_cast("BIT"),
@@ -356,9 +370,11 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
   }
 }
 
-mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
+mssql_sql_if <- function(cond, cond_expr, if_true, if_true_expr,
+                         if_false = NULL, if_false_expr = NULL,
+                         missing = NULL, missing_expr = NULL) {
   cond <- with_mssql_bool(cond)
-  if (is.null(missing)) {
+  if (is.null(missing_expr)) {
     sql_expr(IIF(!!cond, !!if_true, !!if_false))
   } else {
     sql_if(cond, if_true, if_false, missing)
