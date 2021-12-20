@@ -160,14 +160,8 @@ dbplyr_pivot_longer_spec <- function(data,
     )
   }
 
-  # TODO remove if clause after `select()` gets early return
-  # https://github.com/tidyverse/dbplyr/pull/691
-  if (any(nms_map$name != nms_map$name_mapped)) {
-    data_long <- data_long %>%
-      rename(!!!tibble::deframe(nms_map))
-  }
-
-  data_long
+  data_long %>%
+    rename(!!!tibble::deframe(nms_map))
 }
 
 get_measure_column_exprs <- function(name, value, values_transform) {
