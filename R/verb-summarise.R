@@ -54,12 +54,16 @@ check_summarise_vars <- function(dots) {
     cur_vars <- names(dots)[seq_len(i - 1)]
 
     if (any(used_vars %in% cur_vars)) {
-      stop(
-        "`", names(dots)[[i]],
-        "` refers to a variable created earlier in this summarise().\n",
-        "Do you need an extra mutate() step?",
-        call. = FALSE
+      first_used_var <- used_vars[used_vars %in% cur_vars][[1]]
+      message <- c(
+        "In `dbplyr` you cannot use a variable created in the same summarise.",
+        `x` = paste0(
+          "`", names(dots)[[i]],
+          "` refers to `", first_used_var, "` which was created earlier in this summarise()."
+        ),
+        `i` = "You need an extra mutate() step to use it."
       )
+      abort(message)
     }
   }
 }

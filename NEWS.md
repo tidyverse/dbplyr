@@ -1,5 +1,26 @@
 # dbplyr (development version)
 
+* `if_any()` and `if_all()` default to `everything()` when `.cols` is not
+  provided. If `.fns` is not provided they work like like a parallel
+  version of `any()` respectively `all()` (@mgirlich, #734).
+
+* Partially evaluated expressions with infix operations are now correctly
+  translated. For example `translate_sql(!!expr(2 - 1) * x)` now works
+  (@mgirlich, #634).
+
+* Expressions with a unary plus do not produce an error anymore. For example
+  `lazy_frame(x = 1) %>% filter(x == +1)` now works (@mgirlich, #674).
+
+* Fix incorrect SQL in `fill()` translation for SQL Server (#651, @mgirlich).
+
+* Joins now disambiguates columns that only differ in case (@mgirlich, #702).
+
+* `expand()` now works in DuckDB (@mgirlich, #712).
+
+* `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+
+* Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
+
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
 
 * The SQL translation of `quantile()` now doesn't error anymore when using
@@ -12,6 +33,9 @@
 * `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692).
 
 * `pivot_longer()` can now repair names (@mgirlich, #694).
+* `pivot_wider()` works with multiple `names_from` columns (@mgirlich, #693).
+
+* `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
 
 # dbplyr 2.1.1
 

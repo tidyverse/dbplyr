@@ -157,3 +157,43 @@
       SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
       FROM `df`
 
+# if_all/any uses every colum as default
+
+    Code
+      lf %>% filter(if_all(.fns = ~. > 0))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` > 0.0 AND `b` > 0.0)
+
+---
+
+    Code
+      lf %>% filter(if_any(.fns = ~. > 0))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` > 0.0 OR `b` > 0.0)
+
+# if_all/any works without `.fns` argument
+
+    Code
+      lf %>% filter(if_all(a:b))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` AND `b`)
+
+---
+
+    Code
+      lf %>% filter(if_any(a:b))
+    Output
+      <SQL>
+      SELECT *
+      FROM `df`
+      WHERE (`a` OR `b`)
+

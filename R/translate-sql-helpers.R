@@ -132,17 +132,45 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @param pad If `TRUE`, the default, pad the infix operator with spaces.
 #' @export
 sql_infix <- function(f, pad = TRUE) {
+  # Unquoting involving infix operators easily create abstract syntax trees
+  # without parantheses where they are needed for printing and translation.
+  # For example `expr(!!expr(2 - 1) * x))`
+  #
+  # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast
+  # for more information.
+  #
+  # This is fixed with `escape_infix_expr()`
+  # see https://github.com/tidyverse/dbplyr/issues/634
   assert_that(is_string(f))
 
   if (pad) {
     function(x, y) {
+      x <- escape_infix_expr(enexpr(x), x)
+      y <- escape_infix_expr(enexpr(y), y)
+
       build_sql(x, " ", sql(f), " ", y)
     }
   } else {
     function(x, y) {
+      x <- escape_infix_expr(enexpr(x), x)
+      y <- escape_infix_expr(enexpr(y), y)
+
       build_sql(x, sql(f), y)
     }
   }
+}
+
+escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
+  infix_calls <- c("+", "-", "*", "/", "%%", "^")
+  if (is_call(xq, infix_calls, n = 2)) {
+    return(build_sql("(", x, ")"))
+  }
+
+  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
+    return(build_sql("(", x, ")"))
+  }
+
+  x
 }
 
 #' @rdname sql_variant

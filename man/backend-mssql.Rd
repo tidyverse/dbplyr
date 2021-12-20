@@ -7,7 +7,7 @@
 that 15.0 and above will use \code{TRY_CAST()} instead of \code{CAST()}.}
 }
 \description{
-See \code{vignette("translate-function")} and \code{vignette("translate-verb")} for
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology. Key differences for this backend
 are:
 \itemize{

@@ -1,7 +1,7 @@
 #' Backend: Snowflake
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology.
 #'
 #' Use `simulate_snowflake()` with `lazy_frame()` to see simulated SQL without
