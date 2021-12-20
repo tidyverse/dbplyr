@@ -140,7 +140,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
   partition_sql <- purrr::map(
     cols_to_fill,
     ~ translate_sql(
-      cumsum(ifelse(is.na(!!.x), 0L, 1L)),
+      cumsum(case_when(is.na(!!.x) ~ 0L, TRUE ~ 1L)),
       vars_order = translate_sql(!!!order_by_cols, con = .con),
       vars_group = op_grps(.data),
     )
