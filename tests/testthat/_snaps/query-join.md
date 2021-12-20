@@ -24,7 +24,7 @@
       SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -37,7 +37,7 @@
       SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -50,7 +50,7 @@
       SELECT `RHS`.`x` AS `x`, `RHS`.`y` AS `y`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
 
 ---
 
@@ -65,7 +65,7 @@
         COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
 
 # only disambiguates shared variables
 
@@ -78,7 +78,7 @@
       SELECT `LHS`.`x` AS `x`, `y`, `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x`)
+        ON (`LHS`.`x` = `RHS`.`x`)
 
 ---
 
@@ -89,7 +89,7 @@
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`y` = `RHS`.`z`)
+        ON (`LHS`.`y` = `RHS`.`z`)
 
 # disambiguate variables that only differ in case
 
@@ -100,7 +100,7 @@
       SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`X` AS `X`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`y` = `RHS`.`y`)
+        ON (`LHS`.`y` = `RHS`.`y`)
 
 # sql_on query doesn't change unexpectedly
 
@@ -111,7 +111,7 @@
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
-      ON (LHS.y < RHS.z)
+        ON (LHS.y < RHS.z)
 
 ---
 
@@ -122,7 +122,7 @@
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (LHS.y < RHS.z)
+        ON (LHS.y < RHS.z)
 
 ---
 
@@ -133,7 +133,7 @@
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
-      ON (LHS.y < RHS.z)
+        ON (LHS.y < RHS.z)
 
 ---
 
@@ -144,7 +144,7 @@
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
       FROM `df` AS `LHS`
       FULL JOIN `df` AS `RHS`
-      ON (LHS.y < RHS.z)
+        ON (LHS.y < RHS.z)
 
 ---
 

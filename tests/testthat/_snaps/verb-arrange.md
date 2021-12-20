@@ -166,7 +166,7 @@
         FROM `df`
       ) `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`a` = `RHS`.`a`)
+        ON (`LHS`.`a` = `RHS`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
     Message <message>
@@ -210,7 +210,7 @@
         SELECT `LHS`.`a` AS `a`, `b`, `c`
         FROM `df` AS `LHS`
         LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`a` = `RHS`.`a`)
+          ON (`LHS`.`a` = `RHS`.`a`)
       ) `q01`
       ORDER BY `a`
     Code

@@ -304,7 +304,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     sql_clause_select(con, select),
     sql_clause_from(x),
     sql_clause(JOIN, y),
-    sql_clause("ON", on, sep = " AND", parens = TRUE)
+    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   )
   sql_format_clauses(clauses, lvl, con)
 }

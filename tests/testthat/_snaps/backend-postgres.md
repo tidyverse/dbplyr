@@ -7,7 +7,7 @@
       SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
+        ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
 
 # can explain
 

@@ -65,7 +65,7 @@
         SELECT DISTINCT `a`, `c`
         FROM `df`
       ) `RHS`
-      ON (`LHS`.`a` = `RHS`.`a`)
+        ON (`LHS`.`a` = `RHS`.`a`)
 
 # NULL inputs
 
@@ -132,6 +132,6 @@
           ) `RHS`
         ) `LHS`
         FULL JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+          ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       ) `q01`
 
