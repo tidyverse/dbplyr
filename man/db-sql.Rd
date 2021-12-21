@@ -10,6 +10,7 @@
 \alias{sql_query_fields}
 \alias{sql_query_save}
 \alias{sql_query_wrap}
+\alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{sql_query_select}
 \alias{sql_query_join}
@@ -31,7 +32,9 @@ sql_query_fields(con, sql, ...)
 
 sql_query_save(con, sql, name, temporary = TRUE, ...)
 
-sql_query_wrap(con, from, name = unique_subquery_name(), ...)
+sql_query_wrap(con, from, name = unique_subquery_name(), ..., lvl = 0)
+
+sql_indent_subquery(from, con, lvl)
 
 sql_query_rows(con, sql, ...)
 
@@ -46,7 +49,8 @@ sql_query_select(
   limit = NULL,
   distinct = FALSE,
   ...,
-  subquery = FALSE
+  subquery = FALSE,
+  lvl = 0
 )
 
 sql_query_join(
@@ -57,12 +61,13 @@ sql_query_join(
   type = "inner",
   by = NULL,
   na_matches = FALSE,
-  ...
+  ...,
+  lvl = 0
 )
 
-sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ...)
+sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
-sql_query_set_op(con, x, y, method, ..., all = FALSE)
+sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 }
 \description{
 SQL translation:
@@ -92,6 +97,11 @@ capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 (temporary) table.
 \item \code{sql_query_wrap(con, from)} generates SQL for wrapping a query into a
 subquery.
+}
+
+Query indentation:
+\itemize{
+\item \code{sql_indent_subquery(from, con, lvl)} helps indenting a subquery.
 }
 
 Query generation:

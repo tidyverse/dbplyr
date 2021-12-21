@@ -41,15 +41,17 @@ sql_query_select.ACCESS <- function(con, select, from,
                               where = NULL,  group_by = NULL,
                               having = NULL, order_by = NULL,
                               limit = NULL,  distinct = FALSE, ...,
-                              subquery = FALSE) {
+                              subquery = FALSE,
+                              lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    lvl       = lvl
   )
 }
 

@@ -21,8 +21,7 @@
       SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` <=> `RHS`.`x`)
-      
+        ON (`LHS`.`x` <=> `RHS`.`x`)
 
 ---
 
@@ -31,8 +30,10 @@
     Output
       <SQL>
       SELECT `x`
-      FROM (SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
-      FROM `df`) `q01`
+      FROM (
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        FROM `df`
+      ) `q01`
       WHERE (`q01` <= 1)
 
 # can explain
