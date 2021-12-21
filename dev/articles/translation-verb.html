@@ -183,7 +183,6 @@
 <pre><code><span class="co">## &lt;SQL&gt;</span>
 <span class="co">## SELECT `distance`, `air_time`, `distance` / (`air_time` / 60.0) AS `speed`</span>
 <span class="co">## FROM `nycflights13::flights`</span></code></pre>
-<p>(As you can see here, the generated SQL isn’t always as minimal as you might generate by hand.)</p>
 </li>
 <li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> generates a <code>WHERE</code> clause:</p>
@@ -212,11 +211,8 @@
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">month</span>, <span class="va">day</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Warning: Missing values are always removed in SQL.</span>
-<span class="co">## Use `mean(x, na.rm = TRUE)` to silence this warning</span>
-<span class="co">## This warning is displayed only once per session.</span></code></pre>
 <pre><code><span class="co">## `summarise()` has grouped output by 'month'. You can override using the `.groups` argument.</span></code></pre>
 <pre><code><span class="co">## &lt;SQL&gt;</span>
 <span class="co">## SELECT `month`, `day`, AVG(`dep_delay`) AS `delay`</span>
