@@ -206,8 +206,13 @@ db_squash_if <- function(call, env, vars, reduce = "&") {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
-  locs <- tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)
+  .cols <- call$.cols %||% expr(everything())
+  locs <- tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)
   cols <- syms(names(tbl))[locs]
+
+  if (is.null(call$.fns)) {
+    return(Reduce(function(x, y) call2(reduce, x, y), cols))
+  }
 
   fun <- across_fun(call$.fns, env)
 

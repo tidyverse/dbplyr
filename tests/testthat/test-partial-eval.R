@@ -125,3 +125,17 @@ test_that("if_all/any works in mutate()", {
   expect_snapshot(lf %>% mutate(c = if_all(a:b, ~ . > 0)))
   expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
 })
+
+test_that("if_all/any uses every colum as default", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_snapshot(lf %>% filter(if_all(.fns = ~ . > 0)))
+  expect_snapshot(lf %>% filter(if_any(.fns = ~ . > 0)))
+})
+
+test_that("if_all/any works without `.fns` argument", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_snapshot(lf %>% filter(if_all(a:b)))
+  expect_snapshot(lf %>% filter(if_any(a:b)))
+})
