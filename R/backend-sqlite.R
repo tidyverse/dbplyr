@@ -156,8 +156,8 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   by_right <- list(
     x = by$y,
     y = by$x,
-    lhs_as = by$rhs_as,
-    rhs_as = by$lhs_as
+    x_as = by$y_as,
+    y_as = by$x_as
   )
   right_join_sql <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ...)
 

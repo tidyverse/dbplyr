@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* The `*_join()` verbs now have arguments `lhs_as` and `rhs_as` that allow to
+* The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
   specify the table alias to use in the SQL query (@mgirlich, #637).
 * Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
 

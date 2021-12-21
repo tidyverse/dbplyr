@@ -34,7 +34,7 @@
 #'   The default, "never", is how databases usually work. `"na"` makes
 #'   the joins behave like the dplyr join functions, [merge()], [match()],
 #'   and `%in%`.
-#' @param lhs_as,rhs_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
+#' @param x_as,y_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
 #'   `"RHS"`
 #' @inherit arrange.tbl_lazy return
 #' @examples
@@ -71,7 +71,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                                x_as = "LHS", y_as = "RHS") {
 
   add_op_join(
     x, y,
@@ -82,8 +82,8 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -95,7 +95,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                               x_as = "LHS", y_as = "RHS") {
 
   add_op_join(
     x, y,
@@ -106,8 +106,8 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -119,7 +119,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                               x_as = "LHS", y_as = "RHS") {
 
   add_op_join(
     x, y,
@@ -130,8 +130,8 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -143,7 +143,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                               x_as = "LHS", y_as = "RHS") {
 
   add_op_join(
     x, y,
@@ -154,8 +154,8 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -166,7 +166,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                               x_as = "LHS", y_as = "RHS") {
 
   add_op_semi_join(
     x, y,
@@ -176,8 +176,8 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -188,7 +188,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               lhs_as = "LHS", rhs_as = "RHS") {
+                               x_as = "LHS", y_as = "RHS") {
 
   add_op_semi_join(
     x, y,
@@ -198,8 +198,8 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     auto_index = auto_index,
     na_matches = na_matches,
-    lhs_as = lhs_as,
-    rhs_as = rhs_as,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 }
@@ -209,10 +209,13 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         suffix = NULL,
                         auto_index = FALSE,
                         na_matches = "never",
-                        lhs_as = "LHS",
-                        rhs_as = "RHS") {
-  vctrs::vec_assert(lhs_as, character(), size = 1)
-  vctrs::vec_assert(rhs_as, character(), size = 1)
+                        x_as = "LHS",
+                        y_as = "RHS") {
+  vctrs::vec_assert(x_as, character(), size = 1)
+  vctrs::vec_assert(y_as, character(), size = 1)
+  if (x_as == y_as) {
+    abort("`y_as` must be different from `x_as`.")
+  }
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -222,8 +225,8 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$lhs_as <- lhs_as
-  by$rhs_as <- rhs_as
+  by$x_as <- x_as
+  by$y_as <- y_as
 
   y <- auto_copy(
     x, y,
@@ -246,17 +249,17 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never",
-                             lhs_as = "LHS", rhs_as = "RHS") {
-  vctrs::vec_assert(lhs_as, character(), size = 1)
-  vctrs::vec_assert(rhs_as, character(), size = 1)
+                             x_as = "LHS", y_as = "RHS") {
+  vctrs::vec_assert(x_as, character(), size = 1)
+  vctrs::vec_assert(y_as, character(), size = 1)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$lhs_as <- lhs_as
-  by$rhs_as <- rhs_as
+  by$x_as <- x_as
+  by$y_as <- y_as
 
   y <- auto_copy(
     x, y, copy,

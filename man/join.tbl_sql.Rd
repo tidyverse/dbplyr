@@ -20,8 +20,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 
 \method{left_join}{tbl_lazy}(
@@ -34,8 +34,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 
 \method{right_join}{tbl_lazy}(
@@ -48,8 +48,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 
 \method{full_join}{tbl_lazy}(
@@ -62,8 +62,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 
 \method{semi_join}{tbl_lazy}(
@@ -75,8 +75,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 
 \method{anti_join}{tbl_lazy}(
@@ -88,8 +88,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  lhs_as = "LHS",
-  rhs_as = "RHS"
+  x_as = "LHS",
+  y_as = "RHS"
 )
 }
 \arguments{
@@ -144,7 +144,7 @@ The default, "never", is how databases usually work. \code{"na"} makes
 the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[=match]{match()}},
 and \code{\%in\%}.}
 
-\item{lhs_as, rhs_as}{Alias to use for \code{x} resp. \code{y}. Defaults to \code{"LHS"} resp.
+\item{x_as, y_as}{Alias to use for \code{x} resp. \code{y}. Defaults to \code{"LHS"} resp.
 \code{"RHS"}}
 }
 \value{

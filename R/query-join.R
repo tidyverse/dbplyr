@@ -44,14 +44,14 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, lhs_as = "LHS", rhs_as = "RHS") {
+sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS") {
   sql_vector(
     mapply(
       FUN = sql_join_var,
       alias = vars$alias,
       x = vars$x,
       y = vars$y,
-      MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y, lhs_as = lhs_as, rhs_as = rhs_as),
+      MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y, x_as = x_as, y_as = y_as),
       SIMPLIFY = FALSE,
       USE.NAMES = TRUE
     ),
@@ -61,19 +61,19 @@ sql_join_vars <- function(con, vars, lhs_as = "LHS", rhs_as = "RHS") {
   )
 }
 
-sql_join_var <- function(con, alias, x, y, all_x, all_y, lhs_as, rhs_as) {
+sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
   if (!is.na(x) && !is.na(y)) {
     sql_expr(
       COALESCE(
-        !!sql_table_prefix(con, x, table = lhs_as),
-        !!sql_table_prefix(con, y, table = rhs_as)
+        !!sql_table_prefix(con, x, table = x_as),
+        !!sql_table_prefix(con, y, table = y_as)
       ),
       con = con
     )
   } else if (!is.na(x)) {
-    sql_table_prefix(con, x, table = if (x %in% all_y) lhs_as)
+    sql_table_prefix(con, x, table = if (x %in% all_y) x_as)
   } else if (!is.na(y)) {
-    sql_table_prefix(con, y, table = if (y %in% all_x) rhs_as)
+    sql_table_prefix(con, y, table = if (y %in% all_x) y_as)
   } else {
     stop("No source for join column ", alias, call. = FALSE)
   }
@@ -84,8 +84,8 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
 
   on <- NULL
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, by$lhs_as)
-    rhs <- sql_table_prefix(con, by$y, by$rhs_as)
+    lhs <- sql_table_prefix(con, by$x, by$x_as)
+    rhs <- sql_table_prefix(con, by$y, by$y_as)
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
