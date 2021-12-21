@@ -104,3 +104,14 @@
       (SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
       FROM `df`)
 
+# can repair names
+
+    Code
+      out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
+    Message <simpleMessage>
+      New names:
+      * name -> name...2
+      * value -> value...3
+      * name -> name...4
+      * value -> value...5
+

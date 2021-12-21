@@ -110,8 +110,21 @@ dbplyr_pivot_longer_spec <- function(data,
   spec <- deduplicate_spec(spec, data)
 
   id_cols <- syms(setdiff(colnames(data), spec$.name))
+  repair_info <- apply_name_repair_pivot_longer(id_cols, spec, names_repair)
+  id_cols <- repair_info$id_cols
+  spec <- repair_info$spec
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
+  nms_map <- tibble(
+    name = colnames(spec_split$key),
+    name_mapped = ifelse(
+      name %in% unlist(spec_split$key),
+      paste0("..", name),
+      name
+    )
+  )
+  spec_split$key <- set_names(spec_split$key, nms_map$name_mapped)
+
   data_long_list <- purrr::map(
     vctrs::vec_seq_along(spec_split),
     function(idx) {
@@ -147,7 +160,8 @@ dbplyr_pivot_longer_spec <- function(data,
     )
   }
 
-  data_long
+  data_long %>%
+    rename(!!!tibble::deframe(nms_map))
 }
 
 get_measure_column_exprs <- function(name, value, values_transform) {
@@ -167,6 +181,34 @@ get_measure_column_exprs <- function(name, value, values_transform) {
       }
     }
   )
+}
+
+apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
+  # Calculates how the column names in `pivot_longer()` need to be repaired
+  # and applies this to the `id_cols` and the `spec` argument:
+  # * The names of `id_cols` are the repaired id column names
+  # * The `spec` columns after the third column are renamed to the repaired name
+  # * The entries in the `value` column of `spec` are changed to the repaired name
+
+  nms_map_df <- vctrs::vec_rbind(
+    tibble(from = "id_cols", name = as.character(id_cols)),
+    tibble(from = "measure_cols", name = colnames(spec)[-(1:2)]),
+    tibble(from = "value_cols", name = unique(spec[[".value"]]))
+  ) %>%
+    mutate(name_rep = vctrs::vec_as_names(name, repair = names_repair))
+  nms_map <- split(nms_map_df, nms_map_df$from)
+
+  id_cols <- purrr::set_names(id_cols, nms_map$id_cols$name_rep)
+
+  colnames(spec)[-(1:2)] <- nms_map$measure_cols$name_rep
+
+  value_nms_map <- purrr::set_names(
+    nms_map$value_cols$name_rep,
+    nms_map$value_cols$name
+  )
+  spec$.value <- dplyr::recode(spec$.value, !!!value_nms_map)
+
+  list(id_cols = id_cols, spec = spec)
 }
 
 # The following is copy-pasted from `tidyr`
