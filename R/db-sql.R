@@ -341,7 +341,8 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
     build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
-    sql_clause_where(on, lvl = 1),
+    # don't use `sql_clause_where()` to avoid wrapping each element in parens
+    sql_clause("WHERE", on, sep = " AND", parens = TRUE, lvl = 1),
     sql(")")
   )
   sql_format_clauses(lines, lvl, con)
