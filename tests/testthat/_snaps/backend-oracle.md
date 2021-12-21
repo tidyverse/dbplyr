@@ -32,10 +32,8 @@
       SELECT `LHS`.`x` AS `x`
       FROM (`df`) `LHS`
       LEFT JOIN (`df`) `RHS`
-      ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
-      
+        ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
 
-=======
 ---
 
     Code
@@ -54,3 +52,4 @@
       <SQL> CREATE TABLE 
       `schema`.`tbl` AS
       SELECT * FROM foo
+

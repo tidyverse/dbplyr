@@ -7,8 +7,7 @@
       SELECT `df1`.`x` AS `x`, `y`
       FROM `df` AS `df1`
       LEFT JOIN `df` AS `df2`
-      ON (`df1`.`x` = `df2`.`x`)
-      
+        ON (`df1`.`x` = `df2`.`x`)
 
 # complete semi join works with SQLite and table alias
 
@@ -19,8 +18,7 @@
       SELECT `df1`.`x` AS `x`, `y`
       FROM `df` AS `df1`
       INNER JOIN `df` AS `df2`
-      ON (`df1`.`x` = `df2`.`x`)
-      
+        ON (`df1`.`x` = `df2`.`x`)
 
 # join check `x_as` and `y_as`
 
@@ -52,6 +50,5 @@
       SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (CASE WHEN (`LHS`.`x` = `RHS`.`x`) OR (`LHS`.`x` IS NULL AND `RHS`.`x` IS NULL) THEN 0 ELSE 1 = 0 END)
-      
+        ON (CASE WHEN (`LHS`.`x` = `RHS`.`x`) OR (`LHS`.`x` IS NULL AND `RHS`.`x` IS NULL) THEN 0 ELSE 1 = 0 END)
 
