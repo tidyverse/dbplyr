@@ -33,6 +33,7 @@
 * `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692).
 
 * `pivot_longer()` can now repair names (@mgirlich, #694).
+
 * `pivot_wider()` works with multiple `names_from` columns (@mgirlich, #693).
 
 * `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
