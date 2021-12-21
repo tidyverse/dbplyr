@@ -277,8 +277,7 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SELECT `LHS`.`name` AS `name`, `band`, `plays`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FROM `dplyr::band_members` AS `LHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LEFT JOIN `dplyr::band_instruments` AS `RHS`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ON (`LHS`.`name` = `RHS`.`name`)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ON (`LHS`.`name` = `RHS`.`name`)</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Can join with local data frames by setting copy = TRUE</span></span>
 <span class="r-in"><span class="va">band_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -323,15 +322,13 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SELECT `LHS`.`x` AS `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FROM `dbplyr_020` AS `LHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LEFT JOIN `dbplyr_021` AS `RHS`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ON (`LHS`.`x` = `RHS`.`x`)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ON (`LHS`.`x` = `RHS`.`x`)</span>
 <span class="r-in"><span class="va">db1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">db2</span>, sql_on <span class="op">=</span> <span class="st">"LHS.x &lt; RHS.x"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> SELECT `LHS`.`x` AS `x.x`, `RHS`.`x` AS `x.y`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> FROM `dbplyr_020` AS `LHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> LEFT JOIN `dbplyr_021` AS `RHS`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ON (LHS.x &lt; RHS.x)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ON (LHS.x &lt; RHS.x)</span>
 </code></pre></div>
     </div>
   </div>

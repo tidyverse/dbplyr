@@ -25,6 +25,10 @@ sql_query_wrap(con, from) generates SQL for wrapping a query into a
 subquery.
 
 
+Query indentation:
+sql_indent_subquery(from, con, lvl) helps indenting a subquery.
+
+
 Query generation:
 sql_query_select() generate SQL for a SELECT query
 sql_query_join() generate SQL for joins
@@ -163,6 +167,7 @@ capture field names in <code><a href="tbl_sql.html">tbl_sql()</a></code></p></li
 (temporary) table.</p></li>
 <li><p><code>sql_query_wrap(con, from)</code> generates SQL for wrapping a query into a
 subquery.</p></li>
+</ul><p>Query indentation:</p><ul><li><p><code>sql_indent_subquery(from, con, lvl)</code> helps indenting a subquery.</p></li>
 </ul><p>Query generation:</p><ul><li><p><code>sql_query_select()</code> generate SQL for a <code>SELECT</code> query</p></li>
 <li><p><code>sql_query_join()</code> generate SQL for joins</p></li>
 <li><p><code>sql_query_semi_join()</code> generate SQL for semi- and anti-joins</p></li>
@@ -185,7 +190,9 @@ queries.</p></li>
 
 <span class="fu">sql_query_save</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">name</span>, temporary <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
 
-<span class="fu">sql_query_wrap</span><span class="op">(</span><span class="va">con</span>, <span class="va">from</span>, name <span class="op">=</span> <span class="fu">unique_subquery_name</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">sql_query_wrap</span><span class="op">(</span><span class="va">con</span>, <span class="va">from</span>, name <span class="op">=</span> <span class="fu">unique_subquery_name</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+
+<span class="fu">sql_indent_subquery</span><span class="op">(</span><span class="va">from</span>, <span class="va">con</span>, <span class="va">lvl</span><span class="op">)</span>
 
 <span class="fu">sql_query_rows</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -200,7 +207,8 @@ queries.</p></li>
   limit <span class="op">=</span> <span class="cn">NULL</span>,
   distinct <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>,
-  subquery <span class="op">=</span> <span class="cn">FALSE</span>
+  subquery <span class="op">=</span> <span class="cn">FALSE</span>,
+  lvl <span class="op">=</span> <span class="fl">0</span>
 <span class="op">)</span>
 
 <span class="fu">sql_query_join</span><span class="op">(</span>
@@ -211,12 +219,13 @@ queries.</p></li>
   type <span class="op">=</span> <span class="st">"inner"</span>,
   by <span class="op">=</span> <span class="cn">NULL</span>,
   na_matches <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
+  <span class="va">...</span>,
+  lvl <span class="op">=</span> <span class="fl">0</span>
 <span class="op">)</span>
 
-<span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
 
-<span class="fu">sql_query_set_op</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">method</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<span class="fu">sql_query_set_op</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">method</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="dbplyr-">

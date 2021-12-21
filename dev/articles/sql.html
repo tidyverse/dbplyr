@@ -173,8 +173,10 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
 <span class="co">#&gt; SELECT `x`, `y`, `a`, POWER(`a`, 2.0) AS `b`</span>
-<span class="co">#&gt; FROM (SELECT `x`, `y`, `y` * `x` AS `a`</span>
-<span class="co">#&gt; FROM `dbplyr_001`)</span></code></pre></div>
+<span class="co">#&gt; FROM (</span>
+<span class="co">#&gt;   SELECT `x`, `y`, `y` * `x` AS `a`</span>
+<span class="co">#&gt;   FROM `dbplyr_001`</span>
+<span class="co">#&gt; )</span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results are about what you expect.</p>
 </div>
 <div class="section level2">
