@@ -19,3 +19,14 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
     )
   )
 })
+
+test_that("long case_when is on multiple lines", {
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "this is long",
+        x == 0L ~ "so it should",
+        TRUE    ~ "be wrapped")
+    )
+  )
+})

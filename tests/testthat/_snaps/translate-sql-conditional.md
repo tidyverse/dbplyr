@@ -19,3 +19,15 @@
     Output
       <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
 
+# long case_when is on multiple lines
+
+    Code
+      translate_sql(case_when(x == 1L ~ "this is long", x == 0L ~ "so it should",
+      TRUE ~ "be wrapped"))
+    Output
+      <SQL> CASE
+      WHEN (`x` = 1) THEN 'this is long'
+      WHEN (`x` = 0) THEN 'so it should'
+      ELSE 'be wrapped'
+      END
+
