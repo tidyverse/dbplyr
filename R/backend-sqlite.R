@@ -141,7 +141,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
-  if (!type %in% c("full", "right")) {
+  if (type %in% c("left", "inner", "semi", "cross")) {
     return(NextMethod())
   }
 
