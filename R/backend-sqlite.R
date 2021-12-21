@@ -50,7 +50,7 @@ sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALS
   # of `sql_format_clauses()`
   build_sql(
     x, "\n",
-    indent_lvl(sql_kw(method), lvl = lvl), "\n",
+    indent_lvl(method, lvl = lvl), "\n",
     y,
     con = con
   )

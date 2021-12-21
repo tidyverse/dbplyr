@@ -39,9 +39,9 @@ sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0
   }
 
   clause <- build_sql(
-    sql_kw("SELECT"),
-    if (distinct) sql_kw(" DISTINCT"),
-    if (!is.null(top)) build_sql(sql_kw(" TOP "), as.integer(top), con = con),
+    "SELECT",
+    if (distinct) sql(" DISTINCT"),
+    if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
     con = con
   )
 
@@ -81,15 +81,11 @@ sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 
 
 sql_clause_limit <- function(con, limit, lvl = 0){
   if (!is.null(limit) && !identical(limit, Inf)) {
-    sql_clause(sql_kw("LIMIT"), sql(format(limit, scientific = FALSE)))
+    sql_clause("LIMIT", sql(format(limit, scientific = FALSE)))
   }
 }
 
 # helpers -----------------------------------------------------------------
-
-sql_kw <- function(kw) {
-  sql(kw)
-}
 
 sql_format_clauses <- function(clauses, lvl, con) {
   clauses <- unname(clauses)

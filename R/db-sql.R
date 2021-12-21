@@ -367,7 +367,7 @@ sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, 
   method <- paste0(method, if (all) " ALL")
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
-    sql_kw(method),
+    sql(method),
     sql_indent_subquery(y, con = con, lvl = lvl)
   )
   sql_format_clauses(lines, lvl, con)
