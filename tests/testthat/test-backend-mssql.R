@@ -19,7 +19,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(paste(x, y)),     sql("`x` + ' ' + `y`"))
   expect_equal(
     translate_sql(if_else(x, "true", "false", "missing")),
-    sql("CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN ((`x`) IS NULL) THEN 'missing' END")
+    sql("CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN (`x` IS NULL) THEN 'missing' END")
   )
 
   expect_error(translate_sql(bitwShiftL(x, 2L)), sql("not available"))

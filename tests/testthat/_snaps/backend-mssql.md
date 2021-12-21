@@ -6,7 +6,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (((`x`) IS NULL))
+      WHERE ((`x` IS NULL))
 
 ---
 
@@ -16,7 +16,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (NOT(((`x`) IS NULL)))
+      WHERE (NOT((`x` IS NULL)))
 
 ---
 
@@ -52,7 +52,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT `x`, CAST(IIF(~((`x`) IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT `x`, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
