@@ -157,6 +157,7 @@ test_that("join check `x_as` and `y_as`", {
   x <- lazy_frame(x = 1)
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = NULL))
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
+  expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
 })
 
 # sql_build ---------------------------------------------------------------

@@ -36,6 +36,13 @@
     Error <vctrs_error_assert_size>
       `y_as` must have size 1, not size 2.
 
+---
+
+    Code
+      left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS")
+    Error <rlang_error>
+      `y_as` must be different from `x_as`.
+
 # can optionally match NA values
 
     Code
