@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
+  `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
+
 * `if_any()` and `if_all()` default to `everything()` when `.cols` is not
   provided. If `.fns` is not provided they work like like a parallel
   version of `any()` respectively `all()` (@mgirlich, #734).
