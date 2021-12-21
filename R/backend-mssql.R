@@ -123,27 +123,13 @@ simulate_mssql <- function(version = "15.0") {
       bitwShiftR     = sql_not_supported("bitwShiftR"),
 
       `if`           = function(condition, true, false = NULL, missing = NULL) {
-        mssql_sql_if(
-          enquo(condition),
-          enquo(true),
-          enquo(false),
-          enquo(missing)
-        )
+        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
       },
       if_else        = function(condition, true, false, missing = NULL) {
-        mssql_sql_if(
-          enquo(condition),
-          enquo(true),
-          enquo(false),
-          enquo(missing)
-        )
+        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
       },
       ifelse         = function(test, yes, no) {
-        mssql_sql_if(
-          enquo(test),
-          enquo(yes),
-          enquo(no)
-        )
+        mssql_sql_if(enquo(test), enquo(yes), enquo(no))
       },
       case_when      = mssql_case_when,
 
