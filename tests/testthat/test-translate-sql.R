@@ -24,15 +24,6 @@ test_that("between translated to special form (#503)", {
   expect_equal(out, sql("`x` BETWEEN 1.0 AND 2.0"))
 })
 
-test_that("is.na and is.null are equivalent", {
-  # Needs to be wrapped in parens to ensure correct precedence
-  expect_equal(translate_sql(is.na(x)), sql("(`x` IS NULL)"))
-  expect_equal(translate_sql(is.null(x)), sql("(`x` IS NULL)"))
-
-  expect_equal(translate_sql(x + is.na(x)), sql("`x` + (`x` IS NULL)"))
-  expect_equal(translate_sql(!is.na(x)), sql("NOT((`x` IS NULL))"))
-})
-
 test_that("%in% translation parenthesises when needed", {
   expect_equal(translate_sql(x %in% 1L), sql("`x` IN (1)"))
   expect_equal(translate_sql(x %in% c(1L)), sql("`x` IN (1)"))
@@ -81,61 +72,6 @@ test_that("casts as expected", {
   expect_equal(translate_sql(as.integer64(x)), sql("CAST(`x` AS BIGINT)"))
   expect_equal(translate_sql(as.logical(x)),   sql("CAST(`x` AS BOOLEAN)"))
   expect_equal(translate_sql(as.Date(x)),      sql("CAST(`x` AS DATE)"))
-})
-
-# conditionals ------------------------------------------------------------
-
-test_that("all forms of if translated to case statement", {
-  expected <- sql("CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END")
-
-  expect_equal(translate_sql(if (x) 1L else 2L), expected)
-  expect_equal(translate_sql(ifelse(x, 1L, 2L)), expected)
-  expect_equal(translate_sql(if_else(x, 1L, 2L)), expected)
-})
-
-test_that("if translation adds parens", {
-  expect_equal(
-    translate_sql(if (x) y),
-    sql("CASE WHEN `x` THEN `y` END")
-  )
-
-  expect_equal(
-    translate_sql(if (x > 1L) y + 1L),
-    sql("CASE WHEN (`x` > 1) THEN (`y` + 1) END")
-  )
-
-  expect_equal(
-    translate_sql(if (x) y else z),
-    sql("CASE WHEN `x` THEN `y` WHEN NOT `x` THEN `z` END")
-  )
-
-  expect_equal(
-    translate_sql(if (x > 1L) y + 1L else z + 1L),
-    sql("CASE WHEN (`x` > 1) THEN (`y` + 1) WHEN NOT (`x` > 1) THEN (`z` + 1) END")
-  )
-})
-
-test_that("if and ifelse use correctly named arguments",{
-  exp <- translate_sql(if (x) 1 else 2)
-
-  expect_equal(translate_sql(ifelse(test = x, yes = 1, no = 2)), exp)
-  expect_equal(translate_sql(if_else(condition = x, true = 1, false = 2)), exp)
-
-  expect_equal(
-    translate_sql(if_else(condition = x, true = 1, false = 2, missing = 3)),
-    sql("CASE WHEN `x` THEN 1.0 WHEN NOT `x` THEN 2.0 WHEN (`x` IS NULL) THEN 3.0 END")
-  )
-})
-
-test_that("switch translated to CASE WHEN", {
-  expect_equal(
-    translate_sql(switch(x, a = 1L)),
-    sql("CASE `x` WHEN ('a') THEN (1) END")
-  )
-  expect_equal(
-    translate_sql(switch(x, a = 1L, 2L)),
-    sql("CASE `x` WHEN ('a') THEN (1) ELSE (2) END")
-  )
 })
 
 # numeric -----------------------------------------------------------------
