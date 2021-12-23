@@ -1,14 +1,34 @@
-sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
-  build_sql(
-    "CASE WHEN (", cond, ")", " THEN (", if_true, ")",
-    if (!is.null(if_false))
-      build_sql(" WHEN NOT(", cond, ") THEN (", if_false, ")"),
-    if (!is.null(missing)) {
-      missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
-      build_sql(" WHEN ", missing_cond, " THEN (", missing, ")")
-    },
-    " END"
-  )
+sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
+  out <- build_sql("CASE WHEN ", enpar(cond), " THEN ", enpar(if_true))
+
+  # `ifelse()` and `if_else()` have a three value logic: they return `NA` resp.
+  # `missing` if `cond` is `NA`. To get the same in SQL it is necessary to
+  # translate to
+  # CASE
+  #   WHEN <cond> THEN `if_true`
+  #   WHEN NOT <cond> THEN `if_false`
+  #   WHEN <cond> IS NULL THEN `missing`
+  # END
+  #
+  # Together these cases cover every possible case. So, if `if_false` and
+  # `missing` are identical they can be simplified to `ELSE <if_false>`
+  if (!quo_is_null(if_false) && identical(if_false, missing)) {
+    out <- paste0(out, " ELSE ", enpar(if_false), " END")
+    return(sql(out))
+  }
+
+  if (!quo_is_null(if_false)) {
+    false_sql <- build_sql(" WHEN NOT ", enpar(cond), " THEN ", enpar(if_false))
+    out <- paste0(out, false_sql)
+  }
+
+  if (!quo_is_null(missing)) {
+    missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
+    missing_sql <- build_sql(" WHEN ", missing_cond, " THEN ", enpar(missing))
+    out <- paste0(out, missing_sql)
+  }
+
+  sql(paste0(out, " END"))
 }
 
 sql_case_when <- function(...) {
@@ -28,15 +48,21 @@ sql_case_when <- function(...) {
     f <- formulas[[i]]
 
     env <- environment(f)
-    query[[i]] <- escape(eval_bare(f[[2]], env), con = sql_current_con())
-    value[[i]] <- escape(eval_bare(f[[3]], env), con = sql_current_con())
+    query[[i]] <- escape(enpar(quo(!!f[[2]]), tidy = FALSE, env = env), con = sql_current_con())
+    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = sql_current_con())
   }
 
-  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN (", .y, ")"))
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
   if (query[[n]] == "TRUE") {
-    clauses[[n]] <- paste0("ELSE (", value[[n]], ")")
+    clauses[[n]] <- paste0("ELSE ", value[[n]])
   }
+
+  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
+  if (nchar(same_line_sql) <= 80) {
+    return(same_line_sql)
+  }
+
   sql(paste0(
     "CASE\n",
     paste0(clauses, collapse = "\n"),
@@ -66,5 +92,23 @@ sql_switch <- function(x, ...) {
 }
 
 sql_is_null <- function(x) {
-  sql_expr((((!!x)) %is% NULL))
+  x_sql <- enpar(enquo(x))
+  sql_expr((!!x_sql %is% NULL))
+}
+
+enpar <- function(x, tidy = TRUE, env = NULL) {
+  if (!is_quosure(x)) {
+    abort("Internal error: `x` must be a quosure.")
+  }
+
+  if (tidy) {
+    x_sql <- eval_tidy(x, env = env)
+  } else {
+    x_sql <- eval_bare(x, env = env)
+  }
+  if (quo_is_call(x)) {
+    build_sql("(", x_sql, ")")
+  } else {
+    x_sql
+  }
 }

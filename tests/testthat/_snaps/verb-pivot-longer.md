@@ -65,7 +65,7 @@
           FROM `df`
         )
       ) `q01`
-      WHERE (NOT(((`value`) IS NULL)))
+      WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
 

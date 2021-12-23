@@ -5,9 +5,9 @@
     Output
       <SQL>
       SELECT
-        MAX(CASE WHEN (`key` = 'x') THEN (`val`) END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN (`val`) END) AS `y`,
-        MAX(CASE WHEN (`key` = 'z') THEN (`val`) END) AS `z`
+        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
+        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`,
+        MAX(CASE WHEN (`key` = 'z') THEN `val` END) AS `z`
       FROM `df`
 
 # implicit missings turn into explicit missings
@@ -19,8 +19,8 @@
       <SQL>
       SELECT
         `a`,
-        MAX(CASE WHEN (`key` = 'x') THEN (`val`) END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN (`val`) END) AS `y`
+        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
+        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`
       FROM `df`
       GROUP BY `a`
 
@@ -36,7 +36,7 @@
       dbplyr_pivot_wider_spec(df, spec1, values_fn = sum)
     Output
       <SQL>
-      SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN (`val`) END) AS `x`
+      SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
       FROM `df`
       GROUP BY `a`
 
@@ -55,8 +55,8 @@
         `g`,
         `name`,
         `value`,
-        MAX(CASE WHEN (`key` = 'x') THEN (`val`) WHEN NOT(`key` = 'x') THEN (0.0) END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN (`val`) WHEN NOT(`key` = 'y') THEN (0.0) END) AS `y`
+        MAX(CASE WHEN (`key` = 'x') THEN `val` WHEN NOT (`key` = 'x') THEN 0.0 END) AS `x`,
+        MAX(CASE WHEN (`key` = 'y') THEN `val` WHEN NOT (`key` = 'y') THEN 0.0 END) AS `y`
       FROM `df`
       GROUP BY `g`, `name`, `value`
 
@@ -70,8 +70,8 @@
         `g`,
         `name`,
         `value`,
-        MAX(CASE WHEN (`key` = 'x') THEN (`val`) END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN (`val`) END) AS `y`
+        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
+        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`
       FROM `df`
       GROUP BY `g`, `name`, `value`
 

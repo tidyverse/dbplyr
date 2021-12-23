@@ -6,7 +6,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (((`x`) IS NULL))
+      WHERE ((`x` IS NULL))
 
 ---
 
@@ -16,7 +16,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (NOT(((`x`) IS NULL)))
+      WHERE (NOT((`x` IS NULL)))
 
 ---
 
@@ -43,9 +43,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `x`, CASE
-      WHEN (`x` = 1) THEN (1)
-      END AS `z`
+      SELECT `x`, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -54,7 +52,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT `x`, CAST(IIF(~((`x`) IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT `x`, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
