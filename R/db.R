@@ -7,8 +7,8 @@
 #' * `dbplyr_edition()` declares which version of the dbplyr API you want.
 #'    See below for more details.
 #'
-#' @section dplyr 2.0.0:
-#' dplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
+#' @section dbplyr 2.0.0:
+#' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
 #' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
 #' the following methods.
 #'
