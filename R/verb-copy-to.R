@@ -89,12 +89,12 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
 
 #' @export
 db_values <- function(con, df) {
-  if (ncol(df) == 0) {
-    abort("`df` needs at least one column.")
-  }
-
   if (!inherits(df, "data.frame")) {
     abort("`df` needs to be a data.frame.")
+  }
+
+  if (ncol(df) == 0) {
+    abort("`df` needs at least one column.")
   }
 
   tbl(
