@@ -84,6 +84,13 @@ test_that("can override default output column type", {
   )
 })
 
+test_that("values_transform can be a formula", {
+  expect_snapshot(
+    lazy_frame(x = 1) %>%
+      tidyr::pivot_longer(x, values_transform = list(value = ~ as.character(.x)))
+  )
+})
+
 test_that("can pivot to multiple measure cols", {
   df <- lazy_frame(x = "x", y = 1)
   sp <- tibble::tribble(

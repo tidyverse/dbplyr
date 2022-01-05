@@ -40,6 +40,24 @@
       FROM `df`
       GROUP BY `a`
 
+# values_fn can be a formula
+
+    Code
+      dbplyr_pivot_wider_spec(df, spec1, values_fn = ~sum(.x, na.rm = TRUE))
+    Output
+      <SQL>
+      SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
+      FROM `df`
+      GROUP BY `a`
+
+# values_fn can be a named list
+
+    `values_fn` must specify a function for each col in `values_from`
+
+---
+
+    `values_fn` must specify a function for each col in `values_from`
+
 # values_fn cannot be NULL
 
     `values_fn` must not be NULL

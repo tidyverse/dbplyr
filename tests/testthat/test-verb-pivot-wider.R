@@ -137,6 +137,40 @@ test_that("values_fn can be a single function", {
   expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
 })
 
+test_that("values_fn can be a formula", {
+  df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
+
+  expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = ~ sum(.x, na.rm = TRUE)))
+})
+
+test_that("values_fn can be a named list", {
+  df <- lazy_frame(
+    key = c("x", "x"),
+    a = c(1, 2),
+    b = c(3, 4)
+  )
+
+  spec <- tibble(
+    .name = c("a_x", "b_x"),
+    .value = c("a", "b"),
+    key = "x"
+  )
+
+  dbplyr_pivot_wider_spec(
+    df, spec,
+    values_fn = list(a = sum, b = ~ sum(.x, na.rm = TRUE))
+  )
+
+  # must specify `values_fn` for every column
+  expect_snapshot_error(
+    dbplyr_pivot_wider_spec(df, spec, values_fn = list(a = sum))
+  )
+  # no function must be `NULL`
+  expect_snapshot_error(
+    dbplyr_pivot_wider_spec(df, spec, values_fn = list(a = sum, b = NULL))
+  )
+})
+
 test_that("values_fn cannot be NULL", {
   df <- lazy_frame(a = 1, key = "x", val = 1)
 

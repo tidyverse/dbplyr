@@ -165,19 +165,16 @@ dbplyr_pivot_longer_spec <- function(data,
 }
 
 get_measure_column_exprs <- function(name, value, values_transform) {
-  # idea copied from `partial_eval_across`
-  measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
-
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
     ~ {
-      f_trans <- measure_funs[[.y]]
+      f_trans <- values_transform[[.y]]
 
       if (is_null(f_trans)) {
         .x
       } else {
-        expr((!!f_trans)(!!.x))
+        resolve_fun(f_trans, .x)
       }
     }
   )
