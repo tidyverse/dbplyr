@@ -66,13 +66,13 @@ pivot_longer.tbl_lazy <- function(data,
                                   names_prefix = NULL,
                                   names_sep = NULL,
                                   names_pattern = NULL,
-                                  names_ptypes = list(),
-                                  names_transform = list(),
+                                  names_ptypes = NULL,
+                                  names_transform = NULL,
                                   names_repair = "check_unique",
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = list(),
+                                  values_transform = NULL,
                                   ...) {
   if (!is_missing(values_ptypes)) {
     abort("The `values_ptypes` argument is not supported for remote back-ends")
@@ -103,7 +103,7 @@ dbplyr_pivot_longer_spec <- function(data,
                                      spec,
                                      names_repair = "check_unique",
                                      values_drop_na = FALSE,
-                                     values_transform = list()) {
+                                     values_transform = NULL) {
   spec <- check_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column
@@ -115,6 +115,10 @@ dbplyr_pivot_longer_spec <- function(data,
   spec <- repair_info$spec
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
+
+  value_names <- unique(spec$.value)
+  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform")
+
   nms_map <- tibble(
     name = colnames(spec_split$key),
     name_mapped = ifelse(
@@ -272,6 +276,32 @@ deduplicate_spec <- function(spec, df) {
 
   spec$.seq <- copy
   spec
+}
+
+check_list_of_functions <- function(x, names, arg) {
+  # COPIED FROM tidyr
+  if (is.null(x)) {
+    x <- set_names(list(), character())
+  }
+
+  if (!vctrs::vec_is_list(x)) {
+    x <- rep_named(names, list(x))
+  }
+
+  if (length(x) > 0L && !is_named(x)) {
+    abort(glue("All elements of `{arg}` must be named."))
+  }
+
+  if (vctrs::vec_duplicate_any(names(x))) {
+    abort(glue("The names of `{arg}` must be unique."))
+  }
+
+  x <- purrr::map(x, as_function)
+
+  # Silently drop user supplied names not found in the data
+  x <- x[intersect(names(x), names)]
+
+  x
 }
 # nocov end
 

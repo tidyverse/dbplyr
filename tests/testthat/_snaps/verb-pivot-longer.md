@@ -95,6 +95,19 @@
       SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
       FROM `df`
 
+# `values_transform` is validated
+
+    Code
+      (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
+    Output
+      <error/rlang_error>
+      Can't convert a double vector to function
+    Code
+      (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
+    Output
+      <error/rlang_error>
+      All elements of `values_transform` must be named.
+
 # can pivot to multiple measure cols
 
     Code
