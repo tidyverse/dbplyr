@@ -134,6 +134,8 @@ test_that("can override default keys", {
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
+  # translate `sum(x)` to be sure to not get a warning in the snapshot afterwards
+  suppressWarnings(translate_sql(sum(x)))
   expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
 })
 
