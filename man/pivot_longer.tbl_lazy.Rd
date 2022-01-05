@@ -11,13 +11,13 @@ pivot_longer.tbl_lazy(
   names_prefix = NULL,
   names_sep = NULL,
   names_pattern = NULL,
-  names_ptypes = list(),
-  names_transform = list(),
+  names_ptypes = NULL,
+  names_transform = NULL,
   names_repair = "check_unique",
   values_to = "value",
   values_drop_na = FALSE,
   values_ptypes,
-  values_transform = list(),
+  values_transform = NULL,
   ...
 )
 }
