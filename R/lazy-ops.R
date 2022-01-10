@@ -29,8 +29,10 @@ op_base <- function(x, vars, class = character()) {
   )
 }
 
-op_base_local <- function(df) {
-  op_base(df, names(df), class = "local")
+op_base_local <- function(df, name) {
+  out <- op_base(df, names(df), class = "local")
+  out$name <- name
+  out
 }
 
 op_base_remote <- function(x, vars) {
@@ -60,7 +62,7 @@ sql_build.op_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.op_base_local <- function(op, con, ...) {
-  ident("df")
+  ident(op$name)
 }
 
 # Operators ---------------------------------------------------------------
