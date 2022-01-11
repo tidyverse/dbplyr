@@ -29,7 +29,15 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
       return(invisible(x))
     }
 
-    sql <- sql_rows_update(x, y, by, returning_cols = returning_cols)
+    sql <- sql_query_rows_update(
+      con = remote_con(x),
+      x_name = name,
+      y = y,
+      by = by,
+      ...,
+      returning_cols = returning_cols
+    )
+
     rows_get_or_execute(x, sql, returning_cols)
   } else {
     existing_columns <- setdiff(colnames(x), new_columns)
@@ -61,86 +69,104 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
 #' @export
 #' @rdname rows-db
-sql_rows_update <- function(x, y, by, ..., returning_cols = NULL) {
+sql_query_rows_update <- function(con, x_name, y, by, ..., returning_cols = NULL) {
   ellipsis::check_dots_used()
   # FIXME: check here same src for x and y? if not -> error.
-  UseMethod("sql_rows_update")
+  UseMethod("sql_query_rows_update")
 }
 
 #' @export
-sql_rows_update.tbl_lazy <- function(x, y, by, ..., returning_cols = NULL) {
+sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
+                                                returning_cols = NULL) {
+  lvl <- 0
+
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
   # avoid CTEs for the general case as they do not work everywhere
-  p <- sql_rows_prep(x, y, by)
-
-  sql <- paste0(
-    "UPDATE ", p$name, "\n",
-    "SET\n",
-    paste0(
-      "  ", unlist(p$new_columns_qq_list),
-      " = ", unlist(p$new_columns_qual_qq_list),
-      collapse = ",\n"
-    ), "\n",
-    "FROM (\n",
-    "    ", sql_render(y), "\n",
-    "  ) AS ", p$y_name, "\n",
-    "WHERE (", p$compare_qual_qq, ")\n",
-    sql_returning_cols(x, returning_cols)
+  clauses <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_clause_from(parts$from),
+    sql_clause_where(parts$where),
+    sql_returning_cols(con, returning_cols, x_name)
   )
-
-  glue::as_glue(sql)
+  sql_format_clauses(clauses, lvl, con)
 }
 
 #' @export
-`sql_rows_update.tbl_Microsoft SQL Server` <- function(x, y, by, ..., returning_cols = NULL) {
-  p <- sql_rows_prep(x, y, by)
-
+`sql_query_rows_update.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+                                                         returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  sql <- paste0(
-    "WITH ", p$y_name, "(", p$y_columns_qq, ") AS (\n",
-    sql_render(y),
-    "\n)\n",
-    #
-    "UPDATE ", p$name, "\n",
-    "SET\n",
-    paste0(
-      "  ", unlist(p$new_columns_qq_list),
-      " = ", unlist(p$new_columns_qual_qq_list),
-      collapse = ",\n"
-    ),
-    "\n",
-    sql_output_cols(x, returning_cols),
-    "FROM ", p$name, "\n",
-    "  INNER JOIN ", p$y_name, "\n",
-    "  ON ", p$compare_qual_qq
-  )
+  lvl <- 0
 
-  glue::as_glue(sql)
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
+  clauses <- list(
+    sql_clause_update(ident(x_name)),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_output_cols(con, returning_cols),
+    sql_clause_from(ident(x_name)),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause("ON", parts$where, sep = " AND", lvl = 1)
+  )
+  sql_format_clauses(clauses, lvl, con)
 }
 
 #' @export
-sql_rows_update.tbl_MariaDBConnection <- function(x, y, by, ..., returning_cols = NULL) {
-  p <- sql_rows_prep(x, y, by)
-
+sql_query_rows_update.MariaDBConnection <- function(con, x_name, y, by, ...,
+                                                    returning_cols = NULL) {
   # https://stackoverflow.com/a/19346375/946850
-  sql <- paste0(
-    "UPDATE ", p$name, "\n",
-    "  INNER JOIN (\n", sql_render(y), "\n) AS ", p$y_name, "\n",
-    "  ON ", p$compare_qual_qq, "\n",
-    "SET\n",
-    paste0("  ", p$new_columns_qual_qq, " = ", p$new_columns_qual_qq, collapse = ",\n"),
-    sql_returning_cols(x, returning_cols)
-  )
+  lvl <- 0
 
-  glue::as_glue(sql)
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
+  clauses <- list(
+    sql_clause_update(ident(x_name)),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause("ON", parts$where, sep = " AND", lvl = 1),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl, con)
 }
 
-db_key <- function (y, by) {
-  if (is_null(by)) {
-    set_names(1L, colnames(y)[[1]])
-  } else {
-    idx <- match(by, colnames(y))
-    set_names(idx, by)
-  }
+update_prep <- function(con, x_name, y, by, lvl = 0) {
+  y_name <- "...y"
+
+  update_cols <- setdiff(colnames(y), by)
+  update_values <- sql_table_prefix(con, update_cols, y_name)
+
+  from <- dbplyr_sql_subquery(con,
+    sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
+    name = y_name,
+    lvl = lvl
+  )
+
+  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name)
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  list(
+    update_cols = update_cols,
+    update_values = update_values,
+    from = from,
+    where = where
+  )
+}
+
+sql_clause_update <- function(table) {
+  sql_clause("UPDATE", table)
+}
+
+sql_clause_set <- function(lhs, rhs) {
+  update_clauses <- sql(paste0(lhs, " = ", rhs))
+
+  sql_clause("SET", update_clauses)
 }
 
 rows_check_key <- function(by, x, y, error_call = caller_env()) {
@@ -195,59 +221,6 @@ target_table_name <- function (x, in_place) {
   }
 
   NULL
-}
-
-sql_rows_prep <- function(x, y, by) {
-  con <- remote_con(x)
-  name <- remote_name(x)
-
-  # https://stackoverflow.com/a/47753166/946850
-  y_name <- escape(ident("...y"), con = con)
-  y_q <- escape(colnames(y), con = con)
-  by_q <- escape(by, con = con)
-  # y_q <- DBI::dbQuoteIdentifier(con, colnames(y))
-  # by_q <- DBI::dbQuoteIdentifier(con, by)
-
-  y_columns_qq <- sql_list(y_q)
-  y_columns_qual_qq <- sql_list(paste(y_name, ".", y_q))
-
-  by_columns_qq <- sql_list(by_q)
-
-  new_columns_q <- setdiff(y_q, by_q)
-  new_columns_qual_q <- paste0(y_name, ".", new_columns_q)
-  old_columns_qual_q <- paste0(name, ".", new_columns_q)
-
-  new_columns_qq <- sql_list(new_columns_q)
-  new_columns_qq_list <- list(new_columns_q)
-
-  new_columns_qual_qq <- sql_list(new_columns_qual_q)
-  new_columns_qual_qq_list <- list(new_columns_qual_q)
-
-  new_columns_patch <- sql_coalesce(old_columns_qual_q, new_columns_qual_q)
-  new_columns_patch_qq <- sql_list(new_columns_patch)
-  new_columns_patch_qq_list <- list(new_columns_patch)
-
-  compare_qual_qq <- paste0(
-    y_name, ".", by_q,
-    " = ",
-    name, ".", by_q,
-    collapse = " AND "
-  )
-
-  tibble(
-    name, y_name,
-    y_columns_qq,
-    y_columns_qual_qq,
-    by_columns_qq,
-    new_columns_qq, new_columns_qq_list,
-    new_columns_qual_qq, new_columns_qual_qq_list,
-    new_columns_patch_qq, new_columns_patch_qq_list,
-    compare_qual_qq
-  )
-}
-
-sql_list <- function(x) {
-  paste(x, collapse = ", ")
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols) {
@@ -314,42 +287,64 @@ has_returned_rows <- function(x) {
 #' more standardized DBs.
 #' @export
 #' @rdname rows-db
-sql_returning_cols <- function(x, returning_cols, ...) {
-  if (is_empty(returning_cols)) {
+sql_returning_cols <- function(con, cols, table, ...) {
+  if (is_empty(cols)) {
     return(NULL)
   }
 
-  check_dots_empty()
+  ellipsis::check_dots_empty()
   UseMethod("sql_returning_cols")
 }
 
 #' @export
-sql_returning_cols.tbl_lazy <- function(x, returning_cols, ...) {
-  con <- remote_con(x)
-  returning_cols <- sql_named_cols(con, returning_cols, table = remote_name(x))
+sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
+  returning_cols <- sql_named_cols(con, cols, table = table)
 
-  paste0("RETURNING ", returning_cols)
+  sql_clause("RETURNING", returning_cols)
 }
 
 #' @export
-sql_returning_cols.tbl_duckdb_connection <- function(x, returning_cols, ...) {
+sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
   abort("DuckDB does not support the `returning` argument.")
 }
 
 #' @export
-`sql_returning_cols.tbl_Microsoft SQL Server` <- function(x, returning_cols, ...) {
+`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, ...) {
   NULL
+}
+
+#' @export
+#' @param output_delete For `sql_output_cols()`, construct the SQL
+#'   for a `DELETE` operation.
+#' @rdname rows-db
+sql_output_cols <- function(con, cols, output_delete = FALSE, ...) {
+  if (is_empty(cols)) {
+    return(NULL)
+  }
+
+  UseMethod("sql_output_cols")
+}
+
+#' @export
+sql_output_cols.default <- function(con, cols, output_delete = FALSE, ...) {
+  NULL
+}
+
+#' @export
+`sql_output_cols.Microsoft SQL Server` <- function(con, cols, output_delete = FALSE, ...) {
+  returning_cols <- sql_named_cols(
+    con, cols,
+    table = if (output_delete) "DELETED" else "INSERTED"
+  )
+
+  sql_clause("OUTPUT", returning_cols)
 }
 
 sql_named_cols <- function(con, cols, table = NULL) {
   nms <- names2(cols)
   nms[nms == cols] <- ""
 
-  cols <- DBI::dbQuoteIdentifier(con, cols)
-  if (!is.null(table)) {
-    cols <- paste0(table, ".", cols)
-  }
-
-  cols[nms != ""] <- paste0(cols, " AS ", DBI::dbQuoteIdentifier(con, nms[nms != ""]))
-  paste0(cols, collapse = ", ")
+  cols <- sql_table_prefix(con, cols, table)
+  cols <- set_names(cols, nms)
+  escape(ident_q(cols), collapse = NULL, con = con)
 }

@@ -4,6 +4,7 @@
 \alias{rows_update.tbl_lazy}
 \alias{sql_rows_update}
 \alias{sql_returning_cols}
+\alias{sql_output_cols}
 \title{sql_returning_cols}
 \usage{
 \method{rows_update}{tbl_lazy}(
@@ -19,7 +20,13 @@
 
 sql_rows_update(x, y, by, ..., returning_cols = NULL)
 
-sql_returning_cols(x, returning_cols, ...)
+sql_returning_cols(con, cols, table, ...)
+
+sql_output_cols(con, cols, output_delete = FALSE, ...)
+}
+\arguments{
+\item{output_delete}{For \code{sql_output_cols()}, construct the SQL
+for a \code{DELETE} operation.}
 }
 \description{
 \code{sql_returning_cols()} and \code{sql_output_cols()} construct the SQL
