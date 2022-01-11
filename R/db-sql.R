@@ -10,6 +10,13 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
+#' * `sql_returning_cols(con, cols, table)`,
+#'   `sql_output_cols(con, cols, output_delete)` generates the `RETURNING` resp.
+#'   `OUTPUT` clause. Two methods are required, because the syntax for SQL Server
+#'   (and some other databases) is vastly different from Postgres and other
+#'   more standardized DBs.
+
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -107,15 +114,8 @@ sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
 }
 
-#' sql_returning_cols
-#'
-#' `sql_returning_cols()` and `sql_output_cols()` construct the SQL
-#' required to support the `returning` argument.
-#' Two methods are required, because the syntax for SQL Server
-#' (and some other databases) is vastly different from Postgres and other
-#' more standardized DBs.
 #' @export
-#' @rdname rows-db
+#' @rdname db-sql
 sql_returning_cols <- function(con, cols, table, ...) {
   if (is_empty(cols)) {
     return(NULL)
@@ -133,9 +133,7 @@ sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
 }
 
 #' @export
-#' @param output_delete For `sql_output_cols()`, construct the SQL
-#'   for a `DELETE` operation.
-#' @rdname rows-db
+#' @rdname db-sql
 sql_output_cols <- function(con, cols, output_delete = FALSE, ...) {
   if (is_empty(cols)) {
     return(NULL)
@@ -424,7 +422,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 }
 
 #' @export
-#' @rdname rows-db
+#' @rdname db-sql
 sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
                                   returning_cols = NULL) {
   ellipsis::check_dots_used()

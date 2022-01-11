@@ -1,4 +1,7 @@
 #' @export
+#' @inheritParams dplyr::rows_update
+#' @param returning Columns to return.
+#'
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
 rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
@@ -75,6 +78,8 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   }
 }
 
+#' @inheritParams dplyr::rows_patch
+#'
 #' @export
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db

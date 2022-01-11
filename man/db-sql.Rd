@@ -4,6 +4,8 @@
 \alias{db-sql}
 \alias{sql_expr_matches}
 \alias{sql_translation}
+\alias{sql_returning_cols}
+\alias{sql_output_cols}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
 \alias{sql_query_explain}
@@ -16,11 +18,16 @@
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_query_update_from}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
 
 sql_translation(con)
+
+sql_returning_cols(con, cols, table, ...)
+
+sql_output_cols(con, cols, output_delete = FALSE, ...)
 
 sql_table_analyze(con, table, ...)
 
@@ -68,6 +75,16 @@ sql_query_join(
 sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_query_update_from(
+  con,
+  x_name,
+  y,
+  by,
+  update_values,
+  ...,
+  returning_cols = NULL
+)
 }
 \description{
 SQL translation:
@@ -76,6 +93,11 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
+\item \code{sql_returning_cols(con, cols, table)},
+\code{sql_output_cols(con, cols, output_delete)} generates the \code{RETURNING} resp.
+\code{OUTPUT} clause. Two methods are required, because the syntax for SQL Server
+(and some other databases) is vastly different from Postgres and other
+more standardized DBs.
 }
 
 Tables:
