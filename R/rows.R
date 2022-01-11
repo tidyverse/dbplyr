@@ -4,7 +4,7 @@
 #'
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
-rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
   by <- rows_check_key(by, x, y)
   y <- auto_copy(x, y, copy = copy)
@@ -79,7 +79,7 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #' @export
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db
-rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                 returning = NULL) {
   by <- rows_check_key(by, x, y)
   y <- auto_copy(x, y, copy = copy)
@@ -163,7 +163,7 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = N
 #'
 #' @importFrom dplyr rows_upsert
 #' @rdname rows-db
-rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
   by <- rows_check_key(by, x, y)
   y <- auto_copy(x, y, copy = copy)
@@ -235,7 +235,7 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #'
 #' @importFrom dplyr rows_delete
 #' @rdname rows-db
-rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
   by <- rows_check_key(by, x, y)
   y <- auto_copy(x, y, copy = copy)
