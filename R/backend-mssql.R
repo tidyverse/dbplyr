@@ -93,7 +93,7 @@ simulate_mssql <- function(version = "15.0") {
                                                          update_values, ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  parts <- update_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(

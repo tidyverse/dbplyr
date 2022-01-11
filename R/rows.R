@@ -284,7 +284,7 @@ eval_select2 <- function(expr, data) {
   set_names(colnames(sim_data)[locs], names_out)
 }
 
-update_prep <- function(con, x_name, y, by, lvl = 0) {
+rows_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
   from <- dbplyr_sql_subquery(con,
     sql_render(y, con, subquery = TRUE, lvl = lvl + 1),

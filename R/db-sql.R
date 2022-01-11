@@ -434,7 +434,7 @@ sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
 sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
                                                 update_values, ...,
                                                 returning_cols = NULL) {
-  parts <- update_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   # avoid CTEs for the general case as they do not work everywhere
@@ -461,7 +461,7 @@ sql_query_upsert <- function(con, x_name, y, by, update_cols, ...,
 sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
                                            update_cols, ...,
                                            returning_cols = NULL) {
-  parts <- update_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, update_cols)
   update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
 
@@ -498,7 +498,7 @@ sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
 
 #' @export
 sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  parts <- update_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list(
     sql_clause("DELETE FROM", x_name),
