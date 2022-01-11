@@ -144,7 +144,7 @@ test_that("early return if no column to update", {
   )
 
   expect_equal(
-    rows_update(
+    rows_patch(
       memdb_frame(x = 1:3, y = c(11, 12, NA)),
       memdb_frame(x = 1:3),
       by = "x",
@@ -242,6 +242,39 @@ test_that("`in_place = TRUE` with `returning` works", {
 
 
 # rows_upsert -------------------------------------------------------------
+
+test_that("early return if no column to update", {
+  expect_snapshot(
+    rows_upsert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 1:3, .name = "df_y"),
+      by = "x",
+      in_place = FALSE
+    )
+  )
+
+  expect_equal(
+    rows_upsert(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 2:4),
+      by = "x",
+      in_place = FALSE
+    ) %>%
+      collect(),
+    tibble(x = 1:4, y = c(11:13, NA))
+  )
+
+  expect_equal(
+    rows_upsert(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 2:4),
+      by = "x",
+      in_place = TRUE
+    ) %>%
+      collect(),
+    tibble(x = 1:3, y = 11:13)
+  )
+})
 
 test_that("empty `by` works", {
   expect_message(
