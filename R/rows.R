@@ -284,27 +284,6 @@ eval_select2 <- function(expr, data) {
   set_names(colnames(sim_data)[locs], names_out)
 }
 
-rows_prep <- function(con, x_name, y, by, lvl = 0) {
-  y_name <- "...y"
-  from <- dbplyr_sql_subquery(con,
-    sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
-    name = y_name,
-    lvl = lvl
-  )
-
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name)
-  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-
-  list(
-    from = from,
-    where = where
-  )
-}
-
-sql_coalesce <- function(x, y) {
-  sql(paste0("COALESCE(", x, ", ", y, ")"))
-}
-
 rows_check_key <- function(by, x, y, error_call = caller_env()) {
   if (is.null(by)) {
     by <- colnames(y)[[1]]
@@ -353,7 +332,7 @@ rows_check_in_place <- function(df, in_place) {
   }
 }
 
-target_table_name <- function (x, in_place) {
+target_table_name <- function(x, in_place) {
   name <- remote_name(x)
   if (!is_null(name) && is_true(in_place)) {
     return(name)
@@ -433,6 +412,27 @@ has_returned_rows <- function(x) {
 #' @export
 sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
   abort("DuckDB does not support the `returning` argument.")
+}
+
+rows_prep <- function(con, x_name, y, by, lvl = 0) {
+  y_name <- "...y"
+  from <- dbplyr_sql_subquery(con,
+    sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
+    name = y_name,
+    lvl = lvl
+  )
+
+  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name)
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  list(
+    from = from,
+    where = where
+  )
+}
+
+sql_coalesce <- function(x, y) {
+  sql(paste0("COALESCE(", x, ", ", y, ")"))
 }
 
 sql_named_cols <- function(con, cols, table = NULL) {
