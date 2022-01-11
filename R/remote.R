@@ -25,6 +25,9 @@ remote_name <- function(x) {
   if (!inherits(x$ops, "op_base"))
     return()
 
+  if (inherits(x$ops, "op_base_local"))
+    return(x$ops$name)
+
   x$ops$x
 }
 
