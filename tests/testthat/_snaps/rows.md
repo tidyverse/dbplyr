@@ -120,3 +120,15 @@
         WHERE (`LHS`.`x` = `RHS`.`x`)
       )
 
+# `in_place = TRUE` works
+
+    `in_place = TRUE` does not work for simulated connections.
+
+---
+
+    `in_place = TRUE` does not work for simulated connections.
+
+---
+
+    `in_place = TRUE` does not work for simulated connections.
+

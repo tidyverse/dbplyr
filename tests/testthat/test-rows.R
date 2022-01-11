@@ -83,15 +83,14 @@ test_that("`in_place = FALSE` with `returning` works", {
 })
 
 test_that("`in_place = TRUE` works", {
-  # TODO error for `in_place = TRUE` and lazy frames
-  # expect_snapshot(
-  #   rows_update(
-  #     lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-  #     lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
-  #     by = "x",
-  #     in_place = TRUE
-  #   )
-  # )
+  expect_snapshot_error(
+    rows_update(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = TRUE
+    )
+  )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_update(
@@ -204,15 +203,14 @@ test_that("`in_place = FALSE` with `returning` works", {
 })
 
 test_that("`in_place = TRUE` works", {
-  # TODO error for `in_place = TRUE` and lazy frames
-  # expect_snapshot(
-  #   rows_update(
-  #     lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-  #     lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
-  #     by = "x",
-  #     in_place = TRUE
-  #   )
-  # )
+  expect_snapshot_error(
+    rows_patch(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = TRUE
+    )
+  )
 
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   rows_patch(
@@ -293,15 +291,14 @@ test_that("`in_place = FALSE` with `returning` works", {
 })
 
 test_that("`in_place = TRUE` works", {
-  # TODO error for `in_place = TRUE` and lazy frames
-  # expect_snapshot(
-  #   rows_update(
-  #     lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-  #     lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
-  #     by = "x",
-  #     in_place = TRUE
-  #   )
-  # )
+  expect_snapshot_error(
+    rows_delete(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = TRUE
+    )
+  )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_delete(

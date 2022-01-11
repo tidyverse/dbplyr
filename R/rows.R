@@ -21,6 +21,8 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   )
 
   returning_cols <- eval_select2(returning_expr, x)
+  rows_check_returning(x, returning_cols)
+  rows_check_in_place(x, in_place)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -62,10 +64,6 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
     }
 
     if (!is_empty(returning_cols)) {
-      if (inherits(updated, "tbl_TestConnection")) {
-        abort("`returning` does not work for simulated connections")
-      }
-
       returned_rows <- updated %>%
         select(!!!returning_cols) %>%
         collect()
@@ -98,6 +96,8 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = N
   )
 
   returning_cols <- eval_select2(returning_expr, x)
+  rows_check_returning(x, returning_cols)
+  rows_check_in_place(x, in_place)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -148,10 +148,6 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = N
     }
 
     if (!is_empty(returning_cols)) {
-      if (inherits(patched, "tbl_TestConnection")) {
-        abort("`returning` does not work for simulated connections")
-      }
-
       returned_rows <- patched %>%
         select(!!!returning_cols) %>%
         collect()
@@ -184,6 +180,8 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   )
 
   returning_cols <- eval_select2(returning_expr, x)
+  rows_check_returning(x, returning_cols)
+  rows_check_in_place(x, in_place)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -218,10 +216,6 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
     out <- union_all(unchanged, upserted)
 
     if (!is_empty(returning_cols)) {
-      if (inherits(patched, "tbl_TestConnection")) {
-        abort("`returning` does not work for simulated connections")
-      }
-
       returned_rows <- upserted %>%
         select(!!!returning_cols) %>%
         collect()
@@ -254,6 +248,8 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   )
 
   returning_cols <- eval_select2(returning_expr, x)
+  rows_check_in_place(x, in_place)
+  rows_check_returning(x, returning_cols)
   name <- target_table_name(x, in_place)
 
   if (!is_null(name)) {
@@ -338,6 +334,22 @@ rows_check_key_df <- function(df, by, df_name, error_call = caller_env()) {
   if (length(y_miss) > 0) {
     msg <- glue("All `by` columns must exist in `{df_name}`.")
     abort(msg, call = error_call)
+  }
+}
+
+rows_check_returning <- function(df, returning_cols) {
+  if (is_empty(returning_cols)) return()
+
+  if (inherits(df, "tbl_TestConnection")) {
+    abort("`returning` does not work for simulated connections.")
+  }
+}
+
+rows_check_in_place <- function(df, in_place) {
+  if (!in_place) return()
+
+  if (inherits(df, "tbl_TestConnection")) {
+    abort("`in_place = TRUE` does not work for simulated connections.")
   }
 }
 
