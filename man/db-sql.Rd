@@ -20,6 +20,7 @@
 \alias{sql_query_set_op}
 \alias{sql_query_update_from}
 \alias{sql_query_upsert}
+\alias{sql_query_delete}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
@@ -88,6 +89,8 @@ sql_query_update_from(
 )
 
 sql_query_upsert(con, x_name, y, by, update_cols, ..., returning_cols = NULL)
+
+sql_query_delete(con, x_name, y, by, ..., returning_cols = NULL)
 }
 \description{
 SQL translation:

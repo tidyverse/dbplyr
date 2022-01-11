@@ -245,6 +245,62 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   }
 }
 
+#' @export
+#' @inheritParams dplyr::rows_delete
+#'
+#' @importFrom dplyr rows_delete
+#' @rdname rows-db
+rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+                                 returning = NULL) {
+  by <- rows_check_key(by, x, y)
+  y <- auto_copy(x, y, copy = copy)
+
+  rows_check_key_df(x, by, df_name = "x")
+  rows_check_key_df(y, by, df_name = "y")
+  # TODO check that key values in `y` are unique? (argument `check`?)
+
+  # Expect manual quote from user, silently fall back to enexpr()
+  returning_expr <- enexpr(returning)
+  tryCatch(
+    returning_expr <- returning,
+    error = identity
+  )
+
+  returning_cols <- eval_select2(returning_expr, x)
+  name <- target_table_name(x, in_place)
+
+  if (!is_null(name)) {
+    sql <- sql_query_delete(
+      con = remote_con(x),
+      x_name = name,
+      y = y,
+      by = by,
+      ...,
+      returning_cols = returning_cols
+    )
+
+    rows_get_or_execute(x, sql, returning_cols)
+  } else {
+    out <- anti_join(x, y, by = by)
+
+    if (!is_empty(returning_cols)) {
+      returned_rows <- semi_join(x, y, by = by) %>%
+        select(returning_cols) %>%
+        collect()
+      out <- set_returned_rows(out, returned_rows)
+    }
+
+    out
+  }
+}
+
+eval_select2 <- function(expr, data) {
+  sim_data <- simulate_vars(data)
+  locs <- tidyselect::eval_select(expr, sim_data)
+  names_out <- names(locs)
+  set_names(colnames(sim_data)[locs], names_out)
+}
+
 update_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
   from <- dbplyr_sql_subquery(con,

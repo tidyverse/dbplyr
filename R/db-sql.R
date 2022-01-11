@@ -488,6 +488,31 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
   sql_format_clauses(clauses, lvl = 0, con)
 }
 
+#' @export
+#' @rdname db-sql
+sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  ellipsis::check_dots_used()
+  # FIXME: check here same src for x and y? if not -> error.
+  UseMethod("sql_query_delete")
+}
+
+#' @export
+sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  parts <- update_prep(con, x_name, y, by, lvl = 0)
+
+  clauses <- list(
+    sql_clause("DELETE FROM", x_name),
+    sql_output_cols(con, returning_cols, output_delete = TRUE),
+    sql("WHERE EXISTS ("),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", parts$from, lvl = 1),
+    sql_clause_where(parts$where, lvl = 1),
+    sql(")"),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
 # dplyr fallbacks ---------------------------------------------------------
 
 dbplyr_analyze <- function(con, ...) {
