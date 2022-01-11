@@ -75,12 +75,94 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   }
 }
 
+#' @export
+#' @importFrom dplyr rows_patch
+#' @rdname rows-db
+rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+                                returning = NULL) {
+  by <- rows_check_key(by, x, y)
+  y <- auto_copy(x, y, copy = copy)
+
+  rows_check_key_df(x, by, df_name = "x")
+  rows_check_key_df(y, by, df_name = "y")
+  # TODO check that key values in `y` are unique? (argument `check`?)
+
+  # Expect manual quote from user, silently fall back to enexpr()
+  returning_expr <- enexpr(returning)
+  tryCatch(
+    returning_expr <- returning,
+    error = identity
+  )
+
+  sim_data <- simulate_vars(x)
+  returning_cols <- tidyselect::eval_select(returning_expr, sim_data) %>% names()
+
+  new_columns <- setdiff(colnames(y), by)
+  name <- target_table_name(x, in_place)
+
+  if (!is_null(name)) {
+    # TODO handle `returning_cols` here
+    if (is_empty(new_columns)) {
+      return(invisible(x))
+    }
+
+    con <- remote_con(x)
+    update_cols <- setdiff(colnames(y), by)
+    update_values <- sql_coalesce(
+      sql_table_prefix(con, update_cols, name),
+      sql_table_prefix(con, update_cols, "...y")
+    )
+    update_values <- set_names(update_values, update_cols)
+
+    sql <- sql_query_update_from(
+      con = con,
+      x_name = name,
+      y = y,
+      by = by,
+      update_values = update_values,
+      ...,
+      returning_cols = returning_cols
+    )
+
+    rows_get_or_execute(x, sql, returning_cols)
+  } else {
+    to_patch <- inner_join(
+      x, y,
+      by = by,
+      suffix = c("", "...y")
+    )
+
+    patch_columns_y <- paste0(new_columns, "...y")
+    patch_quos <- lapply(new_columns, function(.x) quo(coalesce(!!sym(.x), !!sym(patch_columns_y)))) %>%
+      rlang::set_names(new_columns)
+    if (is_empty(new_columns)) {
+      patched <- to_patch
+      out <- x
+    } else {
+      patched <- to_patch %>%
+        mutate(!!!patch_quos) %>%
+        select(-all_of(patch_columns_y))
+      unchanged <- anti_join(x, y, by = by)
+      out <- union_all(unchanged, patched)
+    }
+
+    if (!is_empty(returning_cols)) {
+      if (inherits(patched, "tbl_TestConnection")) {
+        abort("`returning` does not work for simulated connections")
+      }
+
+      returned_rows <- patched %>%
+        select(!!!returning_cols) %>%
+        collect()
+      out <- set_returned_rows(out, returned_rows)
+    }
+
+    out
+  }
+}
+
 update_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
-
-  update_cols <- setdiff(colnames(y), by)
-  update_values <- sql_table_prefix(con, update_cols, y_name)
-
   from <- dbplyr_sql_subquery(con,
     sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
     name = y_name,
@@ -91,11 +173,13 @@ update_prep <- function(con, x_name, y, by, lvl = 0) {
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   list(
-    update_cols = update_cols,
-    update_values = update_values,
     from = from,
     where = where
   )
+}
+
+sql_coalesce <- function(x, y) {
+  sql(paste0("COALESCE(", x, ", ", y, ")"))
 }
 
 rows_check_key <- function(by, x, y, error_call = caller_env()) {

@@ -4,7 +4,6 @@
 \alias{sql_returning_cols}
 \alias{sql_output_cols}
 \alias{sql_query_update_from}
-\alias{sql_query_rows_patch}
 \alias{rows_update.tbl_lazy}
 \alias{rows_patch.tbl_lazy}
 \title{sql_returning_cols}
@@ -23,8 +22,6 @@ sql_query_update_from(
   returning_cols = NULL
 )
 
-sql_query_rows_patch(con, x_name, y, by, ..., returning_cols = NULL)
-
 \method{rows_update}{tbl_lazy}(
   x,
   y,
@@ -35,7 +32,7 @@ sql_query_rows_patch(con, x_name, y, by, ..., returning_cols = NULL)
   returning = NULL
 )
 
-rows_patch.tbl_lazy(
+\method{rows_patch}{tbl_lazy}(
   x,
   y,
   by = NULL,
