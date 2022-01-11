@@ -19,6 +19,7 @@
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
 \alias{sql_query_update_from}
+\alias{sql_query_upsert}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
@@ -85,6 +86,8 @@ sql_query_update_from(
   ...,
   returning_cols = NULL
 )
+
+sql_query_upsert(con, x_name, y, by, update_cols, ..., returning_cols = NULL)
 }
 \description{
 SQL translation:

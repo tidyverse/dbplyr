@@ -166,6 +166,85 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = N
   }
 }
 
+#' @export
+#' @inheritParams dplyr::rows_upsert
+#'
+#' @importFrom dplyr rows_upsert
+#' @rdname rows-db
+rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
+                                 returning = NULL) {
+  by <- rows_check_key(by, x, y)
+  y <- auto_copy(x, y, copy = copy)
+
+  rows_check_key_df(x, by, df_name = "x")
+  rows_check_key_df(y, by, df_name = "y")
+  # TODO check that key values in `y` are unique? (argument `check`?)
+
+  # Expect manual quote from user, silently fall back to enexpr()
+  returning_expr <- enexpr(returning)
+  tryCatch(
+    returning_expr <- returning,
+    error = identity
+  )
+
+  sim_data <- simulate_vars(x)
+  returning_cols <- tidyselect::eval_select(returning_expr, sim_data) %>% names()
+
+  new_columns <- setdiff(colnames(y), by)
+  name <- target_table_name(x, in_place)
+
+  if (!is_null(name)) {
+    # TODO handle `returning_cols` here
+    if (is_empty(new_columns)) {
+      return(invisible(x))
+    }
+
+    con <- remote_con(x)
+    update_cols <- setdiff(colnames(y), by)
+    # update_values <- set_names(
+    #   sql_table_prefix(con, update_cols, "...y"),
+    #   update_cols
+    # )
+
+    sql <- sql_query_upsert(
+      con = con,
+      x_name = name,
+      y = y,
+      by = by,
+      update_cols = update_cols,
+      ...,
+      returning_cols = returning_cols
+    )
+
+    rows_get_or_execute(x, sql, returning_cols)
+  } else {
+    existing_columns <- setdiff(colnames(x), new_columns)
+
+    unchanged <- anti_join(x, y, by = by)
+    inserted <- anti_join(y, x, by = by)
+    updated <-
+      x %>%
+      select(!!!existing_columns) %>%
+      inner_join(y, by = by)
+    upserted <- union_all(updated, inserted)
+
+    out <- union_all(unchanged, upserted)
+
+    if (!is_empty(returning_cols)) {
+      if (inherits(patched, "tbl_TestConnection")) {
+        abort("`returning` does not work for simulated connections")
+      }
+
+      returned_rows <- upserted %>%
+        select(!!!returning_cols) %>%
+        collect()
+      out <- set_returned_rows(out, returned_rows)
+    }
+
+    out
+  }
+}
+
 update_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
   from <- dbplyr_sql_subquery(con,
