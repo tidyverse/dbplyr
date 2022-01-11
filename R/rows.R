@@ -186,7 +186,7 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   name <- target_table_name(x, in_place)
 
   if (!is_null(name)) {
-    # TODO handle `returning_cols` here
+    # TODO use `rows_insert()` here
     if (is_empty(new_columns)) {
       return(invisible(x))
     }
@@ -203,15 +203,19 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
     rows_get_or_execute(x, sql, returning_cols)
   } else {
-    existing_columns <- setdiff(colnames(x), new_columns)
-
-    unchanged <- anti_join(x, y, by = by)
     inserted <- anti_join(y, x, by = by)
-    updated <-
-      x %>%
-      select(!!!existing_columns) %>%
-      inner_join(y, by = by)
-    upserted <- union_all(updated, inserted)
+
+    if (is_empty(new_columns)) {
+      unchanged <- x
+      upserted <- inserted
+    } else {
+      unchanged <- anti_join(x, y, by = by)
+      existing_columns <- setdiff(colnames(x), new_columns)
+      updated <- x %>%
+        select(!!!existing_columns) %>%
+        inner_join(y, by = by)
+      upserted <- union_all(updated, inserted)
+    }
 
     out <- union_all(unchanged, upserted)
 
