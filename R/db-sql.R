@@ -434,9 +434,7 @@ sql_query_rows_update <- function(con, x_name, y, by, ..., returning_cols = NULL
 #' @export
 sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
                                                 returning_cols = NULL) {
-  lvl <- 0
-
-  parts <- update_prep(con, x_name, y, by, lvl)
+  parts <- update_prep(con, x_name, y, by, lvl = 0)
   update_cols <- parts$update_cols
   update_values <- parts$update_values
 
@@ -448,7 +446,7 @@ sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, x_name)
   )
-  sql_format_clauses(clauses, lvl, con)
+  sql_format_clauses(clauses, lvl = 0, con)
 }
 
 # dplyr fallbacks ---------------------------------------------------------
