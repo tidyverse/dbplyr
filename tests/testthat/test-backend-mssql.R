@@ -155,6 +155,25 @@ test_that("generates custom sql", {
   expect_snapshot(lf %>% slice_sample(x))
 })
 
+test_that("`sql_query_rows_update()` is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_mssql(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_rows_update(
+      con = simulate_mssql(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#272)", {
@@ -207,4 +226,29 @@ test_that("as.integer and as.integer64 translations if parsing failures", {
   expect_identical(out$integer, c(1L, NA))
   expect_identical(out$integer64, bit64::as.integer64(c(1L, NA)))
   expect_identical(out$numeric, c(1.3, NA))
+})
+
+test_that("can update", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+
+  expect_equal(
+    rows_update(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE
+    ) %>%
+      collect(),
+    tibble(
+      a = 1:3,
+      b = 11:13,
+      c = c(1L, -1L, -2L),
+      d = c("a", "y", "z")
+    )
+  )
 })

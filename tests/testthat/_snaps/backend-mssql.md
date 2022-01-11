@@ -201,3 +201,19 @@
       ) `q01`
       WHERE (`q01` <= 1)
 
+# `sql_query_rows_update()` is correct
+
+    Code
+      sql_query_rows_update(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> UPDATE `df_x`
+      SET `c` = `...y`.`c`, `d` = `...y`.`d`
+      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      FROM `df_x`
+      INNER JOIN (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+

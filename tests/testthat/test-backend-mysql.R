@@ -15,6 +15,25 @@ test_that("generates custom sql", {
   expect_snapshot(slice_sample(lf, 5))
 })
 
+test_that("`sql_query_rows_update()` is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_mysql(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_rows_update(
+      con = simulate_mysql(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 # live database -----------------------------------------------------------
 
 test_that("logicals converted to integer correctly", {
@@ -36,4 +55,31 @@ test_that("can overwrite temp tables", {
   df2 <- tibble(x = 2)
   db2 <- copy_to(con, df2, "test-df", temporary = TRUE, overwrite = TRUE)
   expect_equal(collect(db2), df2)
+})
+
+test_that("can update", {
+  con <- src_test("MariaDB")
+
+  df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+
+  # `RETURNING` in an `UPDATE` clause is not (yet) supported for MariaDB
+  # https://jira.mariadb.org/browse/MDEV-5092
+  expect_equal(
+    rows_update(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE
+    ) %>%
+      collect(),
+    tibble(
+      a = 1:3,
+      b = 11:13,
+      c = c(1L, -1L, -2L),
+      d = c("a", "y", "z")
+    )
+  )
 })
