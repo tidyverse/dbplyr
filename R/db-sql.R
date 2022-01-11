@@ -107,6 +107,47 @@ sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
 }
 
+#' sql_returning_cols
+#'
+#' `sql_returning_cols()` and `sql_output_cols()` construct the SQL
+#' required to support the `returning` argument.
+#' Two methods are required, because the syntax for SQL Server
+#' (and some other databases) is vastly different from Postgres and other
+#' more standardized DBs.
+#' @export
+#' @rdname rows-db
+sql_returning_cols <- function(con, cols, table, ...) {
+  if (is_empty(cols)) {
+    return(NULL)
+  }
+
+  ellipsis::check_dots_empty()
+  UseMethod("sql_returning_cols")
+}
+
+#' @export
+sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
+  returning_cols <- sql_named_cols(con, cols, table = table)
+
+  sql_clause("RETURNING", returning_cols)
+}
+
+#' @export
+#' @param output_delete For `sql_output_cols()`, construct the SQL
+#'   for a `DELETE` operation.
+#' @rdname rows-db
+sql_output_cols <- function(con, cols, output_delete = FALSE, ...) {
+  if (is_empty(cols)) {
+    return(NULL)
+  }
+
+  UseMethod("sql_output_cols")
+}
+
+#' @export
+sql_output_cols.DBIConnection <- function(con, cols, output_delete = FALSE, ...) {
+  NULL
+}
 
 # Tables ------------------------------------------------------------------
 
@@ -382,6 +423,33 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
   sql_query_set_op(con, x, y, method)
 }
 
+#' @export
+#' @rdname rows-db
+sql_query_rows_update <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  ellipsis::check_dots_used()
+  # FIXME: check here same src for x and y? if not -> error.
+  UseMethod("sql_query_rows_update")
+}
+
+#' @export
+sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
+                                                returning_cols = NULL) {
+  lvl <- 0
+
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
+  # avoid CTEs for the general case as they do not work everywhere
+  clauses <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_clause_from(parts$from),
+    sql_clause_where(parts$where),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl, con)
+}
 
 # dplyr fallbacks ---------------------------------------------------------
 

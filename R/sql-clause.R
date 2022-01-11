@@ -85,6 +85,16 @@ sql_clause_limit <- function(con, limit, lvl = 0){
   }
 }
 
+sql_clause_update <- function(table) {
+  sql_clause("UPDATE", table)
+}
+
+sql_clause_set <- function(lhs, rhs) {
+  update_clauses <- sql(paste0(lhs, " = ", rhs))
+
+  sql_clause("SET", update_clauses)
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {

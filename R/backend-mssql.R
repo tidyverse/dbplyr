@@ -89,6 +89,27 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
+`sql_query_rows_update.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+                                                         returning_cols = NULL) {
+  # https://stackoverflow.com/a/2334741/946850
+  lvl <- 0
+
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
+  clauses <- list(
+    sql_clause_update(ident(x_name)),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_output_cols(con, returning_cols),
+    sql_clause_from(ident(x_name)),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause("ON", parts$where, sep = " AND", lvl = 1)
+  )
+  sql_format_clauses(clauses, lvl, con)
+}
+
+#' @export
 `sql_translation.Microsoft SQL Server` <- function(con) {
   mssql_scalar <-
     sql_translator(.parent = base_odbc_scalar,
@@ -315,6 +336,21 @@ mssql_version <- function(con) {
 #' @export
 `sql_random.Microsoft SQL Server` <- function(con) {
   sql_expr(RAND())
+}
+
+#' @export
+`sql_output_cols.Microsoft SQL Server` <- function(con, cols, output_delete = FALSE, ...) {
+  returning_cols <- sql_named_cols(
+    con, cols,
+    table = if (output_delete) "DELETED" else "INSERTED"
+  )
+
+  sql_clause("OUTPUT", returning_cols)
+}
+
+#' @export
+`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, ...) {
+  NULL
 }
 
 # Bit vs boolean ----------------------------------------------------------

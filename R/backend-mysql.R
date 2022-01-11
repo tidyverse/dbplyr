@@ -143,5 +143,30 @@ sql_random.MySQLConnection <- sql_random.MariaDBConnection
 #' @export
 sql_random.MySQL <- sql_random.MariaDBConnection
 
+#' @export
+sql_query_rows_update.MariaDBConnection <- function(con, x_name, y, by, ...,
+                                                    returning_cols = NULL) {
+  # https://stackoverflow.com/a/19346375/946850
+  lvl <- 0
+
+  parts <- update_prep(con, x_name, y, by, lvl)
+  update_cols <- parts$update_cols
+  update_values <- parts$update_values
+
+  clauses <- list(
+    sql_clause_update(ident(x_name)),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause("ON", parts$where, sep = " AND", lvl = 1),
+    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl, con)
+}
+
+#' @export
+sql_query_rows_update.MySQLConnection <- sql_query_rows_update.MariaDBConnection
+#' @export
+sql_query_rows_update.MySQL <- sql_query_rows_update.MariaDBConnection
+
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
 

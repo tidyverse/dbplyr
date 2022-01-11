@@ -67,75 +67,6 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   }
 }
 
-#' @export
-#' @rdname rows-db
-sql_query_rows_update <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  ellipsis::check_dots_used()
-  # FIXME: check here same src for x and y? if not -> error.
-  UseMethod("sql_query_rows_update")
-}
-
-#' @export
-sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
-                                                returning_cols = NULL) {
-  lvl <- 0
-
-  parts <- update_prep(con, x_name, y, by, lvl)
-  update_cols <- parts$update_cols
-  update_values <- parts$update_values
-
-  # avoid CTEs for the general case as they do not work everywhere
-  clauses <- list(
-    sql_clause_update(x_name),
-    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
-    sql_clause_from(parts$from),
-    sql_clause_where(parts$where),
-    sql_returning_cols(con, returning_cols, x_name)
-  )
-  sql_format_clauses(clauses, lvl, con)
-}
-
-#' @export
-`sql_query_rows_update.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
-                                                         returning_cols = NULL) {
-  # https://stackoverflow.com/a/2334741/946850
-  lvl <- 0
-
-  parts <- update_prep(con, x_name, y, by, lvl)
-  update_cols <- parts$update_cols
-  update_values <- parts$update_values
-
-  clauses <- list(
-    sql_clause_update(ident(x_name)),
-    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
-    sql_output_cols(con, returning_cols),
-    sql_clause_from(ident(x_name)),
-    sql_clause("INNER JOIN", parts$from),
-    sql_clause("ON", parts$where, sep = " AND", lvl = 1)
-  )
-  sql_format_clauses(clauses, lvl, con)
-}
-
-#' @export
-sql_query_rows_update.MariaDBConnection <- function(con, x_name, y, by, ...,
-                                                    returning_cols = NULL) {
-  # https://stackoverflow.com/a/19346375/946850
-  lvl <- 0
-
-  parts <- update_prep(con, x_name, y, by, lvl)
-  update_cols <- parts$update_cols
-  update_values <- parts$update_values
-
-  clauses <- list(
-    sql_clause_update(ident(x_name)),
-    sql_clause("INNER JOIN", parts$from),
-    sql_clause("ON", parts$where, sep = " AND", lvl = 1),
-    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
-    sql_returning_cols(con, returning_cols, x_name)
-  )
-  sql_format_clauses(clauses, lvl, con)
-}
-
 update_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
 
@@ -157,16 +88,6 @@ update_prep <- function(con, x_name, y, by, lvl = 0) {
     from = from,
     where = where
   )
-}
-
-sql_clause_update <- function(table) {
-  sql_clause("UPDATE", table)
-}
-
-sql_clause_set <- function(lhs, rhs) {
-  update_clauses <- sql(paste0(lhs, " = ", rhs))
-
-  sql_clause("SET", update_clauses)
 }
 
 rows_check_key <- function(by, x, y, error_call = caller_env()) {
@@ -278,66 +199,9 @@ has_returned_rows <- function(x) {
   !identical(attr(x, "returned_rows"), NULL)
 }
 
-#' sql_returning_cols
-#'
-#' `sql_returning_cols()` and `sql_output_cols()` construct the SQL
-#' required to support the `returning` argument.
-#' Two methods are required, because the syntax for SQL Server
-#' (and some other databases) is vastly different from Postgres and other
-#' more standardized DBs.
-#' @export
-#' @rdname rows-db
-sql_returning_cols <- function(con, cols, table, ...) {
-  if (is_empty(cols)) {
-    return(NULL)
-  }
-
-  ellipsis::check_dots_empty()
-  UseMethod("sql_returning_cols")
-}
-
-#' @export
-sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
-  returning_cols <- sql_named_cols(con, cols, table = table)
-
-  sql_clause("RETURNING", returning_cols)
-}
-
 #' @export
 sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
   abort("DuckDB does not support the `returning` argument.")
-}
-
-#' @export
-`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, ...) {
-  NULL
-}
-
-#' @export
-#' @param output_delete For `sql_output_cols()`, construct the SQL
-#'   for a `DELETE` operation.
-#' @rdname rows-db
-sql_output_cols <- function(con, cols, output_delete = FALSE, ...) {
-  if (is_empty(cols)) {
-    return(NULL)
-  }
-
-  UseMethod("sql_output_cols")
-}
-
-#' @export
-sql_output_cols.default <- function(con, cols, output_delete = FALSE, ...) {
-  NULL
-}
-
-#' @export
-`sql_output_cols.Microsoft SQL Server` <- function(con, cols, output_delete = FALSE, ...) {
-  returning_cols <- sql_named_cols(
-    con, cols,
-    table = if (output_delete) "DELETED" else "INSERTED"
-  )
-
-  sql_clause("OUTPUT", returning_cols)
 }
 
 sql_named_cols <- function(con, cols, table = NULL) {
