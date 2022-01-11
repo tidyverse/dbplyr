@@ -20,9 +20,7 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
     error = identity
   )
 
-  sim_data <- simulate_vars(x)
-  returning_cols <- tidyselect::eval_select(returning_expr, sim_data) %>% names()
-
+  returning_cols <- eval_select2(returning_expr, x)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -99,9 +97,7 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = N
     error = identity
   )
 
-  sim_data <- simulate_vars(x)
-  returning_cols <- tidyselect::eval_select(returning_expr, sim_data) %>% names()
-
+  returning_cols <- eval_select2(returning_expr, x)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -187,9 +183,7 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
     error = identity
   )
 
-  sim_data <- simulate_vars(x)
-  returning_cols <- tidyselect::eval_select(returning_expr, sim_data) %>% names()
-
+  returning_cols <- eval_select2(returning_expr, x)
   new_columns <- setdiff(colnames(y), by)
   name <- target_table_name(x, in_place)
 
@@ -199,19 +193,12 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
       return(invisible(x))
     }
 
-    con <- remote_con(x)
-    update_cols <- setdiff(colnames(y), by)
-    # update_values <- set_names(
-    #   sql_table_prefix(con, update_cols, "...y"),
-    #   update_cols
-    # )
-
     sql <- sql_query_upsert(
-      con = con,
+      con = remote_con(x),
       x_name = name,
       y = y,
       by = by,
-      update_cols = update_cols,
+      update_cols = setdiff(colnames(y), by),
       ...,
       returning_cols = returning_cols
     )
