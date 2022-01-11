@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Support `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
+  (@mgirlich, #736).
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 
