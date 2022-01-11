@@ -92,8 +92,8 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
 
   on <- NULL
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, "LHS")
-    rhs <- sql_table_prefix(con, by$y, "RHS")
+    lhs <- sql_table_prefix(con, by$x, by$x_as %||% "LHS")
+    rhs <- sql_table_prefix(con, by$y, by$y_as %||% "RHS")
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
