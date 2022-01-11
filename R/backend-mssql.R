@@ -89,16 +89,16 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_rows_update.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+`sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
+                                                         update_values, ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
   parts <- update_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- parts$update_cols
-  update_values <- parts$update_values
+  update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
     sql_clause_update(x_name),
-    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_clause_set(update_cols, update_values),
     sql_output_cols(con, returning_cols),
     sql_clause_from(x_name),
     sql_clause("INNER JOIN", parts$from),

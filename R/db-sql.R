@@ -425,23 +425,24 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 
 #' @export
 #' @rdname rows-db
-sql_query_rows_update <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
+                                  returning_cols = NULL) {
   ellipsis::check_dots_used()
   # FIXME: check here same src for x and y? if not -> error.
-  UseMethod("sql_query_rows_update")
+  UseMethod("sql_query_update_from")
 }
 
 #' @export
-sql_query_rows_update.DBIConnection <- function(con, x_name, y, by, ...,
+sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
+                                                update_values, ...,
                                                 returning_cols = NULL) {
   parts <- update_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- parts$update_cols
-  update_values <- parts$update_values
+  update_cols <- sql_escape_ident(con, names(update_values))
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
     sql_clause_update(x_name),
-    sql_clause_set(sql_escape_ident(con, update_cols), update_values),
+    sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
     sql_returning_cols(con, returning_cols, x_name)

@@ -3,15 +3,27 @@
 \name{sql_returning_cols}
 \alias{sql_returning_cols}
 \alias{sql_output_cols}
-\alias{sql_query_rows_update}
+\alias{sql_query_update_from}
+\alias{sql_query_rows_patch}
 \alias{rows_update.tbl_lazy}
+\alias{rows_patch.tbl_lazy}
 \title{sql_returning_cols}
 \usage{
 sql_returning_cols(con, cols, table, ...)
 
 sql_output_cols(con, cols, output_delete = FALSE, ...)
 
-sql_query_rows_update(con, x_name, y, by, ..., returning_cols = NULL)
+sql_query_update_from(
+  con,
+  x_name,
+  y,
+  by,
+  update_values,
+  ...,
+  returning_cols = NULL
+)
+
+sql_query_rows_patch(con, x_name, y, by, ..., returning_cols = NULL)
 
 \method{rows_update}{tbl_lazy}(
   x,
@@ -20,7 +32,16 @@ sql_query_rows_update(con, x_name, y, by, ..., returning_cols = NULL)
   ...,
   copy = FALSE,
   in_place = NULL,
-  check = NULL,
+  returning = NULL
+)
+
+rows_patch.tbl_lazy(
+  x,
+  y,
+  by = NULL,
+  ...,
+  copy = FALSE,
+  in_place = NULL,
   returning = NULL
 )
 }

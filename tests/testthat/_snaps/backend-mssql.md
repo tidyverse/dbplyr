@@ -201,14 +201,15 @@
       ) `q01`
       WHERE (`q01` <= 1)
 
-# `sql_query_rows_update()` is correct
+# `sql_query_update_from()` is correct
 
     Code
-      sql_query_rows_update(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_update_from(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
-      SET `c` = `...y`.`c`, `d` = `...y`.`d`
+      SET `c` = COALESCE(`df_x`.`c`, `...y`.`c`), `d` = `...y`.`d`
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       FROM `df_x`
       INNER JOIN (

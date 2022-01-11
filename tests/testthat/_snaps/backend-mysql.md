@@ -39,8 +39,9 @@
 # `sql_query_rows_update()` is correct
 
     Code
-      sql_query_rows_update(con = simulate_mysql(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_update_from(con = simulate_mysql(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
       INNER JOIN (
@@ -48,7 +49,7 @@
         FROM `df_y`
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
-      SET `df_x`.`c` = `...y`.`c`, `df_x`.`d` = `...y`.`d`
+      SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # can explain

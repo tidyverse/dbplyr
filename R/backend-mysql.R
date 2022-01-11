@@ -144,12 +144,12 @@ sql_random.MySQLConnection <- sql_random.MariaDBConnection
 sql_random.MySQL <- sql_random.MariaDBConnection
 
 #' @export
-sql_query_rows_update.MariaDBConnection <- function(con, x_name, y, by, ...,
+sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
+                                                    update_values, ...,
                                                     returning_cols = NULL) {
   # https://stackoverflow.com/a/19346375/946850
   parts <- update_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_table_prefix(con, parts$update_cols, x_name)
-  update_values <- parts$update_values
+  update_cols <- sql_table_prefix(con, names(update_values), x_name)
 
   clauses <- list(
     sql_clause_update(x_name),
@@ -162,9 +162,9 @@ sql_query_rows_update.MariaDBConnection <- function(con, x_name, y, by, ...,
 }
 
 #' @export
-sql_query_rows_update.MySQLConnection <- sql_query_rows_update.MariaDBConnection
+sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
-sql_query_rows_update.MySQL <- sql_query_rows_update.MariaDBConnection
+sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
 

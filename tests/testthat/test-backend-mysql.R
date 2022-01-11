@@ -24,11 +24,15 @@ test_that("`sql_query_rows_update()` is correct", {
     mutate(c = c + 1)
 
   expect_snapshot(
-    sql_query_rows_update(
+    sql_query_update_from(
       con = simulate_mysql(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
+      update_values = sql(
+        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"
+      ),
       returning_cols = c("a", b2 = "b")
     )
   )

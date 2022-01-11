@@ -2,7 +2,7 @@
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
 rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = NULL,
-                                 check = NULL, returning = NULL) {
+                                 returning = NULL) {
   by <- rows_check_key(by, x, y)
   y <- auto_copy(x, y, copy = copy)
 
@@ -29,11 +29,19 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
       return(invisible(x))
     }
 
-    sql <- sql_query_rows_update(
-      con = remote_con(x),
+    con <- remote_con(x)
+    update_cols <- setdiff(colnames(y), by)
+    update_values <- set_names(
+      sql_table_prefix(con, update_cols, "...y"),
+      update_cols
+    )
+
+    sql <- sql_query_update_from(
+      con = con,
       x_name = name,
       y = y,
       by = by,
+      update_values = update_values,
       ...,
       returning_cols = returning_cols
     )
