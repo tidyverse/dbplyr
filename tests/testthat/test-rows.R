@@ -35,12 +35,13 @@ test_that("early return if no column to update", {
 })
 
 test_that("empty `by` works", {
-  expect_snapshot(
+  expect_message(
     rows_update(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
       in_place = FALSE
-    )
+    ),
+    regexp = 'Matching, by = "x"'
   )
 })
 
@@ -155,12 +156,13 @@ test_that("early return if no column to update", {
 })
 
 test_that("empty `by` works", {
-  expect_snapshot(
+  expect_message(
     rows_patch(
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
       in_place = FALSE
-    )
+    ),
+    regexp = 'Matching, by = "x"'
   )
 })
 
@@ -239,16 +241,106 @@ test_that("`in_place = TRUE` with `returning` works", {
 })
 
 
+# rows_upsert -------------------------------------------------------------
+
+test_that("empty `by` works", {
+  expect_message(
+    rows_upsert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 1:3, .name = "df_y"),
+      in_place = FALSE
+    ),
+    regexp = 'Matching, by = "x"'
+  )
+})
+
+test_that("`in_place = FALSE` works", {
+  expect_snapshot(
+    rows_upsert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = FALSE
+    )
+  )
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  expect_equal(
+    rows_upsert(
+      df, memdb_frame(x = 2:4, y = 22:24),
+      by = "x",
+      in_place = FALSE
+    ) %>%
+      collect(),
+    tibble(x = 1:4, y = c(11L, 22:24))
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+})
+
+test_that("`in_place = FALSE` with `returning` works", {
+  expect_equal(
+    rows_upsert(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 2:4, y = 22:24),
+      by = "x",
+      in_place = FALSE,
+      returning = quote(everything())
+    ) %>%
+      get_returned_rows(),
+    tibble(x = 2:4, y = 22:24)
+  )
+})
+
+test_that("`in_place = TRUE` works", {
+  expect_snapshot_error(
+    rows_upsert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = TRUE
+    )
+  )
+
+  skip("not yet implemented for SQLite")
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  rows_upsert(
+    df, memdb_frame(x = 2:4, y = 22:24),
+    by = "x",
+    in_place = TRUE
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11L, 22:23)))
+})
+
+test_that("`in_place = TRUE` with `returning` works", {
+  skip("not yet implemented for SQLite")
+  skip_if_not_installed("RSQLite", "2.2.8")
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  df_upserted <- rows_upsert(
+    df, memdb_frame(x = 2:4, y = 22:24),
+    by = "x",
+    in_place = TRUE,
+    returning = quote(everything())
+  )
+
+  expect_equal(get_returned_rows(df_upserted), tibble(x = 2:4, y = 22:24))
+
+  expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
+})
+
 
 # rows_delete -------------------------------------------------------------
 
 test_that("empty `by` works", {
-  expect_snapshot(
+  expect_message(
     rows_delete(
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
       in_place = FALSE
-    )
+    ),
+    regexp = 'Matching, by = "x"'
   )
 })
 
