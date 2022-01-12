@@ -1,6 +1,35 @@
 
 # rows_update -------------------------------------------------------------
 
+test_that("arguments are checked", {
+  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+
+  expect_snapshot_error(rows_update(lf, lf, by = 1))
+
+  expect_snapshot_error(rows_update(lf, lf, by = c(y = "x")))
+
+  expect_snapshot_error(rows_update(lf, lf, by = "z"))
+
+  expect_snapshot_error(
+    rows_update(
+      lf,
+      lazy_frame(x = 1, y = 2, z = 3),
+      by = "x"
+    )
+  )
+
+  expect_snapshot_error(
+    rows_update(lf, lf, by = "x", returning = quote(everything()))
+  )
+
+  df <- memdb_frame(x = 1)
+  expect_snapshot_error(
+    df %>%
+      mutate(x = x + 1) %>%
+      rows_update(df, by = "x", in_place = TRUE)
+  )
+})
+
 test_that("early return if no column to update", {
   expect_snapshot(
     rows_update(
@@ -449,4 +478,16 @@ test_that("`in_place = TRUE` with `returning` works", {
   expect_equal(get_returned_rows(df_deleted), tibble(x = 2:3, y = 12:13))
 
   expect_equal(df_deleted %>% collect(), tibble(x = 1L, y = 11L))
+})
+
+# returned_rows -----------------------------------------------------------
+
+test_that("`get_returned_rows()` works", {
+  df <- tibble(x = 1)
+  expect_false(has_returned_rows(df))
+  expect_snapshot_error(get_returned_rows(df))
+
+  df2 <- set_returned_rows(df, mtcars)
+  expect_true(has_returned_rows(df2))
+  expect_equal(get_returned_rows(df2), as_tibble(mtcars))
 })

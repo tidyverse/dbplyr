@@ -1,3 +1,27 @@
+# arguments are checked
+
+    `by` must be a character vector.
+
+---
+
+    `by` must be unnamed.
+
+---
+
+    All `by` columns must exist in `x`.
+
+---
+
+    All columns in `y` must exist in `x`.
+
+---
+
+    `returning` does not work for simulated connections.
+
+---
+
+    Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
+
 # early return if no column to update
 
     Code
@@ -17,6 +41,29 @@
       <SQL>
       SELECT *
       FROM `df_x`
+
+---
+
+    Code
+      rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 1:3,
+      .name = "df_y"), by = "x", in_place = FALSE)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM `df_x`
+      )
+      UNION ALL
+      (
+        SELECT `x`, NULL AS `y`
+        FROM (
+          SELECT * FROM `df_y` AS `LHS`
+          WHERE NOT EXISTS (
+            SELECT 1 FROM `df_x` AS `RHS`
+            WHERE (`LHS`.`x` = `RHS`.`x`)
+          )
+        ) `q01`
+      )
 
 # `in_place = FALSE` works
 
@@ -135,4 +182,16 @@
 ---
 
     `in_place = TRUE` does not work for simulated connections.
+
+---
+
+    `in_place = TRUE` does not work for simulated connections.
+
+---
+
+    `in_place = TRUE` does not work for simulated connections.
+
+# `get_returned_rows()` works
+
+    No returned rows available.
 

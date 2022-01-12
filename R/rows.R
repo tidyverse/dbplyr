@@ -329,6 +329,10 @@ rows_check_returning <- function(df, returning_cols) {
 }
 
 rows_check_in_place <- function(df, in_place) {
+  if (!rlang::is_bool(in_place)) {
+    abort("`in_place` must be `TRUE` or `FALSE`.")
+  }
+
   if (!in_place) return()
 
   if (inherits(df, "tbl_TestConnection")) {
@@ -344,15 +348,6 @@ target_table_name <- function(x, in_place) {
 
   if (is_null(name) && is_true(in_place)) {
     abort("Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.")
-  }
-
-  if (is_null(in_place)) {
-    if (is_null(name)) {
-      inform("Result is returned as lazy table, because `x` does not correspond to a table that can be updated. Use `in_place = FALSE` to mute this message.")
-    }
-    else {
-      inform("Result is returned as lazy table. Use `in_place = FALSE` to mute this message, or `in_place = TRUE` to write to the underlying table.")
-    }
   }
 
   NULL
