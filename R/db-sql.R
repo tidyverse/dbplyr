@@ -463,28 +463,41 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
                                            returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, update_cols)
-  update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, "excluded"),
+    sql_table_prefix(con, update_cols, "...y"),
     update_cols
   )
-  update_clause <- sql(paste0(update_cols, " = ", update_values))
+  y_name <- set_names(remote_name(y), "...y")
 
-  # avoid CTEs for the general case as they do not work everywhere
-  clauses <- list(
-    sql_clause("MERGE INTO", x_name),
-    sql_clause("USING", parts$from),
-    sql_clause("ON", parts$where),
-    sql("WHEN MATCHED THEN"),
-    sql_clause("UPDATE SET", update_clause, lvl = 1),
-    sql("WHEN NOT MATCHED THEN"),
-    sql_clause("INSERT", update_cols, parens = TRUE, lvl = 1),
-    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name) %||%
-      sql_output_cols(con, returning_cols),
-    sql(";")
+  updated_cte <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(update_cols, update_values),
+    sql_clause_from(y_name),
+    sql_clause_where(parts$where),
+    sql(paste0("RETURNING ", sql_escape_ident(con, x_name), ".*"))
   )
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+
+  join_by <- list(x = by, y = by, x_as = "updated", y_as = "...y")
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  clauses <- list(
+    sql(paste0("WITH ", sql_escape_ident(con, "updated"), " AS (")),
+    updated_sql,
+    sql(")"),
+    sql_clause("INSERT INTO ", x_name),
+    indent_lvl(insert_cols, 1),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(y_name),
+    sql("WHERE NOT EXISTS ("),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", sql_escape_ident(con, "updated"), lvl = 1),
+    sql_clause_where(where, lvl = 1),
+    sql(")")
+  )
+
   sql_format_clauses(clauses, lvl = 0, con)
 }
 

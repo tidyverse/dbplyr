@@ -364,30 +364,34 @@ test_that("`in_place = TRUE` works", {
     )
   )
 
-  skip("not yet implemented for SQLite")
-  df <- memdb_frame(x = 1:3, y = 11:13)
+  skip_if_not_installed("RSQLite", "2.2.8")
+  con <- src_memdb()
+  x <- copy_to(con, tibble(x = 1:3, y = 11:13), name = "df_x", overwrite = TRUE, unique_indexes = "x")
+  y <- copy_to(con, tibble(x = 2:4, y = 22:24), name = "df_y", overwrite = TRUE)
+
   rows_upsert(
-    df, memdb_frame(x = 2:4, y = 22:24),
+    x, y,
     by = "x",
     in_place = TRUE
   )
 
-  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11L, 22:23)))
+  expect_equal(x %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
 
 test_that("`in_place = TRUE` with `returning` works", {
-  skip("not yet implemented for SQLite")
   skip_if_not_installed("RSQLite", "2.2.8")
 
-  df <- memdb_frame(x = 1:3, y = 11:13)
+  con <- src_memdb()
+  x <- copy_to(con, tibble(x = 1:3, y = 11:13), name = "df_x", overwrite = TRUE, unique_indexes = "x")
+  y <- copy_to(con, tibble(x = 2:4, y = 22:24), name = "df_y", overwrite = TRUE)
   df_upserted <- rows_upsert(
-    df, memdb_frame(x = 2:4, y = 22:24),
+    x, y,
     by = "x",
     in_place = TRUE,
     returning = quote(everything())
   )
 
-  expect_equal(get_returned_rows(df_upserted), tibble(x = 2:4, y = 22:24))
+  expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
 
   expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })

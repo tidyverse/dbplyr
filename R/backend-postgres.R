@@ -234,4 +234,34 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
+#' @export
+sql_query_upsert.PqConnection <- function(con, x_name, y, by,
+                                          update_cols, ...,
+                                          returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols <- sql_escape_ident(con, update_cols)
+
+  update_values <- set_names(
+    sql_table_prefix(con, update_cols, "excluded"),
+    update_cols
+  )
+
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+  clauses <- list(
+    sql_clause("INSERT INTO ", x_name),
+    indent_lvl(insert_cols, 1),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    sql("WHERE true"),
+    sql_clause("ON CONFLICT ", by_sql),
+    sql("DO UPDATE"),
+    sql_clause_set(update_cols, update_values),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+#' @export
+sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
+
 globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL"))
