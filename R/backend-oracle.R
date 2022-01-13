@@ -120,7 +120,7 @@ sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ...,
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " ON COMMIT PRESERVE ROWS AS\n", sql,
+    as.sql(name, con), if (temporary) " ON COMMIT PRESERVE ROWS", " AS\n", sql,
     con = con
   )
 }
