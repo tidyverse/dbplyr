@@ -162,6 +162,7 @@ check_slice_size <- function(n, prop) {
   }
 }
 
+#' @export
 sql_random <- function(con) {
   UseMethod("sql_random")
 }
