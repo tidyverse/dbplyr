@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The implementation of `dbplyr_fill0` for databases without support for IGNORE
+  NULLS now respects the database specific translation (@rsund, #753)
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 
