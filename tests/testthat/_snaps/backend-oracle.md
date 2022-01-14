@@ -40,7 +40,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
       <SQL> CREATE GLOBAL TEMPORARY TABLE 
-      `schema`.`tbl` AS
+      `schema`.`tbl` ON COMMIT PRESERVE ROWS AS
       SELECT * FROM foo
 
 ---
