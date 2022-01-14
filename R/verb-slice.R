@@ -162,9 +162,4 @@ check_slice_size <- function(n, prop) {
   }
 }
 
-#' @export
-sql_random <- function(con) {
-  UseMethod("sql_random")
-}
-
-globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "random"))
+globalVariables(c("min_rank", "cume_dist", "row_number", "desc"))
