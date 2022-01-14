@@ -466,3 +466,5 @@ base_no_win <- sql_translator(
 sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
+
+globalVariables(c("RANDOM"))
