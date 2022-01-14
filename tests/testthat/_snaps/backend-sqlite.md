@@ -9,6 +9,14 @@
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` IS `RHS`.`x`)
 
+# case_when translates correctly to ELSE when TRUE ~ is used
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"),
+      con = simulate_sqlite())
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+
 # full and right join
 
     Code
