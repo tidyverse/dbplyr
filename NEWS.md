@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 
