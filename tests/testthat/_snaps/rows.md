@@ -22,7 +22,7 @@
 
     Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
-# early return if no column to update
+# `rows_update()` returns early if no column to update
 
     Code
       rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 1:3,
@@ -32,40 +32,7 @@
       SELECT *
       FROM `df_x`
 
----
-
-    Code
-      rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
-        x = 1:3, .name = "df_y"), by = "x", in_place = FALSE)
-    Output
-      <SQL>
-      SELECT *
-      FROM `df_x`
-
----
-
-    Code
-      rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 1:3,
-      .name = "df_y"), by = "x", in_place = FALSE)
-    Output
-      <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-      )
-      UNION ALL
-      (
-        SELECT `x`, NULL AS `y`
-        FROM (
-          SELECT * FROM `df_y` AS `LHS`
-          WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x` AS `RHS`
-            WHERE (`LHS`.`x` = `RHS`.`x`)
-          )
-        ) `q01`
-      )
-
-# `in_place = FALSE` works
+# `rows_update()` works with `in_place = FALSE`
 
     Code
       rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
@@ -90,7 +57,21 @@
           ON (`LHS`.`x` = `RHS`.`x`)
       )
 
----
+# `rows_update()` works with `in_place = TRUE`
+
+    `in_place = TRUE` does not work for simulated connections.
+
+# `rows_patch()` returns early if no column to update
+
+    Code
+      rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
+        x = 1:3, .name = "df_y"), by = "x", in_place = FALSE)
+    Output
+      <SQL>
+      SELECT *
+      FROM `df_x`
+
+# `rows_patch()` works with `in_place = FALSE`
 
     Code
       rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
@@ -115,7 +96,34 @@
         ) `q01`
       )
 
----
+# `rows_patch()` works with `in_place = TRUE`
+
+    `in_place = TRUE` does not work for simulated connections.
+
+# `rows_upsert()` returns early if no column to update
+
+    Code
+      rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 1:3,
+      .name = "df_y"), by = "x", in_place = FALSE)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM `df_x`
+      )
+      UNION ALL
+      (
+        SELECT `x`, NULL AS `y`
+        FROM (
+          SELECT * FROM `df_y` AS `LHS`
+          WHERE NOT EXISTS (
+            SELECT 1 FROM `df_x` AS `RHS`
+            WHERE (`LHS`.`x` = `RHS`.`x`)
+          )
+        ) `q01`
+      )
+
+# `rows_upsert()` works with `in_place = FALSE`
 
     Code
       rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
@@ -150,7 +158,11 @@
         )
       )
 
----
+# `rows_upsert()` works with `in_place = TRUE`
+
+    `in_place = TRUE` does not work for simulated connections.
+
+# `rows_delete()` works with `in_place = FALSE`
 
     Code
       rows_delete(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
@@ -163,31 +175,7 @@
         WHERE (`LHS`.`x` = `RHS`.`x`)
       )
 
-# `in_place = TRUE` works
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
-
-    `in_place = TRUE` does not work for simulated connections.
-
----
+# `rows_delete()` works with `in_place = TRUE`
 
     `in_place = TRUE` does not work for simulated connections.
 
