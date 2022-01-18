@@ -5,7 +5,6 @@
 \alias{sql_expr_matches}
 \alias{sql_translation}
 \alias{sql_returning_cols}
-\alias{sql_output_cols}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
 \alias{sql_query_explain}
@@ -28,8 +27,6 @@ sql_expr_matches(con, x, y)
 sql_translation(con)
 
 sql_returning_cols(con, cols, table, ...)
-
-sql_output_cols(con, cols, output_delete = FALSE, ...)
 
 sql_table_analyze(con, table, ...)
 
@@ -99,11 +96,7 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
-\item \code{sql_returning_cols(con, cols, table)},
-\code{sql_output_cols(con, cols, output_delete)} generates the \code{RETURNING} resp.
-\code{OUTPUT} clause. Two methods are required, because the syntax for SQL Server
-(and some other databases) is vastly different from Postgres and other
-more standardized DBs.
+\item \code{sql_returning_cols(con, cols, table)} generates the \code{RETURNING} clause.
 }
 
 Tables:

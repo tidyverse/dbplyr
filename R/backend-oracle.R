@@ -59,7 +59,29 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_query_upsert.Oracle <- `sql_query_upsert.Microsoft SQL Server`
+sql_query_upsert.Oracle <- function(con, x_name, y, by,
+                                    update_cols, ...,
+                                    returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_values <- sql_table_prefix(con, update_cols, "excluded")
+  update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
+  update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
+
+  clauses <- list(
+    sql_clause("MERGE INTO", x_name),
+    sql_clause("USING", parts$from),
+    sql_clause_on(parts$where, lvl = 1),
+    sql("WHEN MATCHED THEN"),
+    sql_clause("UPDATE SET", update_clause, lvl = 1),
+    sql("WHEN NOT MATCHED THEN"),
+    sql_clause_insert(update_cols_esc, lvl = 1),
+    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, x_name),
+    sql(";")
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
 
 #' @export
 sql_translation.Oracle <- function(con) {

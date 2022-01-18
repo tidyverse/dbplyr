@@ -10,11 +10,7 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
-#' * `sql_returning_cols(con, cols, table)`,
-#'   `sql_output_cols(con, cols, output_delete)` generates the `RETURNING` resp.
-#'   `OUTPUT` clause. Two methods are required, because the syntax for SQL Server
-#'   (and some other databases) is vastly different from Postgres and other
-#'   more standardized DBs.
+#' * `sql_returning_cols(con, cols, table)` generates the `RETURNING` clause.
 
 #'
 #' Tables:
@@ -130,21 +126,6 @@ sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
   returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("RETURNING", returning_cols)
-}
-
-#' @export
-#' @rdname db-sql
-sql_output_cols <- function(con, cols, output_delete = FALSE, ...) {
-  if (is_empty(cols)) {
-    return(NULL)
-  }
-
-  UseMethod("sql_output_cols")
-}
-
-#' @export
-sql_output_cols.DBIConnection <- function(con, cols, output_delete = FALSE, ...) {
-  NULL
 }
 
 # Tables ------------------------------------------------------------------

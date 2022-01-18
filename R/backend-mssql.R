@@ -99,7 +99,7 @@ simulate_mssql <- function(version = "15.0") {
   clauses <- list(
     sql_clause_update(x_name),
     sql_clause_set(update_cols, update_values),
-    sql_output_cols(con, returning_cols),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_from(x_name),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
@@ -126,9 +126,20 @@ simulate_mssql <- function(version = "15.0") {
     sql("WHEN NOT MATCHED THEN"),
     sql_clause_insert(update_cols_esc, lvl = 1),
     sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name) %||%
-      sql_output_cols(con, returning_cols),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+`sql_query_delete.Microsoft SQL Server` <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  clauses <- list2(
+    sql_clause("DELETE FROM", x_name),
+    sql_returning_cols(con, returning_cols, table = "DELETED"),
+    !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -363,18 +374,11 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_output_cols.Microsoft SQL Server` <- function(con, cols, output_delete = FALSE, ...) {
-  returning_cols <- sql_named_cols(
-    con, cols,
-    table = if (output_delete) "DELETED" else "INSERTED"
-  )
+`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
+  stopifnot(table %in% c("DELETED", "INSERTED"))
+  returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("OUTPUT", returning_cols)
-}
-
-#' @export
-`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, ...) {
-  NULL
 }
 
 # Bit vs boolean ----------------------------------------------------------
