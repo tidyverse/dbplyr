@@ -9,6 +9,24 @@
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
 
+# `sql_query_upsert()` is correct
+
+    Code
+      sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+      WHERE true
+      ON CONFLICT  (`a`, `b`)
+      DO UPDATE
+      SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
 # can explain
 
     Code

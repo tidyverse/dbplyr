@@ -239,18 +239,17 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
                                           update_cols, ...,
                                           returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_escape_ident(con, update_cols)
 
   update_values <- set_names(
     sql_table_prefix(con, update_cols, "excluded"),
     update_cols
   )
+  update_cols <- sql_escape_ident(con, update_cols)
 
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
-    sql_clause("INSERT INTO ", x_name),
-    indent_lvl(insert_cols, 1),
+    sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     sql("WHERE true"),
