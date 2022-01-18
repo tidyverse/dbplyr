@@ -108,6 +108,16 @@ sql_clause_on <- function(on, lvl = 0) {
   sql_clause("ON", on, sep = " AND", lvl = lvl)
 }
 
+sql_clause_where_exists <- function(table, where, not) {
+  list(
+    sql(paste0("WHERE ", if (not) "NOT ", "EXISTS (")),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", table, lvl = 1),
+    sql_clause_where(where, lvl = 1),
+    sql(")")
+  )
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {

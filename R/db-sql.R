@@ -480,18 +480,14 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
-  clauses <- list(
+  clauses <- list2(
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
     sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    sql("WHERE NOT EXISTS ("),
-    # lvl = 1 because they are basically in a subquery
-    sql_clause("SELECT 1 FROM", update_name, lvl = 1),
-    sql_clause_where(where, lvl = 1),
-    sql(")")
+    !!!sql_clause_where_exists(update_name, where, not = TRUE)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
@@ -509,14 +505,9 @@ sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
 sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
-  clauses <- list(
+  clauses <- list2(
     sql_clause("DELETE FROM", x_name),
-    sql_output_cols(con, returning_cols, output_delete = TRUE),
-    sql("WHERE EXISTS ("),
-    # lvl = 1 because they are basically in a subquery
-    sql_clause("SELECT 1 FROM", parts$from, lvl = 1),
-    sql_clause_where(parts$where, lvl = 1),
-    sql(")"),
+    !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
     sql_returning_cols(con, returning_cols, x_name)
   )
   sql_format_clauses(clauses, lvl = 0, con)
