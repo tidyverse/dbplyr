@@ -272,7 +272,7 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
     if (!is_empty(returning_cols)) {
       returned_rows <- semi_join(x, y, by = by) %>%
-        select(returning_cols) %>%
+        select(!!!returning_cols) %>%
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
