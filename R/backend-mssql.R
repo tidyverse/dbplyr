@@ -112,7 +112,6 @@ simulate_mssql <- function(version = "15.0") {
                                                     update_cols, ...,
                                                     returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_escape_ident(con, update_cols)
   update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
 
   update_values <- set_names(
@@ -120,8 +119,8 @@ simulate_mssql <- function(version = "15.0") {
     update_cols
   )
   update_clause <- sql(paste0(update_cols, " = ", update_values))
+  update_cols <- sql(sql_escape_ident(con, update_cols))
 
-  # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
     sql_clause("MERGE INTO", x_name),
     sql_clause("USING", parts$from),
@@ -129,10 +128,9 @@ simulate_mssql <- function(version = "15.0") {
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause("INSERT", update_cols, parens = TRUE, lvl = 1),
+    sql_clause_insert(update_cols, lvl = 1),
     sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name) %||%
-      sql_output_cols(con, returning_cols),
+    sql_output_cols(con, returning_cols),
     sql(";")
   )
   sql_format_clauses(clauses, lvl = 0, con)
