@@ -102,7 +102,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_output_cols(con, returning_cols),
     sql_clause_from(x_name),
     sql_clause("INNER JOIN", parts$from),
-    sql_clause("ON", parts$where, sep = " AND", lvl = 1)
+    sql_clause_on(parts$where, lvl = 1)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -120,7 +120,7 @@ simulate_mssql <- function(version = "15.0") {
   clauses <- list(
     sql_clause("MERGE INTO", x_name),
     sql_clause("USING", parts$from),
-    sql_clause("ON", parts$where),
+    sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),

@@ -229,7 +229,7 @@
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
       ) `...y`
-      ON `...y`.`a` = `df_x`.`a`, `...y`.`b` = `df_x`.`b`
+        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
         UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
       WHEN NOT MATCHED THEN

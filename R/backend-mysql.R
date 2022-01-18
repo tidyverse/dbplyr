@@ -154,7 +154,7 @@ sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
   clauses <- list(
     sql_clause_update(x_name),
     sql_clause("INNER JOIN", parts$from),
-    sql_clause("ON", parts$where, sep = " AND", lvl = 1),
+    sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, x_name)
   )

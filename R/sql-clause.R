@@ -104,6 +104,10 @@ sql_clause_insert <- function(cols, into = NULL, lvl = 0) {
   }
 }
 
+sql_clause_on <- function(on, lvl = 0) {
+  sql_clause("ON", on, sep = " AND", lvl = lvl)
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {
