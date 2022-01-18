@@ -148,6 +148,28 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
   expect_equal(df_updated %>% collect(), tibble(x = 1:3, y = c(11L, 22:23)))
 })
 
+test_that("`sql_query_update_from()` works", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_mssql(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_update_from(
+      con = simulate_mssql(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      update_values = sql(
+        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"
+      ),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
 
 # rows_patch --------------------------------------------------------------
 
@@ -396,6 +418,25 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
   expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
 
+test_that("`sql_query_upsert()` is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_dbi(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_upsert(
+      con = simulate_dbi(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      update_cols = c("c", "d"),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
 
 # rows_delete -------------------------------------------------------------
 
@@ -482,6 +523,25 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
   expect_equal(get_returned_rows(df_deleted), tibble(x = 2:3, y = 12:13))
 
   expect_equal(df_deleted %>% collect(), tibble(x = 1L, y = 11L))
+})
+
+test_that("`sql_query_delete()` is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_dbi(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_delete(
+      con = simulate_dbi(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
 })
 
 # returned_rows -----------------------------------------------------------

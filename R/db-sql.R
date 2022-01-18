@@ -462,38 +462,34 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
                                            update_cols, ...,
                                            returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_escape_ident(con, update_cols)
 
-  update_values <- set_names(
-    sql_table_prefix(con, update_cols, "...y"),
-    update_cols
-  )
-  y_name <- set_names(remote_name(y), "...y")
+  update_values <- sql_table_prefix(con, update_cols, "...y")
+  update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
     sql_clause_update(x_name),
     sql_clause_set(update_cols, update_values),
-    sql_clause_from(y_name),
+    sql_clause_from(parts$from),
     sql_clause_where(parts$where),
     sql(paste0("RETURNING ", sql_escape_ident(con, x_name), ".*"))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+  update_name <- sql(sql_escape_ident(con, "updated"))
 
   join_by <- list(x = by, y = by, x_as = "updated", y_as = "...y")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   clauses <- list(
-    sql(paste0("WITH ", sql_escape_ident(con, "updated"), " AS (")),
+    sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause("INSERT INTO ", x_name),
-    indent_lvl(insert_cols, 1),
+    sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
     sql_clause_select(con, sql("*")),
-    sql_clause_from(y_name),
+    sql_clause_from(parts$from),
     sql("WHERE NOT EXISTS ("),
     # lvl = 1 because they are basically in a subquery
-    sql_clause("SELECT 1 FROM", sql_escape_ident(con, "updated"), lvl = 1),
+    sql_clause("SELECT 1 FROM", update_name, lvl = 1),
     sql_clause_where(where, lvl = 1),
     sql(")")
   )

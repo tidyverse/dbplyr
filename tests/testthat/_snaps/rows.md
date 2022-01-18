@@ -61,6 +61,23 @@
 
     `in_place = TRUE` does not work for simulated connections.
 
+# `sql_query_update_from()` works
+
+    Code
+      sql_query_update_from(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> UPDATE `df_x`
+      SET `c` = COALESCE(`df_x`.`c`, `...y`.`c`), `d` = `...y`.`d`
+      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      FROM `df_x`
+      INNER JOIN (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+
 # `rows_patch()` returns early if no column to update
 
     Code
@@ -162,6 +179,33 @@
 
     `in_place = TRUE` does not work for simulated connections.
 
+# `sql_query_upsert()` is correct
+
+    Code
+      sql_query_upsert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> WITH `updated` AS (
+        UPDATE `df_x`
+        SET `c` = `...y`.`c`, `d` = `...y`.`d`
+        FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+        RETURNING `df_x`.*
+      )
+      INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `updated`
+        WHERE (`updated`.`a` = `...y`.`a`) AND (`updated`.`b` = `...y`.`b`)
+      )
+
 # `rows_delete()` works with `in_place = FALSE`
 
     Code
@@ -178,6 +222,22 @@
 # `rows_delete()` works with `in_place = TRUE`
 
     `in_place = TRUE` does not work for simulated connections.
+
+# `sql_query_delete()` is correct
+
+    Code
+      sql_query_delete(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> DELETE FROM `df_x`
+      WHERE EXISTS (
+        SELECT 1 FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+      )
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # `get_returned_rows()` works
 
