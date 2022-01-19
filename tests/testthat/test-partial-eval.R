@@ -209,6 +209,37 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
   )
 })
 
+test_that("lambdas in across() can use columns", {
+  expect_equal(
+    partial_eval_dots(quos(across(everything(), ~ .x / y)), c("x", "y", "z")),
+    list(
+      x = quo(x / y),
+      y = quo(y / y),
+      z = quo(z / y)
+    )
+  )
+
+  skip(".data not yet supported in across()")
+  df <- tibble(x = 2, y = 4, z = 8)
+  lf <- lazy_frame(x = 2, y = 4, z = 8)
+  expect_identical(
+    df %>% mutate(data.frame(x = x / y, y = y / y, z = z / y)),
+    df %>% mutate(across(everything(), ~ .x / .data$y))
+  )
+})
+
+test_that("can pass quosure through `across()`", {
+  summarise_mean <- function(data, vars) {
+    data %>% summarise(across({{ vars }}, ~ mean(.x, na.rm = TRUE)))
+  }
+  gdf <- lazy_frame(g = c(1, 1, 2), x = 1:3) %>% group_by(g)
+
+  expect_equal(
+    gdf %>% summarise_mean(x) %>% remote_query(),
+    summarise(gdf, x = mean(x, na.rm = TRUE)) %>% remote_query()
+  )
+})
+
 # if_all ------------------------------------------------------------------
 
 test_that("if_all translations names, strings, and formulas", {
