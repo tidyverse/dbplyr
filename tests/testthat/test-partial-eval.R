@@ -78,6 +78,24 @@ test_that("across() translates NULL", {
   expect_snapshot(lf %>% mutate(across(a:b)))
 })
 
+test_that("across() can rename", {
+  expect_equal(
+    lazy_frame(x = 1:10) %>%
+      mutate(across(.cols = c(y = x), .fns = as.character)) %>%
+      op_vars(),
+    c("x", "y")
+  )
+})
+
+test_that("across() works with .cols = character()", {
+  lf <- lazy_frame(x = 1:10)
+
+  expect_equal(
+    lf %>% mutate(across(.cols = character(), .fns = as.character)),
+    lf
+  )
+})
+
 test_that("partial_eval_dots() names automatically", {
   expect_named(
     partial_eval_dots(quos(across(everything())), c("a", "b")),

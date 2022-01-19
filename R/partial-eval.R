@@ -179,7 +179,8 @@ partial_eval_across <- function(call, vars, env) {
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
   .cols <- call$.cols %||% expr(everything())
-  cols <- syms(vars)[tidyselect::eval_select(.cols, tbl, env = env, allow_rename = FALSE)]
+  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = TRUE)
+  cols <- set_names(syms(vars)[locs], names(locs))
 
   funs <- across_funs(call$.fns, env)
 
@@ -282,6 +283,8 @@ across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
     names <- names %||% "{.col}_{.fn}"
   }
 
+  col_nms <- names2(cols)
+  cols[col_nms != ""] <- col_nms[col_nms != ""]
   glue_env <- child_env(env,
     .col = rep(cols, each = n),
     .fn = rep(funs %||% seq_along(funs), length(cols))
