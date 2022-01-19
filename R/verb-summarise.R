@@ -35,7 +35,7 @@
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(dots, vars = across_vars(.data))
   check_summarise_vars(dots)
   check_groups(.groups)
 
@@ -45,6 +45,10 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
     dots = dots,
     args = list(.groups = .groups, env_caller = caller_env())
   )
+}
+
+across_vars <- function(x) {
+  setdiff(op_vars(x), group_vars(x))
 }
 
 # For each expression, check if it uses any newly created variables
