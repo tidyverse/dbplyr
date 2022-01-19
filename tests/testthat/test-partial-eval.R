@@ -85,10 +85,47 @@ test_that("partial_eval_dots() names automatically", {
   )
 })
 
-test_that("can control names", {
-  lf <- lazy_frame(a = 1, b = 2)
-  out <- lf %>% summarise(across(a:b, c("log", "exp"), .names = "{.fn}_{.col}"))
-  expect_equal(colnames(out), c("log_a", "exp_a", "log_b", "exp_b"))
+test_that("across() correctly names output columns", {
+  gf <- lazy_frame(x = 1, y = 2, z = 3, s = "") %>% group_by(x)
+
+  expect_equal(
+    summarise(gf, across()) %>% op_vars(),
+    c("x", "y", "z", "s")
+  )
+  expect_equal(
+    summarise(gf, across(.names = "id_{.col}")) %>% op_vars(),
+    c("x", "id_y", "id_z", "id_s")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, mean)) %>% op_vars(),
+    c("x", "y", "z")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, mean, .names = "mean_{.col}")) %>% op_vars(),
+    c("x", "mean_y", "mean_z")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, list(mean = mean, sum = sum))) %>% op_vars(),
+    c("x", "y_mean", "y_sum", "z_mean", "z_sum")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, list(mean = mean, sum = sum), .names = "{.fn}_{.col}")) %>% op_vars(),
+    c("x", "mean_y", "sum_y", "mean_z", "sum_z")
+  )
+
+  skip("not yet decided")
+  expect_equal(
+    summarise(gf, across(1:2, list(mean = mean, sum))) %>% op_vars(),
+    c("x", "y_mean", "y_2", "z_mean", "z_2")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, list(mean, sum = sum))) %>% op_vars(),
+    c("x", "y_1", "y_sum", "z_1", "z_sum")
+  )
+  expect_equal(
+    summarise(gf, across(1:2, list(mean, sum))) %>% op_vars(),
+    c("x", "y_1", "y_2", "z_1", "z_2")
+  )
 })
 
 test_that("old _at functions continue to work", {
@@ -104,6 +141,53 @@ test_that("across() defaults to everything()", {
   # SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
   expect_snapshot(
     lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
+  )
+})
+
+test_that("across() passes ... to functions", {
+  expect_equal(
+    partial_eval_dots(quos(across(everything(), log, base = 2)), c("a", "b")),
+    unclass(quos(a = log(a, base = 2), b = log(b, base = 2)))
+  )
+
+  expect_equal(
+    partial_eval_dots(
+      quos(across(everything(), list(times = `*`, plus = `+`), 2)),
+      vars = c("a", "b")
+    ),
+    quos(
+      a_times = a * 2,
+      a_plus = a + 2,
+      b_times = b * 2,
+      b_plus = b + 2
+    ) %>%
+      unclass()
+  )
+})
+
+test_that("across(.names=) can use local variables in addition to {col} and {fn}", {
+  res <- local({
+    prefix <- "MEAN"
+    lazy_frame(x = 42) %>%
+      summarise(across(everything(), ~ mean(.x, na.rm = TRUE), .names = "{prefix}_{.col}"))
+  })
+  expect_equal(op_vars(res), "MEAN_x")
+})
+
+test_that("across() uses environment from the current quosure (dplyr#5460)", {
+  # If the data frame `y` is selected, causes a subscript conversion
+  # error since it is fractional
+  df <- lazy_frame(x = 1, y = 2.4)
+  y <- "x"
+
+  expect_equal(
+    partial_eval_dots(quos(across(all_of(y), mean)), c("x", "y")),
+    list(x = quo(mean(x)))
+  )
+
+  expect_equal(
+    partial_eval_dots(quos(if_all(all_of(y), ~ .x < 2)), c("x", "y")),
+    set_names(list(quo(x < 2)), "")
   )
 })
 
