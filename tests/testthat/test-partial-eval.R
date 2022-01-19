@@ -40,6 +40,20 @@ test_that("fails with multi-classes", {
 # across() ----------------------------------------------------------------
 # test partial_eval_across() indirectly via SQL generation
 
+test_that("across() gives meaningful messages", {
+  expect_snapshot({
+    # expanding
+    (expect_error(
+      lazy_frame(x = 1) %>%
+        summarise(across(x, 42))
+    ))
+    (expect_error(
+      lazy_frame(x = 1) %>%
+        summarise(across(y, mean))
+    ))
+  })
+})
+
 test_that("across() translates character vectors", {
   lf <- lazy_frame(a = 1, b = 2)
   expect_snapshot(lf %>% summarise(across(a:b, "log")))
@@ -240,6 +254,44 @@ test_that("can pass quosure through `across()`", {
   )
 })
 
+test_that("across() can use named selections", {
+  df <- lazy_frame(x = 1, y = 2)
+
+  # no fns
+  expect_equal(
+    df %>% summarise(across(c(a = x, b = y))) %>% remote_query(),
+    sql("SELECT `x` AS `a`, `y` AS `b`\nFROM `df`")
+  )
+  expect_equal(
+    df %>% summarise(across(all_of(c(a = "x", b = "y")))) %>% remote_query(),
+    sql("SELECT `x` AS `a`, `y` AS `b`\nFROM `df`")
+  )
+
+  # one fn
+  expect_equal(
+    df %>%
+      summarise(across(c(a = x, b = y), ~ mean(.x, na.rm = TRUE))) %>%
+      remote_query(),
+    sql("SELECT AVG(`x`) AS `a`, AVG(`y`) AS `b`\nFROM `df`")
+  )
+  expect_equal(
+    df %>%
+      summarise(across(all_of(c(a = "x", b = "y")), ~ mean(.x, na.rm = TRUE))) %>%
+      remote_query(),
+    sql("SELECT AVG(`x`) AS `a`, AVG(`y`) AS `b`\nFROM `df`")
+  )
+
+  # multiple fns
+  expect_snapshot(
+    df %>%
+      summarise(across(c(a = x, b = y), list(mean = mean, sum = sum), na.rm = TRUE))
+  )
+  expect_snapshot(
+    df %>%
+      summarise(across(all_of(c(a = "x", b = "y")), list(mean = mean, sum = sum)), na.rm = TRUE)
+  )
+})
+
 # if_all ------------------------------------------------------------------
 
 test_that("if_all translations names, strings, and formulas", {
@@ -284,4 +336,30 @@ test_that("if_all/any works without `.fns` argument", {
 
   expect_snapshot(lf %>% filter(if_all(a:b)))
   expect_snapshot(lf %>% filter(if_any(a:b)))
+})
+
+test_that("if_any() and if_all() expansions deal with no inputs or single inputs", {
+  d <- lazy_frame(x = 1)
+
+  # No inputs
+  partial_eval_dots(quos(if_any(starts_with("c"), ~ FALSE)), c("x"))
+
+  expect_equal(
+    filter(d, if_any(starts_with("c"), ~ FALSE)) %>% remote_query(),
+    sql("SELECT *\nFROM `df`")
+  )
+  expect_equal(
+    filter(d, if_all(starts_with("c"), ~ FALSE)) %>% remote_query(),
+    sql("SELECT *\nFROM `df`")
+  )
+
+  # Single inputs
+  expect_equal(
+    filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
+    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+  )
+  expect_equal(
+    filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
+    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+  )
 })
