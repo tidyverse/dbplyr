@@ -179,7 +179,7 @@ partial_eval_across <- function(call, vars, env) {
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
   .cols <- call$.cols %||% expr(everything())
-  cols <- syms(vars)[tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)]
+  cols <- syms(vars)[tidyselect::eval_select(.cols, tbl, env = env, allow_rename = FALSE)]
 
   funs <- across_funs(call$.fns, env)
 
@@ -208,7 +208,7 @@ db_squash_if <- function(call, env, vars, reduce = "&") {
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
   .cols <- call$.cols %||% expr(everything())
-  locs <- tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)
+  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = FALSE)
   cols <- syms(names(tbl))[locs]
 
   if (is.null(call$.fns)) {
