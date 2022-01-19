@@ -178,7 +178,8 @@ partial_eval_across <- function(call, vars, env) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
-  cols <- syms(vars)[tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)]
+  .cols <- call$.cols %||% expr(everything())
+  cols <- syms(vars)[tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)]
 
   funs <- across_funs(call$.fns, env)
 

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
+  (@mgirlich, #760).
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 

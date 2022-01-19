@@ -93,6 +93,12 @@ test_that("old _at functions continue to work", {
   expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.)))
 })
 
+test_that("across() defaults to everything()", {
+  # SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
+  expect_snapshot(
+    lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
+  )
+})
 
 # if_all ------------------------------------------------------------------
 

@@ -123,6 +123,15 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
+# across() defaults to everything()
+
+    Code
+      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~. + 1))
+    Output
+      <SQL>
+      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
+      FROM `df`
+
 # if_all/any works in filter()
 
     Code
