@@ -274,14 +274,16 @@ across_formula_fn <- function(x) {
 }
 
 across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
-  if (length(funs) == 1) {
+  n <- length(funs)
+  if (n <= 1) {
     names <- names %||% "{.col}"
+    n <- 1
   } else {
     names <- names %||% "{.col}_{.fn}"
   }
 
   glue_env <- child_env(env,
-    .col = rep(cols, each = length(funs)),
+    .col = rep(cols, each = n),
     .fn = rep(funs %||% seq_along(funs), length(cols))
   )
   glue(names, .envir = glue_env)

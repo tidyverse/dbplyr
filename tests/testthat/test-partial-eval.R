@@ -78,6 +78,13 @@ test_that("across() translates NULL", {
   expect_snapshot(lf %>% mutate(across(a:b)))
 })
 
+test_that("partial_eval_dots() names automatically", {
+  expect_named(
+    partial_eval_dots(quos(across(everything())), c("a", "b")),
+    c("a", "b")
+  )
+})
+
 test_that("can control names", {
   lf <- lazy_frame(a = 1, b = 2)
   out <- lf %>% summarise(across(a:b, c("log", "exp"), .names = "{.fn}_{.col}"))
