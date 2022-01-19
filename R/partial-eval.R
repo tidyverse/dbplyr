@@ -209,7 +209,7 @@ db_squash_if <- function(call, env, vars, reduce = "&") {
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
   .cols <- call$.cols %||% expr(everything())
-  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = FALSE)
+  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = TRUE)
   cols <- syms(names(tbl))[locs]
 
   if (is.null(call$.fns)) {
