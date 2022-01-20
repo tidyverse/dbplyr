@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `filter()` throws an error if you supply a named argument (@mgirlich, #764).
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 
