@@ -5,8 +5,8 @@ partial_eval_across <- function(call, vars, env) {
   # tbl <- simulate_vars(data, drop_groups = TRUE)
   tbl <- as_tibble(rep_named(vars, list(logical())))
   .cols <- call$.cols %||% expr(everything())
-  locs <- tidyselect::eval_select(.cols, tbl)
-  cols <- syms(names(tbl))[locs]
+  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = TRUE)
+  cols <- set_names(syms(vars)[locs], names(locs))
 
   funs <- across_funs(call$.fns, env, vars)
 
@@ -27,7 +27,7 @@ partial_eval_across <- function(call, vars, env) {
   }
 
   .names <- eval(call$.names, env)
-  names(out) <- across_names(names(locs), names(funs), .names, env)
+  names(out) <- across_names(cols, names(funs), .names, env)
   out
 }
 
