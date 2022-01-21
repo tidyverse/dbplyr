@@ -76,10 +76,15 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
   }
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE) {
+partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
   # corresponds to `capture_dots()`
   dots <- enquos(..., .named = .named)
-  dots <- lapply(dots, partial_eval_quo, vars = op_vars(.data))
+  if (across) {
+    vars <- across_vars(.data)
+  } else {
+    vars <- op_vars(.data)
+  }
+  dots <- lapply(dots, partial_eval_quo, vars = vars)
 
   # Remove names from any list elements
   is_list <- vapply(dots, is.list, logical(1))

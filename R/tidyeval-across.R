@@ -123,3 +123,9 @@ across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
   )
   glue(names, .envir = glue_env)
 }
+
+across_vars <- function(x) {
+  # TODO this can be remove after passing `data` to `partial_eval()` etc.
+  # and adding the argument `drop_groups` to `simulate_vars()`
+  setdiff(op_vars(x), group_vars(x))
+}
