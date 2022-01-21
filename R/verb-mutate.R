@@ -22,8 +22,7 @@
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
 mutate.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
 
   nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
 }
@@ -31,8 +30,7 @@ mutate.tbl_lazy <- function(.data, ...) {
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
 
   nest_vars(.data, dots, character())
 }

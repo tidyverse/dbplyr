@@ -157,7 +157,7 @@ dbplyr_pivot_wider_spec <- function(data,
   }
   if (is.function(values_fn)) {
     values_fn <- rep_named(unique(spec$.value), list(values_fn))
-    values_fn <- purrr::map_chr(values_fn, find_fun)
+    values_fn <- purrr::map(values_fn, find_fun)
   }
 
   if (is_scalar(values_fill)) {

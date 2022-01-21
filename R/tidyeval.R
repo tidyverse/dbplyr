@@ -55,14 +55,20 @@
 #' x <- 1
 #' partial_eval(quote(x ^ y))
 partial_eval <- function(call, vars = character(), env = caller_env()) {
-  if (is_null(call)) {
-    NULL
-  } else if (is_atomic(call) || blob::is_blob(call)) {
+  # corresponds to `dt_squash()`
+  # TODO change `vars` to `data`
+  if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
     partial_eval_sym(call, vars, env)
   } else if (is_quosure(call)) {
     partial_eval(get_expr(call), vars, get_env(call))
+  } else if (is_call(call, "if_any")) {
+    db_squash_if(call, env, vars, reduce = "|")
+  } else if (is_call(call, "if_all")) {
+    db_squash_if(call, env, vars, reduce = "&")
+  } else if (is_call(call, "across")) {
+    partial_eval_across(call, vars, env)
   } else if (is_call(call)) {
     partial_eval_call(call, vars, env)
   } else {
@@ -70,20 +76,22 @@ partial_eval <- function(call, vars = character(), env = caller_env()) {
   }
 }
 
-partial_eval_dots <- function(dots, vars) {
-  stopifnot(inherits(dots, "quosures"))
+partial_eval_dots <- function(.data, ..., .named = TRUE) {
+  # corresponds to `capture_dots()`
+  dots <- enquos(..., .named = .named)
+  dots <- lapply(dots, partial_eval_quo, vars = op_vars(.data))
 
-  dots <- lapply(dots, partial_eval_quo, vars = vars)
-
-  # Flatten across() calls
+  # Remove names from any list elements
   is_list <- vapply(dots, is.list, logical(1))
-  dots[!is_list] <- lapply(dots[!is_list], list)
   names(dots)[is_list] <- ""
 
+  # Auto-splice list results from dt_squash()
+  dots[!is_list] <- lapply(dots[!is_list], list)
   unlist(dots, recursive = FALSE)
 }
 
 partial_eval_quo <- function(x, vars) {
+  # corresponds to `dt_squash()`
   expr <- partial_eval(get_expr(x), vars, get_env(x))
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
@@ -107,17 +115,25 @@ is_namespaced_dplyr_call <- function(call) {
   is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
 }
 
-is_tidy_pronoun <- function(call) {
-  is_symbol(call[[1]], c("$", "[[")) && is_symbol(call[[2]], c(".data", ".env"))
+is_mask_pronoun <- function(call) {
+  is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
 
 partial_eval_call <- function(call, vars, env) {
+  # corresponds to `dt_squash_call()`
+  # TODO which of
+  # * `cur_data()`, `cur_data_all()`
+  # * `cur_group()`, `cur_group_id()`, and
+  # * `cur_group_rows()`
+  # are possible?
+
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
     dot_var <- vars[[attr(call, "position")]]
-    call <- replace_dot(attr(fun, "formula")[[2]], dot_var)
+    call <- replace_dot(attr(fun, "formula")[[2]], sym(dot_var))
+    # TODO what about environment in `dtplyr`?
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)
@@ -133,7 +149,7 @@ partial_eval_call <- function(call, vars, env) {
   if (is.call(fun)) {
     if (is_namespaced_dplyr_call(fun)) {
       call[[1]] <- fun[[3]]
-    } else if (is_tidy_pronoun(fun)) {
+    } else if (is_mask_pronoun(fun)) {
       stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
     } else {
       return(eval_bare(call, env))
@@ -141,24 +157,18 @@ partial_eval_call <- function(call, vars, env) {
   }
 
   # .data$, .data[[]], .env$, .env[[]] need special handling
-  if (is_tidy_pronoun(call)) {
-    if (is_symbol(call[[1]], "$")) {
-      idx <- call[[3]]
-    } else {
-      idx <- as.name(eval_bare(call[[3]], env))
+  if (is_mask_pronoun(call)) {
+    var <- call[[3]]
+    if (is_call(call, "[[")) {
+      var <- sym(eval(var, env))
+      # var <- as.name(eval_bare(var, env))
     }
 
     if (is_symbol(call[[2]], ".data")) {
-      idx
+      var
     } else {
-      eval_bare(idx, env)
+      eval_bare(var, env)
     }
-  }  else if (is_call(call, "if_any")) {
-    db_squash_if(call, env, vars, reduce = "|")
-  } else if (is_call(call, "if_all")) {
-    db_squash_if(call, env, vars, reduce = "&")
-  } else if (is_call(call, "across")) {
-    partial_eval_across(call, vars, env)
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local
@@ -172,118 +182,6 @@ partial_eval_call <- function(call, vars, env) {
       call
     }
   }
-}
-
-partial_eval_across <- function(call, vars, env) {
-  call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
-
-  tbl <- as_tibble(rep_named(vars, list(logical())))
-  cols <- syms(vars)[tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)]
-
-  funs <- across_funs(call$.fns, env)
-
-  # Generate grid of expressions
-  out <- vector("list", length(cols) * length(funs))
-  k <- 1
-  for (i in seq_along(cols)) {
-    for (j in seq_along(funs)) {
-      out[[k]] <- exec(funs[[j]], cols[[i]], !!!call$...)
-      k <- k + 1
-    }
-  }
-
-  .names <- eval(call$.names, env)
-  names(out) <- across_names(cols, names(funs), .names, env)
-  out
-}
-
-capture_if_all <- function(data, x) {
-  x <- enquo(x)
-  db_squash_if(get_expr(x), get_env(x), colnames(data))
-}
-
-db_squash_if <- function(call, env, vars, reduce = "&") {
-  call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
-
-  tbl <- as_tibble(rep_named(vars, list(logical())))
-  .cols <- call$.cols %||% expr(everything())
-  locs <- tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)
-  cols <- syms(names(tbl))[locs]
-
-  if (is.null(call$.fns)) {
-    return(Reduce(function(x, y) call2(reduce, x, y), cols))
-  }
-
-  fun <- across_fun(call$.fns, env)
-
-  out <- vector("list", length(cols))
-  for (i in seq_along(cols)) {
-    out[[i]] <- exec(fun, cols[[i]], !!!call$...)
-  }
-
-  Reduce(function(x, y) call2(reduce, x, y), out)
-}
-
-across_funs <- function(funs, env = caller_env()) {
-  if (is.null(funs)) {
-    list(function(x, ...) x)
-  } else if (is_symbol(funs)) {
-    set_names(list(across_fun(funs, env)), as.character(funs))
-  } else if (is.character(funs)) {
-    names(funs)[names2(funs) == ""] <- funs
-    lapply(funs, across_fun, env)
-  } else if (is_call(funs, "~")) {
-    set_names(list(across_fun(funs, env)), expr_name(f_rhs(funs)))
-  } else if (is_call(funs, "list")) {
-    args <- rlang::exprs_auto_name(funs[-1])
-    lapply(args, across_fun, env)
-  } else if (!is.null(env)) {
-    # Try evaluating once, just in case
-    funs <- eval(funs, env)
-    across_funs(funs, NULL)
-  } else {
-    abort("`.fns` argument to dbplyr::across() must be a NULL, a function name, formula, or list")
-  }
-}
-
-across_fun <- function(fun, env) {
-  if (is_symbol(fun) || is_string(fun)) {
-    function(x, ...) call2(fun, x, ...)
-  } else if (is_call(fun, "~")) {
-    fun <- across_formula_fn(f_rhs(fun))
-    function(x, ...) expr_interp(fun, child_env(emptyenv(), .x = x))
-  } else {
-    abort(c(
-      ".fns argument to dbplyr::across() contain a function name or a formula",
-      x = paste0("Problem with ", expr_deparse(fun))
-    ))
-  }
-}
-
-
-across_formula_fn <- function(x) {
-  if (is_symbol(x, ".") || is_symbol(x, ".x")) {
-    quote(!!.x)
-  } else if (is_call(x)) {
-    x[-1] <- lapply(x[-1], across_formula_fn)
-    x
-  } else {
-    x
-  }
-}
-
-across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
-  if (length(funs) == 1) {
-    names <- names %||% "{.col}"
-  } else {
-    names <- names %||% "{.col}_{.fn}"
-  }
-
-  glue_env <- child_env(env,
-    .col = rep(cols, each = length(funs)),
-    .fn = rep(funs %||% seq_along(funs), length(cols))
-  )
-  glue(names, .envir = glue_env)
 }
 
 find_fun <- function(fun) {
@@ -305,6 +203,7 @@ find_fun <- function(fun) {
 }
 
 fun_name <- function(fun) {
+  # `dtplyr` uses the same idea but needs different environments
   pkg_env <- env_parent(global_env())
   known <- c(ls(base_agg), ls(base_scalar))
 
@@ -314,17 +213,17 @@ fun_name <- function(fun) {
 
     fun_x <- env_get(pkg_env, x, inherit = TRUE)
     if (identical(fun, fun_x))
-      return(x)
+      return(sym(x))
   }
 
   NULL
 }
 
-replace_dot <- function(call, var) {
-  if (is_symbol(call, ".")) {
-    sym(var)
+replace_dot <- function(call, sym) {
+  if (is_symbol(call, ".") || is_symbol(call, ".x")) {
+    sym
   } else if (is_call(call)) {
-    call[] <- lapply(call, replace_dot, var = var)
+    call[] <- lapply(call, replace_dot, sym = sym)
     call
   } else {
     call

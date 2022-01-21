@@ -166,7 +166,7 @@ dbplyr_pivot_longer_spec <- function(data,
 
 get_measure_column_exprs <- function(name, value, values_transform) {
   # idea copied from `partial_eval_across`
-  measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
+  measure_funs <- purrr::map(values_transform, find_fun)
 
   measure_cols <- set_names(syms(name), value)
   purrr::imap(

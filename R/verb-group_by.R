@@ -25,8 +25,7 @@
 #'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
 #'   show_query()
 group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
   if (!missing(add)) {
     lifecycle::deprecate_warn("1.0.0", "dplyr::group_by(add = )", "group_by(.add = )")
