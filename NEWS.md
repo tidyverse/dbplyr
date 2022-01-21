@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
+  (@mgirlich, #760).
+
 * `filter()` throws an error if you supply a named argument (@mgirlich, #764).
 
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
