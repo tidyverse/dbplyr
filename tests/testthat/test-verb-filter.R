@@ -34,12 +34,6 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% filter(), lf)
 })
 
-test_that("errors for named input", {
-  lf <- lazy_frame(x = 1, y = 2)
-
-  expect_snapshot(error = TRUE, filter(lf, x = 1))
-  expect_snapshot(error = TRUE, filter(lf, y > 1, x = 1))
-})
 
 # SQL generation --------------------------------------------------------
 
