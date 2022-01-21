@@ -1,3 +1,17 @@
+# across() gives meaningful messages
+
+    Code
+      (expect_error(lazy_frame(x = 1) %>% summarise(across(x, 42))))
+    Output
+      <error/rlang_error>
+      `.fns` argument to dbplyr::across() must be a NULL, a function name, formula, or list
+    Code
+      (expect_error(lazy_frame(x = 1) %>% summarise(across(y, mean))))
+    Output
+      <error/vctrs_error_subscript_oob>
+      Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # across() translates character vectors
 
     Code
@@ -121,6 +135,47 @@
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
+      FROM `df`
+
+# across() defaults to everything()
+
+    Code
+      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~. + 1))
+    Output
+      <SQL>
+      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
+      FROM `df`
+
+# across() can use named selections
+
+    Code
+      df %>% summarise(across(c(a = x, b = y), list(mean = mean, sum = sum), na.rm = TRUE))
+    Output
+      <SQL>
+      SELECT
+        AVG(`x`) AS `a_mean`,
+        SUM(`x`) AS `a_sum`,
+        AVG(`y`) AS `b_mean`,
+        SUM(`y`) AS `b_sum`
+      FROM `df`
+
+---
+
+    Code
+      df %>% summarise(across(all_of(c(a = "x", b = "y")), list(mean = mean, sum = sum)),
+      na.rm = TRUE)
+    Warning <simpleWarning>
+      Missing values are always removed in SQL.
+      Use `mean(x, na.rm = TRUE)` to silence this warning
+      This warning is displayed only once per session.
+    Output
+      <SQL>
+      SELECT
+        AVG(`x`) AS `a_mean`,
+        SUM(`x`) AS `a_sum`,
+        AVG(`y`) AS `b_mean`,
+        SUM(`y`) AS `b_sum`,
+        TRUE AS `na.rm`
       FROM `df`
 
 # if_all/any works in filter()
