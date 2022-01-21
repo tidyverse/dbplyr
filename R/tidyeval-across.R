@@ -10,11 +10,8 @@ partial_eval_across <- function(call, vars, env) {
 
   funs <- across_funs(call$.fns, env, vars)
 
-  dots <- quos(!!!call$...)
-  # TODO this hack gets unnecessary when adapting `partial_eval_quo()`
-  dots <- lapply(dots, quo_set_env, env)
-  dots <- lapply(dots, partial_eval_quo, vars = vars)
-  # dots <- lapply(dots, dt_squash, env = env, data = data, j = j)
+  dots <- call$...
+  dots <- lapply(dots, partial_eval, vars = vars, env = env)
 
   # Generate grid of expressions
   out <- vector("list", length(cols) * length(funs))
