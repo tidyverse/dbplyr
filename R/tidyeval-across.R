@@ -111,14 +111,16 @@ db_squash_formula <- function(x, env, vars, replace = quote(!!.x)) {
 
 across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
   n_reps <- if (is_empty(funs)) 1 else length(funs)
-  if (length(funs) == 1) {
+  if (n_reps == 1) {
     names <- names %||% "{.col}"
   } else {
     names <- names %||% "{.col}_{.fn}"
   }
 
+  col_nms <- names2(cols)
+  cols[col_nms != ""] <- col_nms[col_nms != ""]
   glue_env <- child_env(env,
-    .col = rep(cols, each = length(funs)),
+    .col = rep(cols, each = n_reps),
     .fn = rep(funs %||% seq_len(n_reps), length(cols))
   )
   glue(names, .envir = glue_env)
