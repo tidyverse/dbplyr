@@ -84,7 +84,7 @@ The translation to SQL code basically works as follows:
 }
 }
 \examples{
-if (require("tidyr", quietly = TRUE)) {
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 memdb_frame(
   id = 1,
   key = c("x", "y"),
@@ -95,5 +95,5 @@ memdb_frame(
     names_from = key,
     values_from = value
   )
-}
+\dontshow{\}) # examplesIf}
 }
