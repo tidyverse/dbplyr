@@ -96,7 +96,8 @@
     Code
       sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
       subquery = TRUE)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
