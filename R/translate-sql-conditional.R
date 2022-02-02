@@ -73,7 +73,7 @@ sql_case_when <- function(...) {
 sql_switch <- function(x, ...) {
   input <- list2(...)
 
-  named <- names(input) != ""
+  named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
     build_sql("WHEN (", x , ") THEN (", y, ") ")
@@ -98,7 +98,7 @@ sql_is_null <- function(x) {
 
 enpar <- function(x, tidy = TRUE, env = NULL) {
   if (!is_quosure(x)) {
-    abort("Internal error: `x` must be a quosure.")
+    abort("Internal error: `x` must be a quosure.") # nocov
   }
 
   if (tidy) {
