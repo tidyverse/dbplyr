@@ -55,7 +55,7 @@ sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
-        sql_expr(IF(x, TRUE, FALSE))
+        sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
 
