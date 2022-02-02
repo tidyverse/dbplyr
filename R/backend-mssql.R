@@ -268,7 +268,7 @@ mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {
     attr(con, "version")
   } else {
-    numeric_version(DBI::dbGetInfo(con)$db.version)
+    numeric_version(DBI::dbGetInfo(con)$db.version) # nocov
   }
 }
 
