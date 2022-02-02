@@ -140,7 +140,7 @@
 
     Code
       out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
-    Message <simpleMessage>
+    Message
       New names:
       * name -> name...2
       * value -> value...3

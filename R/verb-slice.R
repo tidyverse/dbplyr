@@ -142,23 +142,23 @@ check_slice_size <- function(n, prop) {
     list(type = "n", n = 1L)
   } else if (!missing(n) && missing(prop)) {
     if (!is.numeric(n) || length(n) != 1) {
-      abort("`n` must be a single number.")
+      abort("`n` must be a single number.", call = caller_env())
     }
     if (is.na(n) || n < 0) {
-      abort("`n` must be a non-missing positive number.")
+      abort("`n` must be a non-missing positive number.", call = caller_env())
     }
 
     list(type = "n", n = as.integer(n))
   } else if (!missing(prop) && missing(n)) {
     if (!is.numeric(prop) || length(prop) != 1) {
-      abort("`prop` must be a single number")
+      abort("`prop` must be a single number", call = caller_env())
     }
     if (is.na(prop) || prop < 0) {
-      abort("`prop` must be a non-missing positive number.")
+      abort("`prop` must be a non-missing positive number.", call = caller_env())
     }
     list(type = "prop", prop = prop)
   } else {
-    abort("Must supply exactly one of `n` and `prop` arguments.")
+    abort("Must supply exactly one of `n` and `prop` arguments.", call = caller_env())
   }
 }
 

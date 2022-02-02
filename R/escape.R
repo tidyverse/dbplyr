@@ -140,7 +140,7 @@ error_embed <- function(type, expr) {
   abort(c(
     glue("Cannot translate {type} to SQL."),
     glue("Force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`")
-  ))
+  ), call = NULL)
 }
 
 #' @export
