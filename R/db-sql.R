@@ -372,6 +372,7 @@ sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, 
   )
   sql_format_clauses(lines, lvl, con)
 }
+# nocov start
 dbplyr_query_set_op <- function(con, ...) {
   dbplyr_fallback(con, "sql_set_op", ...)
 }
@@ -381,6 +382,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
   # dplyr::sql_set_op() doesn't have ...
   sql_query_set_op(con, x, y, method)
 }
+# nocov end
 
 
 # dplyr fallbacks ---------------------------------------------------------
@@ -393,7 +395,7 @@ dbplyr_analyze <- function(con, ...) {
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
-    return()
+    return() # nocov
   }
   dbExecute(con, sql)
 }
