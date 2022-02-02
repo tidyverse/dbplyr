@@ -85,7 +85,7 @@ sql_switch <- function(x, ...) {
   } else if (n_unnamed == 1) {
     clauses <- c(clauses, build_sql("ELSE ", input[!named], " "))
   } else {
-    stop("Can only have one unnamed (ELSE) input", call. = FALSE)
+    abort("Can only have one unnamed (ELSE) input")
   }
 
   build_sql("CASE ", x, " ", !!!clauses, "END")

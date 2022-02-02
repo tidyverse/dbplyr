@@ -68,7 +68,7 @@ c_character <- function(...) {
   }
 
   if (!is.character(x)) {
-    stop("Character input expected", call. = FALSE)
+    abort("Character input expected")
   }
 
   x

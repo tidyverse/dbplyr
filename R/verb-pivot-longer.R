@@ -223,11 +223,11 @@ check_spec <- function(spec) {
   # Waiting for https://github.com/r-lib/vctrs/issues/198
 
   if (!is.data.frame(spec)) {
-    stop("`spec` must be a data frame", call. = FALSE)
+    abort("`spec` must be a data frame")
   }
 
   if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
-    stop("`spec` must have `.name` and `.value` columns", call. = FALSE)
+    abort("`spec` must have `.name` and `.value` columns")
   }
 
   # Ensure .name and .value come first

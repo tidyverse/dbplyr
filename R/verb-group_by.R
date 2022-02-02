@@ -34,7 +34,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    stop("`.drop` is not supported with database backends", call. = FALSE)
+    abort("`.drop` is not supported with database backends")
   }
 
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)

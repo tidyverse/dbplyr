@@ -293,7 +293,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
     cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE)
+    abort(paste0("Unknown join type: ", type))
   )
 
   select <- sql_join_vars(con, vars)

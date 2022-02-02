@@ -83,7 +83,7 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y) {
   } else if (!is.na(y)) {
     sql_table_prefix(con, y, table = if (tolower(y) %in% tolower(all_x)) "RHS")
   } else {
-    stop("No source for join column ", alias, call. = FALSE)
+    abort(paste0("No source for join column ", alias))
   }
 }
 
