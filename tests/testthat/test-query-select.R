@@ -1,5 +1,11 @@
 test_that("select_query() print method output is as expected", {
-  mf <- select_query(lazy_frame(x = 1, con = simulate_dbi()))
+  mf <- select_query(
+    lazy_frame(x = 1, con = simulate_dbi()),
+    where = sql("`x` > 1"),
+    group_by = sql("`x`"),
+    order_by = sql("`x`"),
+    limit = 10
+  )
   expect_snapshot(mf)
 })
 
