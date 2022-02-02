@@ -59,11 +59,7 @@ op_desc.op_group_by <- function(x, ...) {
 
 #' @export
 op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
-  }
+  names(op$dots)
 }
 
 #' @export
