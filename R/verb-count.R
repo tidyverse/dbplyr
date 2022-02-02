@@ -55,8 +55,11 @@ check_name <- function(name, vars) {
     return(name)
   }
 
-  abort(c(
-    glue("'{name}' already present in output"),
-    i = "Use `name = \"new_name\"` to pick a new name."
-  ))
+  abort(
+    c(
+      glue("'{name}' already present in output"),
+      i = "Use `name = \"new_name\"` to pick a new name."
+    ),
+    call = caller_env()
+  )
 }
