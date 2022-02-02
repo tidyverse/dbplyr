@@ -83,6 +83,14 @@
       FROM `df`
       GROUP BY `g`, `name`, `value`
 
+# values_fill is checked
+
+    Code
+      dbplyr_pivot_wider_spec(lf, spec, values_fill = 1:2)
+    Condition
+      Error in `dbplyr_pivot_wider_spec()`:
+      ! `values_fill` must be NULL, a scalar, or a named list
+
 # cannot pivot lazy frames
 
     Code
