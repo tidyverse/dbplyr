@@ -8,7 +8,7 @@
 #'   yourself beforehand; for example replace `arrange(x, desc(y))` by
 #'   `arrange(desc(x), y)`.
 #'
-#' @examples
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' squirrels <- tibble::tribble(
 #'   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
 #'   1,      "Sam",    "Observer",   NA,                 1,
@@ -26,14 +26,12 @@
 #' )
 #' squirrels$id <- 1:12
 #'
-#' if (require("tidyr", quietly = TRUE)) {
-#'   tbl_memdb(squirrels) %>%
-#'     window_order(id) %>%
-#'     tidyr::fill(
-#'       n_squirrels,
-#'       n_squirrels2,
-#'     )
-#' }
+#' tbl_memdb(squirrels) %>%
+#'   window_order(id) %>%
+#'   tidyr::fill(
+#'     n_squirrels,
+#'     n_squirrels2,
+#'   )
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   sim_data <- simulate_vars(.data)
   cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
