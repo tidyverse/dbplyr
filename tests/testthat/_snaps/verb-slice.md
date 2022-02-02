@@ -75,40 +75,40 @@
 # check_slice_size checks for common issues
 
     Code
-      check_slice_size(n = 1, prop = 1)
+      lf %>% slice_sample(n = 1, prop = 1)
     Condition
-      Error in `check_slice_size()`:
+      Error in `slice_sample()`:
       ! Must supply exactly one of `n` and `prop` arguments.
 
 ---
 
     Code
-      check_slice_size(n = "a")
+      lf %>% slice_sample(n = "a")
     Condition
-      Error in `check_slice_size()`:
+      Error in `slice_sample()`:
       ! `n` must be a single number.
 
 ---
 
     Code
-      check_slice_size(prop = "a")
+      lf %>% slice_sample(prop = "a")
     Condition
-      Error in `check_slice_size()`:
+      Error in `slice_sample()`:
       ! `prop` must be a single number
 
 ---
 
     Code
-      check_slice_size(n = -1)
+      lf %>% slice_sample(n = -1)
     Condition
-      Error in `check_slice_size()`:
+      Error in `slice_sample()`:
       ! `n` must be a non-missing positive number.
 
 ---
 
     Code
-      check_slice_size(prop = -1)
+      lf %>% slice_sample(prop = -1)
     Condition
-      Error in `check_slice_size()`:
+      Error in `slice_sample()`:
       ! `prop` must be a non-missing positive number.
 

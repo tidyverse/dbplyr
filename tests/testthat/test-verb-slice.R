@@ -46,9 +46,11 @@ test_that("window_order is preserved", {
 })
 
 test_that("check_slice_size checks for common issues", {
-  expect_snapshot(error = TRUE, check_slice_size(n = 1, prop = 1))
-  expect_snapshot(error = TRUE, check_slice_size(n = "a"))
-  expect_snapshot(error = TRUE, check_slice_size(prop = "a"))
-  expect_snapshot(error = TRUE, check_slice_size(n = -1))
-  expect_snapshot(error = TRUE, check_slice_size(prop = -1))
+  lf <- lazy_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = 1, prop = 1))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = "a"))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(prop = "a"))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = -1))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(prop = -1))
 })

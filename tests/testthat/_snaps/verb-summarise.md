@@ -3,7 +3,7 @@
     Code
       summarise(mf1, y = sum(x), z = sum(y))
     Condition
-      Error in `check_summarise_vars()`:
+      Error in `summarise()`:
       ! In `dbplyr` you cannot use a variable created in the same summarise.
       x `z` refers to `y` which was created earlier in this summarise().
       i You need an extra mutate() step to use it.
@@ -25,7 +25,7 @@
     Code
       df %>% summarise(.groups = "rowwise")
     Condition
-      Error in `check_groups()`:
+      Error in `summarise()`:
       ! `.groups` can't be "rowwise" in dbplyr
       i Possible values are NULL (default), "drop_last", "drop", and "keep"
 
