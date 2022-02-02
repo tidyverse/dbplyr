@@ -26,9 +26,13 @@
 
 # error when overwriting existing column
 
-    Names must be unique.
-    x These names are duplicated:
-      * "a" at locations 1 and 2.
+    Code
+      tidyr::pivot_wider(df, names_from = key, values_from = val)
+    Condition
+      Error in `stop_vctrs()`:
+      ! Names must be unique.
+      x These names are duplicated:
+        * "a" at locations 1 and 2.
 
 # values_fn can be a single function
 
@@ -42,8 +46,12 @@
 
 # values_fn cannot be NULL
 
-    `values_fn` must not be NULL
-    i `values_fn` must be a function or a named list of functions
+    Code
+      dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL)
+    Condition
+      Error in `dbplyr_pivot_wider_spec()`:
+      ! `values_fn` must not be NULL
+      i `values_fn` must be a function or a named list of functions
 
 # can fill in missing cells
 
@@ -77,6 +85,10 @@
 
 # cannot pivot lazy frames
 
-    `dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.
-    i Use `memdb_frame()` together with `show_query()` to see the SQL code.
+    Code
+      tidyr::pivot_wider(lazy_frame(name = "x", value = 1))
+    Condition
+      Error in `dbplyr_build_wider_spec()`:
+      ! `dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.
+      i Use `memdb_frame()` together with `show_query()` to see the SQL code.
 
