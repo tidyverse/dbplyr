@@ -61,7 +61,7 @@ test_that("check basic group size implementation", {
 # tbl_sum -------------------------------------------------------------------
 
 test_that("ungrouped output", {
-  mf <- memdb_frame(x = 1:5, y = 1:5, .name = "tbl_sum_test")
+  mf <- copy_to_test("sqlite", tibble(x = 1:5, y = 1:5), name = "tbl_sum_test")
 
   out1 <- tbl_sum(mf)
   expect_named(out1, c("Source", "Database"))
