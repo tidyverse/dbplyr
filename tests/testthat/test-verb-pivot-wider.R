@@ -57,7 +57,8 @@ test_that("error when overwriting existing column", {
     key = c("a", "b"),
     val = c(1, 2)
   )
-  expect_snapshot_error(
+  expect_snapshot(
+    error = TRUE,
     tidyr::pivot_wider(df, names_from = key, values_from = val)
   )
 })
@@ -140,7 +141,7 @@ test_that("values_fn can be a single function", {
 test_that("values_fn cannot be NULL", {
   df <- lazy_frame(a = 1, key = "x", val = 1)
 
-  expect_snapshot_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
+  expect_snapshot(error = TRUE, dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
 })
 
 # can fill missing cells --------------------------------------------------
@@ -208,7 +209,7 @@ test_that("column order in output matches spec", {
 })
 
 test_that("cannot pivot lazy frames", {
-  expect_snapshot_error(tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
+  expect_snapshot(error = TRUE, tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
 })
 
 # multiple names ----------------------------------------------------------

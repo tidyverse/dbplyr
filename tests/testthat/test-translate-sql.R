@@ -10,9 +10,9 @@ test_that("namespace calls are translated", {
   expect_equal(translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
   expect_equal(translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
 
-  expect_snapshot_error(translate_sql(NOSUCHPACKAGE::foo()))
-  expect_snapshot_error(translate_sql(dbplyr::NOSUCHFUNCTION()))
-  expect_snapshot_error(translate_sql(base::abbreviate(x)))
+  expect_snapshot(error = TRUE, translate_sql(NOSUCHPACKAGE::foo()))
+  expect_snapshot(error = TRUE, translate_sql(dbplyr::NOSUCHFUNCTION()))
+  expect_snapshot(error = TRUE, translate_sql(base::abbreviate(x)))
 })
 
 test_that("Wrong number of arguments raises error", {
