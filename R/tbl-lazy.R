@@ -74,10 +74,12 @@ groups.tbl_lazy <- function(x) {
   lapply(group_vars(x), as.name)
 }
 
+# nocov start
 # Manually registered in zzz.R
 group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }
+# nocov end
 
 #' @importFrom dplyr group_vars
 #' @export

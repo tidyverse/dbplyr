@@ -1,3 +1,4 @@
+# nocov start
 wrap <- function(..., indent = 0) {
   x <- paste0(..., collapse = "")
   wrapped <- strwrap(
@@ -9,6 +10,7 @@ wrap <- function(..., indent = 0) {
 
   paste0(wrapped, collapse = "\n")
 }
+# nocov end
 
 indent <- function(x) {
   x <- paste0(x, collapse = "\n")
