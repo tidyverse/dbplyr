@@ -252,19 +252,15 @@ local_context <- function(x, env = parent.frame()) {
 # Where translation -------------------------------------------------------
 
 uses_window_fun <- function(x, con) {
-  if (is.null(x)) return(FALSE)
-  if (is.list(x)) {
-    calls <- unlist(lapply(x, all_calls))
-  } else {
-    calls <- all_calls(x)
-  }
+  stopifnot(is.list(x))
 
+  calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
 }
 
 common_window_funs <- function() {
-  ls(dbplyr_sql_translation(NULL)$window)
+  ls(dbplyr_sql_translation(NULL)$window) # nocov
 }
 
 #' @noRd
@@ -301,7 +297,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
 
       }
     },
-    abort(glue("Unknown type: ", typeof(expr)))
+    abort(glue("Unknown type: ", typeof(expr))) # nocov
   )
 }
 
