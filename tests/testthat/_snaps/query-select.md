@@ -20,3 +20,11 @@
       <SQL> SELECT `x`
       FROM `df`
 
+---
+
+    Code
+      lazy_frame(x = 1, y = 1) %>% select()
+    Condition
+      Error in `sql_clause_select()`:
+      ! Query contains no columns
+
