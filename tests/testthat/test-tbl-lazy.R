@@ -3,6 +3,21 @@ test_that("adds src class", {
   expect_s3_class(tb, "tbl_SQLiteConnection")
 })
 
+test_that("argument src is deprecated", {
+  expect_snapshot(dummy <- tbl_lazy(mtcars, src = simulate_sqlite()))
+})
+
+test_that("cannot convert tbl_lazy to data.frame", {
+  expect_snapshot(
+    error = TRUE,
+    as.data.frame(tbl_lazy(mtcars, src = simulate_sqlite()))
+  )
+})
+
+test_that("dim() works for tbl_lazy", {
+  expect_equal(dim(tbl_lazy(mtcars)), c(NA, 11))
+})
+
 test_that("has print method", {
   expect_snapshot(tbl_lazy(mtcars))
 })
