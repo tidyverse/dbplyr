@@ -1,10 +1,19 @@
 test_that("symbols weights are dropped in output", {
-  # workaround so that sql snapshot is always the same
-  withr::local_options(list(dbplyr_table_name = 2000))
-  df <- memdb_frame(x = 1, w = 1)
+  df <- copy_to_test("sqlite", tibble(x = 1, w = 1))
   expect_equal(dbplyr_uncount(df, w) %>% collect(), tibble(x = 1))
 
-  expect_snapshot(dbplyr_uncount(df, w) %>% show_query())
+  expect_snapshot(
+    dbplyr_uncount(df, w) %>% show_query(),
+    transform = function(lines) {
+      lines_to_transform <- grepl("INNER JOIN", lines)
+      lines[lines_to_transform] <- gsub(
+        "`dbplyr_\\d+`", "`dbplyr_table`",
+        lines[lines_to_transform]
+      )
+
+      lines
+    }
+  )
 })
 
 test_that("can request to preserve symbols", {

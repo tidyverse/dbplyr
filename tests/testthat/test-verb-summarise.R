@@ -52,7 +52,7 @@ test_that("summarise(.groups=)", {
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- memdb_frame(x = 1, .name = "verb-summarise") %>%
+  out <- copy_to_test("sqlite", tibble(x = 1), name = "verb-summarise") %>%
     group_by(x) %>%
     summarise(n = n())
   expect_snapshot(out %>% sql_render)
