@@ -78,17 +78,29 @@
 
 # expand() errors when expected
 
-    Must supply variables in `...`
+    Code
+      tidyr::expand(memdb_frame(x = 1))
+    Condition
+      Error in `tidyr::expand()`:
+      ! Must supply variables in `...`
 
 ---
 
-    Must supply variables in `...`
+    Code
+      tidyr::expand(memdb_frame(x = 1), x = NULL)
+    Condition
+      Error in `tidyr::expand()`:
+      ! Must supply variables in `...`
 
 # nesting() respects .name_repair
 
-    Names must be unique.
-    x These names are duplicated:
-      * "x" at locations 1 and 2.
+    Code
+      tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
+    Condition
+      Error in `stop_vctrs()`:
+      ! Names must be unique.
+      x These names are duplicated:
+        * "x" at locations 1 and 2.
 
 # replace_na replaces missing values
 
