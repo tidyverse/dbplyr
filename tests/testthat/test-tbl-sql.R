@@ -27,6 +27,15 @@ test_that("can generate sql tbls with raw sql", {
   expect_equal(collect(mf1), collect(mf2))
 })
 
+test_that("sql tbl can be printed", {
+  con <- src_memdb()$con
+  tbl <- DBI::dbListTables(con)[[1]]
+
+  mf <- tbl(src_memdb()$con, build_sql("SELECT * FROM ", ident(tbl), con = con))
+
+  expect_snapshot(mf)
+})
+
 test_that("can refer to default schema explicitly", {
   con <- sqlite_con_with_aux()
   on.exit(DBI::dbDisconnect(con))
