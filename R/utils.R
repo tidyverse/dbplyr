@@ -55,7 +55,7 @@ succeeds <- function(x, quiet = FALSE) {
     },
     error = function(e) {
       if (!quiet)
-        message("Error: ", e$message)
+        message("Error: ", e$message) # nocov
       FALSE
     }
   )
@@ -76,6 +76,7 @@ c_character <- function(...) {
 
 cat_line <- function(...) cat(paste0(..., "\n"), sep = "")
 
+# nocov start
 res_warn_incomplete <- function(res, hint = "n = -1") {
   if (dbHasCompleted(res)) return()
 
@@ -92,6 +93,7 @@ hash_temp <- function(name) {
   )
   name
 }
+# nocov end
 
 # Helper for testing
 local_methods <- function(..., .frame = caller_env()) {
