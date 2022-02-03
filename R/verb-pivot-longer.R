@@ -254,7 +254,7 @@ deduplicate_spec <- function(spec, df) {
 }
 
 check_list_of_functions <- function(x, names, arg) {
-  # COPIED FROM tidyr
+  # mostly COPIED FROM tidyr
   if (is.null(x)) {
     x <- set_names(list(), character())
   }
@@ -270,8 +270,6 @@ check_list_of_functions <- function(x, names, arg) {
   if (vctrs::vec_duplicate_any(names(x))) {
     abort(glue("The names of `{arg}` must be unique."))
   }
-
-  x <- purrr::map(x, as_function)
 
   # Silently drop user supplied names not found in the data
   x <- x[intersect(names(x), names)]
