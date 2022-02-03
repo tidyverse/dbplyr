@@ -37,12 +37,7 @@
 # values_fn can be a single function
 
     Code
-      dbplyr_pivot_wider_spec(df, spec1, values_fn = sum)
-    Condition
-      Warning:
-      Missing values are always removed in SQL.
-      Use `SUM(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
+      suppressWarnings(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
     Output
       <SQL>
       SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`

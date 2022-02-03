@@ -220,7 +220,9 @@ test_that("known bug - building a wider spec with a zero row data frame loses `v
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
-  expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
+  expect_snapshot(
+    suppressWarnings(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
+  )
 })
 
 test_that("values_fn can be a formula", {
