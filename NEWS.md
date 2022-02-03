@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `filter()` throws an error if you supply a named argument (@mgirlich, #764).
+
 * The generic `sql_random()` is now exported.
 
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
