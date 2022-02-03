@@ -60,9 +60,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
 
     if (utils::packageVersion("dplyr") < "0.7.9") {
-      index <- attr(grouped, "indices")
+      index <- attr(grouped, "indices") # nocov
       # convert from 0-index
-      index <- lapply(index, `+`, 1L)
+      index <- lapply(index, `+`, 1L) # nocov
     } else {
       index <- dplyr::group_rows(grouped)
     }
@@ -127,18 +127,21 @@ label_output_dataframe <- function(labels, out, groups) {
 
     dplyr::grouped_df(dplyr::bind_cols(labels, out), groups)
   } else {
-    dplyr::rowwise(out)
+    dplyr::rowwise(out) # nocov
   }
 }
 
 label_output_list <- function(labels, out, groups) {
+  # browser()
   if (!is.null(labels)) {
     labels[names(out)] <- out
     dplyr::rowwise(labels)
   } else {
+     # nocov start
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
     dplyr::rowwise(out)
+     # nocov end
   }
 }
 
