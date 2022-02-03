@@ -49,7 +49,7 @@ Suggests:
     RPostgreSQL,
     RSQLite (>= 2.1.0),
     testthat (>= 3.0.2),
-    tidyr
+    tidyr (>= 1.2.0)
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
