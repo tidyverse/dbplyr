@@ -73,6 +73,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  names_sep = "_",
                                  names_glue = NULL,
                                  names_sort = FALSE,
+                                 names_expand = FALSE,
                                  names_repair = "check_unique",
                                  values_from = value,
                                  values_fill = NULL,
@@ -89,7 +90,8 @@ pivot_wider.tbl_lazy <- function(data,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
-    names_sort = names_sort
+    names_sort = names_sort,
+    names_expand = names_expand
   )
 
   id_cols <- enquo(id_cols)
@@ -106,7 +108,8 @@ dbplyr_build_wider_spec <- function(data,
                                     names_prefix = "",
                                     names_sep = "_",
                                     names_glue = NULL,
-                                    names_sort = FALSE) {
+                                    names_sort = FALSE,
+                                    names_expand = FALSE) {
   if (!inherits(data, "tbl_sql")) {
     error_message <- c(
       "`dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.",
@@ -137,7 +140,8 @@ dbplyr_build_wider_spec <- function(data,
     names_prefix = names_prefix,
     names_sep = names_sep,
     names_glue = names_glue,
-    names_sort = names_sort
+    names_sort = names_sort,
+    names_expand = names_expand
   )
 }
 

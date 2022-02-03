@@ -4,7 +4,7 @@
 \alias{pivot_wider.tbl_lazy}
 \title{Pivot data from long to wide}
 \usage{
-pivot_wider.tbl_lazy(
+\method{pivot_wider}{tbl_lazy}(
   data,
   id_cols = NULL,
   names_from = name,
@@ -12,6 +12,7 @@ pivot_wider.tbl_lazy(
   names_sep = "_",
   names_glue = NULL,
   names_sort = FALSE,
+  names_expand = FALSE,
   names_repair = "check_unique",
   values_from = value,
   values_fill = NULL,
@@ -44,6 +45,12 @@ a glue specification that uses the \code{names_from} columns (and special
 
 \item{names_sort}{Should the column names be sorted? If \code{FALSE}, the default,
 column names are ordered by first appearance.}
+
+\item{names_expand}{Should the values in the \code{names_from} columns be expanded
+by \code{\link[=expand]{expand()}} before pivoting? This results in more columns, the output
+will contain column names corresponding to a complete expansion of all
+possible values in \code{names_from}. Additionally, the column names will be
+sorted, identical to what \code{names_sort} would produce.}
 
 \item{names_repair}{What happens if the output has invalid column names?}
 

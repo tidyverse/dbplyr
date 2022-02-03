@@ -280,3 +280,9 @@ test_that("can pivot multiple from multiple names", {
     tibble(id_1 = "01", name_1 = "curie", id_2 = "02", name_2 = "arrhenius")
   )
 })
+
+test_that("`names_expand` does a cartesian expansion of `names_from` columns (#770)", {
+  df <- memdb_frame(name1 = c("a", "b"), name2 = c("c", "d"), value = c(1, 2))
+  spec <- dbplyr_build_wider_spec(df, names_from = c(name1, name2), names_expand = TRUE)
+  expect_identical(spec$.name, c("a_c", "a_d", "b_c", "b_d"))
+})
