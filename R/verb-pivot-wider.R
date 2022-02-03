@@ -236,10 +236,9 @@ dbplyr_pivot_wider_spec <- function(data,
   }
 
   pivot_exprs <- purrr::map(
-    vctrs::vec_seq_along(spec),
+    set_names(vctrs::vec_seq_along(spec), spec$.name),
     ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn)
-  ) %>%
-    set_names(spec$.name)
+  )
 
   key_vars <- setdiff(id_cols, non_id_cols)
   data_grouped <- group_by(data, !!!syms(key_vars), .add = TRUE)
@@ -272,6 +271,7 @@ build_wider_id_cols_expr <- function(data,
                                      id_cols = NULL,
                                      names_from = name,
                                      values_from = value) {
+  # COPIED FROM tidyr
   # TODO: Use `allow_rename = FALSE`.
   # Requires https://github.com/r-lib/tidyselect/issues/225.
   sim_data <- simulate_vars(data)
@@ -310,6 +310,7 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn) {
 select_wider_id_cols <- function(data,
                                  id_cols = NULL,
                                  non_id_cols = character()) {
+  # COPIED FROM tidyr
   id_cols <- enquo(id_cols)
   sim_data <- simulate_vars(data)
 
