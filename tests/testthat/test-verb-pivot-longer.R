@@ -100,6 +100,35 @@ test_that("`values_transform` works with single functions (#1284)", {
   expect_identical(res$y, "2")
 })
 
+test_that("`names_ptypes` and `names_transform`", {
+  df <- memdb_frame(`1x2` = 1)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1)
+  expect_identical(res$two, 2)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric,
+    names_ptypes = integer()
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1L)
+  expect_identical(res$two, 2L)
+})
+
 test_that("`values_transform` is validated", {
   df <- memdb_frame(x = 1)
 
