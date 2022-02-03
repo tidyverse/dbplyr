@@ -101,12 +101,14 @@
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
       <error/rlang_error>
-      Can't convert a double vector to function
+      Error in `purrr::map()`:
+      ! Can't convert `.x[[i]]`, a number, to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
       <error/rlang_error>
-      All elements of `values_transform` must be named.
+      Error in `check_list_of_functions()`:
+      ! All elements of `values_transform` must be named.
 
 # can pivot to multiple measure cols
 
