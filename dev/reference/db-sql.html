@@ -4,6 +4,8 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
+sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample().
 
 
 Tables:
@@ -154,6 +156,8 @@ queries.
 pair of <code>NULL</code>s should match. The default translation uses a <code>CASE WHEN</code>
 as described in <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link">https://modern-sql.com/feature/is-distinct-from</a>.</p></li>
 <li><p><code>sql_translation(con)</code> generates a SQL translation environment.</p></li>
+<li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
+to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
@@ -179,6 +183,8 @@ queries.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sql_expr_matches</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span>
 
 <span class="fu">sql_translation</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
+<span class="fu">sql_random</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
 
 <span class="fu">sql_table_analyze</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span>
 
