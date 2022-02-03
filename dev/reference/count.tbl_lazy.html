@@ -125,6 +125,9 @@ wrap up <code><a href="group_by.tbl_lazy.html">group_by.tbl_lazy()</a></code>, <
 <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, wt <span class="op">=</span> <span class="cn">NULL</span>, sort <span class="op">=</span> <span class="cn">FALSE</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
 
 <span class="co"># S3 method for tbl_lazy</span>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">add_count</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, wt <span class="op">=</span> <span class="cn">NULL</span>, sort <span class="op">=</span> <span class="cn">FALSE</span>, name <span class="op">=</span> <span class="cn">NULL</span>, .drop <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
+
+<span class="co"># S3 method for tbl_lazy</span>
 <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">tally</a></span><span class="op">(</span><span class="va">x</span>, wt <span class="op">=</span> <span class="cn">NULL</span>, sort <span class="op">=</span> <span class="cn">FALSE</span>, name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
     </div>
 
@@ -147,6 +150,8 @@ Can be <code>NULL</code> or a variable:</p><ul><li><p>If <code>NULL</code> (the 
 <dd><p>The name of the new column in the output.</p>
 <p>If omitted, it will default to <code>n</code>. If there's already a column called <code>n</code>,
 it will error, and require you to specify the name.</p></dd>
+<dt>.drop</dt>
+<dd><p>Not supported for lazy tables.</p></dd>
 </dl></div>
 
     <div id="ref-examples">
