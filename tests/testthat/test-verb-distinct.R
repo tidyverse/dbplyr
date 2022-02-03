@@ -37,6 +37,7 @@ test_that("distinct returns all columns when .keep_all is TRUE", {
   result <- mf %>% distinct(x, .keep_all = TRUE) %>% collect()
   expect_named(result, c("x", "y"))
   expect_equal(result$x, c(1, 2))
+  expect_equal(group_vars(result), character())
 })
 
 test_that("distinct respects groups when .keep_all is TRUE", {
@@ -45,6 +46,7 @@ test_that("distinct respects groups when .keep_all is TRUE", {
   result <- mf %>% group_by(x) %>% distinct(.keep_all = TRUE) %>% collect()
   expect_named(result, c("x", "y"))
   expect_equal(result$x, c(1, 2))
+  expect_equal(group_vars(result), "x")
 })
 
 # sql-render --------------------------------------------------------------
