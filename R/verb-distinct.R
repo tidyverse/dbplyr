@@ -17,9 +17,8 @@
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   if (dots_n(...) > 0) {
     if (.keep_all) {
-      stop(
-        "Can only find distinct value of specified columns if .keep_all is FALSE",
-        call. = FALSE
+      abort(
+        "Can only find distinct value of specified columns if .keep_all is FALSE"
       )
     }
 

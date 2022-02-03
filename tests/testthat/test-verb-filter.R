@@ -41,6 +41,12 @@ test_that("errors for named input", {
   expect_snapshot(error = TRUE, filter(lf, y > 1, x = 1))
 })
 
+test_that(".preserve is not supported", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_snapshot(error = TRUE, lf %>% filter(x == 1, .preserve = TRUE))
+})
+
+
 # SQL generation --------------------------------------------------------
 
 test_that("filter calls windowed versions of sql functions", {
