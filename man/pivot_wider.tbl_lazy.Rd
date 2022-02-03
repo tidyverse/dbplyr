@@ -15,7 +15,7 @@ pivot_wider.tbl_lazy(
   names_repair = "check_unique",
   values_from = value,
   values_fill = NULL,
-  values_fn = max,
+  values_fn = ~max(.x, na.rm = TRUE),
   ...
 )
 }

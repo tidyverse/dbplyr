@@ -467,4 +467,4 @@ sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
 
-globalVariables(c("RANDOM"))
+utils::globalVariables("RANDOM")

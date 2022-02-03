@@ -95,6 +95,16 @@
       SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
       FROM `df`
 
+# values_transform can be a formula
+
+    Code
+      lazy_frame(x = 1) %>% tidyr::pivot_longer(x, values_transform = list(value = ~
+        as.character(.x)))
+    Output
+      <SQL>
+      SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
+      FROM `df`
+
 # `values_transform` is validated
 
     Code

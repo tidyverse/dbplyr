@@ -84,6 +84,13 @@ test_that("can override default output column type", {
   )
 })
 
+test_that("values_transform can be a formula", {
+  expect_snapshot(
+    lazy_frame(x = 1) %>%
+      tidyr::pivot_longer(x, values_transform = list(value = ~ as.character(.x)))
+  )
+})
+
 test_that("`values_transform` works with single functions (#1284)", {
   df <- memdb_frame(x_1 = 1L, y_1 = 2L)
 
