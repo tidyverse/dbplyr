@@ -34,10 +34,10 @@ add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .d
   if (!missing(.drop)) {
     abort("`.drop` argument not supported for lazy tables.")
   }
+
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)
-  }
-  else {
+  } else {
     out <- x
   }
   out <- dplyr::add_tally(out, wt = !!enquo(wt), sort = sort, name = name)
