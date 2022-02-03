@@ -17,6 +17,7 @@ cache_computation <- function(name, computation) {
   }
 }
 
+# nocov start
 load_srcs <- function(f, src_names, quiet = NULL) {
   if (is.null(quiet)) {
     quiet <- !identical(Sys.getenv("NOT_CRAN"), "true")
@@ -57,3 +58,4 @@ db_location <- function(path = NULL, filename) {
 is_writeable <- function(x) {
   unname(file.access(x, 2) == 0)
 }
+# nocov end
