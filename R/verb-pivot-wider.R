@@ -114,7 +114,12 @@ pivot_wider.tbl_lazy <- function(data,
     names_expand = names_expand
   )
 
-  id_cols <- enquo(id_cols)
+  id_cols <- build_wider_id_cols_expr(
+    data = data,
+    id_cols = {{id_cols}},
+    names_from = !!names_from,
+    values_from = !!values_from
+  )
   dbplyr_pivot_wider_spec(data, spec, !!id_cols,
     names_repair = names_repair,
     values_fill = values_fill,
@@ -252,6 +257,44 @@ dbplyr_pivot_wider_spec <- function(data,
 }
 
 globalVariables(c("name", "value"))
+
+build_wider_id_cols_expr <- function(data,
+                                     id_cols = NULL,
+                                     names_from = name,
+                                     values_from = value) {
+  # TODO: Use `allow_rename = FALSE`.
+  # Requires https://github.com/r-lib/tidyselect/issues/225.
+  sim_data <- simulate_vars(data)
+  names_from <- names(tidyselect::eval_select(enquo(names_from), sim_data))
+  values_from <- names(tidyselect::eval_select(enquo(values_from), sim_data))
+  non_id_cols <- c(names_from, values_from)
+
+  out <- select_wider_id_cols(
+    data = data,
+    id_cols = {{id_cols}},
+    non_id_cols = non_id_cols
+  )
+
+  expr(c(!!!out))
+}
+
+select_wider_id_cols <- function(data,
+                                 id_cols = NULL,
+                                 non_id_cols = character()) {
+  id_cols <- enquo(id_cols)
+  sim_data <- simulate_vars(data)
+
+  # Remove known non-id-cols so they are never selected
+  sim_data <- sim_data[setdiff(names(sim_data), non_id_cols)]
+
+  if (quo_is_null(id_cols)) {
+    names(sim_data)
+  } else {
+    # TODO: Use `allow_rename = FALSE`.
+    # Requires https://github.com/r-lib/tidyselect/issues/225.
+    names(tidyselect::eval_select(enquo(id_cols), sim_data))
+  }
+}
 
 is_scalar <- function(x) {
   if (is.null(x)) {
