@@ -1,5 +1,5 @@
 test_that("remote_name returns null for computed tables", {
-  mf <- memdb_frame(x = 5, .name = "refxiudlph")
+  mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
   expect_equal(remote_name(mf), ident("refxiudlph"))
 
   mf2 <- mf %>% filter(x == 3)

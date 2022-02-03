@@ -1,8 +1,8 @@
 ---
-title: "dplyr 2.0.0 backend API"
+title: "dbplyr 2.0.0 backend API"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{dplyr 2.0.0 backend API}
+  %\VignetteIndexEntry{dbplyr 2.0.0 backend API}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

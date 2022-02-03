@@ -55,6 +55,7 @@ sql_translation.HDB <- function(con) {
   )
 }
 
+# nocov start
 #' @export
 db_table_temporary.HDB <- function(con, table, temporary) {
   if (temporary && substr(table, 1, 1) != "#") {
@@ -66,6 +67,7 @@ db_table_temporary.HDB <- function(con, table, temporary) {
     temporary = FALSE
   )
 }
+# nocov end
 
 #' @export
 `sql_table_analyze.HDB` <- function(con, table, ...) {

@@ -79,7 +79,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_fn = max,
                                  ...
                                  ) {
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 

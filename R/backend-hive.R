@@ -68,4 +68,9 @@ sql_table_analyze.Hive <- function(con, table, ...) {
   )
 }
 
+#' @export
+last_value_sql.Hive <- function(con, x) {
+  translate_sql(last_value(!!x, TRUE), con = con)
+}
+
 globalVariables("regexp_replace")

@@ -106,3 +106,9 @@ test_that("magrittr pipe is translated in conditionals", {
     sql("CASE WHEN `x` THEN 1 WHEN NOT `x` THEN 2 END")
   )
 })
+
+test_that("conditionals check arguments", {
+  expect_snapshot(error = TRUE, translate_sql(case_when()))
+
+  expect_snapshot(error = TRUE, translate_sql(switch(x, 1L, 2L)))
+})

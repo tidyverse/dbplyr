@@ -54,7 +54,7 @@ sql_case_when <- function(...) {
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
-  if (query[[n]] == "TRUE") {
+  if (is_true(formulas[[n]][[2]])) {
     clauses[[n]] <- paste0("ELSE ", value[[n]])
   }
 
@@ -73,7 +73,7 @@ sql_case_when <- function(...) {
 sql_switch <- function(x, ...) {
   input <- list2(...)
 
-  named <- names(input) != ""
+  named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
     build_sql("WHEN (", x , ") THEN (", y, ") ")
@@ -85,7 +85,7 @@ sql_switch <- function(x, ...) {
   } else if (n_unnamed == 1) {
     clauses <- c(clauses, build_sql("ELSE ", input[!named], " "))
   } else {
-    stop("Can only have one unnamed (ELSE) input", call. = FALSE)
+    abort("Can only have one unnamed (ELSE) input")
   }
 
   build_sql("CASE ", x, " ", !!!clauses, "END")
@@ -98,7 +98,7 @@ sql_is_null <- function(x) {
 
 enpar <- function(x, tidy = TRUE, env = NULL) {
   if (!is_quosure(x)) {
-    abort("Internal error: `x` must be a quosure.")
+    abort("Internal error: `x` must be a quosure.") # nocov
   }
 
   if (tidy) {

@@ -8,6 +8,7 @@
 #' @name nycflights13
 NULL
 
+# nocov start
 #' @export
 #' @rdname nycflights13
 #' @param path location of SQLite database file
@@ -76,3 +77,4 @@ copy_nycflights13 <- function(con, ...) {
   }
   con
 }
+# nocov end
