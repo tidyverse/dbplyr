@@ -10,6 +10,9 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
+#' * `sql_random(con)` generates SQL to get a random number which can be used
+#'   to select random rows in `slice_sample()`.
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -105,6 +108,12 @@ dbplyr_sql_translation <- function(con) {
 #' @export
 sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_random <- function(con) {
+  UseMethod("sql_random")
 }
 
 

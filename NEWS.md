@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The generic `sql_random()` is now exported.
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 
