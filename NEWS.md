@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
+
 * The `values_fn` argument of `pivot_wider()` and the `values_transform()`
   argument of `pivot_longer()` can now be a formula (@mgirlich, #745).
 

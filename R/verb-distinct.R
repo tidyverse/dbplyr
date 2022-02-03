@@ -15,17 +15,20 @@
 #' db %>% distinct() %>% show_query()
 #' db %>% distinct(x) %>% show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
-  if (dots_n(...) > 0) {
-    if (.keep_all) {
-      abort(
-        "Can only find distinct value of specified columns if .keep_all is FALSE"
-      )
+  grps <- syms(op_grps(.data))
+  can_use_distinct <- !.keep_all || (dots_n(...) == 0 && is_empty(grps))
+  if (can_use_distinct) {
+    if (dots_n(...) > 0) {
+      .data <- transmute(.data, !!!grps, ...)
     }
 
-    .data <- transmute(.data, !!!syms(op_grps(.data)), ...)
+    return(add_op_single("distinct", .data, dots = list()))
   }
 
-  add_op_single("distinct", .data, dots = list())
+  .data %>%
+    group_by(..., .add = TRUE) %>%
+    filter(row_number() == 1L) %>%
+    group_by(!!!grps)
 }
 
 #' @export
