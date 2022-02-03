@@ -140,7 +140,7 @@ db_write_table.DBIConnection <- function(con, table, types, values, temporary = 
 dbi_quote <- function(x, con) UseMethod("dbi_quote")
 dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x))
+dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x)) # nocov
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   if (is.null(indexes)) {

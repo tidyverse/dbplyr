@@ -8,7 +8,7 @@ vignette: >
 ---
 
 
-There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; `vignette("translate-function")` describes how individual expressions within those verbs are translated.
+There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; `vignette("translation-function")` describes how individual expressions within those verbs are translated.
 
 All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
 
@@ -35,9 +35,6 @@ airports <- copy_to(con, nycflights13::airports)
       show_query()
     ```
     
-    (As you can see here, the generated SQL isn't always as minimal as you
-    might generate by hand.)
-    
 *  `filter()` generates a `WHERE` clause:
     
     ```{r}
@@ -59,7 +56,7 @@ airports <- copy_to(con, nycflights13::airports)
     ```{r}
     flights %>%
       group_by(month, day) %>%
-      summarise(delay = mean(dep_delay)) %>%
+      summarise(delay = mean(dep_delay, na.rm = TRUE)) %>%
       show_query()
     ```
 

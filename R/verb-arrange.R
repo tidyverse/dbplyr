@@ -34,6 +34,10 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
   names(dots) <- NULL
 
+  if (is_empty(dots)) {
+    return(.data)
+  }
+
   add_op_single(
     "arrange",
     .data,
@@ -44,7 +48,7 @@ arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
 
 #' @export
 op_sort.op_arrange <- function(op) {
-  c(op_sort(op$x), op$dots)
+  op$dots
 }
 
 #' @export

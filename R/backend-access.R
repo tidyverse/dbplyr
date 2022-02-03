@@ -1,7 +1,7 @@
 #' Backend: MS Access
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -41,15 +41,17 @@ sql_query_select.ACCESS <- function(con, select, from,
                               where = NULL,  group_by = NULL,
                               having = NULL, order_by = NULL,
                               limit = NULL,  distinct = FALSE, ...,
-                              subquery = FALSE) {
+                              subquery = FALSE,
+                              lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    lvl       = lvl
   )
 }
 
@@ -155,7 +157,7 @@ sql_translation.ACCESS <- function(con) {
 #' @export
 sql_table_analyze.ACCESS <- function(con, table, ...) {
   # Do nothing. Access doesn't support an analyze / update statistics function
-  NULL
+  NULL # nocov
 }
 
 # Util -------------------------------------------
@@ -167,8 +169,8 @@ sql_escape_logical.ACCESS <- function(con, x) {
   y[is.na(x)] <- "NULL"
   y
 }
-                   
-#' @export                   
+
+#' @export
 sql_escape_date.ACCESS <-  function(con, x) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
@@ -183,6 +185,6 @@ sql_escape_datetime.ACCESS <-  function(con, x) {
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
   y[is.na(x)] <- "NULL"
   y
-}                   
+}
 
 globalVariables(c("CStr", "iif", "isnull", "text"))

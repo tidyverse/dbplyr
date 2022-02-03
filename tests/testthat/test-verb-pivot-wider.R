@@ -57,7 +57,7 @@ test_that("error when overwriting existing column", {
     key = c("a", "b"),
     val = c(1, 2)
   )
-  expect_snapshot_error(
+  expect_snapshot(error = TRUE,
     tidyr::pivot_wider(df, names_from = key, values_from = val)
   )
 })
@@ -134,13 +134,49 @@ test_that("can override default keys", {
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
+  # translate `sum(x)` to be sure to not get a warning in the snapshot afterwards
+  suppressWarnings(translate_sql(sum(x)))
   expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
+})
+
+test_that("values_fn can be a formula", {
+  df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
+
+  expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = ~ sum(.x, na.rm = TRUE)))
+})
+
+test_that("values_fn can be a named list", {
+  df <- lazy_frame(
+    key = c("x", "x"),
+    a = c(1, 2),
+    b = c(3, 4)
+  )
+
+  spec <- tibble(
+    .name = c("a_x", "b_x"),
+    .value = c("a", "b"),
+    key = "x"
+  )
+
+  dbplyr_pivot_wider_spec(
+    df, spec,
+    values_fn = list(a = sum, b = ~ sum(.x, na.rm = TRUE))
+  )
+
+  # must specify `values_fn` for every column
+  expect_snapshot_error(
+    dbplyr_pivot_wider_spec(df, spec, values_fn = list(a = sum))
+  )
+  # no function must be `NULL`
+  expect_snapshot_error(
+    dbplyr_pivot_wider_spec(df, spec, values_fn = list(a = sum, b = NULL))
+  )
 })
 
 test_that("values_fn cannot be NULL", {
   df <- lazy_frame(a = 1, key = "x", val = 1)
 
-  expect_snapshot_error(dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
+  expect_snapshot(error = TRUE, dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
 })
 
 # can fill missing cells --------------------------------------------------
@@ -170,9 +206,23 @@ test_that("can fill in missing cells", {
 
 test_that("values_fill only affects missing cells", {
   df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
+  dbplyr_build_wider_spec(df)
   out <- tidyr::pivot_wider(df, values_fill = 0) %>%
     collect()
   expect_equal(out$y, c(0, NA))
+})
+
+test_that("values_fill is checked", {
+  lf <- lazy_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
+  spec <- tibble(
+    .name = c("x", "y"),
+    .value = "value",
+    name = .name
+  )
+  expect_snapshot(
+    error = TRUE,
+    dbplyr_pivot_wider_spec(lf, spec, values_fill = 1:2)
+  )
 })
 
 # multiple values ----------------------------------------------------------
@@ -208,5 +258,25 @@ test_that("column order in output matches spec", {
 })
 
 test_that("cannot pivot lazy frames", {
-  expect_snapshot_error(tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
+  expect_snapshot(error = TRUE, tidyr::pivot_wider(lazy_frame(name = "x", value = 1)))
+})
+
+# multiple names ----------------------------------------------------------
+
+test_that("can pivot multiple from multiple names", {
+  x <- tibble(
+    seq = c(1, 1, 2, 2),
+    name = rep(c("id", "name"), 2),
+    value = c("01", "curie", "02", "arrhenius")
+  )
+
+  expect_equal(
+    memdb_frame(x) %>%
+      tidyr::pivot_wider(
+        names_from = c(name, seq),
+        values_from = value
+      ) %>%
+      collect(),
+    tibble(id_1 = "01", name_1 = "curie", id_2 = "02", name_2 = "arrhenius")
+  )
 })

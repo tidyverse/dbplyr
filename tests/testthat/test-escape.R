@@ -90,6 +90,12 @@ test_that("raw is SQL-99 compatible (by default)", {
   expect_equal(escape(blob::as_blob(as.raw(c(0x00, 0xff))), con = con), sql("X'00ff'"))
 })
 
+# Factor ------------------------------------------------------------------
+
+test_that("factors are translated", {
+  con <- simulate_dbi()
+  expect_equal(escape(factor(c("a", "b")), con = con), sql("('a', 'b')"))
+})
 
 # Helpful errors --------------------------------------------------------
 
@@ -98,8 +104,17 @@ test_that("shiny objects give useful errors", {
   input <- structure(list(), class = "reactivevalues")
   x <- structure(function() "y", class = "reactive")
 
-  expect_snapshot_error(lf %>% filter(mpg == input$x) %>% show_query())
-  expect_snapshot_error(lf %>% filter(mpg == x()) %>% show_query())
+  expect_snapshot(error = TRUE, lf %>% filter(a == input$x) %>% show_query())
+  expect_snapshot(error = TRUE, lf %>% filter(a == x()) %>% show_query())
+})
+
+test_that("con must not be NULL", {
+  expect_snapshot(error = TRUE, escape("a"))
+  expect_snapshot(error = TRUE, sql_vector("a"))
+})
+
+test_that("data frames give useful errors", {
+  expect_snapshot(error = TRUE, escape(mtcars, con = simulate_dbi()))
 })
 
 # names_to_as() -----------------------------------------------------------

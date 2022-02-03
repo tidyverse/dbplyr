@@ -34,23 +34,16 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    stop("`.drop` is not supported with database backends", call. = FALSE)
+    abort("`.drop` is not supported with database backends")
   }
 
-  if (length(dots) == 0) {
-    if (.add) {
-      return(.data)
-    } else {
-      return(dplyr::ungroup(.data))
-    }
-  }
-
-  if (".add" %in% names(formals("group_by"))) {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
-  } else {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, add = .add)
-  }
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
+
+  same_groups <- setequal(groups$group_names, group_vars(.data))
+  if (same_groups) {
+    return(groups$data)
+  }
 
   add_op_single("group_by",
     groups$data,
@@ -66,11 +59,7 @@ op_desc.op_group_by <- function(x, ...) {
 
 #' @export
 op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
-  }
+  names(op$dots)
 }
 
 #' @export
@@ -83,15 +72,12 @@ sql_build.op_group_by <- function(op, con, ...) {
 #' @importFrom dplyr ungroup
 #' @export
 ungroup.tbl_lazy <- function(x, ...) {
-  add_op_single("ungroup", x)
-}
-
-#' @export
-op_grps.op_ungroup <- function(op) {
-  character()
-}
-
-#' @export
-sql_build.op_ungroup <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  if (missing(...)) {
+    group_by(x)
+  } else {
+    old_groups <- group_vars(x)
+    to_remove <- tidyselect::vars_select(op_vars(x), ...)
+    new_groups <- setdiff(old_groups, to_remove)
+    group_by(x, !!!syms(new_groups))
+  }
 }

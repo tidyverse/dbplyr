@@ -1,7 +1,7 @@
 #' Backend: Teradata
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -36,15 +36,17 @@ sql_query_select.Teradata <- function(con, select, from, where = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
                                              ...,
-                                             subquery = FALSE) {
+                                             subquery = FALSE,
+                                             lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    lvl       = lvl
   )
 }
 
@@ -78,9 +80,8 @@ sql_translation.Teradata <- function(con) {
                         sql_expr(SUBSTR(!!x, !!start, !!len))
                       },
       paste         =  function(...) {
-                        stop(
-                          "`paste()`` is not supported in this SQL variant, try `paste0()` instead",
-                          call. = FALSE
+                        abort(
+                          "`paste()`` is not supported in this SQL variant, try `paste0()` instead"
                         )
                       }
     ),

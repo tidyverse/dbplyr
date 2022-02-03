@@ -44,7 +44,8 @@
     Code
       db <- lazy_frame(g = 1, x = 2)
       db %>% count(g, name = "g")
-    Error <rlang_error>
-      'g' already present in output
+    Condition
+      Error in `tally()`:
+      ! 'g' already present in output
       i Use `name = "new_name"` to pick a new name.
 

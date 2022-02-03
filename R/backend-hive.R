@@ -1,7 +1,7 @@
 #' Backend: Hive
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are a scattering of custom translations provided by users.
 #'
@@ -66,6 +66,11 @@ sql_table_analyze.Hive <- function(con, table, ...) {
     "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",
     con = con
   )
+}
+
+#' @export
+last_value_sql.Hive <- function(con, x) {
+  translate_sql(last_value(!!x, TRUE), con = con)
 }
 
 globalVariables("regexp_replace")

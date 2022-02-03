@@ -1,3 +1,11 @@
+# custom lubridate functions translated correctly
+
+    Code
+      translate_sql(month(x, label = TRUE, abbr = TRUE))
+    Condition
+      Error in `month()`:
+      ! `abbr` is not supported in SQL Server translation
+
 # convert between bit and boolean as needed
 
     Code
@@ -6,7 +14,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (((`x`) IS NULL))
+      WHERE ((`x` IS NULL))
 
 ---
 
@@ -16,7 +24,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (NOT(((`x`) IS NULL)))
+      WHERE (NOT((`x` IS NULL)))
 
 ---
 
@@ -43,9 +51,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `x`, CASE
-      WHEN (`x` = 1) THEN (1)
-      END AS `z`
+      SELECT `x`, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -54,7 +60,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT `x`, CAST(IIF(~((`x`) IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT `x`, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -96,22 +102,25 @@
 # handles ORDER BY in subqueries
 
     Code
-      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
-    Warning <warning>
+      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
+      subquery = TRUE)
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
-      <SQL> SELECT 'x'
-      FROM 'y'
+      <SQL> SELECT `x`
+      FROM `y`
 
 # custom limit translation
 
     Code
-      sql_query_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
+      sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"),
+      limit = 10)
     Output
-      <SQL> SELECT TOP 10 'x'
-      FROM 'y'
-      ORDER BY 'z'
+      <SQL> SELECT TOP 10 `x`
+      FROM `y`
+      ORDER BY `z`
 
 # custom escapes translated correctly
 
@@ -174,7 +183,9 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
 
 ---
 
@@ -182,5 +193,20 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> SELECT * INTO `schema`.`tbl` FROM (SELECT * FROM foo) AS temp
+      <SQL> SELECT * INTO `schema`.`tbl` FROM (
+        SELECT * FROM foo
+      ) AS temp
+
+---
+
+    Code
+      lf %>% slice_sample(x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        FROM `df`
+      ) `q01`
+      WHERE (`q01` <= 1)
 

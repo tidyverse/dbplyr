@@ -5,8 +5,10 @@ sql_quantile <- function(f,
   style <- match.arg(style)
   force(window)
 
-  function(x, probs) {
+  warned <- FALSE
+  function(x, probs, na.rm = FALSE) {
     check_probs(probs)
+    warned <<- check_na_rm(f, na.rm, warned)
 
     sql <- switch(style,
       infix = sql_call2(f, x, probs),
@@ -28,21 +30,18 @@ sql_quantile <- function(f,
 sql_median <- function(f,
                        style = c("infix", "ordered"),
                        window = FALSE) {
-
-  warned <- FALSE
   quantile <- sql_quantile(f, style = style, window = window)
   function(x, na.rm = FALSE) {
-    warned <<- check_na_rm("median", na.rm, warned)
-    quantile(x, 0.5)
+    quantile(x, 0.5, na.rm = na.rm)
   }
 }
 
 check_probs <- function(probs) {
   if (!is.numeric(probs)) {
-    stop("`probs` must be numeric", call. = FALSE)
+    abort("`probs` must be numeric")
   }
 
   if (length(probs) > 1) {
-    stop("SQL translation only supports single value for `probs`.", call. = FALSE)
+    abort("SQL translation only supports single value for `probs`.")
   }
 }

@@ -20,6 +20,12 @@ test_that("only disambiguates shared variables", {
   expect_snapshot(left_join(lf1, lf2, by = c("y" = "z")))
 })
 
+test_that("disambiguate variables that only differ in case", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(X = 1, y = 2)
+  expect_snapshot(left_join(lf1, lf2, by = "y"))
+})
+
 test_that("sql_on query doesn't change unexpectedly", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 3)
