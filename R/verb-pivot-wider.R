@@ -154,10 +154,16 @@ dbplyr_build_wider_spec <- function(data,
   # row_ids <- vec_unique(data[names_from])
   sim_data <- simulate_vars(data)
   names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
+  if (is_empty(names_from)) {
+    abort("`names_from` must select at least one column.")
+  }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
   values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
+  if (is_empty(values_from)) {
+    abort("`values_from` must select at least one column.")
+  }
   dummy_data <- vctrs::vec_cbind(
     distinct_data,
     !!!rlang::rep_named(values_from, list(TRUE)),
@@ -236,6 +242,7 @@ dbplyr_pivot_wider_spec <- function(data,
   ) %>%
     set_names(spec$.name)
 
+  key_vars <- setdiff(id_cols, non_id_cols)
   data_grouped <- group_by(data, !!!syms(key_vars), .add = TRUE)
 
   group_names <- group_vars(data_grouped)
@@ -311,6 +318,9 @@ resolve_fun <- function(x, var) {
     exec(.fn_expr, var)
   } else {
     fn_name <- find_fun(x)
+    if (is_null(fn_name)) {
+      abort("Can't convert to a function.")
+    }
     call2(fn_name, var)
   }
 }

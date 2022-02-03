@@ -122,3 +122,43 @@
       ! `dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.
       i Use `memdb_frame()` together with `show_query()` to see the SQL code.
 
+# `names_from` must be supplied if `name` isn't in `data` (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, values_from = val)))
+    Output
+      <error/vctrs_error_subscript_oob>
+      Error in `stop_subscript()`:
+      ! Can't subset columns that don't exist.
+      x Column `name` doesn't exist.
+
+# `values_from` must be supplied if `value` isn't in `data` (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = key)))
+    Output
+      <error/vctrs_error_subscript_oob>
+      Error in `stop_subscript()`:
+      ! Can't subset columns that don't exist.
+      x Column `value` doesn't exist.
+
+# `names_from` must identify at least 1 column (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = starts_with("foo"),
+      values_from = val)))
+    Output
+      <error/rlang_error>
+      Error in `dbplyr_build_wider_spec()`:
+      ! `names_from` must select at least one column.
+
+# `values_from` must identify at least 1 column (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = key, values_from = starts_with(
+        "foo"))))
+    Output
+      <error/rlang_error>
+      Error in `dbplyr_build_wider_spec()`:
+      ! `values_from` must select at least one column.
+
