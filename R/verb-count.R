@@ -29,9 +29,8 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 
 #' @rdname count.tbl_lazy
 #' @importFrom dplyr add_count
-#' @importFrom lifecycle deprecated
 #' @export
-add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = deprecated()) {
+add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
   if (!missing(.drop)) {
     abort("`.drop` argument not supported for lazy tables.")
   }
