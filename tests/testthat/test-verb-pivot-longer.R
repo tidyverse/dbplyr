@@ -84,6 +84,60 @@ test_that("can override default output column type", {
   )
 })
 
+test_that("`values_transform` works with single functions (#1284)", {
+  df <- memdb_frame(x_1 = 1L, y_1 = 2L)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = everything(),
+    names_to = c(".value", "set"),
+    names_sep = "_",
+    values_transform = as.character
+  ) %>%
+    collect()
+
+  expect_identical(res$x, "1")
+  expect_identical(res$y, "2")
+})
+
+test_that("`names_ptypes` and `names_transform`", {
+  df <- memdb_frame(`1x2` = 1)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1)
+  expect_identical(res$two, 2)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric,
+    names_ptypes = integer()
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1L)
+  expect_identical(res$two, 2L)
+})
+
+test_that("`values_transform` is validated", {
+  df <- memdb_frame(x = 1)
+
+  expect_snapshot({
+    (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
+    (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
+  })
+})
+
 test_that("can pivot to multiple measure cols", {
   df <- lazy_frame(x = "x", y = 1)
   sp <- tibble::tribble(
