@@ -78,7 +78,7 @@ pivot_longer.tbl_lazy <- function(data,
     abort("The `values_ptypes` argument is not supported for remote back-ends")
   }
 
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
 
   cols <- enquo(cols)
 
