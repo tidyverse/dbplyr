@@ -263,6 +263,57 @@ test_that("values_fn cannot be NULL", {
   expect_snapshot(error = TRUE, dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL))
 })
 
+
+# unused -------------------------------------------------------------------
+
+test_that("`unused_fn` can summarize unused columns (#990)", {
+  df <- memdb_frame(
+    id = c(1, 1, 2, 2),
+    unused1 = c(1, 2, 4, 3),
+    unused2 = c(11, 12, 14, 13),
+    name = c("a", "b", "a", "b"),
+    value = c(1, 2, 3, 4)
+  )
+
+  # By name
+  suppressWarnings(
+    res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = list(unused1 = max)) %>%
+      collect()
+  )
+  expect_named(res, c("id", "a", "b", "unused1"))
+  expect_identical(res$unused1, c(2, 4))
+
+  # Globally
+  suppressWarnings(
+    res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = min) %>%
+      collect()
+  )
+  expect_named(res, c("id", "a", "b", "unused1", "unused2"))
+  expect_identical(res$unused1, c(1, 3))
+  expect_identical(res$unused2, c(11, 13))
+})
+
+test_that("`unused_fn` works with anonymous functions", {
+  df <- memdb_frame(
+    id = c(1, 1, 2, 2),
+    unused = c(1, NA, 4, 3),
+    name = c("a", "b", "a", "b"),
+    value = c(1, 2, 3, 4)
+  )
+
+  res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = ~mean(.x, na.rm = TRUE)) %>%
+    collect()
+  expect_identical(res$unused, c(1, 3.5))
+})
+
+test_that("`unused_fn` is validated", {
+  df <- memdb_frame(id = 1, unused = 1, name = "a", value = 1)
+
+  expect_snapshot(
+    (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
+  )
+})
+
 # can fill missing cells --------------------------------------------------
 
 test_that("can fill in missing cells", {
@@ -394,4 +445,31 @@ test_that("`names_expand` does a cartesian expansion of `names_from` columns (#7
   df <- memdb_frame(name1 = c("a", "b"), name2 = c("c", "d"), value = c(1, 2))
   spec <- dbplyr_build_wider_spec(df, names_from = c(name1, name2), names_expand = TRUE)
   expect_identical(spec$.name, c("a_c", "a_d", "b_c", "b_d"))
+})
+
+
+# checks arguments --------------------------------------------------------
+
+test_that("`names_from` must be supplied if `name` isn't in `data` (#1240)", {
+  df <- memdb_frame(key = "x", val = 1)
+  expect_snapshot((expect_error(tidyr::pivot_wider(df, values_from = val))))
+})
+
+test_that("`values_from` must be supplied if `value` isn't in `data` (#1240)", {
+  df <- memdb_frame(key = "x", val = 1)
+  expect_snapshot((expect_error(tidyr::pivot_wider(df, names_from = key))))
+})
+
+test_that("`names_from` must identify at least 1 column (#1240)", {
+  df <- memdb_frame(key = "x", val = 1)
+  expect_snapshot(
+    (expect_error(tidyr::pivot_wider(df, names_from = starts_with("foo"), values_from = val)))
+  )
+})
+
+test_that("`values_from` must identify at least 1 column (#1240)", {
+  df <- memdb_frame(key = "x", val = 1)
+  expect_snapshot(
+    (expect_error(tidyr::pivot_wider(df, names_from = key, values_from = starts_with("foo"))))
+  )
 })

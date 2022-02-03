@@ -4,7 +4,7 @@
 \alias{pivot_wider.tbl_lazy}
 \title{Pivot data from long to wide}
 \usage{
-\method{pivot_wider}{tbl_lazy}(
+pivot_wider.tbl_lazy(
   data,
   id_cols = NULL,
   names_from = name,
@@ -18,6 +18,7 @@
   values_from = value,
   values_fill = NULL,
   values_fn = ~max(.x, na.rm = TRUE),
+  unused_fn = NULL,
   ...
 )
 }
@@ -71,6 +72,21 @@ sorted, identical to what \code{names_sort} would produce.}
 \item{values_fn}{A function, the default is \code{max()}, applied to the \code{value}
 in each cell in the output. In contrast to local data frames it must not be
 \code{NULL}.}
+
+\item{unused_fn}{Optionally, a function applied to summarize the values from
+the unused columns (i.e. columns not identified by \code{id_cols},
+\code{names_from}, or \code{values_from}).
+
+The default drops all unused columns from the result.
+
+This can be a named list if you want to apply different aggregations
+to different unused columns.
+
+\code{id_cols} must be supplied for \code{unused_fn} to be useful, since otherwise
+all unspecified columns will be considered \code{id_cols}.
+
+This is similar to grouping by the \code{id_cols} then summarizing the
+unused columns using \code{unused_fn}.}
 
 \item{...}{Unused; included for compatibility with generic.}
 }

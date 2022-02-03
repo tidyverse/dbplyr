@@ -67,6 +67,20 @@
 #' @param values_fn A function, the default is `max()`, applied to the `value`
 #' in each cell in the output. In contrast to local data frames it must not be
 #' `NULL`.
+#' @param unused_fn Optionally, a function applied to summarize the values from
+#'   the unused columns (i.e. columns not identified by `id_cols`,
+#'   `names_from`, or `values_from`).
+#'
+#'   The default drops all unused columns from the result.
+#'
+#'   This can be a named list if you want to apply different aggregations
+#'   to different unused columns.
+#'
+#'   `id_cols` must be supplied for `unused_fn` to be useful, since otherwise
+#'   all unspecified columns will be considered `id_cols`.
+#'
+#'   This is similar to grouping by the `id_cols` then summarizing the
+#'   unused columns using `unused_fn`.
 #' @param ... Unused; included for compatibility with generic.
 #'
 #' @examples
@@ -96,7 +110,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_from = value,
                                  values_fill = NULL,
                                  values_fn = ~ max(.x, na.rm = TRUE),
-                                 # unused_fn = NULL,
+                                 unused_fn = NULL,
                                  ...
                                  ) {
   rlang::check_dots_empty()
@@ -127,7 +141,8 @@ pivot_wider.tbl_lazy <- function(data,
     id_cols = !!id_cols,
     names_repair = names_repair,
     values_fill = values_fill,
-    values_fn = values_fn
+    values_fn = values_fn,
+    unused_fn = unused_fn
   )
 }
 
@@ -187,7 +202,8 @@ dbplyr_pivot_wider_spec <- function(data,
                                     names_repair = "check_unique",
                                     id_cols = NULL,
                                     values_fill = NULL,
-                                    values_fn = ~ max(.x, na.rm = TRUE)) {
+                                    values_fn = ~ max(.x, na.rm = TRUE),
+                                    unused_fn = NULL) {
   input <- data
 
   spec <- tidyr::check_pivot_spec(spec)
@@ -221,24 +237,7 @@ dbplyr_pivot_wider_spec <- function(data,
 
   pivot_exprs <- purrr::map(
     vctrs::vec_seq_along(spec),
-    function(row) {
-      values_col <- spec[[".value"]][row]
-      fill_value <- values_fill[[values_col]]
-
-      keys <- vctrs::vec_slice(spec[, -(1:2)], row)
-      keys_cond <- purrr::imap(
-        keys,
-        function(value, name) {
-          expr(!!sym(name) == !!value)
-        }
-      ) %>%
-        purrr::reduce(~ expr(!!.x & !!.y))
-
-      case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
-
-      agg_fn <- values_fn[[values_col]]
-      resolve_fun(agg_fn, case_expr)
-    }
+    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn)
   ) %>%
     set_names(spec$.name)
 
@@ -254,8 +253,16 @@ dbplyr_pivot_wider_spec <- function(data,
   }
   pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
 
+  unused_cols <- setdiff(colnames(data), c(id_cols, non_id_cols))
+  unused_fn <- check_list_of_functions(unused_fn, unused_cols, "unused_fn")
+  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y)))
+
   data_grouped %>%
-    summarise(!!!pivot_exprs, .groups = "drop") %>%
+    summarise(
+      !!!pivot_exprs,
+      !!!unused_col_expr,
+      .groups = "drop"
+    ) %>%
     group_by(!!!syms(group_vars(data)))
 }
 
@@ -279,6 +286,25 @@ build_wider_id_cols_expr <- function(data,
   )
 
   expr(c(!!!out))
+}
+
+build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn) {
+  values_col <- spec[[".value"]][row_id]
+  fill_value <- values_fill[[values_col]]
+
+  keys <- vctrs::vec_slice(spec[, -(1:2)], row_id)
+  keys_cond <- purrr::imap(
+    keys,
+    function(value, name) {
+      expr(!!sym(name) == !!value)
+    }
+  ) %>%
+    purrr::reduce(~ expr(!!.x & !!.y))
+
+  case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
+
+  agg_fn <- values_fn[[values_col]]
+  resolve_fun(agg_fn, case_expr)
 }
 
 select_wider_id_cols <- function(data,

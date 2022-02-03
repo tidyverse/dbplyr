@@ -75,6 +75,15 @@
       Error in `dbplyr_pivot_wider_spec()`:
       ! `values_fn` must specify a function for each col in `values_from`
 
+# `unused_fn` is validated
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
+    Output
+      <error/rlang_error>
+      Error in `resolve_fun()`:
+      ! Can't convert to a function.
+
 # can fill in missing cells
 
     Code
