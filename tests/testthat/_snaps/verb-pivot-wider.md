@@ -47,7 +47,7 @@
 # values_fn can be a formula
 
     Code
-      dbplyr_pivot_wider_spec(df, spec1, values_fn = ~sum(.x, na.rm = TRUE))
+      dbplyr_pivot_wider_spec(df, spec1, values_fn = ~ sum(.x, na.rm = TRUE))
     Output
       <SQL>
       SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
