@@ -147,7 +147,7 @@ dbplyr_pivot_wider_spec <- function(data,
                                     id_cols = NULL,
                                     values_fill = NULL,
                                     values_fn = ~ max(.x, na.rm = TRUE)) {
-  spec <- check_spec(spec)
+  spec <- check_pivot_spec(spec)
 
   if (is_scalar(values_fill)) {
     values_fill <- rep_named(unique(spec$.value), list(values_fill))

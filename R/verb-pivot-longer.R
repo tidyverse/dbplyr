@@ -81,7 +81,6 @@ pivot_longer.tbl_lazy <- function(data,
   rlang::check_dots_empty()
 
   cols <- enquo(cols)
-
   spec <- tidyr::build_longer_spec(simulate_vars(data), !!cols,
     names_to = names_to,
     values_to = values_to,
@@ -104,7 +103,7 @@ dbplyr_pivot_longer_spec <- function(data,
                                      names_repair = "check_unique",
                                      values_drop_na = FALSE,
                                      values_transform = NULL) {
-  spec <- check_spec(spec)
+  spec <- tidyr::check_pivot_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column
   spec <- deduplicate_spec(spec, data)
@@ -213,29 +212,8 @@ apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
 }
 
 # The following is copy-pasted from `tidyr`
-# `check_spec()` can be removed once it is exported by `tidyr`
-# see https://github.com/tidyverse/tidyr/issues/1087
 
 # nocov start
-check_spec <- function(spec) {
-  # COPIED FROM tidyr
-
-  # Eventually should just be vec_assert() on partial_frame()
-  # Waiting for https://github.com/r-lib/vctrs/issues/198
-
-  if (!is.data.frame(spec)) {
-    abort("`spec` must be a data frame")
-  }
-
-  if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
-    abort("`spec` must have `.name` and `.value` columns")
-  }
-
-  # Ensure .name and .value come first
-  vars <- union(c(".name", ".value"), names(spec))
-  spec[vars]
-}
-
 # Ensure that there's a one-to-one match from spec to data by adding
 # a special .seq variable which is automatically removed after pivotting.
 deduplicate_spec <- function(spec, df) {
