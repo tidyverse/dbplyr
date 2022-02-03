@@ -4,7 +4,7 @@
 \alias{replace_na.tbl_lazy}
 \title{Replace NAs with specified values}
 \usage{
-replace_na.tbl_lazy(data, replace = list(), ...)
+\method{replace_na}{tbl_lazy}(data, replace = list(), ...)
 }
 \arguments{
 \item{data}{A pair of lazy data frame backed by database queries.}
