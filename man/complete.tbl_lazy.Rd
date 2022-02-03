@@ -4,7 +4,7 @@
 \alias{complete.tbl_lazy}
 \title{Complete a SQL table with missing combinations of data}
 \usage{
-\method{complete}{tbl_lazy}(data, ..., fill = list())
+complete.tbl_lazy(data, ..., fill = list())
 }
 \arguments{
 \item{data}{A lazy data frame backed by a database query.}
