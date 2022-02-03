@@ -140,6 +140,7 @@ test_that("window_frame()", {
 })
 
 test_that("window_frame() checks arguments", {
+  skip_if(getRversion() <= '3.5.0', "R too old")
   lf <- lazy_frame(x = runif(10), y = 1:10)
 
   expect_snapshot(error = TRUE, window_frame(lf, "a"))
