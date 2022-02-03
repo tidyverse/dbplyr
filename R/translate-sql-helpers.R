@@ -181,9 +181,8 @@ sql_prefix <- function(f, n = NULL) {
   function(...) {
     args <- list(...)
     if (!is.null(n) && length(args) != n) {
-      stop(
-        "Invalid number of args to SQL ", f, ". Expecting ", n,
-        call. = FALSE
+      abort(
+        paste0("Invalid number of args to SQL ", f, ". Expecting ", n)
       )
     }
     if (any(names2(args) != "")) {
@@ -231,9 +230,8 @@ sql_aggregate_win <- function(f) {
   force(f)
 
   function(...) {
-    stop(
-      "`", f, "()` is only available in a windowed (`mutate()`) context",
-      call. = FALSE
+    abort(
+      paste0("`", f, "()` is only available in a windowed (`mutate()`) context"),
     )
   }
 }
@@ -258,7 +256,7 @@ sql_not_supported <- function(f) {
   assert_that(is_string(f))
 
   function(...) {
-    stop(f, " is not available in this SQL variant", call. = FALSE)
+    abort(paste0(f, " is not available in this SQL variant"))
   }
 }
 

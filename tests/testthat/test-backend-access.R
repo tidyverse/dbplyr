@@ -17,6 +17,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(floor(x)),        sql("INT(`x`)"))
   expect_equal(translate_sql(ceiling(x)),      sql("INT(`x` + 0.9999999999)"))
   expect_equal(translate_sql(ceil(x)),         sql("INT(`x` + 0.9999999999)"))
+  expect_equal(translate_sql(x^y),             sql("`x` ^ `y`"))
   # String
   expect_equal(translate_sql(nchar(x)),        sql("LEN(`x`)"))
   expect_equal(translate_sql(tolower(x)),      sql("LCASE(`x`)"))
@@ -34,6 +35,8 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(paste(x, y, sep = "+")), sql("`x` & '+' & `y`"))
   expect_equal(translate_sql(paste0(x, y)), sql("`x` & `y`"))
   expect_error(translate_sql(paste(x, collapse = "-")),"`collapse` not supported")
+  # Logic
+  expect_equal(translate_sql(ifelse(x, "true", "false")), sql("IIF(`x`, 'true', 'false')"))
 })
 
 test_that("custom aggregators translated correctly", {

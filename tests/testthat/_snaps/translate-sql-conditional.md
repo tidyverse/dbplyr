@@ -31,3 +31,19 @@
       ELSE 'be wrapped'
       END
 
+# conditionals check arguments
+
+    Code
+      translate_sql(case_when())
+    Condition
+      Error in `sql_case_when()`:
+      ! No cases provided
+
+---
+
+    Code
+      translate_sql(switch(x, 1L, 2L))
+    Condition
+      Error in `sql_switch()`:
+      ! Can only have one unnamed (ELSE) input
+

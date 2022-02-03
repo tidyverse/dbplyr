@@ -34,6 +34,11 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% filter(), lf)
 })
 
+test_that(".preserve is not supported", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_snapshot(error = TRUE, lf %>% filter(x == 1, .preserve = TRUE))
+})
+
 
 # SQL generation --------------------------------------------------------
 

@@ -2,7 +2,7 @@
 
     Code
       sql_build(left_join(lf1, lf2))
-    Message <message>
+    Message
       Joining, by = "x"
     Output
       <SQL JOIN (LEFT)>
@@ -17,7 +17,7 @@
 
     Code
       inner_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>
@@ -30,7 +30,7 @@
 
     Code
       left_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>
@@ -43,7 +43,7 @@
 
     Code
       right_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>
@@ -56,7 +56,7 @@
 
     Code
       full_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>
@@ -71,7 +71,7 @@
 
     Code
       left_join(lf1, lf2)
-    Message <message>
+    Message
       Joining, by = "x"
     Output
       <SQL>

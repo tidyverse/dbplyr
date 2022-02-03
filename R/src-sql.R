@@ -1,3 +1,5 @@
+# nocov start
+
 #' Create a "sql src" object
 #'
 #' Deprecated: please use directly use a `DBIConnection` object instead.
@@ -35,3 +37,4 @@ format.src_sql <- function(x, ...) {
     wrap("tbls: ", paste0(sort(src_tbls(x)), collapse = ", "))
   )
 }
+# nocov end

@@ -9,5 +9,8 @@ test_that("custom scalar & string functions translated correctly", {
 })
 
 test_that("generates custom sql", {
-  expect_snapshot(sql_table_analyze(simulate_hive(), in_schema("schema", "tbl")))
+  con <- simulate_hive()
+  expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
+
+  expect_snapshot(last_value_sql(con, ident("a")))
 })

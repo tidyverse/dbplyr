@@ -24,6 +24,15 @@ test_that("unnamed results bound together by row", {
   expect_equal_tbl(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 
+test_that("unnamed results must be data frames", {
+  mf <- memdb_frame(
+    g = c(1, 1, 2, 2),
+    x = c(3, 9, 4, 9)
+  ) %>% group_by(g)
+
+  expect_snapshot(error = TRUE, mf %>% do(nrow(.)))
+})
+
 test_that("Results respect select", {
   mf <- memdb_frame(
     g = c(1, 1, 2, 2),
@@ -52,3 +61,18 @@ test_that("results independent of chunk_size", {
   expect_equal(nrows(mf, 10), c(1, 2, 3))
 })
 
+test_that("named argument become list columns", {
+  mf <- memdb_frame(
+    g = rep(1:3, 1:3),
+    x = 1:6
+  ) %>% group_by(g)
+
+  # mix named and unnamed
+  expect_snapshot(error = TRUE, mf %>% do(nrow = nrow(.), ncol(.)))
+
+  # multiple unnamed
+  expect_snapshot(error = TRUE, mf %>% do(nrow(.), ncol(.)))
+
+  # old syntax
+  expect_snapshot(error = TRUE, mf %>% do(.f = nrow))
+})
