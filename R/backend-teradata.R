@@ -80,9 +80,8 @@ sql_translation.Teradata <- function(con) {
                         sql_expr(SUBSTR(!!x, !!start, !!len))
                       },
       paste         =  function(...) {
-                        stop(
-                          "`paste()`` is not supported in this SQL variant, try `paste0()` instead",
-                          call. = FALSE
+                        abort(
+                          "`paste()`` is not supported in this SQL variant, try `paste0()` instead"
                         )
                       }
     ),

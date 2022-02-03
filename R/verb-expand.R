@@ -109,10 +109,6 @@ extract_expand_dot_vars <- function(dot) {
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- tidyr::expand(data, ...)
 
-  if (is_empty(full)) {
-    return(data)
-  }
-
   full <- full_join(full, data, by = colnames(full))
   tidyr::replace_na(full, replace = fill)
 }

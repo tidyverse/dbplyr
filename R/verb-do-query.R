@@ -15,6 +15,7 @@ Query <- R6::R6Class("Query",
       private$.vars <- vars
     },
 
+    # nocov start
     print = function(...) {
       cat("<Query> ", self$sql, "\n", sep = "")
       print(self$con)
@@ -28,6 +29,7 @@ Query <- R6::R6Class("Query",
       res_warn_incomplete(res)
       out
     },
+    # nocov end
 
     fetch_paged = function(chunk_size = 1e4, callback) {
       qry <- dbSendQuery(self$con, self$sql)
@@ -41,6 +43,7 @@ Query <- R6::R6Class("Query",
       invisible(TRUE)
     },
 
+    # nocov start
     vars = function() {
       private$.vars
     },
@@ -48,5 +51,6 @@ Query <- R6::R6Class("Query",
     ncol = function() {
       length(self$vars())
     }
+    # nocov end
   )
 )

@@ -63,7 +63,7 @@ check_summarise_vars <- function(dots) {
         ),
         `i` = "You need an extra mutate() step to use it."
       )
-      abort(message)
+      abort(message, call = caller_env())
     }
   }
 }
@@ -77,13 +77,14 @@ check_groups <- function(.groups) {
     return()
   }
 
-  abort(c(
+  message <- c(
     paste0(
       "`.groups` can't be ", as_label(.groups),
       if (.groups == "rowwise") " in dbplyr"
     ),
     i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-  ))
+  )
+  abort(message, call = caller_env())
 }
 
 #' @export

@@ -193,13 +193,13 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
+            abort("`abbr` is not supported in SQL Server translation")          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
+          abort("`fiscal_start` is not supported in SQL Server translation. Must be 1.")
         }
 
         if (with_year) {
@@ -268,7 +268,7 @@ mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {
     attr(con, "version")
   } else {
-    numeric_version(DBI::dbGetInfo(con)$db.version)
+    numeric_version(DBI::dbGetInfo(con)$db.version) # nocov
   }
 }
 

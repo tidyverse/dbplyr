@@ -134,7 +134,7 @@ partial_eval_call <- function(call, vars, env) {
     if (is_namespaced_dplyr_call(fun)) {
       call[[1]] <- fun[[3]]
     } else if (is_tidy_pronoun(fun)) {
-      stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
+      abort("Use local() or remote() to force evaluation of functions")
     } else {
       return(eval_bare(call, env))
     }
