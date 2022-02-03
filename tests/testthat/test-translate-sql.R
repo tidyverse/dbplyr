@@ -66,6 +66,14 @@ test_that("magrittr pipe is translated", {
   expect_identical(translate_sql(1 %>% is.na()), translate_sql(is.na(1)))
 })
 
+test_that("vars is deprecated", {
+  expect_snapshot(error = TRUE, translate_sql(sin(x), vars = c("x", "y")))
+})
+
+test_that("user infix functions are translated", {
+  expect_equal(translate_sql(x %like% y), sql("`x` like `y`"))
+})
+
 # casts -------------------------------------------------------------------
 
 test_that("casts as expected", {
@@ -120,6 +128,8 @@ test_that("str_trim() translates correctly ", {
     translate_sql(str_trim(x, "both")),
     sql("LTRIM(RTRIM(`x`))")
   )
+  expect_equal(translate_sql(str_trim(x, "left")), sql("LTRIM(`x`)"))
+  expect_equal(translate_sql(str_trim(x, "right")), sql("RTRIM(`x`)"))
 })
 
 # subsetting --------------------------------------------------------------

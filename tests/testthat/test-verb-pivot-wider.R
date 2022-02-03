@@ -57,7 +57,7 @@ test_that("error when overwriting existing column", {
     key = c("a", "b"),
     val = c(1, 2)
   )
-  expect_snapshot(error = TRUE, 
+  expect_snapshot(error = TRUE,
     tidyr::pivot_wider(df, names_from = key, values_from = val)
   )
 })
@@ -170,9 +170,23 @@ test_that("can fill in missing cells", {
 
 test_that("values_fill only affects missing cells", {
   df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
+  dbplyr_build_wider_spec(df)
   out <- tidyr::pivot_wider(df, values_fill = 0) %>%
     collect()
   expect_equal(out$y, c(0, NA))
+})
+
+test_that("values_fill is checked", {
+  lf <- lazy_frame(g = c(1, 2), name = c("x", "y"), value = c(1, NA))
+  spec <- tibble(
+    .name = c("x", "y"),
+    .value = "value",
+    name = .name
+  )
+  expect_snapshot(
+    error = TRUE,
+    dbplyr_pivot_wider_spec(lf, spec, values_fill = 1:2)
+  )
 })
 
 # multiple values ----------------------------------------------------------

@@ -55,7 +55,7 @@ sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
-        sql_expr(IF(x, TRUE, FALSE))
+        sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
 
@@ -113,7 +113,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 #' @export
 sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   if (identical(type, "full")) {
-    stop("MySQL does not support full joins", call. = FALSE)
+    abort("MySQL does not support full joins")
   }
   NextMethod()
 }

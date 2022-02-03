@@ -34,7 +34,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    stop("`.drop` is not supported with database backends", call. = FALSE)
+    abort("`.drop` is not supported with database backends")
   }
 
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
@@ -59,11 +59,7 @@ op_desc.op_group_by <- function(x, ...) {
 
 #' @export
 op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
-  }
+  names(op$dots)
 }
 
 #' @export

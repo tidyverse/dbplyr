@@ -3,6 +3,6 @@
     Code
       mf %>% distinct(x, .keep_all = TRUE) %>% collect()
     Condition
-      Error:
+      Error in `distinct()`:
       ! Can only find distinct value of specified columns if .keep_all is FALSE
 

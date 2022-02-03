@@ -147,3 +147,11 @@
       * name -> name...4
       * value -> value...5
 
+# values_ptype is not supported
+
+    Code
+      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, values_ptypes = character())
+    Condition
+      Error in `tidyr::pivot_longer()`:
+      ! The `values_ptypes` argument is not supported for remote back-ends
+

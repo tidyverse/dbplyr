@@ -1,3 +1,11 @@
+# custom lubridate functions translated correctly
+
+    Code
+      translate_sql(month(x, label = TRUE, abbr = TRUE))
+    Condition
+      Error in `month()`:
+      ! `abbr` is not supported in SQL Server translation
+
 # convert between bit and boolean as needed
 
     Code

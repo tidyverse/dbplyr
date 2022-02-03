@@ -185,3 +185,11 @@ test_that("can repair names", {
     )
   )
 })
+
+test_that("values_ptype is not supported", {
+  expect_snapshot(
+    error = TRUE,
+    lazy_frame(x = 1:2, y = 3:4) %>%
+      tidyr::pivot_longer(x:y, values_ptypes = character())
+  )
+})
