@@ -23,7 +23,7 @@ test_that("distinct for single column equivalent to local unique (#1937)", {
 
 test_that("distinct throws error if column is specified and .keep_all is TRUE", {
   mf <- memdb_frame(x = 1:10)
-  expect_snapshot_error(mf %>% distinct(x, .keep_all = TRUE) %>% collect())
+  expect_snapshot(error = TRUE, mf %>% distinct(x, .keep_all = TRUE) %>% collect())
 })
 
 test_that("distinct doesn't duplicate colum names if grouped (#354)", {

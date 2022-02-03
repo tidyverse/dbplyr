@@ -205,6 +205,27 @@ test_that("extra args generates error", {
     "unused argument"
   )
 })
+
+test_that("suffix arg is checked", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  expect_snapshot(
+    error = TRUE,
+    inner_join(lf1, lf2, by = "x", suffix = "a")
+  )
+})
+
+test_that("copy = TRUE works", {
+  lf <- memdb_frame(x = 1, y = 2)
+  df <- tibble(x = 1, z = 3)
+
+  expect_equal(
+    inner_join(lf, df, by = "x", copy = TRUE) %>% collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {

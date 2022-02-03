@@ -41,7 +41,7 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
-  stop("tail() is not supported by sql sources", call. = FALSE)
+  abort("tail() is not supported by sql sources")
 }
 
 #' @export

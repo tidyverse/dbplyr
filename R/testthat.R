@@ -16,8 +16,8 @@ expect_equal_tbls <- function(results, ref = NULL, ...) {
   stopifnot(is.list(results))
 
   if (!is_named(results)) {
-    result_name <- expr_name(substitute(results))
-    names(results) <- paste0(result_name, "_", seq_along(results))
+    result_name <- expr_name(substitute(results)) # nocov
+    names(results) <- paste0(result_name, "_", seq_along(results)) # nocov
   }
 
   # If ref is NULL, use the first result

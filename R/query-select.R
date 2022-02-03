@@ -46,7 +46,7 @@ print.select_query <- function(x, ...) {
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
   if (length(x$group_by)) cat("Group by: ", named_commas(x$group_by), "\n", sep = "")
   if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
-  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "")
+  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "") # nocov
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
 }
 

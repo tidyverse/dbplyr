@@ -105,6 +105,21 @@
       SELECT 'x' AS `name`, CAST(`x` AS TEXT) AS `value`
       FROM `df`
 
+# `values_transform` is validated
+
+    Code
+      (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
+    Output
+      <error/rlang_error>
+      Error in `purrr::map()`:
+      ! Can't convert `.x[[i]]`, a number, to a function.
+    Code
+      (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
+    Output
+      <error/rlang_error>
+      Error in `check_list_of_functions()`:
+      ! All elements of `values_transform` must be named.
+
 # can pivot to multiple measure cols
 
     Code
@@ -150,10 +165,18 @@
 
     Code
       out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
-    Message <simpleMessage>
+    Message
       New names:
       * name -> name...2
       * value -> value...3
       * name -> name...4
       * value -> value...5
+
+# values_ptype is not supported
+
+    Code
+      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, values_ptypes = character())
+    Condition
+      Error in `tidyr::pivot_longer()`:
+      ! The `values_ptypes` argument is not supported for remote back-ends
 
