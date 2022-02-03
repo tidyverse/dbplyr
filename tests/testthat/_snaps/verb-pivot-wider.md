@@ -38,6 +38,11 @@
 
     Code
       dbplyr_pivot_wider_spec(df, spec1, values_fn = sum)
+    Condition
+      Warning:
+      Missing values are always removed in SQL.
+      Use `SUM(x, na.rm = TRUE)` to silence this warning
+      This warning is displayed only once per session.
     Output
       <SQL>
       SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
@@ -60,7 +65,7 @@
 
 ---
 
-    `values_fn` must specify a function for each col in `values_from`
+    Can't convert to a function.
 
 # values_fn cannot be NULL
 
@@ -68,8 +73,7 @@
       dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL)
     Condition
       Error in `dbplyr_pivot_wider_spec()`:
-      ! `values_fn` must not be NULL
-      i `values_fn` must be a function or a named list of functions
+      ! `values_fn` must specify a function for each col in `values_from`
 
 # can fill in missing cells
 

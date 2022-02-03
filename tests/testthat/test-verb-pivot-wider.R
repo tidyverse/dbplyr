@@ -128,14 +128,66 @@ test_that("can override default keys", {
   )
 })
 
+test_that("`id_cols = everything()` excludes `names_from` and `values_from`", {
+  df <- memdb_frame(key = "x", name = "a", value = 1L)
+
+  expect_identical(
+    tidyr::pivot_wider(df, id_cols = everything()) %>% collect(),
+    tibble(key = "x", a = 1L)
+  )
+
+  spec <- dbplyr_build_wider_spec(df)
+
+  expect_identical(
+    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) %>% collect(),
+    tibble(key = "x", a = 1L)
+  )
+})
+
+test_that("pivoting a zero row data frame drops `names_from` and `values_from` (#1249)", {
+  df <- memdb_frame(key = character(), name = character(), value = integer())
+
+  expect_identical(
+    tidyr::pivot_wider(df, names_from = name, values_from = value) %>% collect(),
+    tibble(key = character())
+  )
+})
+
+test_that("known bug - building a wider spec with a zero row data frame loses `values_from` info (#1249)", {
+  # We can't currently change this behavior in `pivot_wider_spec()`,
+  # for fear of breaking backwards compatibility
+
+  df <- memdb_frame(key = character(), name = character(), value = integer())
+
+  # Building the spec loses the fact that `value` was specified as `values_from`,
+  # which would normally be in the `spec$.value` column
+  spec <- dbplyr_build_wider_spec(df, names_from = name, values_from = value)
+
+  # So pivoting with this spec accidentally keeps `value` around
+  expect_identical(
+    dbplyr_pivot_wider_spec(df, spec) %>% collect(),
+    tibble(key = character(), value = integer())
+  )
+
+  # If you specify `id_cols` to be the `key` column, it works right
+  expect_identical(
+    dbplyr_pivot_wider_spec(df, spec, id_cols = key) %>% collect(),
+    tibble(key = character())
+  )
+
+  # But `id_cols = everything()` won't work as intended, because we can't know
+  # to remove `value` from `names(data)` before computing the tidy-selection
+  expect_identical(
+    dbplyr_pivot_wider_spec(df, spec, id_cols = everything()) %>% collect(),
+    tibble(key = character(), value = integer())
+  )
+})
 
 # non-unqiue keys ---------------------------------------------------------
 
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))
 
-  # translate `sum(x)` to be sure to not get a warning in the snapshot afterwards
-  suppressWarnings(translate_sql(sum(x)))
   expect_snapshot(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
 })
 

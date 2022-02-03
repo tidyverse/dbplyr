@@ -120,7 +120,11 @@ pivot_wider.tbl_lazy <- function(data,
     names_from = !!names_from,
     values_from = !!values_from
   )
-  dbplyr_pivot_wider_spec(data, spec, !!id_cols,
+
+  dbplyr_pivot_wider_spec(
+    data = data,
+    spec = spec,
+    id_cols = !!id_cols,
     names_repair = names_repair,
     values_fill = values_fill,
     values_fn = values_fn
@@ -178,45 +182,37 @@ dbplyr_pivot_wider_spec <- function(data,
                                     id_cols = NULL,
                                     values_fill = NULL,
                                     values_fn = ~ max(.x, na.rm = TRUE)) {
-  spec <- check_pivot_spec(spec)
+  input <- data
 
-  if (is_scalar(values_fill)) {
-    values_fill <- rep_named(unique(spec$.value), list(values_fill))
+  spec <- tidyr::check_pivot_spec(spec)
+
+  names_from_cols <- names(spec)[-(1:2)]
+  values_from_cols <- vctrs::vec_unique(spec$.value)
+  non_id_cols <- c(names_from_cols, values_from_cols)
+
+  id_cols <- select_wider_id_cols(
+    data = data,
+    id_cols = {{id_cols}},
+    non_id_cols = non_id_cols
+  )
+
+  if (is.null(values_fill)) {
+    values_fill <- list()
   }
-  if (!is.null(values_fill) && !is.list(values_fill)) {
+  if (is_scalar(values_fill)) {
+    values_fill <- rep_named(values_from_cols, list(values_fill))
+  }
+  if (!vctrs::vec_is_list(values_fill)) {
     abort("`values_fill` must be NULL, a scalar, or a named list")
   }
+  values_fill <- values_fill[intersect(names(values_fill), values_from_cols)]
 
-  values <- vctrs::vec_unique(spec$.value)
-  spec_cols <- c(names(spec)[-(1:2)], values)
-
-  if (is.null(values_fn)) {
-    abort(c(
-      "`values_fn` must not be NULL",
-      i = "`values_fn` must be a function or a named list of functions"
-    ))
-  }
-
-  if (!vctrs::vec_is_list(values_fn)) {
-    values_fn <- rep_named(values, list(values_fn))
-  }
-
-  values_fn <- purrr::compact(values_fn)
-  missing_values <- setdiff(values, names(values_fn))
+  values_fn <- check_list_of_functions(values_fn, values_from_cols, "values_fn")
+  missing_values <- setdiff(values_from_cols, names(values_fn))
   if (!is_empty(missing_values)) {
     abort("`values_fn` must specify a function for each col in `values_from`")
   }
 
-  id_cols <- enquo(id_cols)
-  if (!quo_is_null(id_cols)) {
-    cn <- set_names(colnames(data))
-    key_vars <- names(tidyselect::eval_select(enquo(id_cols), cn))
-  } else {
-    key_vars <- tbl_vars(data)
-  }
-  key_vars <- setdiff(key_vars, spec_cols)
-
-  key_cols <- syms(names(spec)[-(1:2)])
   pivot_exprs <- purrr::map(
     vctrs::vec_seq_along(spec),
     function(row) {
