@@ -53,3 +53,18 @@ test_that("unary minus works with expressions", {
   expect_equal(translate_sql(-!!expr(x+2)), sql("-(`x` + 2.0)"))
   expect_equal(translate_sql(--x), sql("-(-`x`)"))
 })
+
+test_that("pad = FALSE works", {
+  local_con(simulate_dbi())
+  subset <- sql_infix(".", pad = FALSE)
+
+  expect_equal(subset(ident("df"), ident("x")), sql("`df`.`x`"))
+})
+
+test_that("sql_prefix checks arguments", {
+  local_con(simulate_dbi())
+  sin_db <- sql_prefix("SIN", 1)
+
+  expect_snapshot(error = TRUE, sin_db(sin(1, 2)))
+  expect_snapshot(error = TRUE, sin_db(sin(a = 1)))
+})
