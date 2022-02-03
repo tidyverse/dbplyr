@@ -28,12 +28,10 @@ test_that("can generate sql tbls with raw sql", {
 })
 
 test_that("sql tbl can be printed", {
-  con <- src_memdb()$con
-  tbl <- DBI::dbListTables(con)[[1]]
+  mf1 <- memdb_frame(x = 1:3, y = 3:1)
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x, con = simulate_dbi()))
 
-  mf <- tbl(src_memdb()$con, build_sql("SELECT * FROM ", ident(tbl), con = con))
-
-  expect_snapshot(mf)
+  expect_snapshot(mf2)
 })
 
 test_that("can refer to default schema explicitly", {
