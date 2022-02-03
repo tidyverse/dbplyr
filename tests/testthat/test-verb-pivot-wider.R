@@ -281,6 +281,31 @@ test_that("can pivot multiple from multiple names", {
   )
 })
 
+
+# pass through arguments --------------------------------------------------
+
+test_that("can vary `names_from` values slowest (#839)", {
+  df <- memdb_frame(
+    name = c("name1", "name2"),
+    value1 = c(1, 2),
+    value2 = c(4, 5)
+  )
+
+  spec <- dbplyr_build_wider_spec(df, names_from = name, values_from = c(value1, value2))
+
+  expect_identical(
+    spec$.name,
+    c("value1_name1", "value1_name2", "value2_name1", "value2_name2")
+  )
+
+  spec <- dbplyr_build_wider_spec(df, names_from = name, values_from = c(value1, value2), names_vary = "slowest")
+
+  expect_identical(
+    spec$.name,
+    c("value1_name1", "value2_name1", "value1_name2", "value2_name2")
+  )
+})
+
 test_that("`names_expand` does a cartesian expansion of `names_from` columns (#770)", {
   df <- memdb_frame(name1 = c("a", "b"), name2 = c("c", "d"), value = c(1, 2))
   spec <- dbplyr_build_wider_spec(df, names_from = c(name1, name2), names_expand = TRUE)

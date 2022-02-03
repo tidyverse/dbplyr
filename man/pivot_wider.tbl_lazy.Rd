@@ -12,6 +12,7 @@
   names_sep = "_",
   names_glue = NULL,
   names_sort = FALSE,
+  names_vary = "fastest",
   names_expand = FALSE,
   names_repair = "check_unique",
   values_from = value,
@@ -45,6 +46,16 @@ a glue specification that uses the \code{names_from} columns (and special
 
 \item{names_sort}{Should the column names be sorted? If \code{FALSE}, the default,
 column names are ordered by first appearance.}
+
+\item{names_vary}{When \code{names_from} identifies a column (or columns) with
+multiple unique values, and multiple \code{values_from} columns are provided,
+in what order should the resulting column names be combined?
+\itemize{
+\item \code{"fastest"} varies \code{names_from} values fastest, resulting in a column
+naming scheme of the form: \verb{value1_name1, value1_name2, value2_name1, value2_name2}. This is the default.
+\item \code{"slowest"} varies \code{names_from} values slowest, resulting in a column
+naming scheme of the form: \verb{value1_name1, value2_name1, value1_name2, value2_name2}.
+}}
 
 \item{names_expand}{Should the values in the \code{names_from} columns be expanded
 by \code{\link[=expand]{expand()}} before pivoting? This results in more columns, the output

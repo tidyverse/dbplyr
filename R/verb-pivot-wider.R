@@ -45,7 +45,23 @@
 #'   `.value`) to create custom column names.
 #' @param names_sort Should the column names be sorted? If `FALSE`, the default,
 #'   column names are ordered by first appearance.
+#' @param names_vary When `names_from` identifies a column (or columns) with
+#'   multiple unique values, and multiple `values_from` columns are provided,
+#'   in what order should the resulting column names be combined?
+#'
+#'   - `"fastest"` varies `names_from` values fastest, resulting in a column
+#'     naming scheme of the form: `value1_name1, value1_name2, value2_name1,
+#'     value2_name2`. This is the default.
+#'
+#'   - `"slowest"` varies `names_from` values slowest, resulting in a column
+#'     naming scheme of the form: `value1_name1, value2_name1, value1_name2,
+#'     value2_name2`.
 #' @param names_repair What happens if the output has invalid column names?
+#' @param names_expand Should the values in the `names_from` columns be expanded
+#'   by [expand()] before pivoting? This results in more columns, the output
+#'   will contain column names corresponding to a complete expansion of all
+#'   possible values in `names_from`. Additionally, the column names will be
+#'   sorted, identical to what `names_sort` would produce.
 #' @param values_fill Optionally, a (scalar) value that specifies what each
 #'   `value` should be filled in with when missing.
 #' @param values_fn A function, the default is `max()`, applied to the `value`
@@ -68,16 +84,19 @@
 #' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
+                                 # id_expand = FALSE,
                                  names_from = name,
                                  names_prefix = "",
                                  names_sep = "_",
                                  names_glue = NULL,
                                  names_sort = FALSE,
+                                 names_vary = "fastest",
                                  names_expand = FALSE,
                                  names_repair = "check_unique",
                                  values_from = value,
                                  values_fill = NULL,
                                  values_fn = ~ max(.x, na.rm = TRUE),
+                                 # unused_fn = NULL,
                                  ...
                                  ) {
   rlang::check_dots_empty()
@@ -91,6 +110,7 @@ pivot_wider.tbl_lazy <- function(data,
     names_sep = names_sep,
     names_glue = names_glue,
     names_sort = names_sort,
+    names_vary = names_vary,
     names_expand = names_expand
   )
 
@@ -109,6 +129,7 @@ dbplyr_build_wider_spec <- function(data,
                                     names_sep = "_",
                                     names_glue = NULL,
                                     names_sort = FALSE,
+                                    names_vary = "fastest",
                                     names_expand = FALSE) {
   if (!inherits(data, "tbl_sql")) {
     error_message <- c(
@@ -141,6 +162,7 @@ dbplyr_build_wider_spec <- function(data,
     names_sep = names_sep,
     names_glue = names_glue,
     names_sort = names_sort,
+    names_vary = names_vary,
     names_expand = names_expand
   )
 }
