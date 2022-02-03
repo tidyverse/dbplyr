@@ -3,6 +3,10 @@
 * If the last statement of `case_when()` is of the form `TRUE ~ ...` the
   translation for SQLite now also uses `ELSE ...` (@mgirlich, #754).
 
+* `filter()` throws an error if you supply a named argument (@mgirlich, #764).
+
+* The generic `sql_random()` is now exported.
+
 * The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
   `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
 

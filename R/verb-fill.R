@@ -199,11 +199,6 @@ last_value_sql.DBIConnection <- function(con, x) {
 }
 
 #' @export
-last_value_sql.Hive <- function(con, x) {
-  translate_sql(last_value(!!x, TRUE), con = con)
-}
-
-#' @export
 `last_value_sql.Microsoft SQL Server` <- function(con, x) {
   build_sql("LAST_VALUE(", ident(as.character(x)), ") IGNORE NULLS", con = con)
 }
