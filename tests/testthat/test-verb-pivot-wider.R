@@ -62,6 +62,38 @@ test_that("error when overwriting existing column", {
   )
 })
 
+test_that("`names_repair` happens after spec column reorganization (#1107)", {
+  df <- memdb_frame(
+    test = c("a", "b"),
+    name = c("test", "test2"),
+    value = c(1, 2)
+  )
+
+  out <- tidyr::pivot_wider(df, names_repair = ~make.unique(.x)) %>%
+    collect()
+
+  expect_identical(out$test, c("a", "b"))
+  expect_identical(out$test.1, c(1, NA))
+  expect_identical(out$test2, c(NA, 2))
+})
+
+test_that("minimal `names_repair` doesn't overwrite a value column that collides with key column (#1107)", {
+  skip("`grouped_df()` needs a `name_repair` argument")
+  # `collect.tbl_sql()` does not work with duplicated names
+  df <- memdb_frame(
+    test = c("a", "b"),
+    name = c("test", "test2"),
+    value = c(1, 2)
+  )
+
+  out <- tidyr::pivot_wider(df, names_repair = "minimal") %>%
+    collect()
+
+  expect_identical(out[[1]], c("a", "b"))
+  expect_identical(out[[2]], c(1, NA))
+  expect_identical(out[[3]], c(NA, 2))
+})
+
 test_that("grouping is preserved", {
   df <- lazy_frame(a = 1, key = "x", val = 2)
 
