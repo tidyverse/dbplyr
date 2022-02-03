@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
+
 * `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
 
 * The `values_fn` argument of `pivot_wider()` and the `values_transform()`
