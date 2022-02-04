@@ -244,7 +244,11 @@ simulate_mssql <- function(version = "15.0") {
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()"),
-      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
+
+      # percentile_cont needs `OVER()` in mssql
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
     sql_translator(.parent = base_odbc_win,

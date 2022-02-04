@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix translation of `quantile()` for MS SQL (@mgirlich, #620).
+
 * `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
 
 * `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
