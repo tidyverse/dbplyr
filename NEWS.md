@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
+  the database, rather than locally (#197).
+
 * Fix translation of `quantile()` for MS SQL (@mgirlich, #620).
 
 * `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
