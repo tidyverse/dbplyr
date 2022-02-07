@@ -141,6 +141,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
     cols_to_fill,
     ~ translate_sql(
       cumsum(case_when(is.na(!!.x) ~ 0L, TRUE ~ 1L)),
+      con = .con,
       vars_order = translate_sql(!!!order_by_cols, con = .con),
       vars_group = op_grps(.data),
     )

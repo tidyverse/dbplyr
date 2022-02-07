@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The implementation of `dbplyr_fill0` for databases without support for IGNORE
+  NULLS now respects the database specific translation (@rsund, #753).
+
 * Fix translation of `quantile()` for MS SQL (@mgirlich, #620).
 
 * `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
