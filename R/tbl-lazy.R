@@ -53,7 +53,7 @@ print.tbl_lazy <- function(x, ...) {
 
 #' @export
 as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
-  stop("Can not coerce `tbl_lazy` to data.frame", call. = FALSE)
+  abort("Can not coerce `tbl_lazy` to data.frame")
 }
 
 #' @importFrom dplyr same_src
@@ -74,10 +74,12 @@ groups.tbl_lazy <- function(x) {
   lapply(group_vars(x), as.name)
 }
 
+# nocov start
 # Manually registered in zzz.R
 group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }
+# nocov end
 
 #' @importFrom dplyr group_vars
 #' @export

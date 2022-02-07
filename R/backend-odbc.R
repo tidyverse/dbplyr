@@ -64,6 +64,7 @@ base_odbc_win <- sql_translator(
   sd = win_aggregate("STDDEV_SAMP"),
 )
 
+# nocov start
 #' @export
 db_connection_describe.OdbcConnection <- function(con) {
   info <- DBI::dbGetInfo(con)
@@ -77,5 +78,6 @@ db_connection_describe.OdbcConnection <- function(con) {
     "/", info$dbname, "]"
   )
 }
+# nocov end
 
 utils::globalVariables("EXP")

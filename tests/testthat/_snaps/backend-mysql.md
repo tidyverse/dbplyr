@@ -26,6 +26,14 @@
 ---
 
     Code
+      full_join(lf, lf, by = "x")
+    Condition
+      Error in `sql_query_join()`:
+      ! MySQL does not support full joins
+
+---
+
+    Code
       slice_sample(lf, 5)
     Output
       <SQL>

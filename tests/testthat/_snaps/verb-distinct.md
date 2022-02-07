@@ -1,4 +1,16 @@
-# distinct throws error if column is specified and .keep_all is TRUE
+# distinct respects window_order when .keep_all is TRUE
 
-    Can only find distinct value of specified columns if .keep_all is FALSE
+    Code
+      lf %>% window_order(desc(y)) %>% distinct(x, .keep_all = TRUE)
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT
+          `x`,
+          `y`,
+          ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
+        FROM `df`
+      ) `q01`
+      WHERE (`q01` = 1)
 

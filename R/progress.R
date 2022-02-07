@@ -1,5 +1,5 @@
 # Copy in deprecated progress_estimated() from dplyr
-
+# nocov start
 progress_estimated <- function(n, min_time = 0) {
   Progress$new(n, min_time = min_time)
 }
@@ -111,3 +111,4 @@ show_time <- function(x) {
 }
 
 now <- function() proc.time()[[3]]
+# nocov end

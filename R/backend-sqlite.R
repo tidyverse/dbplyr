@@ -108,7 +108,7 @@ sql_translation.SQLiteConnection <- function(con) {
         median = win_absent("median")
       )
     } else {
-      base_no_win
+      base_no_win # nocov
     }
   )
 }

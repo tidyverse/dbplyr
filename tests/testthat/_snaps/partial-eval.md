@@ -68,7 +68,7 @@
 # across() translates formulas
 
     Code
-      lf %>% summarise(across(a:b, ~log(.x, 2)))
+      lf %>% summarise(across(a:b, ~ log(.x, 2)))
     Output
       <SQL>
       SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
@@ -77,7 +77,7 @@
 ---
 
     Code
-      lf %>% summarise(across(a:b, list(~log(.x, 2))))
+      lf %>% summarise(across(a:b, list(~ log(.x, 2))))
     Output
       <SQL>
       SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
@@ -96,7 +96,8 @@
 
     Code
       lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum")
-    Warning <simpleWarning>
+    Condition
+      Warning:
       Missing values are always removed in SQL.
       Use `SUM(x, na.rm = TRUE)` to silence this warning
       This warning is displayed only once per session.
@@ -117,7 +118,7 @@
 ---
 
     Code
-      lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~sum(.))
+      lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.))
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
@@ -126,7 +127,7 @@
 # if_all/any works in filter()
 
     Code
-      lf %>% filter(if_all(a:b, ~. > 0))
+      lf %>% filter(if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -136,7 +137,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(a:b, ~. > 0))
+      lf %>% filter(if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -146,7 +147,7 @@
 # if_all/any works in mutate()
 
     Code
-      lf %>% mutate(c = if_all(a:b, ~. > 0))
+      lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `a`, `b`, `a` > 0.0 AND `b` > 0.0 AS `c`
@@ -155,7 +156,7 @@
 ---
 
     Code
-      lf %>% mutate(c = if_any(a:b, ~. > 0))
+      lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
@@ -164,7 +165,7 @@
 # if_all/any uses every colum as default
 
     Code
-      lf %>% filter(if_all(.fns = ~. > 0))
+      lf %>% filter(if_all(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -174,7 +175,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(.fns = ~. > 0))
+      lf %>% filter(if_any(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT *
