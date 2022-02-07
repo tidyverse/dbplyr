@@ -104,8 +104,7 @@ partial_eval_sym <- function(sym, vars, env) {
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  packages <- c("dplyr", "stringr", "lubridate")
-  is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
+  is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
 }
 
 is_tidy_pronoun <- function(call) {

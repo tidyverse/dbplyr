@@ -5,8 +5,6 @@ test_that("namespace operators always evaluated locally", {
 
 test_that("namespaced calls to dplyr functions are stripped", {
   expect_equal(partial_eval(quote(dplyr::n())), expr(n()))
-  expect_equal(partial_eval(quote(stringr::str_to_lower(x))), expr(str_to_lower(x)))
-  expect_equal(partial_eval(quote(lubridate::today())), expr(today()))
 })
 
 test_that("use quosure environment for unevaluted formulas", {
