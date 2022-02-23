@@ -73,7 +73,7 @@ replace_expr <- function(x, con) {
     }
 
   } else {
-    x
+    x # nocov
   }
 
 }

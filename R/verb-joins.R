@@ -286,7 +286,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
 
 check_suffix <- function(x) {
   if (!is.character(x) || length(x) != 2) {
-    stop("`suffix` must be a character vector of length 2.", call. = FALSE)
+    abort("`suffix` must be a character vector of length 2.")
   }
 
   list(x = x[1], y = x[2])

@@ -139,7 +139,7 @@ partial_eval_call <- function(call, vars, env) {
     if (is_namespaced_dplyr_call(fun)) {
       call[[1]] <- fun[[3]]
     } else if (is_tidy_pronoun(fun)) {
-      stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
+      abort("Use local() or remote() to force evaluation of functions")
     } else {
       return(eval_bare(call, env))
     }
@@ -211,8 +211,13 @@ db_squash_if <- function(call, env, vars, reduce = "&") {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
 
   tbl <- as_tibble(rep_named(vars, list(logical())))
-  locs <- tidyselect::eval_select(call$.cols, tbl, allow_rename = FALSE)
+  .cols <- call$.cols %||% expr(everything())
+  locs <- tidyselect::eval_select(.cols, tbl, allow_rename = FALSE)
   cols <- syms(names(tbl))[locs]
+
+  if (is.null(call$.fns)) {
+    return(Reduce(function(x, y) call2(reduce, x, y), cols))
+  }
 
   fun <- across_fun(call$.fns, env)
 

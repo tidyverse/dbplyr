@@ -11,7 +11,7 @@ test_that("two arranges equivalent to one", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering ordered grouped table", {
-  db <- memdb_frame(x = 1, y = 2, .name = "test-verb-arrange")
+  db <- copy_to_test("sqlite", tibble(x = 1, y = 2), name = "test-verb-arrange")
   out <- db %>% group_by(x) %>% arrange(y) %>% ungroup()
   expect_snapshot(sql_render(out))
   expect_equal(collect(out), tibble(x = 1, y = 2))
@@ -77,6 +77,11 @@ test_that("can combine arrange with dual table verbs", {
   })
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% arrange(), lf)
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("arrange generates order_by", {
@@ -130,4 +135,3 @@ test_that("multiple arranges combine", {
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list(quote(x), quote(y)))
 })
-

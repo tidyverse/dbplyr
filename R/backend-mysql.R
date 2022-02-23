@@ -1,7 +1,7 @@
 #' Backend: MySQL/MariaDB
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -55,7 +55,7 @@ sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
-        sql_expr(IF(x, TRUE, FALSE))
+        sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
 
@@ -111,7 +111,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 #' @export
 sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   if (identical(type, "full")) {
-    stop("MySQL does not support full joins", call. = FALSE)
+    abort("MySQL does not support full joins")
   }
   NextMethod()
 }
@@ -131,5 +131,15 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
-globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
+#' @export
+sql_random.MariaDBConnection <- function(con) {
+  sql_expr(RAND())
+}
+
+#' @export
+sql_random.MySQLConnection <- sql_random.MariaDBConnection
+#' @export
+sql_random.MySQL <- sql_random.MariaDBConnection
+
+globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))
 

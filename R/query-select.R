@@ -46,7 +46,7 @@ print.select_query <- function(x, ...) {
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
   if (length(x$group_by)) cat("Group by: ", named_commas(x$group_by), "\n", sep = "")
   if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
-  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "")
+  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "") # nocov
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
 }
 
@@ -100,10 +100,11 @@ select_query_clauses <- function(x, subquery = FALSE) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
+sql_render.select_query <- function(query, con, ..., subquery = FALSE, lvl = 0) {
   from <- dbplyr_sql_subquery(con,
-    sql_render(query$from, con, ..., subquery = TRUE),
-    name = NULL
+    sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
+    name = NULL,
+    lvl = lvl
   )
 
   dbplyr_query_select(
@@ -115,7 +116,8 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
     limit = query$limit,
     distinct = query$distinct,
     ...,
-    subquery = subquery
+    subquery = subquery,
+    lvl = lvl
   )
 }
 

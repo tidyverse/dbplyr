@@ -51,7 +51,16 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     }
   )
 
-  purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  by <- group_vars(data)
+  if (is_empty(by)) {
+    # We want a cross join if `by` is empty which is done with
+    # a `full_join()` and `by = character()`
+    purrr::reduce(distinct_tables, full_join, by = character())
+  } else {
+    # In this case a `full_join()` and a `left_join()` produce the same result
+    # but a `left_join()` produces much nicer SQL for SQLite
+    purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  }
 }
 
 extract_expand_dot_vars <- function(dot) {
@@ -99,10 +108,6 @@ extract_expand_dot_vars <- function(dot) {
 #' }
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- tidyr::expand(data, ...)
-
-  if (is_empty(full)) {
-    return(data)
-  }
 
   full <- full_join(full, data, by = colnames(full))
   tidyr::replace_na(full, replace = fill)

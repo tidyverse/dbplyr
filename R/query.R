@@ -1,6 +1,6 @@
 #' @export
-sql_build.query <- function(x, con = NULL, ...) {
-  x
+sql_build.query <- function(op, con = NULL, ...) {
+  op
 }
 
 #' @export

@@ -134,59 +134,59 @@ named_commas2 <- function(...) {
 }
 
 #' @export
-op_vars.lazy_query <- function(x) {
-  x$select$name
+op_vars.lazy_query <- function(op) {
+  op$select$name
 }
 
 #' @export
-op_grps.lazy_query <- function(x) {
+op_grps.lazy_query <- function(op) {
   # Find renamed variables
-  vars <- purrr::set_names(x$select$expr, x$select$name)
+  vars <- purrr::set_names(op$select$expr, op$select$name)
   symbols <- purrr::keep(vars, is_symbol)
   new2old <- purrr::map_chr(symbols, as_string)
   old2new <- set_names(names(new2old), new2old)
 
-  grps <- x$group_vars
+  grps <- op$group_vars
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
   grps
 }
 
 #' @export
-op_sort.lazy_query <- function(x) {
+op_sort.lazy_query <- function(op) {
   # Renaming (like for groups) cannot be done because:
   # * `order_vars` is a list of quosures
   # * variables needed in sorting can be dropped
-  x$order_vars
+  op$order_vars
 }
 
 #' @export
-op_frame.lazy_query <- function(x) {
-  x$frame
+op_frame.lazy_query <- function(op) {
+  op$frame
 }
 
 #' @export
-op_desc.lazy_query <- function(x) {
+op_desc.lazy_query <- function(op) {
   # TODO
 }
 
 #' @export
-sql_build.lazy_select_query <- function(x, con, ...) {
-  if (!is.null(x$message_summarise)) {
-    inform(x$message_summarise)
+sql_build.lazy_select_query <- function(op, con, ...) {
+  if (!is.null(op$message_summarise)) {
+    inform(op$message_summarise)
   }
 
-  select_sql <- get_select_sql(x$select, x$select_operation, op_vars(x$from), con)
-  where_sql <- translate_sql_(x$where, con = con, context = list(clause = "WHERE"))
+  select_sql <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
+  where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
-    from = sql_build(x$from, con),
+    from = sql_build(op$from, con),
     select = select_sql,
     where = where_sql,
-    group_by = translate_sql_(x$group_by, con = con),
-    order_by = translate_sql_(x$order_by, con = con),
-    distinct = x$distinct,
-    limit = x$limit
+    group_by = translate_sql_(op$group_by, con = con),
+    order_by = translate_sql_(op$order_by, con = con),
+    distinct = op$distinct,
+    limit = op$limit
   )
 }
 
@@ -207,16 +207,16 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   select_sql <- purrr::pmap(
     select %>% transmute(
       dots = set_names(expr, name),
-      vars_group = group_vars,
-      vars_order = order_vars,
-      vars_frame = frame
+      vars_group = .data$group_vars,
+      vars_order = .data$order_vars,
+      vars_frame = .data$frame
     ),
     function(dots, vars_group, vars_order, vars_frame) {
       translate_sql_(
         list(dots), con,
         vars_group = translate_sql_(syms(vars_group), con),
         vars_order = translate_sql_(vars_order, con, context = list(clause = "ORDER")),
-        vars_frame = vars_frame,
+        vars_frame = vars_frame[[1]],
         context = list(clause = "SELECT")
       )
     }

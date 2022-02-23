@@ -112,6 +112,9 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
 
   # drop NULLs
   vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
+  if (selects_same_variables(.data, vars)) {
+    return(lazy_query)
+  }
 
   if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
@@ -155,4 +158,16 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     last_op = op,
     select = vars
   )
+}
+
+selects_same_variables <- function(x, vars) {
+  if (!all(vapply(vars, is_symbol, logical(1)))) {
+    return(FALSE)
+  }
+
+  if (!identical(op_vars(x), names(vars))) {
+    return(FALSE)
+  }
+
+  identical(syms(op_vars(x)), unname(vars))
 }

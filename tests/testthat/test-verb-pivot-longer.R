@@ -25,7 +25,7 @@ test_that("can add multiple columns from spec", {
     b = 13:14
   )
   pv <- lazy_frame(x = 1:2, y = 3:4) %>%
-    dbplyr_pivot_longer_spec(df_db, spec = sp)
+    dbplyr_pivot_longer_spec(spec = sp)
 
   expect_equal(colnames(pv), c("a", "b", "v"))
   expect_snapshot(pv)
@@ -82,6 +82,67 @@ test_that("can override default output column type", {
     lazy_frame(x = 1) %>%
       tidyr::pivot_longer(x, values_transform = list(value = as.character))
   )
+})
+
+test_that("values_transform can be a formula", {
+  expect_snapshot(
+    lazy_frame(x = 1) %>%
+      tidyr::pivot_longer(x, values_transform = list(value = ~ as.character(.x)))
+  )
+})
+
+test_that("`values_transform` works with single functions (#1284)", {
+  df <- memdb_frame(x_1 = 1L, y_1 = 2L)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = everything(),
+    names_to = c(".value", "set"),
+    names_sep = "_",
+    values_transform = as.character
+  ) %>%
+    collect()
+
+  expect_identical(res$x, "1")
+  expect_identical(res$y, "2")
+})
+
+test_that("`names_ptypes` and `names_transform`", {
+  df <- memdb_frame(`1x2` = 1)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1)
+  expect_identical(res$two, 2)
+
+  res <- tidyr::pivot_longer(
+    data = df,
+    cols = `1x2`,
+    names_to = c("one", "two"),
+    names_sep = "x",
+    names_transform = as.numeric,
+    names_ptypes = integer()
+  ) %>%
+    collect()
+
+  expect_identical(res$one, 1L)
+  expect_identical(res$two, 2L)
+})
+
+test_that("`values_transform` is validated", {
+  df <- memdb_frame(x = 1)
+
+  expect_snapshot({
+    (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
+    (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
+  })
 })
 
 test_that("can pivot to multiple measure cols", {
@@ -152,4 +213,44 @@ test_that("grouping is preserved", {
     group_by(g) %>%
     tidyr::pivot_longer(x1:x2, names_to = "x", values_to = "v")
   expect_equal(group_vars(out), "g")
+})
+
+test_that("can pivot column with name equal to `names_to`", {
+  df <- memdb_frame(id = 1:2, name2 = c("x", "y"))
+  expect_equal(
+    df %>%
+      tidyr::pivot_longer(name2, names_to = "name2") %>%
+      collect(),
+    tibble(
+      id = 1:2,
+      name2 = "name2",
+      value = c("x", "y")
+    )
+  )
+})
+
+test_that("can repair names", {
+  df <- memdb_frame(id = 1, x = "a", y = "r", name = "nm", value = "val")
+
+  expect_snapshot(out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique"))
+  expect_equal(colnames(out), c("id", "name...2", "value...3", "name...4", "value...5"))
+
+  expect_equal(
+    collect(out),
+    tibble(
+      id = 1,
+      name...2 = "nm",
+      value...3 = "val",
+      name...4 = c("x", "y"),
+      value...5 = c("a", "r")
+    )
+  )
+})
+
+test_that("values_ptype is not supported", {
+  expect_snapshot(
+    error = TRUE,
+    lazy_frame(x = 1:2, y = 3:4) %>%
+      tidyr::pivot_longer(x:y, values_ptypes = character())
+  )
 })

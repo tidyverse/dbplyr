@@ -44,6 +44,9 @@ add_arrange <- function(.data, dots, .by_group) {
   if (.by_group) {
     dots <- c(syms(op_grps(lazy_query)), dots)
   }
+  if (identical(dots, lazy_query$order_vars)) {
+    return(lazy_query)
+  }
 
   # `dots` must be an empty list so that `arrange()` removes the `order_vars`
   dots <- dots %||% list()

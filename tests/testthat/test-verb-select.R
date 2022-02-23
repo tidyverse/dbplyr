@@ -93,6 +93,18 @@ test_that("relocate can rename variables", {
   expect_equal(group_vars(out1), "d")
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% select(everything()), lf)
+  expect_equal(lf %>% select(x, y), lf)
+
+  expect_equal(lf %>% rename(x = x), lf)
+  expect_equal(lf %>% rename(), lf)
+
+  expect_equal(lf %>% relocate(x, y), lf)
+  expect_equal(lf %>% relocate(), lf)
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

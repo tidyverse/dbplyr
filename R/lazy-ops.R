@@ -101,7 +101,7 @@ op_frame <- function(op) UseMethod("op_frame")
 #' @export
 op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
 #' @export
-op_frame.lazy_query_base <- function(op) NULL
+op_frame.lazy_query_base <- function(op) op$frame
 
 # Description -------------------------------------------------------------
 

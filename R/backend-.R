@@ -22,13 +22,27 @@ sql_translation.DBIConnection <- function(con) {
 #' @rdname sql_variant
 #' @format NULL
 base_scalar <- sql_translator(
-  `+`    = sql_infix("+"),
+  `+`    = function(x, y = NULL) {
+    x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
+    if (is.null(y)) {
+      if (is.numeric(x)) {
+        x
+      } else {
+        sql_expr(!!x)
+      }
+    } else {
+      y <- escape_infix_expr(enexpr(y), y)
+
+      sql_expr(!!x + !!y)
+    }
+  },
   `*`    = sql_infix("*"),
   `/`    = sql_infix("/"),
   `%/%`  = sql_not_supported("%/%"),
   `%%`   = sql_infix("%"),
   `^`    = sql_prefix("POWER", 2),
   `-`    = function(x, y = NULL) {
+    x <- escape_infix_expr(enexpr(x), x, escape_unary_minus = TRUE)
     if (is.null(y)) {
       if (is.numeric(x)) {
         -x
@@ -36,6 +50,8 @@ base_scalar <- sql_translator(
         sql_expr(-!!x)
       }
     } else {
+      y <- escape_infix_expr(enexpr(y), y)
+
       sql_expr(!!x - !!y)
     }
   },
@@ -48,7 +64,7 @@ base_scalar <- sql_translator(
     } else if (is.numeric(i)) {
       build_sql(x, "[", as.integer(i), "]")
     } else {
-      stop("Can only index with strings and numbers", call. = FALSE)
+      abort("Can only index with strings and numbers")
     }
 
   },
@@ -134,9 +150,15 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  `if` = sql_if,
-  if_else = function(condition, true, false, missing = NULL) sql_if(condition, true, false, missing),
-  ifelse = function(test, yes, no) sql_if(test, yes, no),
+  `if` = function(cond, if_true, if_false = NULL) {
+    sql_if(enquo(cond), enquo(if_true), enquo(if_false))
+  },
+  if_else = function(condition, true, false, missing = NULL) {
+    sql_if(
+      enquo(condition), enquo(true), enquo(false), enquo(missing)
+    )
+  },
+  ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
   switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),
@@ -439,3 +461,10 @@ base_no_win <- sql_translator(
   str_flatten  = win_absent("STR_FLATTEN"),
   count        = win_absent("COUNT")
 )
+
+#' @export
+sql_random.DBIConnection <- function(con) {
+  sql_expr(RANDOM())
+}
+
+utils::globalVariables("RANDOM")

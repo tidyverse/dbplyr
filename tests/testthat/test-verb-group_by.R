@@ -16,6 +16,12 @@ test_that("warns about add argument ", {
   expect_equal(group_vars(gf), c("x", "y"))
 })
 
+test_that("errors for .drop = FALSE", {
+  expect_snapshot(
+    error = TRUE,
+    lazy_frame(x = 1:3, y = 1:3) %>% group_by(y, .drop = FALSE)
+  )
+})
 
 test_that("collect, collapse and compute preserve grouping", {
   g <- memdb_frame(x = 1:3, y = 1:3) %>% group_by(x, y)
@@ -48,7 +54,33 @@ test_that("group_by handles empty dots", {
   lf <- lazy_frame(x = 1) %>% group_by(x)
 
   expect_equal(lf %>% group_by() %>% group_vars(), character())
+  expect_equal(lf %>% group_by(!!!list()) %>% group_vars(), character())
   expect_equal(lf %>% group_by(.add = TRUE) %>% group_vars(), c("x"))
+})
+
+test_that("only adds step if necessary", {
+  lf <- lazy_frame(x = 1, y = 1)
+  expect_equal(lf %>% group_by(), lf)
+
+  expect_equal(lf %>% ungroup(), lf)
+  expect_equal(lf %>% ungroup(x), lf)
+
+  lf_grouped <- lf %>% group_by(x)
+  lf_grouped2 <- lf_grouped %>% group_by(x)
+  expect_equal(lf_grouped, lf_grouped2)
+  expect_equal(lf_grouped %>% ungroup(y), lf_grouped)
+
+  out <- lf_grouped %>% mutate(y = y - mean(y)) %>% group_by()
+  expect_equal(group_vars(out), character())
+})
+
+test_that("group_by mutate is not optimised away", {
+  lf <- lazy_frame(x = 1) %>% group_by(x)
+
+  expect_equal(
+    lf %>% group_by(x = x + 1) %>% remote_query(),
+    sql("SELECT `x` + 1.0 AS `x`\nFROM `df`")
+  )
 })
 
 

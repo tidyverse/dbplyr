@@ -18,10 +18,7 @@ test_that("summarise performs partial evaluation", {
 
 test_that("can't refer to freshly created variables", {
   mf1 <- lazy_frame(x = 1)
-  expect_error(
-    summarise(mf1, y = sum(x), z = sum(y)),
-    "refers to a variable"
-  )
+  expect_snapshot(error = TRUE, summarise(mf1, y = sum(x), z = sum(y)))
 })
 
 test_that("summarise(.groups=)", {
@@ -49,13 +46,13 @@ test_that("summarise(.groups=)", {
   expect_equal(df %>% summarise(.groups = "drop") %>% group_vars(), character())
   expect_equal(df %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
 
-  expect_snapshot_error(df %>% summarise(.groups = "rowwise"))
+  expect_snapshot(error = TRUE, df %>% summarise(.groups = "rowwise"))
 })
 
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- memdb_frame(x = 1, .name = "verb-summarise") %>%
+  out <- copy_to_test("sqlite", tibble(x = 1), name = "verb-summarise") %>%
     group_by(x) %>%
     summarise(n = n())
   expect_snapshot(out %>% sql_render)

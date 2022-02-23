@@ -66,19 +66,19 @@ pivot_longer.tbl_lazy <- function(data,
                                   names_prefix = NULL,
                                   names_sep = NULL,
                                   names_pattern = NULL,
-                                  names_ptypes = list(),
-                                  names_transform = list(),
+                                  names_ptypes = NULL,
+                                  names_transform = NULL,
                                   names_repair = "check_unique",
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = list(),
+                                  values_transform = NULL,
                                   ...) {
   if (!is_missing(values_ptypes)) {
     abort("The `values_ptypes` argument is not supported for remote back-ends")
   }
 
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
 
   cols <- enquo(cols)
 
@@ -103,15 +103,32 @@ dbplyr_pivot_longer_spec <- function(data,
                                      spec,
                                      names_repair = "check_unique",
                                      values_drop_na = FALSE,
-                                     values_transform = list()) {
+                                     values_transform = NULL) {
   spec <- check_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column
   spec <- deduplicate_spec(spec, data)
 
   id_cols <- syms(setdiff(colnames(data), spec$.name))
+  repair_info <- apply_name_repair_pivot_longer(id_cols, spec, names_repair)
+  id_cols <- repair_info$id_cols
+  spec <- repair_info$spec
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
+
+  value_names <- unique(spec$.value)
+  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform")
+
+  nms_map <- tibble(
+    name = colnames(spec_split$key),
+    name_mapped = ifelse(
+      name %in% unlist(spec_split$key),
+      paste0("..", name),
+      name
+    )
+  )
+  spec_split$key <- set_names(spec_split$key, nms_map$name_mapped)
+
   data_long_list <- purrr::map(
     vctrs::vec_seq_along(spec_split),
     function(idx) {
@@ -147,26 +164,52 @@ dbplyr_pivot_longer_spec <- function(data,
     )
   }
 
-  data_long
+  data_long %>%
+    rename(!!!tibble::deframe(nms_map))
 }
 
 get_measure_column_exprs <- function(name, value, values_transform) {
-  # idea copied from `partial_eval_across`
-  measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
-
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
     ~ {
-      f_trans <- measure_funs[[.y]]
+      f_trans <- values_transform[[.y]]
 
       if (is_null(f_trans)) {
         .x
       } else {
-        expr((!!f_trans)(!!.x))
+        resolve_fun(f_trans, .x)
       }
     }
   )
+}
+
+apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
+  # Calculates how the column names in `pivot_longer()` need to be repaired
+  # and applies this to the `id_cols` and the `spec` argument:
+  # * The names of `id_cols` are the repaired id column names
+  # * The `spec` columns after the third column are renamed to the repaired name
+  # * The entries in the `value` column of `spec` are changed to the repaired name
+
+  nms_map_df <- vctrs::vec_rbind(
+    tibble(from = "id_cols", name = as.character(id_cols)),
+    tibble(from = "measure_cols", name = colnames(spec)[-(1:2)]),
+    tibble(from = "value_cols", name = unique(spec[[".value"]]))
+  ) %>%
+    mutate(name_rep = vctrs::vec_as_names(name, repair = names_repair))
+  nms_map <- split(nms_map_df, nms_map_df$from)
+
+  id_cols <- purrr::set_names(id_cols, nms_map$id_cols$name_rep)
+
+  colnames(spec)[-(1:2)] <- nms_map$measure_cols$name_rep
+
+  value_nms_map <- purrr::set_names(
+    nms_map$value_cols$name_rep,
+    nms_map$value_cols$name
+  )
+  spec$.value <- dplyr::recode(spec$.value, !!!value_nms_map)
+
+  list(id_cols = id_cols, spec = spec)
 }
 
 # The following is copy-pasted from `tidyr`
@@ -181,11 +224,11 @@ check_spec <- function(spec) {
   # Waiting for https://github.com/r-lib/vctrs/issues/198
 
   if (!is.data.frame(spec)) {
-    stop("`spec` must be a data frame", call. = FALSE)
+    abort("`spec` must be a data frame")
   }
 
   if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
-    stop("`spec` must have `.name` and `.value` columns", call. = FALSE)
+    abort("`spec` must have `.name` and `.value` columns")
   }
 
   # Ensure .name and .value come first
@@ -230,6 +273,32 @@ deduplicate_spec <- function(spec, df) {
 
   spec$.seq <- copy
   spec
+}
+
+check_list_of_functions <- function(x, names, arg) {
+  # COPIED FROM tidyr
+  if (is.null(x)) {
+    x <- set_names(list(), character())
+  }
+
+  if (!vctrs::vec_is_list(x)) {
+    x <- rep_named(names, list(x))
+  }
+
+  if (length(x) > 0L && !is_named(x)) {
+    abort(glue("All elements of `{arg}` must be named."))
+  }
+
+  if (vctrs::vec_duplicate_any(names(x))) {
+    abort(glue("The names of `{arg}` must be unique."))
+  }
+
+  x <- purrr::map(x, as_function)
+
+  # Silently drop user supplied names not found in the data
+  x <- x[intersect(names(x), names)]
+
+  x
 }
 # nocov end
 

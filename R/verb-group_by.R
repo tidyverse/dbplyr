@@ -34,23 +34,16 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    stop("`.drop` is not supported with database backends", call. = FALSE)
+    abort("`.drop` is not supported with database backends")
   }
 
-  if (length(dots) == 0) {
-    if (.add) {
-      return(.data)
-    } else {
-      return(dplyr::ungroup(.data))
-    }
-  }
-
-  if (".add" %in% names(formals("group_by"))) {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
-  } else {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, add = .add)
-  }
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
+
+  same_groups <- setequal(groups$group_names, group_vars(.data))
+  if (same_groups) {
+    return(groups$data)
+  }
 
   groups$data$lazy_query <- add_group_by(groups$data, names)
   groups$data
@@ -61,8 +54,14 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
 #' @importFrom dplyr ungroup
 #' @export
 ungroup.tbl_lazy <- function(x, ...) {
-  x$lazy_query <- add_group_by(x, character())
-  x
+  if (missing(...)) {
+    group_by(x)
+  } else {
+    old_groups <- group_vars(x)
+    to_remove <- tidyselect::vars_select(op_vars(x), ...)
+    new_groups <- setdiff(old_groups, to_remove)
+    group_by(x, !!!syms(new_groups))
+  }
 }
 
 add_group_by <- function(.data, group_vars) {

@@ -17,11 +17,16 @@
 #' @importFrom dplyr filter
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {
-    stop("`.preserve` is not supported on database backends", call. = FALSE)
+    abort("`.preserve` is not supported on database backends")
   }
+  check_filter(...)
 
   dots <- quos(...)
   dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  if (is_empty(dots)) {
+    return(.data)
+  }
+
   .data$lazy_query <- add_filter(.data, dots)
   .data
 }
@@ -52,5 +57,24 @@ add_filter <- function(.data, dots) {
       select = syms(set_names(vars)),
       where = where$expr
     )
+  }
+}
+
+check_filter <- function(...) {
+  dots <- enquos(...)
+  named <- have_name(dots)
+
+  for (i in which(named)) {
+    quo <- dots[[i]]
+
+    # Unlike in `dplyr` named logical vectors do not make sense so they are
+    # also not allowed
+    expr <- quo_get_expr(quo)
+    abort(c(
+      glue::glue("Problem with `filter()` input `..{i}`."),
+      x = glue::glue("Input `..{i}` is named."),
+      i = glue::glue("This usually means that you've used `=` instead of `==`."),
+      i = glue::glue("Did you mean `{name} == {as_label(expr)}`?", name = names(dots)[i])
+    ))
   }
 }
