@@ -10,6 +10,9 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
+#' * `sql_random(con)` generates SQL to get a random number which can be used
+#'   to select random rows in `slice_sample()`.
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -105,6 +108,12 @@ dbplyr_sql_translation <- function(con) {
 #' @export
 sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_random <- function(con) {
+  UseMethod("sql_random")
 }
 
 
@@ -293,10 +302,13 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
     cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE)
+    abort(paste0("Unknown join type: ", type))
   )
 
-  select <- sql_join_vars(con, vars)
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
+
+  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -331,8 +343,11 @@ sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0
 }
 #' @export
 sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
-  lhs <- escape(ident("LHS"), con = con)
-  rhs <- escape(ident("RHS"), con = con)
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as)
+
+  lhs <- escape(ident(by$x_as), con = con)
+  rhs <- escape(ident(by$y_as), con = con)
 
   on <- sql_join_tbls(con, by)
 
@@ -372,6 +387,7 @@ sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, 
   )
   sql_format_clauses(lines, lvl, con)
 }
+# nocov start
 dbplyr_query_set_op <- function(con, ...) {
   dbplyr_fallback(con, "sql_set_op", ...)
 }
@@ -381,6 +397,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
   # dplyr::sql_set_op() doesn't have ...
   sql_query_set_op(con, x, y, method)
 }
+# nocov end
 
 
 # dplyr fallbacks ---------------------------------------------------------
@@ -393,7 +410,7 @@ dbplyr_analyze <- function(con, ...) {
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
-    return()
+    return() # nocov
   }
   dbExecute(con, sql)
 }

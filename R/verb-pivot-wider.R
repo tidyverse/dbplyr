@@ -53,8 +53,7 @@
 #' `NULL`.
 #' @param ... Unused; included for compatibility with generic.
 #'
-#' @examples
-#' if (require("tidyr", quietly = TRUE)) {
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' memdb_frame(
 #'   id = 1,
 #'   key = c("x", "y"),
@@ -65,7 +64,6 @@
 #'     names_from = key,
 #'     values_from = value
 #'   )
-#' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
                                  names_from = name,
@@ -76,10 +74,10 @@ pivot_wider.tbl_lazy <- function(data,
                                  names_repair = "check_unique",
                                  values_from = value,
                                  values_fill = NULL,
-                                 values_fn = max,
+                                 values_fn = ~ max(.x, na.rm = TRUE),
                                  ...
                                  ) {
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 
@@ -146,19 +144,8 @@ dbplyr_pivot_wider_spec <- function(data,
                                     names_repair = "check_unique",
                                     id_cols = NULL,
                                     values_fill = NULL,
-                                    values_fn = max) {
+                                    values_fn = ~ max(.x, na.rm = TRUE)) {
   spec <- check_spec(spec)
-
-  if (is.null(values_fn)) {
-    abort(c(
-      "`values_fn` must not be NULL",
-      i = "`values_fn` must be a function or a named list of functions"
-    ))
-  }
-  if (is.function(values_fn)) {
-    values_fn <- rep_named(unique(spec$.value), list(values_fn))
-    values_fn <- purrr::map(values_fn, find_fun)
-  }
 
   if (is_scalar(values_fill)) {
     values_fill <- rep_named(unique(spec$.value), list(values_fill))
@@ -169,6 +156,23 @@ dbplyr_pivot_wider_spec <- function(data,
 
   values <- vctrs::vec_unique(spec$.value)
   spec_cols <- c(names(spec)[-(1:2)], values)
+
+  if (is.null(values_fn)) {
+    abort(c(
+      "`values_fn` must not be NULL",
+      i = "`values_fn` must be a function or a named list of functions"
+    ))
+  }
+
+  if (!vctrs::vec_is_list(values_fn)) {
+    values_fn <- rep_named(values, list(values_fn))
+  }
+
+  values_fn <- purrr::compact(values_fn)
+  missing_values <- setdiff(values, names(values_fn))
+  if (!is_empty(missing_values)) {
+    abort("`values_fn` must specify a function for each col in `values_from`")
+  }
 
   id_cols <- enquo(id_cols)
   if (!quo_is_null(id_cols)) {
@@ -198,7 +202,7 @@ dbplyr_pivot_wider_spec <- function(data,
       case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
       agg_fn <- values_fn[[values_col]]
-      expr((!!agg_fn)(!!case_expr, na.rm = TRUE))
+      resolve_fun(agg_fn, case_expr, data = data)
     }
   ) %>%
     set_names(spec$.name)
@@ -230,5 +234,18 @@ is_scalar <- function(x) {
     (length(x) == 1) && !have_name(x)
   } else {
     length(x) == 1
+  }
+}
+
+
+resolve_fun <- function(x, var, data) {
+  if (is_formula(x)) {
+    # .fn_expr <- across_fun(x)
+    # TODO improve this hack
+    .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
+    exec(.fn_expr, var)
+  } else {
+    fn_name <- find_fun(x)
+    call2(fn_name, var)
   }
 }

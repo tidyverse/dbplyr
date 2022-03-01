@@ -134,7 +134,7 @@ op_vars.op_base <- function(op) op$vars
 #' @export
 op_vars.op_single <- function(op) op_vars(op$x)
 #' @export
-op_vars.op_double <- function(op) stop("Not implemented", call. = FALSE)
+op_vars.op_double <- function(op) abort("Not implemented")
 #' @export
 op_vars.tbl_lazy <- function(op) op_vars(op$ops)
 

@@ -1,8 +1,8 @@
 test_that("slice, head and tail aren't available", {
   lf <- lazy_frame(x = 1)
-  expect_snapshot_error(lf %>% slice())
-  expect_snapshot_error(lf %>% slice_head())
-  expect_snapshot_error(lf %>% slice_tail())
+  expect_snapshot(error = TRUE, lf %>% slice())
+  expect_snapshot(error = TRUE, lf %>% slice_head())
+  expect_snapshot(error = TRUE, lf %>% slice_tail())
 })
 
 test_that("slice_min handles arguments", {
@@ -14,8 +14,8 @@ test_that("slice_min handles arguments", {
   expect_equal(db %>% slice_min(id, n = 2) %>% pull(), c(1, 2))
   expect_equal(db %>% slice_min(id, prop = 0.5) %>% pull(), 1)
 
-  expect_snapshot_error(db %>% slice_min())
-  expect_snapshot_error(db %>% slice_min(id, prop = 0.5, with_ties = FALSE))
+  expect_snapshot(error = TRUE, db %>% slice_min())
+  expect_snapshot(error = TRUE, db %>% slice_min(id, prop = 0.5, with_ties = FALSE))
 })
 
 test_that("slice_max orders in opposite order", {
@@ -23,7 +23,7 @@ test_that("slice_max orders in opposite order", {
 
   expect_equal(db %>% slice_max(id) %>% pull(), 3)
   expect_equal(db %>% slice_max(x) %>% pull(), 3)
-  expect_snapshot_error(db %>% slice_max())
+  expect_snapshot(error = TRUE, db %>% slice_max())
 })
 
 test_that("slice_sample errors when expected", {
@@ -33,9 +33,9 @@ test_that("slice_sample errors when expected", {
   # shows that it doesn't always return the same result
   expect_error(db %>% slice_sample() %>% pull(), NA)
 
-  expect_snapshot_error(db %>% slice_sample(replace = TRUE))
-  expect_snapshot_error(db %>% slice_sample(weight_by = x))
-  expect_snapshot_error(db %>% slice_sample(prop = 0.5))
+  expect_snapshot(error = TRUE, db %>% slice_sample(replace = TRUE))
+  expect_snapshot(error = TRUE, db %>% slice_sample(weight_by = x))
+  expect_snapshot(error = TRUE, db %>% slice_sample(prop = 0.5))
 })
 
 test_that("window_order is preserved", {
@@ -46,9 +46,11 @@ test_that("window_order is preserved", {
 })
 
 test_that("check_slice_size checks for common issues", {
-  expect_snapshot_error(check_slice_size(n = 1, prop = 1))
-  expect_snapshot_error(check_slice_size(n = "a"))
-  expect_snapshot_error(check_slice_size(prop = "a"))
-  expect_snapshot_error(check_slice_size(n = -1))
-  expect_snapshot_error(check_slice_size(prop = -1))
+  lf <- lazy_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = 1, prop = 1))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = "a"))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(prop = "a"))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(n = -1))
+  expect_snapshot(error = TRUE, lf %>% slice_sample(prop = -1))
 })

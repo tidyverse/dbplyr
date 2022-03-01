@@ -31,7 +31,7 @@
 #' build_sql("INSERT INTO Students (Name) VALUES (", name, ")", con = con)
 build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   if (is.null(con)) {
-    stop("`con` must not be NULL", call. = FALSE)
+    abort("`con` must not be NULL")
   }
 
   escape_expr <- function(x, con) {

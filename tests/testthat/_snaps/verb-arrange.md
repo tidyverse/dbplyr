@@ -22,7 +22,8 @@
     Code
       # double arrange
       lf %>% arrange(a) %>% arrange(b)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -40,7 +41,8 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -125,7 +127,8 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -135,7 +138,8 @@
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -153,9 +157,10 @@
       rf <- lazy_frame(a = 1:3, c = 4:6)
       # warn if arrange before join
       lf %>% arrange(a) %>% left_join(rf)
-    Message <message>
+    Message
       Joining, by = "a"
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -169,9 +174,10 @@
         ON (`LHS`.`a` = `RHS`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
-    Message <message>
+    Message
       Joining, by = "a"
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -201,7 +207,7 @@
     Code
       # can arrange after join
       lf %>% left_join(rf) %>% arrange(a)
-    Message <message>
+    Message
       Joining, by = "a"
     Output
       <SQL>
@@ -215,7 +221,7 @@
       ORDER BY `a`
     Code
       lf %>% semi_join(rf) %>% arrange(a)
-    Message <message>
+    Message
       Joining, by = "a"
     Output
       <SQL>
