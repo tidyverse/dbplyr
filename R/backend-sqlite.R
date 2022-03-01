@@ -145,12 +145,28 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
-  # Careful: in the right join resp. the second join in the full join do not
-  # name `y` LHS and `x` RHS as it messes up the select query!
+  if (type %in% c("left", "inner", "semi", "cross")) {
+    return(NextMethod())
+  }
+
+  # as `x` and `y` the vars also need to be swapped in vars and by
+  vars_right <- list(
+    alias = vars$alias,
+    x = vars$y,
+    y = vars$x,
+    all_x = vars$all_y,
+    all_y = vars$all_x
+  )
+  by_right <- list(
+    x = by$y,
+    y = by$x,
+    x_as = by$y_as,
+    y_as = by$x_as
+  )
 
   if (type == "full") {
     x_join <- sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1)
-    y_join <- sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1)
+    y_join <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl + 1)
     join_sql <- sql_query_set_op(
       con,
       x = x_join,
@@ -167,9 +183,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
       lvl = lvl
     )
   } else if (type == "right") {
-    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl)
-  } else {
-    NextMethod()
+    sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl)
   }
 }
 

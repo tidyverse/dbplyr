@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
+  specify the table alias to use in the SQL query (@mgirlich, #637).
+
 * Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
   the database, rather than locally (#197).
 

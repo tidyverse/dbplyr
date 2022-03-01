@@ -35,13 +35,13 @@
           ON (`LHS`.`x` = `RHS`.`x`)
         UNION
         SELECT
-          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          COALESCE(`RHS`.`x`, `LHS`.`x`) AS `x`,
           `LHS`.`y` AS `y.x`,
           `RHS`.`y` AS `y.y`,
           `z`
         FROM `df` AS `RHS`
         LEFT JOIN `df` AS `LHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+          ON (`RHS`.`x` = `LHS`.`x`)
       ) AS `q01`
 
 ---
@@ -53,7 +53,7 @@
       SELECT `RHS`.`x` AS `x`, `LHS`.`y` AS `y.x`, `z`, `RHS`.`y` AS `y.y`
       FROM `df` AS `RHS`
       LEFT JOIN `df` AS `LHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+        ON (`RHS`.`x` = `LHS`.`x`)
 
 # can explain a query
 
