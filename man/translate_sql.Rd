@@ -33,7 +33,7 @@ a list of already quoted objects.}
 \item{con}{An optional database connection to control the details of
 the translation. The default, \code{NULL}, generates ANSI SQL.}
 
-\item{vars}{Deprecated. Now call \code{\link[=partial_eval]{partial_eval()}} directly.}
+\item{vars}{Deprecated. Now call \code{\link[=db_squash]{db_squash()}} directly.}
 
 \item{vars_group, vars_order, vars_frame}{Parameters used in the \code{OVER}
 expression of windowed functions.}

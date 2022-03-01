@@ -55,7 +55,6 @@
 #' x <- 1
 #' db_squash(quote(x ^ y))
 db_squash <- function(call, data, env = caller_env(), across = FALSE) {
-  # corresponds to `dt_squash()`
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
