@@ -4,40 +4,15 @@
       (expect_error(lazy_frame(x = 1) %>% summarise(across(x, 42))))
     Output
       <error/rlang_error>
-      `.fns` argument to dbplyr::across() must be a NULL, a function name, formula, or list
+      Error in `across_funs()`:
+      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
     Code
       (expect_error(lazy_frame(x = 1) %>% summarise(across(y, mean))))
     Output
       <error/vctrs_error_subscript_oob>
-      Can't subset columns that don't exist.
+      Error in `stop_subscript()`:
+      ! Can't subset columns that don't exist.
       x Column `y` doesn't exist.
-
-# across() translates character vectors
-
-    Code
-      lf %>% summarise(across(a:b, "log"))
-    Output
-      <SQL>
-      SELECT LN(`a`) AS `a`, LN(`b`) AS `b`
-      FROM `df`
-
----
-
-    Code
-      lf %>% summarise(across(a:b, "log", base = 2))
-    Output
-      <SQL>
-      SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
-      FROM `df`
-
----
-
-    Code
-      lf %>% summarise(across(a, c("log", "exp")))
-    Output
-      <SQL>
-      SELECT LN(`a`) AS `a_log`, EXP(`a`) AS `a_exp`
-      FROM `df`
 
 # across() translates functions
 
@@ -63,11 +38,7 @@
       lf %>% summarise(across(a:b, list(log, exp)))
     Output
       <SQL>
-      SELECT
-        LN(`a`) AS `a_log`,
-        EXP(`a`) AS `a_exp`,
-        LN(`b`) AS `b_log`,
-        EXP(`b`) AS `b_exp`
+      SELECT LN(`a`) AS `a_1`, EXP(`a`) AS `a_2`, LN(`b`) AS `b_1`, EXP(`b`) AS `b_2`
       FROM `df`
 
 # untranslatable functions are preserved
@@ -82,7 +53,7 @@
 # across() translates formulas
 
     Code
-      lf %>% summarise(across(a:b, ~log(.x, 2)))
+      lf %>% summarise(across(a:b, ~ log(.x, 2)))
     Output
       <SQL>
       SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
@@ -91,10 +62,10 @@
 ---
 
     Code
-      lf %>% summarise(across(a:b, list(~log(.x, 2))))
+      lf %>% summarise(across(a:b, list(~ log(.x, 2))))
     Output
       <SQL>
-      SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
+      SELECT LOG(2.0, `a`) AS `a_1`, LOG(2.0, `b`) AS `b_1`
       FROM `df`
 
 # across() translates NULL
@@ -110,7 +81,8 @@
 
     Code
       lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum")
-    Warning <simpleWarning>
+    Condition
+      Warning:
       Missing values are always removed in SQL.
       Use `SUM(x, na.rm = TRUE)` to silence this warning
       This warning is displayed only once per session.
@@ -131,7 +103,7 @@
 ---
 
     Code
-      lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~sum(.))
+      lf %>% dplyr::summarise_at(dplyr::vars(a:b), ~ sum(.))
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
@@ -140,7 +112,7 @@
 # across() defaults to everything()
 
     Code
-      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~. + 1))
+      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
     Output
       <SQL>
       SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
@@ -164,7 +136,8 @@
     Code
       df %>% summarise(across(all_of(c(a = "x", b = "y")), list(mean = mean, sum = sum)),
       na.rm = TRUE)
-    Warning <simpleWarning>
+    Condition
+      Warning:
       Missing values are always removed in SQL.
       Use `mean(x, na.rm = TRUE)` to silence this warning
       This warning is displayed only once per session.
@@ -181,7 +154,7 @@
 # if_all/any works in filter()
 
     Code
-      lf %>% filter(if_all(a:b, ~. > 0))
+      lf %>% filter(if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -191,7 +164,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(a:b, ~. > 0))
+      lf %>% filter(if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -201,7 +174,7 @@
 # if_all/any works in mutate()
 
     Code
-      lf %>% mutate(c = if_all(a:b, ~. > 0))
+      lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `a`, `b`, `a` > 0.0 AND `b` > 0.0 AS `c`
@@ -210,7 +183,7 @@
 ---
 
     Code
-      lf %>% mutate(c = if_any(a:b, ~. > 0))
+      lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
       SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
@@ -219,7 +192,7 @@
 # if_all/any uses every colum as default
 
     Code
-      lf %>% filter(if_all(.fns = ~. > 0))
+      lf %>% filter(if_all(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT *
@@ -229,7 +202,7 @@
 ---
 
     Code
-      lf %>% filter(if_any(.fns = ~. > 0))
+      lf %>% filter(if_any(.fns = ~ . > 0))
     Output
       <SQL>
       SELECT *
