@@ -74,6 +74,10 @@ db_squash <- function(call, data, env = caller_env(), across = FALSE) {
   }
 }
 
+capture_dot <- function(.data, x) {
+  db_squash(enquo(x), data = .data)
+}
+
 partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
   # corresponds to `capture_dots()`
   dots <- enquos(..., .named = .named)
