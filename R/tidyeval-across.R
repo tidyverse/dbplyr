@@ -99,7 +99,7 @@ across_setup <- function(data,
     names_vars <- names(tbl)[locs]
   }
 
-  dots <- lapply(call$..., partial_eval, data = data, env = env)
+  dots <- lapply(call$..., db_squash, data = data, env = env)
   names_spec <- eval(call$.names, env)
   funs_across_data <- across_funs(
     funs = call$.fns,

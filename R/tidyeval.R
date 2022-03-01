@@ -8,9 +8,9 @@
 #'
 #' @section Symbol substitution:
 #'
-#' `partial_eval()` needs to guess if you're referring to a variable on the
+#' `db_squash()` needs to guess if you're referring to a variable on the
 #' server (remote), or in the current environment (local). It's not possible to
-#' do this 100% perfectly. `partial_eval()` uses the following heuristic:
+#' do this 100% perfectly. `db_squash()` uses the following heuristic:
 #'
 #' \itemize{
 #'   \item If the tbl variables are known, and the symbol matches a tbl
@@ -29,39 +29,39 @@
 #' @keywords internal
 #' @examples
 #' vars <- c("year", "id")
-#' partial_eval(quote(year > 1980), vars = vars)
+#' db_squash(quote(year > 1980), vars = vars)
 #'
 #' ids <- c("ansonca01", "forceda01", "mathebo01")
-#' partial_eval(quote(id %in% ids), vars = vars)
+#' db_squash(quote(id %in% ids), vars = vars)
 #'
 #' # cf.
-#' partial_eval(quote(id == .data$ids), vars = vars)
+#' db_squash(quote(id == .data$ids), vars = vars)
 #'
 #' # You can use local() or .env to disambiguate between local and remote
 #' # variables: otherwise remote is always preferred
 #' year <- 1980
-#' partial_eval(quote(year > year), vars = vars)
-#' partial_eval(quote(year > local(year)), vars = vars)
-#' partial_eval(quote(year > .env$year), vars = vars)
+#' db_squash(quote(year > year), vars = vars)
+#' db_squash(quote(year > local(year)), vars = vars)
+#' db_squash(quote(year > .env$year), vars = vars)
 #'
 #' # Functions are always assumed to be remote. Use local to force evaluation
 #' # in R.
 #' f <- function(x) x + 1
-#' partial_eval(quote(year > f(1980)), vars = vars)
-#' partial_eval(quote(year > local(f(1980))), vars = vars)
+#' db_squash(quote(year > f(1980)), vars = vars)
+#' db_squash(quote(year > local(f(1980))), vars = vars)
 #'
 #' # For testing you can also use it with the tbl omitted
-#' partial_eval(quote(1 + 2 * 3))
+#' db_squash(quote(1 + 2 * 3))
 #' x <- 1
-#' partial_eval(quote(x ^ y))
-partial_eval <- function(call, data, env = caller_env(), across = FALSE) {
+#' db_squash(quote(x ^ y))
+db_squash <- function(call, data, env = caller_env(), across = FALSE) {
   # corresponds to `dt_squash()`
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
     db_squash_sym(call, data, env)
   } else if (is_quosure(call)) {
-    partial_eval(get_expr(call), data, get_env(call), across = across)
+    db_squash(get_expr(call), data, get_env(call), across = across)
   } else if (is_call(call, "if_any")) {
     db_squash_if(call, data, env, reduce = "|")
   } else if (is_call(call, "if_all")) {
@@ -91,7 +91,7 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
 
 partial_eval_quo <- function(x, data, across = FALSE) {
   # corresponds to `dt_squash()`
-  expr <- partial_eval(get_expr(x), data, get_env(x), across = across)
+  expr <- db_squash(get_expr(x), data, get_env(x), across = across)
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
   } else {
@@ -178,7 +178,7 @@ db_squash_call <- function(call, data, env, across = FALSE) {
     } else if (name == "remote") {
       call[[2]]
     } else {
-      call[-1] <- lapply(call[-1], partial_eval, data = data, env = env, across = across)
+      call[-1] <- lapply(call[-1], db_squash, data = data, env = env, across = across)
       call
     }
   }
