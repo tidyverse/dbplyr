@@ -56,17 +56,10 @@
 #' partial_eval(quote(x ^ y))
 partial_eval <- function(call, data, env = caller_env(), across = FALSE) {
   # corresponds to `dt_squash()`
-  # TODO change `vars` to `data`
-  if (across) {
-    vars <- across_vars(data)
-  } else {
-    vars <- op_vars(data)
-  }
-
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
-    partial_eval_sym(call, vars, env)
+    db_squash_sym(call, data, env)
   } else if (is_quosure(call)) {
     partial_eval(get_expr(call), data, get_env(call), across = across)
   } else if (is_call(call, "if_any")) {
@@ -76,7 +69,7 @@ partial_eval <- function(call, data, env = caller_env(), across = FALSE) {
   } else if (is_call(call, "across")) {
     db_squash_across(call, data, env)
   } else if (is_call(call)) {
-    partial_eval_call(call, data, env, across = across)
+    db_squash_call(call, data, env, across = across)
   } else {
     abort(glue("Unknown input type: ", typeof(call)))
   }
@@ -106,7 +99,8 @@ partial_eval_quo <- function(x, data, across = FALSE) {
   }
 }
 
-partial_eval_sym <- function(sym, vars, env) {
+db_squash_sym <- function(sym, data, env) {
+  vars <- op_vars(data)
   name <- as_string(sym)
   if (name %in% vars) {
     sym
@@ -125,9 +119,7 @@ is_mask_pronoun <- function(call) {
   is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
 
-partial_eval_call <- function(call, data, env, across = FALSE) {
-  # TODO rename to `db_squash_call()`
-  # corresponds to `dt_squash_call()`
+db_squash_call <- function(call, data, env, across = FALSE) {
   # TODO which of
   # * `cur_data()`, `cur_data_all()`
   # * `cur_group()`, `cur_group_id()`, and
@@ -136,15 +128,9 @@ partial_eval_call <- function(call, data, env, across = FALSE) {
 
   fun <- call[[1]]
 
-  # TODO vars -> data
-  if (across) {
-    vars <- across_vars(data)
-  } else {
-    vars <- op_vars(data)
-  }
-
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
+    vars <- colnames(simulate_vars(data, drop_groups = across))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_dot(attr(fun, "formula")[[2]], sym(dot_var))
     # TODO what about environment in `dtplyr`?

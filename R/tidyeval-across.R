@@ -78,27 +78,10 @@ db_squash_formula <- function(x, env, data, replace = quote(!!.x)) {
   call <- f_rhs(x)
   call <- replace_dot(call, replace)
   if (is_call(call)) {
-    call <- partial_eval_call(call, data, env)
+    call <- db_squash_call(call, data, env)
   }
   call
 }
-
-# across_names <- function(cols, funs, names = NULL, env = parent.frame()) {
-#   n_reps <- if (is_empty(funs)) 1 else length(funs)
-#   if (n_reps == 1) {
-#     names <- names %||% "{.col}"
-#   } else {
-#     names <- names %||% "{.col}_{.fn}"
-#   }
-#
-#   col_nms <- names2(cols)
-#   cols[col_nms != ""] <- col_nms[col_nms != ""]
-#   glue_env <- child_env(env,
-#     .col = rep(cols, each = n_reps),
-#     .fn = rep(funs %||% seq_len(n_reps), length(cols))
-#   )
-#   glue(names, .envir = glue_env)
-# }
 
 across_vars <- function(x) {
   # TODO this can be remove after passing `data` to `partial_eval()` etc.
