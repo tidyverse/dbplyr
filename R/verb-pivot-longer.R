@@ -48,18 +48,16 @@
 #' @param names_ptypes A list of column name-prototype pairs.
 #' @param values_ptypes Not supported.
 #' @param ... Additional arguments passed on to methods.
-#' @examples
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' # See vignette("pivot") for examples and explanation
 #'
 #' # Simplest case where column names are character data
-#' if (require("tidyr", quietly = TRUE)) {
-#'   memdb_frame(
-#'     id = c("a", "b"),
-#'     x = 1:2,
-#'     y = 3:4
-#'   ) %>%
-#'     pivot_longer(-id)
-#' }
+#' memdb_frame(
+#'   id = c("a", "b"),
+#'   x = 1:2,
+#'   y = 3:4
+#' ) %>%
+#'   tidyr::pivot_longer(-id)
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
                                   names_to = "name",
