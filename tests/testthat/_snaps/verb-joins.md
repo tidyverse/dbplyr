@@ -24,22 +24,25 @@
 
     Code
       left_join(x, x, by = "x", x_as = NULL)
-    Error <vctrs_error_scalar_type>
-      `x_as` must be a vector, not NULL.
+    Condition
+      Error in `stop_vctrs()`:
+      ! `x_as` must be a vector, not NULL.
 
 ---
 
     Code
       left_join(x, x, by = "x", y_as = c("A", "B"))
-    Error <vctrs_error_assert_size>
-      `y_as` must have size 1, not size 2.
+    Condition
+      Error in `vctrs::vec_assert()`:
+      ! `y_as` must have size 1, not size 2.
 
 ---
 
     Code
       left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS")
-    Error <rlang_error>
-      `y_as` must be different from `x_as`.
+    Condition
+      Error in `left_join()`:
+      ! `y_as` must be different from `x_as`.
 
 # can optionally match NA values
 
