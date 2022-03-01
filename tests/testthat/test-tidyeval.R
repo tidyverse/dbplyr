@@ -1,38 +1,49 @@
 test_that("namespace operators always evaluated locally", {
-  expect_equal(partial_eval(quote(base::sum(1, 2))), 3)
-  expect_equal(partial_eval(quote(base:::sum(1, 2))), 3)
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_equal(partial_eval(quote(base::sum(1, 2)), lf), 3)
+  expect_equal(partial_eval(quote(base:::sum(1, 2)), lf), 3)
 })
 
 test_that("namespaced calls to dplyr functions are stripped", {
-  expect_equal(partial_eval(quote(dplyr::n())), expr(n()))
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_equal(partial_eval(quote(dplyr::n()), lf), expr(n()))
 })
 
 test_that("use quosure environment for unevaluted formulas", {
-  x <- 1
-  expect_equal(partial_eval(expr(~x)), quote(~1))
+  lf <- lazy_frame(x = 1, y = 2)
+
+  z <- 1
+  expect_equal(partial_eval(expr(~z), lf), quote(~1))
 })
 
 test_that("can look up inlined function", {
+  lf <- lazy_frame(x = 1, y = 2)
+
   expect_equal(
-    partial_eval(expr((!!mean)(x)), vars = "x"),
+    partial_eval(expr((!!mean)(x)), data = lf),
     expr(mean(x))
   )
 })
 
 test_that("respects tidy evaluation pronouns", {
+  lf <- lazy_frame(x = 1, y = 2)
+
   x <- "X"
   X <- "XX"
 
-  expect_equal(partial_eval(expr(.data$x)), expr(x))
-  expect_equal(partial_eval(expr(.data[["x"]])), expr(x))
-  expect_equal(partial_eval(expr(.data[[x]])), expr(X))
+  expect_equal(partial_eval(expr(.data$x), lf), expr(x))
+  expect_equal(partial_eval(expr(.data[["x"]]), lf), expr(x))
+  expect_equal(partial_eval(expr(.data[[x]]), lf), expr(X))
 
-  expect_equal(partial_eval(expr(.env$x)), "X")
-  expect_equal(partial_eval(expr(.env[["x"]])), "X")
-  expect_equal(partial_eval(expr(.env[[x]])), "XX")
+  expect_equal(partial_eval(expr(.env$x), lf), "X")
+  expect_equal(partial_eval(expr(.env[["x"]]), lf), "X")
+  expect_equal(partial_eval(expr(.env[[x]]), lf), "XX")
 })
 
 test_that("fails with multi-classes", {
+  lf <- lazy_frame(x = 1, y = 2)
   x <- structure(list(), class = c('a', 'b'))
-  expect_error(partial_eval(x), "Unknown input type", fixed = TRUE)
+  expect_error(partial_eval(x, lf), "Unknown input type", fixed = TRUE)
 })
