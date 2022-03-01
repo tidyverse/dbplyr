@@ -111,7 +111,8 @@ db_squash_sym <- function(sym, data, env) {
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
+  packages <- c("dplyr", "stringr", "lubridate")
+  is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 
 is_mask_pronoun <- function(call) {
