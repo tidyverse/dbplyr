@@ -211,11 +211,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                         na_matches = "never",
                         x_as = "LHS",
                         y_as = "RHS") {
-  vctrs::vec_assert(x_as, character(), size = 1)
-  vctrs::vec_assert(y_as, character(), size = 1)
-  if (x_as == y_as) {
-    abort("`y_as` must be different from `x_as`.")
-  }
+  check_join_as(x_as, y_as, call = caller_env())
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -250,8 +246,7 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never",
                              x_as = "LHS", y_as = "RHS") {
-  vctrs::vec_assert(x_as, character(), size = 1)
-  vctrs::vec_assert(y_as, character(), size = 1)
+  check_join_as(x_as, y_as)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -272,6 +267,14 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
     na_matches = na_matches
   ))
   x
+}
+
+check_join_as <- function(x_as, y_as, call) {
+  vctrs::vec_assert(x_as, character(), size = 1)
+  vctrs::vec_assert(y_as, character(), size = 1)
+  if (x_as == y_as) {
+    abort("`y_as` must be different from `x_as`.", call = call)
+  }
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
