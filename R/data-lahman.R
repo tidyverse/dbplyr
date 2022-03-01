@@ -35,6 +35,7 @@
 #' @name lahman
 NULL
 
+# nocov start
 #' @export
 #' @rdname lahman
 lahman_sqlite <- function(path = NULL) {
@@ -95,3 +96,4 @@ lahman <- function(type, ...) {
   f <- match.fun(paste0("lahman_", type))
   f(...)
 }
+# nocov end

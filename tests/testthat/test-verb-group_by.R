@@ -16,6 +16,12 @@ test_that("warns about add argument ", {
   expect_equal(group_vars(gf), c("x", "y"))
 })
 
+test_that("errors for .drop = FALSE", {
+  expect_snapshot(
+    error = TRUE,
+    lazy_frame(x = 1:3, y = 1:3) %>% group_by(y, .drop = FALSE)
+  )
+})
 
 test_that("collect, collapse and compute preserve grouping", {
   g <- memdb_frame(x = 1:3, y = 1:3) %>% group_by(x, y)

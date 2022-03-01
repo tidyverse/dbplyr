@@ -110,7 +110,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
   if (is_false(auto_disconnect)) {
     disco <- NULL
   } else {
-    disco <- db_disconnector(con, quiet = is_true(auto_disconnect))
+    disco <- db_disconnector(con, quiet = is_true(auto_disconnect)) # nocov
   }
 
   subclass <- paste0("src_", class(con)[[1]])
@@ -126,7 +126,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 
 setOldClass(c("src_dbi", "src_sql", "src"))
 
-
+# nocov start
 # Creates an environment that disconnects the database when it's GC'd
 db_disconnector <- function(con, quiet = FALSE) {
   reg.finalizer(environment(), function(...) {
@@ -137,3 +137,4 @@ db_disconnector <- function(con, quiet = FALSE) {
   })
   environment()
 }
+# nocov end

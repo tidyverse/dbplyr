@@ -15,7 +15,7 @@ pivot_wider.tbl_lazy(
   names_repair = "check_unique",
   values_from = value,
   values_fill = NULL,
-  values_fn = max,
+  values_fn = ~max(.x, na.rm = TRUE),
   ...
 )
 }
@@ -73,7 +73,7 @@ identified.
 The translation to SQL code basically works as follows:
 \enumerate{
 \item Get unique keys in \code{names_from} column.
-\item For each key value generate an expression of the form:\if{html}{\out{<div class="sql">}}\preformatted{value_fn(
+\item For each key value generate an expression of the form:\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
   CASE WHEN (`names from column` == `key value`)
   THEN (`value column`)
   END
@@ -84,7 +84,7 @@ The translation to SQL code basically works as follows:
 }
 }
 \examples{
-if (require("tidyr", quietly = TRUE)) {
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 memdb_frame(
   id = 1,
   key = c("x", "y"),
@@ -95,5 +95,5 @@ memdb_frame(
     names_from = key,
     values_from = value
   )
-}
+\dontshow{\}) # examplesIf}
 }

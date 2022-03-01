@@ -2,6 +2,31 @@
 
 * The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
   specify the table alias to use in the SQL query (@mgirlich, #637).
+* Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
+  the database, rather than locally (#197).
+
+* The implementation of `dbplyr_fill0` for databases without support for IGNORE
+  NULLS now respects the database specific translation (@rsund, #753).
+
+* Fix translation of `quantile()` for MS SQL (@mgirlich, #620).
+
+* `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
+
+* `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
+
+* The `values_fn` argument of `pivot_wider()` and the `values_transform()`
+  argument of `pivot_longer()` can now be a formula (@mgirlich, #745).
+
+* If the last statement of `case_when()` is of the form `TRUE ~ ...` the
+  translation for SQLite now also uses `ELSE ...` (@mgirlich, #754).
+
+* `filter()` throws an error if you supply a named argument (@mgirlich, #764).
+
+* The generic `sql_random()` is now exported.
+
+* The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
+  `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
+
 * `if_any()` and `if_all()` default to `everything()` when `.cols` is not
   provided. If `.fns` is not provided they work like like a parallel
   version of `any()` respectively `all()` (@mgirlich, #734).

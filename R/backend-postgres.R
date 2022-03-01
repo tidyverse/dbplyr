@@ -120,7 +120,7 @@ sql_translation.PqConnection <- function(con) {
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          stop("`fiscal_start` is not supported in PostgreSQL translation. Must be 1.", call. = FALSE)
+          abort("`fiscal_start` is not supported in PostgreSQL translation. Must be 1.")
         }
 
         if (with_year) {
@@ -139,7 +139,7 @@ sql_translation.PqConnection <- function(con) {
         } else if (label && abbr) {
           sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
         } else {
-          stop("Unrecognized arguments to `wday`", call. = FALSE)
+          abort("Unrecognized arguments to `wday`")
         }
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),

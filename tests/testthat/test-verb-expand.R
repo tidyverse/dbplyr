@@ -55,12 +55,12 @@ test_that("NULL inputs", {
 })
 
 test_that("expand() errors when expected", {
-  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1)))
-  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1), x = NULL))
+  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1)))
+  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1), x = NULL))
 })
 
 test_that("nesting() respects .name_repair", {
-  expect_snapshot_error(
+  expect_snapshot(error = TRUE, 
     tidyr::expand(
       memdb_frame(x = 1, y = 1),
       nesting(x, x = x + 1)

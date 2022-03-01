@@ -41,7 +41,7 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
     # https://www.sqlite.org/syntax/select-core.html
 
     if (inherits(x$ops, "op_head") || inherits(y$ops, "op_head")) {
-      stop("SQLite does not support set operations on LIMITs", call. = FALSE)
+      abort("SQLite does not support set operations on LIMITs")
     }
   }
 
