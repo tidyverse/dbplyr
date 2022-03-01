@@ -2,7 +2,7 @@
 
     Code
       sql_build(semi_join(lf1, lf2))
-    Message <message>
+    Message
       Joining, by = "x"
     Output
       <SQL SEMI JOIN>
@@ -17,7 +17,7 @@
 
     Code
       semi_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>
@@ -31,7 +31,7 @@
 
     Code
       anti_join(lf, lf)
-    Message <message>
+    Message
       Joining, by = c("x", "y")
     Output
       <SQL>

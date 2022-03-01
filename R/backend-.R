@@ -64,7 +64,7 @@ base_scalar <- sql_translator(
     } else if (is.numeric(i)) {
       build_sql(x, "[", as.integer(i), "]")
     } else {
-      stop("Can only index with strings and numbers", call. = FALSE)
+      abort("Can only index with strings and numbers")
     }
 
   },
@@ -150,9 +150,15 @@ base_scalar <- sql_translator(
     sql_expr(ROUND(!!x, !!as.integer(digits)))
   },
 
-  `if` = sql_if,
-  if_else = function(condition, true, false, missing = NULL) sql_if(condition, true, false, missing),
-  ifelse = function(test, yes, no) sql_if(test, yes, no),
+  `if` = function(cond, if_true, if_false = NULL) {
+    sql_if(enquo(cond), enquo(if_true), enquo(if_false))
+  },
+  if_else = function(condition, true, false, missing = NULL) {
+    sql_if(
+      enquo(condition), enquo(true), enquo(false), enquo(missing)
+    )
+  },
+  ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
   switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),
@@ -460,3 +466,5 @@ base_no_win <- sql_translator(
 sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
+
+utils::globalVariables("RANDOM")

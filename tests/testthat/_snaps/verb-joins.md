@@ -52,3 +52,11 @@
       LEFT JOIN `df` AS `RHS`
         ON (CASE WHEN (`LHS`.`x` = `RHS`.`x`) OR (`LHS`.`x` IS NULL AND `RHS`.`x` IS NULL) THEN 0 ELSE 1 = 0 END)
 
+# suffix arg is checked
+
+    Code
+      inner_join(lf1, lf2, by = "x", suffix = "a")
+    Condition
+      Error in `check_suffix()`:
+      ! `suffix` must be a character vector of length 2.
+

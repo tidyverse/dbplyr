@@ -104,7 +104,8 @@ partial_eval_sym <- function(sym, vars, env) {
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  is_symbol(call[[1]], "::") && is_symbol(call[[2]], "dplyr")
+  packages <- c("dplyr", "stringr", "lubridate")
+  is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 
 is_tidy_pronoun <- function(call) {
@@ -134,7 +135,7 @@ partial_eval_call <- function(call, vars, env) {
     if (is_namespaced_dplyr_call(fun)) {
       call[[1]] <- fun[[3]]
     } else if (is_tidy_pronoun(fun)) {
-      stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
+      abort("Use local() or remote() to force evaluation of functions")
     } else {
       return(eval_bare(call, env))
     }

@@ -1,15 +1,19 @@
 # can't refer to freshly created variables
 
-    In `dbplyr` you cannot use a variable created in the same summarise.
-    x `z` refers to `y` which was created earlier in this summarise().
-    i You need an extra mutate() step to use it.
+    Code
+      summarise(mf1, y = sum(x), z = sum(y))
+    Condition
+      Error in `summarise()`:
+      ! In `dbplyr` you cannot use a variable created in the same summarise.
+      x `z` refers to `y` which was created earlier in this summarise().
+      i You need an extra mutate() step to use it.
 
 # summarise(.groups=)
 
     Code
       eval_bare(expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>%
         remote_query()), env(global_env()))
-    Message <message>
+    Message
       `summarise()` has grouped output by 'x'. You can override using the `.groups` argument.
     Output
       <SQL> SELECT `x`, `y`
@@ -18,8 +22,12 @@
 
 ---
 
-    `.groups` can't be "rowwise" in dbplyr
-    i Possible values are NULL (default), "drop_last", "drop", and "keep"
+    Code
+      df %>% summarise(.groups = "rowwise")
+    Condition
+      Error in `summarise()`:
+      ! `.groups` can't be "rowwise" in dbplyr
+      i Possible values are NULL (default), "drop_last", "drop", and "keep"
 
 # quoting for rendering summarized grouped table
 

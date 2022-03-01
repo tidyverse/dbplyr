@@ -95,6 +95,6 @@ test_srcs <- local({
 
 # Modern helpers ----------------------------------------------------------
 
-copy_to_test <- function(src, df, ...) {
-  copy_to(src_test(src), df, "test", ..., overwrite = TRUE)
+copy_to_test <- function(src, df, ..., name = "test") {
+  copy_to(src_test(src), df, name, ..., overwrite = TRUE)
 }
