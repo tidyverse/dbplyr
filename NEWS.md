@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* The partial evaluation code is now more aligned with `dtplyr`. This makes it
+  easier to transfer bug fixes and new features from one package to the other.
+  In this aligned the function `partial_eval()` was renamed to `db_squash()` and
+  the second argument is now a lazy frame instead of a character vector of
+  variables (@mgirlich, #766).
+
 * `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
   (@mgirlich, #760).
 
