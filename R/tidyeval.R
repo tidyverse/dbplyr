@@ -23,8 +23,10 @@
 #' computation, or by using the `.data` and `.env` pronouns of tidy evaluation.
 #'
 #' @param call an unevaluated expression, as produced by [quote()]
-#' @param vars character vector of variable names.
+#' @param data A lazy data frame backed by a database query.
 #' @param env environment in which to search for local values
+#' @param vars `r lifecycle::badge("deprecated")`: Pass a lazy frame to `data`
+#'   instead.
 #' @export
 #' @keywords internal
 #' @examples
