@@ -93,7 +93,7 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
 }
 
 partial_eval_quo <- function(x, data, across = FALSE) {
-  # corresponds to `dt_squash()`
+  # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   expr <- db_squash(get_expr(x), data, get_env(x), across = across)
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))

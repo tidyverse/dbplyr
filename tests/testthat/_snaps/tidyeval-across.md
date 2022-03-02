@@ -1,44 +1,55 @@
-# across() gives meaningful messages
+# across() does not support formulas with dots
 
     Code
-      (expect_error(lazy_frame(x = 1) %>% summarise(across(x, 42))))
+      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
     Output
       <error/rlang_error>
+      Error in `across_fun()`:
+      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+    Code
+      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
+      )
+    Output
+      <error/rlang_error>
+      Error in `FUN()`:
+      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+
+# across() gives informative errors
+
+    Code
+      capture_across(lf, across(a, 1))
+    Condition
       Error in `across_funs()`:
       ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
     Code
-      (expect_error(lazy_frame(x = 1) %>% summarise(across(y, mean))))
-    Output
-      <error/vctrs_error_subscript_oob>
+      capture_across(lf, across(a, list(1)))
+    Condition
+      Error in `FUN()`:
+      ! .fns argument to dbplyr::across() must contain a function or a formula
+      x Problem with 1
+    Code
+      capture_across(lf, across(a:b, "log"))
+    Condition
+      Error in `across_funs()`:
+      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+    Code
+      capture_across(lf, across(c, mean))
+    Condition
       Error in `stop_subscript()`:
       ! Can't subset columns that don't exist.
-      x Column `y` doesn't exist.
+      x Column `c` doesn't exist.
 
-# across() translates functions
-
-    Code
-      lf %>% summarise(across(a:b, log))
-    Output
-      <SQL>
-      SELECT LN(`a`) AS `a`, LN(`b`) AS `b`
-      FROM `df`
-
----
+# across() defaults to everything()
 
     Code
-      lf %>% summarise(across(a:b, log, base = 2))
+      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
     Output
       <SQL>
-      SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
-      FROM `df`
-
----
-
-    Code
-      lf %>% summarise(across(a:b, list(log, exp)))
-    Output
-      <SQL>
-      SELECT LN(`a`) AS `a_1`, EXP(`a`) AS `a_2`, LN(`b`) AS `b_1`, EXP(`b`) AS `b_2`
+      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
       FROM `df`
 
 # untranslatable functions are preserved
@@ -48,33 +59,6 @@
     Output
       <SQL>
       SELECT SQL_LOG(`a`) AS `a`, SQL_LOG(`b`) AS `b`
-      FROM `df`
-
-# across() translates formulas
-
-    Code
-      lf %>% summarise(across(a:b, ~ log(.x, 2)))
-    Output
-      <SQL>
-      SELECT LOG(2.0, `a`) AS `a`, LOG(2.0, `b`) AS `b`
-      FROM `df`
-
----
-
-    Code
-      lf %>% summarise(across(a:b, list(~ log(.x, 2))))
-    Output
-      <SQL>
-      SELECT LOG(2.0, `a`) AS `a_1`, LOG(2.0, `b`) AS `b_1`
-      FROM `df`
-
-# across() translates NULL
-
-    Code
-      lf %>% mutate(across(a:b))
-    Output
-      <SQL>
-      SELECT `a`, `b`
       FROM `df`
 
 # old _at functions continue to work
@@ -109,47 +93,19 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
-# across() defaults to everything()
+# if_all() gives informative errors
 
     Code
-      lazy_frame(x = 1, y = 1) %>% summarise(across(.fns = ~ . + 1))
-    Output
-      <SQL>
-      SELECT `x` + 1.0 AS `x`, `y` + 1.0 AS `y`
-      FROM `df`
-
-# across() can use named selections
-
-    Code
-      df %>% summarise(across(c(a = x, b = y), list(mean = mean, sum = sum), na.rm = TRUE))
-    Output
-      <SQL>
-      SELECT
-        AVG(`x`) AS `a_mean`,
-        SUM(`x`) AS `a_sum`,
-        AVG(`y`) AS `b_mean`,
-        SUM(`y`) AS `b_sum`
-      FROM `df`
-
----
-
-    Code
-      df %>% summarise(across(all_of(c(a = "x", b = "y")), list(mean = mean, sum = sum)),
-      na.rm = TRUE)
+      capture_if_all(lf, if_all(a, 1))
     Condition
-      Warning:
-      Missing values are always removed in SQL.
-      Use `mean(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
-    Output
-      <SQL>
-      SELECT
-        AVG(`x`) AS `a_mean`,
-        SUM(`x`) AS `a_sum`,
-        AVG(`y`) AS `b_mean`,
-        SUM(`y`) AS `b_sum`,
-        TRUE AS `na.rm`
-      FROM `df`
+      Error in `across_funs()`:
+      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+    Code
+      capture_if_all(lf, if_all(a, list(1)))
+    Condition
+      Error in `FUN()`:
+      ! .fns argument to dbplyr::across() must contain a function or a formula
+      x Problem with 1
 
 # if_all/any works in filter()
 
@@ -228,4 +184,13 @@
       SELECT *
       FROM `df`
       WHERE (`a` OR `b`)
+
+# if_all() cannot rename variables
+
+    Code
+      (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
+    Output
+      <error/rlang_error>
+      Error in `across_setup()`:
+      ! Can't rename variables in this context.
 
