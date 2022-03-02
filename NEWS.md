@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `pivot_wider()` now supports the arguments `names_vary`, `names_expand`, and
+  `unused_fn` (@mgirlich, #774).
+
 * The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
   specify the table alias to use in the SQL query (@mgirlich, #637).
 
