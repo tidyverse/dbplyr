@@ -94,10 +94,6 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   .data
 }
 
-simulate_vars <- function(x) {
-  as_tibble(rep_named(op_vars(x), list(logical())))
-}
-
 simulate_vars <- function(x, drop_groups = FALSE) {
   if (drop_groups) {
     vars <- setdiff(op_vars(x), op_grps(x))
