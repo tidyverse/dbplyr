@@ -49,7 +49,17 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
-partial_eval <- function(call, data, env = caller_env()) {
+partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
+  if (!is_null(vars)) {
+    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
+    data <- lazy_frame(!!!rep_named(vars, list(logical())))
+  }
+
+  if (is.character(data)) {
+    lifecycle::deprecate_warn("2.1.2", "partial_eval(data = 'must be a lazy frame')")
+    data <- lazy_frame(!!!rep_named(data, list(logical())))
+  }
+
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
