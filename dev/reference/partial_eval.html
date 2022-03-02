@@ -74,7 +74,7 @@ is incorporated into the expression."><meta property="og:image" content="https:/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Partially evaluate an expression.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/partial-eval.R" class="external-link"><code>R/partial-eval.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/tidyeval.R" class="external-link"><code>R/tidyeval.R</code></a></small>
       <div class="d-none name"><code>partial_eval.Rd</code></div>
     </div>
 
@@ -88,17 +88,20 @@ is incorporated into the expression.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">partial_eval</span><span class="op">(</span><span class="va">call</span>, vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>, env <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">partial_eval</span><span class="op">(</span><span class="va">call</span>, <span class="va">data</span>, env <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span>, vars <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>call</dt>
 <dd><p>an unevaluated expression, as produced by <code><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote()</a></code></p></dd>
-<dt>vars</dt>
-<dd><p>character vector of variable names.</p></dd>
+<dt>data</dt>
+<dd><p>A lazy data frame backed by a database query.</p></dd>
 <dt>env</dt>
 <dd><p>environment in which to search for local values</p></dd>
+<dt>vars</dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a>: Pass a lazy frame to <code>data</code>
+instead.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="symbol-substitution">Symbol substitution<a class="anchor" aria-label="anchor" href="#symbol-substitution"></a></h2>
@@ -118,42 +121,35 @@ computation, or by using the <code>.data</code> and <code>.env</code> pronouns o
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"id"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1980</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">lf</span> <span class="op">&lt;-</span> <span class="fu"><a href="tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fl">1980</span>, id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1980</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; 1980</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ansonca01"</span>, <span class="st">"forceda01"</span>, <span class="st">"mathebo01"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">ids</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">ids</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> id %in% c("ansonca01", "forceda01", "mathebo01")</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># cf.</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="va">.data</span><span class="op">$</span><span class="va">ids</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> id == ids</span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">id</span> <span class="op">==</span> <span class="va">.data</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> id == id</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># You can use local() or .env to disambiguate between local and remote</span></span>
 <span class="r-in"><span class="co"># variables: otherwise remote is always preferred</span></span>
 <span class="r-in"><span class="va">year</span> <span class="op">&lt;-</span> <span class="fl">1980</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="va">year</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="va">year</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; year</span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; 1980</span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="va">.env</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="va">.env</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; 1980</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Functions are always assumed to be remote. Use local to force evaluation</span></span>
 <span class="r-in"><span class="co"># in R.</span></span>
 <span class="r-in"><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu">f</span><span class="op">(</span><span class="fl">1980</span><span class="op">)</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu">f</span><span class="op">(</span><span class="fl">1980</span><span class="op">)</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; f(1980)</span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="fl">1980</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, vars <span class="op">=</span> <span class="va">vars</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">local</a></span><span class="op">(</span><span class="fu">f</span><span class="op">(</span><span class="fl">1980</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">lf</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> year &gt; 1981</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># For testing you can also use it with the tbl omitted</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 + 2 * 3</span>
-<span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span class="r-in"><span class="fu">partial_eval</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="va">x</span> <span class="op">^</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1^y</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
