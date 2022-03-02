@@ -25,6 +25,24 @@
         FROM `df`
       ) `q01`
 
+# across() does not select grouping variables
+
+    Code
+      df %>% group_by(g) %>% mutate(across(.fns = ~0))
+    Output
+      <SQL>
+      SELECT `g`, 0.0 AS `x`
+      FROM `df`
+
+---
+
+    Code
+      df %>% group_by(g) %>% transmute(across(.fns = ~0))
+    Output
+      <SQL>
+      SELECT 0.0 AS `x`
+      FROM `df`
+
 # mutate generates subqueries as needed
 
     Code

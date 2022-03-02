@@ -136,7 +136,8 @@ dbplyr_pivot_longer_spec <- function(data,
       measure_cols_exprs <- get_measure_column_exprs(
         row[[".name"]],
         row[[".value"]],
-        values_transform
+        values_transform,
+        data = data
       )
 
       transmute(
@@ -165,7 +166,7 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform) {
+get_measure_column_exprs <- function(name, value, values_transform, data) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
@@ -175,7 +176,7 @@ get_measure_column_exprs <- function(name, value, values_transform) {
       if (is_null(f_trans)) {
         .x
       } else {
-        resolve_fun(f_trans, .x)
+        resolve_fun(f_trans, .x, data)
       }
     }
   )

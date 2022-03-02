@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+* The partial evaluation code is now more aligned with `dtplyr`. This makes it
+  easier to transfer bug fixes and new features from one package to the other.
+  In this process the second argument of `partial_eval()` was changed to a lazy
+  frame instead of a character vector of variables (@mgirlich, #766).
+
+* `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
+  (@mgirlich, #760).
+
 * `pivot_wider()` now supports the arguments `names_vary`, `names_expand`, and
   `unused_fn` (@mgirlich, #774).
 
