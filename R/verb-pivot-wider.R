@@ -98,7 +98,6 @@
 #' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
-                                 # id_expand = FALSE,
                                  names_from = name,
                                  names_prefix = "",
                                  names_sep = "_",
