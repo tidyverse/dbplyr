@@ -39,31 +39,26 @@ computation, or by using the \code{.data} and \code{.env} pronouns of tidy evalu
 }
 
 \examples{
-vars <- c("year", "id")
-db_squash(quote(year > 1980), vars = vars)
+lf <- lazy_frame(year = 1980, id = 1)
+db_squash(quote(year > 1980), data = lf)
 
 ids <- c("ansonca01", "forceda01", "mathebo01")
-db_squash(quote(id \%in\% ids), vars = vars)
+db_squash(quote(id \%in\% ids), lf)
 
 # cf.
-db_squash(quote(id == .data$ids), vars = vars)
+db_squash(quote(id == .data$id), lf)
 
 # You can use local() or .env to disambiguate between local and remote
 # variables: otherwise remote is always preferred
 year <- 1980
-db_squash(quote(year > year), vars = vars)
-db_squash(quote(year > local(year)), vars = vars)
-db_squash(quote(year > .env$year), vars = vars)
+db_squash(quote(year > year), lf)
+db_squash(quote(year > local(year)), lf)
+db_squash(quote(year > .env$year), lf)
 
 # Functions are always assumed to be remote. Use local to force evaluation
 # in R.
 f <- function(x) x + 1
-db_squash(quote(year > f(1980)), vars = vars)
-db_squash(quote(year > local(f(1980))), vars = vars)
-
-# For testing you can also use it with the tbl omitted
-db_squash(quote(1 + 2 * 3))
-x <- 1
-db_squash(quote(x ^ y))
+db_squash(quote(year > f(1980)), lf)
+db_squash(quote(year > local(f(1980))), lf)
 }
 \keyword{internal}
