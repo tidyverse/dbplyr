@@ -12,10 +12,13 @@ pivot_wider.tbl_lazy(
   names_sep = "_",
   names_glue = NULL,
   names_sort = FALSE,
+  names_vary = "fastest",
+  names_expand = FALSE,
   names_repair = "check_unique",
   values_from = value,
   values_fill = NULL,
   values_fn = ~max(.x, na.rm = TRUE),
+  unused_fn = NULL,
   ...
 )
 }
@@ -45,6 +48,22 @@ a glue specification that uses the \code{names_from} columns (and special
 \item{names_sort}{Should the column names be sorted? If \code{FALSE}, the default,
 column names are ordered by first appearance.}
 
+\item{names_vary}{When \code{names_from} identifies a column (or columns) with
+multiple unique values, and multiple \code{values_from} columns are provided,
+in what order should the resulting column names be combined?
+\itemize{
+\item \code{"fastest"} varies \code{names_from} values fastest, resulting in a column
+naming scheme of the form: \verb{value1_name1, value1_name2, value2_name1, value2_name2}. This is the default.
+\item \code{"slowest"} varies \code{names_from} values slowest, resulting in a column
+naming scheme of the form: \verb{value1_name1, value2_name1, value1_name2, value2_name2}.
+}}
+
+\item{names_expand}{Should the values in the \code{names_from} columns be expanded
+by \code{\link[=expand]{expand()}} before pivoting? This results in more columns, the output
+will contain column names corresponding to a complete expansion of all
+possible values in \code{names_from}. Additionally, the column names will be
+sorted, identical to what \code{names_sort} would produce.}
+
 \item{names_repair}{What happens if the output has invalid column names?}
 
 \item{values_fill}{Optionally, a (scalar) value that specifies what each
@@ -53,6 +72,21 @@ column names are ordered by first appearance.}
 \item{values_fn}{A function, the default is \code{max()}, applied to the \code{value}
 in each cell in the output. In contrast to local data frames it must not be
 \code{NULL}.}
+
+\item{unused_fn}{Optionally, a function applied to summarize the values from
+the unused columns (i.e. columns not identified by \code{id_cols},
+\code{names_from}, or \code{values_from}).
+
+The default drops all unused columns from the result.
+
+This can be a named list if you want to apply different aggregations
+to different unused columns.
+
+\code{id_cols} must be supplied for \code{unused_fn} to be useful, since otherwise
+all unspecified columns will be considered \code{id_cols}.
+
+This is similar to grouping by the \code{id_cols} then summarizing the
+unused columns using \code{unused_fn}.}
 
 \item{...}{Unused; included for compatibility with generic.}
 }

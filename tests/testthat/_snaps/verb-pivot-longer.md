@@ -111,8 +111,8 @@
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
       <error/rlang_error>
-      Error in `purrr::map()`:
-      ! Can't convert `.x[[i]]`, a number, to a function.
+      Error in `resolve_fun()`:
+      ! Can't convert to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
