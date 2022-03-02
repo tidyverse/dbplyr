@@ -83,8 +83,7 @@
 #'   unused columns using `unused_fn`.
 #' @param ... Unused; included for compatibility with generic.
 #'
-#' @examples
-#' if (require("tidyr", quietly = TRUE)) {
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' memdb_frame(
 #'   id = 1,
 #'   key = c("x", "y"),
@@ -95,7 +94,6 @@
 #'     names_from = key,
 #'     values_from = value
 #'   )
-#' }
 pivot_wider.tbl_lazy <- function(data,
                                  id_cols = NULL,
                                  names_from = name,

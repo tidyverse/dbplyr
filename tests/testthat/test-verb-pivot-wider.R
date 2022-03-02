@@ -319,6 +319,11 @@ test_that("`unused_fn` is validated", {
 # can fill missing cells --------------------------------------------------
 
 test_that("can fill in missing cells", {
+  spec <- tibble(
+    .name = c("x", "y"),
+    .value = "value",
+    name = c("x", "y")
+  )
   df <- memdb_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
   df_lazy <- lazy_frame(g = c(1, 2), name = c("x", "y"), value = c(1, 2))
 

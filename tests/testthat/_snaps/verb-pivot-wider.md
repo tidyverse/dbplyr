@@ -87,12 +87,10 @@
       <SQL>
       SELECT
         `g`,
-        `name`,
-        `value`,
-        MAX(CASE WHEN (`key` = 'x') THEN `val` WHEN NOT (`key` = 'x') THEN 0.0 END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN `val` WHEN NOT (`key` = 'y') THEN 0.0 END) AS `y`
+        MAX(CASE WHEN (`name` = 'x') THEN `value` WHEN NOT (`name` = 'x') THEN 0.0 END) AS `x`,
+        MAX(CASE WHEN (`name` = 'y') THEN `value` WHEN NOT (`name` = 'y') THEN 0.0 END) AS `y`
       FROM `df`
-      GROUP BY `g`, `name`, `value`
+      GROUP BY `g`
 
 ---
 
@@ -102,12 +100,10 @@
       <SQL>
       SELECT
         `g`,
-        `name`,
-        `value`,
-        MAX(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`,
-        MAX(CASE WHEN (`key` = 'y') THEN `val` END) AS `y`
+        MAX(CASE WHEN (`name` = 'x') THEN `value` WHEN NOT (`name` = 'x') THEN 0.0 END) AS `x`,
+        MAX(CASE WHEN (`name` = 'y') THEN `value` WHEN NOT (`name` = 'y') THEN 0.0 END) AS `y`
       FROM `df`
-      GROUP BY `g`, `name`, `value`
+      GROUP BY `g`
 
 # values_fill is checked
 

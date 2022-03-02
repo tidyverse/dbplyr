@@ -57,6 +57,10 @@ test_that("custom aggregators translated correctly", {
   expect_error(translate_sql(cov(x), window = FALSE), "not available")
 
   expect_equal(translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
+  expect_equal(
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
+    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
 })
 
 test_that("custom window functions translated correctly", {
