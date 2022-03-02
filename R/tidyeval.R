@@ -49,13 +49,13 @@
 #' f <- function(x) x + 1
 #' db_squash(quote(year > f(1980)), lf)
 #' db_squash(quote(year > local(f(1980))), lf)
-db_squash <- function(call, data, env = caller_env(), across = FALSE) {
+db_squash <- function(call, data, env = caller_env()) {
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
     db_squash_sym(call, data, env)
   } else if (is_quosure(call)) {
-    db_squash(get_expr(call), data, get_env(call), across = across)
+    db_squash(get_expr(call), data, get_env(call))
   } else if (is_call(call, "if_any")) {
     db_squash_if(call, data, env, reduce = "|")
   } else if (is_call(call, "if_all")) {
@@ -63,7 +63,7 @@ db_squash <- function(call, data, env = caller_env(), across = FALSE) {
   } else if (is_call(call, "across")) {
     db_squash_across(call, data, env)
   } else if (is_call(call)) {
-    db_squash_call(call, data, env, across = across)
+    db_squash_call(call, data, env)
   } else {
     abort(glue("Unknown input type: ", typeof(call)))
   }
@@ -73,10 +73,10 @@ capture_dot <- function(.data, x) {
   db_squash(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
+partial_eval_dots <- function(.data, ..., .named = TRUE) {
   # corresponds to `capture_dots()`
   dots <- enquos(..., .named = .named)
-  dots <- lapply(dots, partial_eval_quo, data = .data, across = across)
+  dots <- lapply(dots, partial_eval_quo, data = .data)
 
   # Remove names from any list elements
   is_list <- purrr::map_lgl(dots, is.list)
@@ -87,9 +87,9 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, across = FALSE) {
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, across = FALSE) {
+partial_eval_quo <- function(x, data) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  expr <- db_squash(get_expr(x), data, get_env(x), across = across)
+  expr <- db_squash(get_expr(x), data, get_env(x))
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
   } else {
@@ -118,7 +118,7 @@ is_mask_pronoun <- function(call) {
   is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
 
-db_squash_call <- function(call, data, env, across = FALSE) {
+db_squash_call <- function(call, data, env) {
   # TODO which of
   # * `cur_data()`, `cur_data_all()`
   # * `cur_group()`, `cur_group_id()`, and
@@ -129,7 +129,7 @@ db_squash_call <- function(call, data, env, across = FALSE) {
 
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
-    vars <- colnames(simulate_vars(data, drop_groups = across))
+    vars <- colnames(simulate_vars(data, drop_groups = FALSE))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_dot(attr(fun, "formula")[[2]], sym(dot_var))
     # TODO what about environment in `dtplyr`?
@@ -177,7 +177,7 @@ db_squash_call <- function(call, data, env, across = FALSE) {
     } else if (name == "remote") {
       call[[2]]
     } else {
-      call[-1] <- lapply(call[-1], db_squash, data = data, env = env, across = across)
+      call[-1] <- lapply(call[-1], db_squash, data = data, env = env)
       call
     }
   }

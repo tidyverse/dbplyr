@@ -34,7 +34,7 @@
 #'   summarise(n()) %>%
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE, across = TRUE)
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
   check_summarise_vars(dots)
   check_groups(.groups)
 
