@@ -240,8 +240,6 @@ is_scalar <- function(x) {
 
 resolve_fun <- function(x, var, data) {
   if (is_formula(x)) {
-    # .fn_expr <- across_fun(x)
-    # TODO improve this hack
     .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
     exec(.fn_expr, var)
   } else {
