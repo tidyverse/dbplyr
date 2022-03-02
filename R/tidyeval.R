@@ -160,7 +160,6 @@ partial_eval_call <- function(call, data, env) {
     var <- call[[3]]
     if (is_call(call, "[[")) {
       var <- sym(eval(var, env))
-      # var <- as.name(eval_bare(var, env))
     }
 
     if (is_symbol(call[[2]], ".data")) {
