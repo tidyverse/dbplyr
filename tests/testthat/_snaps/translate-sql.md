@@ -28,5 +28,5 @@
       translate_sql(sin(x), vars = c("x", "y"))
     Condition
       Error in `translate_sql()`:
-      ! `vars` is deprecated. Please use db_squash() directly.
+      ! `vars` is deprecated. Please use partial_eval() directly.
 

@@ -24,7 +24,7 @@
 #'   a list of already quoted objects.
 #' @param con An optional database connection to control the details of
 #'   the translation. The default, `NULL`, generates ANSI SQL.
-#' @param vars Deprecated. Now call [db_squash()] directly.
+#' @param vars Deprecated. Now call [partial_eval()] directly.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`
@@ -84,7 +84,7 @@ translate_sql <- function(...,
                           window = TRUE) {
 
   if (!missing(vars)) {
-    abort("`vars` is deprecated. Please use db_squash() directly.")
+    abort("`vars` is deprecated. Please use partial_eval() directly.")
   }
 
   con <- con %||% sql_current_con() %||% simulate_dbi()

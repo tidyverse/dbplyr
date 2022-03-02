@@ -8,9 +8,9 @@
 #'
 #' @section Symbol substitution:
 #'
-#' `db_squash()` needs to guess if you're referring to a variable on the
+#' `partial_eval()` needs to guess if you're referring to a variable on the
 #' server (remote), or in the current environment (local). It's not possible to
-#' do this 100% perfectly. `db_squash()` uses the following heuristic:
+#' do this 100% perfectly. `partial_eval()` uses the following heuristic:
 #'
 #' \itemize{
 #'   \item If the tbl variables are known, and the symbol matches a tbl
@@ -29,48 +29,48 @@
 #' @keywords internal
 #' @examples
 #' lf <- lazy_frame(year = 1980, id = 1)
-#' db_squash(quote(year > 1980), data = lf)
+#' partial_eval(quote(year > 1980), data = lf)
 #'
 #' ids <- c("ansonca01", "forceda01", "mathebo01")
-#' db_squash(quote(id %in% ids), lf)
+#' partial_eval(quote(id %in% ids), lf)
 #'
 #' # cf.
-#' db_squash(quote(id == .data$id), lf)
+#' partial_eval(quote(id == .data$id), lf)
 #'
 #' # You can use local() or .env to disambiguate between local and remote
 #' # variables: otherwise remote is always preferred
 #' year <- 1980
-#' db_squash(quote(year > year), lf)
-#' db_squash(quote(year > local(year)), lf)
-#' db_squash(quote(year > .env$year), lf)
+#' partial_eval(quote(year > year), lf)
+#' partial_eval(quote(year > local(year)), lf)
+#' partial_eval(quote(year > .env$year), lf)
 #'
 #' # Functions are always assumed to be remote. Use local to force evaluation
 #' # in R.
 #' f <- function(x) x + 1
-#' db_squash(quote(year > f(1980)), lf)
-#' db_squash(quote(year > local(f(1980))), lf)
-db_squash <- function(call, data, env = caller_env()) {
+#' partial_eval(quote(year > f(1980)), lf)
+#' partial_eval(quote(year > local(f(1980))), lf)
+partial_eval <- function(call, data, env = caller_env()) {
   if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
     call
   } else if (is_symbol(call)) {
-    db_squash_sym(call, data, env)
+    partial_eval_sym(call, data, env)
   } else if (is_quosure(call)) {
-    db_squash(get_expr(call), data, get_env(call))
+    partial_eval(get_expr(call), data, get_env(call))
   } else if (is_call(call, "if_any")) {
-    db_squash_if(call, data, env, reduce = "|")
+    partial_eval_if(call, data, env, reduce = "|")
   } else if (is_call(call, "if_all")) {
-    db_squash_if(call, data, env, reduce = "&")
+    partial_eval_if(call, data, env, reduce = "&")
   } else if (is_call(call, "across")) {
-    db_squash_across(call, data, env)
+    partial_eval_across(call, data, env)
   } else if (is_call(call)) {
-    db_squash_call(call, data, env)
+    partial_eval_call(call, data, env)
   } else {
     abort(glue("Unknown input type: ", typeof(call)))
   }
 }
 
 capture_dot <- function(.data, x) {
-  db_squash(enquo(x), data = .data)
+  partial_eval(enquo(x), data = .data)
 }
 
 partial_eval_dots <- function(.data, ..., .named = TRUE) {
@@ -89,7 +89,7 @@ partial_eval_dots <- function(.data, ..., .named = TRUE) {
 
 partial_eval_quo <- function(x, data) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  expr <- db_squash(get_expr(x), data, get_env(x))
+  expr <- partial_eval(get_expr(x), data, get_env(x))
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
   } else {
@@ -97,7 +97,7 @@ partial_eval_quo <- function(x, data) {
   }
 }
 
-db_squash_sym <- function(sym, data, env) {
+partial_eval_sym <- function(sym, data, env) {
   vars <- op_vars(data)
   name <- as_string(sym)
   if (name %in% vars) {
@@ -118,7 +118,7 @@ is_mask_pronoun <- function(call) {
   is_call(call, c("$", "[["), n = 2) && is_symbol(call[[2]], c(".data", ".env"))
 }
 
-db_squash_call <- function(call, data, env) {
+partial_eval_call <- function(call, data, env) {
   # TODO which of
   # * `cur_data()`, `cur_data_all()`
   # * `cur_group()`, `cur_group_id()`, and
@@ -177,7 +177,7 @@ db_squash_call <- function(call, data, env) {
     } else if (name == "remote") {
       call[[2]]
     } else {
-      call[-1] <- lapply(call[-1], db_squash, data = data, env = env)
+      call[-1] <- lapply(call[-1], partial_eval, data = data, env = env)
       call
     }
   }

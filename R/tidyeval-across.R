@@ -1,19 +1,19 @@
 capture_across <- function(data, x) {
   x <- enquo(x)
-  db_squash_across(get_expr(x), data, get_env(x))
+  partial_eval_across(get_expr(x), data, get_env(x))
 }
 
-db_squash_across <- function(call, data, env) {
+partial_eval_across <- function(call, data, env) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
   across_setup(data, call, env, allow_rename = TRUE, fn = "across()")
 }
 
 capture_if_all <- function(data, x) {
   x <- enquo(x)
-  db_squash_if(get_expr(x), data, get_env(x))
+  partial_eval_if(get_expr(x), data, get_env(x))
 }
 
-db_squash_if <- function(call, data, env, reduce = "&") {
+partial_eval_if <- function(call, data, env, reduce = "&") {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
   if (reduce == "&") {
     fn <- "if_all()"
@@ -64,7 +64,7 @@ across_fun <- function(fun, env, data, dots, fn) {
       )
       abort(msg)
     }
-    call <- db_squash_formula(fun, env, data, replace = quote(!!.x))
+    call <- partial_eval_formula(fun, env, data, replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
   } else {
     abort(c(
@@ -74,11 +74,11 @@ across_fun <- function(fun, env, data, dots, fn) {
   }
 }
 
-db_squash_formula <- function(x, env, data, replace = quote(!!.x)) {
+partial_eval_formula <- function(x, env, data, replace = quote(!!.x)) {
   call <- f_rhs(x)
   call <- replace_dot(call, replace)
   if (is_call(call)) {
-    call <- db_squash_call(call, data, env)
+    call <- partial_eval_call(call, data, env)
   }
   call
 }
@@ -99,7 +99,7 @@ across_setup <- function(data,
     names_vars <- names(tbl)[locs]
   }
 
-  dots <- lapply(call$..., db_squash, data = data, env = env)
+  dots <- lapply(call$..., partial_eval, data = data, env = env)
   names_spec <- eval(call$.names, env)
   funs_across_data <- across_funs(
     funs = call$.fns,
