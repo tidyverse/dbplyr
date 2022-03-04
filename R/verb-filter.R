@@ -42,18 +42,18 @@ add_filter <- function(.data, dots) {
       where = dots
     )
   } else {
-    vars <- op_vars(.data)
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))
 
-    # Convert where$expr back to a lazy dots object, and then
-    # create mutate operation
+    # Add extracted window expressions as columns
     mutated <- mutate(.data, !!!where$comp)
 
+    # And filter with the modified `where` using the new columns
+    original_vars <- op_vars(.data)
     lazy_select_query(
       from = mutated$lazy_query,
       last_op = "filter",
-      select = syms(set_names(vars)),
+      select = syms(set_names(original_vars)),
       where = where$expr
     )
   }
