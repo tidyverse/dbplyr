@@ -69,7 +69,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na")) {
-  lazy_query <- add_join(
+  x$lazy_query <- add_join(
     x, y,
     "inner",
     by = by,
@@ -81,7 +81,6 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
