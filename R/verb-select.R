@@ -126,7 +126,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
       # if current operation is pure projection
       # we can just subset the previous selection
       sel_vars <- purrr::map_chr(vars, as_string)
-      lazy_query <- update_lazy_select(lazy_query, sel_vars)
+      lazy_query$select <- update_lazy_select(select, sel_vars)
 
       return(lazy_query)
     }
@@ -139,7 +139,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
         # and there's no renaming
         # we can just ignore the previous step
         if (op == "select") {
-          lazy_query <- update_lazy_select(lazy_query, vars)
+          lazy_query$select <- update_lazy_select(select, vars)
         } else {
           lazy_query$select <- new_lazy_select(
             vars,

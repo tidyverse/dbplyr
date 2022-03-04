@@ -90,17 +90,14 @@ new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = 
   )
 }
 
-update_lazy_select <- function(lazy_query, vars) {
+update_lazy_select <- function(select, vars) {
   vctrs::vec_as_names(names(vars), repair = "check_unique")
-  select <- lazy_query$select
 
   sel_vars <- purrr::map_chr(vars, as_string)
   idx <- vctrs::vec_match(sel_vars, select$name)
   select <- vctrs::vec_slice(select, idx)
   select$name <- names(vars)
-  lazy_query$select <- select
-
-  lazy_query
+  select
 }
 
 #' @export
