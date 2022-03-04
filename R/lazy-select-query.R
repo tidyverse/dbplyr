@@ -2,7 +2,7 @@
 #' @rdname sql_build
 lazy_select_query <- function(from,
                               last_op,
-                              select,
+                              select = NULL,
                               where = NULL,
                               group_by = NULL,
                               order_by = NULL,
@@ -15,7 +15,7 @@ lazy_select_query <- function(from,
                               message_summarise = NULL) {
   stopifnot(inherits(from, "lazy_query"))
   stopifnot(is_string(last_op))
-  stopifnot(!is.null(select), is_lazy_sql_part(select))
+  stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
@@ -26,6 +26,7 @@ lazy_select_query <- function(from,
   stopifnot(is_lazy_sql_part(order_vars), is.null(names(order_vars)))
   stopifnot(is.null(frame) || is_integerish(frame, n = 2, finite = TRUE))
 
+  select <- select %||% syms(set_names(op_vars(from)))
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
   stopifnot(is.null(message_summarise) || is_string(message_summarise))

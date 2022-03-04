@@ -41,7 +41,6 @@ add_head <- function(x, n) {
     lazy_query <- lazy_select_query(
       from = lazy_query,
       last_op = "head",
-      select = syms(set_names(op_vars(lazy_query))),
       limit = n
     )
 
@@ -54,7 +53,6 @@ add_head <- function(x, n) {
     lazy_query <- lazy_select_query(
       from = lazy_query,
       last_op = "head",
-      select = syms(set_names(op_vars(lazy_query))),
       limit = n
     )
   }

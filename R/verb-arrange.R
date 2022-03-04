@@ -51,11 +51,9 @@ add_arrange <- function(.data, dots, .by_group) {
   # `dots` must be an empty list so that `arrange()` removes the `order_vars`
   dots <- dots %||% list()
 
-  vars <- op_vars(lazy_query)
   new_lazy_query <- lazy_select_query(
     from = lazy_query,
     last_op = "arrange",
-    select = syms(set_names(vars)),
     order_by = dots,
     order_vars = dots
   )

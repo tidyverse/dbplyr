@@ -35,15 +35,14 @@ add_filter <- function(.data, dots) {
   con <- remote_con(.data)
   lazy_query <- .data$lazy_query
 
-  vars <- op_vars(.data)
   if (!uses_window_fun(dots, con)) {
     lazy_select_query(
       from = lazy_query,
       last_op = "filter",
-      select = syms(set_names(vars)),
       where = dots
     )
   } else {
+    vars <- op_vars(.data)
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))
 

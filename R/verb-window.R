@@ -40,7 +40,6 @@ add_order <- function(.data, dots) {
     out <- lazy_select_query(
       from = lazy_query,
       last_op = "window_order",
-      select = syms(set_names(op_vars(lazy_query))),
       order_vars = dots
     )
 

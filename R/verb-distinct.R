@@ -38,7 +38,6 @@ add_distinct <- function(.data) {
   lazy_select_query(
     from = lazy_query,
     last_op = "distinct",
-    select = syms(set_names(op_vars(lazy_query))),
     distinct = TRUE
   )
 }
