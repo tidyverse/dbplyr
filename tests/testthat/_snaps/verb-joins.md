@@ -1,3 +1,49 @@
+# complete join pipeline works with SQLite and table alias
+
+    Code
+      left_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
+    Output
+      <SQL>
+      SELECT `df1`.`x` AS `x`, `y`
+      FROM `df` AS `df1`
+      LEFT JOIN `df` AS `df2`
+        ON (`df1`.`x` = `df2`.`x`)
+
+# complete semi join works with SQLite and table alias
+
+    Code
+      inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
+    Output
+      <SQL>
+      SELECT `df1`.`x` AS `x`, `y`
+      FROM `df` AS `df1`
+      INNER JOIN `df` AS `df2`
+        ON (`df1`.`x` = `df2`.`x`)
+
+# join check `x_as` and `y_as`
+
+    Code
+      left_join(x, x, by = "x", x_as = NULL)
+    Condition
+      Error in `stop_vctrs()`:
+      ! `x_as` must be a vector, not NULL.
+
+---
+
+    Code
+      left_join(x, x, by = "x", y_as = c("A", "B"))
+    Condition
+      Error in `vctrs::vec_assert()`:
+      ! `y_as` must have size 1, not size 2.
+
+---
+
+    Code
+      left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS")
+    Condition
+      Error in `left_join()`:
+      ! `y_as` must be different from `x_as`.
+
 # can optionally match NA values
 
     Code

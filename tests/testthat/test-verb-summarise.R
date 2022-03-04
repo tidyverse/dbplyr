@@ -49,6 +49,13 @@ test_that("summarise(.groups=)", {
   expect_snapshot(error = TRUE, df %>% summarise(.groups = "rowwise"))
 })
 
+test_that("across() does not select grouping variables", {
+  df <- lazy_frame(g = 1, x = 1)
+
+  # SELECT `g`, 0.0 AS `x`
+  expect_snapshot(df %>% group_by(g) %>% summarise(across(.fns = ~ 0)))
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {

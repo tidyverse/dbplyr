@@ -34,6 +34,8 @@
 #'   The default, "never", is how databases usually work. `"na"` makes
 #'   the joins behave like the dplyr join functions, [merge()], [match()],
 #'   and `%in%`.
+#' @param x_as,y_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
+#'   `"RHS"`
 #' @inherit arrange.tbl_lazy return
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
@@ -68,7 +70,8 @@ NULL
 inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL, na_matches = c("never", "na")) {
+                                sql_on = NULL, na_matches = c("never", "na"),
+                                x_as = "LHS", y_as = "RHS") {
   x$lazy_query <- add_join(
     x, y,
     "inner",
@@ -78,6 +81,8 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -90,7 +95,8 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL, na_matches = c("never", "na")) {
+                               sql_on = NULL, na_matches = c("never", "na"),
+                               x_as = "LHS", y_as = "RHS") {
   lazy_query <- add_join(
     x, y,
     "left",
@@ -100,6 +106,8 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -113,7 +121,8 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
-                                sql_on = NULL, na_matches = c("never", "na")) {
+                                sql_on = NULL, na_matches = c("never", "na"),
+                               x_as = "LHS", y_as = "RHS") {
   lazy_query <- add_join(
     x, y,
     "right",
@@ -123,6 +132,8 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -136,7 +147,8 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
-                               sql_on = NULL, na_matches = c("never", "na")) {
+                               sql_on = NULL, na_matches = c("never", "na"),
+                               x_as = "LHS", y_as = "RHS") {
   lazy_query <- add_join(
     x, y,
     "full",
@@ -146,6 +158,8 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     suffix = suffix,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -158,7 +172,8 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @importFrom dplyr semi_join
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL, na_matches = c("never", "na")) {
+                               sql_on = NULL, na_matches = c("never", "na"),
+                               x_as = "LHS", y_as = "RHS") {
   lazy_query <- add_semi_join(
     x, y,
     anti = FALSE,
@@ -167,6 +182,8 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -179,7 +196,8 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 #' @importFrom dplyr anti_join
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
-                               sql_on = NULL, na_matches = c("never", "na")) {
+                               sql_on = NULL, na_matches = c("never", "na"),
+                               x_as = "LHS", y_as = "RHS") {
   lazy_query <- add_semi_join(
     x, y,
     anti = TRUE,
@@ -188,6 +206,8 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     copy = copy,
     auto_index = auto_index,
     na_matches = na_matches,
+    x_as = x_as,
+    y_as = y_as,
     ...
   )
 
@@ -199,7 +219,10 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                      suffix = NULL,
                      auto_index = FALSE,
-                     na_matches = "never") {
+                     na_matches = "never",
+                     x_as = "LHS",
+                     y_as = "RHS") {
+  check_join_as(x_as, y_as, call = caller_env())
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -209,6 +232,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
+  by$x_as <- x_as
+  by$y_as <- y_as
 
   y <- auto_copy(
     x, y,
@@ -230,12 +255,17 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, na_matches = "never") {
+                             auto_index = FALSE, na_matches = "never",
+                             x_as = "LHS", y_as = "RHS") {
+  check_join_as(x_as, y_as)
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
     by <- dplyr::common_by(by, x, y)
   }
+  by$x_as <- x_as
+  by$y_as <- y_as
 
   y <- auto_copy(
     x, y, copy,
@@ -248,6 +278,14 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     by = by,
     na_matches = na_matches
   )
+}
+
+check_join_as <- function(x_as, y_as, call) {
+  vctrs::vec_assert(x_as, character(), size = 1)
+  vctrs::vec_assert(y_as, character(), size = 1)
+  if (x_as == y_as) {
+    abort("`y_as` must be different from `x_as`.", call = call)
+  }
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {

@@ -69,6 +69,14 @@ test_that("supports overwriting variables (#3222)", {
   expect_equal(df, tibble(x = 1, y = 5))
 })
 
+test_that("across() does not select grouping variables", {
+  df <- lazy_frame(g = 1, x = 1)
+
+  # SELECT `g`, 0.0 AS `x`
+  expect_snapshot(df %>% group_by(g) %>% mutate(across(.fns = ~ 0)))
+  expect_snapshot(df %>% group_by(g) %>% transmute(across(.fns = ~ 0)))
+})
+
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {

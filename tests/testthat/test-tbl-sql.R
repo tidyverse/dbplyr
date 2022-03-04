@@ -31,7 +31,9 @@ test_that("sql tbl can be printed", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
   mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
 
-  expect_snapshot(mf2)
+  expect_snapshot(mf2, transform = function(x) {
+    gsub("sqlite .* \\[:memory:\\]", "sqlite ?.?.? [:memory:]", x)
+  })
 })
 
 test_that("can refer to default schema explicitly", {

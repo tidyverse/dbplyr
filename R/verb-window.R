@@ -22,8 +22,7 @@
 #'   mutate(z = sum(x)) %>%
 #'   show_query()
 window_order <- function(.data, ...) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
   lazy_query <- add_order(.data, dots)

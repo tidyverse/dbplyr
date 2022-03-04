@@ -29,6 +29,16 @@
       ! `.groups` can't be "rowwise" in dbplyr
       i Possible values are NULL (default), "drop_last", "drop", and "keep"
 
+# across() does not select grouping variables
+
+    Code
+      df %>% group_by(g) %>% summarise(across(.fns = ~0))
+    Output
+      <SQL>
+      SELECT `g`, 0.0 AS `x`
+      FROM `df`
+      GROUP BY `g`
+
 # quoting for rendering summarized grouped table
 
     Code

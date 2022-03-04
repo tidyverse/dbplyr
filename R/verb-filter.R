@@ -21,8 +21,8 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   }
   check_filter(...)
 
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
+
   if (is_empty(dots)) {
     return(.data)
   }

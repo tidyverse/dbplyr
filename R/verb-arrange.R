@@ -30,8 +30,7 @@
 #' @export
 #' @importFrom dplyr arrange
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
   .data$lazy_query <- add_arrange(.data, dots, .by_group)
