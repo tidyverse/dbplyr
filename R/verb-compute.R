@@ -76,6 +76,5 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
 
   sql <- db_sql_render(x$src$con, x)
   out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete)
-  unique_subquery_name_reset()
   dplyr::grouped_df(out, intersect(op_grps(x), names(out)))
 }
