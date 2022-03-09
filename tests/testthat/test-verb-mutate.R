@@ -31,7 +31,7 @@ test_that("can refer to fresly created values", {
 test_that("transmute includes all needed variables", {
   lf <- lazy_frame(x = 1, y = 2)
   out <- transmute(lf, x = x / 2, x2 = x + y)
-  expect_named(out$ops$x$args$vars, c("x", "y"))
+  expect_equal(op_vars(out$lazy_query$from), c("x", "y"))
   expect_snapshot(out)
 })
 
@@ -173,10 +173,10 @@ test_that("mutate generates simple expressions", {
 
 test_that("mutate can drop variables with NULL", {
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate(y = NULL) %>%
-    sql_build()
+    mutate(y = NULL)
 
-  expect_named(out$select, "x")
+  expect_named(sql_build(out)$select, "x")
+  expect_equal(op_vars(out), "x")
 })
 
 test_that("mutate_all generates correct sql", {

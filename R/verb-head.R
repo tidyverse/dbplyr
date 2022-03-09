@@ -31,21 +31,36 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
   }
   n <- trunc(n)
 
-  if (inherits(x$ops, "op_head")) {
-    x$ops$args$n <- min(x$ops$args$n, n)
-  } else {
-    x$ops <- op_single("head", x = x$ops, args = list(n = n))
-  }
+  x$lazy_query <- add_head(x, n)
   x
+}
+
+add_head <- function(x, n) {
+  lazy_query <- x$lazy_query
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "head",
+      limit = n
+    )
+
+    return(lazy_query)
+  }
+
+  if (identical(lazy_query$last_op, "head")) {
+    lazy_query$limit <- min(lazy_query$limit, n)
+  } else {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "head",
+      limit = n
+    )
+  }
+
+  lazy_query
 }
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
   abort("tail() is not supported by sql sources")
 }
-
-#' @export
-sql_build.op_head <- function(op, con, ...) {
-  select_query(sql_build(op$x, con), limit = op$args$n)
-}
-

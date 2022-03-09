@@ -167,28 +167,28 @@ test_that("join verbs generate expected ops", {
   lf2 <- lazy_frame(x = 1, z = 2)
 
   ji <- inner_join(lf1, lf2, by = "x")
-  expect_s3_class(ji$ops, "op_join")
-  expect_equal(ji$ops$args$type, "inner")
+  expect_s3_class(ji$lazy_query, "lazy_join_query")
+  expect_equal(ji$lazy_query$type, "inner")
 
   jl <- left_join(lf1, lf2, by = "x")
-  expect_s3_class(jl$ops, "op_join")
-  expect_equal(jl$ops$args$type, "left")
+  expect_s3_class(jl$lazy_query, "lazy_join_query")
+  expect_equal(jl$lazy_query$type, "left")
 
   jr <- right_join(lf1, lf2, by = "x")
-  expect_s3_class(jr$ops, "op_join")
-  expect_equal(jr$ops$args$type, "right")
+  expect_s3_class(jr$lazy_query, "lazy_join_query")
+  expect_equal(jr$lazy_query$type, "right")
 
   jf <- full_join(lf1, lf2, by = "x")
-  expect_s3_class(jf$ops, "op_join")
-  expect_equal(jf$ops$args$type, "full")
+  expect_s3_class(jf$lazy_query, "lazy_join_query")
+  expect_equal(jf$lazy_query$type, "full")
 
   js <- semi_join(lf1, lf2, by = "x")
-  expect_s3_class(js$ops, "op_semi_join")
-  expect_equal(js$ops$args$anti, FALSE)
+  expect_s3_class(js$lazy_query, "lazy_semi_join_query")
+  expect_equal(js$lazy_query$anti, FALSE)
 
   ja <- anti_join(lf1, lf2, by = "x")
-  expect_s3_class(ja$ops, "op_semi_join")
-  expect_equal(ja$ops$args$anti, TRUE)
+  expect_s3_class(ja$lazy_query, "lazy_semi_join_query")
+  expect_equal(ja$lazy_query$anti, TRUE)
 })
 
 test_that("can optionally match NA values", {
@@ -203,8 +203,6 @@ test_that("join captures both tables", {
   out <- inner_join(lf1, lf2, by = "x") %>% sql_build()
 
   expect_s3_class(out, "join_query")
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
   expect_equal(out$type, "inner")
 })
 
@@ -214,8 +212,6 @@ test_that("semi join captures both tables", {
 
   out <- semi_join(lf1, lf2, by = "x") %>% sql_build()
 
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
   expect_equal(out$anti, FALSE)
 })
 

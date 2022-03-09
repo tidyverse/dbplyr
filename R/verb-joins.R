@@ -72,8 +72,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
                                 x_as = "LHS", y_as = "RHS") {
-
-  add_op_join(
+  x$lazy_query <- add_join(
     x, y,
     "inner",
     by = by,
@@ -86,6 +85,8 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x
 }
 
 #' @rdname join.tbl_sql
@@ -96,8 +97,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = "LHS", y_as = "RHS") {
-
-  add_op_join(
+  lazy_query <- add_join(
     x, y,
     "left",
     by = by,
@@ -110,6 +110,9 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x$lazy_query <- lazy_query
+  x
 }
 
 #' @rdname join.tbl_sql
@@ -120,8 +123,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
                                x_as = "LHS", y_as = "RHS") {
-
-  add_op_join(
+  lazy_query <- add_join(
     x, y,
     "right",
     by = by,
@@ -134,6 +136,9 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x$lazy_query <- lazy_query
+  x
 }
 
 #' @rdname join.tbl_sql
@@ -144,8 +149,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = "LHS", y_as = "RHS") {
-
-  add_op_join(
+  lazy_query <- add_join(
     x, y,
     "full",
     by = by,
@@ -158,6 +162,9 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x$lazy_query <- lazy_query
+  x
 }
 
 #' @rdname join.tbl_sql
@@ -167,8 +174,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = "LHS", y_as = "RHS") {
-
-  add_op_semi_join(
+  lazy_query <- add_semi_join(
     x, y,
     anti = FALSE,
     by = by,
@@ -180,6 +186,9 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x$lazy_query <- lazy_query
+  x
 }
 
 #' @rdname join.tbl_sql
@@ -189,8 +198,7 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = "LHS", y_as = "RHS") {
-
-  add_op_semi_join(
+  lazy_query <- add_semi_join(
     x, y,
     anti = TRUE,
     by = by,
@@ -202,15 +210,18 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     y_as = y_as,
     ...
   )
+
+  x$lazy_query <- lazy_query
+  x
 }
 
 
-add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
-                        suffix = NULL,
-                        auto_index = FALSE,
-                        na_matches = "never",
-                        x_as = "LHS",
-                        y_as = "RHS") {
+add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
+                     suffix = NULL,
+                     auto_index = FALSE,
+                     na_matches = "never",
+                     x_as = "LHS",
+                     y_as = "RHS") {
   check_join_as(x_as, y_as, call = caller_env())
 
   if (!is.null(sql_on)) {
@@ -233,17 +244,17 @@ add_op_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
 
-  x$ops <- op_double("join", x, y, args = list(
+  lazy_join_query(
+    x, y,
     vars = vars,
     type = type,
     by = by,
     suffix = suffix,
     na_matches = na_matches
-  ))
-  x
+  )
 }
 
-add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
+add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never",
                              x_as = "LHS", y_as = "RHS") {
   check_join_as(x_as, y_as)
@@ -261,12 +272,12 @@ add_op_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy 
     indexes = if (auto_index) list(by$y)
   )
 
-  x$ops <- op_double("semi_join", x, y, args = list(
+  lazy_semi_join_query(
+    x, y,
     anti = anti,
     by = by,
     na_matches = na_matches
-  ))
-  x
+  )
 }
 
 check_join_as <- function(x_as, y_as, call) {
@@ -333,36 +344,4 @@ add_suffixes <- function(x, y, suffix) {
     out[[i]] <- nm
   }
   out
-}
-
-
-#' @export
-op_vars.op_join <- function(op) {
-  op$args$vars$alias
-}
-#' @export
-op_vars.op_semi_join <- function(op) {
-  op_vars(op$x)
-}
-
-#' @export
-sql_build.op_join <- function(op, con, ...) {
-  join_query(
-    op$x, op$y,
-    vars = op$args$vars,
-    type = op$args$type,
-    by = op$args$by,
-    suffix = op$args$suffix,
-    na_matches = op$args$na_matches
-  )
-}
-
-#' @export
-sql_build.op_semi_join <- function(op, con, ...) {
-  semi_join_query(
-    op$x, op$y,
-    anti = op$args$anti,
-    by = op$args$by,
-    na_matches = op$args$na_matches
-  )
 }

@@ -110,3 +110,28 @@ test_that("summarise drops one grouping level", {
   expect_equal(op_grps(out2), character())
 })
 
+
+# lazy_select_query -------------------------------------------------------
+
+test_that("can handle rename", {
+  lf <- lazy_frame(x = 1:3, y = 3:1)
+
+  out <- lf %>%
+    group_by(x) %>%
+    rename(ax = x, by = y) %>%
+    summarise(mean_by = mean(by, na.rm = TRUE)) %>%
+    .$lazy_query
+
+  expect_equal(
+    out,
+    lazy_select_query(
+      from = out$from,
+      last_op = "summarise",
+      select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
+      group_by = syms("ax"),
+      select_operation = "summarise",
+      group_vars = character()
+    ),
+    ignore_formula_env = TRUE
+  )
+})
