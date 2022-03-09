@@ -132,7 +132,6 @@ label_output_dataframe <- function(labels, out, groups) {
 }
 
 label_output_list <- function(labels, out, groups) {
-  # browser()
   if (!is.null(labels)) {
     labels[names(out)] <- out
     dplyr::rowwise(labels)

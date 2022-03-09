@@ -84,7 +84,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   new_vars <- dplyr::relocate(
-    simulate_vars2(.data),
+    simulate_vars(.data),
     ...,
     .before = {{.before}},
     .after = {{.after}}
@@ -101,13 +101,8 @@ simulate_vars <- function(x, drop_groups = FALSE) {
     vars <- op_vars(x)
   }
 
-  as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
-}
-
-simulate_vars2 <- function(x) {
-  vars <- op_vars(x)
   vars_list <- as.list(vars)
-  as_tibble(set_names(vars_list, vars))
+  as_tibble(set_names(vars_list, vars), .name_repair = "minimal")
 }
 
 # op_select ---------------------------------------------------------------
@@ -122,7 +117,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     return(lazy_query)
   }
 
-  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
+  if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in nest_vars()
