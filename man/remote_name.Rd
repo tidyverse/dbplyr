@@ -14,7 +14,7 @@ remote_src(x)
 
 remote_con(x)
 
-remote_query(x)
+remote_query(x, cte = FALSE)
 
 remote_query_plan(x)
 }

@@ -42,8 +42,8 @@ remote_con <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query <- function(x) {
-  db_sql_render(remote_con(x), x)
+remote_query <- function(x, cte = FALSE) {
+  db_sql_render(remote_con(x), x, cte = cte)
 }
 
 #' @export
