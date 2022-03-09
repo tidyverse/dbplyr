@@ -31,7 +31,7 @@ lazy_semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
 lazy_select_query(
   from,
   last_op,
-  select,
+  select = NULL,
   where = NULL,
   group_by = NULL,
   order_by = NULL,
