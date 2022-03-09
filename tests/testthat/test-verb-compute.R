@@ -63,6 +63,17 @@ test_that("compute creates correct column names", {
   expect_equal(out, tibble(x = 1, n = 1L))
 })
 
+test_that("compute keeps window and groups", {
+  out <- memdb_frame(x = 1, y = 1) %>%
+    window_order(x) %>%
+    group_by(x, y) %>%
+    summarise(n = n(), .groups = "drop_last") %>%
+    compute()
+
+  expect_equal(op_sort(out), list(quo(x)), ignore_formula_env = TRUE)
+  expect_equal(op_grps(out), "x")
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("sorting preserved across compute and collapse", {

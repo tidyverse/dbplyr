@@ -55,7 +55,7 @@ compute.tbl_sql <- function(x,
 
   tbl(x$src, name) %>%
     group_by(!!! syms(op_grps(x))) %>%
-    arrange.tbl_lazy(!!!op_sort(x))
+    window_order(!!!op_sort(x))
 }
 
 # collect -----------------------------------------------------------------
