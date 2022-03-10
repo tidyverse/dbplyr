@@ -49,6 +49,15 @@ test_that("summarise(.groups=)", {
   expect_snapshot(error = TRUE, df %>% summarise(.groups = "rowwise"))
 })
 
+test_that("summarise can modify grouping variables", {
+  lf <- lazy_frame(g = 1, x = 1)
+
+  expect_snapshot((result1 <- lf %>% group_by(g) %>% summarise(g = g + 1)))
+  expect_equal(op_vars(result1), "g")
+  expect_snapshot((result2 <- lf %>% group_by(g) %>% summarise(x = x + 1, g = g + 1)))
+  expect_equal(op_vars(result2), c("g", "x"))
+})
+
 test_that("across() does not select grouping variables", {
   df <- lazy_frame(g = 1, x = 1)
 
