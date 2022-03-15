@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `remote_query()` and `show_query()` now have the argument `cte`. If `TRUE`
+  the SQL query uses common table expressions instead of nested queries
+  (@mgirlich, #638).
+
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
   easier to transfer bug fixes and new features from one package to the other.
   In this process the second argument of `partial_eval()` was changed to a lazy
