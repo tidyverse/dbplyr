@@ -36,11 +36,16 @@ add_filter <- function(.data, dots) {
   lazy_query <- .data$lazy_query
 
   if (!uses_window_fun(dots, con)) {
-    lazy_select_query(
-      from = lazy_query,
-      last_op = "filter",
-      where = dots
-    )
+    if (uses_mutated_vars(dots, lazy_query$select)) {
+      lazy_select_query(
+        from = lazy_query,
+        last_op = "filter",
+        where = dots
+      )
+    } else {
+      lazy_query$where <- c(lazy_query$where, dots)
+      lazy_query
+    }
   } else {
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))
