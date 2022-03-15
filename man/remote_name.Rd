@@ -20,6 +20,8 @@ remote_query_plan(x)
 }
 \arguments{
 \item{x}{Remote table, currently must be a \link{tbl_sql}.}
+
+\item{cte}{Use common table expressions in the generated SQL?}
 }
 \value{
 The value, or \code{NULL} if not remote table, or not applicable.

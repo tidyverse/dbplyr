@@ -6,6 +6,7 @@
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
+#' @param cte Use common table expressions in the generated SQL?
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
 #' @export
