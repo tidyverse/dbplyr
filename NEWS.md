@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `compute()` can now handle when `name` is named by unnaming it first
+  (@mgirlich, #623).
+
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
   easier to transfer bug fixes and new features from one package to the other.
   In this process the second argument of `partial_eval()` was changed to a lazy
