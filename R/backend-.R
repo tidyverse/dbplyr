@@ -4,6 +4,7 @@
 #' @include translate-sql-paste.R
 #' @include translate-sql-string.R
 #' @include translate-sql-quantile.R
+#' @include translate-sql-cut.R
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
@@ -243,6 +244,7 @@ base_scalar <- sql_translator(
   paste0 = sql_paste(""),
   substr = sql_substr("SUBSTR"),
   substring = sql_substr("SUBSTR"),
+  cut = sql_cut,
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),
