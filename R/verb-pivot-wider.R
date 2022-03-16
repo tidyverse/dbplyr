@@ -3,6 +3,7 @@
 #' `pivot_wider()` "widens" data, increasing the number of columns and
 #' decreasing the number of rows. The inverse transformation is
 #' `pivot_longer()`.
+#' Note that `pivot_wider()` is not lazy but has to collect the data.
 #' Learn more in `vignette("pivot", "tidyr")`.
 #'
 #' @details
