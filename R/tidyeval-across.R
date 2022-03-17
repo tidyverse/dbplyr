@@ -78,7 +78,7 @@ across_fun <- function(fun, env, data, dots, fn) {
 
 partial_eval_formula <- function(x, env, data, replace = quote(!!.x)) {
   call <- f_rhs(x)
-  call <- replace_dot(call, replace)
+  call <- replace_sym(call, c(".", ".x"), replace)
   if (is_call(call)) {
     call <- partial_eval_call(call, data, env)
   }
