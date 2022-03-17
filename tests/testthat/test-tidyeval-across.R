@@ -41,15 +41,22 @@ test_that("across() translates functions", {
   )
 })
 
-# TODO test for anonymous function?
-# test_that("across() captures anonymous functions", {
-#   lf <- lazy_frame(a = 1)
-#
-#   expect_equal(
-#    capture_across(lf, across(a, function(x) log(x))),
-#    list(a = call2(function(x) log(x), quote(a)))
-#   )
-# })
+test_that("across() captures anonymous functions", {
+  lf <- lazy_frame(a = 1)
+
+  expect_equal(
+    capture_across(lf, across(a, function(x) log(x))),
+    list(a = expr(log(a)))
+  )
+
+  expect_snapshot(
+    (expect_error(capture_across(lf, across(a, function(x) {
+      x <- x + 2
+      log(x)
+      }
+    ))))
+  )
+})
 
 test_that("dots are translated too", {
   fun <- function() {

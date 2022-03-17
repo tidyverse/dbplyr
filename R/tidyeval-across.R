@@ -39,6 +39,9 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     args <- call_args(funs)
     fns <- lapply(args, across_fun, env, data, dots = dots, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
+  } else if (is_call(funs, "function")) {
+    fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
+    names_spec <- names_spec %||% "{.col}"
   } else if (is.list(funs)) {
     fns <- lapply(funs, across_fun, env, data, dots = dots, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
@@ -54,7 +57,7 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
 }
 
 across_fun <- function(fun, env, data, dots, fn) {
-  # unlike in `dtplyr` anonymous functions do not work (`is_function(funs)` || is_call(fun, "function"))
+  # unlike in `dtplyr` anonymous functions do not work (is_function(fun))
   if (is_symbol(fun) || is_string(fun)) {
     function(x) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
@@ -66,7 +69,17 @@ across_fun <- function(fun, env, data, dots, fn) {
       )
       abort(msg)
     }
-    call <- partial_eval_formula(fun, env, data, replace = quote(!!.x))
+    call <- partial_eval_body(f_rhs(fun), env, data, sym = c(".", ".x"), replace = quote(!!.x))
+    function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
+  } else if (is_call(fun, "function")) {
+    fun <- eval(fun, env)
+    body <- fn_body(fun)
+    if (length(body) > 2) {
+      abort("Cannot translate functions consisting of more than one statement.")
+    }
+    args <- fn_fmls_names(fun)
+
+    call <- partial_eval_body(body[[2]], env, data, sym = args[[1]], replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
   } else {
     abort(c(
@@ -76,9 +89,8 @@ across_fun <- function(fun, env, data, dots, fn) {
   }
 }
 
-partial_eval_formula <- function(x, env, data, replace = quote(!!.x)) {
-  call <- f_rhs(x)
-  call <- replace_sym(call, c(".", ".x"), replace)
+partial_eval_body <- function(x, env, data, sym, replace = quote(!!.x)) {
+  call <- replace_sym(x, sym, replace)
   if (is_call(call)) {
     call <- partial_eval_call(call, data, env)
   }

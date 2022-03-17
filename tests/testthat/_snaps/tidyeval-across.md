@@ -1,3 +1,15 @@
+# across() captures anonymous functions
+
+    Code
+      (expect_error(capture_across(lf, across(a, function(x) {
+        x <- x + 2
+        log(x)
+      }))))
+    Output
+      <error/rlang_error>
+      Error in `across_fun()`:
+      ! Cannot translate functions consisting of more than one statement.
+
 # across() does not support formulas with dots
 
     Code
