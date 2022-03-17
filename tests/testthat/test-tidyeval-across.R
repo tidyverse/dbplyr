@@ -96,6 +96,20 @@ test_that("across() does not support formulas with dots", {
   })
 })
 
+test_that("across() translates evaluated functions", {
+  lf <- lazy_frame(x = 1)
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!sum)),
+    exprs(x = sum(x))
+  )
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!function(x) sum(x + 2))),
+    exprs(x = sum(x + 2))
+  )
+})
+
 test_that("across() gives informative errors", {
   lf <- lazy_frame(a = 1,  b = 2)
   expect_snapshot(error = TRUE, {
@@ -295,11 +309,15 @@ test_that("can pass quosure through `across()`", {
 
 test_that("across() translates evaluated lists", {
   lf <- lazy_frame(x = 1)
-  fun_list <- list(~ mean(.x, na.rm = TRUE))
+  fun_list <- list(mean, ~ mean(.x + 1, na.rm = TRUE), function(x) mean(x + 2))
 
   expect_equal(
     capture_across(lf, across(.fns = !!fun_list)),
-    exprs(x_1 = mean(x, na.rm = TRUE))
+    exprs(
+      x_1 = mean(x),
+      x_2 = mean(x + 1, na.rm = TRUE),
+      x_3 = mean(x + 2),
+    )
   )
 })
 

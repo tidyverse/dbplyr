@@ -7,7 +7,7 @@
       }))))
     Output
       <error/rlang_error>
-      Error in `across_fun()`:
+      Error in `partial_eval_fun()`:
       ! Cannot translate functions consisting of more than one statement.
 
 # across() does not support formulas with dots

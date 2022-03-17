@@ -53,7 +53,13 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
 
 across_fun <- function(fun, env, data, dots, fn) {
   # unlike in `dtplyr` anonymous functions do not work (is_function(fun))
-  if (is_symbol(fun) || is_string(fun)) {
+  if (is_function(fun)) {
+    fn_name <- find_fun(fun)
+    if (!is_null(fn_name)) {
+      return(function(x) call2(fn_name, x, !!!dots))
+    }
+    partial_eval_fun(fun, env, data)
+  } else if (is_symbol(fun) || is_string(fun)) {
     function(x) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
@@ -68,20 +74,24 @@ across_fun <- function(fun, env, data, dots, fn) {
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
-    body <- fn_body(fun)
-    if (length(body) > 2) {
-      abort("Cannot translate functions consisting of more than one statement.")
-    }
-    args <- fn_fmls_names(fun)
-
-    call <- partial_eval_body(body[[2]], env, data, sym = args[[1]], replace = quote(!!.x))
-    function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
+    partial_eval_fun(fun, env, data)
   } else {
     abort(c(
       ".fns argument to dbplyr::across() must contain a function or a formula",
       x = paste0("Problem with ", expr_deparse(fun))
     ))
   }
+}
+
+partial_eval_fun <- function(fun, env, data) {
+  body <- fn_body(fun)
+  if (length(body) > 2) {
+    abort("Cannot translate functions consisting of more than one statement.")
+  }
+  args <- fn_fmls_names(fun)
+
+  call <- partial_eval_body(body[[2]], env, data, sym = args[[1]], replace = quote(!!.x))
+  function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
 }
 
 partial_eval_body <- function(x, env, data, sym, replace = quote(!!.x)) {
