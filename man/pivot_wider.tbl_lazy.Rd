@@ -4,7 +4,7 @@
 \alias{pivot_wider.tbl_lazy}
 \title{Pivot data from long to wide}
 \usage{
-pivot_wider.tbl_lazy(
+\method{pivot_wider}{tbl_lazy}(
   data,
   id_cols = NULL,
   names_from = name,
