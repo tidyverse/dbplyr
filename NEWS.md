@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The translation of `n()` now respects the window frame (@mgirlich, #700).
+
 * `explain()` now works for Redshift (@mgirlich, #740).
 
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
