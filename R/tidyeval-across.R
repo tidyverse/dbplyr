@@ -29,19 +29,14 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     fns <- list(`1` = function(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
     return(list(fns = fns, names = names_spec))
-  } else if (is_symbol(funs) || is_function(funs)) {
-    fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
-    names_spec <- names_spec %||% "{.col}"
-  } else if (is_call(funs, "~")) {
+  } else if (is_symbol(funs) || is_function(funs) ||
+             is_call(funs, "~") || is_call(funs, "function")) {
     fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
     names_spec <- names_spec %||% "{.col}"
   } else if (is_call(funs, "list")) {
     args <- call_args(funs)
     fns <- lapply(args, across_fun, env, data, dots = dots, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
-  } else if (is_call(funs, "function")) {
-    fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
-    names_spec <- names_spec %||% "{.col}"
   } else if (is.list(funs)) {
     fns <- lapply(funs, across_fun, env, data, dots = dots, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
