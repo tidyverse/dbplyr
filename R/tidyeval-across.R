@@ -24,13 +24,12 @@ partial_eval_if <- function(call, data, env, reduce = "&") {
   Reduce(function(x, y) call2(reduce, x, y), out)
 }
 
-across_funs <- function(funs, env, data, dots, names_spec, fn) {
+across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE) {
   if (is.null(funs)) {
     fns <- list(`1` = function(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
     return(list(fns = fns, names = names_spec))
-  } else if (is_symbol(funs)) {
-    # unlike in `dtplyr` anonymous functions do not work (`is_function(funs)`)
+  } else if (is_symbol(funs) || is_function(funs)) {
     fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
     names_spec <- names_spec %||% "{.col}"
   } else if (is_call(funs, "~")) {
@@ -40,10 +39,13 @@ across_funs <- function(funs, env, data, dots, names_spec, fn) {
     args <- call_args(funs)
     fns <- lapply(args, across_fun, env, data, dots = dots, fn = fn)
     names_spec <- names_spec %||% "{.col}_{.fn}"
-  } else if (!is.null(env)) {
+  } else if (is.list(funs)) {
+    fns <- lapply(funs, across_fun, env, data, dots = dots, fn = fn)
+    names_spec <- names_spec %||% "{.col}_{.fn}"
+  } else if (!is.null(env) && !evaluated) {
     # Try evaluating once, just in case
     funs <- eval(funs, env)
-    return(across_funs(funs, NULL, dots = dots, names_spec = NULL, fn = fn))
+    return(across_funs(funs, env, data = data, dots = dots, names_spec = NULL, fn = fn, evaluated = TRUE))
   } else {
     abort("`.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list")
   }

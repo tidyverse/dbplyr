@@ -286,6 +286,15 @@ test_that("can pass quosure through `across()`", {
   )
 })
 
+test_that("across() translates evaluated lists", {
+  lf <- lazy_frame(x = 1)
+  fun_list <- list(~ mean(.x, na.rm = TRUE))
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!fun_list)),
+    exprs(x_1 = mean(x, na.rm = TRUE))
+  )
+})
 
 # if_all ------------------------------------------------------------------
 
@@ -394,19 +403,8 @@ test_that("if_all() drops groups", {
   )
 })
 
-test_that("if_any() and if_all() expansions deal with no inputs or single inputs", {
-  skip("TODO")
+test_that("if_any() and if_all() expansions deal with single inputs", {
   d <- lazy_frame(x = 1)
-
-  # No inputs
-  expect_equal(
-    filter(d, if_any(starts_with("c"), ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`")
-  )
-  expect_equal(
-    filter(d, if_all(starts_with("c"), ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`")
-  )
 
   # Single inputs
   expect_equal(
