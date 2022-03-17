@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `explain()` now passes `...` to methods (@mgirlich, #783).
+
 * `compute()` can now handle when `name` is named by unnaming it first
   (@mgirlich, #623).
 
