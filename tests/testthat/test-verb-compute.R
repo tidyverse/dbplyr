@@ -74,6 +74,16 @@ test_that("compute keeps window and groups", {
   expect_equal(op_grps(out), "x")
 })
 
+test_that("compute can handle named name", {
+  name <- set_names(unique_subquery_name(), unique_subquery_name())
+  expect_equal(
+    memdb_frame(x = 1:10) %>%
+      compute() %>%
+      collect(),
+    tibble(x = 1:10)
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("sorting preserved across compute and collapse", {

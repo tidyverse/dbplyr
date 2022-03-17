@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `compute()` can now handle when `name` is named by unnaming it first
+  (@mgirlich, #623).
+
 * The translation of `n()` now respects the window frame (@mgirlich, #700).
 
 * `explain()` now works for Redshift (@mgirlich, #740).
