@@ -6,6 +6,7 @@
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
+#' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
 #' @export
@@ -48,6 +49,6 @@ remote_query <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query_plan <- function(x) {
-  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$lazy_query))
+remote_query_plan <- function(x, ...) {
+  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$lazy_query), ...)
 }

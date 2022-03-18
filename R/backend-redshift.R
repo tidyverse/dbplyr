@@ -87,4 +87,11 @@ sql_paste_redshift <- function(sep) {
   sql_paste_infix(sep, "||", function(x) sql_expr(cast(!!x %as% text)))
 }
 
+# https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
+#' @export
+sql_query_explain.Redshift <- function(con, sql, ...) {
+
+  build_sql("EXPLAIN ", sql, con = con)
+}
+
 utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD"))

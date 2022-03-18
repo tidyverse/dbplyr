@@ -4,7 +4,7 @@
 \alias{expand.tbl_lazy}
 \title{Expand SQL tables to include all possible combinations of values}
 \usage{
-expand.tbl_lazy(data, ..., .name_repair = "check_unique")
+\method{expand}{tbl_lazy}(data, ..., .name_repair = "check_unique")
 }
 \arguments{
 \item{data}{A lazy data frame backed by a database query.}

@@ -16,10 +16,12 @@ remote_con(x)
 
 remote_query(x)
 
-remote_query_plan(x)
+remote_query_plan(x, ...)
 }
 \arguments{
 \item{x}{Remote table, currently must be a \link{tbl_sql}.}
+
+\item{...}{Additional arguments passed on to methods.}
 }
 \value{
 The value, or \code{NULL} if not remote table, or not applicable.
