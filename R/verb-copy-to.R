@@ -144,7 +144,7 @@ sql_values.DBIConnection <- function(con, df) {
 #' @export
 sql_values.SQLiteConnection <- function(con, df) {
   needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
-  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con)) %>%
+  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL)) %>%
     sql_values_clause(con = con)
 }
 

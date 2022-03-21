@@ -87,6 +87,12 @@ test_that("can translate a table", {
       dtt = "2020-01-01T01:23:45Z"
     )
   )
+
+  expect_equal(
+    copy_inline(con, tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))) %>%
+      collect(),
+    tibble(date = c("2020-01-01", "2020-01-02"))
+  )
 })
 
 test_that("can translate 1-column tables", {
