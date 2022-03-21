@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Added `copy_inline()` as a `copy_to()` equivalent that does not need write
+  access (@mgirlich, #628).
+
 * `explain()` now passes `...` to methods (@mgirlich, #783).
 
 * `compute()` can now handle when `name` is named by unnaming it first

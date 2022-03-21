@@ -87,8 +87,14 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   invisible(out)
 }
 
+#' @importFrom dplyr auto_copy
 #' @export
-db_values <- function(con, df) {
+auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
+  copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
+}
+
+#' @export
+copy_inline <- function(con, df) {
   if (!inherits(df, "data.frame")) {
     abort("`df` needs to be a data.frame.")
   }
@@ -113,96 +119,128 @@ sql_values.DBIConnection <- function(con, df) {
   sql_values_clause(con, df)
 }
 
+#' @export
+sql_values.SQLiteConnection <- function(con, df) {
+  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con)) %>%
+    sql_values_clause(con = con)
+}
+
 sql_values_clause <- function(con, df, row = FALSE) {
-  # The query consists of two parts:
-  # * An outer select which converts the values to the correct types
-  # * A subquery which provides:
-  #   * named NULLs (needed as e.g. SQLite cannot name `VALUES`)
-  #   * the actual values without names
-
-  sim_data <- rep_named(colnames(df), list(NULL))
-  cols_clause <- escape(sim_data, con = con, parens = FALSE)
-  null_row_clause <- build_sql("SELECT ", cols_clause, " WHERE 0 = 1", con = con)
-
-  empty_df <- nrow(df) == 0L
-  if (empty_df) {
-    subquery <- null_row_clause
-  } else {
-    escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
-    rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
-    values_clause <- sql(paste0(if (row) "ROW", "(", rows, ")", collapse = ",\n  "))
-
-    union_query <- set_op_query(
-      null_row_clause,
-      build_sql("VALUES\n  ", values_clause, con = con),
-      type = "UNION ALL"
+  if (nrow(df) == 0L) {
+    typed_cols <- purrr::map_chr(
+      vctrs::vec_init(df),
+      ~ {
+        cast_expr <- call2(sql_cast_dispatch(.x), NA)
+        translate_sql(!!cast_expr, con = con)
+      }
     )
 
-    subquery <- sql_render(union_query, con = con)
+    query <- select_query(
+      from = ident(),
+      select = sql(typed_cols),
+      where = sql("0 = 1")
+    )
+
+    return(sql_render(query, con = con))
   }
 
+  # The query consists of two parts:
+  # 1) An outer select which converts the values to the correct types. This needs
+  # to use the translation of `as.<column type>(<column name>)` (e.g. `as.numeric(mpg)`)
+  # because some backends need a special translation for some types e.g. casting
+  # to logical/bool in MySQL
+  #   `IF(<column name>, TRUE, FALSE)`
+  # This is done with the help of `sql_cast_dispatch()` via dispatch on the
+  # column type.
+  # 2) A subquery which is the union of:
+  #   a) a zero row table which is just required to name the columns. This is
+  #      necessary as e.g. SQLite cannot name `VALUES`.
+  #   b) `VALUES` clause
+  sim_data <- rep_named(colnames(df), list(NULL))
+  cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
-  typed_cols <- purrr::map2_chr(df, colnames(df), ~ select_typed_col(.x, ident(.y), con = con))
-  select_clause <- sql_vector(typed_cols, parens = FALSE, collapse = ", ", con = con)
+  null_row_query <- select_query(
+    from = ident(),
+    select = sql(cols_clause),
+    where = sql("0 = 1")
+  )
 
-  build_sql(
-    "SELECT ", select_clause, "\n",
-    "FROM ", sql_subquery(con, subquery, name = "values_table"),
-    con = con
+  escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+  rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
+  rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
+
+  union_query <- set_op_query(
+    null_row_query,
+    sql_format_clauses(list(sql_clause("VALUES", rows_sql)), lvl = 1, con = con),
+    type = "UNION ALL",
+  )
+  subquery <- sql_render(union_query, con = con, lvl = 1)
+
+  typed_cols <- purrr::map2_chr(
+    df, colnames(df),
+    ~ {
+      cast_expr <- call2(sql_cast_dispatch(.x), ident(.y))
+      translate_sql(!!cast_expr, con = con)
+    }
+  )
+  select_clause <- sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
+
+  sql_select(
+    con,
+    select = select_clause,
+    from = sql_subquery(con, subquery, name = "values_table")
   )
 }
 
-select_typed_col <- function(type, col, con) {
-  UseMethod("select_typed_col")
+# This
+sql_cast_dispatch <- function(x) {
+  UseMethod("sql_cast_dispatch")
 }
 
 #' @export
-select_typed_col.default <- function(type, col, con) {
-  translate_sql(!!col, con = con)
+sql_cast_dispatch.sql <- function(x) {
+  expr(as.character)
 }
 
 #' @export
-select_typed_col.character <- function(type, col, con) {
-  translate_sql(!!col, con = con)
+sql_cast_dispatch.logical <- function(x) {
+  expr(as.logical)
 }
 
 #' @export
-select_typed_col.factor <- function(type, col, con) {
-  translate_sql(!!col, con = con)
+sql_cast_dispatch.integer <- function(x) {
+  expr(as.integer)
 }
 
 #' @export
-select_typed_col.integer <- function(type, col, con) {
-  translate_sql(as.integer(!!col), con = con)
+sql_cast_dispatch.numeric <- function(x) {
+  expr(as.numeric)
 }
 
 #' @export
-select_typed_col.numeric <- function(type, col, con) {
-  translate_sql(as.numeric(!!col), con = con)
+sql_cast_dispatch.character <- function(x) {
+  expr(as.character)
 }
 
 #' @export
-select_typed_col.logical <- function(type, col, con) {
-  translate_sql(as.logical(!!col), con = con)
+sql_cast_dispatch.factor <- function(x) {
+  expr(as.character)
 }
 
 #' @export
-select_typed_col.Date <- function(type, col, con) {
-  translate_sql(as.Date(!!col), con = con)
+sql_cast_dispatch.Date <- function(x) {
+  expr(as.Date)
 }
 
 #' @export
-select_typed_col.POSIXt <- function(type, col, con) {
-  translate_sql(as.POSIXct(!!col), con = con)
+sql_cast_dispatch.POSIXct <- function(x) {
+  expr(as.POSIXct)
 }
 
 #' @export
-select_typed_col.integer64 <- function(type, col, con) {
-  translate_sql(as.integer64(!!col), con = con)
+sql_cast_dispatch.integer64 <- function(x) {
+  expr(as.integer64)
 }
 
-#' @importFrom dplyr auto_copy
-#' @export
-auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
-  copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
-}
+globalVariables(c("as.integer64"))
