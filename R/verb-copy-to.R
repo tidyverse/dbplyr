@@ -174,7 +174,8 @@ sql_values_clause <- function(con, df, row = FALSE) {
   # to logical/bool in MySQL
   #   `IF(<column name>, TRUE, FALSE)`
   # This is done with the help of `sql_cast_dispatch()` via dispatch on the
-  # column type.
+  # column type. The explicit cast is required so that joins work e.g. on date
+  # columns in Postgres.
   # 2) A subquery which is the union of:
   #   a) a zero row table which is just required to name the columns. This is
   #      necessary as e.g. SQLite cannot name `VALUES`.
