@@ -31,6 +31,8 @@
 #'   higher up (and your database doesn't support nested transactions.)
 #' @inheritParams dplyr::copy_to
 #' @inherit arrange.tbl_lazy return
+#' @seealso [copy_inline()] to use small data in an SQL query without actually
+#'   writing to a table.
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
@@ -93,7 +95,27 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
   copy_to(x$src, as.data.frame(y), unique_table_name(), ...)
 }
 
+#' Use a local data frame in a dbplyr query
+#'
+#' This is an alternative to [copy_to()] that does not need write access and
+#' is faster for small data.
+#'
+#' It writes the data directly in the SQL query via the `VALUES` clause.
+#'
+#' @seealso [copy_to()] to copy the data into a new database table.
 #' @export
+#' @param con A database connection.
+#' @param df A local data frame. The data is written directly in the SQL query
+#'   so it should be small.
+#' @return A `tbl_lazy`.
+#'
+#' @examples
+#' df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#'
+#' copy_inline(con, df)
+#'
+#' copy_inline(con, df) %>% dplyr::show_query()
 copy_inline <- function(con, df) {
   if (!inherits(df, "data.frame")) {
     abort("`df` needs to be a data.frame.")
