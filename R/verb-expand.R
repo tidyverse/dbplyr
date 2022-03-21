@@ -10,22 +10,20 @@
 #' more details.
 #' @inheritParams tibble::as_tibble
 #' @inherit arrange.tbl_lazy return
-#' @examples
-#' if (require("tidyr", quietly = TRUE)) {
-#'   fruits <- memdb_frame(
-#'     type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
-#'     year   = c(2010, 2010, 2012, 2010, 2010, 2012),
-#'     size = c("XS", "S",  "M", "S", "S", "M"),
-#'     weights = rnorm(6)
-#'   )
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
+#' fruits <- memdb_frame(
+#'   type   = c("apple", "orange", "apple", "orange", "orange", "orange"),
+#'   year   = c(2010, 2010, 2012, 2010, 2010, 2012),
+#'   size = c("XS", "S",  "M", "S", "S", "M"),
+#'   weights = rnorm(6)
+#' )
 #'
-#'   # All possible combinations ---------------------------------------
-#'   fruits %>% expand(type)
-#'   fruits %>% expand(type, size)
+#' # All possible combinations ---------------------------------------
+#' fruits %>% tidyr::expand(type)
+#' fruits %>% tidyr::expand(type, size)
 #'
-#'   # Only combinations that already appear in the data ---------------
-#'   fruits %>% expand(nesting(type, size))
-#' }
+#' # Only combinations that already appear in the data ---------------
+#' fruits %>% tidyr::expand(nesting(type, size))
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   dots <- purrr::discard(quos(...), quo_is_null)
 
@@ -51,7 +49,16 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     }
   )
 
-  purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  by <- group_vars(data)
+  if (is_empty(by)) {
+    # We want a cross join if `by` is empty which is done with
+    # a `full_join()` and `by = character()`
+    purrr::reduce(distinct_tables, full_join, by = character())
+  } else {
+    # In this case a `full_join()` and a `left_join()` produce the same result
+    # but a `left_join()` produces much nicer SQL for SQLite
+    purrr::reduce(distinct_tables, left_join, by = group_vars(data))
+  }
 }
 
 extract_expand_dot_vars <- function(dot) {
@@ -82,27 +89,21 @@ extract_expand_dot_vars <- function(dot) {
 #'
 #' @inherit arrange.tbl_lazy return
 #'
-#' @examples
-#' if (require("tidyr", quietly = TRUE)) {
-#'   df <- memdb_frame(
-#'     group = c(1:2, 1),
-#'     item_id = c(1:2, 2),
-#'     item_name = c("a", "b", "b"),
-#'     value1 = 1:3,
-#'     value2 = 4:6
-#'   )
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
+#' df <- memdb_frame(
+#'   group = c(1:2, 1),
+#'   item_id = c(1:2, 2),
+#'   item_name = c("a", "b", "b"),
+#'   value1 = 1:3,
+#'   value2 = 4:6
+#' )
 #'
-#'   df %>% complete(group, nesting(item_id, item_name))
+#' df %>% tidyr::complete(group, nesting(item_id, item_name))
 #'
-#'   # You can also choose to fill in missing values
-#'   df %>% complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
-#' }
+#' # You can also choose to fill in missing values
+#' df %>% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- tidyr::expand(data, ...)
-
-  if (is_empty(full)) {
-    return(data)
-  }
 
   full <- full_join(full, data, by = colnames(full))
   tidyr::replace_na(full, replace = fill)
@@ -119,11 +120,9 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #'
 #' @inherit arrange.tbl_lazy return
 #'
-#' @examples
-#' if (require("tidyr", quietly = TRUE)) {
-#'   df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
-#'   df %>% replace_na(list(x = 0, y = "unknown"))
-#' }
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
+#' df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
+#' df %>% tidyr::replace_na(list(x = 0, y = "unknown"))
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   stopifnot(is_list(replace))
   stopifnot(is_empty(replace) || is_named(replace))

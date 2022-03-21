@@ -10,9 +10,9 @@ test_that("namespace calls are translated", {
   expect_equal(translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
   expect_equal(translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
 
-  expect_snapshot_error(translate_sql(NOSUCHPACKAGE::foo()))
-  expect_snapshot_error(translate_sql(dbplyr::NOSUCHFUNCTION()))
-  expect_snapshot_error(translate_sql(base::abbreviate(x)))
+  expect_snapshot(error = TRUE, translate_sql(NOSUCHPACKAGE::foo()))
+  expect_snapshot(error = TRUE, translate_sql(dbplyr::NOSUCHFUNCTION()))
+  expect_snapshot(error = TRUE, translate_sql(base::abbreviate(x)))
 })
 
 test_that("Wrong number of arguments raises error", {
@@ -22,15 +22,6 @@ test_that("Wrong number of arguments raises error", {
 test_that("between translated to special form (#503)", {
   out <- translate_sql(between(x, 1, 2))
   expect_equal(out, sql("`x` BETWEEN 1.0 AND 2.0"))
-})
-
-test_that("is.na and is.null are equivalent", {
-  # Needs to be wrapped in parens to ensure correct precedence
-  expect_equal(translate_sql(is.na(x)), sql("((`x`) IS NULL)"))
-  expect_equal(translate_sql(is.null(x)), sql("((`x`) IS NULL)"))
-
-  expect_equal(translate_sql(x + is.na(x)), sql("`x` + ((`x`) IS NULL)"))
-  expect_equal(translate_sql(!is.na(x)), sql("NOT(((`x`) IS NULL))"))
 })
 
 test_that("%in% translation parenthesises when needed", {
@@ -66,7 +57,7 @@ test_that("na_if is translated to NULLIF (#211)", {
 })
 
 test_that("connection affects quoting character", {
-  lf <- lazy_frame(field1 = 1, con = simulate_sqlite())
+  lf <- lazy_frame(field1 = 1, field2 = 2, con = simulate_sqlite())
   out <- select(lf, field1)
   expect_match(sql_render(out), "^SELECT `field1`\nFROM `df`$")
 })
@@ -75,56 +66,20 @@ test_that("magrittr pipe is translated", {
   expect_identical(translate_sql(1 %>% is.na()), translate_sql(is.na(1)))
 })
 
+test_that("vars is deprecated", {
+  expect_snapshot(error = TRUE, translate_sql(sin(x), vars = c("x", "y")))
+})
+
+test_that("user infix functions are translated", {
+  expect_equal(translate_sql(x %like% y), sql("`x` like `y`"))
+})
+
 # casts -------------------------------------------------------------------
 
 test_that("casts as expected", {
   expect_equal(translate_sql(as.integer64(x)), sql("CAST(`x` AS BIGINT)"))
   expect_equal(translate_sql(as.logical(x)),   sql("CAST(`x` AS BOOLEAN)"))
   expect_equal(translate_sql(as.Date(x)),      sql("CAST(`x` AS DATE)"))
-})
-
-# conditionals ------------------------------------------------------------
-
-test_that("all forms of if translated to case statement", {
-  expected <- sql("CASE WHEN (`x`) THEN (1) WHEN NOT(`x`) THEN (2) END")
-
-  expect_equal(translate_sql(if (x) 1L else 2L), expected)
-  expect_equal(translate_sql(ifelse(x, 1L, 2L)), expected)
-  expect_equal(translate_sql(if_else(x, 1L, 2L)), expected)
-})
-
-test_that("if translation adds parens", {
-  expect_equal(
-    translate_sql(if (x) y),
-    sql("CASE WHEN (`x`) THEN (`y`) END")
-  )
-  expect_equal(
-    translate_sql(if (x) y else z),
-    sql("CASE WHEN (`x`) THEN (`y`) WHEN NOT(`x`) THEN (`z`) END")
-  )
-})
-
-test_that("if and ifelse use correctly named arguments",{
-  exp <- translate_sql(if (x) 1 else 2)
-
-  expect_equal(translate_sql(ifelse(test = x, yes = 1, no = 2)), exp)
-  expect_equal(translate_sql(if_else(condition = x, true = 1, false = 2)), exp)
-
-  expect_equal(
-    translate_sql(if_else(condition = x, true = 1, false = 2, missing = 3)),
-    sql("CASE WHEN (`x`) THEN (1.0) WHEN NOT(`x`) THEN (2.0) WHEN ((`x`) IS NULL) THEN (3.0) END")
-  )
-})
-
-test_that("switch translated to CASE WHEN", {
-  expect_equal(
-    translate_sql(switch(x, a = 1L)),
-    sql("CASE `x` WHEN ('a') THEN (1) END")
-  )
-  expect_equal(
-    translate_sql(switch(x, a = 1L, 2L)),
-    sql("CASE `x` WHEN ('a') THEN (1) ELSE (2) END")
-  )
 })
 
 # numeric -----------------------------------------------------------------
@@ -173,6 +128,8 @@ test_that("str_trim() translates correctly ", {
     translate_sql(str_trim(x, "both")),
     sql("LTRIM(RTRIM(`x`))")
   )
+  expect_equal(translate_sql(str_trim(x, "left")), sql("LTRIM(`x`)"))
+  expect_equal(translate_sql(str_trim(x, "right")), sql("RTRIM(`x`)"))
 })
 
 # subsetting --------------------------------------------------------------

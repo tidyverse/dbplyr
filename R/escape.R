@@ -33,7 +33,7 @@
 #' escape_ansi(escape_ansi(escape_ansi("X")))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
-    stop("`con` must not be NULL", call. = FALSE)
+    abort("`con` must not be NULL")
   }
 
   UseMethod("escape")
@@ -132,7 +132,7 @@ escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
 
 #' @export
 escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
-  error_embed("shiny inputs", "inputs$x")
+  error_embed("shiny inputs", "input$x")
 }
 
 # Also used in default_ops() for reactives
@@ -140,14 +140,14 @@ error_embed <- function(type, expr) {
   abort(c(
     glue("Cannot translate {type} to SQL."),
     glue("Force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`")
-  ))
+  ), call = NULL)
 }
 
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
-    stop("`con` must not be NULL", call. = FALSE)
+    abort("`con` must not be NULL")
   }
 
   if (length(x) == 0) {

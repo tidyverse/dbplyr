@@ -1,7 +1,7 @@
 #' Backend: SQL server
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -75,14 +75,16 @@ simulate_mssql <- function(version = "15.0") {
                                              limit = NULL,
                                              distinct = FALSE,
                                              ...,
-                                             subquery = FALSE) {
+                                             subquery = FALSE,
+                                             lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit)
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    lvl       = lvl
   )
 }
 
@@ -120,9 +122,15 @@ simulate_mssql <- function(version = "15.0") {
       bitwShiftL     = sql_not_supported("bitwShiftL"),
       bitwShiftR     = sql_not_supported("bitwShiftR"),
 
-      `if`           = mssql_sql_if,
-      if_else        = function(condition, true, false, missing = NULL) mssql_sql_if(condition, true, false, missing),
-      ifelse         = function(test, yes, no) mssql_sql_if(test, yes, no),
+      `if`           = function(condition, true, false = NULL, missing = NULL) {
+        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
+      },
+      if_else        = function(condition, true, false, missing = NULL) {
+        mssql_sql_if(enquo(condition), enquo(true), enquo(false), enquo(missing))
+      },
+      ifelse         = function(test, yes, no) {
+        mssql_sql_if(enquo(test), enquo(yes), enquo(no))
+      },
       case_when      = mssql_case_when,
 
       as.logical    = sql_cast("BIT"),
@@ -185,13 +193,13 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
+            abort("`abbr` is not supported in SQL Server translation")          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
+          abort("`fiscal_start` is not supported in SQL Server translation. Must be 1.")
         }
 
         if (with_year) {
@@ -236,7 +244,11 @@ simulate_mssql <- function(version = "15.0") {
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()"),
-      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
+
+      # percentile_cont needs `OVER()` in mssql
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
     sql_translator(.parent = base_odbc_win,
@@ -260,7 +272,7 @@ mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {
     attr(con, "version")
   } else {
-    numeric_version(DBI::dbGetInfo(con)$db.version)
+    numeric_version(DBI::dbGetInfo(con)$db.version) # nocov
   }
 }
 
@@ -302,6 +314,11 @@ mssql_version <- function(con) {
     "FROM (\n  ", sql, "\n) AS temp",
     con = con
   )
+}
+
+#' @export
+`sql_random.Microsoft SQL Server` <- function(con) {
+  sql_expr(RAND())
 }
 
 # Bit vs boolean ----------------------------------------------------------
@@ -352,9 +369,11 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
 }
 
 mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
-  cond <- with_mssql_bool(cond)
-  if (is.null(missing)) {
-    sql_expr(IIF(!!cond, !!if_true, !!if_false))
+  cond_sql <- with_mssql_bool(eval_tidy(cond))
+  if (is_null(missing) || quo_is_null(missing)) {
+    if_true_sql <- build_sql(eval_tidy(if_true))
+    if_false_sql <- build_sql(eval_tidy(if_false))
+    sql_expr(IIF(!!cond_sql, !!if_true_sql, !!if_false_sql))
   } else {
     sql_if(cond, if_true, if_false, missing)
   }

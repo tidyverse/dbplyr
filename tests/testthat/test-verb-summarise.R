@@ -18,10 +18,7 @@ test_that("summarise performs partial evaluation", {
 
 test_that("can't refer to freshly created variables", {
   mf1 <- lazy_frame(x = 1)
-  expect_error(
-    summarise(mf1, y = sum(x), z = sum(y)),
-    "refers to a variable"
-  )
+  expect_snapshot(error = TRUE, summarise(mf1, y = sum(x), z = sum(y)))
 })
 
 test_that("summarise(.groups=)", {
@@ -49,13 +46,29 @@ test_that("summarise(.groups=)", {
   expect_equal(df %>% summarise(.groups = "drop") %>% group_vars(), character())
   expect_equal(df %>% summarise(.groups = "keep") %>% group_vars(), c("x", "y"))
 
-  expect_snapshot_error(df %>% summarise(.groups = "rowwise"))
+  expect_snapshot(error = TRUE, df %>% summarise(.groups = "rowwise"))
+})
+
+test_that("summarise can modify grouping variables", {
+  lf <- lazy_frame(g = 1, x = 1)
+
+  expect_snapshot((result1 <- lf %>% group_by(g) %>% summarise(g = g + 1)))
+  expect_equal(op_vars(result1), "g")
+  expect_snapshot((result2 <- lf %>% group_by(g) %>% summarise(x = x + 1, g = g + 1)))
+  expect_equal(op_vars(result2), c("g", "x"))
+})
+
+test_that("across() does not select grouping variables", {
+  df <- lazy_frame(g = 1, x = 1)
+
+  # SELECT `g`, 0.0 AS `x`
+  expect_snapshot(df %>% group_by(g) %>% summarise(across(.fns = ~ 0)))
 })
 
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
-  out <- memdb_frame(x = 1, .name = "verb-summarise") %>%
+  out <- copy_to_test("sqlite", tibble(x = 1), name = "verb-summarise") %>%
     group_by(x) %>%
     summarise(n = n())
   expect_snapshot(out %>% sql_render)
@@ -106,3 +119,28 @@ test_that("summarise drops one grouping level", {
   expect_equal(op_grps(out2), character())
 })
 
+
+# lazy_select_query -------------------------------------------------------
+
+test_that("can handle rename", {
+  lf <- lazy_frame(x = 1:3, y = 3:1)
+
+  out <- lf %>%
+    group_by(x) %>%
+    rename(ax = x, by = y) %>%
+    summarise(mean_by = mean(by, na.rm = TRUE)) %>%
+    .$lazy_query
+
+  expect_equal(
+    out,
+    lazy_select_query(
+      from = out$from,
+      last_op = "summarise",
+      select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
+      group_by = syms("ax"),
+      select_operation = "summarise",
+      group_vars = character()
+    ),
+    ignore_formula_env = TRUE
+  )
+})

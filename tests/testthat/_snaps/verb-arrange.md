@@ -22,9 +22,6 @@
     Code
       # double arrange
       lf %>% arrange(a) %>% arrange(b)
-    Warning <warning>
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT *
@@ -40,7 +37,8 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -55,7 +53,6 @@
       <SQL>
       SELECT *
       FROM `df`
-      ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange()
     Output
@@ -81,9 +78,11 @@
     Output
       <SQL>
       SELECT *
-      FROM (SELECT *
-      FROM `df`
-      LIMIT 1) `q01`
+      FROM (
+        SELECT *
+        FROM `df`
+        LIMIT 1
+      ) `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% head(1)
@@ -98,10 +97,12 @@
     Output
       <SQL>
       SELECT *
-      FROM (SELECT *
-      FROM `df`
-      ORDER BY `a`
-      LIMIT 1) `q01`
+      FROM (
+        SELECT *
+        FROM `df`
+        ORDER BY `a`
+        LIMIT 1
+      ) `q01`
       ORDER BY `b`
     Code
       # mutate
@@ -121,7 +122,8 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
@@ -131,14 +133,17 @@
       ORDER BY `b`
     Code
       lf %>% mutate(a = -a) %>% arrange(a) %>% mutate(a = -a)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT -`a` AS `a`, `b`
-      FROM (SELECT -`a` AS `a`, `b`
-      FROM `df`) `q01`
+      FROM (
+        SELECT -`a` AS `a`, `b`
+        FROM `df`
+      ) `q01`
 
 # can combine arrange with dual table verbs
 
@@ -147,30 +152,35 @@
       rf <- lazy_frame(a = 1:3, c = 4:6)
       # warn if arrange before join
       lf %>% arrange(a) %>% left_join(rf)
-    Message <message>
+    Message
       Joining, by = "a"
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `b`, `c`
-      FROM (SELECT *
-      FROM `df`) `LHS`
+      FROM (
+        SELECT *
+        FROM `df`
+      ) `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`a` = `RHS`.`a`)
-      
+        ON (`LHS`.`a` = `RHS`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
-    Message <message>
+    Message
       Joining, by = "a"
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT * FROM (SELECT *
-      FROM `df`) `LHS`
+      SELECT * FROM (
+        SELECT *
+        FROM `df`
+      ) `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
         WHERE (`LHS`.`a` = `RHS`.`a`)
@@ -179,48 +189,61 @@
       lf %>% arrange(a) %>% union(rf)
     Output
       <SQL>
-      (SELECT `a`, `b`, NULL AS `c`
-      FROM `df`
-      ORDER BY `a`)
+      (
+        SELECT `a`, `b`, NULL AS `c`
+        FROM `df`
+        ORDER BY `a`
+      )
       UNION
-      (SELECT `a`, NULL AS `b`, `c`
-      FROM `df`)
+      (
+        SELECT `a`, NULL AS `b`, `c`
+        FROM `df`
+      )
     Code
       # can arrange after join
       lf %>% left_join(rf) %>% arrange(a)
-    Message <message>
+    Message
       Joining, by = "a"
     Output
       <SQL>
       SELECT *
-      FROM (SELECT `LHS`.`a` AS `a`, `b`, `c`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`a` = `RHS`.`a`)
+      FROM (
+        SELECT `LHS`.`a` AS `a`, `b`, `c`
+        FROM `df` AS `LHS`
+        LEFT JOIN `df` AS `RHS`
+          ON (`LHS`.`a` = `RHS`.`a`)
       ) `q01`
       ORDER BY `a`
     Code
       lf %>% semi_join(rf) %>% arrange(a)
-    Message <message>
+    Message
       Joining, by = "a"
     Output
       <SQL>
       SELECT *
-      FROM (SELECT * FROM `df` AS `LHS`
-      WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (`LHS`.`a` = `RHS`.`a`)
-      )) `q01`
+      FROM (
+        SELECT * FROM `df` AS `LHS`
+        WHERE EXISTS (
+          SELECT 1 FROM `df` AS `RHS`
+          WHERE (`LHS`.`a` = `RHS`.`a`)
+        )
+      ) `q01`
       ORDER BY `a`
     Code
       lf %>% union(rf) %>% arrange(a)
     Output
       <SQL>
       SELECT *
-      FROM ((SELECT `a`, `b`, NULL AS `c`
-      FROM `df`)
-      UNION
-      (SELECT `a`, NULL AS `b`, `c`
-      FROM `df`)) `q01`
+      FROM (
+        (
+          SELECT `a`, `b`, NULL AS `c`
+          FROM `df`
+        )
+        UNION
+        (
+          SELECT `a`, NULL AS `b`, `c`
+          FROM `df`
+        )
+      ) `q01`
       ORDER BY `a`
 

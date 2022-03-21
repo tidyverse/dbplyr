@@ -1,7 +1,7 @@
 #' Backend: ODBC
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are minor translations for common data types.
 #'
@@ -64,6 +64,7 @@ base_odbc_win <- sql_translator(
   sd = win_aggregate("STDDEV_SAMP"),
 )
 
+# nocov start
 #' @export
 db_connection_describe.OdbcConnection <- function(con) {
   info <- DBI::dbGetInfo(con)
@@ -77,5 +78,6 @@ db_connection_describe.OdbcConnection <- function(con) {
     "/", info$dbname, "]"
   )
 }
+# nocov end
 
 utils::globalVariables("EXP")

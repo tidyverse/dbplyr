@@ -7,7 +7,7 @@
 simulate_snowflake()
 }
 \description{
-See \code{vignette("translate-function")} and \code{vignette("translate-verb")} for
+See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
 details of overall translation technology.
 
 Use \code{simulate_snowflake()} with \code{lazy_frame()} to see simulated SQL without

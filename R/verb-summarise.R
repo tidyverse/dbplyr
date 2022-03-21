@@ -34,17 +34,16 @@
 #'   summarise(n()) %>%
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
   check_summarise_vars(dots)
   check_groups(.groups)
 
-  add_op_single(
-    "summarise",
-    .data,
-    dots = dots,
-    args = list(.groups = .groups, env_caller = caller_env())
+  .data$lazy_query <- add_summarise(
+    .data, dots,
+    .groups = .groups,
+    env_caller = caller_env()
   )
+  .data
 }
 
 # For each expression, check if it uses any newly created variables
@@ -54,12 +53,16 @@ check_summarise_vars <- function(dots) {
     cur_vars <- names(dots)[seq_len(i - 1)]
 
     if (any(used_vars %in% cur_vars)) {
-      stop(
-        "`", names(dots)[[i]],
-        "` refers to a variable created earlier in this summarise().\n",
-        "Do you need an extra mutate() step?",
-        call. = FALSE
+      first_used_var <- used_vars[used_vars %in% cur_vars][[1]]
+      message <- c(
+        "In `dbplyr` you cannot use a variable created in the same summarise.",
+        `x` = paste0(
+          "`", names(dots)[[i]],
+          "` refers to `", first_used_var, "` which was created earlier in this summarise()."
+        ),
+        `i` = "You need an extra mutate() step to use it."
       )
+      abort(message, call = caller_env())
     }
   }
 }
@@ -73,55 +76,54 @@ check_groups <- function(.groups) {
     return()
   }
 
-  abort(c(
+  message <- c(
     paste0(
       "`.groups` can't be ", as_label(.groups),
       if (.groups == "rowwise") " in dbplyr"
     ),
     i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-  ))
+  )
+  abort(message, call = caller_env())
 }
 
-#' @export
-op_vars.op_summarise <- function(op) {
-  c(op_grps(op$x), names(op$dots))
-}
+add_summarise <- function(.data, dots, .groups, env_caller) {
+  lazy_query <- .data$lazy_query
 
-#' @export
-op_grps.op_summarise <- function(op) {
-  grps <- op_grps(op$x)
-  .groups <- op$args$.groups %||% "drop_last"
+  grps <- op_grps(lazy_query)
+  message_summarise <- summarise_message(grps, .groups, env_caller)
 
-  switch(.groups,
+  .groups <- .groups %||% "drop_last"
+  groups_out <- switch(.groups,
     drop_last = grps[-length(grps)],
     keep = grps,
     drop = character()
   )
+
+  vars <- c(grps, setdiff(names(dots), grps))
+  select <- syms(set_names(vars))
+  select[names(dots)] <- dots
+
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "summarise",
+    select = select,
+    group_by = syms(grps),
+    group_vars = groups_out,
+    select_operation = "summarise",
+    message_summarise = message_summarise
+  )
 }
 
-#' @export
-op_sort.op_summarise <- function(op) NULL
-
-#' @export
-sql_build.op_summarise <- function(op, con, ...) {
-  select_vars <- translate_sql_(op$dots, con, window = FALSE, context = list(clause = "SELECT"))
-  group_vars <- op_grps(op$x)
-  n <- length(group_vars)
-
-  .groups <- op$args$.groups
-  verbose <- summarise_verbose(.groups, op$args$env_caller)
-  .groups <- .groups %||% "drop_last"
-
-  if (verbose && n > 1) {
-    new_groups <- glue::glue_collapse(paste0("'", group_vars[-n], "'"), sep = ", ")
-    summarise_inform("has grouped output by {new_groups}")
+summarise_message <- function(grps, .groups, env_caller) {
+  verbose <- summarise_verbose(.groups, env_caller)
+  n <- length(grps)
+  if (!verbose || n <= 1) {
+    return(NULL)
   }
 
-  group_vars <- c.sql(ident(group_vars), con = con)
-  select_query(
-    sql_build(op$x, con),
-    select = c.sql(group_vars, select_vars, con = con),
-    group_by = group_vars
+  new_groups <- glue::glue_collapse(paste0("'", grps[-n], "'"), sep = ", ")
+  summarise_message <- paste0(
+    "`summarise()` has grouped output by ", new_groups, '. You can override using the `.groups` argument.'
   )
 }
 
@@ -129,10 +131,4 @@ summarise_verbose <- function(.groups, .env) {
   is.null(.groups) &&
     is_reference(topenv(.env), global_env()) &&
     !identical(getOption("dplyr.summarise.inform"), FALSE)
-}
-
-summarise_inform <- function(..., .env = parent.frame()) {
-  inform(paste0(
-    "`summarise()` ", glue(..., .envir = .env), '. You can override using the `.groups` argument.'
-  ))
 }

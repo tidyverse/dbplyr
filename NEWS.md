@@ -1,5 +1,74 @@
 # dbplyr (development version)
 
+* `explain()` now passes `...` to methods (@mgirlich, #783).
+
+* `compute()` can now handle when `name` is named by unnaming it first
+  (@mgirlich, #623).
+
+* The translation of `n()` now respects the window frame (@mgirlich, #700).
+
+* `explain()` now works for Redshift (@mgirlich, #740).
+
+* The partial evaluation code is now more aligned with `dtplyr`. This makes it
+  easier to transfer bug fixes and new features from one package to the other.
+  In this process the second argument of `partial_eval()` was changed to a lazy
+  frame instead of a character vector of variables (@mgirlich, #766).
+
+* `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
+  (@mgirlich, #760).
+
+* `pivot_wider()` now supports the arguments `names_vary`, `names_expand`, and
+  `unused_fn` (@mgirlich, #774).
+
+* The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
+  specify the table alias to use in the SQL query (@mgirlich, #637).
+
+* Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
+  the database, rather than locally (#197).
+
+* The implementation of `dbplyr_fill0` for databases without support for IGNORE
+  NULLS now respects the database specific translation (@rsund, #753).
+
+* Fix translation of `quantile()` for MS SQL (@mgirlich, #620).
+
+* `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
+
+* `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
+
+* The `values_fn` argument of `pivot_wider()` and the `values_transform()`
+  argument of `pivot_longer()` can now be a formula (@mgirlich, #745).
+
+* If the last statement of `case_when()` is of the form `TRUE ~ ...` the
+  translation for SQLite now also uses `ELSE ...` (@mgirlich, #754).
+
+* `filter()` throws an error if you supply a named argument (@mgirlich, #764).
+
+* The generic `sql_random()` is now exported.
+
+* The translation of `is.na()` and the conditionals `ifelse()`, `if_else()`,
+  `case_when()`, and `if()` is slightly shorter (@mgirlich, #738).
+
+* `if_any()` and `if_all()` default to `everything()` when `.cols` is not
+  provided. If `.fns` is not provided they work like like a parallel
+  version of `any()` respectively `all()` (@mgirlich, #734).
+
+* Partially evaluated expressions with infix operations are now correctly
+  translated. For example `translate_sql(!!expr(2 - 1) * x)` now works
+  (@mgirlich, #634).
+
+* Expressions with a unary plus do not produce an error anymore. For example
+  `lazy_frame(x = 1) %>% filter(x == +1)` now works (@mgirlich, #674).
+
+* Fix incorrect SQL in `fill()` translation for SQL Server (#651, @mgirlich).
+
+* Joins now disambiguates columns that only differ in case (@mgirlich, #702).
+
+* `expand()` now works in DuckDB (@mgirlich, #712).
+
+* `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+
+* Joins with `na_matches = "na"` now work for DuckDB (@mgirlich, #704).
+
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
 
 * The SQL translation of `quantile()` now doesn't error anymore when using
@@ -9,6 +78,13 @@
 
 * `if_else()` now supports the `missing` argument (@mgirlich, #641).
 
+* `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692).
+
+* `pivot_longer()` can now repair names (@mgirlich, #694).
+
+* `pivot_wider()` works with multiple `names_from` columns (@mgirlich, #693).
+
+* `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
 
 # dbplyr 2.1.1
 

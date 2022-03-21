@@ -2,27 +2,19 @@ Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
 Version: 2.1.1.9000
-Authors@R: 
-    c(person(given = "Hadley",
-             family = "Wickham",
-             role = c("aut", "cre"),
-             email = "hadley@rstudio.com"),
-      person(given = "Maximilian",
-             family = "Girlich",
-             role = "aut"),
-      person(given = "Edgar",
-             family = "Ruiz",
-             role = "aut"),
-      person(given = "RStudio",
-             role = c("cph", "fnd")))
-Description: A 'dplyr' back end for databases that allows you to
-    work with remote database tables as if they are in-memory data frames.
-    Basic features works with any database that has a 'DBI' back end; more
+Authors@R: c(
+    person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
+    person("Maximilian", "Girlich", role = "aut"),
+    person("Edgar", "Ruiz", role = "aut"),
+    person("RStudio", role = c("cph", "fnd"))
+  )
+Description: A 'dplyr' back end for databases that allows you to work with
+    remote database tables as if they are in-memory data frames.  Basic
+    features works with any database that has a 'DBI' back end; more
     advanced features require 'SQL' translation to be provided by the
     package author.
 License: MIT + file LICENSE
-URL: https://dbplyr.tidyverse.org/,
-    https://github.com/tidyverse/dbplyr
+URL: https://dbplyr.tidyverse.org/, https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
     R (>= 3.1)
@@ -30,15 +22,14 @@ Imports:
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.4),
-    ellipsis,
+    dplyr (>= 1.0.6),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
     methods,
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
-    rlang (>= 0.2.0),
+    rlang (>= 1.0.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils,
@@ -57,9 +48,10 @@ Suggests:
     RPostgreSQL,
     RSQLite (>= 2.1.0),
     testthat (>= 3.0.2),
-    tidyr
+    tidyr (>= 1.2.0)
 VignetteBuilder: 
     knitr
+Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-gb
@@ -101,9 +93,11 @@ Collate:
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'lazy-join-query.R'
     'lazy-ops.R'
+    'lazy-select-query.R'
+    'lazy-set-op-query.R'
     'memdb.R'
-    'partial-eval.R'
     'progress.R'
     'query-join.R'
     'query-select.R'
@@ -123,6 +117,8 @@ Collate:
     'tbl-sql.R'
     'test-frame.R'
     'testthat.R'
+    'tidyeval-across.R'
+    'tidyeval.R'
     'translate-sql.R'
     'utils-format.R'
     'verb-arrange.R'

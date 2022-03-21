@@ -25,8 +25,7 @@
 #'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
 #'   show_query()
 group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
   if (!missing(add)) {
     lifecycle::deprecate_warn("1.0.0", "dplyr::group_by(add = )", "group_by(.add = )")
@@ -34,48 +33,19 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    stop("`.drop` is not supported with database backends", call. = FALSE)
+    abort("`.drop` is not supported with database backends")
   }
 
-  if (length(dots) == 0) {
-    if (.add) {
-      return(.data)
-    } else {
-      return(dplyr::ungroup(.data))
-    }
-  }
-
-  if (".add" %in% names(formals("group_by"))) {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
-  } else {
-    groups <- dplyr::group_by_prepare(.data, !!!dots, add = .add)
-  }
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
   names <- purrr::map_chr(groups$groups, as_string)
 
-  add_op_single("group_by",
-    groups$data,
-    dots = set_names(groups$groups, names),
-    args = list(add = FALSE)
-  )
-}
-
-#' @export
-op_desc.op_group_by <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-op_grps.op_group_by <- function(op) {
-  if (isTRUE(op$args$add)) {
-    union(op_grps(op$x), names(op$dots))
-  } else {
-    names(op$dots)
+  same_groups <- setequal(groups$group_names, group_vars(.data))
+  if (same_groups) {
+    return(groups$data)
   }
-}
 
-#' @export
-sql_build.op_group_by <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  groups$data$lazy_query <- add_group_by(groups$data, names)
+  groups$data
 }
 
 # ungroup -----------------------------------------------------------------
@@ -83,15 +53,25 @@ sql_build.op_group_by <- function(op, con, ...) {
 #' @importFrom dplyr ungroup
 #' @export
 ungroup.tbl_lazy <- function(x, ...) {
-  add_op_single("ungroup", x)
+  if (missing(...)) {
+    group_by(x)
+  } else {
+    old_groups <- group_vars(x)
+    to_remove <- tidyselect::vars_select(op_vars(x), ...)
+    new_groups <- setdiff(old_groups, to_remove)
+    group_by(x, !!!syms(new_groups))
+  }
 }
 
-#' @export
-op_grps.op_ungroup <- function(op) {
-  character()
-}
+add_group_by <- function(.data, group_vars) {
+  lazy_query <- .data$lazy_query
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "group_by"
+    )
+  }
 
-#' @export
-sql_build.op_ungroup <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  lazy_query$group_vars <- group_vars
+  lazy_query
 }

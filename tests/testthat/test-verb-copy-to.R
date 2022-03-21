@@ -53,6 +53,13 @@ test_that("can create a new table in non-default schema", {
   expect_equal(collect(db2), df2)
 })
 
+test_that("df must be a local or remote table", {
+  con <- DBI::dbConnect(RSQLite::SQLite())
+  on.exit(DBI::dbDisconnect(con))
+
+  expect_snapshot(error = TRUE, copy_to(con, list(x = 1), name = "df"))
+})
+
 # db_values() -------------------------------------------------------------
 
 test_that("can translate a table", {

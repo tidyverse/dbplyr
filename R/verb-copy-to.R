@@ -52,7 +52,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   assert_that(is.flag(temporary))
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
-    stop("`df` must be a local dataframe or a remote tbl_sql", call. = FALSE)
+    abort("`df` must be a local dataframe or a remote tbl_sql")
   }
 
   name <- as.sql(name, con = dest$con)

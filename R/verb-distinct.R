@@ -15,29 +15,29 @@
 #' db %>% distinct() %>% show_query()
 #' db %>% distinct(x) %>% show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
-  if (dots_n(...) > 0) {
-    if (.keep_all) {
-      stop(
-        "Can only find distinct value of specified columns if .keep_all is FALSE",
-        call. = FALSE
-      )
+  grps <- syms(op_grps(.data))
+  can_use_distinct <- !.keep_all || (dots_n(...) == 0 && is_empty(grps))
+  if (can_use_distinct) {
+    if (dots_n(...) > 0) {
+      .data <- transmute(.data, !!!grps, ...)
     }
 
-    .data <- transmute(.data, !!!syms(op_grps(.data)), ...)
+    .data$lazy_query <- add_distinct(.data)
+    return(.data)
   }
 
-  add_op_single("distinct", .data, dots = list())
+  .data %>%
+    group_by(..., .add = TRUE) %>%
+    filter(row_number() == 1L) %>%
+    group_by(!!!grps)
 }
 
-#' @export
-op_vars.op_distinct <- function(op) {
-  union(op_grps(op$x), op_vars(op$x))
-}
+add_distinct <- function(.data) {
+  lazy_query <- .data$lazy_query
 
-#' @export
-sql_build.op_distinct <- function(op, con, ...) {
-  select_query(
-    sql_build(op$x, con),
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "distinct",
     distinct = TRUE
   )
 }
