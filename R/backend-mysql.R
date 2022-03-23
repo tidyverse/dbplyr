@@ -132,14 +132,22 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
+sql_values.MariaDBConnection <- function(con, df) {
+  sql_values_clause(con, df, row = TRUE)
+}
+
+#' @export
+sql_values.MySQL <- sql_values.MariaDBConnection
+#' @export
+sql_values.MySQLConnection <- sql_values.MariaDBConnection
+
+#' @export
 sql_random.MariaDBConnection <- function(con) {
   sql_expr(RAND())
 }
-
 #' @export
 sql_random.MySQLConnection <- sql_random.MariaDBConnection
 #' @export
 sql_random.MySQL <- sql_random.MariaDBConnection
 
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))
-

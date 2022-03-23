@@ -88,3 +88,17 @@ test_that("can overwrite temp tables", {
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
 })
+
+test_that("copy_inline works", {
+  src <- src_test("postgres")
+  df <- tibble(
+    lgl = TRUE,
+    int = 1L,
+    dbl = 1.5,
+    chr = "a",
+    date = as.Date("2020-01-01", tz = "UTC"),
+    dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
+  )
+
+  expect_equal(copy_inline(src, df) %>% collect(), df)
+})
