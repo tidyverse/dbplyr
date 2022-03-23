@@ -100,6 +100,9 @@
     <loc>https://dbplyr.tidyverse.org/dev/reference/complete.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/copy_inline.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.html</loc>
   </url>
   <url>
