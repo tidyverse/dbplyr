@@ -40,10 +40,12 @@ transmute.tbl_lazy <- function(.data, ...) {
     .data$lazy_query <- add_select(.data, layer, "mutate")
   }
 
-  group_vars_missing <- setdiff(group_vars(.data), layer_info$all_new_vars)
-  vars_out <- union(group_vars_missing, layer_info$all_new_vars)
-  .data %>%
-    select(all_of(vars_out))
+  cols_expr <- layer_info$modified_vars
+  cols_group <- group_vars(.data)
+  cols_group <- setdiff(cols_group, cols_expr)
+  cols_retain <- c(cols_group, cols_expr)
+
+  select(.data, all_of(cols_retain))
 }
 
 # helpers -----------------------------------------------------------------
@@ -53,8 +55,8 @@ get_mutate_layers <- function(.data, ...) {
   grps <- syms(op_grps(.data))
   cur_data <- simulate_lazy_tbl(op_vars(.data), grps)
 
-  layer_new_vars <- character()
-  all_new_vars <- character()
+  layer_modified_vars <- character()
+  all_modified_vars <- character()
   all_vars <- op_vars(cur_data)
 
   cur_layer <- set_names(syms(all_vars), all_vars)
@@ -73,34 +75,33 @@ get_mutate_layers <- function(.data, ...) {
 
       if (quo_is_null(cur_quo)) {
         cur_layer[[cur_var]] <- NULL
-        layer_new_vars <- setdiff(layer_new_vars, cur_var)
-        all_new_vars <- setdiff(all_new_vars, cur_var)
+        layer_modified_vars <- setdiff(layer_modified_vars, cur_var)
+        all_modified_vars <- setdiff(all_modified_vars, cur_var)
         all_vars <- setdiff(all_vars, cur_var)
         next
       }
 
-      all_new_vars <- c(all_new_vars, setdiff(cur_var, all_new_vars))
+      all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
       all_vars <- c(all_vars, setdiff(cur_var, all_vars))
 
       used_vars <- all_names(cur_quo)
-      if (any(used_vars %in% layer_new_vars)) {
+      if (any(used_vars %in% layer_modified_vars)) {
         layers <- append(layers, list(cur_layer))
 
         cur_layer <- set_names(syms(all_vars), all_vars)
-        layer_new_vars <- character()
+        layer_modified_vars <- character()
       }
 
       cur_layer[[cur_var]] <- cur_quo
-      layer_new_vars <- c(layer_new_vars, cur_var)
+      layer_modified_vars <- c(layer_modified_vars, cur_var)
     }
 
     cur_data <- simulate_lazy_tbl(all_vars, grps)
   }
 
-  layers <- append(layers, list(cur_layer))
   list(
-    layers = layers,
-    all_new_vars = all_new_vars
+    layers = append(layers, list(cur_layer)),
+    modified_vars = all_modified_vars
   )
 }
 
