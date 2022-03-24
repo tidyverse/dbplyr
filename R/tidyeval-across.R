@@ -28,7 +28,6 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
   if (is.null(funs)) {
     fns <- list(`1` = function(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
-    return(list(fns = fns, names = names_spec))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
     fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
@@ -52,7 +51,6 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
 }
 
 across_fun <- function(fun, env, data, dots, fn) {
-  # unlike in `dtplyr` anonymous functions do not work (is_function(fun))
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
