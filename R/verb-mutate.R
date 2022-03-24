@@ -22,67 +22,90 @@
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
 mutate.tbl_lazy <- function(.data, ...) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE)
+  layer_info <- get_mutate_layers(.data, ...)
 
-  nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
+  for (layer in layer_info$layers) {
+    .data$lazy_query <- add_select(.data, layer, "mutate")
+  }
+
+  .data
 }
 
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE)
+  layer_info <- get_mutate_layers(.data, ...)
 
-  nest_vars(.data, dots, character())
+  for (layer in layer_info$layers) {
+    .data$lazy_query <- add_select(.data, layer, "mutate")
+  }
+
+  group_vars_missing <- setdiff(group_vars(.data), layer_info$all_new_vars)
+  vars_out <- union(group_vars_missing, layer_info$all_new_vars)
+  .data %>%
+    select(all_of(vars_out))
 }
 
 # helpers -----------------------------------------------------------------
 
-# TODO: refactor to remove `.data` argument and return a list of layers.
-nest_vars <- function(.data, dots, all_vars) {
-  # For each expression, check if it uses any newly created variables.
-  # If so, nest the mutate()
-  new_vars <- character()
-  init <- 0L
+get_mutate_layers <- function(.data, ...) {
+  dots <- enquos(..., .named = TRUE)
+  grps <- syms(op_grps(.data))
+  cur_data <- simulate_lazy_tbl(op_vars(.data), grps)
+
+  layer_new_vars <- character()
+  all_new_vars <- character()
+  all_vars <- op_vars(cur_data)
+
+  cur_layer <- set_names(syms(all_vars), all_vars)
+  layers <- list()
+
   for (i in seq_along(dots)) {
-    cur_var <- names(dots)[[i]]
-    used_vars <- all_names(get_expr(dots[[i]]))
-
-    if (any(used_vars %in% new_vars)) {
-      new_actions <- dots[seq2(init, length(dots))][new_vars]
-      .data$lazy_query <- add_select(.data, carry_over(union(all_vars, used_vars), new_actions), "mutate")
-      all_vars <- c(all_vars, setdiff(new_vars, all_vars))
-      new_vars <- cur_var
-      init <- i
-    } else {
-      new_vars <- c(new_vars, cur_var)
+    quosures <- partial_eval_quo(dots[[i]], cur_data)
+    if (!is.list(quosures)) {
+      quosures <- set_names(list(quosures), names(dots)[[i]])
     }
+    quosures <- unclass(quosures)
+
+    for (k in seq_along(quosures)) {
+      cur_quo <- quosures[[k]]
+      cur_var <- names(quosures)[[k]]
+
+      if (quo_is_null(cur_quo)) {
+        cur_layer[[cur_var]] <- NULL
+        layer_new_vars <- setdiff(layer_new_vars, cur_var)
+        all_new_vars <- setdiff(all_new_vars, cur_var)
+        all_vars <- setdiff(all_vars, cur_var)
+        next
+      }
+
+      all_new_vars <- c(all_new_vars, setdiff(cur_var, all_new_vars))
+      all_vars <- c(all_vars, setdiff(cur_var, all_vars))
+
+      used_vars <- all_names(cur_quo)
+      if (any(used_vars %in% layer_new_vars)) {
+        layers <- append(layers, list(cur_layer))
+
+        cur_layer <- set_names(syms(all_vars), all_vars)
+        layer_new_vars <- character()
+      }
+
+      cur_layer[[cur_var]] <- cur_quo
+      layer_new_vars <- c(layer_new_vars, cur_var)
+    }
+
+    cur_data <- simulate_lazy_tbl(all_vars, grps)
   }
 
-  if (init != 0L) {
-    dots <- dots[-seq2(1L, init - 1)]
-  }
-  .data$lazy_query <- add_select(.data, carry_over(all_vars, dots), "mutate")
-  .data
+  layers <- append(layers, list(cur_layer))
+  list(
+    layers = layers,
+    all_new_vars = all_new_vars
+  )
 }
 
-# Combine a selection (passed through from subquery)
-# with new actions
-carry_over <- function(sel = character(), act = list()) {
-  if (is.null(names(sel))) {
-    names(sel) <- sel
-  }
-  sel <- syms(sel)
-
-  # Keep last of duplicated acts
-  act <- act[!duplicated(names(act), fromLast = TRUE)]
-
-  # Preserve order of sel
-  both <- intersect(names(sel), names(act))
-  sel[both] <- act[both]
-
-  # Adding new variables at end
-  new <- setdiff(names(act), names(sel))
-
-  c(sel, act[new])
+simulate_lazy_tbl <- function(vars, groups) {
+  df <- as_tibble(as.list(set_names(vars)), .name_repair = "minimal")
+  tbl_lazy(df) %>%
+    group_by(!!!groups)
 }
-

@@ -77,6 +77,50 @@ test_that("across() does not select grouping variables", {
   expect_snapshot(df %>% group_by(g) %>% transmute(across(.fns = ~ 0)))
 })
 
+test_that("transmute() keeps grouping variables", {
+  lf <- lazy_frame(g = 1, x = 1) %>% group_by(g)
+  expect_equal(lf %>% transmute(x = 1) %>% op_vars(), c("g", "x"))
+  expect_equal(lf %>% transmute(x = 1, g) %>% op_vars(), c("x", "g"))
+})
+
+test_that("across() can access previously created variables", {
+  out <- memdb_frame(x = 1) %>%
+    mutate(y = 2, across(y, sqrt))
+
+  expect_equal(
+    collect(out),
+    tibble(x = 1, y = sqrt(2))
+  )
+
+  expect_equal(
+    op_vars(out),
+    c("x", "y")
+  )
+
+  expect_snapshot(remote_query(out))
+})
+
+test_that("new columns take precedence over global variables", {
+  y <- "global var"
+  db <- memdb_frame(data.frame(x = 1)) %>% mutate(y = 2, z = y + 1)
+  lf <- lazy_frame(data.frame(x = 1)) %>% mutate(y = 2, z = y + 1)
+
+  expect_equal(
+    collect(db),
+    tibble(x = 1, y = 2, z = 3)
+  )
+
+  expect_snapshot(remote_query(lf))
+})
+
+test_that("constants do not need a new query", {
+  expect_equal(
+    lazy_frame(x = 1, y = 2) %>% mutate(z = 2, z = 3) %>% remote_query(),
+    sql("SELECT `x`, `y`, 3.0 AS `z`\nFROM `df`")
+  )
+})
+
+
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {
@@ -177,6 +221,27 @@ test_that("mutate can drop variables with NULL", {
 
   expect_named(sql_build(out)$select, "x")
   expect_equal(op_vars(out), "x")
+})
+
+test_that("var = NULL works when var is in original data", {
+  lf <- lazy_frame(x = 1) %>% mutate(x = 2, z = x*2, x = NULL)
+  expect_equal(sql_build(lf)$select, sql(z = "`x` * 2.0"))
+  expect_equal(op_vars(lf), "z")
+  expect_snapshot(remote_query(lf))
+})
+
+test_that("var = NULL when var is in final output", {
+  lf <- lazy_frame(x = 1) %>% mutate(y = NULL, y = 3)
+  expect_equal(sql_build(lf)$select, sql(x = "`x`", y = "3.0"))
+  expect_equal(op_vars(lf), c("x", "y"))
+  expect_snapshot(remote_query(lf))
+})
+
+test_that("temp var with nested arguments", {
+  lf <- lazy_frame(x = 1) %>% mutate(y = 2, z = y*2, y = NULL)
+  expect_equal(sql_build(lf)$select, sql(x = "`x`", z = "`y` * 2.0"))
+  expect_equal(op_vars(lf), c("x", "z"))
+  expect_snapshot(remote_query(lf))
 })
 
 test_that("mutate_all generates correct sql", {

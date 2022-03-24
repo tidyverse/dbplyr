@@ -40,8 +40,30 @@
       df %>% group_by(g) %>% transmute(across(.fns = ~0))
     Output
       <SQL>
-      SELECT 0.0 AS `x`
+      SELECT `g`, 0.0 AS `x`
       FROM `df`
+
+# across() can access previously created variables
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `x`, SQRT(`y`) AS `y`
+      FROM (
+        SELECT `x`, 2.0 AS `y`
+        FROM `dbplyr_122`
+      )
+
+# new columns take precedence over global variables
+
+    Code
+      remote_query(lf)
+    Output
+      <SQL> SELECT `x`, `y`, `y` + 1.0 AS `z`
+      FROM (
+        SELECT `x`, 2.0 AS `y`
+        FROM `df`
+      ) `q01`
 
 # mutate generates subqueries as needed
 
@@ -83,5 +105,24 @@
     Output
       <SQL>
       SELECT `y` * 2.0 AS `y`, `x` * 2.0 AS `x`
+      FROM `df`
+
+# var = NULL works when var is in original data
+
+    Code
+      remote_query(lf)
+    Output
+      <SQL> SELECT `x` * 2.0 AS `z`
+      FROM (
+        SELECT 2.0 AS `x`
+        FROM `df`
+      ) `q01`
+
+# var = NULL when var is in final output
+
+    Code
+      remote_query(lf)
+    Output
+      <SQL> SELECT `x`, 3.0 AS `y`
       FROM `df`
 

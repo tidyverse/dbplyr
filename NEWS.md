@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* Multiple `across()` calls in `mutate()` and `transmute()` can now access
+  freshly created variables (@mgirlich, #671).
+
+* `transmute()` now keeps grouping variables (@mgirlich, #671).
+
 * Added `copy_inline()` as a `copy_to()` equivalent that does not need write
   access (@mgirlich, #628).
 
