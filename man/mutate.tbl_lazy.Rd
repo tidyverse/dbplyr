@@ -18,7 +18,7 @@
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
 
-\item{.keep}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
+\item{.keep}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Control which columns from \code{.data} are retained in the output. Grouping
 columns and columns created by \code{...} are always kept.
 \itemize{
@@ -33,15 +33,10 @@ the columns used to generate them.
 variables and columns created by \code{...} are kept.
 }}
 
-\item{.before}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
-<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
+\item{.before, .after}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+<\code{\link[=dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
 should appear (the default is to add to the right hand side). See
-\code{\link[dplyr:relocate]{relocate()}} for more details.}
-
-\item{.after}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
-<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
-should appear (the default is to add to the right hand side). See
-\code{\link[dplyr:relocate]{relocate()}} for more details.}
+\code{\link[=relocate]{relocate()}} for more details.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
