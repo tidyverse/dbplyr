@@ -37,7 +37,7 @@ compute.tbl_sql <- function(x,
                             indexes = list(),
                             analyze = TRUE,
                             ...) {
-
+  name <- unname(name)
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
   assert_that(all(unlist(unique_indexes) %in% vars))

@@ -3,6 +3,18 @@
 * `across()`, `if_any()`, and `if_all()` can now translate evaluated lists
   and functions (@mgirlich, #796).
 
+* Added `copy_inline()` as a `copy_to()` equivalent that does not need write
+  access (@mgirlich, #628).
+
+* `explain()` now passes `...` to methods (@mgirlich, #783).
+
+* `compute()` can now handle when `name` is named by unnaming it first
+  (@mgirlich, #623).
+
+* The translation of `n()` now respects the window frame (@mgirlich, #700).
+
+* `explain()` now works for Redshift (@mgirlich, #740).
+
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
   easier to transfer bug fixes and new features from one package to the other.
   In this process the second argument of `partial_eval()` was changed to a lazy
