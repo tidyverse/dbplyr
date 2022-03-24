@@ -4,7 +4,13 @@
 \alias{mutate.tbl_lazy}
 \title{Create, modify, and delete columns}
 \usage{
-\method{mutate}{tbl_lazy}(.data, ..., .keep = c("all", "used", "unused", "none"))
+\method{mutate}{tbl_lazy}(
+  .data,
+  ...,
+  .keep = c("all", "used", "unused", "none"),
+  .before = NULL,
+  .after = NULL
+)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
@@ -26,6 +32,16 @@ the columns used to generate them.
 \item \code{"none"} doesn't retain any extra columns from \code{.data}. Only the grouping
 variables and columns created by \code{...} are kept.
 }}
+
+\item{.before}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
+<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
+should appear (the default is to add to the right hand side). See
+\code{\link[dplyr:relocate]{relocate()}} for more details.}
+
+\item{.after}{\ifelse{{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}}
+<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
+should appear (the default is to add to the right hand side). See
+\code{\link[dplyr:relocate]{relocate()}} for more details.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated

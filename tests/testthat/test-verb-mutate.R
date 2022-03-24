@@ -182,6 +182,8 @@ test_that("sequence of operations work", {
   expect_equal(out, tibble(y = 1, z = 2))
 })
 
+# .before, .after, .keep ------------------------------------------------------
+
 test_that(".keep = 'unused' keeps variables explicitly mentioned", {
   df <- lazy_frame(x = 1, y = 2)
   out <- mutate(df, x1 = x + 1, y = y, .keep = "unused")
@@ -227,6 +229,26 @@ test_that(".keep = 'none' retains original ordering (#5967)", {
   )
 })
 
+test_that("can use .before and .after to control column position", {
+  df <- lazy_frame(x = 1, y = 2)
+  expect_equal(mutate(df, z = 1) %>% op_vars(), c("x", "y", "z"))
+  expect_equal(mutate(df, z = 1, .before = 1) %>% op_vars(), c("z", "x", "y"))
+  expect_equal(mutate(df, z = 1, .after = 1) %>% op_vars(), c("x", "z", "y"))
+
+  # but doesn't affect order of existing columns
+  df <- lazy_frame(x = 1, y = 2)
+  expect_equal(mutate(df, x = 1, .after = y) %>% op_vars(), c("x", "y"))
+})
+
+test_that(".keep and .before/.after interact correctly", {
+  df <- lazy_frame(x = 1, y = 1, z = 1, a = 1, b = 2, c = 3) %>%
+    group_by(a, b)
+
+  expect_equal(mutate(df, d = 1, x = 2, .keep = "none") %>% op_vars(), c("x", "a", "b", "d"))
+  expect_equal(mutate(df, d = 1, x = 2, .keep = "none", .before = "a") %>% op_vars(), c("x", "d", "a", "b"))
+  expect_equal(mutate(df, d = 1, x = 2, .keep = "none", .after = "a") %>% op_vars(), c("x", "a", "d", "b"))
+})
+
 test_that("dropping column with `NULL` then readding it retains original location", {
   df <- lazy_frame(x = 1, y = 2, z = 3, a = 4)
   df <- group_by(df, z)
@@ -244,7 +266,6 @@ test_that("dropping column with `NULL` then readding it retains original locatio
     c("x", "y", "z", "b")
   )
 
-  skip("`.before` not yet supported")
   # It isn't treated as a "new" column
   expect_equal(mutate(df, y = NULL, y = 3, .keep = "all", .before = x) %>% op_vars(), c("x", "y", "z", "a"))
 })

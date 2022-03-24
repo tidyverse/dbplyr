@@ -21,7 +21,11 @@
 #' db %>%
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
-mutate.tbl_lazy <- function(.data, ..., .keep = c("all", "used", "unused", "none")) {
+mutate.tbl_lazy <- function(.data,
+                            ...,
+                            .keep = c("all", "used", "unused", "none"),
+                            .before = NULL,
+                            .after = NULL) {
   keep <- arg_match(.keep)
   layer_info <- get_mutate_layers(.data, ...)
   used <- layer_info$used_vars
@@ -43,6 +47,14 @@ mutate.tbl_lazy <- function(.data, ..., .keep = c("all", "used", "unused", "none
 
   cols_used <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[!used]))
   cols_unused <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[used]))
+
+  .before <- enquo(.before)
+  .after <- enquo(.after)
+
+  if (!quo_is_null(.before) || !quo_is_null(.after)) {
+    # Only change the order of new columns
+    out <- relocate(out, all_of(cols_expr_new), .before = !!.before, .after = !!.after)
+  }
 
   cols_out <- op_vars(out)
 
