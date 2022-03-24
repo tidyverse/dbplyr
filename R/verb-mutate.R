@@ -21,14 +21,43 @@
 #' db %>%
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
-mutate.tbl_lazy <- function(.data, ...) {
+mutate.tbl_lazy <- function(.data, ..., .keep = c("all", "used", "unused", "none")) {
+  keep <- arg_match(.keep)
   layer_info <- get_mutate_layers(.data, ...)
+  used <- layer_info$used_vars
+  layers <- layer_info$layers
 
-  for (layer in layer_info$layers) {
-    .data$lazy_query <- add_select(.data, layer, "mutate")
+  # The layers may contain `var = quo(NULL)` at this point.
+  # They are removed in `add_select()`.
+  out <- .data
+  for (layer in layers) {
+    out$lazy_query <- add_select(out, layer, "mutate")
   }
 
-  .data
+  cols_data <- op_vars(.data)
+  cols_group <- group_vars(.data)
+
+  cols_expr <- layer_info$modified_vars
+  cols_expr_modified <- intersect(cols_expr, cols_data)
+  cols_expr_new <- setdiff(cols_expr, cols_expr_modified)
+
+  cols_used <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[!used]))
+  cols_unused <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[used]))
+
+  cols_out <- op_vars(out)
+
+  if (keep == "all") {
+    cols_retain <- cols_out
+  } else if (keep == "used") {
+    cols_retain <- setdiff(cols_out, cols_unused)
+  } else if (keep == "unused") {
+    cols_retain <- setdiff(cols_out, cols_used)
+  } else if (keep == "none") {
+    cols_retain <- setdiff(cols_out, c(cols_used, cols_unused))
+  }
+
+
+  select(out, all_of(cols_retain))
 }
 
 #' @export
@@ -57,9 +86,11 @@ get_mutate_layers <- function(.data, ...) {
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
-  all_vars <- op_vars(cur_data)
+  all_used_vars <- character()
+  all_vars <- op_vars(.data)
+  var_is_null <- rep_named(op_vars(.data), FALSE)
 
-  cur_layer <- set_names(syms(all_vars), all_vars)
+  cur_layer <- syms(set_names(op_vars(.data)))
   layers <- list()
 
   for (i in seq_along(dots)) {
@@ -74,34 +105,37 @@ get_mutate_layers <- function(.data, ...) {
       cur_var <- names(quosures)[[k]]
 
       if (quo_is_null(cur_quo)) {
-        cur_layer[[cur_var]] <- NULL
+        var_is_null[[cur_var]] <- TRUE
+        cur_layer[[cur_var]] <- cur_quo
         layer_modified_vars <- setdiff(layer_modified_vars, cur_var)
         all_modified_vars <- setdiff(all_modified_vars, cur_var)
-        all_vars <- setdiff(all_vars, cur_var)
         next
       }
 
       all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
-      all_vars <- c(all_vars, setdiff(cur_var, all_vars))
 
       used_vars <- all_names(cur_quo)
+      all_used_vars <- c(all_used_vars, used_vars)
       if (any(used_vars %in% layer_modified_vars)) {
         layers <- append(layers, list(cur_layer))
 
-        cur_layer <- set_names(syms(all_vars), all_vars)
+        cur_layer[!var_is_null] <- syms(names(cur_layer)[!var_is_null])
         layer_modified_vars <- character()
       }
 
+      var_is_null[[cur_var]] <- FALSE
       cur_layer[[cur_var]] <- cur_quo
       layer_modified_vars <- c(layer_modified_vars, cur_var)
     }
 
+    all_vars <- names(cur_layer)[!var_is_null]
     cur_data <- simulate_lazy_tbl(all_vars, grps)
   }
 
   list(
     layers = append(layers, list(cur_layer)),
-    modified_vars = all_modified_vars
+    modified_vars = all_modified_vars,
+    used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
 }
 
