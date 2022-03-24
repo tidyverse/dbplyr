@@ -69,9 +69,13 @@ transmute.tbl_lazy <- function(.data, ...) {
     .data$lazy_query <- add_select(.data, layer, "mutate")
   }
 
+  # Retain expression columns in order of their appearance
   cols_expr <- layer_info$modified_vars
+
+  # Retain untouched group variables up front
   cols_group <- group_vars(.data)
   cols_group <- setdiff(cols_group, cols_expr)
+
   cols_retain <- c(cols_group, cols_expr)
 
   select(.data, all_of(cols_retain))
