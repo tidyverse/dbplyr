@@ -46,13 +46,13 @@
 # across() can access previously created variables
 
     Code
-      remote_query(out)
+      remote_query(lf)
     Output
       <SQL> SELECT `x`, SQRT(`y`) AS `y`
       FROM (
         SELECT `x`, 2.0 AS `y`
-        FROM `dbplyr_122`
-      )
+        FROM `df`
+      ) `q01`
 
 # new columns take precedence over global variables
 
@@ -125,4 +125,15 @@
     Output
       <SQL> SELECT `x`, 3.0 AS `y`
       FROM `df`
+
+# temp var with nested arguments
+
+    Code
+      remote_query(lf)
+    Output
+      <SQL> SELECT `x`, `y` * 2.0 AS `z`
+      FROM (
+        SELECT `x`, 2.0 AS `y`
+        FROM `df`
+      ) `q01`
 

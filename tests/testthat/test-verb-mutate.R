@@ -84,8 +84,8 @@ test_that("transmute() keeps grouping variables", {
 })
 
 test_that("across() can access previously created variables", {
-  out <- memdb_frame(x = 1) %>%
-    mutate(y = 2, across(y, sqrt))
+  out <- memdb_frame(x = 1) %>% mutate(y = 2, across(y, sqrt))
+  lf <- lazy_frame(x = 1) %>% mutate(y = 2, across(y, sqrt))
 
   expect_equal(
     collect(out),
@@ -97,7 +97,7 @@ test_that("across() can access previously created variables", {
     c("x", "y")
   )
 
-  expect_snapshot(remote_query(out))
+  expect_snapshot(remote_query(lf))
 })
 
 test_that("new columns take precedence over global variables", {
