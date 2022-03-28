@@ -26,6 +26,14 @@
 ---
 
     Code
+      full_join(lf, lf, by = "x")
+    Condition
+      Error in `sql_query_join()`:
+      ! MySQL does not support full joins
+
+---
+
+    Code
       slice_sample(lf, 5)
     Output
       <SQL>
@@ -35,6 +43,21 @@
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)
+
+---
+
+    Code
+      sql_values(con, tibble(x = 1, y = "a"))
+    Output
+      <SQL> SELECT CAST(`x` AS NUMERIC) AS `x`, CAST(`y` AS CHAR) AS `y`
+      FROM (
+        (
+          SELECT NULL AS `x`, NULL AS `y`
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (  VALUES ROW(1.0, 'a'))
+      ) `values_table`
 
 # `sql_query_rows_update()` is correct
 

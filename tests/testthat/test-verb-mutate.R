@@ -22,7 +22,7 @@ test_that("can refer to fresly created values", {
     collect()
   expect_equal(out1, tibble(x1 = 1, x2 = 2, x3 = 3, x4 = 4))
 
-  out2 <- memdb_frame(x = 1, .name = "multi_mutate") %>%
+  out2 <- copy_to_test("sqlite", tibble(x = 1), name = "multi_mutate") %>%
     mutate(x = x + 1, x = x + 2, x = x + 4)
   expect_equal(collect(out2), tibble(x = 8))
   expect_snapshot(show_query(out2))
@@ -31,7 +31,7 @@ test_that("can refer to fresly created values", {
 test_that("transmute includes all needed variables", {
   lf <- lazy_frame(x = 1, y = 2)
   out <- transmute(lf, x = x / 2, x2 = x + y)
-  expect_named(out$ops$x$args$vars, c("x", "y"))
+  expect_equal(op_vars(out$lazy_query$from), c("x", "y"))
   expect_snapshot(out)
 })
 
@@ -67,6 +67,14 @@ test_that("supports overwriting variables (#3222)", {
     mutate(y = 4, y = x + 4) %>%
     collect()
   expect_equal(df, tibble(x = 1, y = 5))
+})
+
+test_that("across() does not select grouping variables", {
+  df <- lazy_frame(g = 1, x = 1)
+
+  # SELECT `g`, 0.0 AS `x`
+  expect_snapshot(df %>% group_by(g) %>% mutate(across(.fns = ~ 0)))
+  expect_snapshot(df %>% group_by(g) %>% transmute(across(.fns = ~ 0)))
 })
 
 # SQL generation -----------------------------------------------------------
@@ -165,10 +173,10 @@ test_that("mutate generates simple expressions", {
 
 test_that("mutate can drop variables with NULL", {
   out <- lazy_frame(x = 1, y = 1) %>%
-    mutate(y = NULL) %>%
-    sql_build()
+    mutate(y = NULL)
 
-  expect_named(out$select, "x")
+  expect_named(sql_build(out)$select, "x")
+  expect_equal(op_vars(out), "x")
 })
 
 test_that("mutate_all generates correct sql", {

@@ -249,13 +249,13 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            stop("`abbr` is not supported in SQL Server translation", call. = FALSE)          }
+            abort("`abbr` is not supported in SQL Server translation")          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          stop("`fiscal_start` is not supported in SQL Server translation. Must be 1.", call. = FALSE)
+          abort("`fiscal_start` is not supported in SQL Server translation. Must be 1.")
         }
 
         if (with_year) {
@@ -300,7 +300,11 @@ simulate_mssql <- function(version = "15.0") {
                       # MSSQL does not have function for: cor and cov
       cor           = sql_not_supported("cor()"),
       cov           = sql_not_supported("cov()"),
-      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
+
+      # percentile_cont needs `OVER()` in mssql
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
     sql_translator(.parent = base_odbc_win,
@@ -324,7 +328,7 @@ mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {
     attr(con, "version")
   } else {
-    numeric_version(DBI::dbGetInfo(con)$db.version)
+    numeric_version(DBI::dbGetInfo(con)$db.version) # nocov
   }
 }
 

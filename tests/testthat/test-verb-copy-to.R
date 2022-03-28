@@ -52,3 +52,75 @@ test_that("can create a new table in non-default schema", {
   db2 <- copy_to(con, df2, in_schema("aux", "df"), temporary = FALSE, overwrite = TRUE)
   expect_equal(collect(db2), df2)
 })
+
+test_that("df must be a local or remote table", {
+  con <- DBI::dbConnect(RSQLite::SQLite())
+  on.exit(DBI::dbDisconnect(con))
+
+  expect_snapshot(error = TRUE, copy_to(con, list(x = 1), name = "df"))
+})
+
+# copy_inline() -----------------------------------------------------------
+
+test_that("can translate a table", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  df <- tibble(
+    lgl = TRUE,
+    int = 1L,
+    dbl = 1.5,
+    chr = "a",
+    date = as.Date("2020-01-01", tz = "UTC"),
+    dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
+  )
+
+  expect_snapshot(copy_inline(con, df) %>% remote_query())
+
+  expect_equal(
+    copy_inline(con, df) %>% collect(),
+    tibble(
+      lgl = 1L,
+      int = 1L,
+      dbl = 1.5,
+      chr = "a",
+      date = "2020-01-01",
+      dtt = "2020-01-01T01:23:45Z"
+    )
+  )
+
+  expect_equal(
+    copy_inline(con, tibble(date = as.Date(c("2020-01-01", "2020-01-02"), tz = "UTC"))) %>%
+      collect(),
+    tibble(date = c("2020-01-01", "2020-01-02"))
+  )
+})
+
+test_that("can translate 1-column tables", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  expect_snapshot(
+    copy_inline(con, tibble(dbl = 1.5)) %>%
+      remote_query()
+  )
+})
+
+test_that("zero row table works", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  expect_snapshot(
+    copy_inline(con, tibble(dbl = numeric(), chr = character())) %>%
+      remote_query()
+  )
+
+  expect_snapshot(
+    copy_inline(con, tibble(dbl = numeric())) %>%
+      remote_query()
+  )
+})
+
+test_that("checks inputs", {
+  expect_snapshot({
+    (expect_error(copy_inline(simulate_dbi(), tibble())))
+    (expect_error(copy_inline(simulate_dbi(), lazy_frame(a = 1))))
+  })
+})

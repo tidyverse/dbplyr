@@ -99,10 +99,27 @@ test_that("`sql_query_upsert()` is correct", {
 test_that("can explain", {
   db <- copy_to_test("postgres", data.frame(x = 1:3))
   expect_snapshot(db %>% mutate(y = x + 1) %>% explain())
+
+  # `explain()` passes `...` to methods
+  expect_snapshot(db %>% mutate(y = x + 1) %>% explain(format = "json"))
 })
 
 test_that("can overwrite temp tables", {
   src <- src_test("postgres")
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
+})
+
+test_that("copy_inline works", {
+  src <- src_test("postgres")
+  df <- tibble(
+    lgl = TRUE,
+    int = 1L,
+    dbl = 1.5,
+    chr = "a",
+    date = as.Date("2020-01-01", tz = "UTC"),
+    dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
+  )
+
+  expect_equal(copy_inline(src, df) %>% collect(), df)
 })

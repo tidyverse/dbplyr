@@ -10,28 +10,40 @@
 # registered onLoad
 #' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  add_op_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
+  lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
+
+  x$lazy_query <- lazy_query
+  x
 }
 # registered onLoad
 #' @importFrom dplyr union
 #' @rdname intersect.tbl_lazy
 union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  add_op_set_op(x, y, "UNION", copy = copy, ..., all = all)
+  lazy_query <- add_set_op(x, y, "UNION", copy = copy, ..., all = all)
+
+  x$lazy_query <- lazy_query
+  x
 }
 #' @export
 #' @importFrom dplyr union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  add_op_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
+  lazy_query <- add_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
+
+  x$lazy_query <- lazy_query
+  x
 }
 # registered onLoad
 #' @importFrom dplyr setdiff
 #' @rdname intersect.tbl_lazy
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  add_op_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)
+  lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)
+
+  x$lazy_query <- lazy_query
+  x
 }
 
-add_op_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
+add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
   y <- auto_copy(x, y, copy)
 
   if (inherits(x$src$con, "SQLiteConnection")) {
@@ -40,8 +52,8 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
     # https://www.sqlite.org/syntax/compound-select-stmt.html
     # https://www.sqlite.org/syntax/select-core.html
 
-    if (inherits(x$ops, "op_head") || inherits(y$ops, "op_head")) {
-      stop("SQLite does not support set operations on LIMITs", call. = FALSE)
+    if (identical(x$lazy_query$last_op, "head") || identical(y$lazy_query$last_op, "head")) {
+      abort("SQLite does not support set operations on LIMITs")
     }
   }
 
@@ -50,8 +62,7 @@ add_op_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
   x <- fill_vars(x, vars)
   y <- fill_vars(y, vars)
 
-  x$ops <- op_double("set_op", x, y, args = list(type = type, all = all))
-  x
+  lazy_set_op_query(x$lazy_query, y$lazy_query, type = type, all = all)
 }
 
 fill_vars <- function(x, vars) {
@@ -68,17 +79,5 @@ fill_vars <- function(x, vars) {
     }
   })
 
-  x$ops <- op_select(x$ops, new_vars)
-  x
-}
-
-#' @export
-op_vars.op_set_op <- function(op) {
-  union(op_vars(op$x), op_vars(op$y))
-}
-
-#' @export
-sql_build.op_set_op <- function(op, con, ...) {
-  # add_op_set_op() ensures that both have same variables
-  set_op_query(op$x, op$y, type = op$args$type, all = op$args$all)
+  transmute(x, !!!new_vars)
 }

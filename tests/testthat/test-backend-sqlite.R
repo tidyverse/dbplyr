@@ -44,6 +44,19 @@ test_that("custom SQL translation", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
+test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        TRUE    ~ "undefined"
+      ),
+      con = simulate_sqlite()
+    )
+  )
+})
+
 test_that("full and right join", {
   df1 <- lazy_frame(
     x = 1:3, y = c("x", "y", "z"),

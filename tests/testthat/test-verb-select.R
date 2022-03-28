@@ -85,6 +85,14 @@ test_that("relocate works", {
   expect_named(out2, c("b", "c", "a"))
 })
 
+test_that("relocate can rename variables", {
+  mf <- memdb_frame(a = 1, b = 2, c = 1) %>% group_by(b)
+
+  out1 <- mf %>% relocate(d = b) %>% collect()
+  expect_named(out1, c("d", "a", "c"))
+  expect_equal(group_vars(out1), "d")
+})
+
 test_that("only add step if necessary", {
   lf <- lazy_frame(x = 1:3, y = 1:3)
   expect_equal(lf %>% select(everything()), lf)
@@ -171,4 +179,62 @@ test_that("mutate preserves grouping vars (#396)", {
   df <- lazy_frame(a = 1, b = 2, c = 3) %>% group_by(a, b)
   expect_equal(df %>% mutate(a = 1) %>% op_grps(), c("a", "b"))
   expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
+})
+
+
+# lazy_select_query -------------------------------------------------------
+
+test_that("select, relocate, and rename work", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_equal(
+    lf %>%
+      select(x) %>%
+      .$lazy_query %>%
+      .$select,
+    new_lazy_select(exprs(x = x))
+  )
+
+  expect_equal(
+    lf %>%
+      relocate(y) %>%
+      .$lazy_query %>%
+      .$select,
+    new_lazy_select(exprs(y = y, x = x))
+  )
+
+  expect_equal(
+    lf %>%
+      rename(b = y, a = x) %>%
+      .$lazy_query %>%
+      .$select,
+    new_lazy_select(exprs(a = x, b = y))
+  )
+})
+
+test_that("renaming handles groups correctly", {
+  lf <- lazy_frame(x = 1, y = 1) %>%
+    group_by(x) %>%
+    rename(ax = x)
+
+  result <- lf$lazy_query
+  expect_equal(
+    result$select,
+    new_lazy_select(exprs(ax = x, y = y))
+  )
+
+  expect_equal(result$group_vars, "x")
+  expect_equal(op_grps(result), "ax")
+
+  result <- lf %>%
+    rename(x = ax) %>%
+    .$lazy_query
+
+  expect_equal(
+    result$select,
+    new_lazy_select(exprs(x = x, y = y))
+  )
+
+  expect_equal(result$group_vars, "x")
+  expect_equal(op_grps(result), "x")
 })

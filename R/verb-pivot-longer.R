@@ -48,40 +48,37 @@
 #' @param names_ptypes A list of column name-prototype pairs.
 #' @param values_ptypes Not supported.
 #' @param ... Additional arguments passed on to methods.
-#' @examples
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' # See vignette("pivot") for examples and explanation
 #'
 #' # Simplest case where column names are character data
-#' if (require("tidyr", quietly = TRUE)) {
-#'   memdb_frame(
-#'     id = c("a", "b"),
-#'     x = 1:2,
-#'     y = 3:4
-#'   ) %>%
-#'     pivot_longer(-id)
-#' }
+#' memdb_frame(
+#'   id = c("a", "b"),
+#'   x = 1:2,
+#'   y = 3:4
+#' ) %>%
+#'   tidyr::pivot_longer(-id)
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
                                   names_to = "name",
                                   names_prefix = NULL,
                                   names_sep = NULL,
                                   names_pattern = NULL,
-                                  names_ptypes = list(),
-                                  names_transform = list(),
+                                  names_ptypes = NULL,
+                                  names_transform = NULL,
                                   names_repair = "check_unique",
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = list(),
+                                  values_transform = NULL,
                                   ...) {
   if (!is_missing(values_ptypes)) {
     abort("The `values_ptypes` argument is not supported for remote back-ends")
   }
 
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
 
   cols <- enquo(cols)
-
   spec <- tidyr::build_longer_spec(simulate_vars(data), !!cols,
     names_to = names_to,
     values_to = values_to,
@@ -103,8 +100,8 @@ dbplyr_pivot_longer_spec <- function(data,
                                      spec,
                                      names_repair = "check_unique",
                                      values_drop_na = FALSE,
-                                     values_transform = list()) {
-  spec <- check_spec(spec)
+                                     values_transform = NULL) {
+  spec <- tidyr::check_pivot_spec(spec)
   # .seq col needed if different input columns are mapped to the same output
   # column
   spec <- deduplicate_spec(spec, data)
@@ -115,6 +112,10 @@ dbplyr_pivot_longer_spec <- function(data,
   spec <- repair_info$spec
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
+
+  value_names <- unique(spec$.value)
+  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform")
+
   nms_map <- tibble(
     name = colnames(spec_split$key),
     name_mapped = ifelse(
@@ -135,7 +136,8 @@ dbplyr_pivot_longer_spec <- function(data,
       measure_cols_exprs <- get_measure_column_exprs(
         row[[".name"]],
         row[[".value"]],
-        values_transform
+        values_transform,
+        data = data
       )
 
       transmute(
@@ -164,20 +166,17 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform) {
-  # idea copied from `partial_eval_across`
-  measure_funs <- syms(purrr::map_chr(values_transform, find_fun))
-
+get_measure_column_exprs <- function(name, value, values_transform, data) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
     ~ {
-      f_trans <- measure_funs[[.y]]
+      f_trans <- values_transform[[.y]]
 
       if (is_null(f_trans)) {
         .x
       } else {
-        expr((!!f_trans)(!!.x))
+        resolve_fun(f_trans, .x, data)
       }
     }
   )
@@ -212,29 +211,8 @@ apply_name_repair_pivot_longer <- function(id_cols, spec, names_repair) {
 }
 
 # The following is copy-pasted from `tidyr`
-# `check_spec()` can be removed once it is exported by `tidyr`
-# see https://github.com/tidyverse/tidyr/issues/1087
 
 # nocov start
-check_spec <- function(spec) {
-  # COPIED FROM tidyr
-
-  # Eventually should just be vec_assert() on partial_frame()
-  # Waiting for https://github.com/r-lib/vctrs/issues/198
-
-  if (!is.data.frame(spec)) {
-    stop("`spec` must be a data frame", call. = FALSE)
-  }
-
-  if (!has_name(spec, ".name") || !has_name(spec, ".value")) {
-    stop("`spec` must have `.name` and `.value` columns", call. = FALSE)
-  }
-
-  # Ensure .name and .value come first
-  vars <- union(c(".name", ".value"), names(spec))
-  spec[vars]
-}
-
 # Ensure that there's a one-to-one match from spec to data by adding
 # a special .seq variable which is automatically removed after pivotting.
 deduplicate_spec <- function(spec, df) {
@@ -272,6 +250,30 @@ deduplicate_spec <- function(spec, df) {
 
   spec$.seq <- copy
   spec
+}
+
+check_list_of_functions <- function(x, names, arg) {
+  # mostly COPIED FROM tidyr
+  if (is.null(x)) {
+    x <- set_names(list(), character())
+  }
+
+  if (!vctrs::vec_is_list(x)) {
+    x <- rep_named(names, list(x))
+  }
+
+  if (length(x) > 0L && !is_named(x)) {
+    abort(glue("All elements of `{arg}` must be named."))
+  }
+
+  if (vctrs::vec_duplicate_any(names(x))) {
+    abort(glue("The names of `{arg}` must be unique."))
+  }
+
+  # Silently drop user supplied names not found in the data
+  x <- x[intersect(names(x), names)]
+
+  x
 }
 # nocov end
 

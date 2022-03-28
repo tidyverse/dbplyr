@@ -1,3 +1,11 @@
+# custom lubridate functions translated correctly
+
+    Code
+      translate_sql(month(x, label = TRUE, abbr = TRUE))
+    Condition
+      Error in `month()`:
+      ! `abbr` is not supported in SQL Server translation
+
 # convert between bit and boolean as needed
 
     Code
@@ -96,7 +104,8 @@
     Code
       sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z",
       subquery = TRUE)
-    Warning <warning>
+    Condition
+      Warning:
       ORDER BY is ignored in subqueries without LIMIT
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output

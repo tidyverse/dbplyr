@@ -55,11 +55,9 @@ sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
-        sql_expr(IF(x, TRUE, FALSE))
+        sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
-
-      random = function() sql_expr(RAND()),
 
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
@@ -113,7 +111,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 #' @export
 sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   if (identical(type, "full")) {
-    stop("MySQL does not support full joins", call. = FALSE)
+    abort("MySQL does not support full joins")
   }
   NextMethod()
 }
@@ -134,10 +132,19 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
+sql_values.MariaDBConnection <- function(con, df) {
+  sql_values_clause(con, df, row = TRUE)
+}
+
+#' @export
+sql_values.MySQL <- sql_values.MariaDBConnection
+#' @export
+sql_values.MySQLConnection <- sql_values.MariaDBConnection
+
+#' @export
 sql_random.MariaDBConnection <- function(con) {
   sql_expr(RAND())
 }
-
 #' @export
 sql_random.MySQLConnection <- sql_random.MariaDBConnection
 #' @export
@@ -166,5 +173,4 @@ sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
-globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR"))
-
+globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))

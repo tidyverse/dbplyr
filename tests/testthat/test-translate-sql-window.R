@@ -23,6 +23,13 @@ test_that("aggregating window functions ignore order_by", {
   )
 })
 
+test_that("count uses order_by if frame is used", {
+  expect_equal(
+    translate_sql(n(), vars_order = "x", vars_frame = c(-2, 1)),
+    sql("COUNT(*) OVER (ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 1 FOLLOWING)")
+  )
+})
+
 test_that("order_by overrides default ordering", {
   expect_equal(
     translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
@@ -76,6 +83,33 @@ test_that("can override frame of recycled functions", {
   )
 })
 
+test_that("frame is checked", {
+  expect_snapshot(
+    error = TRUE,
+    translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+  )
+})
+
+test_that("win_rank works", {
+  local_con(simulate_dbi())
+  sql_row_number <- win_rank("ROW_NUMBER")
+  expect_equal(
+    sql_row_number("x"),
+    sql("ROW_NUMBER() OVER (ORDER BY `x`)")
+  )
+})
+
+test_that("win_rank works", {
+  local_con(simulate_dbi())
+  sql_cumsum <- win_cumulative("SUM")
+
+  expect_equal(
+    sql_cumsum(ident("x"), "y"),
+    sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+  )
+})
+
+
 # win_over ----------------------------------------------------------------
 
 test_that("over() only requires first argument", {
@@ -97,3 +131,28 @@ test_that("multiple group by or order values don't have parens", {
   )
 })
 
+
+# window_frame ------------------------------------------------------------
+
+test_that("window_frame()", {
+  lf <- lazy_frame(x = runif(10), y = 1:10)
+
+  expect_snapshot(
+    lf %>%
+      window_frame(-3, 0) %>%
+      window_order(x) %>%
+      mutate(z = sum(y)) %>%
+      show_query()
+  )
+})
+
+test_that("window_frame() checks arguments", {
+  skip_if(getRversion() <= '3.5.0', "R too old")
+  lf <- lazy_frame(x = runif(10), y = 1:10)
+
+  expect_snapshot(error = TRUE, window_frame(lf, "a"))
+  expect_snapshot(error = TRUE, window_frame(lf, 1:2))
+
+  expect_snapshot(error = TRUE, window_frame(lf, 1, "a"))
+  expect_snapshot(error = TRUE, window_frame(lf, 1, 1:2))
+})

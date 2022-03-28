@@ -64,7 +64,7 @@ base_scalar <- sql_translator(
     } else if (is.numeric(i)) {
       build_sql(x, "[", as.integer(i), "]")
     } else {
-      stop("Can only index with strings and numbers", call. = FALSE)
+      abort("Can only index with strings and numbers")
     }
 
   },
@@ -403,7 +403,13 @@ base_win <- sql_translator(
 
   # Counts
   n     = function() {
-    win_over(sql("COUNT(*)"), win_current_group())
+    frame <- win_current_frame()
+    win_over(
+      sql("COUNT(*)"),
+      partition = win_current_group(),
+      order = if (!is.null(frame)) win_current_order(),
+      frame = frame
+    )
   },
   n_distinct = function(x) {
     win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
@@ -466,3 +472,5 @@ base_no_win <- sql_translator(
 sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
+
+utils::globalVariables("RANDOM")

@@ -9,6 +9,14 @@
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` IS `RHS`.`x`)
 
+# case_when translates correctly to ELSE when TRUE ~ is used
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"),
+      con = simulate_sqlite())
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+
 # full and right join
 
     Code
@@ -27,13 +35,13 @@
           ON (`LHS`.`x` = `RHS`.`x`)
         UNION
         SELECT
-          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          COALESCE(`RHS`.`x`, `LHS`.`x`) AS `x`,
           `LHS`.`y` AS `y.x`,
           `RHS`.`y` AS `y.y`,
           `z`
         FROM `df` AS `RHS`
         LEFT JOIN `df` AS `LHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+          ON (`RHS`.`x` = `LHS`.`x`)
       ) AS `q01`
 
 ---
@@ -45,7 +53,7 @@
       SELECT `RHS`.`x` AS `x`, `LHS`.`y` AS `y.x`, `z`, `RHS`.`y` AS `y.y`
       FROM `df` AS `RHS`
       LEFT JOIN `df` AS `LHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+        ON (`RHS`.`x` = `LHS`.`x`)
 
 # can explain a query
 

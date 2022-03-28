@@ -2,7 +2,7 @@
 
     Code
       out <- mf %>% select(a) %>% collect()
-    Message <message>
+    Message
       Adding missing grouping variables: `b`
 
 # multiple selects are collapsed
@@ -11,7 +11,7 @@
       lf %>% select(2:1) %>% select(2:1)
     Output
       <SQL>
-      SELECT `x`, `y`
+      SELECT *
       FROM `df`
 
 ---

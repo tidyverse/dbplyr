@@ -2,23 +2,14 @@
 % Please edit documentation in R/lazy-ops.R
 \name{lazy_ops}
 \alias{lazy_ops}
-\alias{op_base}
-\alias{op_single}
-\alias{add_op_single}
-\alias{op_double}
+\alias{lazy_query_base}
 \alias{op_grps}
 \alias{op_vars}
 \alias{op_sort}
 \alias{op_frame}
 \title{Lazy operations}
 \usage{
-op_base(x, vars, class = character())
-
-op_single(name, x, dots = list(), args = list())
-
-add_op_single(name, .data, dots = list(), args = list())
-
-op_double(name, x, y, args = list())
+lazy_query_base(x, vars, class = character())
 
 op_grps(op)
 
