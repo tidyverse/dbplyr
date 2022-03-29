@@ -119,7 +119,7 @@ sql_returning_cols <- function(con, cols, table, ...) {
     return(NULL)
   }
 
-  ellipsis::check_dots_empty()
+  rlang::check_dots_empty()
   UseMethod("sql_returning_cols")
 }
 
@@ -420,7 +420,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 #' @rdname db-sql
 sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
                                   returning_cols = NULL) {
-  ellipsis::check_dots_used()
+  rlang::check_dots_used()
   # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_update_from")
 }
@@ -447,7 +447,7 @@ sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
 #' @rdname db-sql
 sql_query_upsert <- function(con, x_name, y, by, update_cols, ...,
                                   returning_cols = NULL) {
-  ellipsis::check_dots_used()
+  rlang::check_dots_used()
   # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_upsert")
 }
@@ -491,7 +491,7 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
 #' @export
 #' @rdname db-sql
 sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  ellipsis::check_dots_used()
+  rlang::check_dots_used()
   # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_delete")
 }
