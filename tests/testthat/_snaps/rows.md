@@ -8,11 +8,13 @@
 
 ---
 
-    All `by` columns must exist in `x`.
+    All columns specified through `by` must exist in `x` and `y`.
+    i The following columns are missing from `x`: `z`.
 
 ---
 
     All columns in `y` must exist in `x`.
+    i The following columns only exist in `y`: `z`.
 
 ---
 
@@ -21,16 +23,6 @@
 ---
 
     Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
-
-# `rows_update()` returns early if no column to update
-
-    Code
-      rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 1:3,
-      .name = "df_y"), by = "x", in_place = FALSE)
-    Output
-      <SQL>
-      SELECT *
-      FROM `df_x`
 
 # `rows_update()` works with `in_place = FALSE`
 
@@ -210,7 +202,7 @@
 
     Code
       rows_delete(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
-        x = 2:3, y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
+        x = 2:3, .name = "df_y"), by = "x", in_place = FALSE)
     Output
       <SQL>
       SELECT * FROM `df_x` AS `LHS`

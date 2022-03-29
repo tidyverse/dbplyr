@@ -6,12 +6,20 @@
 #' @rdname rows-db
 rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
-  by <- rows_check_key(by, x, y)
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
   y <- auto_copy(x, y, copy = copy)
 
-  rows_check_key_df(x, by, df_name = "x")
-  rows_check_key_df(y, by, df_name = "y")
-  # TODO check that key values in `y` are unique? (argument `check`?)
+  rows_check_containment(x, y)
+
+  by <- rows_check_by(by, y)
+
+  rows_check_key(x, by, "x")
+  rows_check_key(y, by, "y", unique = TRUE)
+
+  new_columns <- setdiff(colnames(y), by)
 
   # Expect manual quote from user, silently fall back to enexpr()
   returning_expr <- enexpr(returning)
@@ -22,9 +30,7 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
   returning_cols <- eval_select2(returning_expr, x)
   rows_check_returning(x, returning_cols)
-  rows_check_in_place(x, in_place)
-  new_columns <- setdiff(colnames(y), by)
-  name <- target_table_name(x, in_place)
+
 
   if (!is_null(name)) {
     # TODO handle `returning_cols` here
@@ -81,12 +87,20 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #' @rdname rows-db
 rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                 returning = NULL) {
-  by <- rows_check_key(by, x, y)
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
   y <- auto_copy(x, y, copy = copy)
 
-  rows_check_key_df(x, by, df_name = "x")
-  rows_check_key_df(y, by, df_name = "y")
-  # TODO check that key values in `y` are unique? (argument `check`?)
+  rows_check_containment(x, y)
+
+  by <- rows_check_by(by, y)
+
+  rows_check_key(x, by, "x")
+  rows_check_key(y, by, "y", unique = TRUE)
+
+  new_columns <- setdiff(colnames(y), by)
 
   # Expect manual quote from user, silently fall back to enexpr()
   returning_expr <- enexpr(returning)
@@ -97,9 +111,6 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
 
   returning_cols <- eval_select2(returning_expr, x)
   rows_check_returning(x, returning_cols)
-  rows_check_in_place(x, in_place)
-  new_columns <- setdiff(colnames(y), by)
-  name <- target_table_name(x, in_place)
 
   if (!is_null(name)) {
     # TODO handle `returning_cols` here
@@ -165,12 +176,18 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
 #' @rdname rows-db
 rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
-  by <- rows_check_key(by, x, y)
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
   y <- auto_copy(x, y, copy = copy)
 
-  rows_check_key_df(x, by, df_name = "x")
-  rows_check_key_df(y, by, df_name = "y")
-  # TODO check that key values in `y` are unique? (argument `check`?)
+  rows_check_containment(x, y)
+
+  by <- rows_check_by(by, y)
+
+  rows_check_key(x, by, "x")
+  rows_check_key(y, by, "y", unique = TRUE)
 
   # Expect manual quote from user, silently fall back to enexpr()
   returning_expr <- enexpr(returning)
@@ -181,9 +198,8 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
   returning_cols <- eval_select2(returning_expr, x)
   rows_check_returning(x, returning_cols)
-  rows_check_in_place(x, in_place)
+
   new_columns <- setdiff(colnames(y), by)
-  name <- target_table_name(x, in_place)
 
   if (!is_null(name)) {
     # TODO use `rows_insert()` here
@@ -237,12 +253,18 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #' @rdname rows-db
 rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
                                  returning = NULL) {
-  by <- rows_check_key(by, x, y)
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
   y <- auto_copy(x, y, copy = copy)
 
-  rows_check_key_df(x, by, df_name = "x")
-  rows_check_key_df(y, by, df_name = "y")
-  # TODO check that key values in `y` are unique? (argument `check`?)
+  rows_check_containment(x, y)
+
+  by <- rows_check_by(by, y)
+
+  rows_check_key(x, by, "x")
+  rows_check_key(y, by, "y")
 
   # Expect manual quote from user, silently fall back to enexpr()
   returning_expr <- enexpr(returning)
@@ -252,9 +274,13 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   )
 
   returning_cols <- eval_select2(returning_expr, x)
-  rows_check_in_place(x, in_place)
   rows_check_returning(x, returning_cols)
-  name <- target_table_name(x, in_place)
+
+  extra <- setdiff(colnames(y), by)
+  if (!is_empty(extra)) {
+    message <- glue("Ignoring extra `y` columns: ", commas(tick(extra)))
+    inform(message, class = c("dplyr_message_delete_extra_cols", "dplyr_message"))
+  }
 
   if (!is_null(name)) {
     sql <- sql_query_delete(
@@ -279,90 +305,6 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
     out
   }
-}
-
-eval_select2 <- function(expr, data) {
-  sim_data <- simulate_vars(data)
-  locs <- tidyselect::eval_select(expr, sim_data)
-  names_out <- names(locs)
-  set_names(colnames(sim_data)[locs], names_out)
-}
-
-rows_check_key <- function(by, x, y, error_call = caller_env()) {
-  if (is.null(by)) {
-    by <- colnames(y)[[1]]
-    msg <- glue("Matching, by = \"{by}\"")
-    # TODO change or remove class?
-    inform(msg, class = c("dplyr_message_matching_by", "dplyr_message"))
-  }
-
-  if (!is.character(by) || length(by) == 0) {
-    abort("`by` must be a character vector.", call = error_call)
-  }
-  # is_named(by) checks all(names2(by) != ""), we need any(...)
-  if (any(names2(by) != "")) {
-    abort("`by` must be unnamed.", call = error_call)
-  }
-
-  bad <- setdiff(colnames(y), colnames(x))
-  if (has_length(bad)) {
-    abort("All columns in `y` must exist in `x`.", call = error_call)
-  }
-
-  by
-}
-
-rows_check_key_df <- function(df, by, df_name, error_call = caller_env()) {
-  y_miss <- setdiff(by, colnames(df))
-  if (length(y_miss) > 0) {
-    msg <- glue("All `by` columns must exist in `{df_name}`.")
-    abort(msg, call = error_call)
-  }
-}
-
-rows_check_returning <- function(df, returning_cols) {
-  if (is_empty(returning_cols)) return()
-
-  if (inherits(df, "tbl_TestConnection")) {
-    abort("`returning` does not work for simulated connections.")
-  }
-}
-
-rows_check_in_place <- function(df, in_place) {
-  if (!rlang::is_bool(in_place)) {
-    abort("`in_place` must be `TRUE` or `FALSE`.")
-  }
-
-  if (!in_place) return()
-
-  if (inherits(df, "tbl_TestConnection")) {
-    abort("`in_place = TRUE` does not work for simulated connections.")
-  }
-}
-
-target_table_name <- function(x, in_place) {
-  name <- remote_name(x)
-  if (!is_null(name) && is_true(in_place)) {
-    return(name)
-  }
-
-  if (is_null(name) && is_true(in_place)) {
-    abort("Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.")
-  }
-
-  NULL
-}
-
-rows_get_or_execute <- function(x, sql, returning_cols) {
-  con <- remote_con(x)
-  if (is_empty(returning_cols)) {
-    dbExecute(con, sql, immediate = TRUE)
-  } else {
-    returned_rows <- dbGetQuery(con, sql, immediate = TRUE)
-    x <- set_returned_rows(x, returned_rows)
-  }
-
-  invisible(x)
 }
 
 set_returned_rows <- function(x, returned_rows) {
@@ -413,6 +355,170 @@ sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
   abort("DuckDB does not support the `returning` argument.")
 }
 
+sql_coalesce <- function(x, y) {
+  sql(paste0("COALESCE(", x, ", ", y, ")"))
+}
+
+# check helpers -----------------------------------------------------------
+
+rows_check_by <- function(by, y, ..., error_call = caller_env()) {
+  check_dots_empty()
+
+  if (is.null(by)) {
+    if (ncol(y) == 0L) {
+      abort("`y` must have at least one column.", call = error_call)
+    }
+
+    by <- colnames(y)[[1]]
+
+    inform(
+      message = glue("Matching, by = \"{by}\""),
+      class = c("dplyr_message_matching_by", "dplyr_message")
+    )
+  }
+
+  if (!is.character(by)) {
+    abort("`by` must be a character vector.", call = error_call)
+  }
+  if (is_empty(by)) {
+    abort("`by` must specify at least 1 column.", call = error_call)
+  }
+  if (!all(names2(by) == "")) {
+    abort("`by` must be unnamed.", call = error_call)
+  }
+
+  by
+}
+
+rows_check_containment <- function(x, y, ..., error_call = caller_env()) {
+  check_dots_empty()
+
+  bad <- setdiff(colnames(y), colnames(x))
+
+  if (!is_empty(bad)) {
+    bad <- err_vars(bad)
+
+    message <- c(
+      "All columns in `y` must exist in `x`.",
+      i = glue("The following columns only exist in `y`: {bad}.")
+    )
+
+    abort(message, call = error_call)
+  }
+
+  invisible()
+}
+
+rows_check_key <- function(x,
+                           by,
+                           arg,
+                           ...,
+                           unique = FALSE,
+                           error_call = caller_env()) {
+  check_dots_empty()
+
+  missing <- setdiff(by, colnames(x))
+
+  if (!is_empty(missing)) {
+    missing <- err_vars(missing)
+
+    message <- c(
+      "All columns specified through `by` must exist in `x` and `y`.",
+      i = glue("The following columns are missing from `{arg}`: {missing}.")
+    )
+
+    abort(message, call = error_call)
+  }
+
+  # TODO adapt this
+  # out <- x[by]
+  #
+  # if (unique && vec_duplicate_any(out)) {
+  #   duplicated <- vec_duplicate_detect(out)
+  #   duplicated <- which(duplicated)
+  #   duplicated <- err_locs(duplicated)
+  #
+  #   message <- c(
+  #     glue("`{arg}` key values must be unique."),
+  #     i = glue("The following rows contain duplicate key values: {duplicated}.")
+  #   )
+  #
+  #   abort(message, call = error_call)
+  # }
+  #
+  # out
+}
+
+# rows_check_conflict <- function(conflict, ..., error_call = caller_env()) {
+#   check_dots_empty()
+#
+#   arg_match(
+#     arg = conflict,
+#     values = c("error", "ignore"),
+#     error_arg = "conflict",
+#     error_call = error_call
+#   )
+# }
+
+rows_check_in_place <- function(df, in_place) {
+  if (!rlang::is_bool(in_place)) {
+    abort("`in_place` must be `TRUE` or `FALSE`.")
+  }
+
+  if (!in_place) return()
+
+  if (inherits(df, "tbl_TestConnection")) {
+    abort("`in_place = TRUE` does not work for simulated connections.")
+  }
+}
+
+rows_check_returning <- function(df, returning_cols) {
+  if (is_empty(returning_cols)) return()
+
+  if (inherits(df, "tbl_TestConnection")) {
+    abort("`returning` does not work for simulated connections.")
+  }
+}
+
+err_vars <- function(x) {
+  if (is.logical(x)) {
+    x <- which(x)
+  }
+  if (is.character(x)) {
+    x <- encodeString(x, quote = "`")
+  }
+
+  glue::glue_collapse(x, sep = ", ", last = if (length(x) <= 2) " and " else ", and ")
+}
+
+commas <- function(...) paste0(..., collapse = ", ")
+
+tick <- function(x) {
+  ifelse(is.na(x), "NA", encodeString(x, quote = "`"))
+}
+
+# other helpers -----------------------------------------------------------
+
+eval_select2 <- function(expr, data) {
+  sim_data <- simulate_vars(data)
+  locs <- tidyselect::eval_select(expr, sim_data)
+  names_out <- names(locs)
+  set_names(colnames(sim_data)[locs], names_out)
+}
+
+target_table_name <- function(x, in_place) {
+  name <- remote_name(x)
+  if (!is_null(name) && is_true(in_place)) {
+    return(name)
+  }
+
+  if (is_null(name) && is_true(in_place)) {
+    abort("Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.")
+  }
+
+  NULL
+}
+
 rows_prep <- function(con, x_name, y, by, lvl = 0) {
   y_name <- "...y"
   from <- dbplyr_sql_subquery(con,
@@ -430,15 +536,14 @@ rows_prep <- function(con, x_name, y, by, lvl = 0) {
   )
 }
 
-sql_coalesce <- function(x, y) {
-  sql(paste0("COALESCE(", x, ", ", y, ")"))
-}
+rows_get_or_execute <- function(x, sql, returning_cols) {
+  con <- remote_con(x)
+  if (is_empty(returning_cols)) {
+    dbExecute(con, sql, immediate = TRUE)
+  } else {
+    returned_rows <- dbGetQuery(con, sql, immediate = TRUE)
+    x <- set_returned_rows(x, returned_rows)
+  }
 
-sql_named_cols <- function(con, cols, table = NULL) {
-  nms <- names2(cols)
-  nms[nms == cols] <- ""
-
-  cols <- sql_table_prefix(con, cols, table)
-  cols <- set_names(cols, nms)
-  escape(ident_q(cols), collapse = NULL, con = con)
+  invisible(x)
 }

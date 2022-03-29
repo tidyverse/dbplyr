@@ -129,6 +129,16 @@ sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
 
   sql_clause("RETURNING", returning_cols)
 }
+
+sql_named_cols <- function(con, cols, table = NULL) {
+  nms <- names2(cols)
+  nms[nms == cols] <- ""
+
+  cols <- sql_table_prefix(con, cols, table)
+  cols <- set_names(cols, nms)
+  escape(ident_q(cols), collapse = NULL, con = con)
+}
+
 sql_random <- function(con) {
   UseMethod("sql_random")
 }

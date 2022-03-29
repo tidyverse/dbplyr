@@ -31,35 +31,38 @@ test_that("arguments are checked", {
 })
 
 test_that("`rows_update()` returns early if no column to update", {
-  expect_snapshot(
+  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+  expect_equal(
     rows_update(
-      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lf,
       lazy_frame(x = 1:3, .name = "df_y"),
       by = "x",
       in_place = FALSE
-    )
+    ),
+    lf
   )
 
+  db <- memdb_frame(x = 1:3, y = 11:13)
   expect_equal(
     rows_update(
-      memdb_frame(x = 1:3, y = 11:13),
+      db,
       memdb_frame(x = 1:3),
       by = "x",
       in_place = FALSE
     ) %>%
       collect(),
-    tibble(x = 1:3, y = 11:13)
+    collect(db)
   )
 
   expect_equal(
     rows_update(
-      memdb_frame(x = 1:3, y = 11:13),
+      db,
       memdb_frame(x = 1:3),
       by = "x",
       in_place = TRUE
     ) %>%
       collect(),
-    tibble(x = 1:3, y = 11:13)
+    collect(db)
   )
 })
 
@@ -451,11 +454,23 @@ test_that("`rows_delete()` works with empty `by`", {
   )
 })
 
+test_that("`rows_delete()` ignores extra `y` columns", {
+  expect_message(
+    rows_delete(
+      lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
+      lazy_frame(x = 1:3, y = 11, .name = "df_y"),
+      by = "x",
+      in_place = FALSE
+    ),
+    regexp = 'Ignoring extra `y` columns: `y`'
+  )
+})
+
 test_that("`rows_delete()` works with `in_place = FALSE`", {
   expect_snapshot(
     rows_delete(
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
-      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      lazy_frame(x = 2:3, .name = "df_y"),
       by = "x",
       in_place = FALSE
     )
@@ -464,7 +479,7 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   expect_equal(
     rows_delete(
-      df, memdb_frame(x = 2:3, y = 22:23),
+      df, memdb_frame(x = 2:3),
       by = "x",
       in_place = FALSE
     ) %>%
@@ -479,7 +494,7 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
   expect_equal(
     rows_delete(
       memdb_frame(x = 1:3, y = c(11, 12, 13)),
-      memdb_frame(x = 2:3, y = 22:23),
+      memdb_frame(x = 2:3),
       by = "x",
       in_place = FALSE,
       returning = quote(everything())
@@ -493,7 +508,7 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
   expect_snapshot_error(
     rows_delete(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
-      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      lazy_frame(x = 2:3, .name = "df_y"),
       by = "x",
       in_place = TRUE
     )
@@ -501,7 +516,7 @@ test_that("`rows_delete()` works with `in_place = TRUE`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_delete(
-    df, memdb_frame(x = 2:3, y = 22:23),
+    df, memdb_frame(x = 2:3),
     by = "x",
     in_place = TRUE
   )
@@ -514,7 +529,7 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   df_deleted <- rows_delete(
-    df, memdb_frame(x = 2:4, y = 22:24),
+    df, memdb_frame(x = 2:4),
     by = "x",
     in_place = TRUE,
     returning = quote(everything())
