@@ -21,15 +21,7 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
   new_columns <- setdiff(colnames(y), by)
 
-  # Expect manual quote from user, silently fall back to enexpr()
-  returning_expr <- enexpr(returning)
-  tryCatch(
-    returning_expr <- returning,
-    error = identity
-  )
-
-  returning_cols <- eval_select2(returning_expr, x)
-  rows_check_returning(x, returning_cols)
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
 
   if (!is_null(name)) {
@@ -102,15 +94,7 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
 
   new_columns <- setdiff(colnames(y), by)
 
-  # Expect manual quote from user, silently fall back to enexpr()
-  returning_expr <- enexpr(returning)
-  tryCatch(
-    returning_expr <- returning,
-    error = identity
-  )
-
-  returning_cols <- eval_select2(returning_expr, x)
-  rows_check_returning(x, returning_cols)
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   if (!is_null(name)) {
     # TODO handle `returning_cols` here
@@ -189,15 +173,7 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   rows_check_key(x, by, "x")
   rows_check_key(y, by, "y", unique = TRUE)
 
-  # Expect manual quote from user, silently fall back to enexpr()
-  returning_expr <- enexpr(returning)
-  tryCatch(
-    returning_expr <- returning,
-    error = identity
-  )
-
-  returning_cols <- eval_select2(returning_expr, x)
-  rows_check_returning(x, returning_cols)
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   new_columns <- setdiff(colnames(y), by)
 
@@ -266,15 +242,7 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   rows_check_key(x, by, "x")
   rows_check_key(y, by, "y")
 
-  # Expect manual quote from user, silently fall back to enexpr()
-  returning_expr <- enexpr(returning)
-  tryCatch(
-    returning_expr <- returning,
-    error = identity
-  )
-
-  returning_cols <- eval_select2(returning_expr, x)
-  rows_check_returning(x, returning_cols)
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   extra <- setdiff(colnames(y), by)
   if (!is_empty(extra)) {
@@ -472,12 +440,22 @@ rows_check_in_place <- function(df, in_place) {
   }
 }
 
-rows_check_returning <- function(df, returning_cols) {
-  if (is_empty(returning_cols)) return()
+rows_check_returning <- function(df, returning, returning_expr) {
+  # Expect manual quote from user, silently fall back to enexpr()
+  tryCatch(
+    returning_expr <- returning,
+    error = identity
+  )
+
+  returning_cols <- eval_select2(returning_expr, df)
+
+  if (is_empty(returning_cols)) return(returning_cols)
 
   if (inherits(df, "tbl_TestConnection")) {
     abort("`returning` does not work for simulated connections.")
   }
+
+  returning_cols
 }
 
 err_vars <- function(x) {
