@@ -17,6 +17,7 @@
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_query_insert}
 \alias{sql_query_update_from}
 \alias{sql_query_upsert}
 \alias{sql_query_delete}
@@ -74,6 +75,8 @@ sql_query_join(
 sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_query_insert(con, x_name, y, ..., returning_cols = NULL)
 
 sql_query_update_from(
   con,

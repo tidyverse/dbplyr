@@ -1,7 +1,58 @@
 #' @export
-#' @inheritParams dplyr::rows_update
+#' @inheritParams dplyr::rows_insert
 #' @param returning Columns to return.
 #'
+#' @importFrom dplyr rows_insert
+#' @rdname rows-db
+rows_insert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
+                                 returning = NULL) {
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
+  y <- auto_copy(x, y, copy = copy)
+
+  rows_check_containment(x, y)
+
+  by <- rows_check_by(by, y)
+
+  rows_check_key(x, by, "x")
+  rows_check_key(y, by, "y", unique = TRUE)
+
+  new_columns <- setdiff(colnames(y), by)
+
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
+
+  if (!is_null(name)) {
+    sql <- sql_query_insert(
+      con = remote_con(x),
+      x_name = name,
+      y = y,
+      by = by,
+      ...,
+      returning_cols = returning_cols
+    )
+
+    rows_get_or_execute(x, sql, returning_cols)
+  } else {
+    out <- union_all(x, anti_join(y, x, by = by))
+
+    if (!is_empty(returning_cols)) {
+      # Need to `union_all()` with `x` so that all columns of `x` exist in the result
+      returned_rows <- anti_join(y, x, by = by) %>%
+        union_all(x %>% filter(0 == 1)) %>%
+        select(returning_cols) %>%
+        collect()
+      out <- set_returned_rows(out, returned_rows)
+    }
+
+    out
+  }
+}
+
+#' @inheritParams dplyr::rows_update
+#'
+#' @export
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
 rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,

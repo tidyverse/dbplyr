@@ -428,10 +428,35 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 
 #' @export
 #' @rdname db-sql
+sql_query_insert <- function(con, x_name, y, ..., returning_cols = NULL) {
+  rlang::check_dots_used()
+  UseMethod("sql_query_insert")
+}
+
+#' @export
+sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  join_by <- list(x = by, y = by, x_as = x_name, y_as = "...y")
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  clauses <- list2(
+    sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    !!!sql_clause_where_exists(x_name, where, not = TRUE),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
 sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
                                   returning_cols = NULL) {
   rlang::check_dots_used()
-  # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_update_from")
 }
 
@@ -458,7 +483,6 @@ sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
 sql_query_upsert <- function(con, x_name, y, by, update_cols, ...,
                                   returning_cols = NULL) {
   rlang::check_dots_used()
-  # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_upsert")
 }
 
@@ -502,7 +526,6 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
 #' @rdname db-sql
 sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
   rlang::check_dots_used()
-  # FIXME: check here same src for x and y? if not -> error.
   UseMethod("sql_query_delete")
 }
 

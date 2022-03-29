@@ -1,4 +1,123 @@
 
+# rows_insert -------------------------------------------------------------
+
+test_that("`rows_insert()` works with empty `by`", {
+  expect_message(
+    rows_insert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 1:3, .name = "df_y"),
+      in_place = FALSE
+    ),
+    regexp = 'Matching, by = "x"'
+  )
+})
+
+test_that("`rows_insert()` works with `in_place = FALSE`", {
+  expect_snapshot(
+    rows_insert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 3:4, y = 23:24, .name = "df_y"),
+      by = "x",
+      in_place = FALSE
+    )
+  )
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  expect_equal(
+    rows_insert(
+      df, memdb_frame(x = 3:4, y = 23:24),
+      by = "x",
+      in_place = FALSE
+    ) %>%
+      collect(),
+    tibble(x = 1:4, y = c(11:13, 24))
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+})
+
+test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
+  expect_equal(
+    rows_insert(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 3:4, y = 23:24),
+      by = "x",
+      in_place = FALSE,
+      returning = quote(everything())
+    ) %>%
+      get_returned_rows(),
+    tibble(x = 4, y = 24)
+  )
+
+  # all `x` columns are present
+  expect_equal(
+    rows_insert(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 3:4),
+      by = "x",
+      in_place = FALSE,
+      returning = quote(everything())
+    ) %>%
+      get_returned_rows(),
+    tibble(x = 4, y = NA)
+  )
+})
+
+test_that("`rows_insert()` works with `in_place = TRUE`", {
+  expect_snapshot_error(
+    rows_insert(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      by = "x",
+      in_place = TRUE
+    )
+  )
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  rows_insert(
+    df, memdb_frame(x = 3:4, y = 23:24),
+    by = "x",
+    in_place = TRUE
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
+})
+
+test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
+  skip_if_not_installed("RSQLite", "2.2.8")
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  df_inserted <- rows_insert(
+    df, memdb_frame(x = 3:4, y = 23:24),
+    by = "x",
+    in_place = TRUE,
+    returning = quote(everything())
+  )
+
+  expect_equal(get_returned_rows(df_inserted), tibble(x = 4L, y = 24L))
+
+  expect_equal(df_inserted %>% collect(), tibble(x = 1:4, y = c(11:13, 24L)))
+})
+
+test_that("`sql_query_insert()` works", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_mssql(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_insert(
+      con = simulate_sqlite(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 # rows_update -------------------------------------------------------------
 
 test_that("arguments are checked", {

@@ -1,3 +1,45 @@
+# `rows_insert()` works with `in_place = FALSE`
+
+    Code
+      rows_insert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 3:4,
+      y = 23:24, .name = "df_y"), by = "x", in_place = FALSE)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM `df_x`
+      )
+      UNION ALL
+      (
+        SELECT * FROM `df_y` AS `LHS`
+        WHERE NOT EXISTS (
+          SELECT 1 FROM `df_x` AS `RHS`
+          WHERE (`LHS`.`x` = `RHS`.`x`)
+        )
+      )
+
+# `rows_insert()` works with `in_place = TRUE`
+
+    `in_place = TRUE` does not work for simulated connections.
+
+# `sql_query_insert()` works
+
+    Code
+      sql_query_insert(con = simulate_sqlite(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) AS `...y`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_x`
+        WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
+      )
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
 # arguments are checked
 
     `by` must be a character vector.
