@@ -428,24 +428,30 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 
 #' @export
 #' @rdname db-sql
-sql_query_insert <- function(con, x_name, y, ..., returning_cols = NULL) {
+sql_query_insert <- function(con, x_name, y, by, ..., conflict = c("error", "ignore"), returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_insert")
 }
 
 #' @export
-sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c("error", "ignore"), returning_cols = NULL) {
+  conflict <- rows_check_conflict(conflict)
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
-
-  join_by <- list(x = by, y = by, x_as = x_name, y_as = "...y")
-  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+
+  if (conflict == "error") {
+    conflict_clauses <- list()
+  } else {
+    join_by <- list(x = by, y = by, x_as = x_name, y_as = "...y")
+    where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+    conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+  }
   clauses <- list2(
     sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    !!!sql_clause_where_exists(x_name, where, not = TRUE),
+    !!!conflict_clauses,
     sql_returning_cols(con, returning_cols, x_name)
   )
 

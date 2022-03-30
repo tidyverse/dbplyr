@@ -1,14 +1,28 @@
 #' @export
 #' @inheritParams dplyr::rows_insert
+#' @param conflict How should keys in `y` that already exist in `x` be handled?
+#'   One of:
+#'   - `"error"`, the default, will error if there are any keys in `y` that
+#'     already exist in `x`. This requires a corresponding unique constraint in
+#'     `x`.
+#'   - `"ignore"` will not insert rows in `y` with keys that already exist in `y`.
 #' @param returning Columns to return.
 #'
 #' @importFrom dplyr rows_insert
 #' @rdname rows-db
-rows_insert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
+rows_insert.tbl_lazy <- function(x,
+                                 y,
+                                 by = NULL,
+                                 ...,
+                                 conflict = c("error", "ignore"),
+                                 copy = FALSE,
+                                 in_place = FALSE,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
+
+  conflict <- rows_check_conflict(conflict)
 
   y <- auto_copy(x, y, copy = copy)
 
@@ -24,17 +38,26 @@ rows_insert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   if (!is_null(name)) {
+    if (conflict == "error") {
+      inform("Duplicated rows only produce an error if there is a unique constraint on `x`.")
+    }
+
     sql <- sql_query_insert(
       con = remote_con(x),
       x_name = name,
       y = y,
       by = by,
       ...,
+      conflict = conflict,
       returning_cols = returning_cols
     )
 
     rows_get_or_execute(x, sql, returning_cols)
   } else {
+    if (conflict == "error") {
+      abort('`conflict = "error"` is not supported for `in_place = FALSE`.')
+    }
+
     out <- union_all(x, anti_join(y, x, by = by))
 
     if (!is_empty(returning_cols)) {
@@ -489,6 +512,15 @@ rows_check_in_place <- function(df, in_place) {
   if (inherits(df, "tbl_TestConnection")) {
     abort("`in_place = TRUE` does not work for simulated connections.")
   }
+}
+
+rows_check_conflict <- function(conflict, error_call = caller_env()) {
+  arg_match(
+    arg = conflict,
+    values = c("error", "ignore"),
+    error_arg = "conflict",
+    error_call = error_call
+  )
 }
 
 rows_check_returning <- function(df, returning, returning_expr) {

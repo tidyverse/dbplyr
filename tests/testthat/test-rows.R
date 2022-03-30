@@ -6,9 +6,24 @@ test_that("`rows_insert()` works with empty `by`", {
     rows_insert(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
-      in_place = FALSE
+      in_place = FALSE,
+      conflict = "ignore"
     ),
     regexp = 'Matching, by = "x"'
+  )
+})
+
+test_that("`rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`", {
+  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+  expect_snapshot(
+    (expect_error(
+      rows_insert(
+        lf, lf,
+        by = "x",
+        conflict = "error",
+        in_place = FALSE
+      )
+    ))
   )
 })
 
@@ -18,6 +33,7 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 3:4, y = 23:24, .name = "df_y"),
       by = "x",
+      conflict = "ignore",
       in_place = FALSE
     )
   )
@@ -27,6 +43,7 @@ test_that("`rows_insert()` works with `in_place = FALSE`", {
     rows_insert(
       df, memdb_frame(x = 3:4, y = 23:24),
       by = "x",
+      conflict = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -42,6 +59,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 1:3, y = 11:13),
       memdb_frame(x = 3:4, y = 23:24),
       by = "x",
+      conflict = "ignore",
       in_place = FALSE,
       returning = quote(everything())
     ) %>%
@@ -55,6 +73,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 1:3, y = 11:13),
       memdb_frame(x = 3:4),
       by = "x",
+      conflict = "ignore",
       in_place = FALSE,
       returning = quote(everything())
     ) %>%
@@ -74,13 +93,24 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
   )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
+  expect_message(
+    rows_insert(
+      df, memdb_frame(x = 3:4, y = 23:24),
+      conflict = "error",
+      by = "x",
+      in_place = TRUE
+    )
+  )
+  expect_equal(df %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
+
+  df2 <- memdb_frame(x = 1:3, y = 11:13)
   rows_insert(
-    df, memdb_frame(x = 3:4, y = 23:24),
+    df2, memdb_frame(x = 3:4, y = 23:24),
     by = "x",
+    conflict = "ignore",
     in_place = TRUE
   )
-
-  expect_equal(df %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
+  expect_equal(df2 %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
 })
 
 test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
@@ -90,6 +120,7 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
   df_inserted <- rows_insert(
     df, memdb_frame(x = 3:4, y = 23:24),
     by = "x",
+    conflict = "ignore",
     in_place = TRUE,
     returning = quote(everything())
   )
@@ -113,6 +144,18 @@ test_that("`sql_query_insert()` works", {
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
+      conflict = "error",
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+
+  expect_snapshot(
+    sql_query_insert(
+      con = simulate_sqlite(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      conflict = "ignore",
       returning_cols = c("a", b2 = "b")
     )
   )

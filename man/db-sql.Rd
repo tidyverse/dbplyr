@@ -76,7 +76,15 @@ sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 
-sql_query_insert(con, x_name, y, ..., returning_cols = NULL)
+sql_query_insert(
+  con,
+  x_name,
+  y,
+  by,
+  ...,
+  conflict = c("error", "ignore"),
+  returning_cols = NULL
+)
 
 sql_query_update_from(
   con,
