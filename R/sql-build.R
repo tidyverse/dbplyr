@@ -31,7 +31,7 @@ sql_build <- function(op, con = NULL, ...) {
 #' @export
 sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
   # only used for testing
-  qry <- sql_build(op$ops, con = con, ...)
+  qry <- sql_build(op$lazy_query, con = con, ...)
   sql_optimise(qry, con = con, ...)
 }
 
@@ -54,11 +54,11 @@ sql_render <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
 
 #' @export
 sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0) {
-  sql_render(query$ops, con = con, ..., subquery = subquery, lvl = lvl)
+  sql_render(query$lazy_query, con = con, ..., subquery = subquery, lvl = lvl)
 }
 
 #' @export
-sql_render.op <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.lazy_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
   qry <- sql_build(query, con = con, ...)
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
   sql_render(qry, con = con, ..., subquery = subquery, lvl = lvl)

@@ -25,8 +25,7 @@
 #'   mutate(x2 = x / sum(x, na.rm = TRUE)) %>%
 #'   show_query()
 group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
   if (!missing(add)) {
     lifecycle::deprecate_warn("1.0.0", "dplyr::group_by(add = )", "group_by(.add = )")
@@ -45,26 +44,8 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
     return(groups$data)
   }
 
-  add_op_single("group_by",
-    groups$data,
-    dots = set_names(groups$groups, names),
-    args = list(add = FALSE)
-  )
-}
-
-#' @export
-op_desc.op_group_by <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-op_grps.op_group_by <- function(op) {
-  names(op$dots)
-}
-
-#' @export
-sql_build.op_group_by <- function(op, con, ...) {
-  sql_build(op$x, con, ...)
+  groups$data$lazy_query <- add_group_by(groups$data, names)
+  groups$data
 }
 
 # ungroup -----------------------------------------------------------------
@@ -80,4 +61,17 @@ ungroup.tbl_lazy <- function(x, ...) {
     new_groups <- setdiff(old_groups, to_remove)
     group_by(x, !!!syms(new_groups))
   }
+}
+
+add_group_by <- function(.data, group_vars) {
+  lazy_query <- .data$lazy_query
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    lazy_query <- lazy_select_query(
+      from = lazy_query,
+      last_op = "group_by"
+    )
+  }
+
+  lazy_query$group_vars <- group_vars
+  lazy_query
 }

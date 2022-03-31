@@ -71,7 +71,6 @@ test_that("only adds step if necessary", {
   expect_equal(lf_grouped %>% ungroup(y), lf_grouped)
 
   out <- lf_grouped %>% mutate(y = y - mean(y)) %>% group_by()
-  expect_s3_class(out$ops, "op_group_by")
   expect_equal(group_vars(out), character())
 })
 

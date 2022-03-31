@@ -22,7 +22,8 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
       .data <- transmute(.data, !!!grps, ...)
     }
 
-    return(add_op_single("distinct", .data, dots = list()))
+    .data$lazy_query <- add_distinct(.data)
+    return(.data)
   }
 
   .data %>%
@@ -31,15 +32,12 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
     group_by(!!!grps)
 }
 
-#' @export
-op_vars.op_distinct <- function(op) {
-  union(op_grps(op$x), op_vars(op$x))
-}
+add_distinct <- function(.data) {
+  lazy_query <- .data$lazy_query
 
-#' @export
-sql_build.op_distinct <- function(op, con, ...) {
-  select_query(
-    sql_build(op$x, con),
+  lazy_select_query(
+    from = lazy_query,
+    last_op = "distinct",
     distinct = TRUE
   )
 }

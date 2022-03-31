@@ -23,7 +23,7 @@ tbl_lazy <- function(df, con = NULL, src = NULL) {
 
   dplyr::make_tbl(
     purrr::compact(c(subclass, "lazy")),
-    ops = op_base_local(df),
+    lazy_query = lazy_query_local(df),
     src = src_dbi(con)
   )
 }
@@ -38,12 +38,12 @@ lazy_frame <- function(..., con = NULL, src = NULL) {
 
 #' @export
 dimnames.tbl_lazy <- function(x) {
-  list(NULL, op_vars(x$ops))
+  list(NULL, op_vars(x$lazy_query))
 }
 
 #' @export
 dim.tbl_lazy <- function(x) {
-  c(NA, length(op_vars(x$ops)))
+  c(NA, length(op_vars(x$lazy_query)))
 }
 
 #' @export
@@ -65,7 +65,7 @@ same_src.tbl_lazy <- function(x, y) {
 #' @importFrom dplyr tbl_vars
 #' @export
 tbl_vars.tbl_lazy <- function(x) {
-  op_vars(x$ops)
+  op_vars(x$lazy_query)
 }
 
 #' @importFrom dplyr groups
@@ -84,5 +84,5 @@ group_by_drop_default.tbl_lazy <- function(x) {
 #' @importFrom dplyr group_vars
 #' @export
 group_vars.tbl_lazy <- function(x) {
-  op_grps(x$ops)
+  op_grps(x$lazy_query)
 }

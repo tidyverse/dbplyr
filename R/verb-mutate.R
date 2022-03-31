@@ -22,8 +22,7 @@
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
 mutate.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
 
   nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
 }
@@ -31,8 +30,7 @@ mutate.tbl_lazy <- function(.data, ...) {
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
-  dots <- quos(..., .named = TRUE)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = TRUE)
 
   nest_vars(.data, dots, character())
 }
@@ -51,7 +49,7 @@ nest_vars <- function(.data, dots, all_vars) {
 
     if (any(used_vars %in% new_vars)) {
       new_actions <- dots[seq2(init, length(dots))][new_vars]
-      .data$ops <- op_select(.data$ops, carry_over(union(all_vars, used_vars), new_actions))
+      .data$lazy_query <- add_select(.data, carry_over(union(all_vars, used_vars), new_actions), "mutate")
       all_vars <- c(all_vars, setdiff(new_vars, all_vars))
       new_vars <- cur_var
       init <- i
@@ -63,7 +61,7 @@ nest_vars <- function(.data, dots, all_vars) {
   if (init != 0L) {
     dots <- dots[-seq2(1L, init - 1)]
   }
-  .data$ops <- op_select(.data$ops, carry_over(all_vars, dots))
+  .data$lazy_query <- add_select(.data, carry_over(all_vars, dots), "mutate")
   .data
 }
 

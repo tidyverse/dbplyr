@@ -10,7 +10,7 @@
 \item{.data}{a tbl}
 
 \item{...}{Expressions to apply to each group. If named, results will be
-stored in a new column. If unnamed, should return a data frame. You can
+stored in a new column. If unnamed, must return a data frame. You can
 use \code{.} to refer to the current group. You can not mix named and
 unnamed arguments.}
 
