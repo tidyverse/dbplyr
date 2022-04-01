@@ -25,7 +25,7 @@ select.tbl_lazy <- function(.data, ...) {
   loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
-  .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -58,7 +58,7 @@ rename.tbl_lazy <- function(.data, ...) {
   new_vars <- set_names(names(sim_data), names(sim_data))
   names(new_vars)[loc] <- names(loc)
 
-  .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -74,7 +74,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
 
-  .data$ops <- op_select(.data$ops, syms(new_vars))
+  .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
 }
 
@@ -83,52 +83,82 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
-  vars <- simulate_vars(.data)
   new_vars <- dplyr::relocate(
     simulate_vars(.data),
     ...,
     .before = {{.before}},
     .after = {{.after}}
   )
-  .data$ops <- op_select(.data$ops, syms(set_names(names(new_vars))))
+
+  .data$lazy_query <- add_select(.data, syms(unlist(new_vars)))
   .data
 }
 
-simulate_vars <- function(x) {
-  as_tibble(rep_named(op_vars(x), list(logical())))
+simulate_vars <- function(x, drop_groups = FALSE) {
+  if (drop_groups) {
+    vars <- setdiff(op_vars(x), op_grps(x))
+  } else {
+    vars <- op_vars(x)
+  }
+
+  vars_list <- as.list(vars)
+  as_tibble(set_names(vars_list, vars), .name_repair = "minimal")
 }
 
 # op_select ---------------------------------------------------------------
 
-op_select <- function(x, vars) {
-  if (selects_same_variables(x, vars)) {
-    return(x)
+add_select <- function(.data, vars, op = c("select", "mutate")) {
+  op <- match.arg(op, c("select", "mutate"))
+  lazy_query <- .data$lazy_query
+
+  # drop NULLs
+  vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
+  if (selects_same_variables(.data, vars)) {
+    return(lazy_query)
   }
 
-  if (inherits(x, "op_select")) {
+  if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
-    # the logic in nest_vars()
-    prev_vars <- x$args$vars
+    # the logic in get_mutate_layers()
+    select <- lazy_query$select
 
     if (purrr::every(vars, is.symbol)) {
       # if current operation is pure projection
       # we can just subset the previous selection
       sel_vars <- purrr::map_chr(vars, as_string)
-      vars <- set_names(prev_vars[sel_vars], names(sel_vars))
-      x <- x$x
-    } else if (purrr::every(prev_vars, is.symbol)) {
+      lazy_query$select <- update_lazy_select(select, sel_vars)
+
+      return(lazy_query)
+    }
+
+    prev_vars <- select$expr
+    if (purrr::every(prev_vars, is.symbol)) {
       # if previous operation is pure projection
       sel_vars <- purrr::map_chr(prev_vars, as_string)
-      if (all(names(sel_vars) == sel_vars)) {
+      if (all(select$name == sel_vars)) {
         # and there's no renaming
         # we can just ignore the previous step
-        x <- x$x
+        if (op == "select") {
+          lazy_query$select <- update_lazy_select(select, vars)
+        } else {
+          lazy_query$select <- new_lazy_select(
+            vars,
+            group_vars = op_grps(lazy_query),
+            order_vars = op_sort(lazy_query),
+            frame = op_frame(lazy_query)
+          )
+        }
+        return(lazy_query)
       }
     }
   }
 
-  new_op_select(x, vars)
+  lazy_select_query(
+    from = lazy_query,
+    last_op = op,
+    select = vars
+  )
 }
 
 selects_same_variables <- function(x, vars) {
@@ -141,47 +171,4 @@ selects_same_variables <- function(x, vars) {
   }
 
   identical(syms(op_vars(x)), unname(vars))
-}
-
-# SELECT in the SQL sense - powers select(), rename(), mutate(), and transmute()
-new_op_select <- function(x, vars) {
-  stopifnot(inherits(x, "op"))
-  stopifnot(is.list(vars))
-
-  op_single("select", x, dots = list(), args = list(vars = vars))
-}
-
-#' @export
-op_vars.op_select <- function(op) {
-  names(op$args$vars)
-}
-
-#' @export
-op_grps.op_select <- function(op) {
-  # Find renamed variables
-  symbols <- purrr::keep(op$args$vars, is_symbol)
-  new2old <- purrr::map_chr(symbols, as_string)
-  old2new <- set_names(names(new2old), new2old)
-
-  grps <- op_grps(op$x)
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  grps
-}
-
-#' @export
-sql_build.op_select <- function(op, con, ...) {
-
-  new_vars <- translate_sql_(
-    op$args$vars, con,
-    vars_group = op_grps(op),
-    vars_order = translate_sql_(op_sort(op), con, context = list(clause = "ORDER")),
-    vars_frame = op_frame(op),
-    context = list(clause = "SELECT")
-  )
-
-  select_query(
-    sql_build(op$x, con),
-    select = new_vars
-  )
 }

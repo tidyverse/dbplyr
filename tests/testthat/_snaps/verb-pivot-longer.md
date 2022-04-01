@@ -111,8 +111,8 @@
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
       <error/rlang_error>
-      Error in `purrr::map()`:
-      ! Can't convert `.x[[i]]`, a number, to a function.
+      Error in `resolve_fun()`:
+      ! Can't convert to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
@@ -167,10 +167,10 @@
       out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
     Message
       New names:
-      * name -> name...2
-      * value -> value...3
-      * name -> name...4
-      * value -> value...5
+      * `name` -> `name...2`
+      * `value` -> `value...3`
+      * `name` -> `name...4`
+      * `value` -> `value...5`
 
 # values_ptype is not supported
 

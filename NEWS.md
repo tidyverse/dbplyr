@@ -1,5 +1,52 @@
 # dbplyr (development version)
 
+
+* Fix translation of `str_flatten()` for Redshift (@hdplsa, #804) 
+
+* `remote_query()` and `show_query()` now have the argument `cte`. If `TRUE`
+  the SQL query uses common table expressions instead of nested queries
+  (@mgirlich, #638).
+
+* `across()`, `if_any()`, and `if_all()` can now translate evaluated lists
+  and functions (@mgirlich, #796).
+
+* `mutate()` now supports the arguments `.keep`, `.before`, and `.after
+  (@mgirlich, #802).
+
+* Multiple `across()` calls in `mutate()` and `transmute()` can now access
+  freshly created variables (@mgirlich, #802).
+
+* `transmute()` now keeps grouping variables (@mgirlich, #802).
+
+* Added `copy_inline()` as a `copy_to()` equivalent that does not need write
+  access (@mgirlich, #628).
+
+* `explain()` now passes `...` to methods (@mgirlich, #783).
+
+* `compute()` can now handle when `name` is named by unnaming it first
+  (@mgirlich, #623).
+
+* The translation of `n()` now respects the window frame (@mgirlich, #700).
+
+* `explain()` now works for Redshift (@mgirlich, #740).
+
+* The partial evaluation code is now more aligned with `dtplyr`. This makes it
+  easier to transfer bug fixes and new features from one package to the other.
+  In this process the second argument of `partial_eval()` was changed to a lazy
+  frame instead of a character vector of variables (@mgirlich, #766).
+
+* `across()` now defaults to `.cols = everything()` when `.cols` isn't provided
+  (@mgirlich, #760).
+
+* `pivot_wider()` now supports the arguments `names_vary`, `names_expand`, and
+  `unused_fn` (@mgirlich, #774).
+
+* The `*_join()` verbs now have arguments `x_as` and `y_as` that allow to
+  specify the table alias to use in the SQL query (@mgirlich, #637).
+
+* Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
+  the database, rather than locally (#197).
+
 * The implementation of `dbplyr_fill0` for databases without support for IGNORE
   NULLS now respects the database specific translation (@rsund, #753).
 

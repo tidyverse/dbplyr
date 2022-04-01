@@ -1,4 +1,5 @@
 test_that("two arranges equivalent to one", {
+  skip("not clear whether test makes sense")
   mf <- memdb_frame(x = c(2, 2, 1), y = c(1, -1, 1))
 
   mf1 <- mf %>% arrange(x, y)
@@ -124,4 +125,13 @@ test_that("arranges captures DESC", {
 
   sort <- lapply(op_sort(out), get_expr)
   expect_equal(sort, list(quote(desc(x))))
+})
+
+test_that("multiple arranges combine", {
+  skip("not clear whether test makes sense")
+  out <- lazy_frame(x = 1:3, y = 3:1) %>% arrange(x) %>% arrange(y)
+  out <- arrange(arrange(lazy_frame(x = 1:3, y = 3:1), x), y)
+
+  sort <- lapply(op_sort(out), get_expr)
+  expect_equal(sort, list(quote(x), quote(y)))
 })

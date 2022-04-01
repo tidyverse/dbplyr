@@ -29,7 +29,7 @@
     Code
       tidyr::pivot_wider(df, names_from = key, values_from = val)
     Condition
-      Error in `stop_vctrs()`:
+      Error in `dbplyr_pivot_wider_spec()`:
       ! Names must be unique.
       x These names are duplicated:
         * "a" at locations 1 and 2.
@@ -37,7 +37,7 @@
 # values_fn can be a single function
 
     Code
-      dbplyr_pivot_wider_spec(df, spec1, values_fn = sum)
+      suppressWarnings(dbplyr_pivot_wider_spec(df, spec1, values_fn = sum))
     Output
       <SQL>
       SELECT `a`, SUM(CASE WHEN (`key` = 'x') THEN `val` END) AS `x`
@@ -60,7 +60,7 @@
 
 ---
 
-    `values_fn` must specify a function for each col in `values_from`
+    Can't convert to a function.
 
 # values_fn cannot be NULL
 
@@ -68,8 +68,16 @@
       dbplyr_pivot_wider_spec(df, spec1, values_fn = NULL)
     Condition
       Error in `dbplyr_pivot_wider_spec()`:
-      ! `values_fn` must not be NULL
-      i `values_fn` must be a function or a named list of functions
+      ! `values_fn` must specify a function for each col in `values_from`
+
+# `unused_fn` is validated
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
+    Output
+      <error/rlang_error>
+      Error in `resolve_fun()`:
+      ! Can't convert to a function.
 
 # can fill in missing cells
 
@@ -113,4 +121,44 @@
       Error in `dbplyr_build_wider_spec()`:
       ! `dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.
       i Use `memdb_frame()` together with `show_query()` to see the SQL code.
+
+# `names_from` must be supplied if `name` isn't in `data` (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, values_from = val)))
+    Output
+      <error/vctrs_error_subscript_oob>
+      Error in `chr_as_locations()`:
+      ! Can't subset columns past the end.
+      x Column `name` doesn't exist.
+
+# `values_from` must be supplied if `value` isn't in `data` (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = key)))
+    Output
+      <error/vctrs_error_subscript_oob>
+      Error in `chr_as_locations()`:
+      ! Can't subset columns past the end.
+      x Column `value` doesn't exist.
+
+# `names_from` must identify at least 1 column (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = starts_with("foo"),
+      values_from = val)))
+    Output
+      <error/rlang_error>
+      Error in `dbplyr_build_wider_spec()`:
+      ! `names_from` must select at least one column.
+
+# `values_from` must identify at least 1 column (#1240)
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, names_from = key, values_from = starts_with(
+        "foo"))))
+    Output
+      <error/rlang_error>
+      Error in `dbplyr_build_wider_spec()`:
+      ! `values_from` must select at least one column.
 
