@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+* `mutate()` now supports the arguments `.keep`, `.before`, and `.after
+  (@mgirlich, #802).
+
+* Multiple `across()` calls in `mutate()` and `transmute()` can now access
+  freshly created variables (@mgirlich, #802).
+
+* `transmute()` now keeps grouping variables (@mgirlich, #802).
+
 * Added `copy_inline()` as a `copy_to()` equivalent that does not need write
   access (@mgirlich, #628).
 
