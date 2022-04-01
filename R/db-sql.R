@@ -89,8 +89,8 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
   build_sql(
     "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
     "THEN 0 ",
-    "ELSE 1 = 0 ",
-    "END",
+    "ELSE 1 ",
+    "END = 0",
     con = con
   )
 }

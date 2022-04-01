@@ -23,6 +23,13 @@ test_that("aggregating window functions ignore order_by", {
   )
 })
 
+test_that("count uses order_by if frame is used", {
+  expect_equal(
+    translate_sql(n(), vars_order = "x", vars_frame = c(-2, 1)),
+    sql("COUNT(*) OVER (ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 1 FOLLOWING)")
+  )
+})
+
 test_that("order_by overrides default ordering", {
   expect_equal(
     translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
