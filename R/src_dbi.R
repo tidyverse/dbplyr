@@ -85,6 +85,15 @@ tbl.src_dbi <- function(src, from, ...) {
   tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
 }
 
+# Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi()
+# which always avoids the database roundtrip because `vars` is required.
+tbl_src_dbi <- function(src, from, vars) {
+  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
+  tbl_sql_impl(c(subclass, "dbi"), src, from, vars)
+}
+
+
+
 #' Database src
 #'
 #' @description
