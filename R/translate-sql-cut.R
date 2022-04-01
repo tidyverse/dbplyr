@@ -5,7 +5,7 @@ sql_cut <- function(x, breaks, labels = NULL, right = TRUE) {
   }
   n <- length(breaks)
   if (n == 1) {
-    abort("`breaks` must have size 2 or bigger.")
+    abort("`breaks` must have at least two values.")
   }
 
   labels <- labels %||% TRUE
