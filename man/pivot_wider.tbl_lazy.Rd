@@ -4,7 +4,7 @@
 \alias{pivot_wider.tbl_lazy}
 \title{Pivot data from long to wide}
 \usage{
-\method{pivot_wider}{tbl_lazy}(
+pivot_wider.tbl_lazy(
   data,
   id_cols = NULL,
   names_from = name,
@@ -95,6 +95,9 @@ unused columns using \code{unused_fn}.}
 decreasing the number of rows. The inverse transformation is
 \code{pivot_longer()}.
 Learn more in \code{vignette("pivot", "tidyr")}.
+
+Note that \code{pivot_wider()} is not and cannot be lazy because we need to look
+at the data to figure out what the new column names will be.
 }
 \details{
 The big difference to \code{pivot_wider()} for local data frames is that

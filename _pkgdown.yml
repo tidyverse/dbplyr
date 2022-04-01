@@ -20,6 +20,7 @@ reference:
   - tbl.src_dbi
   - arrange.tbl_lazy
   - copy_to.src_sql
+  - copy_inline
   - collapse.tbl_sql
   - count.tbl_lazy
   - distinct.tbl_lazy

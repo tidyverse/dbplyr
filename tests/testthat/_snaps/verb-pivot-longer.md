@@ -167,10 +167,10 @@
       out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
     Message
       New names:
-      * name -> name...2
-      * value -> value...3
-      * name -> name...4
-      * value -> value...5
+      * `name` -> `name...2`
+      * `value` -> `value...3`
+      * `name` -> `name...4`
+      * `value` -> `value...5`
 
 # values_ptype is not supported
 

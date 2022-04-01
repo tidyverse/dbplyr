@@ -41,15 +41,22 @@ test_that("across() translates functions", {
   )
 })
 
-# TODO test for anonymous function?
-# test_that("across() captures anonymous functions", {
-#   lf <- lazy_frame(a = 1)
-#
-#   expect_equal(
-#    capture_across(lf, across(a, function(x) log(x))),
-#    list(a = call2(function(x) log(x), quote(a)))
-#   )
-# })
+test_that("across() captures anonymous functions", {
+  lf <- lazy_frame(a = 1)
+
+  expect_equal(
+    capture_across(lf, across(a, function(x) log(x))),
+    list(a = expr(log(a)))
+  )
+
+  expect_snapshot(
+    (expect_error(capture_across(lf, across(a, function(x) {
+      x <- x + 2
+      log(x)
+      }
+    ))))
+  )
+})
 
 test_that("dots are translated too", {
   fun <- function() {
@@ -87,6 +94,20 @@ test_that("across() does not support formulas with dots", {
     (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
     (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
   })
+})
+
+test_that("across() translates evaluated functions", {
+  lf <- lazy_frame(x = 1)
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!sum)),
+    exprs(x = sum(x))
+  )
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!function(x) sum(x + 2))),
+    exprs(x = sum(x + 2))
+  )
 })
 
 test_that("across() gives informative errors", {
@@ -286,6 +307,19 @@ test_that("can pass quosure through `across()`", {
   )
 })
 
+test_that("across() translates evaluated lists", {
+  lf <- lazy_frame(x = 1)
+  fun_list <- list(mean, ~ mean(.x + 1, na.rm = TRUE), function(x) mean(x + 2))
+
+  expect_equal(
+    capture_across(lf, across(.fns = !!fun_list)),
+    exprs(
+      x_1 = mean(x),
+      x_2 = mean(x + 1, na.rm = TRUE),
+      x_3 = mean(x + 2),
+    )
+  )
+})
 
 # if_all ------------------------------------------------------------------
 
@@ -394,19 +428,8 @@ test_that("if_all() drops groups", {
   )
 })
 
-test_that("if_any() and if_all() expansions deal with no inputs or single inputs", {
-  skip("TODO")
+test_that("if_any() and if_all() expansions deal with single inputs", {
   d <- lazy_frame(x = 1)
-
-  # No inputs
-  expect_equal(
-    filter(d, if_any(starts_with("c"), ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`")
-  )
-  expect_equal(
-    filter(d, if_all(starts_with("c"), ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`")
-  )
 
   # Single inputs
   expect_equal(
