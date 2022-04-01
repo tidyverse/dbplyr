@@ -1,3 +1,15 @@
+# across() captures anonymous functions
+
+    Code
+      (expect_error(capture_across(lf, across(a, function(x) {
+        x <- x + 2
+        log(x)
+      }))))
+    Output
+      <error/rlang_error>
+      Error in `partial_eval_fun()`:
+      ! Cannot translate functions consisting of more than one statement.
+
 # across() does not support formulas with dots
 
     Code
@@ -39,8 +51,8 @@
     Code
       capture_across(lf, across(c, mean))
     Condition
-      Error in `stop_subscript()`:
-      ! Can't subset columns that don't exist.
+      Error in `chr_as_locations()`:
+      ! Can't subset columns past the end.
       x Column `c` doesn't exist.
 
 # across() defaults to everything()

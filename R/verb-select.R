@@ -120,7 +120,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
-    # the logic in nest_vars()
+    # the logic in get_mutate_layers()
     select <- lazy_query$select
 
     if (purrr::every(vars, is.symbol)) {
