@@ -1,4 +1,4 @@
-sql_cut <- function(x, breaks, labels = NULL, right = TRUE) {
+sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TRUE) {
   breaks <- sort.int(as.double(breaks))
   if (anyDuplicated(breaks)) {
     abort("`breaks` are not unique.")
@@ -8,45 +8,55 @@ sql_cut <- function(x, breaks, labels = NULL, right = TRUE) {
     abort("`breaks` must have at least two values.")
   }
 
-  labels <- check_cut_labels(labels, breaks, right)
-
-  if (right) {
-    op_smaller <- sym("<=")
-    op_bigger <- sym(">")
-  } else {
-    op_smaller <- sym("<")
-    op_bigger <- sym(">=")
-  }
-
-  if (is.finite(breaks[[1]])) {
-    first_case <- expr(!!call2(op_smaller, x, breaks[[1]]) ~ NA)
-    start <- 1L
-  } else {
-    first_case <- expr(!!call2(op_smaller, x, breaks[[2]]) ~ !!labels[[1]])
-    start <- 2L
-  }
-
-  if (is.finite(breaks[[n]])) {
-    last_case <- expr(!!call2(op_bigger, x, breaks[[n]]) ~ NA)
-    end <- n - 1L
-  } else {
-    last_case <- expr(!!call2(op_bigger, x, breaks[[n - 1]]) ~ !!labels[[n - 1]])
-    end <- n - 2L
-  }
+  include.lowest <- vctrs::vec_cast(include.lowest, logical())
+  vctrs::vec_assert(include.lowest, size = 1)
+  labels <- check_cut_labels(labels, breaks, include.lowest, right)
 
   cases <- purrr::map(
-    seq2(start, end),
+    seq2(1, n - 2L),
     ~ {
-      cond_lower <- expr(!!call2(op_bigger, x, breaks[[.x]]))
-      cond_upper <- expr(!!call2(op_smaller, x, breaks[[.x + 1]]))
-      expr(!!cond_lower & !!cond_upper ~ !!labels[[.x]])
+      if (right) {
+        expr(!!x <= !!breaks[[.x + 1]] ~ !!labels[[.x]])
+      } else {
+        expr(!!x < !!breaks[[.x + 1]] ~ !!labels[[.x]])
+      }
     }
   )
 
-  translate_sql(case_when(!!first_case, !!!cases, !!last_case))
+  if (is.finite(breaks[[1]])) {
+    if (right && !include.lowest) {
+      first_case <- expr(!!x <= !!breaks[[1]] ~ NA)
+    } else {
+      first_case <- expr(!!x < !!breaks[[1]] ~ NA)
+    }
+
+    cases <- c(first_case, cases)
+  }
+
+  if (is.finite(breaks[[n]])) {
+    if (right || include.lowest) {
+      last_cases <- exprs(
+        !!x <= !!breaks[[n]] ~ !!labels[[n - 1]],
+        !!x > !!breaks[[n]] ~ NA
+      )
+    } else {
+      last_cases <- exprs(
+        !!x < !!breaks[[n]] ~ !!labels[[n - 1]],
+        !!x >= !!breaks[[n]] ~ NA
+      )
+    }
+  } else {
+    if (right) {
+      last_cases <- exprs(!!x > !!breaks[[n - 1]] ~ !!labels[[n - 1]])
+    } else {
+      last_cases <- exprs(!!x >= !!breaks[[n - 1]] ~ !!labels[[n - 1]])
+    }
+  }
+
+  translate_sql(case_when(!!!cases, !!!last_cases))
 }
 
-check_cut_labels <- function(labels, breaks, right) {
+check_cut_labels <- function(labels, breaks, include.lowest, right) {
   labels <- labels %||% TRUE
 
   n <- length(breaks)
@@ -64,10 +74,21 @@ check_cut_labels <- function(labels, breaks, right) {
   }
 
   if (right) {
-    paste0("(", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], "]")
+    labels <- paste0("(", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], "]")
   } else {
-    paste0("[", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], ")")
+    labels <- paste0("[", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], ")")
   }
+
+  if (include.lowest) {
+    if (right) {
+      substr(labels[[1]], 1, 1) <- "["
+    } else {
+      nchar <- nchar(labels[[n-1]], "chars")
+      substr(labels[[n-1]], nchar, nchar) <- "]"
+    }
+  }
+
+  labels
 }
 
 globalVariables(c("case_when"))
