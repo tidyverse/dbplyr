@@ -24,6 +24,14 @@ test_that("numeric translations", {
   expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
 })
 
+test_that("aggregate functions", {
+  local_con(simulate_redshift())
+
+  expect_equal(translate_sql(str_flatten(x, y), window = FALSE), sql("LISTAGG(`x`, `y`)"))
+  expect_equal(translate_sql(str_flatten(x, y), window = TRUE), sql("LISTAGG(`x`, `y`) OVER ()"))
+  expect_equal(translate_sql(order_by(z, str_flatten(x, y))), sql("LISTAGG(`x`, `y`) WITHIN GROUP (ORDER BY `z`) OVER ()"))
+})
+
 test_that("lag and lead translation", {
   local_con(simulate_redshift())
 
