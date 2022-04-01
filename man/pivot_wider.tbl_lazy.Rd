@@ -94,9 +94,10 @@ unused columns using \code{unused_fn}.}
 \code{pivot_wider()} "widens" data, increasing the number of columns and
 decreasing the number of rows. The inverse transformation is
 \code{pivot_longer()}.
+Learn more in \code{vignette("pivot", "tidyr")}.
+
 Note that \code{pivot_wider()} is not and cannot be lazy because we need to look
 at the data to figure out what the new column names will be.
-Learn more in \code{vignette("pivot", "tidyr")}.
 }
 \details{
 The big difference to \code{pivot_wider()} for local data frames is that

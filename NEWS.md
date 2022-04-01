@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `remote_query()` and `show_query()` now have the argument `cte`. If `TRUE`
+  the SQL query uses common table expressions instead of nested queries
+  (@mgirlich, #638).
+
 * `across()`, `if_any()`, and `if_all()` can now translate evaluated lists
   and functions (@mgirlich, #796).
 

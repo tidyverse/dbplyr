@@ -14,12 +14,14 @@ remote_src(x)
 
 remote_con(x)
 
-remote_query(x)
+remote_query(x, cte = FALSE)
 
 remote_query_plan(x, ...)
 }
 \arguments{
 \item{x}{Remote table, currently must be a \link{tbl_sql}.}
+
+\item{cte}{Use common table expressions in the generated SQL?}
 
 \item{...}{Additional arguments passed on to methods.}
 }
