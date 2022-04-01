@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `across()`, `if_any()`, and `if_all()` can now translate evaluated lists
+  and functions (@mgirlich, #796).
+
 * `mutate()` now supports the arguments `.keep`, `.before`, and `.after
   (@mgirlich, #802).
 
