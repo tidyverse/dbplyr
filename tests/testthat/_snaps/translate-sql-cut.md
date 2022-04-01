@@ -1,3 +1,12 @@
+# works with labels a character vector
+
+    Code
+      (expect_error(translate_sql(cut(x, 1:3, labels = c("a", "b", "c")))))
+    Output
+      <error/vctrs_error_incompatible_size>
+      Error in `check_cut_labels()`:
+      ! Can't recycle `labels` (size 3) to size 2.
+
 # cut checks arguments
 
     Code
@@ -5,7 +14,7 @@
     Output
       <error/rlang_error>
       Error in `cut()`:
-      ! `breaks` must have size 2 or bigger.
+      ! `breaks` must have at least two values.
     Code
       (expect_error(translate_sql(cut(x, c(1, 1)))))
     Output

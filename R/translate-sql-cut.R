@@ -8,19 +8,7 @@ sql_cut <- function(x, breaks, labels = NULL, right = TRUE) {
     abort("`breaks` must have at least two values.")
   }
 
-  labels <- labels %||% TRUE
-  labels <- vctrs::vec_cast(labels, logical())
-  vctrs::vec_assert(labels, size = 1L)
-
-  if (is_true(labels)) {
-    if (right) {
-      labels <- paste0("(", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], "]")
-    } else {
-      labels <- paste0("[", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], ")")
-    }
-  } else {
-    labels <- as.character(seq2(1, n))
-  }
+  labels <- check_cut_labels(labels, breaks, right)
 
   if (right) {
     op_smaller <- sym("<=")
@@ -56,6 +44,30 @@ sql_cut <- function(x, breaks, labels = NULL, right = TRUE) {
   )
 
   translate_sql(case_when(!!first_case, !!!cases, !!last_case))
+}
+
+check_cut_labels <- function(labels, breaks, right) {
+  labels <- labels %||% TRUE
+
+  n <- length(breaks)
+  if (vctrs::vec_is(labels, character())) {
+    return(vctrs::vec_recycle(labels, n - 1, x_arg = "labels"))
+  }
+
+  vctrs::vec_assert(labels, size = 1L)
+  if (!vctrs::vec_is(labels, logical()) || is.na(labels)) {
+    abort("`labels` must be a bool or a character.")
+  }
+
+  if (is_false(labels)) {
+    return(as.character(seq2(1, n)))
+  }
+
+  if (right) {
+    paste0("(", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], "]")
+  } else {
+    paste0("[", breaks[seq2(1, n-1)], ",", breaks[seq2(2, n)], ")")
+  }
 }
 
 globalVariables(c("case_when"))
