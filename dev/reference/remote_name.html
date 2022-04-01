@@ -91,7 +91,7 @@ the query plan (as computed by the remote database). <code>remote_src()</code> a
 
 <span class="fu">remote_con</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 
-<span class="fu">remote_query</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<span class="fu">remote_query</span><span class="op">(</span><span class="va">x</span>, cte <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="fu">remote_query_plan</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
@@ -100,6 +100,8 @@ the query plan (as computed by the remote database). <code>remote_src()</code> a
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
 <dd><p>Remote table, currently must be a <a href="tbl_sql.html">tbl_sql</a>.</p></dd>
+<dt>cte</dt>
+<dd><p>Use common table expressions in the generated SQL?</p></dd>
 <dt>...</dt>
 <dd><p>Additional arguments passed on to methods.</p></dd>
 </dl></div>
