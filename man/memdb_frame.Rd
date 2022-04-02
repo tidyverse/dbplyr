@@ -6,7 +6,7 @@
 \alias{src_memdb}
 \title{Create a database table in temporary in-memory database.}
 \usage{
-memdb_frame(..., .name = unique_table_name())
+memdb_frame(..., .name = NULL)
 
 tbl_memdb(df, name = deparse(substitute(df)))
 
@@ -27,8 +27,9 @@ named \code{.data}.}
 
 \item{df}{Data frame to copy}
 
-\item{name, .name}{Name of table in database: defaults to a random name that's
-unlikely to conflict with an existing table.}
+\item{name, .name}{Name of table in database: if provided, \code{\link[=copy_to]{copy_to()}}
+will be used to create the table, otherwise \code{\link[=copy_inline]{copy_inline()}} creates
+an anonymous table.}
 }
 \description{
 \code{memdb_frame()} works like \code{\link[tibble:tibble]{tibble::tibble()}}, but instead of creating a new

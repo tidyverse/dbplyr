@@ -4,8 +4,9 @@
 #' data frame in R, it creates a table in [src_memdb()].
 #'
 #' @inheritParams tibble::tibble
-#' @param name,.name Name of table in database: defaults to a random name that's
-#'   unlikely to conflict with an existing table.
+#' @param name,.name Name of table in database: if provided, [copy_to()]
+#'   will be used to create the table, otherwise [copy_inline()] creates
+#'   an anonymous table.
 #' @param df Data frame to copy
 #' @export
 #' @examples
@@ -16,8 +17,12 @@
 #'
 #' mtcars_db <- tbl_memdb(mtcars)
 #' mtcars_db %>% group_by(cyl) %>% summarise(n = n()) %>% show_query()
-memdb_frame <- function(..., .name = unique_table_name()) {
-  x <- copy_to(src_memdb(), tibble(...), name = .name)
+memdb_frame <- function(..., .name = NULL) {
+  if (is.null(.name)) {
+    x <- copy_inline(src_memdb()$con, tibble(...))
+  } else {
+    x <- copy_to(src_memdb(), tibble(...), name = .name)
+  }
   x
 }
 
