@@ -53,8 +53,8 @@ compute.tbl_sql <- function(x,
     ...
   )
 
-  tbl_src_dbi(x$src, name, colnames(x)) %>%
-    group_by(!!! syms(op_grps(x))) %>%
+  tbl_src_dbi(x$src, as.sql(name), colnames(x)) %>%
+    group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
 }
 
