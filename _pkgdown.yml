@@ -32,7 +32,7 @@ reference:
   - intersect.tbl_lazy
   - mutate.tbl_lazy
   - pull.tbl_sql
-  - rows_update.tbl_lazy
+  - "rows-db"
   - get_returned_rows
   - select.tbl_lazy
   - slice_min.tbl_lazy
