@@ -61,6 +61,7 @@ Collate:
     'utils.R'
     'sql.R'
     'escape.R'
+    'translate-sql-cut.R'
     'translate-sql-quantile.R'
     'translate-sql-string.R'
     'translate-sql-paste.R'

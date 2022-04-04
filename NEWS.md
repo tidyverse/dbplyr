@@ -1,5 +1,6 @@
 # dbplyr (development version)
 
+* Added translation for `cut()` (@mgirlich, #697).
 
 * Fix translation of `str_flatten()` for Redshift (@hdplsa, #804) 
 
