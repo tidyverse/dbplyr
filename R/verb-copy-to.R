@@ -125,30 +125,57 @@ copy_inline <- function(con, df) {
     abort("`df` needs at least one column.")
   }
 
-  tbl(
-    src = con,
-    from = sql_values(con, df),
+  subclass <- class(con)[[1]] # prefix added by dplyr::make_tbl
+  dplyr::make_tbl(
+    c(subclass, "sql", "lazy"),
+    src = src_dbi(con),
+    from = df,
+    lazy_query = lazy_values_query(df),
     vars = colnames(df)
   )
 }
 
-sql_values <- function(con, df) {
+lazy_values_query <- function(df) {
+  structure(list(df = df), class = c("lazy_values_query", "lazy_query"))
+}
+
+#' @export
+sql_build.lazy_values_query <- function(op, con, ...) {
+  op
+}
+
+#' @export
+sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  sql_values(con, query$df, lvl = lvl)
+}
+
+#' @export
+op_vars.lazy_values_query <- function(op) {
+  colnames(op$df)
+}
+
+#' @export
+op_grps.lazy_values_query <- function(op) {
+  character()
+}
+
+sql_values <- function(con, df, lvl = 0) {
   UseMethod("sql_values")
 }
 
 #' @export
-sql_values.DBIConnection <- function(con, df) {
-  sql_values_clause(con, df)
+sql_values.DBIConnection <- function(con, df, lvl = 0) {
+  sql_values_clause(con, df, lvl = lvl)
 }
 
 #' @export
-sql_values.SQLiteConnection <- function(con, df) {
+sql_values.SQLiteConnection <- function(con, df, lvl = 0) {
   needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL)) %>%
-    sql_values_clause(con = con)
+    sql_values_clause(con = con, lvl = lvl)
 }
 
-sql_values_clause <- function(con, df, row = FALSE) {
+sql_values_clause <- function(con, df, row = FALSE, lvl = 0) {
   if (nrow(df) == 0L) {
     typed_cols <- purrr::map_chr(
       vctrs::vec_init(df),
@@ -164,7 +191,7 @@ sql_values_clause <- function(con, df, row = FALSE) {
       where = sql("0 = 1")
     )
 
-    return(sql_render(query, con = con))
+    return(sql_render(query, con = con, lvl = lvl))
   }
 
   # The query consists of two parts:
@@ -195,10 +222,10 @@ sql_values_clause <- function(con, df, row = FALSE) {
 
   union_query <- set_op_query(
     null_row_query,
-    sql_format_clauses(list(sql_clause("VALUES", rows_sql)), lvl = 1, con = con),
+    sql_format_clauses(list(sql_clause("VALUES", rows_sql)), lvl = lvl + 1, con = con),
     type = "UNION ALL",
   )
-  subquery <- sql_render(union_query, con = con, lvl = 1)
+  subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
 
   typed_cols <- purrr::map2_chr(
     df, colnames(df),
@@ -209,10 +236,11 @@ sql_values_clause <- function(con, df, row = FALSE) {
   )
   select_clause <- sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
 
-  sql_select(
+  sql_query_select(
     con,
     select = select_clause,
-    from = sql_subquery(con, subquery, name = "values_table")
+    from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
+    lvl = lvl
   )
 }
 
