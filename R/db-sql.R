@@ -139,6 +139,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
   escape(ident_q(cols), collapse = NULL, con = con)
 }
 
+#' @export
 sql_random <- function(con) {
   UseMethod("sql_random")
 }
