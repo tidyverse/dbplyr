@@ -2,6 +2,8 @@
 
 * Added translation for `cut()` (@mgirlich, #697).
 
+* Fix translation of `str_flatten()` for Redshift (@hdplsa, #804) 
+
 * `remote_query()` and `show_query()` now have the argument `cte`. If `TRUE`
   the SQL query uses common table expressions instead of nested queries
   (@mgirlich, #638).
