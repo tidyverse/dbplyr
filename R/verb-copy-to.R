@@ -150,6 +150,22 @@ sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subque
 }
 
 #' @export
+flatten_query.lazy_values_query <- function(qry, query_list) {
+  id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
+
+  if (!is.na(id)) {
+    query_list$name <- names(query_list$queries)[[id]]
+  } else {
+    name <- unique_subquery_name()
+    wrapped_query <- set_names(list(qry), name)
+    query_list$queries <- c(query_list$queries, wrapped_query)
+    query_list$name <- name
+  }
+
+  query_list
+}
+
+#' @export
 op_vars.lazy_values_query <- function(op) {
   colnames(op$df)
 }
