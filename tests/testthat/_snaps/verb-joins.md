@@ -25,7 +25,7 @@
     Code
       left_join(x, x, by = "x", x_as = NULL)
     Condition
-      Error in `stop_vctrs()`:
+      Error in `check_join_as()`:
       ! `x_as` must be a vector, not NULL.
 
 ---
@@ -33,7 +33,7 @@
     Code
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
-      Error in `vctrs::vec_assert()`:
+      Error in `check_join_as()`:
       ! `y_as` must have size 1, not size 2.
 
 ---
