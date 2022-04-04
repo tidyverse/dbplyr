@@ -436,6 +436,7 @@ sql_query_insert <- function(con, x_name, y, by, ..., conflict = c("error", "ign
 
 #' @export
 sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c("error", "ignore"), returning_cols = NULL) {
+  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
@@ -471,6 +472,7 @@ sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
 sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
                                                 update_values, ...,
                                                 returning_cols = NULL) {
+  # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 

@@ -62,6 +62,7 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 sql_query_upsert.Oracle <- function(con, x_name, y, by,
                                     update_cols, ...,
                                     returning_cols = NULL) {
+  # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, "excluded")

@@ -238,6 +238,8 @@ sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 sql_query_upsert.PqConnection <- function(con, x_name, y, by,
                                           update_cols, ...,
                                           returning_cols = NULL) {
+  # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
+  # https://www.sqlite.org/lang_UPSERT.html
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_values <- set_names(
@@ -252,6 +254,7 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
     sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
+    # `WHERE true` is required for SQLite
     sql("WHERE true"),
     sql_clause("ON CONFLICT ", by_sql),
     sql("DO UPDATE"),
