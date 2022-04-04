@@ -115,6 +115,10 @@ flatten_query.select_query <- function(qry, query_list) {
   query_list <- flatten_query(from, query_list)
 
   qry$from <- get_subquery_name(from, query_list)
+  querylist_reuse_query(qry, query_list)
+}
+
+querylist_reuse_query <- function(qry, query_list) {
   id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
 
   if (!is.na(id)) {
