@@ -487,7 +487,7 @@ sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
 #' @export
 #' @rdname db-sql
 sql_query_upsert <- function(con, x_name, y, by, update_cols, ...,
-                                  returning_cols = NULL) {
+                             returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_upsert")
 }
