@@ -49,6 +49,10 @@
 #' * `sql_query_semi_join()` generate SQL for semi- and anti-joins
 #' * `sql_query_set_op()` generate SQL for `UNION`, `INTERSECT`, and `EXCEPT`
 #'   queries.
+#' * `sql_query_insert()` generate SQL for an `INSERT FROM` query.
+#' * `sql_query_update_from()` generate SQL for an `UPDATE FROM` query.
+#' * `sql_query_upsert()` generate SQL for an `UPSERT` query.
+#' * `sql_query_delete()` generate SQL for an `DELETE FROM` query
 #'
 #' @section dbplyr 2.0.0:
 #'
