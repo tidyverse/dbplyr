@@ -145,6 +145,10 @@ Query generation:
 \item \code{sql_query_semi_join()} generate SQL for semi- and anti-joins
 \item \code{sql_query_set_op()} generate SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
 queries.
+\item \code{sql_query_insert()} generate SQL for an \verb{INSERT FROM} query.
+\item \code{sql_query_update_from()} generate SQL for an \verb{UPDATE FROM} query.
+\item \code{sql_query_upsert()} generate SQL for an \code{UPSERT} query.
+\item \code{sql_query_delete()} generate SQL for an \verb{DELETE FROM} query
 }
 }
 \section{dbplyr 2.0.0}{
