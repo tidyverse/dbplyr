@@ -125,6 +125,7 @@ copy_inline <- function(con, df) {
     abort("`df` needs at least one column.")
   }
 
+  # This workaround is needed because `tbl_sql()` applies `as.sql()` on `from`
   subclass <- class(con)[[1]] # prefix added by dplyr::make_tbl
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
