@@ -64,21 +64,13 @@ test_that(".preserve is not supported", {
 
 test_that("filter() works with mutate()", {
   lf <- lazy_frame(x = 1, y = 2)
-  named_list <- function(...) {
-    out <- list(...)
-    if (is_null(names(out))) {
-      names(out) <- names2(out)
-    }
-
-    out
-  }
 
   out <- lf %>%
     mutate(x = x + 1) %>%
     filter(y == 1)
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
-  expect_equal(lq$where, named_list(quo(y == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where %>% unname(), list(quo(y == 1)), ignore_formula_env = TRUE)
 
   out2 <- lf %>%
     mutate(x = x + 1) %>%
@@ -86,19 +78,11 @@ test_that("filter() works with mutate()", {
   lq2 <- out2$lazy_query
   expect_equal(lq2$from$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
   expect_equal(lq2$select$expr, syms(c("x", "y")))
-  expect_equal(lq2$where, named_list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$where %>% unname(), list(quo(x == 1)), ignore_formula_env = TRUE)
 })
 
 test_that("filter() works with summarise()", {
   lf <- lazy_frame(x = 1, y = 2)
-  named_list <- function(...) {
-    out <- list(...)
-    if (is_null(names(out))) {
-      names(out) <- names2(out)
-    }
-
-    out
-  }
 
   out <- lf %>%
     group_by(y) %>%
@@ -106,7 +90,7 @@ test_that("filter() works with summarise()", {
     filter(y == 1)
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
-  expect_equal(lq$where, named_list(quo(y == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where %>% unname(), list(quo(y == 1)), ignore_formula_env = TRUE)
 
   out2 <- lf %>%
     group_by(y) %>%
@@ -115,7 +99,7 @@ test_that("filter() works with summarise()", {
   lq2 <- out2$lazy_query
   expect_equal(lq2$from$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
   expect_equal(lq2$select$expr, syms(c("y", "x")))
-  expect_equal(lq2$where, named_list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$where %>% unname(), list(quo(x == 1)), ignore_formula_env = TRUE)
 })
 
 # SQL generation --------------------------------------------------------
