@@ -65,7 +65,7 @@ test_that("trivial subqueries are collapsed", {
     arrange()
 
   qry <- lf %>% sql_build()
-  expect_s3_class(qry$from, "ident")
+  expect_s3_class(qry$from, "sql")
   expect_true(qry$distinct)
 
   # And check that it returns the correct value

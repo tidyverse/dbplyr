@@ -42,7 +42,7 @@ test_that("queries are not nested unnecessarily", {
     sql_build()
 
   expect_s3_class(sql$from, "select_query")
-  expect_s3_class(sql$from$from, "ident")
+  expect_s3_class(sql$from$from, "sql")
 })
 
 test_that("maintains order of existing columns (#3216, #3223)", {
@@ -294,9 +294,9 @@ test_that(".keep= always retains grouping variables (#5582)", {
 # sql_render --------------------------------------------------------------
 
 test_that("quoting for rendering mutated grouped table", {
-  out <- memdb_frame(x = 1, y = 2) %>% mutate(y = x)
-  expect_match(out %>% sql_render, "^SELECT `x`, `x` AS `y`\nFROM `[^`]*`$")
-  expect_equal(out %>% collect, tibble(x = 1, y = 1))
+  out <- memdb_frame(x = 1, y = 2, .name = unique_table_name()) %>% mutate(y = x)
+  expect_match(out %>% sql_render(), "^SELECT `x`, `x` AS `y`\nFROM `[^`]*`$")
+  expect_equal(out %>% collect(), tibble(x = 1, y = 1))
 })
 
 test_that("mutate generates subqueries as needed", {
