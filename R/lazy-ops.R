@@ -62,7 +62,6 @@ sql_build.lazy_query_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_query_base_local <- function(op, con, ...) {
-  # ident("df")
   ident(op$name)
 }
 
