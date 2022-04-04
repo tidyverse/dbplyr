@@ -1,11 +1,14 @@
 sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TRUE) {
-  breaks <- sort.int(as.double(breaks))
+  breaks <- sort.int(as.double(breaks), na.last = TRUE)
   if (anyDuplicated(breaks)) {
     abort("`breaks` are not unique.")
   }
   n <- length(breaks)
   if (n == 1) {
     abort("`breaks` must have at least two values.")
+  }
+  if (any(is.na(breaks))) {
+    abort("`breaks` values must not be missing.")
   }
 
   include.lowest <- vctrs::vec_cast(include.lowest, logical())

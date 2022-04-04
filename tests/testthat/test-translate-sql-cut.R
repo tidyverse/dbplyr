@@ -138,5 +138,6 @@ test_that("cut checks arguments", {
   expect_snapshot({
     (expect_error(translate_sql(cut(x, 1))))
     (expect_error(translate_sql(cut(x, c(1, 1)))))
+    (expect_error(translate_sql(cut(x, c(1, 2, NA)))))
   })
 })
