@@ -56,7 +56,12 @@ sql_translation.RedshiftConnection <- function(con) {
         sql_expr(REGEXP_REPLACE(!!string, !!pattern, !!replacement))
       }
     ),
-    sql_translator(.parent = postgres$aggregate),
+    sql_translator(.parent = postgres$aggregate,
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
+      str_flatten = function(x, collapse){
+        sql_expr(LISTAGG(!!x, !!collapse))
+      }
+    ),
     sql_translator(.parent = postgres$window,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LAG.html
       lag = function(x, n = 1L, order_by = NULL) {
@@ -76,6 +81,23 @@ sql_translation.RedshiftConnection <- function(con) {
           win_current_frame()
         )
       },
+      # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
+      str_flatten = function(x, collapse) {
+        order <- win_current_order()
+        if(length(order) > 0){
+          sql <- build_sql(sql_expr(LISTAGG(!!x, !!collapse)),
+                           " WITHIN GROUP (ORDER BY ", order, ")")
+        } else {
+          sql <- sql_expr(LISTAGG(!!x, !!collapse))
+        }
+
+        win_over(
+          sql,
+          partition = win_current_group()
+          # Cannot use the order here because LISTAGG requires the ordering in the
+          # WITHIN GROUP (ORDER BY ...) clause
+        )
+      }
     )
   )
 }
@@ -94,4 +116,4 @@ sql_query_explain.Redshift <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD"))
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))

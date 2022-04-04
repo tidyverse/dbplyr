@@ -33,7 +33,7 @@ Imports:
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils,
-    vctrs,
+    vctrs (>= 0.4.0),
     withr
 Suggests:
     bit64,
@@ -61,6 +61,7 @@ Collate:
     'utils.R'
     'sql.R'
     'escape.R'
+    'translate-sql-cut.R'
     'translate-sql-quantile.R'
     'translate-sql-string.R'
     'translate-sql-paste.R'

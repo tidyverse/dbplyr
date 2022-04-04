@@ -18,7 +18,7 @@ expression.}
 
 \item{x}{Object to coerce}
 
-\item{con}{Needed when \code{x} is directly suppled from the user so that
+\item{con}{Needed when \code{x} is directly supplied from the user so that
 schema specifications can be quoted using the correct identifiers.}
 }
 \description{
