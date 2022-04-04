@@ -165,17 +165,18 @@ op_grps.lazy_values_query <- function(op) {
   character()
 }
 
-sql_values <- function(con, df, lvl = 0) {
+sql_values <- function(con, df, lvl = 0, ...) {
+  check_dots_empty()
   UseMethod("sql_values")
 }
 
 #' @export
-sql_values.DBIConnection <- function(con, df, lvl = 0) {
+sql_values.DBIConnection <- function(con, df, lvl = 0, ...) {
   sql_values_clause(con, df, lvl = lvl)
 }
 
 #' @export
-sql_values.SQLiteConnection <- function(con, df, lvl = 0) {
+sql_values.SQLiteConnection <- function(con, df, lvl = 0, ...) {
   needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL)) %>%
     sql_values_clause(con = con, lvl = lvl)
