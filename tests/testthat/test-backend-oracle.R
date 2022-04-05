@@ -4,6 +4,7 @@ test_that("custom scalar functions translated correctly", {
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
   expect_equal(translate_sql(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
   expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
+  expect_equal(translate_sql(as.Date(x)),    sql("DATE `x`"))
 })
 
 test_that("paste and paste0 translate correctly", {
