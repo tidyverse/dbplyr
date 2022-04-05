@@ -45,25 +45,3 @@ expect_equal_tbls <- function(results, ref = NULL, ...) {
 
   invisible(TRUE)
 }
-
-expect_function_unused <- function(name) {
-  start <- as.list(asNamespace("dbplyr"), all.names = TRUE)
-  is_function <- purrr::map_lgl(start, is.function)
-  purrr::walk(start[is_function], expect_function_unused_call, name)
-}
-
-expect_function_unused_call <- function(x, name) {
-  if (is.function(x)) {
-    expect_function_unused_call(body(x), name)
-  } else if (is.call(x)) {
-    if (identical(as.character(x[[1]]), name)) {
-      expect_true(FALSE, label = as_label(x))
-    }
-
-    purrr::walk(as.list(x)[-1], expect_function_unused_call, name)
-  } else if (is.symbol(x)) {
-    if (identical(as.character(x), name)) {
-      expect_true(FALSE, label = as_label(x))
-    }
-  }
-}
