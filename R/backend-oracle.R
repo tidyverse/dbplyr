@@ -67,8 +67,8 @@ sql_translation.Oracle <- function(con) {
 
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
-      # https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/date-and-time-functions.html#function_date
-      as.Date = function(x) sql_expr(DATE(!!x)),
+      # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
+      as.Date = function(x) build_sql("DATE ", x),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
