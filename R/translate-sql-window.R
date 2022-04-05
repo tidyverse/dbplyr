@@ -243,12 +243,6 @@ set_current_context <- function(context) {
 
 sql_current_context <- function() sql_context$context
 
-local_context <- function(x, env = parent.frame()) {
-  old <- set_current_context(x)
-  withr::defer(set_current_context(old), envir = env)
-  invisible()
-}
-
 # Where translation -------------------------------------------------------
 
 uses_window_fun <- function(x, con) {
