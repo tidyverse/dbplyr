@@ -197,7 +197,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   if (identical(select$name, in_vars) &&
       purrr::every(select$expr, is_symbol) &&
       identical(syms(select$name), select$expr)) {
-    return(sql("*"))
+    return(new_sql("*"))
   }
 
   select_sql <- purrr::pmap(

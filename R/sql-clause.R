@@ -40,7 +40,7 @@ sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0
 
   clause <- build_sql(
     "SELECT",
-    if (distinct) sql(" DISTINCT"),
+    if (distinct) new_sql(" DISTINCT"),
     if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
     con = con
   )
@@ -134,5 +134,5 @@ lvl_indent <- function(times, char = "  ") {
 }
 
 indent_lvl <- function(x, lvl) {
-  sql(paste0(lvl_indent(lvl), x))
+  new_sql(paste0(lvl_indent(lvl), x))
 }

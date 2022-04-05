@@ -195,7 +195,7 @@ sql_values_clause <- function(con, df, row = FALSE, lvl = 0) {
     query <- select_query(
       from = ident(),
       select = sql(typed_cols),
-      where = sql("0 = 1")
+      where = new_sql("0 = 1")
     )
 
     return(sql_render(query, con = con, lvl = lvl))
@@ -220,7 +220,7 @@ sql_values_clause <- function(con, df, row = FALSE, lvl = 0) {
   null_row_query <- select_query(
     from = ident(),
     select = sql(cols_clause),
-    where = sql("0 = 1")
+    where = new_sql("0 = 1")
   )
 
   escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)

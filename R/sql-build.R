@@ -176,7 +176,7 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, 
   if (subquery) {
     query
   } else {
-    dbplyr_query_select(con, sql("*"), query, lvl = lvl)
+    dbplyr_query_select(con, new_sql("*"), query, lvl = lvl)
   }
 }
 

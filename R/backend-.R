@@ -172,7 +172,7 @@ base_scalar <- sql_translator(
     sql_expr(((!!x)))
   },
   desc = function(x) {
-    build_sql(x, sql(" DESC"))
+    build_sql(x, new_sql(" DESC"))
   },
 
   is.null = sql_is_null,
@@ -289,9 +289,9 @@ base_scalar <- sql_translator(
 )
 
 base_symbols <- sql_translator(
-  pi = sql("PI()"),
-  `*` = sql("*"),
-  `NULL` = sql("NULL")
+  pi = new_sql("PI()"),
+  `*` = new_sql("*"),
+  `NULL` = new_sql("NULL")
 )
 sql_exp <- function(a, x) {
   a <- as.integer(a)
@@ -310,7 +310,7 @@ sql_exp <- function(a, x) {
 base_agg <- sql_translator(
   # SQL-92 aggregates
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
-  n          = function() sql("COUNT(*)"),
+  n          = function() new_sql("COUNT(*)"),
   mean       = sql_aggregate("AVG", "mean"),
   var        = sql_aggregate("VARIANCE", "var"),
   sum        = sql_aggregate("SUM"),
@@ -407,7 +407,7 @@ base_win <- sql_translator(
   n     = function() {
     frame <- win_current_frame()
     win_over(
-      sql("COUNT(*)"),
+      new_sql("COUNT(*)"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame

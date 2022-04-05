@@ -1,7 +1,7 @@
 #' @export
 #' @rdname sql_build
 select_query <- function(from,
-                         select = sql("*"),
+                         select = new_sql("*"),
                          where = character(),
                          group_by = character(),
                          having = character(),
@@ -90,7 +90,7 @@ select_query_clauses <- function(x, subquery = FALSE) {
     where =    length(x$where) > 0,
     group_by = length(x$group_by) > 0,
     having =   length(x$having) > 0,
-    select =   !identical(x$select, sql("*")),
+    select =   !identical(x$select, new_sql("*")),
     distinct = x$distinct,
     order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
     limit    = !is.null(x$limit)

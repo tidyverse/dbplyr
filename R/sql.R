@@ -9,7 +9,12 @@
 #' @export
 sql <- function(...) {
   x <- c_character(...)
-  structure(x, class = c("sql", "character"))
+  new_sql(x)
+}
+
+new_sql <- function(x = character()) {
+  class(x) <- c("sql", "character")
+  x
 }
 
 # See setOldClass definition in zzz.R

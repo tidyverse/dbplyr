@@ -297,11 +297,11 @@ sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matche
 sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   JOIN <- switch(
     type,
-    left = sql("LEFT JOIN"),
-    inner = sql("INNER JOIN"),
-    right = sql("RIGHT JOIN"),
-    full = sql("FULL JOIN"),
-    cross = sql("CROSS JOIN"),
+    left = new_sql("LEFT JOIN"),
+    inner = new_sql("INNER JOIN"),
+    right = new_sql("RIGHT JOIN"),
+    full = new_sql("FULL JOIN"),
+    cross = new_sql("CROSS JOIN"),
     abort(paste0("Unknown join type: ", type))
   )
 

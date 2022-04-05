@@ -111,7 +111,7 @@ escape.blob <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.NULL <- function(x, parens = NA, collapse = " ", con = NULL) {
-  sql("NULL")
+  new_sql("NULL")
 }
 
 #' @export
@@ -152,9 +152,9 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
 
   if (length(x) == 0) {
     if (!is.null(collapse)) {
-      return(if (isTRUE(parens)) sql("()") else sql(""))
+      return(if (isTRUE(parens)) new_sql("()") else new_sql(""))
     } else {
-      return(sql())
+      return(new_sql())
     }
   }
 
@@ -165,7 +165,7 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   x <- names_to_as(x, con = con)
   x <- paste(x, collapse = collapse)
   if (parens) x <- paste0("(", x, ")")
-  sql(x)
+  new_sql(x)
 }
 
 names_to_as <- function(x, names = names2(x), con = NULL) {
