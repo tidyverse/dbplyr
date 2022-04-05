@@ -14,6 +14,6 @@ test_that("generates custom sql", {
 
   expect_snapshot(last_value_sql(con, ident("a")))
 
-  lf <- lazy_frame(df = df, con = con)
+  lf <- lazy_frame(tibble(x = 1), con = con)
   expect_snapshot(union_all(lf, lf))
 })
