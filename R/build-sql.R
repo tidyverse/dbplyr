@@ -46,5 +46,5 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   }
 
   pieces <- purrr::map_chr(enexprs(...), escape_expr, con = con)
-  sql(paste0(pieces, collapse = ""))
+  new_sql(paste0(pieces, collapse = ""))
 }

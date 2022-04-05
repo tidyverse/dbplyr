@@ -104,17 +104,24 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
   }
 
   lvl <- lvl + x$lvl
+  x$parts <- escape(x$parts, collapse = NULL, con = con)
 
   # check length without starting a new line
-  fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
-  if (x$parens) {
-    fields_same_line <- paste0("(", fields_same_line, ")")
-  }
-  same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(same_line_clause)
+  # <indent><x$kw> (<part1><x$sep> <part2><x$sep> ...<part n>)
+  nchar_same_line <- nchar(lvl_indent(lvl)) +
+    nchar(x$kw) + 1 +
+    (if (x$parens) 2 else 0) +
+    sum(nchar(x$parts)) + (nchar(x$sep) + 1) * (length(x$parts) - 1)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
-    return(sql(same_line_clause))
+    fields_same_line <- sql_vector(x$parts, parens = FALSE, collapse = paste0(x$sep, " "), con = con)
+    if (x$parens) {
+      same_line_clause <- paste0(x$kw, " (", fields_same_line, ")")
+    } else {
+      same_line_clause <- paste0(x$kw, " ", fields_same_line)
+    }
+
+    return(new_sql(same_line_clause))
   }
 
   indent <- lvl_indent(lvl + 1)
@@ -122,7 +129,8 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
 
   field_string <- paste0(
     x$kw, if (x$parens) " (", "\n",
-    indent, escape(x$parts, collapse = collapse, con = con),
+    # indent, escape(x$parts, collapse = collapse, con = con),
+    indent, sql_vector(x$parts, parens = FALSE, collapse = collapse, con = con),
     if (x$parens) paste0("\n", indent_lvl(")", lvl))
   )
 

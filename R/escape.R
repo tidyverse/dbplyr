@@ -163,7 +163,9 @@ sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   }
 
   x <- names_to_as(x, con = con)
-  x <- paste(x, collapse = collapse)
+  if (!is.null(collapse)) {
+    x <- paste(x, collapse = collapse)
+  }
   if (parens) x <- paste0("(", x, ")")
   new_sql(x)
 }
