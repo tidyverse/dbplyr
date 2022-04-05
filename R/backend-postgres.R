@@ -250,4 +250,7 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
-globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL"))
+globalVariables(
+  c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL",
+    "FLOOR", "WEEK"
+  ))
