@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix `union()` translation for Hive (@mgirlich, #663).
+
 * Added translation for `cut()` (@mgirlich, #697).
 
 * Fix translation of `str_flatten()` for Redshift (@hdplsa, #804) 
