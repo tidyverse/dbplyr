@@ -173,6 +173,10 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
     return(character())
   }
 
+  if (all(names == "")) {
+    return(as.character(x))
+  }
+
   names_esc <- sql_escape_ident(con, names)
   as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
 

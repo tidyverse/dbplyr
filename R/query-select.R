@@ -1,7 +1,7 @@
 #' @export
 #' @rdname sql_build
 select_query <- function(from,
-                         select = new_sql("*"),
+                         select = sql("*"),
                          where = character(),
                          group_by = character(),
                          having = character(),
