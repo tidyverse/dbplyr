@@ -156,3 +156,67 @@ test_that("window_frame() checks arguments", {
   expect_snapshot(error = TRUE, window_frame(lf, 1, "a"))
   expect_snapshot(error = TRUE, window_frame(lf, 1, 1:2))
 })
+
+
+# named windows -----------------------------------------------------------
+
+test_that("names windows automatically", {
+  lf <- lazy_frame(
+    col1 = runif(3),
+    col2 = runif(3),
+    col3 = runif(3),
+    col4 = runif(3),
+    part = c("a", "a", "b"),
+    ord = 3:1
+  ) %>%
+    group_by(part) %>%
+    window_order(ord)
+
+  expect_snapshot({
+    # window only used once -> no need to name the window
+    lf %>%
+      mutate(
+        across(c(col1), sum, na.rm = TRUE),
+        across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
+      )
+
+    # uses 2 different window
+    lf %>%
+      mutate(
+        across(c(col1, col2), sum, na.rm = TRUE),
+        across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
+      )
+  })
+
+  # Different order does not confuse naming of windows
+  expect_snapshot(
+    lf %>%
+      transmute(
+        col1 = sum(col1, na.rm = TRUE),
+        col3 = order_by(desc(ord), cumsum(col3)),
+        col2 = sum(col2, na.rm = TRUE),
+        col4 = order_by(desc(ord), cumsum(col4))
+      )
+  )
+
+  lf2 <- lazy_frame(
+    col1 = runif(3),
+    col2 = runif(3),
+    col3 = runif(3),
+    col4 = runif(3),
+    part = c("a", "a", "b"),
+    ord = 3:1,
+    con = simulate_hana()
+  ) %>%
+    group_by(part) %>%
+    window_order(ord)
+
+  # Does not use named windows as they are not supported
+  expect_snapshot({
+    lf2 %>%
+      mutate(
+        across(c(col1, col2), sum, na.rm = TRUE),
+        across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
+      )
+  })
+})
