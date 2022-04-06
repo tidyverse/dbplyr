@@ -475,19 +475,4 @@ sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
 
-#' @export
-supports_window_clause <- function(con) {
-  UseMethod("supports_window_clause")
-}
-
-#' @export
-supports_window_clause.default <- function(con) {
-  FALSE
-}
-
-#' @export
-supports_window_clause.TestConnection <- function(con) {
-  TRUE
-}
-
 utils::globalVariables("RANDOM")

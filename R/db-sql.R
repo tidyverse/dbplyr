@@ -13,6 +13,8 @@
 #' * `sql_random(con)` generates SQL to get a random number which can be used
 #'   to select random rows in `slice_sample()`.
 #'
+#' * `supports_window_clause(con)` does the backend support named windows?
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -225,6 +227,22 @@ sql_query_rows <- function(con, sql, ...) {
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
+}
+
+#' @rdname db-sql
+#' @export
+supports_window_clause <- function(con) {
+  UseMethod("supports_window_clause")
+}
+
+#' @export
+supports_window_clause.DBIConnection <- function(con) {
+  FALSE
+}
+
+#' @export
+supports_window_clause.TestConnection <- function(con) {
+  TRUE
 }
 
 
