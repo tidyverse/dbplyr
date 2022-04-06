@@ -32,6 +32,11 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     return(across_funs(quo_squash(funs), env, data, dots, names_spec, fn, evaluated = evaluated))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
+    if (is_symbol(funs) && exists(funs, env) && is.list(get(funs, envir = env))) {
+      funs <- eval(funs, env)
+      return(across_funs(funs, env, data, dots, names_spec, fn, evaluated = evaluated))
+    }
+
     fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
     names_spec <- names_spec %||% "{.col}"
   } else if (is_call(funs, "list")) {
