@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `mutate()` and `transmute()` now automatically use named windows if a window
+  definition is used at least twice and the backend supports named windows
+  (@mgirlich, #624).
+
 * Added translations for lubridate functions `day()`, `week()`, `isoweek()`,
   and `isoyear()` for Postgres (@mgirlich, #675).
 
