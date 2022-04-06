@@ -59,17 +59,17 @@ sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TR
   translate_sql(case_when(!!!cases, !!!last_cases))
 }
 
-check_cut_labels <- function(labels, breaks, include.lowest, right) {
+check_cut_labels <- function(labels, breaks, include.lowest, right, call = caller_env()) {
   labels <- labels %||% TRUE
 
   n <- length(breaks)
   if (vctrs::vec_is(labels, character())) {
-    return(vctrs::vec_recycle(labels, n - 1, x_arg = "labels"))
+    return(vctrs::vec_recycle(labels, n - 1, x_arg = "labels", call = call))
   }
 
   vctrs::vec_assert(labels, size = 1L)
   if (!vctrs::vec_is(labels, logical()) || is.na(labels)) {
-    abort("`labels` must be a bool or a character.")
+    abort("`labels` must be a bool or a character.", call = call)
   }
 
   if (is_false(labels)) {
