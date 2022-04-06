@@ -91,7 +91,7 @@ win_register <- function(over) {
 win_register_names <- function() {
   windows <- sql_context$windows %||% character()
 
-  window_count <- vctrs::vec_count(windows)
+  window_count <- vctrs::vec_count(windows, sort = "location")
   window_count <- vctrs::vec_slice(window_count, window_count$count > 1)
   if (nrow(window_count) > 0) {
     window_count$name <- ident(paste0("win", seq_along(window_count$key)))
