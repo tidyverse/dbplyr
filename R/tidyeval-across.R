@@ -32,7 +32,16 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     return(across_funs(quo_squash(funs), env, data, dots, names_spec, fn, evaluated = evaluated))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
-    if (is_symbol(funs) && exists(funs, env) && is.list(get(funs, envir = env))) {
+    is_local_list <- function(funs) {
+      if (!is_symbol(funs)) {
+        return(FALSE)
+      }
+
+      funs <- as_name(funs)
+      exists(funs, env) && is.list(get(funs, envir = env))
+    }
+
+    if (is_local_list(funs)) {
       funs <- eval(funs, env)
       return(across_funs(funs, env, data, dots, names_spec, fn, evaluated = evaluated))
     }
