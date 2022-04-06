@@ -123,7 +123,8 @@ translate_sql_ <- function(dots,
   on.exit(set_current_con(old_con), add = TRUE)
 
   if (length(context) > 0) {
-    local_context(context)
+    old_context <- set_current_context(context)
+    on.exit(set_current_context(old_context), add = TRUE)
   }
 
   if (window) {
