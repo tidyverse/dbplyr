@@ -396,4 +396,9 @@ mssql_case_when <- function(...) {
   y
 }
 
+#' @export
+`supports_window_clause.Microsoft SQL Server` <- function(con) {
+  FALSE
+}
+
 globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))

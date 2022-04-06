@@ -165,4 +165,14 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
+#' @export
+supports_window_clause.Oracle <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_window_clause.OraConnection <- function(con) {
+  TRUE
+}
+
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))

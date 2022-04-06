@@ -150,4 +150,19 @@ sql_random.MySQLConnection <- sql_random.MariaDBConnection
 #' @export
 sql_random.MySQL <- sql_random.MariaDBConnection
 
+#' @export
+supports_window_clause.MariaDBConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_window_clause.MySQLConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_window_clause.MySQL <- function(con) {
+  TRUE
+}
+
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))

@@ -176,4 +176,9 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   }
 }
 
+#' @export
+supports_window_clause.SQLiteConnection <- function(con) {
+  TRUE
+}
+
 globalVariables(c("datetime", "NUMERIC", "REAL"))

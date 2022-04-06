@@ -67,6 +67,11 @@ db_table_temporary.HDB <- function(con, table, temporary) {
     temporary = FALSE
   )
 }
+
+#' @export
+supports_window_clause.HDB <- function(con) {
+  FALSE
+}
 # nocov end
 
 #' @export
