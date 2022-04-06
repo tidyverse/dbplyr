@@ -6,6 +6,8 @@
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
+#' @param cte Use common table expressions in the generated SQL?
+#' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
 #' @export
@@ -22,10 +24,10 @@
 #' remote_con(mf2)
 #' remote_query(mf2)
 remote_name <- function(x) {
-  if (!inherits(x$ops, "op_base"))
+  if (!inherits(x$lazy_query, "lazy_query_base"))
     return()
 
-  x$ops$x
+  x$lazy_query$x
 }
 
 #' @export
@@ -42,12 +44,12 @@ remote_con <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query <- function(x) {
-  db_sql_render(remote_con(x), x)
+remote_query <- function(x, cte = FALSE) {
+  db_sql_render(remote_con(x), x, cte = cte)
 }
 
 #' @export
 #' @rdname remote_name
-remote_query_plan <- function(x) {
-  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$ops))
+remote_query_plan <- function(x, ...) {
+  dbplyr_explain(remote_con(x), db_sql_render(remote_con(x), x$lazy_query), ...)
 }

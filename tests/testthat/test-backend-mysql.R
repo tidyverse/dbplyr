@@ -1,7 +1,26 @@
+# function translation ----------------------------------------------------
+
+test_that("custom scalar translated correctly", {
+  local_con(simulate_mysql())
+  expect_equal(translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
+
+  expect_equal(translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
+  expect_equal(translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
+})
+
+test_that("custom aggregators translated correctly", {
+  local_con(simulate_mysql())
+
+  expect_equal(translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
+})
+
 test_that("use CHAR type for as.character", {
   local_con(simulate_mysql())
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
 })
+
+
+# verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
   con <- simulate_mysql()
@@ -11,6 +30,11 @@ test_that("generates custom sql", {
 
   lf <- lazy_frame(x = 1, con = con)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+  expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
+
+  expect_snapshot(slice_sample(lf, 5))
+
+  expect_snapshot(sql_values(con, tibble(x = 1, y = "a")))
 })
 
 # live database -----------------------------------------------------------

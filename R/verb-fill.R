@@ -8,7 +8,7 @@
 #'   yourself beforehand; for example replace `arrange(x, desc(y))` by
 #'   `arrange(desc(x), y)`.
 #'
-#' @examples
+#' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' squirrels <- tibble::tribble(
 #'   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
 #'   1,      "Sam",    "Observer",   NA,                 1,
@@ -26,14 +26,12 @@
 #' )
 #' squirrels$id <- 1:12
 #'
-#' if (require("tidyr", quietly = TRUE)) {
-#'   tbl_memdb(squirrels) %>%
-#'     window_order(id) %>%
-#'     tidyr::fill(
-#'       n_squirrels,
-#'       n_squirrels2,
-#'     )
-#' }
+#' tbl_memdb(squirrels) %>%
+#'   window_order(id) %>%
+#'   tidyr::fill(
+#'     n_squirrels,
+#'     n_squirrels2,
+#'   )
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   sim_data <- simulate_vars(.data)
   cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
@@ -73,7 +71,6 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
 # databases with support for `IGNORE NULLS`
 # * hive: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+WindowingAndAnalytics
 # * impala: https://docs.cloudera.com/documentation/enterprise/5-11-x/topics/impala_analytic_functions.html
-# * mssql: https://docs.microsoft.com/en-us/sql/t-sql/functions/first-value-transact-sql?view=sql-server-ver15
 # * oracle: https://oracle-base.com/articles/misc/first-value-and-last-value-analytic-functions
 # * redshift: https://docs.aws.amazon.com/redshift/latest/dg/r_WF_first_value.html
 # * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
@@ -119,6 +116,8 @@ dbplyr_fill0.DBIConnection <- function(.con,
 # * mysql: https://dev.mysql.com/doc/refman/8.0/en/window-function-descriptions.html
 # * mariadb
 # * postgres: https://www.postgresql.org/docs/13/functions-window.html
+# * mssql: https://docs.microsoft.com/en-us/sql/t-sql/functions/first-value-transact-sql?view=sql-server-ver15
+#   -> `IGNORE NULLS` only in Azure SQL Edge
 #' @export
 dbplyr_fill0.SQLiteConnection <- function(.con,
                                              .data,
@@ -139,7 +138,8 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
   partition_sql <- purrr::map(
     cols_to_fill,
     ~ translate_sql(
-      cumsum(ifelse(is.na(!!.x), 0L, 1L)),
+      cumsum(case_when(is.na(!!.x) ~ 0L, TRUE ~ 1L)),
+      con = .con,
       vars_order = translate_sql(!!!order_by_cols, con = .con),
       vars_group = op_grps(.data),
     )
@@ -177,6 +177,8 @@ dbplyr_fill0.HDB <- dbplyr_fill0.SQLiteConnection
 
 #' @export
 dbplyr_fill0.ACCESS <- dbplyr_fill0.SQLiteConnection
+#' @export
+`dbplyr_fill0.Microsoft SQL Server` <- dbplyr_fill0.SQLiteConnection
 
 #' @export
 dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
@@ -196,8 +198,8 @@ last_value_sql.DBIConnection <- function(con, x) {
 }
 
 #' @export
-last_value_sql.Hive <- function(con, x) {
-  translate_sql(last_value(!!x, TRUE), con = con)
+`last_value_sql.Microsoft SQL Server` <- function(con, x) {
+  build_sql("LAST_VALUE(", ident(as.character(x)), ") IGNORE NULLS", con = con)
 }
 
 globalVariables("last_value")

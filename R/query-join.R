@@ -29,61 +29,51 @@ print.join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$x, con, ..., subquery = TRUE),
-    name = "LHS"
-  )
-  from_y <- dbplyr_sql_subquery(
-    con,
-    sql_render(query$y, con, ..., subquery = TRUE),
-    name = "RHS"
-  )
+sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+  from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
   dbplyr_query_join(con, from_x, from_y,
     vars = query$vars,
     type = query$type,
     by = query$by,
-    na_matches = query$na_matches
+    na_matches = query$na_matches,
+    lvl = lvl
   )
 }
 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars) {
-  sql_vector(
-    mapply(
-      FUN = sql_join_var,
-      alias = vars$alias,
-      x = vars$x,
-      y = vars$y,
-      MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y),
-      SIMPLIFY = FALSE,
-      USE.NAMES = TRUE
-    ),
-    parens = FALSE,
-    collapse = ", ",
-    con = con
+sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS") {
+  join_vars_list <- mapply(
+    FUN = sql_join_var,
+    alias = vars$alias,
+    x = vars$x,
+    y = vars$y,
+    MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y, x_as = x_as, y_as = y_as),
+    SIMPLIFY = FALSE,
+    USE.NAMES = TRUE
   )
+
+  sql(unlist(join_vars_list))
 }
 
-sql_join_var <- function(con, alias, x, y, all_x, all_y) {
+sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
   if (!is.na(x) && !is.na(y)) {
     sql_expr(
       COALESCE(
-        !!sql_table_prefix(con, x, table = "LHS"),
-        !!sql_table_prefix(con, y, table = "RHS")
+        !!sql_table_prefix(con, x, table = x_as),
+        !!sql_table_prefix(con, y, table = y_as)
       ),
       con = con
     )
   } else if (!is.na(x)) {
-    sql_table_prefix(con, x, table = if (x %in% all_y) "LHS")
+    sql_table_prefix(con, x, table = if (tolower(x) %in% tolower(all_y)) x_as)
   } else if (!is.na(y)) {
-    sql_table_prefix(con, y, table = if (y %in% all_x) "RHS")
+    sql_table_prefix(con, y, table = if (tolower(y) %in% tolower(all_x)) y_as)
   } else {
-    stop("No source for join column ", alias, call. = FALSE)
+    abort(paste0("No source for join column ", alias)) # nocov
   }
 }
 
@@ -92,8 +82,8 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
 
   on <- NULL
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, "LHS")
-    rhs <- sql_table_prefix(con, by$y, "RHS")
+    lhs <- sql_table_prefix(con, by$x, by$x_as)
+    rhs <- sql_table_prefix(con, by$y, by$y_as)
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
@@ -103,12 +93,10 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
       compare <- paste0(lhs, " = ", rhs)
     }
 
-    on <- sql_vector(compare, collapse = " AND ", parens = TRUE, con = con)
+    sql(compare)
   } else if (length(by$on) > 0) {
-    on <- build_sql("(", by$on, ")", con = con)
+    by$on
   }
-
-  on
 }
 
 sql_table_prefix <- function(con, var, table = NULL) {

@@ -6,6 +6,18 @@ test_that("complete join pipeline works with SQLite", {
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 })
 
+test_that("complete join pipeline works with SQLite and table alias", {
+  df1 <- memdb_frame(x = 1:5)
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+
+  out <- left_join(df1, df2, by = "x", x_as = "df1", y_as = "df2")
+  expect_equal(out %>% collect(), tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+
+  lf1 <- lazy_frame(x = 1:5)
+  lf2 <- lazy_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+  expect_snapshot(left_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
+})
+
 test_that("complete semi join works with SQLite", {
   lf1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
   lf2 <- memdb_frame(x = 1)
@@ -15,6 +27,18 @@ test_that("complete semi join works with SQLite", {
 
   out <- collect(lf3)
   expect_equal(out, tibble(x = 1, y = 2))
+})
+
+test_that("complete semi join works with SQLite and table alias", {
+  df1 <- memdb_frame(x = c(1, 2), y = c(2, 3))
+  df2 <- memdb_frame(x = 1)
+
+  out <- inner_join(df1, df2, by = "x", x_as = "df1", y_as = "df2")
+  expect_equal(out %>% collect(), tibble(x = 1, y = 2))
+
+  lf1 <- lazy_frame(x = c(1, 2), y = c(2, 3))
+  lf2 <- lazy_frame(x = 1)
+  expect_snapshot(inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
 })
 
 test_that("joins with non by variables gives cross join", {
@@ -129,6 +153,13 @@ test_that("join functions error on column not found for SQL sources #1928", {
   )
 })
 
+test_that("join check `x_as` and `y_as`", {
+  x <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = NULL))
+  expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
+  expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {
@@ -136,28 +167,28 @@ test_that("join verbs generate expected ops", {
   lf2 <- lazy_frame(x = 1, z = 2)
 
   ji <- inner_join(lf1, lf2, by = "x")
-  expect_s3_class(ji$ops, "op_join")
-  expect_equal(ji$ops$args$type, "inner")
+  expect_s3_class(ji$lazy_query, "lazy_join_query")
+  expect_equal(ji$lazy_query$type, "inner")
 
   jl <- left_join(lf1, lf2, by = "x")
-  expect_s3_class(jl$ops, "op_join")
-  expect_equal(jl$ops$args$type, "left")
+  expect_s3_class(jl$lazy_query, "lazy_join_query")
+  expect_equal(jl$lazy_query$type, "left")
 
   jr <- right_join(lf1, lf2, by = "x")
-  expect_s3_class(jr$ops, "op_join")
-  expect_equal(jr$ops$args$type, "right")
+  expect_s3_class(jr$lazy_query, "lazy_join_query")
+  expect_equal(jr$lazy_query$type, "right")
 
   jf <- full_join(lf1, lf2, by = "x")
-  expect_s3_class(jf$ops, "op_join")
-  expect_equal(jf$ops$args$type, "full")
+  expect_s3_class(jf$lazy_query, "lazy_join_query")
+  expect_equal(jf$lazy_query$type, "full")
 
   js <- semi_join(lf1, lf2, by = "x")
-  expect_s3_class(js$ops, "op_semi_join")
-  expect_equal(js$ops$args$anti, FALSE)
+  expect_s3_class(js$lazy_query, "lazy_semi_join_query")
+  expect_equal(js$lazy_query$anti, FALSE)
 
   ja <- anti_join(lf1, lf2, by = "x")
-  expect_s3_class(ja$ops, "op_semi_join")
-  expect_equal(ja$ops$args$anti, TRUE)
+  expect_s3_class(ja$lazy_query, "lazy_semi_join_query")
+  expect_equal(ja$lazy_query$anti, TRUE)
 })
 
 test_that("can optionally match NA values", {
@@ -172,8 +203,6 @@ test_that("join captures both tables", {
   out <- inner_join(lf1, lf2, by = "x") %>% sql_build()
 
   expect_s3_class(out, "join_query")
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
   expect_equal(out$type, "inner")
 })
 
@@ -183,8 +212,6 @@ test_that("semi join captures both tables", {
 
   out <- semi_join(lf1, lf2, by = "x") %>% sql_build()
 
-  expect_equal(op_vars(out$x), c("x", "y"))
-  expect_equal(op_vars(out$y), c("x", "z"))
   expect_equal(out$anti, FALSE)
 })
 
@@ -205,6 +232,27 @@ test_that("extra args generates error", {
     "unused argument"
   )
 })
+
+test_that("suffix arg is checked", {
+  lf1 <- lazy_frame(x = 1, y = 2)
+  lf2 <- lazy_frame(x = 1, z = 2)
+
+  expect_snapshot(
+    error = TRUE,
+    inner_join(lf1, lf2, by = "x", suffix = "a")
+  )
+})
+
+test_that("copy = TRUE works", {
+  lf <- memdb_frame(x = 1, y = 2)
+  df <- tibble(x = 1, z = 3)
+
+  expect_equal(
+    inner_join(lf, df, by = "x", copy = TRUE) %>% collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {

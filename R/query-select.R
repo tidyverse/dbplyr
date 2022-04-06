@@ -50,7 +50,7 @@ print.select_query <- function(x, ...) {
   if (length(x$group_by)) cat("Group by: ", named_commas(x$group_by), "\n", sep = "")
   if (length(x$window))   cat("Window:   ", named_commas(x$window), "\n", sep = "")
   if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
-  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "")
+  if (length(x$having))   cat("Having:   ", named_commas(x$having), "\n", sep = "") # nocov
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
 }
 
@@ -105,10 +105,11 @@ select_query_clauses <- function(x, subquery = FALSE) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
+sql_render.select_query <- function(query, con, ..., subquery = FALSE, lvl = 0) {
   from <- dbplyr_sql_subquery(con,
-    sql_render(query$from, con, ..., subquery = TRUE),
-    name = NULL
+    sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
+    name = NULL,
+    lvl = lvl
   )
 
   dbplyr_query_select(
@@ -121,11 +122,19 @@ sql_render.select_query <- function(query, con, ..., subquery = FALSE) {
     limit = query$limit,
     distinct = query$distinct,
     ...,
-    subquery = subquery
+    subquery = subquery,
+    lvl = lvl
   )
 }
 
 warn_drop_order_by <- function() {
+  # Rules according to SQLite: https://sqlite.org/forum/forumpost/878ca7a9be0862af?t=h
+  # 1. There is no LIMIT clause in the subquery
+  # 3. The subquery is not part of the FROM clause in an UPDATE-FROM statement
+  # 4. The outer query does not use any aggregate functions other than the built-in count(), min(), and/or max() functions.
+  # 5. Either the outer query has its own ORDER BY clause or else the subquery is one term of a join.
+  #
+  # (2. and 6. are left out as they are SQLite internal)
   warn(c(
     "ORDER BY is ignored in subqueries without LIMIT",
     i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"

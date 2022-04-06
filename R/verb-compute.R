@@ -18,7 +18,7 @@ collapse.tbl_sql <- function(x, ...) {
 
   tbl(x$src, sql) %>%
     group_by(!!! syms(op_grps(x))) %>%
-    add_op_order(op_sort(x))
+    arrange.tbl_lazy(!!!op_sort(x))
 }
 
 # compute -----------------------------------------------------------------
@@ -37,13 +37,13 @@ compute.tbl_sql <- function(x,
                             indexes = list(),
                             analyze = TRUE,
                             ...) {
-
+  name <- unname(name)
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
   assert_that(all(unlist(unique_indexes) %in% vars))
 
   x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
-  sql <- db_sql_render(x$src$con, x_aliased$ops)
+  sql <- db_sql_render(x$src$con, x_aliased$lazy_query)
 
   name <- db_compute(x$src$con, name, sql,
     temporary = temporary,
@@ -55,7 +55,7 @@ compute.tbl_sql <- function(x,
 
   tbl(x$src, name) %>%
     group_by(!!! syms(op_grps(x))) %>%
-    add_op_order(op_sort(x))
+    window_order(!!!op_sort(x))
 }
 
 # collect -----------------------------------------------------------------

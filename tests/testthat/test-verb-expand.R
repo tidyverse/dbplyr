@@ -25,6 +25,11 @@ test_that("expand accepts expressions", {
   expect_snapshot(tidyr::expand(df, nesting(x_half = round(x / 2), x1 = x + 1)))
 })
 
+test_that("works with tidyr::nesting", {
+  df_lazy <- lazy_frame(x = 1:2, y = 1:2)
+  expect_snapshot(df_lazy %>% tidyr::expand(tidyr::nesting(x, y)))
+})
+
 test_that("expand respects groups", {
   df <- tibble(
     a = c(1L, 1L, 2L),
@@ -50,8 +55,27 @@ test_that("NULL inputs", {
 })
 
 test_that("expand() errors when expected", {
-  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1)))
-  expect_snapshot_error(tidyr::expand(memdb_frame(x = 1), x = NULL))
+  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1)))
+  expect_snapshot(error = TRUE, tidyr::expand(memdb_frame(x = 1), x = NULL))
+})
+
+test_that("nesting() respects .name_repair", {
+  expect_snapshot(error = TRUE, 
+    tidyr::expand(
+      memdb_frame(x = 1, y = 1),
+      nesting(x, x = x + 1)
+    )
+  )
+
+  vars <- suppressMessages(
+    tidyr::expand(
+      memdb_frame(x = 1, y = 1),
+      nesting(x, x = x + 1, .name_repair = "unique")
+    ) %>%
+      op_vars()
+  )
+
+  expect_equal(vars, c("x...1", "x...2"))
 })
 
 test_that("expand respect .name_repair", {

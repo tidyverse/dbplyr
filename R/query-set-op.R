@@ -24,16 +24,19 @@ print.set_op_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE) {
-  from_x <- sql_render(query$x, con, ..., subquery = FALSE)
-  from_y <- sql_render(query$y, con, ..., subquery = FALSE)
+sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+  sub_lvl <- lvl + !inherits(con, "SQLiteConnection")
+  from_x <- sql_render(query$x, con, ..., subquery = FALSE, lvl = sub_lvl)
+  from_y <- sql_render(query$y, con, ..., subquery = FALSE, lvl = sub_lvl)
 
   if (dbplyr_edition(con) >= 2) {
-    sql_query_set_op(con, from_x, from_y, method = query$type, all = query$all)
+    sql_query_set_op(con, from_x, from_y, method = query$type, all = query$all, lvl = lvl)
   } else {
+    # nocov start
     if (isTRUE(query$all)) {
       abort("`all` argument not supported by this backend")
     }
-    dbplyr_query_set_op(con, from_x, from_y, method = query$type)
+    dbplyr_query_set_op(con, from_x, from_y, method = query$type, lvl = lvl)
+    # nocov end
   }
 }

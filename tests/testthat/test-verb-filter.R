@@ -29,6 +29,23 @@ test_that("each argument gets implicit parens", {
   expect_equal_tbl(mf1, mf2)
 })
 
+test_that("only add step if necessary", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_equal(lf %>% filter(), lf)
+})
+
+test_that("errors for named input", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot(error = TRUE, filter(lf, x = 1))
+  expect_snapshot(error = TRUE, filter(lf, y > 1, x = 1))
+})
+
+test_that(".preserve is not supported", {
+  lf <- lazy_frame(x = 1:3, y = 1:3)
+  expect_snapshot(error = TRUE, lf %>% filter(x == 1, .preserve = TRUE))
+})
+
 
 # SQL generation --------------------------------------------------------
 
@@ -67,4 +84,49 @@ test_that("filter generates simple expressions", {
     sql_build()
 
   expect_equal(out$where, sql('`x` > 1'))
+})
+
+
+# lazy_select_query -------------------------------------------------------
+
+test_that("generates correct lazy_select_query", {
+  lf <- lazy_frame(x = 1:3, y = 3:1)
+
+  expect_equal(
+    lf %>%
+      filter(x > 1) %>%
+      .$lazy_query,
+    lazy_select_query(
+      from = lf$lazy_query,
+      last_op = "filter",
+      select = syms(set_names(colnames(lf))),
+      where = unclass(quos(x > 1))
+    ),
+    ignore_formula_env = TRUE
+  )
+
+  out <- lf %>%
+    filter(mean(x, na.rm = TRUE) > 1) %>%
+    .$lazy_query
+
+  expect_equal(
+    out,
+    lazy_select_query(
+      from = out$from,
+      last_op = "filter",
+      select = syms(set_names(colnames(lf))),
+      where = set_names(list(expr(q01 > 1)), "")
+    ),
+    ignore_formula_env = TRUE
+  )
+
+  expect_equal(
+    out$from,
+    lazy_select_query(
+      from = lf$lazy_query,
+      last_op = "mutate",
+      select = list(x = sym("x"), y = sym("y"), q01 = quo(mean(x, na.rm = TRUE)))
+    ),
+    ignore_formula_env = TRUE
+  )
 })

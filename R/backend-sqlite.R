@@ -1,7 +1,7 @@
 #' Backend: SQLite
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -43,15 +43,7 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 }
 
 #' @export
-sql_query_set_op.SQLiteConnection <- function(con, x, y, method, ..., all = FALSE) {
-  # SQLite does not allow parentheses
-  build_sql(
-    x,
-    "\n", sql(method), if (all) sql(" ALL"), "\n",
-    y,
-    con = con
-  )
-}
+sql_query_set_op.SQLiteConnection <- sql_query_set_op.Hive
 
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
@@ -105,7 +97,7 @@ sql_translation.SQLiteConnection <- function(con) {
         median = win_absent("median")
       )
     } else {
-      base_no_win
+      base_no_win # nocov
     }
   )
 }
@@ -118,14 +110,15 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
+
     if (is.null(name)) {
-      build_sql("(", from, ")", con = con)
+      build_sql(sql_indent_subquery(from, con, lvl), con = con)
     } else {
-      build_sql("(", from, ") AS ", ident(name), con = con)
+      build_sql(sql_indent_subquery(from, con, lvl), " AS ", ident(name), con = con)
     }
   }
 }
@@ -137,31 +130,49 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
 }
 
 #' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
   # see: https://www.sqlite.org/omitted.html
 
-  # Careful: in the right join resp. the second join in the full join do not
-  # name `y` LHS and `x` RHS as it messes up the select query!
+  if (type %in% c("left", "inner", "semi", "cross")) {
+    return(NextMethod())
+  }
+
+  # as `x` and `y` the vars also need to be swapped in vars and by
+  vars_right <- list(
+    alias = vars$alias,
+    x = vars$y,
+    y = vars$x,
+    all_x = vars$all_y,
+    all_y = vars$all_x
+  )
+  by_right <- list(
+    x = by$y,
+    y = by$x,
+    x_as = by$y_as,
+    y_as = by$x_as
+  )
 
   if (type == "full") {
-    join_sql <- build_sql(
-      sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ...),
-      "UNION\n",
-      sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...),
-      con = con
+    x_join <- sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1)
+    y_join <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl + 1)
+    join_sql <- sql_query_set_op(
+      con,
+      x = x_join,
+      y = y_join,
+      method = "UNION",
+      lvl = lvl + 1
     )
 
     sql_query_select(
       con,
       select = ident(vars$alias),
-      from = sql_subquery(con, join_sql),
-      subquery = TRUE
+      from = dbplyr_sql_subquery(con, join_sql, lvl = lvl),
+      subquery = TRUE,
+      lvl = lvl
     )
   } else if (type == "right") {
-    sql_query_join(con, y, x, vars, type = "left", by = by, na_matches = na_matches, ...)
-  } else {
-    NextMethod()
+    sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl)
   }
 }
 

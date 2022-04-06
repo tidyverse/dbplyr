@@ -30,38 +30,43 @@
 #' @export
 #' @importFrom dplyr arrange
 arrange.tbl_lazy <- function(.data, ..., .by_group = FALSE) {
-  dots <- quos(...)
-  dots <- partial_eval_dots(dots, vars = op_vars(.data))
+  dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
-  add_op_single(
-    "arrange",
-    .data,
-    dots = dots,
-    args = list(.by_group = .by_group)
-  )
+  .data$lazy_query <- add_arrange(.data, dots, .by_group)
+  .data
 }
 
-#' @export
-op_sort.op_arrange <- function(op) {
-  c(op_sort(op$x), op$dots)
-}
+add_arrange <- function(.data, dots, .by_group) {
+  lazy_query <- .data$lazy_query
 
-#' @export
-op_desc.op_arrange <- function(x, ...) {
-  op_desc(x$x, ...)
-}
-
-#' @export
-sql_build.op_arrange <- function(op, con, ...) {
-  order_vars <- translate_sql_(op$dots, con, context = list(clause = "ORDER"))
-
-  if (op$args$.by_group) {
-    order_vars <- c.sql(ident(op_grps(op$x)), order_vars, con = con)
+  if (.by_group) {
+    dots <- c(syms(op_grps(lazy_query)), dots)
+  }
+  if (identical(dots, lazy_query$order_vars)) {
+    return(lazy_query)
   }
 
-  select_query(
-    sql_build(op$x, con),
-    order_by = order_vars
+  # `dots` must be an empty list so that `arrange()` removes the `order_vars`
+  dots <- dots %||% list()
+
+  new_lazy_query <- lazy_select_query(
+    from = lazy_query,
+    last_op = "arrange",
+    order_by = dots,
+    order_vars = dots
   )
+
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(new_lazy_query)
+  }
+
+  # Needed because `ORDER BY` is evaluated before `LIMIT`
+  if (!is.null(lazy_query$limit)) {
+    return(new_lazy_query)
+  }
+
+  lazy_query$order_vars <- dots
+  lazy_query$order_by <- dots
+  lazy_query
 }

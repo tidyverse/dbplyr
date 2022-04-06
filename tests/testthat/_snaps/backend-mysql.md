@@ -21,8 +21,43 @@
       SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
-      ON (`LHS`.`x` <=> `RHS`.`x`)
-      
+        ON (`LHS`.`x` <=> `RHS`.`x`)
+
+---
+
+    Code
+      full_join(lf, lf, by = "x")
+    Condition
+      Error in `sql_query_join()`:
+      ! MySQL does not support full joins
+
+---
+
+    Code
+      slice_sample(lf, 5)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        FROM `df`
+      ) `q01`
+      WHERE (`q01` <= 1)
+
+---
+
+    Code
+      sql_values(con, tibble(x = 1, y = "a"))
+    Output
+      <SQL> SELECT CAST(`x` AS NUMERIC) AS `x`, CAST(`y` AS CHAR) AS `y`
+      FROM (
+        (
+          SELECT NULL AS `x`, NULL AS `y`
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (  VALUES ROW(1.0, 'a'))
+      ) `values_table`
 
 # can explain
 

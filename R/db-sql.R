@@ -10,6 +10,9 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
+#' * `sql_random(con)` generates SQL to get a random number which can be used
+#'   to select random rows in `slice_sample()`.
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -32,6 +35,10 @@
 #'
 #' * `sql_query_wrap(con, from)` generates SQL for wrapping a query into a
 #'   subquery.
+#'
+#' Query indentation:
+#'
+#' * `sql_indent_subquery(from, con, lvl)` helps indenting a subquery.
 #'
 #' Query generation:
 #'
@@ -82,7 +89,8 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
   build_sql(
     "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
     "THEN 0 ",
-    "ELSE 1 = 0",
+    "ELSE 1 ",
+    "END = 0",
     con = con
   )
 }
@@ -100,6 +108,12 @@ dbplyr_sql_translation <- function(con) {
 #' @export
 sql_translate_env.DBIConnection <- function(con) {
   sql_translation(con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_random <- function(con) {
+  UseMethod("sql_random")
 }
 
 
@@ -165,23 +179,40 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " AS ", sql,
+    as.sql(name, con), " AS\n", sql,
     con = con
   )
 }
 #' @export
 #' @rdname db-sql
-sql_query_wrap <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   UseMethod("sql_query_wrap")
 }
 #' @export
-sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else if (is.schema(from)) {
     setNames(as.sql(from, con), name)
   } else {
-    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
+    ident_name <- ident(name %||% unique_subquery_name())
+    build_sql(sql_indent_subquery(from, con, lvl), " ", ident_name, con = con)
+  }
+}
+
+#' @export
+#' @rdname db-sql
+sql_indent_subquery <- function(from, con, lvl) {
+  multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
+  if (multi_line) {
+    build_sql(
+      "(\n",
+      from, "\n",
+      indent_lvl(")", lvl),
+      con = con
+    )
+  } else {
+    build_sql("(", from, ")", con = con)
   }
 }
 
@@ -208,7 +239,8 @@ sql_query_select <- function(con, select, from, where = NULL,
                              limit = NULL,
                              distinct = FALSE,
                              ...,
-                             subquery = FALSE) {
+                             subquery = FALSE,
+                             lvl = 0) {
   UseMethod("sql_query_select")
 }
 
@@ -220,16 +252,18 @@ sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
                                limit = NULL,
                                distinct = FALSE,
                                ...,
-                               subquery = FALSE) {
+                               subquery = FALSE,
+                               lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    window    = sql_clause_window(con, window),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
-    limit     = sql_clause_limit(con, limit)
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
+    limit     = sql_clause_limit(con, limit),
+    lvl       = lvl
   )
 }
 dbplyr_query_select <- function(con, ...) {
@@ -261,11 +295,11 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
 
 #' @rdname db-sql
 #' @export
-sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   UseMethod("sql_query_join")
 }
 #' @export
-sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -273,80 +307,92 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
     cross = sql("CROSS JOIN"),
-    stop("Unknown join type:", type, call. = FALSE)
+    abort(paste0("Unknown join type: ", type))
   )
 
-  select <- sql_join_vars(con, vars)
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
+
+  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
-  build_sql(
-    "SELECT ", select, "\n",
-    "FROM ", x, "\n",
-    JOIN, " ", y, "\n",
-    if (!is.null(on)) build_sql("ON ", on, "\n", con = con) else NULL,
-    con = con
+  clauses <- list(
+    sql_clause_select(con, select),
+    sql_clause_from(x),
+    sql_clause(JOIN, y),
+    sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
   )
+  sql_format_clauses(clauses, lvl, con)
 }
-dbplyr_query_join <- function(con, ...) {
-  dbplyr_fallback(con, "sql_join", ...)
+dbplyr_query_join <- function(con, ..., lvl = 0) {
+  dbplyr_fallback(con, "sql_join", ..., lvl = lvl)
 }
 #' @export
 #' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ...) {
+sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
   sql_query_join(
     con, x, y, vars,
     type = type,
     by = by,
     na_matches = na_matches,
-    ...
+    ...,
+    lvl = lvl
   )
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ...) {
+sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  lhs <- escape(ident("LHS"), con = con)
-  rhs <- escape(ident("RHS"), con = con)
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+  x <- dbplyr_sql_subquery(con, x, name = by$x_as)
+  y <- dbplyr_sql_subquery(con, y, name = by$y_as)
+
+  lhs <- escape(ident(by$x_as), con = con)
+  rhs <- escape(ident(by$y_as), con = con)
 
   on <- sql_join_tbls(con, by)
 
-  build_sql(
-    "SELECT * FROM ", x, "\n",
-    "WHERE ", if (anti) sql("NOT "), "EXISTS (\n",
-    "  SELECT 1 FROM ", y, "\n",
-    "  WHERE ", on, "\n",
-    ")",
-    con = con
+  lines <- list(
+    build_sql("SELECT * FROM ", x, con = con),
+    build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", y, lvl = 1),
+    # don't use `sql_clause_where()` to avoid wrapping each element in parens
+    sql_clause("WHERE", on, sep = " AND", parens = TRUE, lvl = 1),
+    sql(")")
   )
+  sql_format_clauses(lines, lvl, con)
 }
+
 dbplyr_query_semi_join <- function(con, ...) {
   dbplyr_fallback(con, "sql_semi_join", ...)
 }
 #' @export
 #' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ...) {
-  sql_query_semi_join(con, x, y, anti = anti, by = by, ...)
+sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+  sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ..., all = FALSE) {
+sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE) {
-  build_sql(
-    "(", x, ")",
-    "\n", sql(method), if (all) sql(" ALL"), "\n",
-    "(", y, ")",
-    con = con
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
+  method <- paste0(method, if (all) " ALL")
+  lines <- list(
+    sql_indent_subquery(x, con = con, lvl = lvl),
+    sql(method),
+    sql_indent_subquery(y, con = con, lvl = lvl)
   )
+  sql_format_clauses(lines, lvl, con)
 }
+# nocov start
 dbplyr_query_set_op <- function(con, ...) {
   dbplyr_fallback(con, "sql_set_op", ...)
 }
@@ -356,6 +402,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
   # dplyr::sql_set_op() doesn't have ...
   sql_query_set_op(con, x, y, method)
 }
+# nocov end
 
 
 # dplyr fallbacks ---------------------------------------------------------
@@ -368,7 +415,7 @@ dbplyr_analyze <- function(con, ...) {
 db_analyze.DBIConnection <- function(con, table, ...) {
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
-    return()
+    return() # nocov
   }
   dbExecute(con, sql)
 }
@@ -422,6 +469,6 @@ dbplyr_sql_subquery <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ...) {
-  sql_query_wrap(con, from = from, name = name, ...)
+sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+  sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
 }

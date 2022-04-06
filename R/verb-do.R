@@ -60,9 +60,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
 
     if (utils::packageVersion("dplyr") < "0.7.9") {
-      index <- attr(grouped, "indices")
+      index <- attr(grouped, "indices") # nocov
       # convert from 0-index
-      index <- lapply(index, `+`, 1L)
+      index <- lapply(index, `+`, 1L) # nocov
     } else {
       index <- dplyr::group_rows(grouped)
     }
@@ -108,11 +108,10 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 label_output_dataframe <- function(labels, out, groups) {
   data_frame <- vapply(out[[1]], is.data.frame, logical(1))
   if (any(!data_frame)) {
-    stop(
+    abort(c(
       "Results are not data frames at positions: ",
-      paste(which(!data_frame), collapse = ", "),
-      call. = FALSE
-    )
+      paste(which(!data_frame), collapse = ", ")
+    ))
   }
 
   rows <- vapply(out[[1]], nrow, numeric(1))
@@ -128,7 +127,7 @@ label_output_dataframe <- function(labels, out, groups) {
 
     dplyr::grouped_df(dplyr::bind_cols(labels, out), groups)
   } else {
-    dplyr::rowwise(out)
+    dplyr::rowwise(out) # nocov
   }
 }
 
@@ -137,9 +136,11 @@ label_output_list <- function(labels, out, groups) {
     labels[names(out)] <- out
     dplyr::rowwise(labels)
   } else {
+     # nocov start
     class(out) <- "data.frame"
     attr(out, "row.names") <- .set_row_names(length(out[[1]]))
     dplyr::rowwise(out)
+     # nocov end
   }
 }
 
@@ -147,20 +148,18 @@ named_args <- function(args) {
   # Arguments must either be all named or all unnamed.
   named <- sum(names2(args) != "")
   if (!(named == 0 || named == length(args))) {
-    stop(
-      "Arguments to do() must either be all named or all unnamed",
-      call. = FALSE
+    abort(
+      "Arguments to do() must either be all named or all unnamed"
     )
   }
   if (named == 0 && length(args) > 1) {
-    stop("Can only supply single unnamed argument to do()", call. = FALSE)
+    abort("Can only supply single unnamed argument to do()")
   }
 
   # Check for old syntax
   if (named == 1 && names(args) == ".f") {
-    stop(
-      "do syntax changed in dplyr 0.2. Please see documentation for details",
-      call. = FALSE
+    abort(
+      "do syntax changed in dplyr 0.2. Please see documentation for details"
     )
   }
 

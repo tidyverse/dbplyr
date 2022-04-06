@@ -11,7 +11,7 @@ db_connection_describe(con)
 
 sql_join_suffix(con, ...)
 
-db_sql_render(con, sql, ...)
+db_sql_render(con, sql, ..., cte = FALSE)
 
 dbplyr_edition(con)
 }
@@ -28,9 +28,9 @@ from. It should be a single line, and ideally less than 60 characters wide.
 See below for more details.
 }
 }
-\section{dplyr 2.0.0}{
+\section{dbplyr 2.0.0}{
 
-dplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
+dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
 from dplyr to dbplyr. If you have an existing backend, you'll need to rename
 the following methods.
 \itemize{

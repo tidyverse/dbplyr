@@ -1,7 +1,7 @@
 #' Backend: Hive
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are a scattering of custom translations provided by users.
 #'
@@ -64,6 +64,25 @@ sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
   build_sql(
     "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",
+    con = con
+  )
+}
+
+#' @export
+last_value_sql.Hive <- function(con, x) {
+  translate_sql(last_value(!!x, TRUE), con = con)
+}
+
+#' @export
+sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+  # SQLite does not allow parentheses
+  method <- paste0(method, if (all) " ALL")
+  # `x` and `y` already have the correct indent, so use `build_sql()` instead
+  # of `sql_format_clauses()`
+  build_sql(
+    x, "\n",
+    indent_lvl(method, lvl = lvl), "\n",
+    y,
     con = con
   )
 }

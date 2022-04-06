@@ -7,8 +7,8 @@
 #' * `dbplyr_edition()` declares which version of the dbplyr API you want.
 #'    See below for more details.
 #'
-#' @section dplyr 2.0.0:
-#' dplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
+#' @section dbplyr 2.0.0:
+#' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
 #' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
 #' the following methods.
 #'
@@ -34,10 +34,12 @@ db_desc.DBIConnection <- function(x) {
 db_connection_describe <- function(con) {
   UseMethod("db_connection_describe")
 }
+# nocov start
 #' @export
 db_connection_describe.DBIConnection <- function(con) {
   class(con)[[1]]
 }
+# nocov end
 
 
 #' @rdname db-misc
@@ -52,12 +54,12 @@ sql_join_suffix.DBIConnection <- function(con, ...) {
 
 #' @rdname db-misc
 #' @export
-db_sql_render <- function(con, sql, ...) {
+db_sql_render <- function(con, sql, ..., cte = FALSE) {
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ...) {
-  sql_render(sql, con = con, ...)
+db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE) {
+  sql_render(sql, con = con, ..., cte = cte)
 }
 
 #' @rdname db-misc

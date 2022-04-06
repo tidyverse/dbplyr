@@ -16,12 +16,12 @@ sql <- function(...) {
 
 # c() is also called outside of the dbplyr context so must supply default
 # connection - this seems like a design mistake, and probably an indication
-# that within dbplyr c() should be replace with a more specific function
+# that within dbplyr c() should be replaced with a more specific function
 #' @export
 c.sql <- function(..., drop_null = FALSE, con = simulate_dbi()) {
   input <- list(...)
 
-  if (drop_null) input <- purrr::compact(input)
+  if (drop_null) input <- purrr::compact(input) # nocov
 
   out <- unlist(lapply(input, escape, collapse = NULL, con = con))
   sql(out)
@@ -32,7 +32,7 @@ c.ident <- c.sql
 
 #' @export
 unique.sql <- function(x, ...) {
-  sql(NextMethod())
+  sql(NextMethod()) # nocov
 }
 
 #' @rdname sql
@@ -57,7 +57,7 @@ format.sql <- function(x, ...) {
 #' @rdname sql
 #' @export
 #' @param x Object to coerce
-#' @param con Needed when `x` is directly suppled from the user so that
+#' @param con Needed when `x` is directly supplied from the user so that
 #'   schema specifications can be quoted using the correct identifiers.
 as.sql <- function(x, con) UseMethod("as.sql")
 

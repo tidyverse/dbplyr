@@ -4,13 +4,39 @@
 \alias{mutate.tbl_lazy}
 \title{Create, modify, and delete columns}
 \usage{
-\method{mutate}{tbl_lazy}(.data, ...)
+\method{mutate}{tbl_lazy}(
+  .data,
+  ...,
+  .keep = c("all", "used", "unused", "none"),
+  .before = NULL,
+  .after = NULL
+)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+
+\item{.keep}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Control which columns from \code{.data} are retained in the output. Grouping
+columns and columns created by \code{...} are always kept.
+\itemize{
+\item \code{"all"} retains all columns from \code{.data}. This is the default.
+\item \code{"used"} retains only the columns used in \code{...} to create new
+columns. This is useful for checking your work, as it displays inputs
+and outputs side-by-side.
+\item \code{"unused"} retains only the columns \emph{not} used in \code{...} to create new
+columns. This is useful if you generate new columns, but no longer need
+the columns used to generate them.
+\item \code{"none"} doesn't retain any extra columns from \code{.data}. Only the grouping
+variables and columns created by \code{...} are kept.
+}}
+
+\item{.before, .after}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+<\code{\link[=dplyr_tidy_select]{tidy-select}}> Optionally, control where new columns
+should appear (the default is to add to the right hand side). See
+\code{\link[=relocate]{relocate()}} for more details.}
 }
 \value{
 Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated

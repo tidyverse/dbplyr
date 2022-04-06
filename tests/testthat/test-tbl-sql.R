@@ -22,9 +22,18 @@ test_that("same_src distinguishes srcs", {
 
 test_that("can generate sql tbls with raw sql", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$ops$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
 
   expect_equal(collect(mf1), collect(mf2))
+})
+
+test_that("sql tbl can be printed", {
+  mf1 <- memdb_frame(x = 1:3, y = 3:1)
+  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
+
+  expect_snapshot(mf2, transform = function(x) {
+    gsub("sqlite .* \\[:memory:\\]", "sqlite ?.?.? [:memory:]", x)
+  })
 })
 
 test_that("can refer to default schema explicitly", {
@@ -61,7 +70,7 @@ test_that("check basic group size implementation", {
 # tbl_sum -------------------------------------------------------------------
 
 test_that("ungrouped output", {
-  mf <- memdb_frame(x = 1:5, y = 1:5, .name = "tbl_sum_test")
+  mf <- copy_to_test("sqlite", tibble(x = 1:5, y = 1:5), name = "tbl_sum_test")
 
   out1 <- tbl_sum(mf)
   expect_named(out1, c("Source", "Database"))

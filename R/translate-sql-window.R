@@ -121,7 +121,7 @@ win_reset <- function() {
 }
 
 rows <- function(from = -Inf, to = 0) {
-  if (from >= to) stop("from must be less than to", call. = FALSE)
+  if (from >= to) abort("from must be less than to")
 
   dir <- function(x) if (x < 0) "PRECEDING" else "FOLLOWING"
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
@@ -212,9 +212,8 @@ win_absent <- function(f) {
   force(f)
 
   function(...) {
-    stop(
-      "Window function `", f, "()` is not supported by this database",
-      call. = FALSE
+    abort(
+      paste0("Window function `", f, "()` is not supported by this database")
     )
   }
 }
@@ -307,19 +306,15 @@ local_context <- function(x, env = parent.frame()) {
 # Where translation -------------------------------------------------------
 
 uses_window_fun <- function(x, con) {
-  if (is.null(x)) return(FALSE)
-  if (is.list(x)) {
-    calls <- unlist(lapply(x, all_calls))
-  } else {
-    calls <- all_calls(x)
-  }
+  stopifnot(is.list(x))
 
+  calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
 }
 
 common_window_funs <- function() {
-  ls(dbplyr_sql_translation(NULL)$window)
+  ls(dbplyr_sql_translation(NULL)$window) # nocov
 }
 
 #' @noRd
@@ -356,7 +351,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
 
       }
     },
-    abort(glue("Unknown type: ", typeof(expr)))
+    abort(glue("Unknown type: ", typeof(expr))) # nocov
   )
 }
 

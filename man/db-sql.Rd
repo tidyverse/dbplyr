@@ -4,12 +4,14 @@
 \alias{db-sql}
 \alias{sql_expr_matches}
 \alias{sql_translation}
+\alias{sql_random}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
 \alias{sql_query_explain}
 \alias{sql_query_fields}
 \alias{sql_query_save}
 \alias{sql_query_wrap}
+\alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{sql_query_select}
 \alias{sql_query_join}
@@ -21,6 +23,8 @@ sql_expr_matches(con, x, y)
 
 sql_translation(con)
 
+sql_random(con)
+
 sql_table_analyze(con, table, ...)
 
 sql_table_index(con, table, columns, name = NULL, unique = FALSE, ...)
@@ -31,7 +35,9 @@ sql_query_fields(con, sql, ...)
 
 sql_query_save(con, sql, name, temporary = TRUE, ...)
 
-sql_query_wrap(con, from, name = unique_subquery_name(), ...)
+sql_query_wrap(con, from, name = unique_subquery_name(), ..., lvl = 0)
+
+sql_indent_subquery(from, con, lvl)
 
 sql_query_rows(con, sql, ...)
 
@@ -47,7 +53,8 @@ sql_query_select(
   limit = NULL,
   distinct = FALSE,
   ...,
-  subquery = FALSE
+  subquery = FALSE,
+  lvl = 0
 )
 
 sql_query_join(
@@ -58,12 +65,13 @@ sql_query_join(
   type = "inner",
   by = NULL,
   na_matches = FALSE,
-  ...
+  ...,
+  lvl = 0
 )
 
-sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ...)
+sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
-sql_query_set_op(con, x, y, method, ..., all = FALSE)
+sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 }
 \description{
 SQL translation:
@@ -72,6 +80,8 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
+\item \code{sql_random(con)} generates SQL to get a random number which can be used
+to select random rows in \code{slice_sample()}.
 }
 
 Tables:
@@ -93,6 +103,11 @@ capture field names in \code{\link[=tbl_sql]{tbl_sql()}}
 (temporary) table.
 \item \code{sql_query_wrap(con, from)} generates SQL for wrapping a query into a
 subquery.
+}
+
+Query indentation:
+\itemize{
+\item \code{sql_indent_subquery(from, con, lvl)} helps indenting a subquery.
 }
 
 Query generation:

@@ -5,11 +5,14 @@
     Output
       <SQL>
       SELECT `x`, `y`
-      FROM (SELECT DISTINCT `x`
-      FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
-      FROM `df`) `RHS`
-      
+      FROM (
+        SELECT DISTINCT `x`
+        FROM `df`
+      ) `LHS`
+      CROSS JOIN (
+        SELECT DISTINCT `y`
+        FROM `df`
+      ) `RHS`
 
 # nesting doesn't expand values
 
@@ -38,6 +41,15 @@
       SELECT DISTINCT ROUND(`x` / 2.0, 0) AS `x_half`, `x` + 1.0 AS `x1`
       FROM `df`
 
+# works with tidyr::nesting
+
+    Code
+      df_lazy %>% tidyr::expand(tidyr::nesting(x, y))
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y`
+      FROM `df`
+
 # expand respects groups
 
     Code
@@ -45,12 +57,15 @@
     Output
       <SQL>
       SELECT `LHS`.`a` AS `a`, `b`, `c`
-      FROM (SELECT DISTINCT `a`, `b`
-      FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `a`, `c`
-      FROM `df`) `RHS`
-      ON (`LHS`.`a` = `RHS`.`a`)
-      
+      FROM (
+        SELECT DISTINCT `a`, `b`
+        FROM `df`
+      ) `LHS`
+      LEFT JOIN (
+        SELECT DISTINCT `a`, `c`
+        FROM `df`
+      ) `RHS`
+        ON (`LHS`.`a` = `RHS`.`a`)
 
 # NULL inputs
 
@@ -63,11 +78,29 @@
 
 # expand() errors when expected
 
-    Must supply variables in `...`
+    Code
+      tidyr::expand(memdb_frame(x = 1))
+    Condition
+      Error in `tidyr::expand()`:
+      ! Must supply variables in `...`
 
 ---
 
-    Must supply variables in `...`
+    Code
+      tidyr::expand(memdb_frame(x = 1), x = NULL)
+    Condition
+      Error in `tidyr::expand()`:
+      ! Must supply variables in `...`
+
+# nesting() respects .name_repair
+
+    Code
+      tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
+    Condition
+      Error in `tidyr::expand()`:
+      ! Names must be unique.
+      x These names are duplicated:
+        * "x" at locations 1 and 2.
 
 # replace_na replaces missing values
 
@@ -94,14 +127,23 @@
     Output
       <SQL>
       SELECT `x`, `y`, COALESCE(`z`, 'c') AS `z`
-      FROM (SELECT COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`, COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`, `z`
-      FROM (SELECT `x`, `y`
-      FROM (SELECT DISTINCT `x`
-      FROM `df`) `LHS`
-      LEFT JOIN (SELECT DISTINCT `y`
-      FROM `df`) `RHS`
-      ) `LHS`
-      FULL JOIN `df` AS `RHS`
-      ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      FROM (
+        SELECT
+          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
+          COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`,
+          `z`
+        FROM (
+          SELECT `x`, `y`
+          FROM (
+            SELECT DISTINCT `x`
+            FROM `df`
+          ) `LHS`
+          CROSS JOIN (
+            SELECT DISTINCT `y`
+            FROM `df`
+          ) `RHS`
+        ) `LHS`
+        FULL JOIN `df` AS `RHS`
+          ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       ) `q01`
 

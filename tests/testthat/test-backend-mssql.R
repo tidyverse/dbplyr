@@ -17,6 +17,18 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(substr(x, 1, 2)), sql("SUBSTRING(`x`, 1, 2)"))
   expect_equal(translate_sql(trimws(x)),       sql("LTRIM(RTRIM(`x`))"))
   expect_equal(translate_sql(paste(x, y)),     sql("`x` + ' ' + `y`"))
+  expect_equal(
+    translate_sql(if_else(x, "true", "false", "missing")),
+    sql("CASE WHEN `x` THEN 'true' WHEN NOT `x` THEN 'false' WHEN (`x` IS NULL) THEN 'missing' END")
+  )
+  expect_equal(
+    translate_sql(ifelse(x, "true", "false")),
+    sql("IIF(`x`, 'true', 'false')")
+  )
+  expect_equal(
+    translate_sql(if(x) "true" else "false"),
+    sql("IIF(`x`, 'true', 'false')")
+  )
 
   expect_error(translate_sql(bitwShiftL(x, 2L)), sql("not available"))
   expect_error(translate_sql(bitwShiftR(x, 2L)), sql("not available"))
@@ -45,6 +57,10 @@ test_that("custom aggregators translated correctly", {
   expect_error(translate_sql(cov(x), window = FALSE), "not available")
 
   expect_equal(translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
+  expect_equal(
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
+    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
 })
 
 test_that("custom window functions translated correctly", {
@@ -73,11 +89,15 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(translate_sql(second(x)), sql("DATEPART(SECOND, `x`)"))
   expect_equal(translate_sql(month(x)), sql("DATEPART(MONTH, `x`)"))
   expect_equal(translate_sql(month(x, label = TRUE, abbr = FALSE)), sql("DATENAME(MONTH, `x`)"))
-  expect_error(translate_sql(month(x, abbr = TRUE, abbr = TRUE)))
+  expect_snapshot(error = TRUE, translate_sql(month(x, label = TRUE, abbr = TRUE)))
 
   expect_equal(translate_sql(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
   expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
   expect_error(translate_sql(quarter(x, fiscal_start = 5)))
+})
+
+test_that("last_value_sql() translated correctly", {
+  expect_equal(last_value_sql(simulate_mssql(), "x"), sql("LAST_VALUE(`x`) IGNORE NULLS"))
 })
 
 # verb translation --------------------------------------------------------
@@ -102,13 +122,13 @@ test_that("convert between bit and boolean as needed", {
 
 test_that("handles ORDER BY in subqueries", {
   expect_snapshot(
-    sql_query_select(simulate_mssql(), "x", "y", order_by = "z", subquery = TRUE)
+    sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = "z", subquery = TRUE)
   )
 })
 
 test_that("custom limit translation", {
   expect_snapshot(
-    sql_query_select(simulate_mssql(), "x", "y", order_by = "z", limit = 10)
+    sql_query_select(simulate_mssql(), ident("x"), ident("y"), order_by = ident("z"), limit = 10)
   )
 })
 
@@ -142,6 +162,9 @@ test_that("generates custom sql", {
   # Automatic renaming is handled upstream by db_collect()/db_copy_to()
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+
+  lf <- lazy_frame(x = 1:3, con = simulate_mssql())
+  expect_snapshot(lf %>% slice_sample(x))
 })
 
 # Live database -----------------------------------------------------------

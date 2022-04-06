@@ -1,7 +1,7 @@
 #' Backend: Oracle
 #'
 #' @description
-#' See `vignette("translate-function")` and `vignette("translate-verb")` for
+#' See `vignette("translation-function")` and `vignette("translation-verb")` for
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
@@ -41,20 +41,22 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              limit = NULL,
                              distinct = FALSE,
                              ...,
-                             subquery = FALSE) {
+                             subquery = FALSE,
+                             lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
-    from      = sql_clause_from(con, from),
-    where     = sql_clause_where(con, where),
-    group_by  = sql_clause_group_by(con, group_by),
-    having    = sql_clause_having(con, having),
-    window    = sql_clause_window(con, window),
-    order_by  = sql_clause_order_by(con, order_by, subquery, limit),
+    from      = sql_clause_from(from),
+    where     = sql_clause_where(where),
+    group_by  = sql_clause_group_by(group_by),
+    having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
+    order_by  = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
       build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
-    }
+    },
+    lvl = lvl
   )
 }
 
@@ -67,8 +69,8 @@ sql_translation.Oracle <- function(con) {
 
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
-      # https://docs.oracle.com/cd/E17952_01/mysql-5.7-en/date-and-time-functions.html#function_date
-      as.Date = function(x) sql_expr(DATE(!!x)),
+      # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
+      as.Date = function(x) build_sql("DATE ", x),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -107,20 +109,30 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ...) {
+sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
     build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
   } else {
-    build_sql("(", from, ") ", ident(name %||% unique_subquery_name()), con = con)
+    build_sql(sql_indent_subquery(from, con, lvl), " ", ident(name %||% unique_subquery_name()), con = con)
   }
+}
+
+#' @export
+sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
+  build_sql(
+    "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
+    as.sql(name, con), " AS\n", sql,
+    con = con
+  )
 }
 
 # registered onLoad located in the zzz.R script
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
-  add_op_set_op(x, y, "MINUS", copy = copy, ...)
+  x$lazy_query <- add_set_op(x, y, "MINUS", copy = copy, ...)
+  x
 }
 
 #' @export
