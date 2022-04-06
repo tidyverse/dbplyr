@@ -25,7 +25,7 @@
     Code
       left_join(x, x, by = "x", x_as = NULL)
     Condition
-      Error in `check_join_as()`:
+      Error in `left_join()`:
       ! `x_as` must be a vector, not NULL.
 
 ---
@@ -33,7 +33,7 @@
     Code
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
-      Error in `check_join_as()`:
+      Error in `left_join()`:
       ! `y_as` must have size 1, not size 2.
 
 ---
@@ -60,6 +60,6 @@
     Code
       inner_join(lf1, lf2, by = "x", suffix = "a")
     Condition
-      Error in `check_suffix()`:
+      Error in `inner_join()`:
       ! `suffix` must be a character vector of length 2.
 
