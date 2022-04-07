@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `across()` now works if passing the name of a list of functions to the `.fns`
+  argument (@mgirlich, #817).
+
 * Added translations for lubridate functions `day()`, `week()`, `isoweek()`,
   and `isoyear()` for Postgres (@mgirlich, #675).
 
