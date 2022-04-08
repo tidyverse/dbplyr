@@ -5,6 +5,7 @@
 \alias{sql_expr_matches}
 \alias{sql_translation}
 \alias{sql_returning_cols}
+\alias{sql_random}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
 \alias{sql_query_explain}
@@ -28,6 +29,8 @@ sql_expr_matches(con, x, y)
 sql_translation(con)
 
 sql_returning_cols(con, cols, table, ...)
+
+sql_random(con)
 
 sql_table_analyze(con, table, ...)
 
