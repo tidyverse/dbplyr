@@ -129,7 +129,11 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_na
     if (is.null(name)) {
       build_sql(sql_indent_subquery(from, con, lvl), con = con)
     } else {
-      build_sql(sql_indent_subquery(from, con, lvl), " AS ", ident(name), con = con)
+      ident_name <- name %||% unique_subquery_name()
+      if (!is.ident(ident_name)) {
+        ident_name <- ident(ident_name)
+      }
+      build_sql(sql_indent_subquery(from, con, lvl), " AS ", ident_name, con = con)
     }
   }
 }

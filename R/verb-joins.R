@@ -232,8 +232,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- x_as
-  by$y_as <- y_as
+  by$x_as <- ident(x_as)
+  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y,
@@ -264,8 +264,8 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- x_as
-  by$y_as <- y_as
+  by$x_as <- ident(x_as)
+  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y, copy,

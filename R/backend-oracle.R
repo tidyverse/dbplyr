@@ -110,9 +110,21 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
-    build_sql("(", from, ") ", if (!is.null(name)) ident(name), con = con)
+    if (is.null(name)) {
+      ident_name <- NULL
+    } else if (!is.ident(name)) {
+      ident_name <- ident(name)
+    } else {
+      ident_name <- name
+    }
+    build_sql("(", from, ") ", ident_name, con = con)
   } else {
-    build_sql(sql_indent_subquery(from, con, lvl), " ", ident(name %||% unique_subquery_name()), con = con)
+    ident_name <- name %||% unique_subquery_name()
+    if (!is.ident(ident_name)) {
+      ident_name <- ident(ident_name)
+    }
+
+    build_sql(sql_indent_subquery(from, con, lvl), " ", ident_name, con = con)
   }
 }
 
