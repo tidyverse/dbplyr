@@ -144,6 +144,7 @@ sql_named_cols <- function(con, cols, table = NULL) {
 }
 
 #' @export
+#' @rdname db-sql
 sql_random <- function(con) {
   UseMethod("sql_random")
 }
