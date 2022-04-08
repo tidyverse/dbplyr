@@ -64,7 +64,7 @@ rows_insert.tbl_lazy <- function(x,
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
       returned_rows <- anti_join(y, x, by = by) %>%
         union_all(x %>% filter(0 == 1)) %>%
-        select(all_of(returning_cols)) %>%
+        select(!!!returning_cols) %>%
         collect()
       out <- set_returned_rows(out, returned_rows)
     }
