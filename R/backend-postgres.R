@@ -107,6 +107,33 @@ sql_translation.PqConnection <- function(con) {
       },
 
       # lubridate functions
+      # https://www.postgresql.org/docs/9.1/functions-datetime.html
+      day = function(x) {
+        sql_expr(EXTRACT(DAY %FROM% !!x))
+      },
+      mday = function(x) {
+        sql_expr(EXTRACT(DAY %FROM% !!x))
+      },
+      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        if (!label) {
+          week_start <- week_start %||% getOption("lubridate.week.start", 7)
+          offset <- as.integer(7 - week_start)
+          sql_expr(EXTRACT("dow" %FROM% DATE(!!x) + !!offset) + 1)
+        } else if (label && !abbr) {
+          sql_expr(TO_CHAR(!!x, "Day"))
+        } else if (label && abbr) {
+          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
+        } else {
+          abort("Unrecognized arguments to `wday`")
+        }
+      },
+      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
+      week = function(x) {
+        sql_expr(FLOOR ((EXTRACT(DOY %FROM% !!x) - 1L) / 7L) + 1L)
+      },
+      isoweek = function(x) {
+        sql_expr(EXTRACT(WEEK %FROM% !!x))
+      },
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
           sql_expr(EXTRACT(MONTH %FROM% !!x))
@@ -129,20 +156,9 @@ sql_translation.PqConnection <- function(con) {
           sql_expr(EXTRACT(QUARTER %FROM% !!x))
         }
       },
-      wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
-        if (!label) {
-          week_start <- week_start %||% getOption("lubridate.week.start", 7)
-          offset <- as.integer(7 - week_start)
-          sql_expr(EXTRACT("dow" %FROM% DATE(!!x) + !!offset) + 1)
-        } else if (label && !abbr) {
-          sql_expr(TO_CHAR(!!x, "Day"))
-        } else if (label && abbr) {
-          sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
-        } else {
-          abort("Unrecognized arguments to `wday`")
-        }
+      isoyear = function(x) {
+        sql_expr(EXTRACT(YEAR %FROM% !!x))
       },
-      yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
 
       # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
       seconds = function(x) {

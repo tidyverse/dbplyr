@@ -113,8 +113,9 @@ dbplyr_pivot_longer_spec <- function(data,
 
   spec_split <- vctrs::vec_split(spec, spec[, -(1:2)])
 
+  call <- current_env()
   value_names <- unique(spec$.value)
-  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform")
+  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform", call)
 
   nms_map <- tibble(
     name = colnames(spec_split$key),
@@ -137,7 +138,8 @@ dbplyr_pivot_longer_spec <- function(data,
         row[[".name"]],
         row[[".value"]],
         values_transform,
-        data = data
+        data = data,
+        call = call
       )
 
       transmute(
@@ -166,7 +168,7 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform, data) {
+get_measure_column_exprs <- function(name, value, values_transform, data, call) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
@@ -176,7 +178,7 @@ get_measure_column_exprs <- function(name, value, values_transform, data) {
       if (is_null(f_trans)) {
         .x
       } else {
-        resolve_fun(f_trans, .x, data)
+        resolve_fun(f_trans, .x, data, call)
       }
     }
   )
@@ -252,7 +254,7 @@ deduplicate_spec <- function(spec, df) {
   spec
 }
 
-check_list_of_functions <- function(x, names, arg) {
+check_list_of_functions <- function(x, names, arg, call = caller_env()) {
   # mostly COPIED FROM tidyr
   if (is.null(x)) {
     x <- set_names(list(), character())
@@ -263,11 +265,11 @@ check_list_of_functions <- function(x, names, arg) {
   }
 
   if (length(x) > 0L && !is_named(x)) {
-    abort(glue("All elements of `{arg}` must be named."))
+    abort(glue("All elements of `{arg}` must be named."), call = call)
   }
 
   if (vctrs::vec_duplicate_any(names(x))) {
-    abort(glue("The names of `{arg}` must be unique."))
+    abort(glue("The names of `{arg}` must be unique."), call = call)
   }
 
   # Silently drop user supplied names not found in the data

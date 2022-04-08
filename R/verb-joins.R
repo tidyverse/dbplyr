@@ -242,7 +242,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
-  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
+  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = caller_env())
 
   lazy_join_query(
     x, y,
@@ -257,7 +257,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                              auto_index = FALSE, na_matches = "never",
                              x_as = "LHS", y_as = "RHS") {
-  check_join_as(x_as, y_as)
+  check_join_as(x_as, y_as, call = caller_env())
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -281,19 +281,19 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
 }
 
 check_join_as <- function(x_as, y_as, call) {
-  vctrs::vec_assert(x_as, character(), size = 1)
-  vctrs::vec_assert(y_as, character(), size = 1)
+  vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
+  vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
   if (x_as == y_as) {
     abort("`y_as` must be different from `x_as`.", call = call)
   }
 }
 
-join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
+join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
   # Add suffix where needed
-  suffix <- check_suffix(suffix)
+  suffix <- check_suffix(suffix, call)
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
 
@@ -321,9 +321,9 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   )
 }
 
-check_suffix <- function(x) {
+check_suffix <- function(x, call) {
   if (!is.character(x) || length(x) != 2) {
-    abort("`suffix` must be a character vector of length 2.")
+    abort("`suffix` must be a character vector of length 2.", call = call)
   }
 
   list(x = x[1], y = x[2])

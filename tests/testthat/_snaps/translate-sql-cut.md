@@ -4,7 +4,7 @@
       (expect_error(translate_sql(cut(x, 1:3, labels = c("a", "b", "c")))))
     Output
       <error/vctrs_error_incompatible_size>
-      Error in `check_cut_labels()`:
+      Error in `cut()`:
       ! Can't recycle `labels` (size 3) to size 2.
 
 # cut checks arguments
