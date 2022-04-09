@@ -245,7 +245,7 @@ sql_values_clause <- function(con, df, row = FALSE, derived = FALSE, lvl = 0) {
     rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
   }
 
-  union_query <- set_op_query(null_row_query, rows_query, type = "UNION ALL")
+  union_query <- set_op_query(null_row_query, rows_query, type = "UNION", all = TRUE)
   subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
 
   typed_cols <- purrr::map2_chr(
