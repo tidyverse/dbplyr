@@ -56,7 +56,7 @@
           WHERE (0 = 1)
         )
         UNION ALL
-        (  VALUES ROW(1.0, 'a'))
+        (VALUES ROW(1.0, 'a'))
       ) `values_table`
 
 # can explain
