@@ -210,3 +210,23 @@
       ) `q01`
       WHERE (`q01` <= 1)
 
+---
+
+    Code
+      sql_values(con, tibble(x = 1:2, y = letters[1:2]))
+    Output
+      <SQL> SELECT
+        TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT) AS `x`,
+        TRY_CAST(`y` AS VARCHAR(MAX)) AS `y`
+      FROM (
+        (
+          SELECT NULL AS `x`, NULL AS `y`
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (
+          SELECT *
+          FROM (VALUES (1, 'a'), (2, 'b')) drvd(`x`, `y`)
+        )
+      ) `values_table`
+

@@ -182,7 +182,7 @@ sql_values.SQLiteConnection <- function(con, df, lvl = 0, ...) {
     sql_values_clause(con = con, lvl = lvl)
 }
 
-sql_values_clause <- function(con, df, row = FALSE, lvl = 0) {
+sql_values_clause <- function(con, df, row = FALSE, derived = FALSE, lvl = 0) {
   if (nrow(df) == 0L) {
     typed_cols <- purrr::map_chr(
       vctrs::vec_init(df),
@@ -227,11 +227,25 @@ sql_values_clause <- function(con, df, row = FALSE, lvl = 0) {
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
   rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
 
-  union_query <- set_op_query(
-    null_row_query,
-    sql_format_clauses(list(sql_clause("VALUES", rows_sql)), lvl = lvl + 1, con = con),
-    type = "UNION ALL",
-  )
+  rows_clauses <- list(sql_clause("VALUES", rows_sql))
+
+  if (derived) {
+    rows_query <- sql_format_clauses(rows_clauses, lvl = 0, con = con)
+
+    derived_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
+
+    rows_query <- sql_query_select(
+      con,
+      sql("*"),
+      # sql_subquery() can't use sql() or ident_q() as `name` argument
+      build_sql(sql_indent_subquery(rows_query, con, lvl + 2), " ", derived_sql, con = con),
+      lvl = lvl + 2
+    )
+  } else {
+    rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+  }
+
+  union_query <- set_op_query(null_row_query, rows_query, type = "UNION ALL")
   subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
 
   typed_cols <- purrr::map2_chr(
