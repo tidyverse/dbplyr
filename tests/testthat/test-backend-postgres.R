@@ -51,10 +51,15 @@ test_that("postgres mimics two argument log", {
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_postgres())
 
+  expect_equal(translate_sql(day(x)), sql("EXTRACT(DAY FROM `x`)"))
+  expect_equal(translate_sql(mday(x)), sql("EXTRACT(DAY FROM `x`)"))
   expect_equal(translate_sql(yday(x)), sql("EXTRACT(DOY FROM `x`)"))
+  expect_equal(translate_sql(week(x)), sql("FLOOR((EXTRACT(DOY FROM `x`) - 1) / 7) + 1"))
+  expect_equal(translate_sql(isoweek(x)), sql("EXTRACT(WEEK FROM `x`)"))
   expect_equal(translate_sql(quarter(x)), sql("EXTRACT(QUARTER FROM `x`)"))
   expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
   expect_error(translate_sql(quarter(x, fiscal_start = 2)))
+  expect_equal(translate_sql(isoyear(x)), sql("EXTRACT(YEAR FROM `x`)"))
 
   expect_equal(translate_sql(seconds(x)), sql("CAST('`x` seconds' AS INTERVAL)"))
   expect_equal(translate_sql(minutes(x)), sql("CAST('`x` minutes' AS INTERVAL)"))

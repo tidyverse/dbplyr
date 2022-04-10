@@ -1,5 +1,13 @@
 # dbplyr (development version)
 
+* Added translations for lubridate functions `day()`, `week()`, `isoweek()`,
+  and `isoyear()` for Postgres (@mgirlich, #675).
+
+* Fix `union()` translation for Hive (@mgirlich, #663).
+
+* Fix translation of `as.Date()` for Oracle (@mgirlich, #661).
+
+* Added translation for `cut()` (@mgirlich, #697).
 
 * Fix translation of `str_flatten()` for Redshift (@hdplsa, #804) 
 

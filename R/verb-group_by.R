@@ -36,7 +36,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
     abort("`.drop` is not supported with database backends")
   }
 
-  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())
   names <- purrr::map_chr(groups$groups, as_string)
 
   same_groups <- setequal(groups$group_names, group_vars(.data))
