@@ -14,7 +14,6 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translation-verb")` describes how entire verbs are translated.
 
-
 ```{r, message = FALSE}
 library(dbplyr)
 library(dplyr)
@@ -131,14 +130,67 @@ translate_sql(switch(x, a = 1L, b = 2L, 3L))
 
 ## Unknown functions
 
-Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via `translate_sql()`. Here a couple of examples that will work with [SQLite](https://www.sqlite.org/lang_corefunc.html):
+Any function that dplyr doesn't know how to convert is left as is. This means that database functions that are not covered by dplyr can often be used directly via `translate_sql()`. 
+
+### Prefix functions
+
+Any function that dbplyr doesn't know about will be left as is:
 
 ```{r}
-translate_sql(glob(x, y))
-translate_sql(x %like% "ab%")
+translate_sql(foofify(x, y))
 ```
 
-See `vignette("sql")` for more details.
+Because SQL functions are general case insensitive, I recommend using upper case when you're using SQL functions in R code. That makes it easier to spot that you're doing something unusual:
+
+```{r}
+translate_sql(FOOFIFY(x, y))
+```
+
+### Infix functions
+
+As well as prefix functions (where the name of the function comes before the arguments), dbplyr also translates infix functions. That allows you to use expressions like `LIKE` which does a limited form of pattern matching:
+
+```{r}
+translate_sql(x %LIKE% "%foo%")
+```
+
+Or use `||` for string concatenation (although most backends will translate `paste()` and `paste0()` for you):
+
+```{r}
+translate_sql(x %||% y)
+```
+
+### Special forms
+
+SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can't be translated directly from R code. To insert these in your own queries, you can use literal SQL inside `sql()`:
+
+```{r}
+translate_sql(sql("x!"))
+translate_sql(x == sql("ANY VALUES(1, 2, 3)"))
+```
+
+This gives you a lot of freedom to generate the SQL you need: 
+
+```{r}
+mf <- memdb_frame(x = 1, y = 2)
+
+mf %>% 
+  transmute(factorial = sql("x!")) %>% 
+  show_query()
+
+mf %>% 
+  transmute(factorial = sql("CAST(x AS FLOAT)")) %>% 
+  show_query()
+```
+
+### Error for unknown translations
+
+If needed, you can also force dbplyr to error if it doesn't know how to translate a function with the `dplyr.strict_sql` option:
+
+```{r, error = TRUE}
+options(dplyr.strict_sql = TRUE)
+translate_sql(glob(x, y))
+```
 
 ## Window functions
 
