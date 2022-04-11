@@ -37,8 +37,3 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 # Link to full list: https://docs.snowflake.com/en/sql-reference/sql-all.html
 #' @export
 sql_table_analyze.Snowflake <- function(con, table, ...) {}
-
-#' @export
-supports_window_clause.SnowFlake <- function(con) {
-  FALSE
-}

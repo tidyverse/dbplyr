@@ -78,11 +78,6 @@ db_connection_describe.OdbcConnection <- function(con) {
     "/", info$dbname, "]"
   )
 }
-
-#' @export
-supports_window_clause.OdbcConnection <- function(con) {
-  FALSE
-}
 # nocov end
 
 utils::globalVariables("EXP")

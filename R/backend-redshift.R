@@ -116,9 +116,4 @@ sql_query_explain.Redshift <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
-#' @export
-supports_window_clause.Redshift <- function(con) {
-  FALSE
-}
-
 utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))

@@ -52,8 +52,3 @@ sql_table_analyze.Impala <- function(con, table, ...) {
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
   build_sql("COMPUTE STATS ", as.sql(table, con = con), con = con)
 }
-
-#' @export
-supports_window_clause.Impala <- function(con) {
-  FALSE
-}
