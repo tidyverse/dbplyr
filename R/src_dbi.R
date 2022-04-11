@@ -78,6 +78,7 @@
 #'   summarise(n = n()) %>%
 #'   show_query()
 #' }
+#' @importFrom dplyr tbl
 #' @aliases tbl_dbi
 tbl.src_dbi <- function(src, from, ...) {
   subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
