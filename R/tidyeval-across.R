@@ -28,8 +28,24 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
   if (is.null(funs)) {
     fns <- list(`1` = function(x, ...) x)
     names_spec <- names_spec %||% "{.col}"
+  } else if (is_quosure(funs)) {
+    return(across_funs(quo_squash(funs), env, data, dots, names_spec, fn, evaluated = evaluated))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
+    is_local_list <- function(funs) {
+      if (!is_symbol(funs)) {
+        return(FALSE)
+      }
+
+      funs <- as_name(funs)
+      exists(funs, env) && is.list(get(funs, envir = env))
+    }
+
+    if (is_local_list(funs)) {
+      funs <- eval(funs, env)
+      return(across_funs(funs, env, data, dots, names_spec, fn, evaluated = evaluated))
+    }
+
     fns <- list(`1` = across_fun(funs, env, data, dots = dots, fn = fn))
     names_spec <- names_spec %||% "{.col}"
   } else if (is_call(funs, "list")) {
