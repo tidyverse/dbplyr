@@ -321,6 +321,50 @@ test_that("across() translates evaluated lists", {
   )
 })
 
+test_that("across() translates evaluated quosures", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, !!quo(list(log)))),
+    exprs(
+      a_1 = log(a),
+      b_1 = log(b)
+    )
+  )
+
+  expect_equal(
+    capture_across(lf, across(a:b, !!quo(~ log(.x, 2)))),
+    exprs(
+      a = log(a, 2),
+      b = log(b, 2)
+    )
+  )
+
+  expect_equal(
+    capture_across(lf, across(a:b, !!quo(list(log2 = ~ log(.x, 2))))),
+    exprs(
+      a_log2 = log(a, 2),
+      b_log2 = log(b, 2)
+    )
+  )
+})
+
+test_that("across() searches for list in environment", {
+  lf <- lazy_frame(a = 1, b = 2)
+  list_formula <- list(~ log(.x), sum)
+
+  expect_equal(
+    capture_across(lf, across(a:b, list_formula)),
+    exprs(
+      a_1 = log(a),
+      a_2 = sum(a),
+      b_1 = log(b),
+      b_2 = sum(b)
+    )
+  )
+})
+
+
 # if_all ------------------------------------------------------------------
 
 test_that("if_all() translates functions", {
