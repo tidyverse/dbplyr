@@ -240,11 +240,6 @@ supports_window_clause.DBIConnection <- function(con) {
   FALSE
 }
 
-#' @export
-supports_window_clause.TestConnection <- function(con) {
-  TRUE
-}
-
 
 # Query generation --------------------------------------------------------
 
