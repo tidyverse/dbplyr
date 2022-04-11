@@ -35,7 +35,7 @@ sql_query_fields(con, sql, ...)
 
 sql_query_save(con, sql, name, temporary = TRUE, ...)
 
-sql_query_wrap(con, from, name = unique_subquery_name(), ..., lvl = 0)
+sql_query_wrap(con, from, name = NULL, ..., lvl = 0)
 
 sql_indent_subquery(from, con, lvl)
 

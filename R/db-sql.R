@@ -185,11 +185,11 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 }
 #' @export
 #' @rdname db-sql
-sql_query_wrap <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
   UseMethod("sql_query_wrap")
 }
 #' @export
-sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else if (is.schema(from)) {
