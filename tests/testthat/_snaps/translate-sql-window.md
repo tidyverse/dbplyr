@@ -107,7 +107,7 @@
         `win1` AS (PARTITION BY `part`),
         `win2` AS (PARTITION BY `part` ORDER BY `ord` DESC ROWS UNBOUNDED PRECEDING)
 
----
+# name windows only if supported
 
     Code
       lf2 %>% mutate(across(c(col1, col2), sum, na.rm = TRUE), across(c(col3, col4),

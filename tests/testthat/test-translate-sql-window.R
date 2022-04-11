@@ -167,7 +167,8 @@ test_that("names windows automatically", {
     col3 = runif(3),
     col4 = runif(3),
     part = c("a", "a", "b"),
-    ord = 3:1
+    ord = 3:1,
+    con = simulate_sqlite()
   ) %>%
     group_by(part) %>%
     window_order(ord)
@@ -198,7 +199,9 @@ test_that("names windows automatically", {
         col4 = order_by(desc(ord), cumsum(col4))
       )
   )
+})
 
+test_that("name windows only if supported", {
   lf2 <- lazy_frame(
     col1 = runif(3),
     col2 = runif(3),
