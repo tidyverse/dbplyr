@@ -25,7 +25,7 @@ library(dplyr)
 translate_sql((x + y) / 2)
 ```
 
-`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translate_env()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details.  You can use the various simulate helpers to see the translations used by different backends:
+`translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translation()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details.  You can use the various simulate helpers to see the translations used by different backends:
 
 ```{r}
 translate_sql(x ^ 2L)
