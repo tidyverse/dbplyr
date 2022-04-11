@@ -78,7 +78,6 @@
 #'   summarise(n = n()) %>%
 #'   show_query()
 #' }
-#' @importFrom dplyr tbl
 #' @aliases tbl_dbi
 tbl.src_dbi <- function(src, from, ...) {
   subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
@@ -88,6 +87,10 @@ tbl.src_dbi <- function(src, from, ...) {
 # Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi().
 # The former may query the database for column names if `vars` is omitted,
 # the latter always requires `vars`.
+tbl <- function(...) {
+  abort("Use `tbl_src_dbi()` instead")
+}
+
 tbl_src_dbi <- function(src, from, vars) {
   subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
   tbl_sql_impl(c(subclass, "dbi"), src, from, vars)
