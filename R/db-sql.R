@@ -139,8 +139,8 @@ sql_named_cols <- function(con, cols, table = NULL) {
   nms[nms == cols] <- ""
 
   cols <- sql_table_prefix(con, cols, table)
-  cols <- set_names(cols, nms)
-  escape(ident_q(cols), collapse = NULL, con = con)
+  cols <- set_names(ident_q(cols), nms)
+  escape(cols, collapse = NULL, con = con)
 }
 
 #' @export
