@@ -203,12 +203,15 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
 
   # translate once just to register windows
   win_register_activate()
+  # Remove known windows before building the next query
+  on.exit(win_reset(), add = TRUE)
+  on.exit(win_register_deactivate(), add = TRUE)
   select_sql <- translate_select_sql(con, select)
+  win_register_deactivate()
 
   named_windows <- win_register_names()
   if (nrow(named_windows) > 0 && supports_window_clause(con)) {
     # need to translate again and use registered windows names
-    win_register_deactivate()
     select_sql <- translate_select_sql(con, select)
 
     # build window sql
@@ -217,10 +220,6 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   } else {
     window_sql <- character()
   }
-
-  # Remove known windows before building the next query
-  win_reset()
-  win_register_deactivate()
 
   list(
     select_sql = select_sql,
