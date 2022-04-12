@@ -195,14 +195,23 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
   } else if (is.schema(from)) {
     setNames(as.sql(from, con), name)
   } else {
-    ident_name <- ident(name %||% unique_subquery_name())
-    build_sql(sql_indent_subquery(from, con, lvl), " ", ident_name, con = con)
+    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
+  }
+}
+
+as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
+  if (is.ident(x)) {
+    x
+  } else if (is.null(x)) {
+    default
+  } else {
+    ident(x)
   }
 }
 
 #' @export
 #' @rdname db-sql
-sql_indent_subquery <- function(from, con, lvl) {
+sql_indent_subquery <- function(from, con, lvl = 0) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
   if (multi_line) {
     build_sql(
@@ -378,7 +387,7 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   method <- paste0(method, if (all) " ALL")
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
