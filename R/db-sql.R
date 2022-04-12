@@ -527,10 +527,10 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("RETURNING ", sql_escape_ident(con, x_name), ".*"))
+    sql(paste0("RETURNING ", escape(x_name, con = con), ".*"))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
-  update_name <- sql(sql_escape_ident(con, "updated"))
+  update_name <- sql(escape(ident("updated"), con = con))
 
   join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"))
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
