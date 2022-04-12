@@ -165,6 +165,9 @@ test_that("generates custom sql", {
 
   lf <- lazy_frame(x = 1:3, con = simulate_mssql())
   expect_snapshot(lf %>% slice_sample(x))
+
+  expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
+  expect_snapshot(sql_values(con, trees))
 })
 
 test_that("`sql_query_update_from()` is correct", {

@@ -34,7 +34,7 @@ test_that("generates custom sql", {
 
   expect_snapshot(slice_sample(lf, 5))
 
-  expect_snapshot(sql_values(con, tibble(x = 1, y = "a")))
+  expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
 })
 
 test_that("`sql_query_rows_update()` is correct", {

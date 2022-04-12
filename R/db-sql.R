@@ -254,6 +254,8 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
       con = con
     )
   } else {
+    # Strip indent
+    from <- gsub("^ +", "", from)
     build_sql("(", from, ")", con = con)
   }
 }
