@@ -117,7 +117,7 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></code></pre></div>
-<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_translate_env()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details. You can use the various simulate helpers to see the translations used by different backends:</p>
+<p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code> parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses <code><a href="../reference/db-sql.html">sql_translation()</a></code> to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details. You can use the various simulate helpers to see the translations used by different backends:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">^</span> <span class="fl">2L</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; POWER(`x`, 2)</span>
@@ -264,13 +264,68 @@
 <div class="section level2">
 <h2 id="unknown-functions">Unknown functions<a class="anchor" aria-label="anchor" href="#unknown-functions"></a>
 </h2>
-<p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>. Here a couple of examples that will work with <a href="https://www.sqlite.org/lang_corefunc.html" class="external-link">SQLite</a>:</p>
+<p>Any function that dplyr doesn’t know how to convert is left as is. This means that database functions that are not covered by dplyr can often be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>.</p>
+<div class="section level3">
+<h3 id="prefix-functions">Prefix functions<a class="anchor" aria-label="anchor" href="#prefix-functions"></a>
+</h3>
+<p>Any function that dbplyr doesn’t know about will be left as is:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">glob</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; glob(`x`, `y`)</span>
-<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%like%</span> <span class="st">"ab%"</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; `x` like 'ab%'</span></code></pre></div>
-<p>See <code><a href="../articles/sql.html">vignette("sql")</a></code> for more details.</p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; foofify(`x`, `y`)</span></code></pre></div>
+<p>Because SQL functions are general case insensitive, I recommend using upper case when you’re using SQL functions in R code. That makes it easier to spot that you’re doing something unusual:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">FOOFIFY</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; FOOFIFY(`x`, `y`)</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="infix-functions">Infix functions<a class="anchor" aria-label="anchor" href="#infix-functions"></a>
+</h3>
+<p>As well as prefix functions (where the name of the function comes before the arguments), dbplyr also translates infix functions. That allows you to use expressions like <code>LIKE</code> which does a limited form of pattern matching:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; `x` LIKE '%foo%'</span></code></pre></div>
+<p>Or use <code>||</code> for string concatenation (although most backends will translate <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code> for you):</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%||%</span> <span class="va">y</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; `x` || `y`</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="special-forms">Special forms<a class="anchor" aria-label="anchor" href="#special-forms"></a>
+</h3>
+<p>SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can’t be translated directly from R code. To insert these in your own queries, you can use literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; x!</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"ANY VALUES(1, 2, 3)"</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; `x` = ANY VALUES(1, 2, 3)</span></code></pre></div>
+<p>This gives you a lot of freedom to generate the SQL you need:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+
+<span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt;</span>
+<span class="co">#&gt; SELECT x! AS `factorial`</span>
+<span class="co">#&gt; FROM `dbplyr_001`</span>
+
+<span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt;</span>
+<span class="co">#&gt; SELECT CAST(x AS FLOAT) AS `factorial`</span>
+<span class="co">#&gt; FROM `dbplyr_001`</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="error-for-unknown-translations">Error for unknown translations<a class="anchor" aria-label="anchor" href="#error-for-unknown-translations"></a>
+</h3>
+<p>If needed, you can also force dbplyr to error if it doesn’t know how to translate a function with the <code>dplyr.strict_sql</code> option:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>dplyr.strict_sql <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">glob</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `glob()`:</span></span>
+<span class="co">#&gt; <span style="color: #BBBB00;">!</span> Don't know how to translate glob()</span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="window-functions">Window functions<a class="anchor" aria-label="anchor" href="#window-functions"></a>
@@ -293,7 +348,7 @@
 </li>
 </ul>
 <p>To see how individual window functions are translated to SQL, we can again use <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span>
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>
@@ -303,7 +358,7 @@
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></code></pre></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the “partition by” and “order by” clauses. For interactive exploration, you can achieve the same effect by setting the <code>vars_group</code> and <code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/cumall.html" class="external-link">cummean</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span>, vars_order <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span>
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="op">)</span>, vars_group <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span>
@@ -315,7 +370,7 @@
 <li><p>Aggregates implemented in dplyr (<code>lead</code>, <code>lag</code>, <code>nth_value</code>, <code>first_value</code>, <code>last_value</code>) have an <code>order_by</code> argument. Supply it to override the default ordering.</p></li>
 </ul>
 <p>The three options are illustrated in the snippet below:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">players</span>,
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">min_rank</a></span><span class="op">(</span><span class="va">yearID</span><span class="op">)</span>,
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/order_by.html" class="external-link">order_by</a></span><span class="op">(</span><span class="va">yearID</span>, <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>,
