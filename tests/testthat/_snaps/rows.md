@@ -35,7 +35,7 @@
 # `sql_query_insert()` works
 
     Code
-      sql_query_insert(con = simulate_sqlite(), x_name = ident("df_x"), y = df_y, by = c(
+      sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
         "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
@@ -43,13 +43,13 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) AS `...y`
+      ) `...y`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 ---
 
     Code
-      sql_query_insert(con = simulate_sqlite(), x_name = ident("df_x"), y = df_y, by = c(
+      sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
         "a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
@@ -57,7 +57,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) AS `...y`
+      ) `...y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
         WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
@@ -122,19 +122,18 @@
 # `sql_query_update_from()` works
 
     Code
-      sql_query_update_from(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      sql_query_update_from(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
       by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
       SET `c` = COALESCE(`df_x`.`c`, `...y`.`c`), `d` = `...y`.`d`
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
-      FROM `df_x`
-      INNER JOIN (
+      FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
       ) `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+      WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # `rows_patch()` returns early if no column to update
 

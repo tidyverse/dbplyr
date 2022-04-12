@@ -133,14 +133,14 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
 test_that("`sql_query_insert()` works", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = simulate_dbi(),
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_sqlite(),
+      con = simulate_dbi(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
@@ -151,7 +151,7 @@ test_that("`sql_query_insert()` works", {
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_sqlite(),
+      con = simulate_dbi(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
@@ -316,14 +316,14 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 test_that("`sql_query_update_from()` works", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = simulate_dbi(),
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_update_from(
-      con = simulate_mssql(),
+      con = simulate_dbi(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
