@@ -459,7 +459,7 @@ sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c
   if (conflict == "error") {
     conflict_clauses <- list()
   } else {
-    join_by <- list(x = by, y = by, x_as = x_name, y_as = "...y")
+    join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
     where <- sql_join_tbls(con, by = join_by, na_matches = "never")
     conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
   }
@@ -517,7 +517,7 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
                                            returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
-  update_values <- sql_table_prefix(con, update_cols, "...y")
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
@@ -530,7 +530,7 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(sql_escape_ident(con, "updated"))
 
-  join_by <- list(x = by, y = by, x_as = "updated", y_as = "...y")
+  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"))
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)

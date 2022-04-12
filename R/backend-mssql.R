@@ -113,9 +113,9 @@ simulate_mssql <- function(version = "15.0") {
                                                     returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, "excluded")
+  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
+  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
 
   clauses <- list(
     sql_clause("MERGE INTO", x_name),
@@ -380,7 +380,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
   stopifnot(table %in% c("DELETED", "INSERTED"))
-  returning_cols <- sql_named_cols(con, cols, table = table)
+  returning_cols <- sql_named_cols(con, cols, table = ident(table))
 
   sql_clause("OUTPUT", returning_cols)
 }

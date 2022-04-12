@@ -107,7 +107,7 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
     con <- remote_con(x)
     update_cols <- setdiff(colnames(y), by)
     update_values <- set_names(
-      sql_table_prefix(con, update_cols, "...y"),
+      sql_table_prefix(con, update_cols, ident("...y")),
       update_cols
     )
 
@@ -180,7 +180,7 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
       sql_table_prefix(con, update_cols, name),
-      sql_table_prefix(con, update_cols, "...y")
+      sql_table_prefix(con, update_cols, ident("...y"))
     )
     update_values <- set_names(update_values, update_cols)
 
@@ -581,7 +581,7 @@ target_table_name <- function(x, in_place) {
 }
 
 rows_prep <- function(con, x_name, y, by, lvl = 0) {
-  y_name <- "...y"
+  y_name <- ident("...y")
   from <- dbplyr_sql_subquery(con,
     sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
     name = y_name,

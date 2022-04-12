@@ -259,7 +259,7 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, "excluded"),
+    sql_table_prefix(con, update_cols, ident("excluded")),
     update_cols
   )
   update_cols <- sql_escape_ident(con, update_cols)

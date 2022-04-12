@@ -65,9 +65,9 @@ sql_query_upsert.Oracle <- function(con, x_name, y, by,
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, "excluded")
+  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, "...y")
+  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
 
   clauses <- list(
     sql_clause("MERGE INTO", x_name),
