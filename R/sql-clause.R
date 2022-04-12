@@ -95,11 +95,11 @@ sql_clause_set <- function(lhs, rhs) {
   sql_clause("SET", update_clauses)
 }
 
-sql_clause_insert <- function(cols, into = NULL, lvl = 0) {
+sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
   if (is.null(into)) {
     sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
   } else {
-    kw <- paste0("INSERT INTO ", into)
+    kw <- paste0("INSERT INTO ", escape(into, con = con))
     sql_clause(kw, cols, lvl = lvl)
   }
 }

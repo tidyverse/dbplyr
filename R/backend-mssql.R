@@ -124,7 +124,7 @@ simulate_mssql <- function(version = "15.0") {
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(update_cols_esc, lvl = 1),
+    sql_clause_insert(con, update_cols_esc, lvl = 1),
     sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")

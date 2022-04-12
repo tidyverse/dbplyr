@@ -466,7 +466,7 @@ sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c
     conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
   }
   clauses <- list2(
-    sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
+    sql_clause_insert(con, insert_cols, x_name),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!conflict_clauses,
@@ -540,7 +540,7 @@ sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause_insert(insert_cols, sql_escape_ident(con, x_name)),
+    sql_clause_insert(con, insert_cols, x_name),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE)
