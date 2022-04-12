@@ -317,6 +317,12 @@ mssql_version <- function(con) {
 }
 
 #' @export
+`sql_values.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
+  # https://docs.microsoft.com/en-us/sql/t-sql/queries/table-value-constructor-transact-sql
+  sql_values_clause(con, df, derived = TRUE, lvl = lvl)
+}
+
+#' @export
 `sql_random.Microsoft SQL Server` <- function(con) {
   sql_expr(RAND())
 }
