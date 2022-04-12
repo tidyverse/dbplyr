@@ -230,7 +230,7 @@ sql_values_clause <- function(con, df, row = FALSE, derived = FALSE, lvl = 0) {
   rows_clauses <- list(sql_clause("VALUES", rows_sql))
 
   if (derived) {
-    rows_query <- sql_format_clauses(rows_clauses, lvl = 0, con = con)
+    rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 3, con = con)
 
     derived_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
 

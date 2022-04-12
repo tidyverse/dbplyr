@@ -167,6 +167,7 @@ test_that("generates custom sql", {
   expect_snapshot(lf %>% slice_sample(x))
 
   expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
+  expect_snapshot(sql_values(con, trees))
 })
 
 # Live database -----------------------------------------------------------
