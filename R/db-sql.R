@@ -195,8 +195,17 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
   } else if (is.schema(from)) {
     setNames(as.sql(from, con), name)
   } else {
-    ident_name <- ident(name %||% unique_subquery_name())
-    build_sql(sql_indent_subquery(from, con, lvl), " ", ident_name, con = con)
+    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
+  }
+}
+
+as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
+  if (is.ident(x)) {
+    x
+  } else if (is.null(x)) {
+    default
+  } else {
+    ident(x)
   }
 }
 
