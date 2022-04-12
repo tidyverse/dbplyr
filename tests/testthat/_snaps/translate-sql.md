@@ -1,3 +1,16 @@
+# dplyr.strict_sql = TRUE prevents auto conversion
+
+    Code
+      translate_sql(blah(x))
+    Condition
+      Error in `blah()`:
+      ! Don't know how to translate blah()
+    Code
+      translate_sql(x %blah% y)
+    Condition
+      Error in `x %blah% y`:
+      ! Don't know how to translate %blah%
+
 # namespace calls are translated
 
     Code

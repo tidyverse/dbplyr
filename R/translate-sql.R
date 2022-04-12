@@ -1,23 +1,13 @@
-#' Translate an expression to sql
+#' Translate an expression to SQL
 #'
-#' @section Base translation:
-#' The base translator, `base_sql`, provides custom mappings for for
-#' commonly used base functions including logical (`!`, `&`, `|`),
-#' arithmetic (`^`), and comparison (`!=`) operators, as well as common
-#' summary (`mean()`, `var()`) and manipulation functions.
-#'
-#' All other functions will be preserved as is. R's infix functions
+#' @description
+#' dbplyr translates commonly used base functions including logical
+#' (`!`, `&`, `|`), arithmetic (`^`), and comparison (`!=`) operators, as well
+#' as common summary (`mean()`, `var()`), and transformation (`log()`)
+#' functions.  All other functions will be preserved as is. R's infix functions
 #' (e.g. `%like%`) will be converted to their SQL equivalents (e.g. `LIKE`).
-#' You can use this to access SQL string concatenation: `||` is mapped to
-#' `OR`, but `%||%` is mapped to `||`. To suppress this behaviour, and force
-#' errors immediately when dplyr doesn't know how to translate a function it
-#' encounters, using set the `dplyr.strict_sql` option to `TRUE`.
 #'
-#' You can also use [sql()] to insert a raw sql string.
-#'
-#' @section SQLite translation:
-#' The SQLite variant currently only adds one additional function: a mapping
-#' from `sd()` to the SQL aggregation function `STDEV`.
+#' Learn more in `vignette("translation-function")`.
 #'
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
@@ -158,12 +148,9 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
-  if (!strict) {
-    unknown <- setdiff(all_calls(expr), names(variant))
-    top_env <- ceply(unknown, default_op, parent = empty_env(), env = get_env(expr))
-  } else {
-    top_env <- child_env(NULL)
-  }
+  unknown <- setdiff(all_calls(expr), names(variant))
+  op <- if (strict) missing_op else default_op
+  top_env <- ceply(unknown, op, parent = empty_env(), env = get_env(expr))
 
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
@@ -225,6 +212,16 @@ default_op <- function(x, env) {
     sql_infix(x)
   } else {
     sql_prefix(x)
+  }
+}
+
+missing_op <- function(x, env) {
+  force(x)
+
+  function(...) {
+    needs_parens <- !is_infix_base(x) && !is_infix_user(x)
+
+    abort(paste0("Don't know how to translate ", x, if (needs_parens) "()"))
   }
 }
 

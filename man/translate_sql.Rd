@@ -3,7 +3,7 @@
 \name{translate_sql}
 \alias{translate_sql}
 \alias{translate_sql_}
-\title{Translate an expression to sql}
+\title{Translate an expression to SQL}
 \usage{
 translate_sql(
   ...,
@@ -45,31 +45,14 @@ SQL for a grouped summary.}
 \item{context}{Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.}
 }
 \description{
-Translate an expression to sql
-}
-\section{Base translation}{
-
-The base translator, \code{base_sql}, provides custom mappings for for
-commonly used base functions including logical (\code{!}, \code{&}, \code{|}),
-arithmetic (\code{^}), and comparison (\code{!=}) operators, as well as common
-summary (\code{mean()}, \code{var()}) and manipulation functions.
-
-All other functions will be preserved as is. R's infix functions
+dbplyr translates commonly used base functions including logical
+(\code{!}, \code{&}, \code{|}), arithmetic (\code{^}), and comparison (\code{!=}) operators, as well
+as common summary (\code{mean()}, \code{var()}), and transformation (\code{log()})
+functions.  All other functions will be preserved as is. R's infix functions
 (e.g. \verb{\%like\%}) will be converted to their SQL equivalents (e.g. \code{LIKE}).
-You can use this to access SQL string concatenation: \code{||} is mapped to
-\code{OR}, but \verb{\%||\%} is mapped to \code{||}. To suppress this behaviour, and force
-errors immediately when dplyr doesn't know how to translate a function it
-encounters, using set the \code{dplyr.strict_sql} option to \code{TRUE}.
 
-You can also use \code{\link[=sql]{sql()}} to insert a raw sql string.
+Learn more in \code{vignette("translation-function")}.
 }
-
-\section{SQLite translation}{
-
-The SQLite variant currently only adds one additional function: a mapping
-from \code{sd()} to the SQL aggregation function \code{STDEV}.
-}
-
 \examples{
 # Regular maths is translated in a very straightforward way
 translate_sql(x + 1)
