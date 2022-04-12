@@ -202,7 +202,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = unique_subquery_name(
 
 #' @export
 #' @rdname db-sql
-sql_indent_subquery <- function(from, con, lvl) {
+sql_indent_subquery <- function(from, con, lvl = 0) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
   if (multi_line) {
     build_sql(
@@ -378,7 +378,7 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl) {
+sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   method <- paste0(method, if (all) " ALL")
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
