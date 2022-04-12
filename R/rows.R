@@ -568,16 +568,17 @@ eval_select2 <- function(expr, data) {
 }
 
 target_table_name <- function(x, in_place) {
-  name <- remote_name(x)
-  if (!is_null(name) && is_true(in_place)) {
-    return(name)
+  # Never touch target table with `in_place = FALSE`
+  if (!is_true(in_place)) {
+    return(NULL)
   }
 
-  if (is_null(name) && is_true(in_place)) {
+  name <- remote_name(x)
+  if (is_null(name)) {
     abort("Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.")
   }
 
-  NULL
+  name
 }
 
 rows_prep <- function(con, x_name, y, by, lvl = 0) {
