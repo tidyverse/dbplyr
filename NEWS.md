@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The 1st edition extension mechanism is formally deprecated (#507).
+
 * `across()` now works if passing the name of a list of functions to the `.fns`
   argument (@mgirlich, #817).
 
