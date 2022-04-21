@@ -86,6 +86,7 @@ check_groups <- function(.groups) {
   abort(message, call = caller_env())
 }
 
+#' @export
 add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_query <- .data$lazy_query
 
