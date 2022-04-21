@@ -4,6 +4,7 @@ sql_select_clauses <- function(con,
                                where,
                                group_by,
                                having,
+                               window,
                                order_by,
                                limit = NULL,
                                lvl) {
@@ -13,6 +14,7 @@ sql_select_clauses <- function(con,
     where = where,
     group_by = group_by,
     having = having,
+    window = window,
     order_by = order_by,
     limit = limit
   )
@@ -68,6 +70,10 @@ sql_clause_group_by <- function(group_by, lvl = 0) {
 
 sql_clause_having <- function(having, lvl = 0) {
   sql_clause("HAVING", having)
+}
+
+sql_clause_window <- function(window) {
+  sql_clause("WINDOW", window)
 }
 
 sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 0) {

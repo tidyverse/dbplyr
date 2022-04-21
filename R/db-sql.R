@@ -13,6 +13,8 @@
 #' * `sql_random(con)` generates SQL to get a random number which can be used
 #'   to select random rows in `slice_sample()`.
 #'
+#' * `supports_window_clause(con)` does the backend support named windows?
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -238,6 +240,17 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
 }
 
+#' @rdname db-sql
+#' @export
+supports_window_clause <- function(con) {
+  UseMethod("supports_window_clause")
+}
+
+#' @export
+supports_window_clause.DBIConnection <- function(con) {
+  FALSE
+}
+
 
 # Query generation --------------------------------------------------------
 
@@ -245,6 +258,7 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
 #' @export
 sql_query_select <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
+                             window = NULL,
                              order_by = NULL,
                              limit = NULL,
                              distinct = FALSE,
@@ -257,6 +271,7 @@ sql_query_select <- function(con, select, from, where = NULL,
 #' @export
 sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
                                group_by = NULL, having = NULL,
+                               window = NULL,
                                order_by = NULL,
                                limit = NULL,
                                distinct = FALSE,
@@ -269,6 +284,7 @@ sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
     where     = sql_clause_where(where),
     group_by  = sql_clause_group_by(group_by),
     having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     limit     = sql_clause_limit(con, limit),
     lvl       = lvl
@@ -281,6 +297,7 @@ dbplyr_query_select <- function(con, ...) {
 #' @export
 sql_select.DBIConnection <- function(con, select, from, where = NULL,
                                      group_by = NULL, having = NULL,
+                                     window = NULL,
                                      order_by = NULL,
                                      limit = NULL,
                                      distinct = FALSE,
@@ -291,6 +308,7 @@ sql_select.DBIConnection <- function(con, select, from, where = NULL,
     where = where,
     group_by = group_by,
     having = having,
+    window = window,
     order_by = order_by,
     limit = limit,
     distinct = distinct,
