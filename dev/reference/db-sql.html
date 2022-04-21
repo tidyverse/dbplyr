@@ -6,6 +6,7 @@ as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
 sql_random(con) generates SQL to get a random number which can be used
 to select random rows in slice_sample().
+supports_window_clause(con) does the backend support named windows?
 
 
 Tables:
@@ -45,6 +46,7 @@ as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
 sql_random(con) generates SQL to get a random number which can be used
 to select random rows in slice_sample().
+supports_window_clause(con) does the backend support named windows?
 
 
 Tables:
@@ -155,6 +157,7 @@ as described in <a href="https://modern-sql.com/feature/is-distinct-from" class=
 <li><p><code>sql_translation(con)</code> generates a SQL translation environment.</p></li>
 <li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
 to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
+<li><p><code>supports_window_clause(con)</code> does the backend support named windows?</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
@@ -200,6 +203,8 @@ queries.</p></li>
 
 <span class="fu">sql_query_rows</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span>
 
+<span class="fu">supports_window_clause</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
 <span class="fu">sql_query_select</span><span class="op">(</span>
   <span class="va">con</span>,
   <span class="va">select</span>,
@@ -207,6 +212,7 @@ queries.</p></li>
   where <span class="op">=</span> <span class="cn">NULL</span>,
   group_by <span class="op">=</span> <span class="cn">NULL</span>,
   having <span class="op">=</span> <span class="cn">NULL</span>,
+  window <span class="op">=</span> <span class="cn">NULL</span>,
   order_by <span class="op">=</span> <span class="cn">NULL</span>,
   limit <span class="op">=</span> <span class="cn">NULL</span>,
   distinct <span class="op">=</span> <span class="cn">FALSE</span>,
