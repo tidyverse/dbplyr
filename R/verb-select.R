@@ -83,17 +83,36 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
+  sim_data <- simulate_vars(.data)
+  for (i in seq_along(sim_data)) {
+    attr(sim_data[[i]], "dbplyr_org_pos") <- i
+  }
+
   new_vars <- dplyr::relocate(
-    simulate_vars(.data),
+    sim_data,
     ...,
     .before = {{.before}},
     .after = {{.after}}
   )
 
-  .data$lazy_query <- add_select(.data, syms(unlist(new_vars)))
+  old_vars <- colnames(sim_data)
+  vars_mapping <- purrr::map_chr(
+    new_vars,
+    ~ old_vars[[attr(.x, "dbplyr_org_pos")]]
+  )
+
+  .data$lazy_query <- add_select(.data, syms(vars_mapping))
   .data
 }
 
+#' Simulate variables to use in tidyselect
+#'
+#' @param x A lazy table
+#' @param drop_groups Should groups be dropped?
+#'
+#' @return A 0 row tibble with the same columns as `x` and - if possible - the
+#'   column should be the R equivalend.
+#'
 #' @export
 simulate_vars <- function (x, drop_groups = FALSE) {
   UseMethod("simulate_vars")
@@ -107,8 +126,7 @@ simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
     vars <- op_vars(x)
   }
 
-  vars_list <- as.list(vars)
-  as_tibble(set_names(vars_list, vars), .name_repair = "minimal")
+  as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
 }
 
 # op_select ---------------------------------------------------------------
