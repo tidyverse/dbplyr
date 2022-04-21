@@ -94,7 +94,13 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   .data
 }
 
-simulate_vars <- function(x, drop_groups = FALSE) {
+#' @export
+simulate_vars <- function (x, drop_groups = FALSE) {
+  UseMethod("simulate_vars")
+}
+
+#' @export
+simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
   if (drop_groups) {
     vars <- setdiff(op_vars(x), op_grps(x))
   } else {
