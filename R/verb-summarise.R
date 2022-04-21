@@ -87,6 +87,7 @@ check_groups <- function(.groups) {
 }
 
 #' @export
+#' @rdname lazy_ops
 add_summarise <- function(.data, dots, .groups, env_caller) {
   lazy_query <- .data$lazy_query
 

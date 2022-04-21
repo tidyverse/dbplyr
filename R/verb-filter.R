@@ -32,6 +32,7 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
 }
 
 #' @export
+#' @rdname lazy_ops
 add_filter <- function(.data, dots) {
   con <- remote_con(.data)
   lazy_query <- .data$lazy_query
