@@ -59,7 +59,7 @@
         (VALUES ROW(1, 'a'), ROW(2, 'b'))
       ) `values_table`
 
-# `sql_query_rows_update()` is correct
+# `sql_query_update_from()` is correct
 
     Code
       sql_query_update_from(con = simulate_mysql(), x_name = ident("df_x"), y = df_y,

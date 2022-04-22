@@ -301,6 +301,22 @@
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
 
+# `sql_query_delete()` is correct
+
+    Code
+      sql_query_delete(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> DELETE FROM `df_x`
+      OUTPUT `DELETED`.`a`, `DELETED`.`b` AS `b2`
+      WHERE EXISTS (
+        SELECT 1 FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
+      )
+
 # `sql_query_upsert()` is correct
 
     Code

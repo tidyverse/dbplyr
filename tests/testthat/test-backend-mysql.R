@@ -37,7 +37,7 @@ test_that("generates custom sql", {
   expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
 })
 
-test_that("`sql_query_rows_update()` is correct", {
+test_that("`sql_query_update_from()` is correct", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
     con = simulate_mysql(),
