@@ -83,6 +83,9 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
+  # Hack: We want to use `dplyr::relocate.data.frame()` instead of reimplementing it.
+  # Because `relocate()` can rename columns we use an attribute to store the
+  # original column position.
   sim_data <- simulate_vars(.data)
   for (i in seq_along(sim_data)) {
     attr(sim_data[[i]], "dbplyr_org_pos") <- i
