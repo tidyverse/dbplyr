@@ -131,8 +131,6 @@ simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
 
 # op_select ---------------------------------------------------------------
 
-#' @export
-#' @rdname lazy_ops
 add_select <- function(.data, vars, op = c("select", "mutate")) {
   op <- match.arg(op, c("select", "mutate"))
   lazy_query <- .data$lazy_query
