@@ -173,4 +173,12 @@ sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
+supports_window_clause.MariaDBConnection <- function(con) {
+  TRUE
+}
+#' @export
+supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnection
+#' @export
+supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
+
 globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))

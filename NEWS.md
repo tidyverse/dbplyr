@@ -3,6 +3,10 @@
 * Support `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
   (@mgirlich, #736).
 
+* `mutate()` and `transmute()` now automatically use named windows if a window
+  definition is used at least twice and the backend supports named windows
+  (@mgirlich, #624).
+
 * `across()` now works if passing the name of a list of functions to the `.fns`
   argument (@mgirlich, #817).
 

@@ -87,4 +87,9 @@ sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) 
   )
 }
 
+#' @export
+supports_window_clause.Hive <- function(con) {
+  TRUE
+}
+
 globalVariables("regexp_replace")

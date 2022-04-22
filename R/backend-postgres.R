@@ -282,4 +282,13 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
 #' @export
 sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
 
-globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL"))
+supports_window_clause.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_window_clause.PostgreSQL <- function(con) {
+  TRUE
+}
+
+globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))

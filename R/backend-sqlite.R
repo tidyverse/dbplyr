@@ -113,7 +113,7 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
   } else {
@@ -177,6 +177,11 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   } else if (type == "right") {
     sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl)
   }
+}
+
+#' @export
+supports_window_clause.SQLiteConnection <- function(con) {
+  TRUE
 }
 
 globalVariables(c("datetime", "NUMERIC", "REAL"))

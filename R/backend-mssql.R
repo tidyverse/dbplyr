@@ -71,6 +71,7 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_query_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
                                              group_by = NULL, having = NULL,
+                                             window = NULL,
                                              order_by = NULL,
                                              limit = NULL,
                                              distinct = FALSE,
@@ -83,6 +84,7 @@ simulate_mssql <- function(version = "15.0") {
     where     = sql_clause_where(where),
     group_by  = sql_clause_group_by(group_by),
     having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     lvl       = lvl
   )

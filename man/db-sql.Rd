@@ -14,6 +14,7 @@
 \alias{sql_query_wrap}
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
+\alias{supports_window_clause}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
@@ -42,11 +43,13 @@ sql_query_fields(con, sql, ...)
 
 sql_query_save(con, sql, name, temporary = TRUE, ...)
 
-sql_query_wrap(con, from, name = unique_subquery_name(), ..., lvl = 0)
+sql_query_wrap(con, from, name = NULL, ..., lvl = 0)
 
 sql_indent_subquery(from, con, lvl = 0)
 
 sql_query_rows(con, sql, ...)
+
+supports_window_clause(con)
 
 sql_query_select(
   con,
@@ -55,6 +58,7 @@ sql_query_select(
   where = NULL,
   group_by = NULL,
   having = NULL,
+  window = NULL,
   order_by = NULL,
   limit = NULL,
   distinct = FALSE,
@@ -113,6 +117,7 @@ as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_returning_cols(con, cols, table)} generates the \code{RETURNING} clause.
 \item \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}.
+\item \code{supports_window_clause(con)} does the backend support named windows?
 }
 
 Tables:
