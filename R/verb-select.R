@@ -117,6 +117,7 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
 #'   column should be the R equivalend.
 #'
 #' @export
+#' @keywords internal
 simulate_vars <- function (x, drop_groups = FALSE) {
   UseMethod("simulate_vars")
 }
