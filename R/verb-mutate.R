@@ -115,7 +115,7 @@ transmute.tbl_lazy <- function(.data, ...) {
 get_mutate_layers <- function(.data, ...) {
   dots <- enquos(..., .named = TRUE)
   grps <- syms(op_grps(.data))
-  cur_data <- simulate_lazy_tbl(op_vars(.data), grps)
+  cur_data <- .data
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
@@ -162,7 +162,7 @@ get_mutate_layers <- function(.data, ...) {
     }
 
     all_vars <- names(cur_layer)[!var_is_null]
-    cur_data <- simulate_lazy_tbl(all_vars, grps)
+    cur_data$lazy_query <- add_select(cur_data, cur_layer, "mutate")
   }
 
   list(
@@ -170,10 +170,4 @@ get_mutate_layers <- function(.data, ...) {
     modified_vars = all_modified_vars,
     used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
-}
-
-simulate_lazy_tbl <- function(vars, groups) {
-  df <- as_tibble(as.list(set_names(vars)), .name_repair = "minimal")
-  tbl_lazy(df) %>%
-    group_by(!!!groups)
 }
