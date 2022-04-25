@@ -1,11 +1,22 @@
 #' @export
 #' @inheritParams dplyr::rows_insert
-#' @param conflict How should keys in `y` that already exist in `x` be handled?
+#' @param conflict For `rows_insert()`, how should keys in `y` that conflict
+#'   with keys in `x` be handled? A conflict arises if there is a key in `y`
+#'   that already exists in `x`.
+#'
 #'   One of:
-#'   - `"error"`, the default, will error if there are any keys in `y` that
-#'     already exist in `x`. This requires a corresponding unique constraint in
+#'   - `"error"`, the default, is not supported for database tables.
+#'   - `"ignore"` will ignore rows in `y` with keys that conflict with keys in
 #'     `x`.
-#'   - `"ignore"` will not insert rows in `y` with keys that already exist in `y`.
+#' @param unmatched For `rows_update()`, `rows_patch()`, and `rows_delete()`,
+#'   how should keys in `y` that are unmatched by the keys in `x` be handled?
+#'
+#'   One of:
+#'   - `"error"`, the default, is not supported for database tables. Add a
+#'     foreign key constraint on the `by` columns of `y` to let the database
+#'     check this behaviour for you.
+#'   - `"ignore"` will ignore rows in `y` with keys that are unmatched by the
+#'     keys in `x`.
 #' @param returning Columns to return.
 #'
 #' @importFrom dplyr rows_insert
