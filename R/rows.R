@@ -566,7 +566,6 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
 }
 
 rows_check_returning <- function(df, returning, returning_expr) {
-  # Expect manual quote from user, silently fall back to enexpr()
   tryCatch(
     returning_expr <- returning,
     error = identity

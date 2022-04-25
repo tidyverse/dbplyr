@@ -61,7 +61,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       by = "x",
       conflict = "ignore",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 4, y = 24)
@@ -75,7 +75,7 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
       by = "x",
       conflict = "ignore",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 4, y = NA)
@@ -122,7 +122,7 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
     by = "x",
     conflict = "ignore",
     in_place = TRUE,
-    returning = quote(everything())
+    returning = everything()
   )
 
   expect_equal(get_returned_rows(df_inserted), tibble(x = 4L, y = 24L))
@@ -187,7 +187,7 @@ test_that("arguments are checked", {
   )
 
   expect_snapshot(error = TRUE,
-    (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = quote(everything())))
+    (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = everything()))
   )
 
   df <- memdb_frame(x = 1)
@@ -283,7 +283,7 @@ test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 2:3, y = 22:23)
@@ -321,7 +321,7 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
-    returning = quote(everything())
+    returning = everything()
   )
 
   expect_equal(get_returned_rows(df_updated), tibble(x = 2:3, y = 22:23))
@@ -436,7 +436,7 @@ test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 2:3, y = c(12, 23))
@@ -474,7 +474,7 @@ test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
-    returning = quote(everything())
+    returning = everything()
   )
 
   expect_equal(get_returned_rows(df_patched), tibble(x = 2:3, y = c(12, 23)))
@@ -560,7 +560,7 @@ test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 2:4, y = 22:24),
       by = "x",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 2:4, y = 22:24)
@@ -601,7 +601,7 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
     x, y,
     by = "x",
     in_place = TRUE,
-    returning = quote(everything())
+    returning = everything()
   )
 
   expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
@@ -690,7 +690,7 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
       by = "x",
       unmatched = "ignore",
       in_place = FALSE,
-      returning = quote(everything())
+      returning = everything()
     ) %>%
       get_returned_rows(),
     tibble(x = 2:3, y = 12:13)
@@ -728,7 +728,7 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
     by = "x",
     unmatched = "ignore",
     in_place = TRUE,
-    returning = quote(everything())
+    returning = everything()
   )
 
   expect_equal(get_returned_rows(df_deleted), tibble(x = 2:3, y = 12:13))

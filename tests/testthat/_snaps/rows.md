@@ -120,8 +120,7 @@
 ---
 
     Code
-      (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = quote(
-        everything())))
+      (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = everything()))
     Condition
       Error in `rows_check_returning()`:
       ! `returning` does not work for simulated connections.
