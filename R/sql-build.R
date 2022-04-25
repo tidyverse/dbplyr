@@ -96,7 +96,11 @@ cte_render <- function(query_list, con) {
   )
   cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
 
-  build_sql("WITH ", cte_query, "\n", query_list[[n]], con = con)
+  with_sql <- "WITH "
+  if (dbplyr_use_colour()) {
+    with_sql <- cli::col_blue(with_sql)
+  }
+  build_sql(sql(with_sql), cte_query, "\n", query_list[[n]], con = con)
 }
 
 get_subquery_name <- function(x, query_list) {

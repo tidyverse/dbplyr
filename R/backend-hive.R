@@ -77,6 +77,9 @@ last_value_sql.Hive <- function(con, x) {
 sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   # SQLite does not allow parentheses
   method <- paste0(method, if (all) " ALL")
+  if (dbplyr_use_colour()) {
+    method <- cli::col_blue(method)
+  }
   # `x` and `y` already have the correct indent, so use `build_sql()` instead
   # of `sql_format_clauses()`
   build_sql(

@@ -112,12 +112,20 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
   lvl <- lvl + x$lvl
 
   # check length without starting a new line
+  if (dbplyr_use_colour() && x$sep == " AND") {
+    x$sep <- cli::col_blue(x$sep)
+  }
+
   fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
   if (x$parens) {
     fields_same_line <- paste0("(", fields_same_line, ")")
   }
+
+  if (dbplyr_use_colour()) {
+    x$kw <- cli::col_blue(x$kw)
+  }
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(same_line_clause)
+  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) + cli::ansi_nchar(same_line_clause)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
     return(sql(same_line_clause))

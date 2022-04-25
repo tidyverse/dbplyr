@@ -27,3 +27,7 @@ indent_print <- function(x) {
   mark <- if (identical(getOption("OutDec"), ",")) "." else ","
   formatC(x, big.mark = mark, ...)
 }
+
+dbplyr_use_colour <- function() {
+  getOption("dbplyr_use_colour", FALSE) && cli::num_ansi_colors() > 1L
+}

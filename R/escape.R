@@ -174,7 +174,11 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
   }
 
   names_esc <- sql_escape_ident(con, names)
-  as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
+  as_sql <- " AS "
+  if (dbplyr_use_colour()) {
+    as_sql <- cli::col_blue(as_sql)
+  }
+  as <- ifelse(names == "" | names_esc == x, "", paste0(as_sql, names_esc))
 
   paste0(x, as)
 }
