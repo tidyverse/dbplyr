@@ -559,19 +559,19 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   )
 
   if (unmatched == "error") {
-    abort('`unmatched` = "error" is not supported for database tables.')
+    abort('`unmatched` = "error" is not supported for database tables.', call = error_call)
   }
 
   unmatched
 }
 
-rows_check_returning <- function(df, returning, returning_expr) {
+rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
   returning_cols <- eval_select2(returning_expr, df)
 
   if (is_empty(returning_cols)) return(returning_cols)
 
   if (inherits(df, "tbl_TestConnection")) {
-    abort("`returning` does not work for simulated connections.")
+    abort("`returning` does not work for simulated connections.", call = error_call)
   }
 
   returning_cols

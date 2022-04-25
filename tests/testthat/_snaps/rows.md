@@ -26,7 +26,7 @@
     Code
       (rows_insert(lf, lf, by = "x", conflict = "ignore", returning = everything()))
     Condition
-      Error in `rows_check_returning()`:
+      Error in `rows_insert()`:
       ! `returning` does not work for simulated connections.
 
 ---
@@ -134,12 +134,12 @@
     Code
       (rows_update(lf, lf, by = "x", unmatched = "error"))
     Condition
-      Error in `rows_check_ummatched()`:
+      Error in `rows_update()`:
       ! `unmatched` = "error" is not supported for database tables.
     Code
       (rows_update(lf, lf, by = "x"))
     Condition
-      Error in `rows_check_ummatched()`:
+      Error in `rows_update()`:
       ! `unmatched` = "error" is not supported for database tables.
 
 ---
@@ -157,7 +157,7 @@
     Code
       (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = everything()))
     Condition
-      Error in `rows_check_returning()`:
+      Error in `rows_update()`:
       ! `returning` does not work for simulated connections.
 
 ---
