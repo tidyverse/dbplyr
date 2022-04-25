@@ -492,36 +492,7 @@ rows_check_key <- function(x,
 
     abort(message, call = error_call)
   }
-
-  # TODO adapt this
-  # out <- x[by]
-  #
-  # if (unique && vec_duplicate_any(out)) {
-  #   duplicated <- vec_duplicate_detect(out)
-  #   duplicated <- which(duplicated)
-  #   duplicated <- err_locs(duplicated)
-  #
-  #   message <- c(
-  #     glue("`{arg}` key values must be unique."),
-  #     i = glue("The following rows contain duplicate key values: {duplicated}.")
-  #   )
-  #
-  #   abort(message, call = error_call)
-  # }
-  #
-  # out
 }
-
-# rows_check_conflict <- function(conflict, ..., error_call = caller_env()) {
-#   check_dots_empty()
-#
-#   arg_match(
-#     arg = conflict,
-#     values = c("error", "ignore"),
-#     error_arg = "conflict",
-#     error_call = error_call
-#   )
-# }
 
 rows_check_in_place <- function(df, in_place) {
   if (!rlang::is_bool(in_place)) {
