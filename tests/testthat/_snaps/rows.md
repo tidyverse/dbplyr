@@ -1,3 +1,43 @@
+# rows_insert() checks arguments
+
+    Code
+      (rows_insert(lf, lf, by = "x", conflict = "error"))
+    Condition
+      Error in `rows_insert()`:
+      ! `conflict` = "error" is not supported for database tables.
+    Code
+      (rows_insert(lf, lf, by = "x"))
+    Condition
+      Error in `rows_insert()`:
+      ! `conflict` = "error" is not supported for database tables.
+
+---
+
+    Code
+      (rows_insert(lf, lazy_frame(x = 1, y = 2, z = 3), by = "x", conflict = "ignore")
+      )
+    Condition
+      Error in `rows_insert()`:
+      ! All columns in `y` must exist in `x`.
+      i The following columns only exist in `y`: `z`.
+
+---
+
+    Code
+      (rows_insert(lf, lf, by = "x", conflict = "ignore", returning = everything()))
+    Condition
+      Error in `rows_check_returning()`:
+      ! `returning` does not work for simulated connections.
+
+---
+
+    Code
+      (df %>% mutate(x = x + 1) %>% rows_insert(df, by = "x", conflict = "ignore",
+        in_place = TRUE))
+    Condition
+      Error in `target_table_name()`:
+      ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code
@@ -6,7 +46,7 @@
     Output
       <error/rlang_error>
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for `in_place = FALSE`.
+      ! `conflict` = "error" is not supported for database tables.
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -40,16 +80,11 @@
 # `sql_query_insert()` works
 
     Code
-      sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b"))
-    Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      SELECT *
-      FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      (sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
+    Condition
+      Error in `sql_query_insert()`:
+      ! `conflict` = "error" is not supported for database tables.
 
 ---
 

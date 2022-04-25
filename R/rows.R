@@ -38,10 +38,6 @@ rows_insert.tbl_lazy <- function(x,
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   if (!is_null(name)) {
-    if (conflict == "error") {
-      inform("Duplicated rows only produce an error if there is a unique constraint on `x`.")
-    }
-
     sql <- sql_query_insert(
       con = remote_con(x),
       x_name = name,
@@ -54,10 +50,6 @@ rows_insert.tbl_lazy <- function(x,
 
     rows_get_or_execute(x, sql, returning_cols)
   } else {
-    if (conflict == "error") {
-      abort('`conflict = "error"` is not supported for `in_place = FALSE`.')
-    }
-
     out <- union_all(x, anti_join(y, x, by = by))
 
     if (!is_empty(returning_cols)) {
@@ -544,12 +536,18 @@ rows_check_in_place <- function(df, in_place) {
 }
 
 rows_check_conflict <- function(conflict, error_call = caller_env()) {
-  arg_match(
+  conflict <- arg_match(
     arg = conflict,
     values = c("error", "ignore"),
     error_arg = "conflict",
     error_call = error_call
   )
+
+  if (conflict == "error") {
+    abort('`conflict` = "error" is not supported for database tables.', call = error_call)
+  }
+
+  conflict
 }
 
 rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
@@ -563,14 +561,11 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   if (unmatched == "error") {
     abort('`unmatched` = "error" is not supported for database tables.')
   }
+
+  unmatched
 }
 
 rows_check_returning <- function(df, returning, returning_expr) {
-  tryCatch(
-    returning_expr <- returning,
-    error = identity
-  )
-
   returning_cols <- eval_select2(returning_expr, df)
 
   if (is_empty(returning_cols)) return(returning_cols)

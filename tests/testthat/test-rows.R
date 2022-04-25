@@ -1,6 +1,36 @@
 
 # rows_insert -------------------------------------------------------------
 
+test_that("rows_insert() checks arguments", {
+  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+
+  expect_snapshot(error = TRUE, {
+    (rows_insert(lf, lf, by = "x", conflict = "error"))
+    (rows_insert(lf, lf, by = "x"))
+  })
+
+  expect_snapshot(error = TRUE,
+    (rows_insert(
+      lf,
+      lazy_frame(x = 1, y = 2, z = 3),
+      by = "x",
+      conflict = "ignore"
+    ))
+  )
+
+  expect_snapshot(error = TRUE,
+    (rows_insert(lf, lf, by = "x", conflict = "ignore", returning = everything()))
+  )
+
+  df <- memdb_frame(x = 1)
+  expect_snapshot(error = TRUE,
+    (df %>%
+      mutate(x = x + 1) %>%
+      rows_insert(df, by = "x", conflict = "ignore", in_place = TRUE))
+  )
+})
+
+
 test_that("`rows_insert()` works with empty `by`", {
   expect_message(
     rows_insert(
@@ -93,24 +123,13 @@ test_that("`rows_insert()` works with `in_place = TRUE`", {
   )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
-  expect_message(
-    rows_insert(
-      df, memdb_frame(x = 3:4, y = 23:24),
-      conflict = "error",
-      by = "x",
-      in_place = TRUE
-    )
-  )
-  expect_equal(df %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
-
-  df2 <- memdb_frame(x = 1:3, y = 11:13)
   rows_insert(
-    df2, memdb_frame(x = 3:4, y = 23:24),
+    df, memdb_frame(x = 3:4, y = 23:24),
     by = "x",
     conflict = "ignore",
     in_place = TRUE
   )
-  expect_equal(df2 %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
+  expect_equal(df %>% collect(), tibble(x = 1:4, y = c(11:13, 24)))
 })
 
 test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
@@ -138,15 +157,15 @@ test_that("`sql_query_insert()` works", {
   ) %>%
     mutate(c = c + 1)
 
-  expect_snapshot(
-    sql_query_insert(
+  expect_snapshot(error = TRUE,
+    (sql_query_insert(
       con = simulate_dbi(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
       conflict = "error",
       returning_cols = c("a", b2 = "b")
-    )
+    ))
   )
 
   expect_snapshot(

@@ -476,13 +476,10 @@ sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
 
-  if (conflict == "error") {
-    conflict_clauses <- list()
-  } else {
-    join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
-    where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-    conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
-  }
+  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+  conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+
   clauses <- list2(
     sql_clause_insert(con, insert_cols, x_name),
     sql_clause_select(con, sql("*")),
