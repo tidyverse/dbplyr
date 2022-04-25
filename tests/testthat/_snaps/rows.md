@@ -30,7 +30,12 @@
 
 # `rows_insert()` works with `in_place = TRUE`
 
-    `in_place = TRUE` does not work for simulated connections.
+    Code
+      (rows_insert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_insert()` works
 
@@ -66,35 +71,75 @@
 
 # arguments are checked
 
-    `by` must be a character vector.
+    Code
+      (rows_update(lf, lf, by = 1, unmatched = "ignore"))
+    Condition
+      Error in `rows_update()`:
+      ! `by` must be a character vector.
 
 ---
 
-    `by` must be unnamed.
+    Code
+      (rows_update(lf, lf, by = c(y = "x"), unmatched = "ignore"))
+    Condition
+      Error in `rows_update()`:
+      ! `by` must be unnamed.
 
 ---
 
-    All columns specified through `by` must exist in `x` and `y`.
-    i The following columns are missing from `x`: `z`.
+    Code
+      (rows_update(lf, lf, by = "z", unmatched = "ignore"))
+    Condition
+      Error in `rows_update()`:
+      ! All columns specified through `by` must exist in `x` and `y`.
+      i The following columns are missing from `x`: `z`.
 
 ---
 
-    All columns in `y` must exist in `x`.
-    i The following columns only exist in `y`: `z`.
+    Code
+      (rows_update(lf, lf, by = "x", unmatched = "error"))
+    Condition
+      Error in `rows_check_ummatched()`:
+      ! `unmatched` = "error" is not supported for database tables.
+    Code
+      (rows_update(lf, lf, by = "x"))
+    Condition
+      Error in `rows_check_ummatched()`:
+      ! `unmatched` = "error" is not supported for database tables.
 
 ---
 
-    `returning` does not work for simulated connections.
+    Code
+      (rows_update(lf, lazy_frame(x = 1, y = 2, z = 3), by = "x", unmatched = "ignore")
+      )
+    Condition
+      Error in `rows_update()`:
+      ! All columns in `y` must exist in `x`.
+      i The following columns only exist in `y`: `z`.
 
 ---
 
-    Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
+    Code
+      (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = quote(
+        everything())))
+    Condition
+      Error in `rows_check_returning()`:
+      ! `returning` does not work for simulated connections.
+
+---
+
+    Code
+      (df %>% mutate(x = x + 1) %>% rows_update(df, by = "x", unmatched = "ignore",
+        in_place = TRUE))
+    Condition
+      Error in `target_table_name()`:
+      ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
 # `rows_update()` works with `in_place = FALSE`
 
     Code
       rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
-      y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
+      y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
       (
@@ -117,7 +162,12 @@
 
 # `rows_update()` works with `in_place = TRUE`
 
-    `in_place = TRUE` does not work for simulated connections.
+    Code
+      (rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_update_from()` works
 
@@ -139,7 +189,7 @@
 
     Code
       rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
-        x = 1:3, .name = "df_y"), by = "x", in_place = FALSE)
+        x = 1:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
       SELECT *
@@ -149,7 +199,8 @@
 
     Code
       rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
-        x = 2:3, y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
+        x = 2:3, y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore",
+      in_place = FALSE)
     Output
       <SQL>
       (
@@ -172,7 +223,12 @@
 
 # `rows_patch()` works with `in_place = TRUE`
 
-    `in_place = TRUE` does not work for simulated connections.
+    Code
+      (rows_patch(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
 
 # `rows_upsert()` returns early if no column to update
 
@@ -234,7 +290,12 @@
 
 # `rows_upsert()` works with `in_place = TRUE`
 
-    `in_place = TRUE` does not work for simulated connections.
+    Code
+      (rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_upsert()` is correct
 
@@ -267,7 +328,7 @@
 
     Code
       rows_delete(lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"), lazy_frame(
-        x = 2:3, .name = "df_y"), by = "x", in_place = FALSE)
+        x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
       SELECT * FROM `df_x` AS `LHS`
@@ -278,7 +339,12 @@
 
 # `rows_delete()` works with `in_place = TRUE`
 
-    `in_place = TRUE` does not work for simulated connections.
+    Code
+      (rows_delete(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_delete()` is correct
 
@@ -298,5 +364,9 @@
 
 # `get_returned_rows()` works
 
-    No returned rows available.
+    Code
+      (get_returned_rows(df))
+    Condition
+      Error in `get_returned_rows()`:
+      ! No returned rows available.
 

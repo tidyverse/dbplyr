@@ -78,7 +78,13 @@ rows_insert.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr rows_update
 #' @rdname rows-db
-rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
+rows_update.tbl_lazy <- function(x,
+                                 y,
+                                 by = NULL,
+                                 ...,
+                                 unmatched = c("error", "ignore"),
+                                 copy = FALSE,
+                                 in_place = FALSE,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
@@ -92,6 +98,8 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
   rows_check_key(x, by, "x")
   rows_check_key(y, by, "y", unique = TRUE)
+
+  unmatched <- rows_check_ummatched(unmatched)
 
   new_columns <- setdiff(colnames(y), by)
 
@@ -151,8 +159,14 @@ rows_update.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #' @export
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db
-rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
-                                returning = NULL) {
+rows_patch.tbl_lazy <- function(x,
+                                 y,
+                                 by = NULL,
+                                 ...,
+                                 unmatched = c("error", "ignore"),
+                                 copy = FALSE,
+                                 in_place = FALSE,
+                                 returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
@@ -165,6 +179,8 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
 
   rows_check_key(x, by, "x")
   rows_check_key(y, by, "y", unique = TRUE)
+
+  unmatched <- rows_check_ummatched(unmatched)
 
   new_columns <- setdiff(colnames(y), by)
 
@@ -232,7 +248,12 @@ rows_patch.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = F
 #'
 #' @importFrom dplyr rows_upsert
 #' @rdname rows-db
-rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
+rows_upsert.tbl_lazy <- function(x,
+                                 y,
+                                 by = NULL,
+                                 ...,
+                                 copy = FALSE,
+                                 in_place = FALSE,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
@@ -301,7 +322,13 @@ rows_upsert.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 #'
 #' @importFrom dplyr rows_delete
 #' @rdname rows-db
-rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = FALSE,
+rows_delete.tbl_lazy <- function(x,
+                                 y,
+                                 by = NULL,
+                                 ...,
+                                 unmatched = c("error", "ignore"),
+                                 copy = FALSE,
+                                 in_place = FALSE,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
@@ -315,6 +342,8 @@ rows_delete.tbl_lazy <- function(x, y, by = NULL, ..., copy = FALSE, in_place = 
 
   rows_check_key(x, by, "x")
   rows_check_key(y, by, "y")
+
+  unmatched <- rows_check_ummatched(unmatched)
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
@@ -521,6 +550,19 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
     error_arg = "conflict",
     error_call = error_call
   )
+}
+
+rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
+  unmatched <- arg_match(
+    arg = unmatched,
+    values = c("error", "ignore"),
+    error_arg = "ummatched",
+    error_call = error_call
+  )
+
+  if (unmatched == "error") {
+    abort('`unmatched` = "error" is not supported for database tables.')
+  }
 }
 
 rows_check_returning <- function(df, returning, returning_expr) {

@@ -83,13 +83,13 @@ test_that("`rows_insert()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_insert()` works with `in_place = TRUE`", {
-  expect_snapshot_error(
-    rows_insert(
+  expect_snapshot(error = TRUE,
+    (rows_insert(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
       in_place = TRUE
-    )
+    ))
   )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
@@ -166,29 +166,35 @@ test_that("`sql_query_insert()` works", {
 test_that("arguments are checked", {
   lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
 
-  expect_snapshot_error(rows_update(lf, lf, by = 1))
+  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = 1, unmatched = "ignore")))
 
-  expect_snapshot_error(rows_update(lf, lf, by = c(y = "x")))
+  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = c(y = "x"), unmatched = "ignore")))
 
-  expect_snapshot_error(rows_update(lf, lf, by = "z"))
+  expect_snapshot(error = TRUE, (rows_update(lf, lf, by = "z", unmatched = "ignore")))
 
-  expect_snapshot_error(
-    rows_update(
+  expect_snapshot(error = TRUE, {
+    (rows_update(lf, lf, by = "x", unmatched = "error"))
+    (rows_update(lf, lf, by = "x"))
+  })
+
+  expect_snapshot(error = TRUE,
+    (rows_update(
       lf,
       lazy_frame(x = 1, y = 2, z = 3),
-      by = "x"
-    )
+      by = "x",
+      unmatched = "ignore"
+    ))
   )
 
-  expect_snapshot_error(
-    rows_update(lf, lf, by = "x", returning = quote(everything()))
+  expect_snapshot(error = TRUE,
+    (rows_update(lf, lf, by = "x", unmatched = "ignore", returning = quote(everything())))
   )
 
   df <- memdb_frame(x = 1)
-  expect_snapshot_error(
-    df %>%
+  expect_snapshot(error = TRUE,
+    (df %>%
       mutate(x = x + 1) %>%
-      rows_update(df, by = "x", in_place = TRUE)
+      rows_update(df, by = "x", unmatched = "ignore", in_place = TRUE))
   )
 })
 
@@ -199,6 +205,7 @@ test_that("`rows_update()` returns early if no column to update", {
       lf,
       lazy_frame(x = 1:3, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ),
     lf
@@ -210,6 +217,7 @@ test_that("`rows_update()` returns early if no column to update", {
       db,
       memdb_frame(x = 1:3),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -221,6 +229,7 @@ test_that("`rows_update()` returns early if no column to update", {
       db,
       memdb_frame(x = 1:3),
       by = "x",
+      unmatched = "ignore",
       in_place = TRUE
     ) %>%
       collect(),
@@ -233,6 +242,7 @@ test_that("`rows_update()` works with empty `by`", {
     rows_update(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
+      unmatched = "ignore",
       in_place = FALSE
     ),
     regexp = 'Matching, by = "x"'
@@ -245,6 +255,7 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     )
   )
@@ -254,6 +265,7 @@ test_that("`rows_update()` works with `in_place = FALSE`", {
     rows_update(
       df, memdb_frame(x = 2:3, y = 22:23),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -269,6 +281,7 @@ test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 1:3, y = 11:13),
       memdb_frame(x = 2:3, y = 22:23),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE,
       returning = quote(everything())
     ) %>%
@@ -278,19 +291,21 @@ test_that("`rows_update()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_update()` works with `in_place = TRUE`", {
-  expect_snapshot_error(
-    rows_update(
+  expect_snapshot(error = TRUE,
+    (rows_update(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = TRUE
-    )
+    ))
   )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_update(
     df, memdb_frame(x = 2:3, y = 22:23),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE
   )
 
@@ -304,6 +319,7 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
   df_updated <- rows_update(
     df, memdb_frame(x = 2:4, y = 22:24),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE,
     returning = quote(everything())
   )
@@ -344,6 +360,7 @@ test_that("`rows_patch()` returns early if no column to update", {
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     )
   )
@@ -353,6 +370,7 @@ test_that("`rows_patch()` returns early if no column to update", {
       memdb_frame(x = 1:3, y = c(11, 12, NA)),
       memdb_frame(x = 1:3),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -364,6 +382,7 @@ test_that("`rows_patch()` returns early if no column to update", {
       memdb_frame(x = 1:3, y = c(11, 12, NA)),
       memdb_frame(x = 1:3),
       by = "x",
+      unmatched = "ignore",
       in_place = TRUE
     ) %>%
       collect(),
@@ -376,6 +395,7 @@ test_that("`rows_patch()` works with empty `by`", {
     rows_patch(
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
+      unmatched = "ignore",
       in_place = FALSE
     ),
     regexp = 'Matching, by = "x"'
@@ -388,6 +408,7 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     )
   )
@@ -397,6 +418,7 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
     rows_patch(
       df, memdb_frame(x = 2:3, y = 22:23),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -412,6 +434,7 @@ test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
       memdb_frame(x = 1:3, y = c(11, 12, NA)),
       memdb_frame(x = 2:3, y = 22:23),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE,
       returning = quote(everything())
     ) %>%
@@ -421,19 +444,21 @@ test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_patch()` works with `in_place = TRUE`", {
-  expect_snapshot_error(
-    rows_patch(
+  expect_snapshot(error = TRUE,
+    (rows_patch(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = TRUE
-    )
+    ))
   )
 
   df <- memdb_frame(x = 1:3, y = c(11, 12, NA))
   rows_patch(
     df, memdb_frame(x = 2:3, y = 22:23),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE
   )
 
@@ -447,6 +472,7 @@ test_that("`rows_patch()` works with `in_place = TRUE` and `returning`", {
   df_patched <- rows_patch(
     df, memdb_frame(x = 2:4, y = 22:24),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE,
     returning = quote(everything())
   )
@@ -542,13 +568,13 @@ test_that("`rows_upsert()` works with `in_place = FALSE` and `returning`", {
 })
 
 test_that("`rows_upsert()` works with `in_place = TRUE`", {
-  expect_snapshot_error(
-    rows_upsert(
+  expect_snapshot(error = TRUE,
+    (rows_upsert(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
       by = "x",
       in_place = TRUE
-    )
+    ))
   )
 
   skip_if_not_installed("RSQLite", "2.2.8")
@@ -610,6 +636,7 @@ test_that("`rows_delete()` works with empty `by`", {
     rows_delete(
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, .name = "df_y"),
+      unmatched = "ignore",
       in_place = FALSE
     ),
     regexp = 'Matching, by = "x"'
@@ -622,6 +649,7 @@ test_that("`rows_delete()` ignores extra `y` columns", {
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 1:3, y = 11, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ),
     regexp = 'Ignoring extra `y` columns: `y`'
@@ -634,6 +662,7 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
       lazy_frame(x = 1:3, y = c(11, 12, NA), .name = "df_x"),
       lazy_frame(x = 2:3, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     )
   )
@@ -643,6 +672,7 @@ test_that("`rows_delete()` works with `in_place = FALSE`", {
     rows_delete(
       df, memdb_frame(x = 2:3),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE
     ) %>%
       collect(),
@@ -658,6 +688,7 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
       memdb_frame(x = 1:3, y = c(11, 12, 13)),
       memdb_frame(x = 2:3),
       by = "x",
+      unmatched = "ignore",
       in_place = FALSE,
       returning = quote(everything())
     ) %>%
@@ -667,19 +698,21 @@ test_that("`rows_delete()` works with `in_place = FALSE` with `returning`", {
 })
 
 test_that("`rows_delete()` works with `in_place = TRUE`", {
-  expect_snapshot_error(
-    rows_delete(
+  expect_snapshot(error = TRUE,
+    (rows_delete(
       lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
       lazy_frame(x = 2:3, .name = "df_y"),
       by = "x",
+      unmatched = "ignore",
       in_place = TRUE
-    )
+    ))
   )
 
   df <- memdb_frame(x = 1:3, y = 11:13)
   rows_delete(
     df, memdb_frame(x = 2:3),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE
   )
 
@@ -693,6 +726,7 @@ test_that("`rows_delete()` works with `in_place = TRUE` and `returning`", {
   df_deleted <- rows_delete(
     df, memdb_frame(x = 2:4),
     by = "x",
+    unmatched = "ignore",
     in_place = TRUE,
     returning = quote(everything())
   )
@@ -726,7 +760,7 @@ test_that("`sql_query_delete()` is correct", {
 test_that("`get_returned_rows()` works", {
   df <- tibble(x = 1)
   expect_false(has_returned_rows(df))
-  expect_snapshot_error(get_returned_rows(df))
+  expect_snapshot(error = TRUE, (get_returned_rows(df)))
 
   df2 <- set_returned_rows(df, mtcars)
   expect_true(has_returned_rows(df2))
