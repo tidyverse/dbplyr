@@ -163,7 +163,7 @@ op_frame.lazy_query <- function(op) {
 
 #' @export
 op_desc.lazy_query <- function(op) {
-  # TODO
+  "SQL"
 }
 
 #' @export
