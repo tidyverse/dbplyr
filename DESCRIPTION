@@ -27,6 +27,7 @@ Imports:
     lifecycle (>= 1.0.0),
     magrittr,
     methods,
+    pillar (>= 1.5.0),
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
     rlang (>= 1.0.0),
@@ -99,6 +100,7 @@ Collate:
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'pillar.R'
     'progress.R'
     'query-join.R'
     'query-select.R'
