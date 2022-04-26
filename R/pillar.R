@@ -3,21 +3,14 @@
 tbl_format_header.tbl_sql <- function(x, setup, ...) {
   # The setup object may know the total number of rows
   desc <- tbl_desc(x, rows_total = setup$rows_total)
-  tbl_sum <- tbl_sum_tbl_sql(x, desc = desc)
-  named_header <- tbl_sum
+  named_header <- tbl_sum_tbl_sql(x, desc = desc)
 
-  # Copied from pillar
-  if (all(names2(named_header) == "")) {
-    header <- named_header
-  } else {
-    header <- paste0(
-      align(paste0(names2(named_header), ":"), space = "\U00A0"),
-      # We add a space after the NBSP inserted by align()
-      # so that wrapping occurs at the right location for very narrow outputs
-      " ",
-      named_header
-    )
-  }
+  # Adapted from pillar
+  header <- paste0(
+    align(paste0(names(named_header), ":")),
+    " ",
+    named_header
+  )
 
   style_subtle(paste0("# ", header))
 }
