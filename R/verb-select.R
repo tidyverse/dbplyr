@@ -113,8 +113,7 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
 #' @param x A lazy table
 #' @param drop_groups Should groups be dropped?
 #'
-#' @return A 0 row tibble with the same columns as `x` and - if possible - the
-#'   column should be the R equivalend.
+#' @return A 0 row tibble with the same columns names, and, if possible, types, as `x`.
 #'
 #' @export
 #' @keywords internal
