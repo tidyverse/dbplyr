@@ -122,6 +122,19 @@ test_that("mutate collapses over nested select", {
   expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(x))
 })
 
+test_that("", {
+  local_reproducible_output(crayon = TRUE)
+
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  out <- lf %>%
+    group_by(x) %>%
+    mutate(y = mean(y), z = z + 1) %>%
+    filter(z == 1) %>%
+    left_join(lf, by = "x")
+
+  expect_snapshot(show_query(out, cte = TRUE))
+})
+
 # sql_build -------------------------------------------------------------
 
 test_that("select picks variables", {
