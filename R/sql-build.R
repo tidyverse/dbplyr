@@ -96,10 +96,7 @@ cte_render <- function(query_list, con) {
   )
   cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
 
-  with_sql <- "WITH "
-  if (dbplyr_use_colour()) {
-    with_sql <- cli::col_blue(with_sql)
-  }
+  with_sql <- style_kw("WITH ")
   build_sql(sql(with_sql), cte_query, "\n", query_list[[n]], con = con)
 }
 

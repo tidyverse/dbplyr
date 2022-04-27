@@ -409,9 +409,7 @@ sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
 #' @export
 sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
   method <- paste0(method, if (all) " ALL")
-  if (dbplyr_use_colour()) {
-    method <- cli::col_blue(method)
-  }
+  method <- style_kw(method)
   lines <- list(
     sql_indent_subquery(x, con = con, lvl = lvl),
     sql(method),
