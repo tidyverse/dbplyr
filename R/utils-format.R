@@ -29,5 +29,5 @@ indent_print <- function(x) {
 }
 
 dbplyr_use_colour <- function() {
-  getOption("dbplyr_use_colour", FALSE) && cli::num_ansi_colors() > 1L
+  getOption("dbplyr_use_colour", FALSE)
 }
