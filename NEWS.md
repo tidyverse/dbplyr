@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `show_query()` now creates more readable queries by printing the most common
+  keywords in blue (@mgirlich, #644).
+
 * `mutate()` and `transmute()` now automatically use named windows if a window
   definition is used at least twice and the backend supports named windows
   (@mgirlich, #624).
