@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New `pillar::tbl_format_header()` method for lazy tables: Printing a lazy table where all rows are displayed also shows the exact number of rows in the header. The threshold is controlled by `getOption("pillar.print_min")`, with a default of 10 (#796, @krlmlr).
+
 * `mutate()` and `transmute()` now automatically use named windows if a window
   definition is used at least twice and the backend supports named windows
   (@mgirlich, #624).
