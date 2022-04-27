@@ -91,7 +91,7 @@ cte_render <- function(query_list, con) {
 
   ctes <- purrr::imap(query_list[-n],
     function(query, name) {
-      build_sql(ident(name), " AS (\n", sql(query), "\n)", con = con)
+      build_sql(ident(name), sql(style_kw(" AS")), " (\n", sql(query), "\n)", con = con)
     }
   )
   cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
