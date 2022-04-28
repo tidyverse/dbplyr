@@ -88,7 +88,9 @@ that already exists in \code{x}.
 
 One of:
 \itemize{
-\item \code{"error"}, the default, is not supported for database tables.
+\item \code{"error"}, the default, is not supported for database tables. To get the
+same behaviour add a unique index on the \code{by} columns and use
+\code{rows_append()}.
 \item \code{"ignore"} will ignore rows in \code{y} with keys that conflict with keys in
 \code{x}.
 }}
@@ -119,5 +121,7 @@ keys in \code{x}.
 }}
 }
 \description{
-These are methods for the dplyr \code{\link[=rows_*]{rows_*()}} generics.
+These are methods for the dplyr \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}},
+\code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_patch]{rows_patch()}}, \code{\link[=rows_upsert]{rows_upsert()}}, and \code{\link[=rows_delete]{rows_delete()}}
+generics.
 }

@@ -1,7 +1,9 @@
 #' Manipulate individual rows
 #'
 #' @description
-#' These are methods for the dplyr [rows_*()] generics.
+#' These are methods for the dplyr [rows_insert()], [`rows_append()`],
+#' [`rows_update()`], [`rows_patch()`], [`rows_upsert()`], and [`rows_delete()`]
+#' generics.
 #'
 #' @export
 #' @inheritParams dplyr::rows_insert
