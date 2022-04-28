@@ -10,7 +10,9 @@
 #'   that already exists in `x`.
 #'
 #'   One of:
-#'   - `"error"`, the default, is not supported for database tables.
+#'   - `"error"`, the default, is not supported for database tables. To get the
+#'     same behaviour add a unique index on the `by` columns and use
+#'     `rows_append()`.
 #'   - `"ignore"` will ignore rows in `y` with keys that conflict with keys in
 #'     `x`.
 #' @param unmatched For `rows_update()`, `rows_patch()`, and `rows_delete()`,
