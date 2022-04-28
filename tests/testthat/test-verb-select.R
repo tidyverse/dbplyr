@@ -122,7 +122,7 @@ test_that("mutate collapses over nested select", {
   expect_snapshot(lf %>% mutate(a = 1, b = 2) %>% select(x))
 })
 
-test_that("", {
+test_that("output is styled", {
   local_reproducible_output(crayon = TRUE)
 
   lf <- lazy_frame(x = 1, y = 1, z = 1)
