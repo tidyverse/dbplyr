@@ -40,9 +40,9 @@ db_location <- function(path = NULL, filename) {
   if (!is.null(path)) {
     # Check that path is a directory and is writeable
     if (!file.exists(path) || !file.info(path)$isdir) {
-      abort(paste0(path, " is not a directory"))
+      cli_abort("{.path {path}} is not a directory")
     }
-    if (!is_writeable(path)) abort(paste0("Can not write to ", path))
+    if (!is_writeable(path)) cli_abort("Can not write to {.path {path}}")
     return(file.path(path, filename))
   }
 
@@ -52,7 +52,7 @@ db_location <- function(path = NULL, filename) {
   tmp <- tempdir()
   if (is_writeable(tmp)) return(file.path(tmp, filename))
 
-  abort("Could not find writeable location to cache db")
+  cli_abort("Could not find writeable location to cache db")
 }
 
 is_writeable <- function(x) {

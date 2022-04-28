@@ -61,5 +61,5 @@
       inner_join(lf1, lf2, by = "x", suffix = "a")
     Condition
       Error in `inner_join()`:
-      ! `suffix` must be a character vector of length 2.
+      ! `suffix` must have size 2, not size 1.
 

@@ -50,15 +50,10 @@
       SELECT `x`
       FROM `df`
 
-# 
+# output is styled
 
     Code
       show_query(out, cte = TRUE)
-    Condition
-      [1m[33mWarning[39m:[22m
-      Missing values are always removed in SQL.
-      Use `AVG(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
     Output
       <SQL>
       [34mWITH [39m`q01`[34m AS[39m (

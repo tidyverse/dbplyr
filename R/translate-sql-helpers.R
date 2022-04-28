@@ -181,12 +181,10 @@ sql_prefix <- function(f, n = NULL) {
   function(...) {
     args <- list(...)
     if (!is.null(n) && length(args) != n) {
-      abort(
-        paste0("Invalid number of args to SQL ", f, ". Expecting ", n)
-      )
+      cli_abort("Invalid number of args to SQL {f}. Expecting {n}.")
     }
     if (any(names2(args) != "")) {
-      warning("Named arguments ignored for SQL ", f, call. = FALSE)
+      cli::cli_warn("Named arguments ignored for SQL {f}")
     }
     build_sql(sql(f), args)
   }
@@ -230,9 +228,8 @@ sql_aggregate_win <- function(f) {
   force(f)
 
   function(...) {
-    abort(
-      paste0("`", f, "()` is only available in a windowed (`mutate()`) context"),
-    )
+    # TODO use {.fun {f}} after https://github.com/r-lib/cli/issues/422 is fixed
+    cli_abort("`{f}()`` is only available in a windowed ({.fun mutate}) context")
   }
 }
 
@@ -241,12 +238,12 @@ check_na_rm <- function(f, na.rm, warned) {
     return(warned)
   }
 
-  warning(
-    "Missing values are always removed in SQL.\n",
-    "Use `", f, "(x, na.rm = TRUE)` to silence this warning\n",
-    "This warning is displayed only once per session.",
-    call. = FALSE
-  )
+  # TODO use `{.code ...}` when https://github.com/r-lib/cli/issues/422 is fixed
+  cli::cli_warn(c(
+    "Missing values are always removed in SQL.",
+    "Use `{f}(x, na.rm = TRUE)` to silence this warning",
+    "This warning is displayed only once per session."
+  ))
   TRUE
 }
 
@@ -256,7 +253,8 @@ sql_not_supported <- function(f) {
   assert_that(is_string(f))
 
   function(...) {
-    abort(paste0(f, " is not available in this SQL variant"))
+    # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+    cli_abort("{f} is not available in this SQL variant")
   }
 }
 

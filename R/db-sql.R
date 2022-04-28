@@ -331,7 +331,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
     cross = sql("CROSS JOIN"),
-    abort(paste0("Unknown join type: ", type))
+    cli_abort("Unknown join type: {.val {type}}")
   )
 
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)

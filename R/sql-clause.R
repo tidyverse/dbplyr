@@ -37,7 +37,7 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
 sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0) {
   assert_that(is.character(select))
   if (is_empty(select)) {
-    abort("Query contains no columns")
+    cli_abort("Query contains no columns")
   }
 
   clause <- build_sql(
