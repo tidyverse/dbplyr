@@ -275,13 +275,13 @@
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT *</span>
-<span class="co">#&gt; FROM (</span>
-<span class="co">#&gt;   SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`</span>
-<span class="co">#&gt;   FROM `flights`</span>
-<span class="co">#&gt;   GROUP BY `tailnum`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `tailnum`, AVG(`arr_delay`)<span style="color: #0000BB;"> AS </span>`delay`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `flights`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> `tailnum`</span>
 <span class="co">#&gt; )</span>
-<span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`n` &gt; 100.0)</span></code></pre></div>
 <p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> to pull all the data down into a local tibble:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">

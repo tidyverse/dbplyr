@@ -127,10 +127,10 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT `x`, `y`, `a`, POWER(`a`, 2.0) AS `b`</span>
-<span class="co">#&gt; FROM (</span>
-<span class="co">#&gt;   SELECT `x`, `y`, `y` * `x` AS `a`</span>
-<span class="co">#&gt;   FROM `dbplyr_001`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `y`, `a`, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `x`, `y`, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
 <span class="co">#&gt; )</span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results are about what you expect.</p>
 </div>
@@ -144,31 +144,31 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT `x`, `y`, foofify(`x`, `y`) AS `z`</span>
-<span class="co">#&gt; FROM `dbplyr_001`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `y`, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
 
 <span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT *</span>
-<span class="co">#&gt; FROM `dbplyr_001`</span>
-<span class="co">#&gt; WHERE (`x` LIKE '%foo%')</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></code></pre></div>
 <p>SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can’t be translated directly from R code. To insert these in your own queries, you can use literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT x! AS `factorial`</span>
-<span class="co">#&gt; FROM `dbplyr_001`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
 
 <span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT CAST(x AS FLOAT) AS `factorial`</span>
-<span class="co">#&gt; FROM `dbplyr_001`</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></code></pre></div>
 <p>Learn more in <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

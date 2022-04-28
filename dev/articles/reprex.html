@@ -154,9 +154,9 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT `cyl`, COUNT(*) AS `n`</span>
-<span class="co">#&gt; FROM `mtcars`</span>
-<span class="co">#&gt; GROUP BY `cyl`</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `cyl`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `mtcars`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">GROUP BY</span> `cyl`</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="translating-verbs">Translating verbs<a class="anchor" aria-label="anchor" href="#translating-verbs"></a>
@@ -169,16 +169,16 @@
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT *</span>
-<span class="co">#&gt; FROM `df`</span>
-<span class="co">#&gt; LIMIT 5</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">LIMIT</span> 5</span>
 
 <span class="fu"><a href="../reference/tbl_lazy.html">lazy_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT TOP 5 *</span>
-<span class="co">#&gt; FROM `df`</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT TOP 5</span> *</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></code></pre></div>
 <p>If you isolate the problem to incorrect SQL generation, it would be very helpful if you could also suggest more appropriate SQL.</p>
 </div>
 <div class="section level2">

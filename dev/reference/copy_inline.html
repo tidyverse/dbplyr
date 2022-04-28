@@ -119,12 +119,12 @@ so it should be small.</p></dd>
 <span class="r-in"></span>
 <span class="r-in"><span class="fu">copy_inline</span><span class="op">(</span><span class="va">con</span>, <span class="va">df</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> FROM (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   SELECT NULL AS `x`, NULL AS `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   WHERE (0 = 1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   UNION ALL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   VALUES (1, 'a'), (2, 'b'), (3, 'c')</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> CAST(`x` AS INTEGER)<span style="color: #0000BB;"> AS </span>`x`, CAST(`y` AS TEXT)<span style="color: #0000BB;"> AS </span>`y`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> NULL<span style="color: #0000BB;"> AS </span>`x`, NULL<span style="color: #0000BB;"> AS </span>`y`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">WHERE</span> (0 = 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">UNION ALL</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">VALUES</span> (1, 'a'), (2, 'b'), (3, 'c')</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) AS `values_table`</span>
 </code></pre></div>
     </div>
