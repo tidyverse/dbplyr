@@ -303,14 +303,14 @@ and return data to R.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "x"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `LHS`.`x`<span style="color: #0000BB;"> AS </span>`x`, `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_020`<span style="color: #0000BB;"> AS </span>`LHS`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> `dbplyr_021`<span style="color: #0000BB;"> AS </span>`RHS`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_016`<span style="color: #0000BB;"> AS </span>`LHS`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> `dbplyr_017`<span style="color: #0000BB;"> AS </span>`RHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">ON</span> (`LHS`.`x` = `RHS`.`x`)</span>
 <span class="r-in"><span class="va">db1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">db2</span>, sql_on <span class="op">=</span> <span class="st">"LHS.x &lt; RHS.x"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `LHS`.`x`<span style="color: #0000BB;"> AS </span>`x.x`, `RHS`.`x`<span style="color: #0000BB;"> AS </span>`x.y`, `y`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_020`<span style="color: #0000BB;"> AS </span>`LHS`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> `dbplyr_021`<span style="color: #0000BB;"> AS </span>`RHS`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_016`<span style="color: #0000BB;"> AS </span>`LHS`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">LEFT JOIN</span> `dbplyr_017`<span style="color: #0000BB;"> AS </span>`RHS`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">ON</span> (LHS.x &lt; RHS.x)</span>
 </code></pre></div>
     </div>

@@ -139,7 +139,7 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   `y`,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   (`x` + `y`) / 2.0<span style="color: #0000BB;"> AS </span>`a`,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SQRT((POWER(`x`, 2)) + POWER(`y`, 2))<span style="color: #0000BB;"> AS </span>`b`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_023`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_019`</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># dbplyr automatically creates subqueries as needed</span></span>
 <span class="r-in"><span class="va">db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -149,7 +149,7 @@ and return data to R.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`, `x1`, `x1` * 2.0<span style="color: #0000BB;"> AS </span>`x2`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> `x`, `y`, `x` + 1.0<span style="color: #0000BB;"> AS </span>`x1`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_023`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_019`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 </code></pre></div>
     </div>
