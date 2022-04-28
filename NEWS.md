@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* New `pillar::tbl_format_header()` method for lazy tables: Printing a lazy table where all rows are displayed also shows the exact number of rows in the header. The threshold is controlled by `getOption("pillar.print_min")`, with a default of 10 (#796, @krlmlr).
+
 * The 1st edition extension mechanism is formally deprecated (#507).
 
 * `show_query()` now creates more readable queries by printing the most common
