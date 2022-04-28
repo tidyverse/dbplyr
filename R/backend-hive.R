@@ -81,7 +81,7 @@ sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) 
   # of `sql_format_clauses()`
   build_sql(
     x, "\n",
-    indent_lvl(method, lvl = lvl), "\n",
+    indent_lvl(style_kw(method), lvl = lvl), "\n",
     y,
     con = con
   )

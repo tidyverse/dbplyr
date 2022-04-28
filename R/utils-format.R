@@ -21,9 +21,21 @@ indent_print <- function(x) {
   indent(utils::capture.output(print(x)))
 }
 
+style_kw <- function(x) {
+  if (dbplyr_use_colour()) {
+    cli::col_blue(x)
+  } else {
+    x
+  }
+}
+
 # function for the thousand separator,
 # returns "," unless it's used for the decimal point, in which case returns "."
 'big_mark' <- function(x, ...) {
   mark <- if (identical(getOption("OutDec"), ",")) "." else ","
   formatC(x, big.mark = mark, ...)
+}
+
+dbplyr_use_colour <- function() {
+  getOption("dbplyr_use_colour", FALSE)
 }
