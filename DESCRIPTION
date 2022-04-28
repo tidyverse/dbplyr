@@ -22,7 +22,7 @@ Imports:
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.6),
+    dplyr (>= 1.0.8.9000),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
@@ -147,3 +147,5 @@ Collate:
     'verb-uncount.R'
     'verb-window.R'
     'zzz.R'
+Remotes:  
+    tidyverse/dplyr
