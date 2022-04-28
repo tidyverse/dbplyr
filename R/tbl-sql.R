@@ -18,6 +18,10 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
 
   vars <- vars %||% dbplyr_query_fields(src$con, from)
 
+  tbl_sql_impl(subclass, src, from, vars)
+}
+
+tbl_sql_impl <- function(subclass, src, from, vars) {
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
     src = src,
