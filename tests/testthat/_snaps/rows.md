@@ -104,6 +104,63 @@
       )
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
+# rows_append() checks arguments
+
+    Code
+      (lf %>% rows_append(df, by = "x"))
+    Condition
+      Error in `rows_append()`:
+      ! `...` must be empty.
+      x Problematic argument:
+      * by = "x"
+    Code
+      (lf %>% rows_append(df, conflict = "error"))
+    Condition
+      Error in `rows_append()`:
+      ! `...` must be empty.
+      x Problematic argument:
+      * conflict = "error"
+
+# `rows_append()` works with `in_place = FALSE`
+
+    Code
+      rows_append(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 3:4,
+      y = 23:24, .name = "df_y"), in_place = FALSE)
+    Output
+      <SQL>
+      (
+        SELECT *
+        FROM `df_x`
+      )
+      UNION ALL
+      (
+        SELECT *
+        FROM `df_y`
+      )
+
+# `rows_append()` works with `in_place = TRUE`
+
+    Code
+      (rows_append(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
+      y = 22:23, .name = "df_y"), in_place = TRUE))
+    Condition
+      Error in `rows_check_in_place()`:
+      ! `in_place = TRUE` does not work for simulated connections.
+
+# `sql_query_append()` works
+
+    Code
+      sql_query_append(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
+      returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
 # arguments are checked
 
     Code
