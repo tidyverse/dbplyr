@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The 1st edition extension mechanism is formally deprecated (#507).
+
 * `show_query()` now creates more readable queries by printing the most common
   keywords in blue (@mgirlich, #644).
 
