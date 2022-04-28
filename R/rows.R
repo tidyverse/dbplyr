@@ -1,3 +1,8 @@
+#' Manipulate individual rows
+#'
+#' @description
+#' These are methods for the dplyr [rows_*()] generics.
+#'
 #' @export
 #' @inheritParams dplyr::rows_insert
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
@@ -67,6 +72,52 @@ rows_insert.tbl_lazy <- function(x,
       # Need to `union_all()` with `x` so that all columns of `x` exist in the result
       returned_rows <- anti_join(y, x, by = by) %>%
         union_all(x %>% filter(0 == 1)) %>%
+        select(!!!returning_cols) %>%
+        collect()
+      out <- set_returned_rows(out, returned_rows)
+    }
+
+    out
+  }
+}
+
+#' @inheritParams dplyr::rows_append
+#'
+#' @export
+#' @importFrom dplyr rows_append
+#' @rdname rows-db
+rows_append.tbl_lazy <- function(x,
+                                 y,
+                                 ...,
+                                 copy = FALSE,
+                                 in_place = FALSE,
+                                 returning = NULL) {
+  check_dots_empty()
+  rows_check_in_place(x, in_place)
+  name <- target_table_name(x, in_place)
+
+  y <- auto_copy(x, y, copy = copy)
+
+  rows_check_containment(x, y)
+
+  returning_cols <- rows_check_returning(x, returning, enexpr(returning))
+
+  if (!is_null(name)) {
+    sql <- sql_query_append(
+      con = remote_con(x),
+      x_name = name,
+      y = y,
+      ...,
+      returning_cols = returning_cols
+    )
+
+    rows_get_or_execute(x, sql, returning_cols)
+  } else {
+    out <- union_all(x, y)
+
+    if (!is_empty(returning_cols)) {
+      # Need to `union_all()` with `x` so that all columns of `x` exist in the result
+      returned_rows <- union_all(y, x %>% filter(0 == 1)) %>%
         select(!!!returning_cols) %>%
         collect()
       out <- set_returned_rows(out, returned_rows)

@@ -180,6 +180,114 @@ test_that("`sql_query_insert()` works", {
   )
 })
 
+# rows_append -------------------------------------------------------------
+
+test_that("rows_append() checks arguments", {
+  lf <- lazy_frame(x = 1:3, y = 11:13, .name = "df_x")
+  expect_snapshot(error = TRUE, {
+    (lf %>% rows_append(df, by = "x"))
+    (lf %>% rows_append(df, conflict = "error"))
+  })
+})
+
+
+test_that("`rows_append()` works with `in_place = FALSE`", {
+  expect_snapshot(
+    rows_append(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 3:4, y = 23:24, .name = "df_y"),
+      in_place = FALSE
+    )
+  )
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  expect_equal(
+    rows_append(
+      df, memdb_frame(x = 3:4, y = 23:24),
+      in_place = FALSE
+    ) %>%
+      collect(),
+    tibble(x = c(1:3, 3:4), y = c(11:13, 23:24))
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:3, y = 11:13))
+})
+
+test_that("`rows_append()` works with `in_place = FALSE` and `returning`", {
+  expect_equal(
+    rows_append(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 3:4, y = 23:24),
+      in_place = FALSE,
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(x = 3:4, y = 23:24)
+  )
+
+  # all `x` columns are present
+  expect_equal(
+    rows_append(
+      memdb_frame(x = 1:3, y = 11:13),
+      memdb_frame(x = 3:4),
+      in_place = FALSE,
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(x = 3:4, y = NA)
+  )
+})
+
+test_that("`rows_append()` works with `in_place = TRUE`", {
+  expect_snapshot(error = TRUE,
+    (rows_append(
+      lazy_frame(x = 1:3, y = 11:13, .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, .name = "df_y"),
+      in_place = TRUE
+    ))
+  )
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  rows_append(
+    df, memdb_frame(x = 3:4, y = 23:24),
+    in_place = TRUE
+  )
+  expect_equal(df %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
+})
+
+test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
+  skip_if_not_installed("RSQLite", "2.2.8")
+
+  df <- memdb_frame(x = 1:3, y = 11:13)
+  df_inserted <- rows_append(
+    df, memdb_frame(x = 3:4, y = 23:24),
+    in_place = TRUE,
+    returning = everything()
+  )
+
+  expect_equal(get_returned_rows(df_inserted), tibble(x = 3:4, y = 23:24))
+
+  expect_equal(df_inserted %>% collect(), tibble(x = c(1:3, 3:4), y = c(11:13, 23:24)))
+})
+
+test_that("`sql_query_append()` works", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_dbi(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_append(
+      con = simulate_dbi(),
+      x_name = ident("df_x"),
+      y = df_y,
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 # rows_update -------------------------------------------------------------
 
 test_that("arguments are checked", {
