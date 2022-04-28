@@ -36,6 +36,7 @@ dbplyr_edition.Oracle <- function(con) {
 #' @export
 sql_query_select.Oracle <- function(con, select, from, where = NULL,
                              group_by = NULL, having = NULL,
+                             window = NULL,
                              order_by = NULL,
                              limit = NULL,
                              distinct = FALSE,
@@ -49,6 +50,7 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
     where     = sql_clause_where(where),
     group_by  = sql_clause_group_by(group_by),
     having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
@@ -107,7 +109,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_wrap.Oracle <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
     build_sql("(", from, ") ", as_subquery_name(name, default = NULL), con = con)
@@ -162,5 +164,15 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
+
+#' @export
+supports_window_clause.Oracle <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_window_clause.OraConnection <- function(con) {
+  TRUE
+}
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))

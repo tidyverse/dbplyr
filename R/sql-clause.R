@@ -4,6 +4,7 @@ sql_select_clauses <- function(con,
                                where,
                                group_by,
                                having,
+                               window,
                                order_by,
                                limit = NULL,
                                lvl) {
@@ -13,6 +14,7 @@ sql_select_clauses <- function(con,
     where = where,
     group_by = group_by,
     having = having,
+    window = window,
     order_by = order_by,
     limit = limit
   )
@@ -70,6 +72,10 @@ sql_clause_having <- function(having, lvl = 0) {
   sql_clause("HAVING", having)
 }
 
+sql_clause_window <- function(window) {
+  sql_clause("WINDOW", window)
+}
+
 sql_clause_order_by <- function(order_by, subquery = FALSE, limit = NULL, lvl = 0) {
   if (subquery && length(order_by) > 0 && is.null(limit)) {
     warn_drop_order_by()
@@ -106,12 +112,18 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
   lvl <- lvl + x$lvl
 
   # check length without starting a new line
+  if (x$sep == " AND") {
+    x$sep <- style_kw(x$sep)
+  }
+
   fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
   if (x$parens) {
     fields_same_line <- paste0("(", fields_same_line, ")")
   }
+
+  x$kw <- style_kw(x$kw)
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(same_line_clause)
+  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) + cli::ansi_nchar(same_line_clause)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
     return(sql(same_line_clause))

@@ -172,14 +172,15 @@ sql_build.lazy_select_query <- function(op, con, ...) {
     inform(op$message_summarise)
   }
 
-  select_sql <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
+  select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
     from = sql_build(op$from, con),
-    select = select_sql,
+    select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
+    window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
     distinct = op$distinct,
     limit = op$limit
@@ -191,22 +192,52 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     select_expr <- set_names(select$expr, select$name)
     select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
     select_sql <- sql_vector(select_sql_list, parens = FALSE, collapse = NULL, con = con)
-    return(select_sql)
+    return(list(select_sql = select_sql, window_sql = character()))
   }
 
   if (identical(select$name, in_vars) &&
       purrr::every(select$expr, is_symbol) &&
       identical(syms(select$name), select$expr)) {
-    return(sql("*"))
+    return(list(select_sql = sql("*"), window_sql = character()))
   }
 
-  select_sql <- purrr::pmap(
-    select %>% transmute(
-      dots = set_names(expr, name),
-      vars_group = .data$group_vars,
-      vars_order = .data$order_vars,
-      vars_frame = .data$frame
-    ),
+  # translate once just to register windows
+  win_register_activate()
+  # Remove known windows before building the next query
+  on.exit(win_reset(), add = TRUE)
+  on.exit(win_register_deactivate(), add = TRUE)
+  select_sql <- translate_select_sql(con, select)
+  win_register_deactivate()
+
+  named_windows <- win_register_names()
+  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+    # need to translate again and use registered windows names
+    select_sql <- translate_select_sql(con, select)
+
+    # build window sql
+    names_esc <- sql_escape_ident(con, named_windows$name)
+    window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
+  } else {
+    window_sql <- character()
+  }
+
+  list(
+    select_sql = select_sql,
+    window_sql = window_sql
+  )
+}
+
+translate_select_sql <- function(con, select_df) {
+  select_df <- transmute(
+    select_df,
+    dots = set_names(expr, name),
+    vars_group = .data$group_vars,
+    vars_order = .data$order_vars,
+    vars_frame = .data$frame
+  )
+
+  out <- purrr::pmap(
+    select_df,
     function(dots, vars_group, vars_order, vars_frame) {
       translate_sql_(
         list(dots), con,
@@ -218,5 +249,5 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     }
   )
 
-  sql(unlist(select_sql))
+  sql(unlist(out))
 }

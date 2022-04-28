@@ -52,7 +52,7 @@
       capture_across(lf, across(c, mean))
     Condition
       Error in `chr_as_locations()`:
-      ! Can't subset columns past the end.
+      ! Can't subset columns that don't exist.
       x Column `c` doesn't exist.
 
 # across() defaults to everything()

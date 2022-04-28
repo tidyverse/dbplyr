@@ -56,4 +56,9 @@ sql_expr_matches.PostgreSQLConnection <- sql_expr_matches.PqConnection
 
 #' @export
 sql_query_explain.PostgreSQLConnection <- sql_query_explain.PqConnection
+
+#' @export
+supports_window_clause.PostgreSQLConnection <- function(con) {
+  TRUE
+}
 # nocov end
