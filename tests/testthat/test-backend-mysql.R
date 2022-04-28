@@ -98,6 +98,7 @@ test_that("can update", {
     rows_update(
       x, y,
       by = c("a", "b"),
+      unmatched = "ignore",
       in_place = TRUE
     ) %>%
       collect(),
