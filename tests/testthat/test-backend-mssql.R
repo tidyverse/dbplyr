@@ -286,14 +286,73 @@ test_that("as.integer and as.integer64 translations if parsing failures", {
   expect_identical(out$numeric, c(1.3, NA))
 })
 
+test_that("can insert", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore"
+    ) %>%
+      collect(),
+    tibble(
+      a = 1:3,
+      b = 11:13,
+      c = c(1L, -1L, -2L),
+      d = c("a", "y", "z")
+    )
+  )
+})
+
+test_that("can insert with returning", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+})
+
 test_that("can update", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
   x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
   y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
     mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_update(
@@ -308,6 +367,149 @@ test_that("can update", {
       b = 11:13,
       c = c(1L, -1L, -2L),
       d = c("a", "y", "z")
+    )
+  )
+})
+
+test_that("can update with returning", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_update(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      unmatched = "ignore",
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+})
+
+test_that("can upsert", {
+  skip("FIXME")
+
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE
+    ) %>%
+      collect(),
+    tibble(
+      a = 1:3,
+      b = 11:13,
+      c = c(1L, -1L, -2L),
+      d = c("a", "y", "z")
+    )
+  )
+})
+
+test_that("can upsert with returning", {
+  skip("FIXME")
+
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+})
+
+test_that("can delete", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_delete(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      unmatched = "ignore"
+    ) %>%
+      collect(),
+    tibble(
+      a = 1L,
+      b = 11L,
+      c = 1L,
+      d = "a"
+    )
+  )
+})
+
+test_that("can delete with returning", {
+  con <- src_test("mssql")
+
+  df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  df_y <- tibble(a = 2:3, b = c(12L, 13L))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+
+  expect_equal(
+    rows_delete(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      unmatched = "ignore",
+      returning = everything()
+    ) %>%
+      get_returned_rows(),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = 2:3,
+      d = c("b", "c")
     )
   )
 })
