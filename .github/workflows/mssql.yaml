@@ -1,16 +1,16 @@
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 name: mssql
 
 jobs:
   mssql:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     services:
       sqlserver:
@@ -24,7 +24,7 @@ jobs:
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_MSSQL: true
-      RSPM: "https://demo.rstudiopm.com/all/__linux__/bionic/latest"
+      RSPM: "https://demo.rstudiopm.com/all/__linux__/focal/latest"
       ODBCSYSINI: ${{ github.workspace }}/.github/odbc
 
     steps:
@@ -67,7 +67,7 @@ jobs:
       - name: Install SQL Server driver
         run: |
           curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-          curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
           apt-get update
           ACCEPT_EULA=Y apt-get install -y msodbcsql17
           sqlcmd -U SA -P 'Password12' -Q 'CREATE DATABASE test;'

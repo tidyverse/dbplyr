@@ -1,16 +1,16 @@
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 name: postgres
 
 jobs:
   postgres:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
 
     services:
       postgres:
@@ -26,7 +26,7 @@ jobs:
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_POSTGRES: true
-      RSPM: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"
+      RSPM: "https://demo.rstudiopm.com/all/__linux__/focal/latest"
 
     steps:
       - uses: actions/checkout@v2
