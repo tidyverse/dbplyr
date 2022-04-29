@@ -401,8 +401,6 @@ test_that("can update with returning", {
 })
 
 test_that("can upsert", {
-  skip("FIXME")
-
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
@@ -430,8 +428,6 @@ test_that("can upsert", {
 })
 
 test_that("can upsert with returning", {
-  skip("FIXME")
-
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
@@ -449,7 +445,8 @@ test_that("can upsert with returning", {
       in_place = TRUE,
       returning = everything()
     ) %>%
-      get_returned_rows(),
+      get_returned_rows() %>%
+      arrange(a),
     tibble(
       a = 2:3,
       b = 12:13,

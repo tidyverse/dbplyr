@@ -139,10 +139,14 @@ simulate_mssql <- function(version = "15.0") {
                                                     update_cols, ...,
                                                     returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  insert_cols <- c(by, update_cols)
+  insert_cols_esc <- sql(sql_escape_ident(con, insert_cols))
+  insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
     sql_clause("MERGE INTO", x_name),
@@ -151,8 +155,8 @@ simulate_mssql <- function(version = "15.0") {
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, update_cols_esc, lvl = 1),
-    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
+    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause("VALUES", insert_cols_qual, parens = TRUE, lvl = 1),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql(";")
   )
