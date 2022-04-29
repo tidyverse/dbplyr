@@ -46,15 +46,19 @@
 #'
 #' Query generation:
 #'
-#' * `sql_query_select()` generate SQL for a `SELECT` query
-#' * `sql_query_join()` generate SQL for joins
-#' * `sql_query_semi_join()` generate SQL for semi- and anti-joins
-#' * `sql_query_set_op()` generate SQL for `UNION`, `INTERSECT`, and `EXCEPT`
+#' * `sql_query_select()` generates SQL for a `SELECT` query
+#' * `sql_query_join()` generates SQL for joins
+#' * `sql_query_semi_join()` generates SQL for semi- and anti-joins
+#' * `sql_query_set_op()` generates SQL for `UNION`, `INTERSECT`, and `EXCEPT`
 #'   queries.
-#' * `sql_query_insert()` generate SQL for an `INSERT FROM` query.
-#' * `sql_query_update_from()` generate SQL for an `UPDATE FROM` query.
-#' * `sql_query_upsert()` generate SQL for an `UPSERT` query.
-#' * `sql_query_delete()` generate SQL for an `DELETE FROM` query
+#'
+#' Query generation for manipulation:
+#'
+#' * `sql_query_insert()` and `sql_query_append()` generate SQL for an `INSERT FROM` query.
+#' * `sql_query_update_from()` generates SQL for an `UPDATE FROM` query.
+#' * `sql_query_upsert()` generates SQL for an `UPSERT` query.
+#' * `sql_query_delete()` generates SQL for an `DELETE FROM` query
+#' * `sql_returning_cols()` generates SQL for a `RETURNING` clause
 #'
 #' @section dbplyr 2.0.0:
 #'

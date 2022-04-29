@@ -151,15 +151,20 @@ Query indentation:
 
 Query generation:
 \itemize{
-\item \code{sql_query_select()} generate SQL for a \code{SELECT} query
-\item \code{sql_query_join()} generate SQL for joins
-\item \code{sql_query_semi_join()} generate SQL for semi- and anti-joins
-\item \code{sql_query_set_op()} generate SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
+\item \code{sql_query_select()} generates SQL for a \code{SELECT} query
+\item \code{sql_query_join()} generates SQL for joins
+\item \code{sql_query_semi_join()} generates SQL for semi- and anti-joins
+\item \code{sql_query_set_op()} generates SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
 queries.
-\item \code{sql_query_insert()} generate SQL for an \verb{INSERT FROM} query.
-\item \code{sql_query_update_from()} generate SQL for an \verb{UPDATE FROM} query.
-\item \code{sql_query_upsert()} generate SQL for an \code{UPSERT} query.
-\item \code{sql_query_delete()} generate SQL for an \verb{DELETE FROM} query
+}
+
+Query generation for manipulation:
+\itemize{
+\item \code{sql_query_insert()} and \code{sql_query_append()} generate SQL for an \verb{INSERT FROM} query.
+\item \code{sql_query_update_from()} generates SQL for an \verb{UPDATE FROM} query.
+\item \code{sql_query_upsert()} generates SQL for an \code{UPSERT} query.
+\item \code{sql_query_delete()} generates SQL for an \verb{DELETE FROM} query
+\item \code{sql_returning_cols()} generates SQL for a \code{RETURNING} clause
 }
 }
 \section{dbplyr 2.0.0}{
