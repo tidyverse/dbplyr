@@ -18,6 +18,10 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
 
   vars <- vars %||% dbplyr_query_fields(src$con, from)
 
+  tbl_sql_impl(subclass, src, from, vars)
+}
+
+tbl_sql_impl <- function(subclass, src, from, vars) {
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
     src = src,
@@ -72,21 +76,25 @@ as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
 #' @export
 #' @importFrom tibble tbl_sum
 tbl_sum.tbl_sql <- function(x) {
+  tbl_sum_tbl_sql(x)
+}
+
+tbl_sum_tbl_sql <- function(x, desc = tbl_desc(x)) {
   grps <- op_grps(x$lazy_query)
   sort <- op_sort(x$lazy_query)
   c(
-    "Source" = tbl_desc(x),
+    "Source" = desc,
     "Database" = dbplyr_connection_describe(x$src$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
   )
 }
 
-tbl_desc <- function(x) {
+tbl_desc <- function(x, rows_total = NA_integer_) {
   paste0(
     op_desc(x$lazy_query),
     " [",
-    op_rows(x$lazy_query),
+    op_rows(x$lazy_query, rows_total),
     " x ",
     big_mark(op_cols(x$lazy_query)),
     "]"

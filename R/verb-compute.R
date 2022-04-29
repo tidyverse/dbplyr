@@ -16,7 +16,7 @@
 collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 
-  tbl(x$src, sql) %>%
+  tbl_src_dbi(x$src, sql, colnames(x)) %>%
     group_by(!!! syms(op_grps(x))) %>%
     arrange.tbl_lazy(!!!op_sort(x))
 }
@@ -53,8 +53,8 @@ compute.tbl_sql <- function(x,
     ...
   )
 
-  tbl(x$src, name) %>%
-    group_by(!!! syms(op_grps(x))) %>%
+  tbl_src_dbi(x$src, as.sql(name), colnames(x)) %>%
+    group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
 }
 
