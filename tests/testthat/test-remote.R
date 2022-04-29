@@ -6,6 +6,30 @@ test_that("remote_name returns null for computed tables", {
   expect_equal(remote_name(mf2), NULL)
 })
 
+test_that("remote_name returns name for grouped tables", {
+  mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
+
+  expect_equal(
+    mf %>% group_by(x) %>% remote_name(),
+    ident("refxiudlph")
+  )
+})
+
+test_that("remote_name returns name for unarranged tables", {
+  mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
+
+  expect_equal(
+    mf %>% arrange(x) %>% arrange() %>% remote_name(),
+    ident("refxiudlph")
+  )
+})
+
+test_that("remote_name returns name after compute()", {
+  mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
+
+  expect_false(is_null(mf %>% mutate(x = x + 1) %>% compute() %>% remote_name()))
+})
+
 test_that("can retrieve query, src and con metadata", {
   mf <- memdb_frame(x = 5)
 
