@@ -170,6 +170,26 @@ test_that("generates custom sql", {
   expect_snapshot(sql_values(con, trees))
 })
 
+test_that("`sql_query_insert()` is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_mssql(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_insert(
+      con = simulate_mssql(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      conflict = "ignore",
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 test_that("`sql_query_update_from()` is correct", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
