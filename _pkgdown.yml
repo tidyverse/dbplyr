@@ -33,11 +33,11 @@ reference:
   - mutate.tbl_lazy
   - pull.tbl_sql
   - "rows-db"
+  - rows_insert.tbl_lazy
   - get_returned_rows
   - select.tbl_lazy
   - slice_min.tbl_lazy
   - summarise.tbl_lazy
-  - rows_insert.tbl_lazy
 
 - title: tidyr verbs
   contents:
