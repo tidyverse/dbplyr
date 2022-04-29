@@ -467,7 +467,8 @@ get_returned_rows <- function(x) {
 #' has_returned_rows()
 #'
 #' `has_returned_rows()` checks if `x` has stored RETURNING rows produced by
-#' [rows_insert()], [rows_update()], [rows_upsert()], or [rows_delete()].
+#' [rows_insert()], [rows_append()], [rows_update()], [rows_upsert()],
+#' or [rows_delete()].
 #'
 #' @param x A lazy tbl.
 #'

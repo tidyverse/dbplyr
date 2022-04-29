@@ -26,5 +26,6 @@ or \code{\link[=rows_delete]{rows_delete()}} if these are called with the \code{
 An error is raised if this information is not available.
 
 \code{has_returned_rows()} checks if \code{x} has stored RETURNING rows produced by
-\code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}}, or \code{\link[=rows_delete]{rows_delete()}}.
+\code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}},
+or \code{\link[=rows_delete]{rows_delete()}}.
 }
