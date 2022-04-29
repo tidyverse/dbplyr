@@ -173,6 +173,7 @@ sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
+#' @export
 supports_window_clause.MariaDBConnection <- function(con) {
   TRUE
 }

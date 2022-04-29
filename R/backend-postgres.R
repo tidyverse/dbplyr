@@ -282,6 +282,7 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
 #' @export
 sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
 
+#' @export
 supports_window_clause.PqConnection <- function(con) {
   TRUE
 }
