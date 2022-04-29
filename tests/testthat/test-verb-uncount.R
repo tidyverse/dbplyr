@@ -28,8 +28,8 @@ test_that("can request to preserve symbols", {
 test_that("unique identifiers created on request", {
   df <- memdb_frame(w = 1:3)
   expect_equal(
-    dbplyr_uncount(df, w, .id = "id") %>% collect(),
-    tibble(id = c(1L, 1:2, 1:3))
+    dbplyr_uncount(df, w, .id = "id") %>% collect() %>% arrange(id),
+    tibble(id = c(1L, 1:2, 1:3)) %>% arrange(id)
   )
 })
 

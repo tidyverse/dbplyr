@@ -107,8 +107,16 @@ op_frame.lazy_query_base <- function(op) op$frame
 
 # Description -------------------------------------------------------------
 
-op_rows <- function(op) "??"
-op_cols <- function(op) length(op_vars(op))
+op_rows <- function(op, rows_total = NA_integer_) {
+  if (is.na(rows_total)) {
+    "??"
+  } else {
+    big_mark(rows_total)
+  }
+}
+op_cols <- function(op) {
+  length(op_vars(op))
+}
 
 op_desc <- function(op) UseMethod("op_desc")
 
