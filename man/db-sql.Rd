@@ -117,7 +117,6 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
-\item \code{sql_returning_cols(con, cols, table)} generates the \code{RETURNING} clause.
 \item \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
