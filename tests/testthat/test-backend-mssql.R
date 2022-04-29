@@ -243,8 +243,8 @@ test_that("can copy_to() and compute() with temporary tables (#272)", {
   )
   expect_equal(db %>% pull(), 1:3)
 
-  db2 <- expect_message(
-    db %>% mutate(y = x + 1) %>% compute(),
+  expect_message(
+    db2 <- db %>% mutate(y = x + 1) %>% compute(),
     "Created a temporary table"
   )
   expect_equal(db2 %>% pull(), 2:4)

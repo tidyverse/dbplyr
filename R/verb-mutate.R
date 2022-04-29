@@ -112,18 +112,34 @@ transmute.tbl_lazy <- function(.data, ...) {
 
 # helpers -----------------------------------------------------------------
 
+# Split mutate expressions in independent layers, e.g.
+#
+# `get_mutate_layers(lf, b = a + 1, c = a - 1, d = b + 1)`
+#
+# creates two layers:
+# 1) a = a, b = a + 1, c = a - 1
+#    because `b` and `c` are independent of each other they can be on the
+#    same layer
+# 2) a = a, b = b, c = c, d = b + 1
+#    because `d` depends on `b` it must be on a new layer
 get_mutate_layers <- function(.data, ...) {
   dots <- enquos(..., .named = TRUE)
-  grps <- syms(op_grps(.data))
-  cur_data <- simulate_lazy_tbl(op_vars(.data), grps)
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
   all_used_vars <- character()
   all_vars <- op_vars(.data)
-  var_is_null <- rep_named(op_vars(.data), FALSE)
+  var_is_null <- rep_named(all_vars, FALSE)
 
-  cur_layer <- syms(set_names(op_vars(.data)))
+  # Each dot may contain an `across()` expression which can refer to freshly
+  # created variables. So, it is necessary to keep track of the current data
+  # to partially evaluate the dot.
+  # `dot_layer` contains the expressions of the current dot and is only needed
+  # to correctly update `cur_data`
+  cur_data <- .data
+  dot_layer <- syms(set_names(all_vars))
+
+  cur_layer <- syms(set_names(all_vars))
   layers <- list()
 
   for (i in seq_along(dots)) {
@@ -140,6 +156,7 @@ get_mutate_layers <- function(.data, ...) {
       if (quo_is_null(cur_quo)) {
         var_is_null[[cur_var]] <- TRUE
         cur_layer[[cur_var]] <- cur_quo
+        dot_layer[[cur_var]] <- cur_quo
         layer_modified_vars <- setdiff(layer_modified_vars, cur_var)
         all_modified_vars <- setdiff(all_modified_vars, cur_var)
         next
@@ -158,11 +175,13 @@ get_mutate_layers <- function(.data, ...) {
 
       var_is_null[[cur_var]] <- FALSE
       cur_layer[[cur_var]] <- cur_quo
+      dot_layer[[cur_var]] <- cur_quo
       layer_modified_vars <- c(layer_modified_vars, cur_var)
     }
 
     all_vars <- names(cur_layer)[!var_is_null]
-    cur_data <- simulate_lazy_tbl(all_vars, grps)
+    cur_data$lazy_query <- add_select(cur_data, dot_layer, "mutate")
+    dot_layer <- syms(set_names(all_vars))
   }
 
   list(
@@ -170,10 +189,4 @@ get_mutate_layers <- function(.data, ...) {
     modified_vars = all_modified_vars,
     used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
-}
-
-simulate_lazy_tbl <- function(vars, groups) {
-  df <- as_tibble(as.list(set_names(vars)), .name_repair = "minimal")
-  tbl_lazy(df) %>%
-    group_by(!!!groups)
 }
