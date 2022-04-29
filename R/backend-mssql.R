@@ -116,6 +116,22 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
+`sql_query_append.Microsoft SQL Server` <- function(con, x_name, y, ...,
+                                                    returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+
+  clauses <- list2(
+    sql_clause_insert(con, insert_cols, x_name),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
 `sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
                                                          update_values, ...,
                                                          returning_cols = NULL) {

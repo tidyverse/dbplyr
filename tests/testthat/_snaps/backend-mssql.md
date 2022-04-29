@@ -302,6 +302,20 @@
         WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
       )
 
+# `sql_query_append()` is correct
+
+    Code
+      sql_query_append(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+
 # `sql_query_update_from()` is correct
 
     Code
