@@ -169,7 +169,7 @@ op_desc.lazy_query <- function(op) {
 #' @export
 sql_build.lazy_select_query <- function(op, con, ...) {
   if (!is.null(op$message_summarise)) {
-    cli::cli_inform(op$message_summarise)
+    message(op$message_summarise)
   }
 
   select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
