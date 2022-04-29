@@ -2,9 +2,12 @@
 % Please edit documentation in R/verb-select.R
 \name{simulate_vars}
 \alias{simulate_vars}
+\alias{simulate_vars_is_typed}
 \title{Simulate variables to use in tidyselect}
 \usage{
 simulate_vars(x, drop_groups = FALSE)
+
+simulate_vars_is_typed(x)
 }
 \arguments{
 \item{x}{A lazy table}
@@ -12,8 +15,7 @@ simulate_vars(x, drop_groups = FALSE)
 \item{drop_groups}{Should groups be dropped?}
 }
 \value{
-A 0 row tibble with the same columns as \code{x} and - if possible - the
-column should be the R equivalend.
+A 0 row tibble with the same columns names, and, if possible, types, as \code{x}.
 }
 \description{
 Simulate variables to use in tidyselect

@@ -132,6 +132,12 @@ simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
   as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
 }
 
+#' @rdname simulate_vars
+#' @export
+simulate_vars_is_typed <- function(x) UseMethod("simulate_vars_is_typed")
+#' @export
+simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
+
 # op_select ---------------------------------------------------------------
 
 add_select <- function(.data, vars, op = c("select", "mutate")) {
