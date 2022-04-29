@@ -330,10 +330,10 @@
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
-        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
       WHEN NOT MATCHED THEN
-        INSERT (`c`, `d`)
-        VALUES (`...y`.`c`, `...y`.`d`)
+        INSERT (`a`, `b`, `c`, `d`)
+        VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       ;
 
