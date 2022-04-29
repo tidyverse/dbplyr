@@ -119,6 +119,8 @@ test_that("across() gives informative errors", {
     capture_across(lf, across(a:b, "log"))
 
     capture_across(lf, across(c, mean))
+
+    capture_across(lf, across(c))
   })
 })
 

@@ -5,6 +5,11 @@ capture_across <- function(data, x) {
 
 partial_eval_across <- function(call, data, env) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
+  if (is_null(call$.fns)) {
+    # For data.frames this produces a data frame column
+    cli::cli_abort("{.code .fns = NULL} is not supported for lazy tables.")
+  }
+
   across_setup(data, call, env, allow_rename = TRUE, fn = "across()")
 }
 
