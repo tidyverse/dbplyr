@@ -582,7 +582,7 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
   )
 
   if (conflict == "error") {
-    abort('`conflict` = "error" is not supported for database tables.', call = error_call)
+    abort('`conflict = "error"` is not supported for database tables.', call = error_call)
   }
 
   conflict
@@ -597,7 +597,7 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   )
 
   if (unmatched == "error") {
-    abort('`unmatched` = "error" is not supported for database tables.', call = error_call)
+    abort('`unmatched = "error"` is not supported for database tables.', call = error_call)
   }
 
   unmatched

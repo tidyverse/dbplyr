@@ -4,12 +4,12 @@
       (rows_insert(lf, lf, by = "x", conflict = "error"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict` = "error" is not supported for database tables.
+      ! `conflict = "error"` is not supported for database tables.
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict` = "error" is not supported for database tables.
+      ! `conflict = "error"` is not supported for database tables.
 
 ---
 
@@ -46,7 +46,7 @@
     Output
       <error/rlang_error>
       Error in `rows_insert()`:
-      ! `conflict` = "error" is not supported for database tables.
+      ! `conflict = "error"` is not supported for database tables.
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -84,7 +84,7 @@
         "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict` = "error" is not supported for database tables.
+      ! `conflict = "error"` is not supported for database tables.
 
 ---
 
@@ -192,12 +192,12 @@
       (rows_update(lf, lf, by = "x", unmatched = "error"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched` = "error" is not supported for database tables.
+      ! `unmatched = "error"` is not supported for database tables.
     Code
       (rows_update(lf, lf, by = "x"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched` = "error" is not supported for database tables.
+      ! `unmatched = "error"` is not supported for database tables.
 
 ---
 
