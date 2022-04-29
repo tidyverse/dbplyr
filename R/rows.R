@@ -447,8 +447,8 @@ set_returned_rows <- function(x, returned_rows) {
 #' `r lifecycle::badge("experimental")`
 #'
 #' `get_returned_rows()` extracts the RETURNING rows produced by
-#' [rows_insert()], [rows_update()], [rows_upsert()], or [rows_delete()]
-#' if called with the `returning` argument.
+#' [rows_insert()], [rows_append()], [rows_update()], [rows_upsert()],
+#' or [rows_delete()] if these are called with the `returning` argument.
 #' An error is raised if this information is not available.
 #'
 #' @param x A lazy tbl.
