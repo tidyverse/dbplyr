@@ -299,7 +299,8 @@ test_that("can update", {
     rows_update(
       x, y,
       by = c("a", "b"),
-      in_place = TRUE
+      in_place = TRUE,
+      unmatched = "ignore"
     ) %>%
       collect(),
     tibble(
