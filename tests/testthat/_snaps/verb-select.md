@@ -50,7 +50,7 @@
       SELECT `x`
       FROM `df`
 
-# 
+# output is styled
 
     Code
       show_query(out, cte = TRUE)
