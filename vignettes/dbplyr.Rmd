@@ -199,4 +199,4 @@ PostgreSQL is a considerably more powerful database than SQLite. It has a much w
 
 BigQuery is a hosted database server provided by Google. To connect, you need to provide your `project`, `dataset` and optionally a project for `billing` (if billing for `project` isn't enabled). 
 
-It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it's a hosted solution, there's no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can [ship hard drives](https://cloud.google.com/products/data-transfer)!)
+It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it's a hosted solution, there's no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can [ship hard drives](https://cloud.google.com/storage-transfer-service)!)

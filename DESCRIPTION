@@ -21,19 +21,21 @@ Depends:
 Imports: 
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
+    cli,
     DBI (>= 1.0.0),
     dplyr (>= 1.0.6),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
     methods,
+    pillar (>= 1.5.0),
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
     rlang (>= 1.0.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils,
-    vctrs (>= 0.4.0),
+    vctrs (>= 0.4.1),
     withr
 Suggests:
     bit64,
@@ -99,6 +101,7 @@ Collate:
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'pillar.R'
     'progress.R'
     'query-join.R'
     'query-select.R'
