@@ -4,7 +4,6 @@
 \alias{db-sql}
 \alias{sql_expr_matches}
 \alias{sql_translation}
-\alias{sql_returning_cols}
 \alias{sql_random}
 \alias{sql_table_analyze}
 \alias{sql_table_index}
@@ -24,13 +23,12 @@
 \alias{sql_query_update_from}
 \alias{sql_query_upsert}
 \alias{sql_query_delete}
+\alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
 
 sql_translation(con)
-
-sql_returning_cols(con, cols, table, ...)
 
 sql_random(con)
 
@@ -109,6 +107,8 @@ sql_query_update_from(
 sql_query_upsert(con, x_name, y, by, update_cols, ..., returning_cols = NULL)
 
 sql_query_delete(con, x_name, y, by, ..., returning_cols = NULL)
+
+sql_returning_cols(con, cols, table, ...)
 }
 \description{
 SQL translation:

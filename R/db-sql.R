@@ -120,33 +120,6 @@ sql_translate_env.DBIConnection <- function(con) {
 
 #' @export
 #' @rdname db-sql
-sql_returning_cols <- function(con, cols, table, ...) {
-  if (is_empty(cols)) {
-    return(NULL)
-  }
-
-  rlang::check_dots_empty()
-  UseMethod("sql_returning_cols")
-}
-
-#' @export
-sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
-  returning_cols <- sql_named_cols(con, cols, table = table)
-
-  sql_clause("RETURNING", returning_cols)
-}
-
-sql_named_cols <- function(con, cols, table = NULL) {
-  nms <- names2(cols)
-  nms[nms == cols] <- ""
-
-  cols <- sql_table_prefix(con, cols, table)
-  cols <- set_names(ident_q(cols), nms)
-  escape(cols, collapse = NULL, con = con)
-}
-
-#' @export
-#' @rdname db-sql
 sql_random <- function(con) {
   UseMethod("sql_random")
 }
@@ -605,6 +578,33 @@ sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_co
     sql_returning_cols(con, returning_cols, x_name)
   )
   sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_returning_cols <- function(con, cols, table, ...) {
+  if (is_empty(cols)) {
+    return(NULL)
+  }
+
+  rlang::check_dots_empty()
+  UseMethod("sql_returning_cols")
+}
+
+#' @export
+sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
+  returning_cols <- sql_named_cols(con, cols, table = table)
+
+  sql_clause("RETURNING", returning_cols)
+}
+
+sql_named_cols <- function(con, cols, table = NULL) {
+  nms <- names2(cols)
+  nms[nms == cols] <- ""
+
+  cols <- sql_table_prefix(con, cols, table)
+  cols <- set_names(ident_q(cols), nms)
+  escape(cols, collapse = NULL, con = con)
 }
 
 # dplyr fallbacks ---------------------------------------------------------
