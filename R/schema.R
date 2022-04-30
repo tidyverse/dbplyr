@@ -28,7 +28,13 @@
 #' con %>% tbl("df")
 #' con %>% tbl(in_schema("aux", "df"))
 in_schema <- function(schema, table) {
-  in_catalog(NULL, schema, table)
+  structure(
+    list(
+      schema = as.sql(schema),
+      table = as.sql(table)
+    ),
+    class = "dbplyr_schema"
+  )
 }
 
 #' @rdname in_schema
@@ -38,35 +44,37 @@ in_catalog <- function(catalog, schema, table) {
     list(
       schema = as.sql(schema),
       table = as.sql(table),
-      catalog = if (!is.null(catalog)) as.sql(catalog)
+      catalog = as.sql(catalog)
     ),
-    class = "dbplyr_schema"
+    class = "dbplyr_catalog"
   )
 }
 
 #' @export
 print.dbplyr_schema <- function(x, ...) {
-  if (is.null(x$catalog)) {
-    cat_line("<SCHEMA> ", escape_ansi(x$schema), ".", escape_ansi(x$table))
-  } else {
-    cat_line("<CATALOG> ", escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
-  }
+  cat_line("<SCHEMA> ", escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+
+#' @export
+print.dbplyr_catalog <- function(x, ...) {
+  cat_line("<CATALOG> ", escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
 }
 
 #' @export
 as.sql.dbplyr_schema <- function(x, con) {
-  if (is.null(x$catalog)) {
-    ident_q(paste0(
-      escape(x$schema, con = con), ".", escape(x$table, con = con)
-    ))
-  } else {
-    ident_q(paste0(
-      escape(x$catalog, con = con), ".", escape(x$schema, con = con), ".", escape(x$table, con = con)
-    ))
-  }
+  ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
 }
 
-is.schema <- function(x) inherits(x, "dbplyr_schema")
+#' @export
+as.sql.dbplyr_catalog <- function(x, con) {
+  ident_q(paste0(
+    escape(x$catalog, con = con), ".", escape(x$schema, con = con), ".", escape(x$table, con = con)
+  ))
+}
+
+is_schema <- function(x) inherits(x, "dbplyr_schema")
+
+is_catalog <- function(x) inherits(x, "dbplyr_catalog")
 
 # Support for DBI::Id() ---------------------------------------------------
 
