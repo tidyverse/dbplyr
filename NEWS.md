@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
+
 ## New features
 
 * Support `rows_insert()`, `rows_append()`, `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
