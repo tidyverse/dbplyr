@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
+
 ## New features
 
 * SQL formatting has been considerably improved with new wrapping and indenting. 
