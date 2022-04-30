@@ -61,6 +61,32 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 }
 
 #' @export
+sql_query_upsert.Oracle <- function(con, x_name, y, by,
+                                    update_cols, ...,
+                                    returning_cols = NULL) {
+  # https://oracle-base.com/articles/9i/merge-statement
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
+  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  clauses <- list(
+    sql_clause("MERGE INTO", x_name),
+    sql_clause("USING", parts$from),
+    sql_clause_on(parts$where, lvl = 1),
+    sql("WHEN MATCHED THEN"),
+    sql_clause("UPDATE SET", update_clause, lvl = 1),
+    sql("WHEN NOT MATCHED THEN"),
+    sql_clause_insert(con, update_cols_esc, lvl = 1),
+    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, x_name),
+    sql(";")
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
 sql_translation.Oracle <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
@@ -152,6 +178,9 @@ sql_translation.OraConnection <- sql_translation.Oracle
 
 #' @export
 sql_query_select.OraConnection <- sql_query_select.Oracle
+
+#' @export
+sql_query_upsert.OraConnection <- sql_query_upsert.Oracle
 
 #' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle

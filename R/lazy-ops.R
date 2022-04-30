@@ -17,20 +17,22 @@ NULL
 
 #' @export
 #' @rdname lazy_ops
-lazy_query_base <- function(x, vars, class = character()) {
+lazy_query_base <- function(x, vars, class = character(), ...) {
   stopifnot(is.character(vars))
 
   structure(
     list(
       x = x,
-      vars = vars
+      vars = vars,
+      ...
     ),
     class = c(paste0("lazy_query_base_", class), "lazy_query_base", "lazy_query")
   )
 }
 
-lazy_query_local <- function(df) {
-  lazy_query_base(df, names(df), class = "local")
+lazy_query_local <- function(df, name) {
+  out <- lazy_query_base(df, names(df), class = "local", name = name)
+  out
 }
 
 lazy_query_remote <- function(x, vars) {
@@ -60,7 +62,7 @@ sql_build.lazy_query_base_remote <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_query_base_local <- function(op, con, ...) {
-  ident("df")
+  ident(op$name)
 }
 
 # op_grps -----------------------------------------------------------------

@@ -91,6 +91,39 @@ sql_clause_limit <- function(con, limit, lvl = 0){
   }
 }
 
+sql_clause_update <- function(table) {
+  sql_clause("UPDATE", table)
+}
+
+sql_clause_set <- function(lhs, rhs) {
+  update_clauses <- sql(paste0(lhs, " = ", rhs))
+
+  sql_clause("SET", update_clauses)
+}
+
+sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
+  if (is.null(into)) {
+    sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
+  } else {
+    kw <- paste0("INSERT INTO ", escape(into, con = con))
+    sql_clause(kw, cols, lvl = lvl)
+  }
+}
+
+sql_clause_on <- function(on, lvl = 0) {
+  sql_clause("ON", on, sep = " AND", lvl = lvl)
+}
+
+sql_clause_where_exists <- function(table, where, not) {
+  list(
+    sql(paste0("WHERE ", if (not) "NOT ", "EXISTS (")),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", table, lvl = 1),
+    sql_clause_where(where, lvl = 1),
+    sql(")")
+  )
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {

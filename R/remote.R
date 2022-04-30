@@ -24,7 +24,7 @@
 #' remote_con(mf2)
 #' remote_query(mf2)
 remote_name <- function(x) {
-  if (inherits(x$lazy_query, "lazy_query_remote")) {
+  if (inherits(x$lazy_query, "lazy_query_base_remote")) {
     return(x$lazy_query$x)
   }
 
@@ -33,7 +33,7 @@ remote_name <- function(x) {
   }
 
   lq <- x$lazy_query
-  if (!inherits(lq$from, "lazy_query_remote")) {
+  if (!inherits(lq$from, "lazy_query_base_remote")) {
     return()
   }
 
