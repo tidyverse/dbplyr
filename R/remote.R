@@ -27,6 +27,9 @@ remote_name <- function(x) {
   if (!inherits(x$lazy_query, "lazy_query_base"))
     return()
 
+  if (inherits(x$lazy_query, "lazy_query_base_local"))
+    return(ident(x$lazy_query$name))
+
   x$lazy_query$x
 }
 

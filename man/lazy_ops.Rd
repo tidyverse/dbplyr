@@ -9,7 +9,7 @@
 \alias{op_frame}
 \title{Lazy operations}
 \usage{
-lazy_query_base(x, vars, class = character())
+lazy_query_base(x, vars, class = character(), ...)
 
 op_grps(op)
 
