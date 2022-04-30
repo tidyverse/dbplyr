@@ -42,7 +42,19 @@ remote_name <- function(x) {
     return()
   }
 
-  if (!(is_empty(lq$where) && is_empty(lq$order_by) && is_false(lq$distinct) && is_empty(lq$limit))) {
+  if (!is_empty(lq$where)) {
+    return()
+  }
+
+  if (!is_empty(lq$order_by)) {
+    return()
+  }
+
+  if (!is_false(lq$distinct)) {
+    return()
+  }
+
+  if (!is_empty(lq$limit)) {
     return()
   }
 
