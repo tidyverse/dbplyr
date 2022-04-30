@@ -148,6 +148,9 @@
     <loc>https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.html</loc>
   </url>
   <url>
@@ -209,6 +212,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/replace_na.tbl_lazy.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/rows-db.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.html</loc>
