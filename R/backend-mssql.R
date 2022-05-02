@@ -168,7 +168,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("OUTPUT ", sql_table_prefix(con, ident_q("*"), "UPDATED")))
+    sql(paste0("OUTPUT ", sql_table_prefix(con, ident_q("*"), "INSERTED")))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
@@ -185,7 +185,7 @@ simulate_mssql <- function(version = "15.0") {
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, "INSERTED")
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
