@@ -27,6 +27,7 @@
 #'   - `"ignore"` will ignore rows in `y` with keys that are unmatched by the
 #'     keys in `x`.
 #' @param returning Columns to return.
+#' @param use_vendor_method Use vendor specific method?
 #'
 #' @importFrom dplyr rows_insert
 #' @rdname rows-db
@@ -37,7 +38,8 @@ rows_insert.tbl_lazy <- function(x,
                                  conflict = c("error", "ignore"),
                                  copy = FALSE,
                                  in_place = FALSE,
-                                 returning = NULL) {
+                                 returning = NULL,
+                                 use_vendor_method = TRUE) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
@@ -58,15 +60,27 @@ rows_insert.tbl_lazy <- function(x,
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
   if (!is_null(name)) {
-    sql <- sql_query_insert(
-      con = remote_con(x),
-      x_name = name,
-      y = y,
-      by = by,
-      ...,
-      conflict = conflict,
-      returning_cols = returning_cols
-    )
+    if (is_true(use_vendor_method)) {
+      sql <- sql_query_insert_vendor(
+        con = remote_con(x),
+        x_name = name,
+        y = y,
+        by = by,
+        ...,
+        conflict = conflict,
+        returning_cols = returning_cols
+      )
+    } else {
+      sql <- sql_query_insert(
+        con = remote_con(x),
+        x_name = name,
+        y = y,
+        by = by,
+        ...,
+        conflict = conflict,
+        returning_cols = returning_cols
+      )
+    }
 
     rows_get_or_execute(x, sql, returning_cols)
   } else {
@@ -312,7 +326,8 @@ rows_upsert.tbl_lazy <- function(x,
                                  ...,
                                  copy = FALSE,
                                  in_place = FALSE,
-                                 returning = NULL) {
+                                 returning = NULL,
+                                 use_vendor_method = TRUE) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
@@ -336,15 +351,27 @@ rows_upsert.tbl_lazy <- function(x,
       return(invisible(x))
     }
 
-    sql <- sql_query_upsert(
-      con = remote_con(x),
-      x_name = name,
-      y = y,
-      by = by,
-      update_cols = setdiff(colnames(y), by),
-      ...,
-      returning_cols = returning_cols
-    )
+    if (is_true(use_vendor_method)) {
+      sql <- sql_query_upsert_vendor(
+        con = remote_con(x),
+        x_name = name,
+        y = y,
+        by = by,
+        update_cols = setdiff(colnames(y), by),
+        ...,
+        returning_cols = returning_cols
+      )
+    } else {
+      sql <- sql_query_upsert(
+        con = remote_con(x),
+        x_name = name,
+        y = y,
+        by = by,
+        update_cols = setdiff(colnames(y), by),
+        ...,
+        returning_cols = returning_cols
+      )
+    }
 
     rows_get_or_execute(x, sql, returning_cols)
   } else {
