@@ -250,10 +250,24 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
+#' Upsert using the `ON CONFLICT ... DO UPDATE` clause
+#'
+#' The `ON CONFLICT ... DO UPDATE` clause requires a unique index on the columns
+#' in `by`. One of the advantages is better concurrency behaviour. See the
+#' [Postgres Wiki](https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax) for
+#' more information on the advantages and disadvantages compared to other
+#' upsert implementations.
+#'
+#' @inheritParams sql_query_upsert
+#'
 #' @export
-sql_query_upsert.PqConnection <- function(con, x_name, y, by,
-                                          update_cols, ...,
-                                          returning_cols = NULL) {
+sql_query_upsert_vendor.PqConnection <- function(con,
+                                                 x_name,
+                                                 y,
+                                                 by,
+                                                 update_cols,
+                                                 ...,
+                                                 returning_cols = NULL) {
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
@@ -280,7 +294,7 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
   sql_format_clauses(clauses, lvl = 0, con)
 }
 #' @export
-sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
+sql_query_upsert_vendor.PostgreSQL <- sql_query_upsert_vendor.PqConnection
 
 #' @export
 supports_window_clause.PqConnection <- function(con) {

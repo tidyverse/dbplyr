@@ -8,11 +8,11 @@
       FROM (`df`) 
       FETCH FIRST 6 ROWS ONLY
 
-# `sql_query_upsert()` is correct
+# `sql_query_upsert_vendor()` is correct
 
     Code
-      sql_query_upsert(con = simulate_oracle(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert_vendor(con = simulate_oracle(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> MERGE INTO `df_x`
       USING (

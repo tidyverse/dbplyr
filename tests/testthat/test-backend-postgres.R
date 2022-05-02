@@ -78,7 +78,7 @@ test_that("custom SQL translation", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
-test_that("`sql_query_upsert()` is correct", {
+test_that("`sql_query_upsert_vendor()` is correct", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
     con = simulate_postgres(),
@@ -87,7 +87,7 @@ test_that("`sql_query_upsert()` is correct", {
     mutate(c = c + 1)
 
   expect_snapshot(
-    sql_query_upsert(
+    sql_query_upsert_vendor(
       con = simulate_postgres(),
       x_name = ident("df_x"),
       y = df_y,
@@ -127,4 +127,66 @@ test_that("copy_inline works", {
   )
 
   expect_equal(copy_inline(src, df) %>% collect(), df)
+})
+
+test_that("can upsert with returning", {
+  con <- src_test("postgres")
+
+  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
+
+  # Errors because there is no unique index
+  expect_snapshot(error = TRUE, {
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      use_vendor_method = TRUE
+    )
+  })
+
+  # DBI method does not need a unique index
+  expect_error(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      use_vendor_method = FALSE
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
+
+  expect_equal(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      use_vendor_method = TRUE
+    ) %>%
+      get_returned_rows() %>%
+      arrange(a),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+
+  expect_equal(
+    collect(x),
+    tibble(a = 1:3, b = 11:13, c = c(1L, -1L, -2L), d = c("a", "y", "z"))
+  )
 })

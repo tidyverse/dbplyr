@@ -414,6 +414,7 @@
         SELECT 1 FROM `updated`
         WHERE (`updated`.`a` = `...y`.`a`) AND (`updated`.`b` = `...y`.`b`)
       )
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # `rows_delete()` works with `in_place = FALSE`
 
