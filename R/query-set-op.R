@@ -36,7 +36,7 @@ sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE, lv
     if (isTRUE(query$all)) {
       abort("`all` argument not supported by this backend")
     }
-    dbplyr_query_set_op(con, from_x, from_y, method = query$type, lvl = lvl)
+    dbplyr_query_set_op(con, from_x, from_y, method = query$type)
     # nocov end
   }
 }
