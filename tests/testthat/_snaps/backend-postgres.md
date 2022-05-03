@@ -12,8 +12,9 @@
 # `sql_query_upsert_vendor()` is correct
 
     Code
-      sql_query_upsert_vendor(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
+      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
+      method = "on_conflict")
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
@@ -57,7 +58,7 @@
 
     Code
       rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
-      use_vendor_method = TRUE)
+      method = "on_conflict")
     Condition
       Error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification

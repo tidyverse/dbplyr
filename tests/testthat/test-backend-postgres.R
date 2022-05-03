@@ -87,13 +87,14 @@ test_that("`sql_query_upsert_vendor()` is correct", {
     mutate(c = c + 1)
 
   expect_snapshot(
-    sql_query_upsert_vendor(
+    sql_query_upsert(
       con = simulate_postgres(),
       x_name = ident("df_x"),
       y = df_y,
       by = c("a", "b"),
       update_cols = c("c", "d"),
-      returning_cols = c("a", b2 = "b")
+      returning_cols = c("a", b2 = "b"),
+      method = "on_conflict"
     )
   )
 })
@@ -148,7 +149,7 @@ test_that("can upsert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything(),
-      use_vendor_method = TRUE
+      method = "on_conflict"
     )
   })
 
@@ -159,7 +160,7 @@ test_that("can upsert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything(),
-      use_vendor_method = FALSE
+      method = "cte_update"
     ),
     NA
   )
@@ -173,7 +174,7 @@ test_that("can upsert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything(),
-      use_vendor_method = TRUE
+      method = "on_conflict"
     ) %>%
       get_returned_rows() %>%
       arrange(a),

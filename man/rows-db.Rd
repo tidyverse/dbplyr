@@ -18,7 +18,7 @@
   copy = FALSE,
   in_place = FALSE,
   returning = NULL,
-  use_vendor_method = TRUE
+  method = NULL
 )
 
 \method{rows_append}{tbl_lazy}(x, y, ..., copy = FALSE, in_place = FALSE, returning = NULL)
@@ -53,7 +53,7 @@
   copy = FALSE,
   in_place = FALSE,
   returning = NULL,
-  use_vendor_method = TRUE
+  method = NULL
 )
 
 \method{rows_delete}{tbl_lazy}(
@@ -110,7 +110,8 @@ when \code{FALSE}, a new object representing the resulting changes is returned.}
 
 \item{returning}{Columns to return.}
 
-\item{use_vendor_method}{Use vendor specific method?}
+\item{method}{A string specifying the method to use. This is only relevant for
+\code{in_place = TRUE}.}
 
 \item{unmatched}{For \code{rows_update()}, \code{rows_patch()}, and \code{rows_delete()},
 how should keys in \code{y} that are unmatched by the keys in \code{x} be handled?

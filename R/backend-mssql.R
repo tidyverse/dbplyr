@@ -93,7 +93,10 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
                                                     conflict = c("error", "ignore"),
-                                                    returning_cols = NULL) {
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
+  method <- method %||% "where_not_exists"
+  arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
@@ -150,14 +153,13 @@ simulate_mssql <- function(version = "15.0") {
   sql_format_clauses(clauses, lvl = 0, con)
 }
 
-#' @export
-`sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                           x_name,
-                                                           y,
-                                                           by,
-                                                           update_cols,
-                                                           ...,
-                                                           returning_cols = NULL) {
+mssql_sql_query_upsert_cte_update <- function(con,
+                                              x_name,
+                                              y,
+                                              by,
+                                              update_cols,
+                                              ...,
+                                              returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -192,13 +194,29 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_upsert_vendor.Microsoft SQL Server` <- function(con,
+`sql_query_upsert.Microsoft SQL Server` <- function(con,
                                                            x_name,
                                                            y,
                                                            by,
                                                            update_cols,
                                                            ...,
-                                                           returning_cols = NULL) {
+                                                           returning_cols = NULL,
+                                                           method = NULL) {
+  method <- method %||% "merge"
+
+  if (method == "cte_update") {
+    sql <- mssql_sql_query_upsert_cte_update(
+      con = con,
+      x_name = x_name,
+      y = y,
+      by = by,
+      update_cols = update_cols,
+      ...,
+      returning_cols = returning_cols
+    )
+    return(sql)
+  }
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))

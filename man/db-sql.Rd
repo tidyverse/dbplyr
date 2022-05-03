@@ -19,11 +19,9 @@
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
 \alias{sql_query_insert}
-\alias{sql_query_insert_vendor}
 \alias{sql_query_append}
 \alias{sql_query_update_from}
 \alias{sql_query_upsert}
-\alias{sql_query_upsert_vendor}
 \alias{sql_query_delete}
 \alias{sql_returning_cols}
 \title{SQL generation generics}
@@ -92,17 +90,7 @@ sql_query_insert(
   ...,
   conflict = c("error", "ignore"),
   returning_cols = NULL,
-  use_vendor_method = TRUE
-)
-
-sql_query_insert_vendor(
-  con,
-  x_name,
-  y,
-  by,
-  ...,
-  conflict = c("error", "ignore"),
-  returning_cols = NULL
+  method = NULL
 )
 
 sql_query_append(con, x_name, y, ..., returning_cols = NULL)
@@ -117,16 +105,15 @@ sql_query_update_from(
   returning_cols = NULL
 )
 
-sql_query_upsert(con, x_name, y, by, update_cols, ..., returning_cols = NULL)
-
-sql_query_upsert_vendor(
+sql_query_upsert(
   con,
   x_name,
   y,
   by,
   update_cols,
   ...,
-  returning_cols = NULL
+  returning_cols = NULL,
+  method = NULL
 )
 
 sql_query_delete(con, x_name, y, by, ..., returning_cols = NULL)

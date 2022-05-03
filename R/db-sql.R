@@ -446,7 +446,7 @@ sql_query_insert <- function(con,
                              ...,
                              conflict = c("error", "ignore"),
                              returning_cols = NULL,
-                             use_vendor_method = TRUE) {
+                             method = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_insert")
 }
@@ -458,7 +458,10 @@ sql_query_insert.DBIConnection <- function(con,
                                            by,
                                            ...,
                                            conflict = c("error", "ignore"),
-                                           returning_cols = NULL) {
+                                           returning_cols = NULL,
+                                           method = NULL) {
+  method <- method %||% "where_not_exists"
+  arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
@@ -478,38 +481,6 @@ sql_query_insert.DBIConnection <- function(con,
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
-}
-
-#' @export
-#' @rdname db-sql
-sql_query_insert_vendor <- function(con,
-                                    x_name,
-                                    y,
-                                    by,
-                                    ...,
-                                    conflict = c("error", "ignore"),
-                                    returning_cols = NULL) {
-  rlang::check_dots_used()
-  UseMethod("sql_query_insert_vendor")
-}
-
-#' @export
-sql_query_insert_vendor.DBIConnection <- function(con,
-                                                  x_name,
-                                                  y,
-                                                  by,
-                                                  ...,
-                                                  conflict = c("error", "ignore"),
-                                                  returning_cols = NULL) {
-  sql_query_insert(
-    con,
-    x_name,
-    y,
-    by,
-    ...,
-    conflict = conflict,
-    returning_cols = returning_cols
-  )
 }
 
 #' @export
@@ -570,7 +541,8 @@ sql_query_upsert <- function(con,
                              by,
                              update_cols,
                              ...,
-                             returning_cols = NULL) {
+                             returning_cols = NULL,
+                             method = NULL) {
   # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
   # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
   rlang::check_dots_used()
@@ -584,7 +556,11 @@ sql_query_upsert.DBIConnection <- function(con,
                                            by,
                                            update_cols,
                                            ...,
-                                           returning_cols = NULL) {
+                                           returning_cols = NULL,
+                                           method = NULL) {
+  method <- method %||% "cte_update"
+  arg_match(method, "cte_update", error_arg = "method")
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -616,37 +592,6 @@ sql_query_upsert.DBIConnection <- function(con,
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
-}
-
-#' @export
-#' @rdname db-sql
-sql_query_upsert_vendor <- function(con,
-                                    x_name,
-                                    y,
-                                    by,
-                                    update_cols,
-                                    ...,
-                                    returning_cols = NULL) {
-  UseMethod("sql_query_upsert_vendor")
-}
-
-#' @export
-sql_query_upsert_vendor.DBIConnection <- function(con,
-                                                  x_name,
-                                                  y,
-                                                  by,
-                                                  update_cols,
-                                                  ...,
-                                                  returning_cols = NULL) {
-  sql_query_upsert(
-    con,
-    x_name,
-    y,
-    by,
-    update_cols,
-    ...,
-    returning_cols = NULL
-  )
 }
 
 #' @export
