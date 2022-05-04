@@ -182,7 +182,7 @@ sql_prefix <- function(f, n = NULL) {
     args <- list(...)
     if (!is.null(n) && length(args) != n) {
       cli_abort(
-        "Invalid number of args to SQL function {f}"
+        "Invalid number of args to SQL function {f}",
         i = "Expecting {n} and got {length(args)}"
      )
     }
