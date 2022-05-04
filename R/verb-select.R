@@ -36,7 +36,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
   if (length(missing) > 0) {
     vars <- names(data)[missing]
     if (notify) {
-      message(cli::format_message("Adding missing grouping variables: {.var {vars}}"))
+      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
     }
     loc <- c(set_names(missing, vars), loc)
   }
