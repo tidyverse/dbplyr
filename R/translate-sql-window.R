@@ -121,7 +121,7 @@ win_reset <- function() {
 }
 
 rows <- function(from = -Inf, to = 0) {
-  if (from >= to) cli_abort("{.arg from} must be less than {.arg to}")
+  if (from >= to) cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
 
   dir <- function(x) if (x < 0) "PRECEDING" else "FOLLOWING"
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
