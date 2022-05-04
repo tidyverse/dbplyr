@@ -195,7 +195,8 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            cli_abort("{.arg abbr} is not supported in SQL Server translation")          }
+            cli_abort("{.arg abbr} is not supported in SQL Server translation")
+          }
         }
       },
 
