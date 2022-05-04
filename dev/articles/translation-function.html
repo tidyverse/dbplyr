@@ -201,7 +201,7 @@
 <span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">10</span>    -<span style="color: #BB0000;">3</span>     -<span style="color: #BB0000;">1</span></span>
 <span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="va">y</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [4 x 3]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.2 [:memory:]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.3 [:memory:]</span></span>
 <span class="co">#&gt;       x     y `x%%y`</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    10     3      1</span>
@@ -324,7 +324,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>dplyr.strict_sql <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">glob</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `glob()`:</span></span>
-<span class="co">#&gt; <span style="color: #BBBB00;">!</span> Don't know how to translate glob()</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BBBB00;">!</span> Don't know how to translate `glob()`</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

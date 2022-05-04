@@ -198,8 +198,8 @@ SQL for a grouped summary.</p></dd>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># and vars_order controls ordering for those functions that need it</span></span>
 <span class="r-in"><span class="fu">translate_sql</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Windowed expression 'SUM(`mpg`)' does not have explicit order.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Please use arrange() or window_order() to make determinstic.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Windowed expression `SUM(`mpg`)` does not have explicit order.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `arrange()` or `window_order()` to make deterministic.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SUM(`mpg`) OVER (ROWS UNBOUNDED PRECEDING)</span>
 <span class="r-in"><span class="fu">translate_sql</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span>, vars_order <span class="op">=</span> <span class="st">"mpg"</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; SUM(`mpg`) OVER (ORDER BY `mpg` ROWS UNBOUNDED PRECEDING)</span>
