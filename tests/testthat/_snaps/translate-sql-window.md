@@ -5,9 +5,9 @@
     Condition
       Warning:
       Windowed expression `SUM(`x`)` does not have explicit order.
-      Please use `arrange()` or `window_order()` to make determinstic.
+      i Please use `arrange()` or `window_order()` to make deterministic.
       Error in `rows()`:
-      ! `from` must be less than `to`
+      ! `from` (1) must be less than `to` (0)
 
 # window_frame()
 

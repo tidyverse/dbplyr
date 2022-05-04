@@ -4,8 +4,8 @@
       mf %>% do(nrow(.))
     Condition
       Error in `label_output_dataframe()`:
-      ! Results are not data frames at positions:
-      1, 2
+      ! Results must be data frames
+      Problems at positions 1 and 2
 
 # named argument become list columns
 
