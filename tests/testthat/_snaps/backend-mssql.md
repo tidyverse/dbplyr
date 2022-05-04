@@ -364,7 +364,7 @@
         FROM `df_y`
       ) `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
-        OUTPUT 'INSERTED'.`*`
+        OUTPUT `INSERTED`.*
       )
       INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
