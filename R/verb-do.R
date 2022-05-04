@@ -109,8 +109,8 @@ label_output_dataframe <- function(labels, out, groups) {
   data_frame <- vapply(out[[1]], is.data.frame, logical(1))
   if (any(!data_frame)) {
     cli_abort(c(
-      "Results are not data frames at positions: ",
-      paste(which(!data_frame), collapse = ", ")
+      "Results must be data frames",
+      "Problems at positions {which(!data_frame)}"
     ))
   }
 
