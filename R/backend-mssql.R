@@ -153,46 +153,6 @@ simulate_mssql <- function(version = "15.0") {
   sql_format_clauses(clauses, lvl = 0, con)
 }
 
-mssql_sql_query_upsert_cte_update <- function(con,
-                                              x_name,
-                                              y,
-                                              by,
-                                              update_cols,
-                                              ...,
-                                              returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
-
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
-  update_cols <- sql_escape_ident(con, update_cols)
-
-  updated_cte <- list(
-    sql_clause_update(x_name),
-    sql_clause_set(update_cols, update_values),
-    sql(paste0("OUTPUT ", sql_escape_ident(con, "INSERTED"), ".*")),
-    sql_clause_from(parts$from),
-    sql_clause_where(parts$where)
-  )
-  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
-  update_name <- sql(escape(ident("updated"), con = con))
-
-  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"))
-  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
-  clauses <- list2(
-    sql(paste0("WITH ", update_name, " AS (")),
-    updated_sql,
-    sql(")"),
-    sql_clause_insert(con, insert_cols, x_name),
-    sql_clause_select(con, sql("*")),
-    sql_clause_from(parts$from),
-    !!!sql_clause_where_exists(update_name, where, not = TRUE),
-    sql_returning_cols(con, returning_cols, "INSERTED")
-  )
-
-  sql_format_clauses(clauses, lvl = 0, con)
-}
-
 #' @export
 `sql_query_upsert.Microsoft SQL Server` <- function(con,
                                                            x_name,
@@ -203,19 +163,7 @@ mssql_sql_query_upsert_cte_update <- function(con,
                                                            returning_cols = NULL,
                                                            method = NULL) {
   method <- method %||% "merge"
-
-  if (method == "cte_update") {
-    sql <- mssql_sql_query_upsert_cte_update(
-      con = con,
-      x_name = x_name,
-      y = y,
-      by = by,
-      update_cols = update_cols,
-      ...,
-      returning_cols = returning_cols
-    )
-    return(sql)
-  }
+  arg_match(method, "merge", error_arg = "method")
 
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 

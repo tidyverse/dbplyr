@@ -265,18 +265,6 @@ test_that("`sql_query_upsert()` is correct", {
       y = df_y,
       by = c("a", "b"),
       update_cols = c("c", "d"),
-      returning_cols = c("a", b2 = "b"),
-      method = "cte_update"
-    )
-  )
-
-  expect_snapshot(
-    sql_query_upsert(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
-      by = c("a", "b"),
-      update_cols = c("c", "d"),
       returning_cols = c("a", b2 = "b")
     )
   )
@@ -530,34 +518,6 @@ test_that("can upsert", {
   )
 })
 
-test_that("can upsert(method = cte_update)", {
-  con <- src_test("mssql")
-
-  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
-  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
-    mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
-
-  expect_equal(
-    rows_upsert(
-      x, y,
-      by = c("a", "b"),
-      in_place = TRUE,
-      method = "cte_update"
-    ) %>%
-      collect(),
-    tibble(
-      a = 1:3,
-      b = 11:13,
-      c = c(1L, -1L, -2L),
-      d = c("a", "y", "z")
-    )
-  )
-})
-
 test_that("can upsert with returning", {
   con <- src_test("mssql")
 
@@ -575,36 +535,6 @@ test_that("can upsert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything()
-    ) %>%
-      get_returned_rows() %>%
-      arrange(a),
-    tibble(
-      a = 2:3,
-      b = 12:13,
-      c = c(-1L, -2L),
-      d = c("y", "z")
-    )
-  )
-})
-
-test_that("can upsert(method = cte_update) with returning", {
-  con <- src_test("mssql")
-
-  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
-  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
-    mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
-
-  expect_equal(
-    rows_upsert(
-      x, y,
-      by = c("a", "b"),
-      in_place = TRUE,
-      returning = everything(),
-      method = "cte_update"
     ) %>%
       get_returned_rows() %>%
       arrange(a),
