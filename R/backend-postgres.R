@@ -47,8 +47,7 @@ db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
   if (any(c(perl, fixed, useBytes))) {
-    args <- c("perl", "fixed", "useBytes")
-    cli_abort("{.arg {args}} parameters are unsupported.")
+    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
   }
 
   if (ignore.case) {
