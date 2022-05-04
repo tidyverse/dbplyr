@@ -56,7 +56,7 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
       # TODO use {.code {expr}} after https://github.com/r-lib/cli/issues/422 is fixed
       cli::cli_warn(c(
         "Windowed expression `{expr}` does not have explicit order.",
-        "Please use {.fun arrange} or {.fun window_order} to make determinstic."
+        i = "Please use {.fun arrange} or {.fun window_order} to make deterministic."
       ))
     }
 
