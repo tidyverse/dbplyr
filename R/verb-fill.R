@@ -39,10 +39,10 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   .direction <- arg_match0(.direction, c("down", "up"))
 
   if (is_empty(order_by_cols)) {
-    abort(
+    cli_abort(
       c(
-        x = "`.data` does not have explicit order.",
-        i = "Please use arrange() or window_order() to make determinstic."
+        x = "{.arg .data} does not have explicit order.",
+        i = "Please use {.fun arrange} or {.fun window_order} to make determinstic."
       )
     )
   }

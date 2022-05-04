@@ -53,7 +53,7 @@ print.tbl_lazy <- function(x, ...) {
 
 #' @export
 as.data.frame.tbl_lazy <- function(x, row.names, optional, ...) {
-  abort("Can not coerce `tbl_lazy` to data.frame")
+  cli_abort("Can not coerce {.cls tbl_lazy} to {.cls data.frame}")
 }
 
 #' @importFrom dplyr same_src

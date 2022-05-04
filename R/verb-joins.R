@@ -284,7 +284,7 @@ check_join_as <- function(x_as, y_as, call) {
   vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
   vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
   if (x_as == y_as) {
-    abort("`y_as` must be different from `x_as`.", call = call)
+    cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 }
 
@@ -322,10 +322,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
 }
 
 check_suffix <- function(x, call) {
-  if (!is.character(x) || length(x) != 2) {
-    abort("`suffix` must be a character vector of length 2.", call = call)
-  }
-
+  vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
   list(x = x[1], y = x[2])
 }
 
