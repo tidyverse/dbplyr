@@ -28,7 +28,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   dots <- purrr::discard(quos(...), quo_is_null)
 
   if (is_empty(dots)) {
-    abort("Must supply variables in `...`")
+    cli_abort("Must supply variables in `...`")
   }
 
   distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars, call = current_env())

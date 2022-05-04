@@ -36,18 +36,18 @@
       capture_across(lf, across(a, 1))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(a, list(1)))
     Condition
       Error in `FUN()`:
-      ! .fns argument to dbplyr::across() must contain a function or a formula
+      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(c, mean))
     Condition
@@ -111,12 +111,12 @@
       capture_if_all(lf, if_all(a, 1))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
       Error in `FUN()`:
-      ! .fns argument to dbplyr::across() must contain a function or a formula
+      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
 
 # if_all/any works in filter()

@@ -296,13 +296,14 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            abort("`abbr` is not supported in SQL Server translation")          }
+            cli_abort("{.arg abbr} is not supported in SQL Server translation")
+          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          abort("`fiscal_start` is not supported in SQL Server translation. Must be 1.")
+          cli_abort("{.arg fiscal_start} is not supported in SQL Server translation. Must be 1.")
         }
 
         if (with_year) {

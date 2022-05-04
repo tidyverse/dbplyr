@@ -128,7 +128,7 @@ test_that("output is styled", {
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   out <- lf %>%
     group_by(x) %>%
-    mutate(y = mean(y), z = z + 1) %>%
+    mutate(y = mean(y, na.rm = TRUE), z = z + 1) %>%
     filter(z == 1) %>%
     left_join(lf, by = "x")
 

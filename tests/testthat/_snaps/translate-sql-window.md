@@ -4,10 +4,10 @@
       translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
     Condition
       Warning:
-      Windowed expression 'SUM(`x`)' does not have explicit order.
-      Please use arrange() or window_order() to make determinstic.
+      Windowed expression `SUM(`x`)` does not have explicit order.
+      i Please use `arrange()` or `window_order()` to make deterministic.
       Error in `rows()`:
-      ! from must be less than to
+      ! `from` (1) must be less than `to` (0)
 
 # window_frame()
 

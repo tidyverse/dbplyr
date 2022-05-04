@@ -60,7 +60,7 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     funs <- eval(funs, env)
     return(across_funs(funs, env, data = data, dots = dots, names_spec = NULL, fn = fn, evaluated = TRUE))
   } else {
-    abort("`.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list")
+    cli_abort("{.arg .fns} argument to {.fun dbplyr::across} must be a NULL, a function, formula, or list")
   }
 
   list(fns = fns, names = names_spec)
@@ -77,12 +77,12 @@ across_fun <- function(fun, env, data, dots, fn) {
     function(x) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
-      msg <- c(
-        paste0("`dbplyr::", fn, "` does not support `...` when a purrr-style lambda is used in `.fns`."),
+      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+      cli_abort(c(
+        "`dbplyr::{fn}` does not support `...` when a purrr-style lambda is used in {.arg .fns}.",
         i = "Use a lambda instead.",
         i = "Or inline them via a purrr-style lambda."
-      )
-      abort(msg)
+      ))
     }
     call <- partial_eval_body(f_rhs(fun), env, data, sym = c(".", ".x"), replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
@@ -90,9 +90,9 @@ across_fun <- function(fun, env, data, dots, fn) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, data)
   } else {
-    abort(c(
-      ".fns argument to dbplyr::across() must contain a function or a formula",
-      x = paste0("Problem with ", expr_deparse(fun))
+    cli_abort(c(
+      "{.arg .fns} argument to {.fun dbplyr::across} must contain a function or a formula",
+      x = "Problem with {expr_deparse(fun)}"
     ))
   }
 }
@@ -100,7 +100,7 @@ across_fun <- function(fun, env, data, dots, fn) {
 partial_eval_fun <- function(fun, env, data) {
   body <- fn_body(fun)
   if (length(body) > 2) {
-    abort("Cannot translate functions consisting of more than one statement.")
+    cli_abort("Cannot translate functions consisting of more than one statement.")
   }
   args <- fn_fmls_names(fun)
 

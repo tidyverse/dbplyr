@@ -65,7 +65,7 @@ base_scalar <- sql_translator(
     } else if (is.numeric(i)) {
       build_sql(x, "[", as.integer(i), "]")
     } else {
-      abort("Can only index with strings and numbers")
+      cli_abort("Can only index with strings and numbers")
     }
 
   },
