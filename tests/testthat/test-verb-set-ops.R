@@ -22,7 +22,9 @@ test_that("first edition works", {
     sql_escape_ident.Test = function(con, x) sql_quote(x, "`")
   )
 
-  expect_error(expect_warning(union_all(lf, lf) %>% remote_query()), NA)
+  local_options(rlib_warning_verbosity = "quiet")
+
+  expect_error(union_all(lf, lf) %>% remote_query(), NA)
 })
 
 # SQL generation ----------------------------------------------------------
