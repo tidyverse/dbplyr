@@ -140,7 +140,7 @@ error_embed <- function(type, expr) {
   # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
   cli_abort(c(
     "Cannot translate {type} to SQL.",
-    `*` = "Force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`"
+    `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"
   ), call = NULL)
 }
 
