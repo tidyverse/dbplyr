@@ -168,9 +168,9 @@ mssql_sql_query_upsert_cte_update <- function(con,
   updated_cte <- list(
     sql_clause_update(x_name),
     sql_clause_set(update_cols, update_values),
+    sql(paste0("OUTPUT ", sql_escape_ident(con, "INSERTED"), ".*")),
     sql_clause_from(parts$from),
-    sql_clause_where(parts$where),
-    sql(paste0("OUTPUT ", sql_escape_ident(con, "INSERTED"), ".*"))
+    sql_clause_where(parts$where)
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
