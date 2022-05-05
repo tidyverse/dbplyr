@@ -44,11 +44,19 @@
 #'
 #' Query generation:
 #'
-#' * `sql_query_select()` generate SQL for a `SELECT` query
-#' * `sql_query_join()` generate SQL for joins
-#' * `sql_query_semi_join()` generate SQL for semi- and anti-joins
-#' * `sql_query_set_op()` generate SQL for `UNION`, `INTERSECT`, and `EXCEPT`
+#' * `sql_query_select()` generates SQL for a `SELECT` query
+#' * `sql_query_join()` generates SQL for joins
+#' * `sql_query_semi_join()` generates SQL for semi- and anti-joins
+#' * `sql_query_set_op()` generates SQL for `UNION`, `INTERSECT`, and `EXCEPT`
 #'   queries.
+#'
+#' Query generation for manipulation:
+#'
+#' * `sql_query_insert()` and `sql_query_append()` generate SQL for an `INSERT FROM` query.
+#' * `sql_query_update_from()` generates SQL for an `UPDATE FROM` query.
+#' * `sql_query_upsert()` generates SQL for an `UPSERT` query.
+#' * `sql_query_delete()` generates SQL for an `DELETE FROM` query
+#' * `sql_returning_cols()` generates SQL for a `RETURNING` clause
 #'
 #' @section dbplyr 2.0.0:
 #'
@@ -331,7 +339,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
     right = sql("RIGHT JOIN"),
     full = sql("FULL JOIN"),
     cross = sql("CROSS JOIN"),
-    abort(paste0("Unknown join type: ", type))
+    cli_abort("Unknown join type: {.val {type}}")
   )
 
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
@@ -429,6 +437,177 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 }
 # nocov end
 
+#' @export
+#' @rdname db-sql
+sql_query_insert <- function(con, x_name, y, by, ..., conflict = c("error", "ignore"), returning_cols = NULL) {
+  rlang::check_dots_used()
+  UseMethod("sql_query_insert")
+}
+
+#' @export
+sql_query_insert.DBIConnection <- function(con, x_name, y, by, ..., conflict = c("error", "ignore"), returning_cols = NULL) {
+  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
+  conflict <- rows_check_conflict(conflict)
+
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+
+  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+  conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+
+  clauses <- list2(
+    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    !!!conflict_clauses,
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_query_append <- function(con, x_name, y, ..., returning_cols = NULL) {
+  rlang::check_dots_used()
+  UseMethod("sql_query_append")
+}
+
+#' @export
+sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols = NULL) {
+  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
+  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+
+  clauses <- list2(
+    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
+                                  returning_cols = NULL) {
+  rlang::check_dots_used()
+  UseMethod("sql_query_update_from")
+}
+
+#' @export
+sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
+                                                update_values, ...,
+                                                returning_cols = NULL) {
+  # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols <- sql_escape_ident(con, names(update_values))
+
+  # avoid CTEs for the general case as they do not work everywhere
+  clauses <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(update_cols, update_values),
+    sql_clause_from(parts$from),
+    sql_clause_where(parts$where),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_query_upsert <- function(con, x_name, y, by, update_cols, ...,
+                             returning_cols = NULL) {
+  # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
+  # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
+  rlang::check_dots_used()
+  UseMethod("sql_query_upsert")
+}
+
+#' @export
+sql_query_upsert.DBIConnection <- function(con, x_name, y, by,
+                                           update_cols, ...,
+                                           returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_cols <- sql_escape_ident(con, update_cols)
+
+  updated_cte <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(update_cols, update_values),
+    sql_clause_from(parts$from),
+    sql_clause_where(parts$where),
+    sql(paste0("RETURNING ", escape(x_name, con = con), ".*"))
+  )
+  updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
+  update_name <- sql(escape(ident("updated"), con = con))
+
+  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"))
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  clauses <- list2(
+    sql(paste0("WITH ", update_name, " AS (")),
+    updated_sql,
+    sql(")"),
+    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    !!!sql_clause_where_exists(update_name, where, not = TRUE)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  rlang::check_dots_used()
+  UseMethod("sql_query_delete")
+}
+
+#' @export
+sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  clauses <- list2(
+    sql_clause("DELETE FROM", x_name),
+    !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+#' @rdname db-sql
+sql_returning_cols <- function(con, cols, table, ...) {
+  if (is_empty(cols)) {
+    return(NULL)
+  }
+
+  rlang::check_dots_empty()
+  UseMethod("sql_returning_cols")
+}
+
+#' @export
+sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
+  returning_cols <- sql_named_cols(con, cols, table = table)
+
+  sql_clause("RETURNING", returning_cols)
+}
+
+sql_named_cols <- function(con, cols, table = NULL) {
+  nms <- names2(cols)
+  nms[nms == cols] <- ""
+
+  cols <- sql_table_prefix(con, cols, table)
+  cols <- set_names(ident_q(cols), nms)
+  escape(cols, collapse = NULL, con = con)
+}
 
 # dplyr fallbacks ---------------------------------------------------------
 

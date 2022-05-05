@@ -18,6 +18,12 @@
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_query_insert}
+\alias{sql_query_append}
+\alias{sql_query_update_from}
+\alias{sql_query_upsert}
+\alias{sql_query_delete}
+\alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
@@ -75,6 +81,34 @@ sql_query_join(
 sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_query_insert(
+  con,
+  x_name,
+  y,
+  by,
+  ...,
+  conflict = c("error", "ignore"),
+  returning_cols = NULL
+)
+
+sql_query_append(con, x_name, y, ..., returning_cols = NULL)
+
+sql_query_update_from(
+  con,
+  x_name,
+  y,
+  by,
+  update_values,
+  ...,
+  returning_cols = NULL
+)
+
+sql_query_upsert(con, x_name, y, by, update_cols, ..., returning_cols = NULL)
+
+sql_query_delete(con, x_name, y, by, ..., returning_cols = NULL)
+
+sql_returning_cols(con, cols, table, ...)
 }
 \description{
 SQL translation:
@@ -116,11 +150,20 @@ Query indentation:
 
 Query generation:
 \itemize{
-\item \code{sql_query_select()} generate SQL for a \code{SELECT} query
-\item \code{sql_query_join()} generate SQL for joins
-\item \code{sql_query_semi_join()} generate SQL for semi- and anti-joins
-\item \code{sql_query_set_op()} generate SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
+\item \code{sql_query_select()} generates SQL for a \code{SELECT} query
+\item \code{sql_query_join()} generates SQL for joins
+\item \code{sql_query_semi_join()} generates SQL for semi- and anti-joins
+\item \code{sql_query_set_op()} generates SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
 queries.
+}
+
+Query generation for manipulation:
+\itemize{
+\item \code{sql_query_insert()} and \code{sql_query_append()} generate SQL for an \verb{INSERT FROM} query.
+\item \code{sql_query_update_from()} generates SQL for an \verb{UPDATE FROM} query.
+\item \code{sql_query_upsert()} generates SQL for an \code{UPSERT} query.
+\item \code{sql_query_delete()} generates SQL for an \verb{DELETE FROM} query
+\item \code{sql_returning_cols()} generates SQL for a \code{RETURNING} clause
 }
 }
 \section{dbplyr 2.0.0}{

@@ -38,10 +38,10 @@ sql_median <- function(f,
 
 check_probs <- function(probs) {
   if (!is.numeric(probs)) {
-    abort("`probs` must be numeric")
+    cli_abort("{.arg probs} must be numeric")
   }
 
   if (length(probs) > 1) {
-    abort("SQL translation only supports single value for `probs`.")
+    cli_abort("SQL translation only supports single value for {.arg probs}.")
   }
 }

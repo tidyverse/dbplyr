@@ -45,6 +45,9 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 #' @export
 sql_query_set_op.SQLiteConnection <- sql_query_set_op.Hive
 
+#' @export
+sql_query_upsert.SQLiteConnection <- sql_query_upsert.PqConnection
+
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
 }

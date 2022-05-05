@@ -68,7 +68,7 @@ c_character <- function(...) {
   }
 
   if (!is.character(x)) {
-    abort("Character input expected")
+    cli_abort("Character input expected")
   }
 
   x
@@ -81,13 +81,12 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
   if (dbHasCompleted(res)) return()
 
   rows <- big_mark(dbGetRowCount(res))
-  warning("Only first ", rows, " results retrieved. Use ", hint, " to retrieve all.",
-    call. = FALSE)
+  cli::cli_warn("Only first {rows} results retrieved. Use {hint} to retrieve all.")
 }
 
 hash_temp <- function(name) {
   name <- ident(paste0("#", name))
-  inform(
+  cli::cli_inform(
     paste0("Created a temporary table named ", name),
     class = c("dbplyr_message_temp_table", "dbplyr_message")
   )

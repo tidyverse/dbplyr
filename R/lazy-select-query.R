@@ -195,9 +195,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (identical(select$name, in_vars) &&
-      purrr::every(select$expr, is_symbol) &&
-      identical(syms(select$name), select$expr)) {
+  if (is_select_trivial(select, in_vars)) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
@@ -225,6 +223,12 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     select_sql = select_sql,
     window_sql = window_sql
   )
+}
+
+is_select_trivial <- function(select, vars_prev) {
+  identical(select$name, vars_prev) &&
+    purrr::every(select$expr, is_symbol) &&
+    identical(syms(select$name), select$expr)
 }
 
 translate_select_sql <- function(con, select_df) {

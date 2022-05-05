@@ -1,6 +1,12 @@
 # dbplyr (development version)
 
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
+
 ## New features
+
+* Support `rows_insert()`, `rows_append()`, `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
+  (@mgirlich, #736).
 
 * SQL formatting has been considerably improved with new wrapping and indenting. 
   `show_query()` creates more readable queries by printing the keywords in blue 
