@@ -3,6 +3,9 @@
 * `remote_name()` now returns a name in more cases where it makes sense
   (@mgirlich, #850).
 
+* New `in_catalog()`, like `in_schema()` but  allows creation of table identifiers
+  consisting of three components: catalog, schema, name (#806, @krlmlr).
+
 ## New features
 
 * Support `rows_insert()`, `rows_append()`, `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
