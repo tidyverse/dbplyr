@@ -15,9 +15,9 @@
 * Added `copy_inline()` as a `copy_to()` equivalent that does not need write
   access (@mgirlich, #628).
 
-* `remote_query()` and `show_query()` have an experimental `cte` argument.
-  If `TRUE` the SQL query will use common table expressions instead of nested 
-  queries (@mgirlich, #638).
+* `remote_query()`, `show_query()`, `compute()` and `collect()` have an
+  experimental `cte` argument. If `TRUE` the SQL query will use common table
+  expressions instead of nested queries (@mgirlich, #638).
 
 ## Function translations
 
