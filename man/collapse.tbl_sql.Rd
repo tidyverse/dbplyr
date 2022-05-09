@@ -40,7 +40,8 @@ will create a new index.}
 \item{analyze}{if \code{TRUE} (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.}
 
-\item{cte}{Use common table expressions in the generated SQL?}
+\item{cte}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Use common table expressions in the generated SQL?}
 
 \item{n}{Number of rows to fetch. Defaults to \code{Inf}, meaning all rows.}
 

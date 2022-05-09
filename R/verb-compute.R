@@ -28,7 +28,7 @@ collapse.tbl_sql <- function(x, ...) {
 #' @param temporary Should the table be temporary (`TRUE`, the default`) or
 #'   persistent (`FALSE`)?
 #' @inheritParams copy_to.src_sql
-#' @param cte Use common table expressions in the generated SQL?
+#' @inheritParams collect.tbl_sql
 #' @export
 #' @importFrom dplyr compute
 compute.tbl_sql <- function(x,
@@ -65,7 +65,8 @@ compute.tbl_sql <- function(x,
 #' @rdname collapse.tbl_sql
 #' @param n Number of rows to fetch. Defaults to `Inf`, meaning all rows.
 #' @param warn_incomplete Warn if `n` is less than the number of result rows?
-#' @param cte Use common table expressions in the generated SQL?
+#' @param cte `r lifecycle::badge("experimental")`
+#'   Use common table expressions in the generated SQL?
 #' @importFrom dplyr collect
 #' @export
 collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE) {
