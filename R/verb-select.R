@@ -147,6 +147,19 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     return(lazy_query)
   }
 
+  if (inherits(lazy_query, "lazy_join_query")) {
+    if (purrr::every(vars, is.symbol)) {
+      sel_vars <- purrr::map_chr(vars, as_string)
+
+      idx <- vctrs::vec_match(sel_vars, lazy_query$vars$alias)
+      lazy_query$vars$alias <- names(sel_vars)
+      lazy_query$vars$x <- lazy_query$vars$x[idx]
+      lazy_query$vars$y <- lazy_query$vars$y[idx]
+
+      return(lazy_query)
+    }
+  }
+
   if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with

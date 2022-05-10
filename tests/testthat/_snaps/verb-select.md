@@ -5,6 +5,28 @@
     Message
       Adding missing grouping variables: `b`
 
+# select after join is inlined
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
+    Output
+      <SQL>
+      SELECT `b`, `LHS`.`x` AS `x`
+      FROM `lf1` AS `LHS`
+      LEFT JOIN `lf2` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
+---
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
+    Output
+      <SQL>
+      SELECT `b`, `LHS`.`x` AS `x`, `a`
+      FROM `lf1` AS `LHS`
+      LEFT JOIN `lf2` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
 # multiple selects are collapsed
 
     Code
