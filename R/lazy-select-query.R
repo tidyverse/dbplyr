@@ -100,6 +100,42 @@ update_lazy_select <- function(select, vars) {
   select
 }
 
+is_lazy_select_query_simple <- function(x,
+                                        ignore_group_by = FALSE,
+                                        select = c("projection", "trivial")) {
+  select <- arg_match(select, c("projection", "trivial"))
+  if (!inherits(x, "lazy_select_query")) {
+    return(FALSE)
+  }
+
+  if (!purrr::every(x$select$expr, is_symbol)) {
+    return(FALSE)
+  }
+
+  vars_prev <- op_vars(x$from)
+  if (select == "trivial" && !is_select_trivial(x$select, vars_prev)) {
+    return(FALSE)
+  }
+
+  if (!is_empty(x$where)) {
+    return(FALSE)
+  }
+  if (!ignore_group_by && !is_empty(x$group_by)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$order_by)) {
+    return(FALSE)
+  }
+  if (is_true(x$distinct)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$limit)) {
+    return(FALSE)
+  }
+
+  TRUE
+}
+
 #' @export
 print.lazy_select_query <- function(x, ...) {
   cat(

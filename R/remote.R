@@ -24,37 +24,16 @@
 #' remote_con(mf2)
 #' remote_query(mf2)
 remote_name <- function(x) {
-  if (inherits(x$lazy_query, "lazy_query_base_remote")) {
-    return(x$lazy_query$x)
-  }
-
-  if (!inherits(x$lazy_query, "lazy_select_query")) {
-    return()
-  }
-
   lq <- x$lazy_query
+  if (inherits(lq, "lazy_query_base_remote")) {
+    return(lq$x)
+  }
+
+  if (!is_lazy_select_query_simple(lq, ignore_group_by = TRUE, select = "trivial")) {
+    return()
+  }
+
   if (!inherits(lq$from, "lazy_query_base_remote")) {
-    return()
-  }
-
-  vars_base <- op_vars(lq$from)
-  if (!is_select_trivial(lq$select, vars_base)) {
-    return()
-  }
-
-  if (!is_empty(lq$where)) {
-    return()
-  }
-
-  if (!is_empty(lq$order_by)) {
-    return()
-  }
-
-  if (!is_false(lq$distinct)) {
-    return()
-  }
-
-  if (!is_empty(lq$limit)) {
     return()
   }
 
