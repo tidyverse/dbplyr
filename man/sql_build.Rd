@@ -23,10 +23,23 @@ lazy_join_query(
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),
-  na_matches = FALSE
+  na_matches = FALSE,
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL
 )
 
-lazy_semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+lazy_semi_join_query(
+  x,
+  y,
+  vars,
+  anti = FALSE,
+  by = NULL,
+  na_matches = FALSE,
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL
+)
 
 lazy_select_query(
   from,
@@ -68,7 +81,7 @@ select_query(
   distinct = FALSE
 )
 
-semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type = type, all = FALSE)
 
