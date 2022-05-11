@@ -32,14 +32,26 @@ lazy_join_query <- function(x,
 
 #' @export
 #' @rdname sql_build
-lazy_semi_join_query <- function(x, y, anti = FALSE, by = NULL, na_matches = FALSE) {
+lazy_semi_join_query <- function(x,
+                                 y,
+                                 vars,
+                                 anti = FALSE,
+                                 by = NULL,
+                                 na_matches = FALSE,
+                                 group_vars = NULL,
+                                 order_vars = NULL,
+                                 frame = NULL) {
   structure(
     list(
       x = x,
       y = y,
+      vars = vars,
       anti = anti,
       by = by,
       na_matches = na_matches,
+      group_vars = group_vars %||% op_grps(x),
+      order_vars = order_vars %||% op_sort(x),
+      frame = frame %||% op_frame(x),
       last_op = "semi_join"
     ),
     class = c("lazy_semi_join_query", "lazy_query")
@@ -80,13 +92,8 @@ op_vars.lazy_join_query <- function(op) {
 }
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
-  op_vars(op$x)
+  names(op$vars)
 }
-
-#' @export
-op_grps.lazy_join_query <- function(op) op$group_vars
-#' @export
-op_grps.lazy_semi_join_query <- function(op) op_grps(op$x)
 
 #' @export
 sql_build.lazy_join_query <- function(op, con, ...) {
@@ -103,9 +110,19 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
-    semi_join_query(
+  vars <- op$vars
+  vars_prev <- op_vars(op$x)
+  if (identical(unname(vars), names(vars)) &&
+      identical(unname(vars), vars_prev)) {
+    vars <- sql("*")
+  } else {
+    vars <- ident(vars)
+  }
+
+  semi_join_query(
     sql_optimise(sql_build(op$x, con), con),
     sql_optimise(sql_build(op$y, con), con),
+    vars = vars,
     anti = op$anti,
     by = op$by,
     na_matches = op$na_matches

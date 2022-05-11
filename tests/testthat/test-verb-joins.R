@@ -164,23 +164,6 @@ test_that("select() before join is inlined", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
 
-  out <- left_join(
-    lf %>% select(a2 = a, x = x1),
-    lf2 %>% select(x = x2, b),
-    sql_on = sql("LHS.x = RHS.x")
-  )
-
-  lq <- out$lazy_query
-  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
-  expect_s3_class(lq$y$lazy_query, "lazy_select_query")
-  expect_equal(lq$vars$x, c("a2", "x", NA, NA))
-  expect_equal(lq$vars$y, c(NA, NA, "x", "b"))
-})
-
-test_that("select() before join is inlined", {
-  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
-  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
-
   test_vars <- function(lq, x, y) {
     expect_equal(lq$vars$alias, c("a2", "x", "b"))
     expect_equal(lq$vars$x, x)
@@ -232,6 +215,62 @@ test_that("select() before join is inlined", {
   expect_equal(vars$y, c(NA, NA, "x2", "b"))
   expect_equal(vars$all_x, c("x1", "a", "y"))
   expect_equal(vars$all_y, c("x2", "b", "z"))
+})
+
+test_that("select() before join is not inlined when using `sql_on`", {
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+
+  out <- left_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    sql_on = sql("LHS.x = RHS.x")
+  )
+
+  lq <- out$lazy_query
+  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
+  expect_s3_class(lq$y$lazy_query, "lazy_select_query")
+  expect_equal(lq$vars$x, c("a2", "x", NA, NA))
+  expect_equal(lq$vars$y, c(NA, NA, "x", "b"))
+})
+
+test_that("select() before semi_join is inlined", {
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+
+  out_semi <- semi_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  lq <- out_semi$lazy_query
+  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$by$x, "x1")
+  expect_snapshot(out_semi)
+
+  out_anti <- anti_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  lq <- out_anti$lazy_query
+  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$by$x, "x1")
+})
+
+test_that("select() before join is not inlined when using `sql_on`", {
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+
+  out <- semi_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    sql_on = sql("LHS.x = RHS.x")
+  )
+
+  lq <- out$lazy_query
+  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
+  expect_equal(lq$vars, c(a2 = "a2", x = "x"))
 })
 
 # sql_build ---------------------------------------------------------------
