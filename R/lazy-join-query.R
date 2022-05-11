@@ -1,6 +1,17 @@
 #' @export
 #' @rdname sql_build
-lazy_join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
+lazy_join_query <- function(x,
+                            y,
+                            vars,
+                            type = "inner",
+                            by = NULL,
+                            suffix = c(".x", ".y"),
+                            na_matches = FALSE,
+                            group_vars = NULL,
+                            order_vars = NULL,
+                            frame = NULL) {
+  carry_over <- c("group_vars", "order_vars", "frame", "last_op")
+
   structure(
     list(
       x = x,
@@ -10,6 +21,9 @@ lazy_join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".
       by = by,
       suffix = suffix,
       na_matches = na_matches,
+      group_vars = group_vars %||% op_grps(x),
+      order_vars = order_vars %||% op_sort(x),
+      frame = frame %||% op_frame(x),
       last_op = "join"
     ),
     class = c("lazy_join_query", "lazy_query")
@@ -70,7 +84,7 @@ op_vars.lazy_semi_join_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_join_query <- function(op) op_grps(op$x)
+op_grps.lazy_join_query <- function(op) op$group_vars
 #' @export
 op_grps.lazy_semi_join_query <- function(op) op_grps(op$x)
 

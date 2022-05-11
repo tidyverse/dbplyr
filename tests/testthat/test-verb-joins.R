@@ -160,6 +160,80 @@ test_that("join check `x_as` and `y_as`", {
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
 })
 
+test_that("select() before join is inlined", {
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+
+  out <- left_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    sql_on = sql("LHS.x = RHS.x")
+  )
+
+  lq <- out$lazy_query
+  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
+  expect_s3_class(lq$y$lazy_query, "lazy_select_query")
+  expect_equal(lq$vars$x, c("a2", "x", NA, NA))
+  expect_equal(lq$vars$y, c(NA, NA, "x", "b"))
+})
+
+test_that("select() before join is inlined", {
+  lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
+  lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
+
+  test_vars <- function(lq, x, y) {
+    expect_equal(lq$vars$alias, c("a2", "x", "b"))
+    expect_equal(lq$vars$x, x)
+    expect_equal(lq$vars$y, y)
+    expect_equal(lq$vars$all_x, c("x1", "a", "y"))
+    expect_equal(lq$vars$all_y, c("x2", "b", "z"))
+
+    expect_equal(lq$by$x, "x1")
+    expect_equal(lq$by$y, "x2")
+  }
+
+  out_left <- left_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  test_vars(out_left$lazy_query, c("a", "x1", NA), c(NA, NA, "b"))
+  expect_snapshot(out_left)
+
+  out_inner <- inner_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  test_vars(out_inner$lazy_query, c("a", "x1", NA), c(NA, NA, "b"))
+
+  out_right <- right_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  test_vars(out_right$lazy_query, c("a", NA, NA), c(NA, "x2", "b"))
+
+  out_full <- full_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = "x"
+  )
+  test_vars(out_full$lazy_query, c("a", "x1", NA), c(NA, "x2", "b"))
+
+  out_cross <- full_join(
+    lf %>% select(a2 = a, x = x1),
+    lf2 %>% select(x = x2, b),
+    by = character()
+  )
+  vars <- out_cross$lazy_query$vars
+  expect_equal(vars$alias, c("a2", "x.x", "x.y", "b"))
+  expect_equal(vars$x, c("a", "x1", NA, NA))
+  expect_equal(vars$y, c(NA, NA, "x2", "b"))
+  expect_equal(vars$all_x, c("x1", "a", "y"))
+  expect_equal(vars$all_y, c("x2", "b", "z"))
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {

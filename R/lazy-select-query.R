@@ -171,7 +171,7 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_query <- function(op) {
+op_grps.lazy_select_query <- function(op) {
   # Find renamed variables
   vars <- purrr::set_names(op$select$expr, op$select$name)
   symbols <- purrr::keep(vars, is_symbol)

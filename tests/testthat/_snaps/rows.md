@@ -242,11 +242,8 @@
       )
       UNION ALL
       (
-        SELECT `LHS`.`x` AS `x`, `y`
-        FROM (
-          SELECT `x`
-          FROM `df_x`
-        ) `LHS`
+        SELECT `LHS`.`x` AS `x`, `RHS`.`y` AS `y`
+        FROM `df_x` AS `LHS`
         INNER JOIN `df_y` AS `RHS`
           ON (`LHS`.`x` = `RHS`.`x`)
       )
@@ -361,11 +358,8 @@
       UNION ALL
       (
         (
-          SELECT `LHS`.`x` AS `x`, `y`
-          FROM (
-            SELECT `x`
-            FROM `df_x`
-          ) `LHS`
+          SELECT `LHS`.`x` AS `x`, `RHS`.`y` AS `y`
+          FROM `df_x` AS `LHS`
           INNER JOIN `df_y` AS `RHS`
             ON (`LHS`.`x` = `RHS`.`x`)
         )
