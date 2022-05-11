@@ -193,11 +193,6 @@ op_sort.lazy_query <- function(op) {
 }
 
 #' @export
-op_frame.lazy_query <- function(op) {
-  op$frame
-}
-
-#' @export
 op_desc.lazy_query <- function(op) {
   "SQL"
 }

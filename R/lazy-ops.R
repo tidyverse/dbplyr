@@ -74,6 +74,8 @@ op_grps <- function(op) UseMethod("op_grps")
 op_grps.tbl_lazy <- function(op) op_grps(op$lazy_query)
 #' @export
 op_grps.lazy_query_base <- function(op) character()
+#' @export
+op_grps.lazy_query <- function(op) op$group_vars
 
 # op_vars -----------------------------------------------------------------
 
@@ -103,7 +105,7 @@ op_frame <- function(op) UseMethod("op_frame")
 #' @export
 op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
 #' @export
-op_frame.lazy_query_base <- function(op) op$frame
+op_frame.lazy_query <- function(op) op$frame
 
 # Description -------------------------------------------------------------
 
