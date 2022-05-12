@@ -9,7 +9,7 @@
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
 
-# `sql_query_upsert_vendor()` is correct
+# `sql_query_upsert()` with method = 'on_conflict' is correct
 
     Code
       sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,

@@ -155,13 +155,13 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                           x_name,
-                                                           y,
-                                                           by,
-                                                           update_cols,
-                                                           ...,
-                                                           returning_cols = NULL,
-                                                           method = NULL) {
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    update_cols,
+                                                    ...,
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 

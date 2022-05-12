@@ -78,7 +78,7 @@ test_that("custom SQL translation", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
-test_that("`sql_query_upsert_vendor()` is correct", {
+test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
     con = simulate_postgres(),
