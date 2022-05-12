@@ -13,6 +13,8 @@ lazy_select_query <- function(from,
                               frame = NULL,
                               select_operation = c("mutate", "summarise"),
                               message_summarise = NULL) {
+  # TODO `lazy_set_op_query()`, `lazy_join_query()` and `lazy_semi_join_query()`
+  # use <tbl_lazy> instead of <lazy_query> -> should be consistent
   stopifnot(inherits(from, "lazy_query"))
   stopifnot(is_string(last_op))
   stopifnot(is.null(select) || is_lazy_sql_part(select))
@@ -21,10 +23,6 @@ lazy_select_query <- function(from,
   stopifnot(is_lazy_sql_part(order_by))
   stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
-
-  # stopifnot(is.null(group_vars) || (is.character(group_vars) && is.null(names(group_vars))))
-  stopifnot(is_lazy_sql_part(order_vars), is.null(names(order_vars)))
-  stopifnot(is.null(frame) || is_integerish(frame, n = 2, finite = TRUE))
 
   select <- select %||% syms(set_names(op_vars(from)))
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
@@ -47,24 +45,27 @@ lazy_select_query <- function(from,
     select <- new_lazy_select(select)
   }
 
-  structure(
-    list(
-      from = from,
-      select = select,
-      where = where,
-      group_by = group_by,
-      order_by = order_by,
-      distinct = distinct,
-      limit = limit,
-      group_vars = group_vars,
-      order_vars = order_vars,
-      frame = frame,
-      select_operation = select_operation,
-      last_op = last_op,
-      message_summarise = message_summarise
-    ),
-    class = c("lazy_select_query", "lazy_query")
+  out <- lazy_query(
+    query_type = "select",
+    x = from,
+    select = select,
+    where = where,
+    group_by = group_by,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    select_operation = select_operation,
+    last_op = last_op,
+    message_summarise = message_summarise,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame
   )
+
+  # TODO this should only use `x` instead of `from` but this might need to be
+  # deprecated first
+  out$from <- out$x
+  out
 }
 
 is_lazy_sql_part <- function(x) {
@@ -135,7 +136,7 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_query <- function(op) {
+op_grps.lazy_select_query <- function(op) {
   # Find renamed variables
   vars <- purrr::set_names(op$select$expr, op$select$name)
   symbols <- purrr::keep(vars, is_symbol)
@@ -146,19 +147,6 @@ op_grps.lazy_query <- function(op) {
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
   grps
-}
-
-#' @export
-op_sort.lazy_query <- function(op) {
-  # Renaming (like for groups) cannot be done because:
-  # * `order_vars` is a list of quosures
-  # * variables needed in sorting can be dropped
-  op$order_vars
-}
-
-#' @export
-op_frame.lazy_query <- function(op) {
-  op$frame
 }
 
 #' @export

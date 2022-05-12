@@ -17,30 +17,30 @@ NULL
 
 #' @export
 #' @rdname lazy_ops
-lazy_query_base <- function(x, vars, class = character(), ...) {
+lazy_base_query <- function(x, vars, class = character(), ...) {
   stopifnot(is.character(vars))
 
-  structure(
-    list(
-      x = x,
-      vars = vars,
-      ...
-    ),
-    class = c(paste0("lazy_query_base_", class), "lazy_query_base", "lazy_query")
+  lazy_query(
+    query_type = c(paste0("base_", class), "base"),
+    x = x,
+    vars = vars,
+    ...,
+    group_vars = character(),
+    order_vars = NULL,
+    frame = NULL
   )
 }
 
 lazy_query_local <- function(df, name) {
-  out <- lazy_query_base(df, names(df), class = "local", name = name)
-  out
+  lazy_base_query(df, names(df), class = "local", name = name)
 }
 
 lazy_query_remote <- function(x, vars) {
-  lazy_query_base(x, vars, class = "remote")
+  lazy_base_query(x, vars, class = "remote")
 }
 
 #' @export
-print.lazy_query_base_remote <- function(x, ...) {
+print.lazy_base_remote_query <- function(x, ...) {
   if (inherits(x$x, "ident")) {
     cat("From: ", x$x, "\n", sep = "")
   } else {
@@ -51,17 +51,17 @@ print.lazy_query_base_remote <- function(x, ...) {
 }
 
 #' @export
-print.lazy_query_base_local <- function(x, ...) {
+print.lazy_base_local_query <- function(x, ...) {
   cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
 }
 
 #' @export
-sql_build.lazy_query_base_remote <- function(op, con, ...) {
+sql_build.lazy_base_remote_query <- function(op, con, ...) {
   op$x
 }
 
 #' @export
-sql_build.lazy_query_base_local <- function(op, con, ...) {
+sql_build.lazy_base_local_query <- function(op, con, ...) {
   ident(op$name)
 }
 
@@ -73,7 +73,7 @@ op_grps <- function(op) UseMethod("op_grps")
 #' @export
 op_grps.tbl_lazy <- function(op) op_grps(op$lazy_query)
 #' @export
-op_grps.lazy_query_base <- function(op) character()
+op_grps.lazy_query <- function(op) op$group_vars %||% character()
 
 # op_vars -----------------------------------------------------------------
 
@@ -83,7 +83,7 @@ op_vars <- function(op) UseMethod("op_vars")
 #' @export
 op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
 #' @export
-op_vars.lazy_query_base <- function(op) op$vars
+op_vars.lazy_base_query <- function(op) op$vars
 
 # op_sort -----------------------------------------------------------------
 
@@ -93,7 +93,12 @@ op_sort <- function(op) UseMethod("op_sort")
 #' @export
 op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
 #' @export
-op_sort.lazy_query_base <- function(op) NULL
+op_sort.lazy_query <- function(op) {
+  # Renaming (like for groups) cannot be done because:
+  # * `order_vars` is a list of quosures
+  # * variables needed in sorting can be dropped
+  op$order_vars
+}
 
 # op_frame ----------------------------------------------------------------
 
@@ -103,7 +108,7 @@ op_frame <- function(op) UseMethod("op_frame")
 #' @export
 op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
 #' @export
-op_frame.lazy_query_base <- function(op) op$frame
+op_frame.lazy_query <- function(op) op$frame
 
 # Description -------------------------------------------------------------
 
@@ -121,7 +126,7 @@ op_cols <- function(op) {
 op_desc <- function(op) UseMethod("op_desc")
 
 #' @export
-op_desc.lazy_query_base_remote <- function(op) {
+op_desc.lazy_base_remote_query <- function(op) {
   if (is.ident(op$x)) {
     paste0("table<", op$x, ">")
   } else {

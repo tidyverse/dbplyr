@@ -1,14 +1,12 @@
 #' @export
 #' @rdname sql_build
 lazy_set_op_query <- function(x, y, type = type, all = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      type = type,
-      all = all
-    ),
-    class = c("lazy_set_op_query", "lazy_query")
+  lazy_query(
+    query_type = "set_op",
+    x = x,
+    y = y,
+    type = type,
+    all = all
   )
 }
 
@@ -26,16 +24,6 @@ print.lazy_set_op_query <- function(x, ..., con = NULL) {
 #' @export
 op_vars.lazy_set_op_query <- function(op) {
   union(op_vars(op$x), op_vars(op$y))
-}
-
-#' @export
-op_grps.lazy_set_op_query <- function(op) {
-  op_grps(op$x)
-}
-
-#' @export
-op_sort.lazy_set_op_query <- function(op) {
-  op_sort(op$x)
 }
 
 #' @export

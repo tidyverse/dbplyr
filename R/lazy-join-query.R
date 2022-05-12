@@ -1,34 +1,40 @@
 #' @export
 #' @rdname sql_build
-lazy_join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      vars = vars,
-      type = type,
-      by = by,
-      suffix = suffix,
-      na_matches = na_matches,
-      last_op = "join"
-    ),
-    class = c("lazy_join_query", "lazy_query")
+lazy_join_query <- function(x,
+                            y,
+                            vars,
+                            type = "inner",
+                            by = NULL,
+                            suffix = c(".x", ".y"),
+                            na_matches = FALSE) {
+  lazy_query(
+    query_type = "join",
+    x = x,
+    y = y,
+    vars = vars,
+    type = type,
+    by = by,
+    suffix = suffix,
+    na_matches = na_matches,
+    last_op = "join"
   )
 }
 
 #' @export
 #' @rdname sql_build
-lazy_semi_join_query <- function(x, y, anti = FALSE, by = NULL, na_matches = FALSE) {
-  structure(
-    list(
-      x = x,
-      y = y,
-      anti = anti,
-      by = by,
-      na_matches = na_matches,
-      last_op = "semi_join"
-    ),
-    class = c("lazy_semi_join_query", "lazy_query")
+lazy_semi_join_query <- function(x,
+                                 y,
+                                 anti = FALSE,
+                                 by = NULL,
+                                 na_matches = FALSE) {
+  lazy_query(
+    query_type = "semi_join",
+    x = x,
+    y = y,
+    anti = anti,
+    by = by,
+    na_matches = na_matches,
+    last_op = "semi_join"
   )
 }
 
@@ -68,11 +74,6 @@ op_vars.lazy_join_query <- function(op) {
 op_vars.lazy_semi_join_query <- function(op) {
   op_vars(op$x)
 }
-
-#' @export
-op_grps.lazy_join_query <- function(op) op_grps(op$x)
-#' @export
-op_grps.lazy_semi_join_query <- function(op) op_grps(op$x)
 
 #' @export
 sql_build.lazy_join_query <- function(op, con, ...) {
