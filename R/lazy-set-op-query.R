@@ -1,6 +1,11 @@
 #' @export
 #' @rdname sql_build
-lazy_set_op_query <- function(x, y, type = type, all = FALSE) {
+lazy_set_op_query <- function(x, y, type, all) {
+  stopifnot(inherits(x, "lazy_query"))
+  stopifnot(inherits(y, "lazy_query"))
+  vctrs::vec_assert(type, character(), size = 1L)
+  assert_flag(all)
+
   lazy_query(
     query_type = "set_op",
     x = x,
