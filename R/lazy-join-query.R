@@ -3,10 +3,18 @@
 lazy_join_query <- function(x,
                             y,
                             vars,
-                            type = "inner",
-                            by = NULL,
+                            type,
+                            by,
                             suffix = c(".x", ".y"),
-                            na_matches = FALSE) {
+                            na_matches = c("never", "na")) {
+  stopifnot(inherits(x, "lazy_query"))
+  stopifnot(inherits(y, "lazy_query"))
+  join_check_vars(vars)
+  type <- arg_match(type, c("left", "right", "inner", "full", "cross"))
+  join_check_by(by)
+  vctrs::vec_assert(suffix, ptype = character(), size = 2L)
+  na_matches <- arg_match(na_matches, c("never", "na"))
+
   lazy_query(
     query_type = "join",
     x = x,
@@ -20,13 +28,51 @@ lazy_join_query <- function(x,
   )
 }
 
+join_check_vars <- function(vars) {
+  if (!vctrs::vec_is_list(vars)) {
+    # TODO use `cli_abort()`
+    abort("`vars` must be a list", .internal = TRUE)
+  }
+
+  if (!identical(names(vars), c("alias", "x", "y", "all_x", "all_y"))) {
+    # TODO use `cli_abort()`
+    abort("`vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`", .internal = TRUE)
+  }
+
+  n <- vctrs::vec_size(vars$alias)
+  vctrs::vec_assert(vars$alias, character())
+  vctrs::vec_assert(vars$x, character(), size = n)
+  vctrs::vec_assert(vars$y, character(), size = n)
+  vctrs::vec_assert(vars$all_x, character())
+  vctrs::vec_assert(vars$all_y, character())
+}
+
+join_check_by <- function(by) {
+  if (!vctrs::vec_is_list(by)) {
+    abort("`by` must be a list", .internal = TRUE)
+  }
+  vctrs::vec_assert(by$x, character())
+  vctrs::vec_assert(by$y, character())
+  if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
+    abort("`by$x` and `by$y` must have the same size", .internal = TRUE)
+  }
+  vctrs::vec_assert(by$x_as, ident(), size = 1L)
+  vctrs::vec_assert(by$y_as, ident(), size = 1L)
+}
+
 #' @export
 #' @rdname sql_build
 lazy_semi_join_query <- function(x,
                                  y,
-                                 anti = FALSE,
-                                 by = NULL,
-                                 na_matches = FALSE) {
+                                 anti,
+                                 by,
+                                 na_matches = c("never", "na")) {
+  stopifnot(inherits(x, "lazy_query"))
+  stopifnot(inherits(y, "lazy_query"))
+  assert_flag(anti, "anti")
+  join_check_by(by)
+  na_matches <- arg_match(na_matches, c("never", "na"))
+
   lazy_query(
     query_type = "semi_join",
     x = x,
@@ -90,7 +136,7 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
-    semi_join_query(
+  semi_join_query(
     sql_optimise(sql_build(op$x, con), con),
     sql_optimise(sql_build(op$y, con), con),
     anti = op$anti,

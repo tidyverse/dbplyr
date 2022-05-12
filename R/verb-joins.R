@@ -245,7 +245,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = caller_env())
 
   lazy_join_query(
-    x, y,
+    x$lazy_query,
+    y$lazy_query,
     vars = vars,
     type = type,
     by = by,
@@ -273,7 +274,8 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 
   lazy_semi_join_query(
-    x, y,
+    x$lazy_query,
+    y$lazy_query,
     anti = anti,
     by = by,
     na_matches = na_matches

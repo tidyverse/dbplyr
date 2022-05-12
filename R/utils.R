@@ -98,3 +98,12 @@ hash_temp <- function(name) {
 local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
+
+assert_flag <- function(x, arg, call = caller_env()) {
+  vctrs::vec_assert(x, logical(), size = 1L)
+  if (is.na(x)) {
+    # TODO use cli_abort()
+    # TODO use correct arg name
+    abort("`x` must not be NA.", call = call)
+  }
+}
