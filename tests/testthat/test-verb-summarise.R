@@ -134,7 +134,7 @@ test_that("can handle rename", {
   expect_equal(
     out,
     lazy_select_query(
-      from = out$from,
+      x = out$x,
       last_op = "summarise",
       select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
       group_by = syms("ax"),

@@ -33,11 +33,11 @@ remote_name <- function(x) {
   }
 
   lq <- x$lazy_query
-  if (!inherits(lq$from, "lazy_base_remote_query")) {
+  if (!inherits(lq$x, "lazy_base_remote_query")) {
     return()
   }
 
-  vars_base <- op_vars(lq$from)
+  vars_base <- op_vars(lq$x)
   if (!is_select_trivial(lq$select, vars_base)) {
     return()
   }
@@ -58,7 +58,7 @@ remote_name <- function(x) {
     return()
   }
 
-  lq$from$x
+  lq$x$x
 }
 
 #' @export

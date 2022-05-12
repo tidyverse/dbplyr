@@ -31,7 +31,7 @@ test_that("can refer to fresly created values", {
 test_that("transmute includes all needed variables", {
   lf <- lazy_frame(x = 1, y = 2)
   out <- transmute(lf, x = x / 2, x2 = x + y)
-  expect_equal(op_vars(out$lazy_query$from), c("x", "y"))
+  expect_equal(op_vars(out$lazy_query$x), c("x", "y"))
   expect_snapshot(out)
 })
 

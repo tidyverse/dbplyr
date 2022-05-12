@@ -39,7 +39,7 @@ add_head <- function(x, n) {
   lazy_query <- x$lazy_query
   if (!inherits(lazy_query, "lazy_select_query")) {
     lazy_query <- lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "head",
       limit = n
     )
@@ -51,7 +51,7 @@ add_head <- function(x, n) {
     lazy_query$limit <- min(lazy_query$limit, n)
   } else {
     lazy_query <- lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "head",
       limit = n
     )

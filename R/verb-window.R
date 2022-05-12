@@ -37,7 +37,7 @@ add_order <- function(.data, dots) {
   lazy_query <- .data$lazy_query
   if (!inherits(lazy_query, "lazy_select_query")) {
     out <- lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "window_order",
       order_vars = dots
     )

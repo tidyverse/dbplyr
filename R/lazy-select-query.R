@@ -1,6 +1,6 @@
 #' @export
 #' @rdname sql_build
-lazy_select_query <- function(from,
+lazy_select_query <- function(x,
                               last_op,
                               select = NULL,
                               where = NULL,
@@ -13,9 +13,7 @@ lazy_select_query <- function(from,
                               frame = NULL,
                               select_operation = c("mutate", "summarise"),
                               message_summarise = NULL) {
-  # TODO `lazy_set_op_query()`, `lazy_join_query()` and `lazy_semi_join_query()`
-  # use <tbl_lazy> instead of <lazy_query> -> should be consistent
-  stopifnot(inherits(from, "lazy_query"))
+  stopifnot(inherits(x, "lazy_query"))
   stopifnot(is_string(last_op))
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
@@ -24,15 +22,15 @@ lazy_select_query <- function(from,
   stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
 
-  select <- select %||% syms(set_names(op_vars(from)))
+  select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
   stopifnot(is.null(message_summarise) || is_string(message_summarise))
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
-  group_vars <- group_vars %||% op_grps(from)
-  order_vars <- order_vars %||% op_sort(from)
-  frame <- frame %||% op_frame(from)
+  group_vars <- group_vars %||% op_grps(x)
+  order_vars <- order_vars %||% op_sort(x)
+  frame <- frame %||% op_frame(x)
 
   if (last_op == "mutate") {
     select <- new_lazy_select(
@@ -45,9 +43,9 @@ lazy_select_query <- function(from,
     select <- new_lazy_select(select)
   }
 
-  out <- lazy_query(
+  lazy_query(
     query_type = "select",
-    x = from,
+    x = x,
     select = select,
     where = where,
     group_by = group_by,
@@ -61,11 +59,6 @@ lazy_select_query <- function(from,
     order_vars = order_vars,
     frame = frame
   )
-
-  # TODO this should only use `x` instead of `from` but this might need to be
-  # deprecated first
-  out$from <- out$x
-  out
 }
 
 is_lazy_sql_part <- function(x) {
@@ -109,7 +102,7 @@ print.lazy_select_query <- function(x, ...) {
     sep = ""
   )
   cat_line("From:")
-  cat_line(indent_print(sql_build(x$from, simulate_dbi())))
+  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
   if (length(select))   cat("Select:   ", named_commas2(select), "\n", sep = "")
@@ -160,11 +153,11 @@ sql_build.lazy_select_query <- function(op, con, ...) {
     inform(op$message_summarise)
   }
 
-  select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
+  select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$x), con)
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
-    from = sql_build(op$from, con),
+    from = sql_build(op$x, con),
     select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
