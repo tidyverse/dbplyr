@@ -1,6 +1,9 @@
 #' @export
 #' @rdname sql_build
-lazy_set_op_query <- function(x, y, type = type, all = FALSE) {
+lazy_set_op_query <- function(x,
+                              y,
+                              type,
+                              all = FALSE) {
   structure(
     list(
       x = x,
