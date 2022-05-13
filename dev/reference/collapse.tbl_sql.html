@@ -96,11 +96,12 @@ downloads the data into R.</p>
   unique_indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
   analyze <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
+  <span class="va">...</span>,
+  cte <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span>
 
 <span class="co"># S3 method for tbl_sql</span>
-<span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, n <span class="op">=</span> <span class="cn">Inf</span>, warn_incomplete <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span>, n <span class="op">=</span> <span class="cn">Inf</span>, warn_incomplete <span class="op">=</span> <span class="cn">TRUE</span>, cte <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -123,6 +124,9 @@ will create a new index.</p></dd>
 <dt>analyze</dt>
 <dd><p>if <code>TRUE</code> (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.</p></dd>
+<dt>cte</dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+Use common table expressions in the generated SQL?</p></dd>
 <dt>n</dt>
 <dd><p>Number of rows to fetch. Defaults to <code>Inf</code>, meaning all rows.</p></dd>
 <dt>warn_incomplete</dt>
