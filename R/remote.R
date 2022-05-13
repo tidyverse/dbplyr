@@ -6,7 +6,8 @@
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
-#' @param cte Use common table expressions in the generated SQL?
+#' @param cte `r lifecycle::badge("experimental")`
+#'   Use common table expressions in the generated SQL?
 #' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"

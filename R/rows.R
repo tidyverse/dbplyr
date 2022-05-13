@@ -672,6 +672,19 @@ rows_prep <- function(con, x_name, y, by, lvl = 0) {
   )
 }
 
+rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
+  out <- rows_prep(con, x_name, y, by, lvl = lvl)
+
+  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+  out$conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  out$insert_clause <- sql_clause_insert(con, insert_cols, x_name)
+
+  out
+}
+
 rows_get_or_execute <- function(x, sql, returning_cols) {
   con <- remote_con(x)
   if (is_empty(returning_cols)) {
