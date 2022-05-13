@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
+  column (@mgirlich).
+
 * `remote_name()` now returns a name in more cases where it makes sense
   (@mgirlich, #850).
 
