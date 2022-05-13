@@ -83,7 +83,7 @@
 
     Code
       rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
-      returning = everything())
+      returning = everything(), method = "on_conflict")
     Condition
       Error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification

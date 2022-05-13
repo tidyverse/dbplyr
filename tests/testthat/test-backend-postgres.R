@@ -180,10 +180,24 @@ test_that("can insert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore",
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     )
   })
 
+  expect_error(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything(),
+      method = "where_not_exists"
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
   db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
@@ -192,7 +206,8 @@ test_that("can insert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore",
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     ) %>%
       get_returned_rows(),
     tibble(

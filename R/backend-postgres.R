@@ -251,10 +251,20 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 #' @export
-sql_query_insert.PqConnection <- function(con, x_name, y, by,
+sql_query_insert.PqConnection <- function(con,
+                                          x_name,
+                                          y,
+                                          by,
                                           conflict = c("error", "ignore"),
                                           ...,
-                                          returning_cols = NULL) {
+                                          returning_cols = NULL,
+                                          method = NULL) {
+  method <- method %||% "on_conflict"
+  arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
+  if (method == "where_not_exists") {
+    return(NextMethod("sql_query_insert"))
+  }
+
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
   conflict <- rows_check_conflict(conflict)
