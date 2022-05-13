@@ -353,35 +353,6 @@
 
     Code
       sql_query_upsert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
-      method = "cte_update")
-    Output
-      <SQL> WITH `updated` AS (
-        UPDATE `df_x`
-        SET `c` = `...y`.`c`, `d` = `...y`.`d`
-        FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
-        WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
-        OUTPUT `INSERTED`.*
-      )
-      INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      SELECT *
-      FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
-      WHERE NOT EXISTS (
-        SELECT 1 FROM `updated`
-        WHERE (`updated`.`a` = `...y`.`a`) AND (`updated`.`b` = `...y`.`b`)
-      )
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
-
----
-
-    Code
-      sql_query_upsert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
         "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> MERGE INTO `df_x`
