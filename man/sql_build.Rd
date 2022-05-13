@@ -21,13 +21,13 @@ lazy_join_query(
   x,
   y,
   vars,
-  type = "inner",
-  by = NULL,
+  type,
+  by,
   suffix = c(".x", ".y"),
-  na_matches = FALSE
+  na_matches = c("never", "na")
 )
 
-lazy_semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+lazy_semi_join_query(x, y, anti, by, na_matches = c("never", "na"))
 
 lazy_query(
   query_type,
@@ -39,7 +39,7 @@ lazy_query(
 )
 
 lazy_select_query(
-  from,
+  x,
   last_op,
   select = NULL,
   where = NULL,
@@ -54,7 +54,7 @@ lazy_select_query(
   message_summarise = NULL
 )
 
-lazy_set_op_query(x, y, type = type, all = FALSE)
+lazy_set_op_query(x, y, type, all)
 
 join_query(
   x,
@@ -80,7 +80,7 @@ select_query(
 
 semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
 
-set_op_query(x, y, type = type, all = FALSE)
+set_op_query(x, y, type, all = FALSE)
 
 sql_build(op, con = NULL, ...)
 
