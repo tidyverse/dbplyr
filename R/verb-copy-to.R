@@ -54,7 +54,7 @@ copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
   assert_that(is.flag(temporary))
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
-    abort("`df` must be a local dataframe or a remote tbl_sql")
+    cli_abort("{.var df} must be a local dataframe or a remote tbl_sql")
   }
 
   name <- as.sql(name, con = dest$con)
@@ -118,11 +118,11 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' copy_inline(con, df) %>% dplyr::show_query()
 copy_inline <- function(con, df) {
   if (!inherits(df, "data.frame")) {
-    abort("`df` needs to be a data.frame.")
+    cli_abort("{.var df} needs to be a data.frame.")
   }
 
   if (ncol(df) == 0) {
-    abort("`df` needs at least one column.")
+    cli_abort("{.var df} needs at least one column.")
   }
 
   # This workaround is needed because `tbl_sql()` applies `as.sql()` on `from`

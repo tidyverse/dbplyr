@@ -47,7 +47,7 @@ db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
   if (any(c(perl, fixed, useBytes))) {
-    abort("`perl`, `fixed` and `useBytes` parameters are unsupported")
+    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
   }
 
   if (ignore.case) {
@@ -124,7 +124,7 @@ sql_translation.PqConnection <- function(con) {
         } else if (label && abbr) {
           sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
         } else {
-          abort("Unrecognized arguments to `wday`")
+          cli_abort("Unrecognized arguments to {.arg wday}")
         }
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
@@ -147,7 +147,7 @@ sql_translation.PqConnection <- function(con) {
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          abort("`fiscal_start` is not supported in PostgreSQL translation. Must be 1.")
+          cli_abort("{.arg fiscal_start} is not supported in PostgreSQL translation. Must be 1.")
         }
 
         if (with_year) {
@@ -249,6 +249,31 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 }
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
+
+#' @export
+sql_query_insert.PqConnection <- function(con, x_name, y, by,
+                                          conflict = c("error", "ignore"),
+                                          ...,
+                                          returning_cols = NULL) {
+  # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
+  # https://www.sqlite.org/lang_UPSERT.html
+  conflict <- rows_check_conflict(conflict)
+
+  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+
+  clauses <- list(
+    parts$insert_clause,
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    sql_clause("ON CONFLICT", by_sql),
+    {if (conflict == "ignore") sql("DO NOTHING")},
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+#' @export
+sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' Upsert using the `ON CONFLICT ... DO UPDATE` clause
 #'

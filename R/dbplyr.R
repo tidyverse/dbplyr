@@ -3,6 +3,7 @@
 #' @importFrom stats setNames update
 #' @importFrom utils head tail
 #' @importFrom glue glue
+#' @importFrom cli cli_abort
 #' @importFrom dplyr n
 #' @import rlang
 #' @import DBI

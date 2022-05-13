@@ -5,7 +5,7 @@
     Condition
       Error:
       ! Cannot translate shiny inputs to SQL.
-      * Force evaluation in R with (e.g.) `!!input$x` or `local(input$x)`
+      i Do you want to force evaluation in R with (e.g.) `!!input$x` or `local(input$x)`?
 
 ---
 
@@ -14,7 +14,7 @@
     Condition
       Error:
       ! Cannot translate a shiny reactive to SQL.
-      * Force evaluation in R with (e.g.) `!!foo()` or `local(foo())`
+      i Do you want to force evaluation in R with (e.g.) `!!foo()` or `local(foo())`?
 
 # con must not be NULL
 
@@ -39,5 +39,5 @@
     Condition
       Error:
       ! Cannot translate a data.frame to SQL.
-      * Force evaluation in R with (e.g.) `!!df$x` or `local(df$x)`
+      i Do you want to force evaluation in R with (e.g.) `!!df$x` or `local(df$x)`?
 
