@@ -97,19 +97,14 @@ simulate_mssql <- function(version = "15.0") {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
-
-  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
-  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    parts$insert_clause,
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    !!!conflict_clauses
+    !!!parts$conflict_clauses
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
