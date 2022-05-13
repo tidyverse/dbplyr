@@ -459,7 +459,7 @@ set_returned_rows <- function(x, returned_rows) {
 get_returned_rows <- function(x) {
   out <- attr(x, "returned_rows", TRUE)
   if (is.null(out)) {
-    abort("No returned rows available.")
+    cli_abort("No returned rows available.")
   }
   out
 }
@@ -482,7 +482,7 @@ has_returned_rows <- function(x) {
 
 #' @export
 sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
-  abort("DuckDB does not support the `returning` argument.")
+  cli_abort("DuckDB does not support the {.arg returning} argument.")
 }
 
 sql_coalesce <- function(x, y) {
@@ -496,7 +496,7 @@ rows_check_by <- function(by, y, ..., error_call = caller_env()) {
 
   if (is.null(by)) {
     if (ncol(y) == 0L) {
-      abort("`y` must have at least one column.", call = error_call)
+      cli_abort("{.arg y} must have at least one column.", call = error_call)
     }
 
     by <- colnames(y)[[1]]
@@ -508,13 +508,13 @@ rows_check_by <- function(by, y, ..., error_call = caller_env()) {
   }
 
   if (!is.character(by)) {
-    abort("`by` must be a character vector.", call = error_call)
+    cli_abort("{.arg by} must be a character vector.", call = error_call)
   }
   if (is_empty(by)) {
-    abort("`by` must specify at least 1 column.", call = error_call)
+    cli_abort("{.arg by} must specify at least 1 column.", call = error_call)
   }
   if (!all(names2(by) == "")) {
-    abort("`by` must be unnamed.", call = error_call)
+    cli_abort("{.arg by} must be unnamed.", call = error_call)
   }
 
   by
@@ -529,11 +529,11 @@ rows_check_containment <- function(x, y, ..., error_call = caller_env()) {
     bad <- err_vars(bad)
 
     message <- c(
-      "All columns in `y` must exist in `x`.",
-      i = glue("The following columns only exist in `y`: {bad}.")
+      "All columns in {.arg y} must exist in {.arg x}.",
+      i = "The following columns only exist in {.arg y}: {.field {bad}}."
     )
 
-    abort(message, call = error_call)
+    cli_abort(message, call = error_call)
   }
 
   invisible()
@@ -553,23 +553,23 @@ rows_check_key <- function(x,
     missing <- err_vars(missing)
 
     message <- c(
-      "All columns specified through `by` must exist in `x` and `y`.",
-      i = glue("The following columns are missing from `{arg}`: {missing}.")
+      "All columns specified through {.arg by} must exist in {.arg x} and {.arg y}.",
+      i = "The following columns are missing from {.arg {arg}}: {.field {missing}}."
     )
 
-    abort(message, call = error_call)
+    cli_abort(message, call = error_call)
   }
 }
 
 rows_check_in_place <- function(df, in_place) {
   if (!rlang::is_bool(in_place)) {
-    abort("`in_place` must be `TRUE` or `FALSE`.")
+    cli_abort("{.arg in_place} must be `TRUE` or `FALSE`.")
   }
 
   if (!in_place) return()
 
   if (inherits(df, "tbl_TestConnection")) {
-    abort("`in_place = TRUE` does not work for simulated connections.")
+    cli_abort("{.code in_place = TRUE} does not work for simulated connections.")
   }
 }
 
@@ -582,7 +582,7 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
   )
 
   if (conflict == "error") {
-    abort('`conflict = "error"` is not supported for database tables.', call = error_call)
+    cli_abort('{.code conflict = "error"} is not supported for database tables.', call = error_call)
   }
 
   conflict
@@ -597,7 +597,7 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   )
 
   if (unmatched == "error") {
-    abort('`unmatched = "error"` is not supported for database tables.', call = error_call)
+    cli_abort('{.code unmatched = "error"} is not supported for database tables.', call = error_call)
   }
 
   unmatched
@@ -609,7 +609,7 @@ rows_check_returning <- function(df, returning, returning_expr, error_call = cal
   if (is_empty(returning_cols)) return(returning_cols)
 
   if (inherits(df, "tbl_TestConnection")) {
-    abort("`returning` does not work for simulated connections.", call = error_call)
+    cli_abort("{.arg returning} does not work for simulated connections.", call = error_call)
   }
 
   returning_cols
@@ -649,7 +649,7 @@ target_table_name <- function(x, in_place) {
 
   name <- remote_name(x)
   if (is_null(name)) {
-    abort("Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.")
+    cli_abort("Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table.")
   }
 
   name
