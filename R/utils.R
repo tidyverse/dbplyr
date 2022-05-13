@@ -102,8 +102,6 @@ local_methods <- function(..., .frame = caller_env()) {
 assert_flag <- function(x, arg, call = caller_env()) {
   vctrs::vec_assert(x, logical(), size = 1L)
   if (is.na(x)) {
-    # TODO use cli_abort()
-    # TODO use correct arg name
-    abort("`x` must not be NA.", call = call)
+    cli_abort("{.arg {arg}} must not be NA.", call = call)
   }
 }

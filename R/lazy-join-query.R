@@ -30,12 +30,14 @@ lazy_join_query <- function(x,
 
 join_check_vars <- function(vars) {
   if (!vctrs::vec_is_list(vars)) {
-    # TODO use `cli_abort()`
+    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
+    # is fixed
     abort("`vars` must be a list", .internal = TRUE)
   }
 
   if (!identical(names(vars), c("alias", "x", "y", "all_x", "all_y"))) {
-    # TODO use `cli_abort()`
+    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
+    # is fixed
     abort("`vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`", .internal = TRUE)
   }
 
@@ -49,11 +51,15 @@ join_check_vars <- function(vars) {
 
 join_check_by <- function(by) {
   if (!vctrs::vec_is_list(by)) {
+    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
+    # is fixed
     abort("`by` must be a list", .internal = TRUE)
   }
   vctrs::vec_assert(by$x, character())
   vctrs::vec_assert(by$y, character())
   if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
+    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
+    # is fixed
     abort("`by$x` and `by$y` must have the same size", .internal = TRUE)
   }
   vctrs::vec_assert(by$x_as, ident(), size = 1L)
