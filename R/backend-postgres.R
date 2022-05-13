@@ -267,8 +267,6 @@ sql_query_insert.PqConnection <- function(con, x_name, y, by,
     sql_clause_insert(con, insert_cols, x_name),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    # `WHERE true` is required for SQLite
-    sql("WHERE true"),
     sql_clause("ON CONFLICT", by_sql),
     {if (conflict == "ignore") sql("DO NOTHING")},
     sql_returning_cols(con, returning_cols, x_name)
