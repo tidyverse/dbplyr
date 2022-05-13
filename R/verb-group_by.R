@@ -33,7 +33,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    abort("`.drop` is not supported with database backends")
+    cli_abort("{.arg .drop} is not supported with database backends")
   }
 
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())

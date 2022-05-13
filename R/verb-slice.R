@@ -49,24 +49,24 @@ NULL
 #' @importFrom dplyr slice
 #' @export
 slice.tbl_lazy <- function(.data, ...) {
-  abort("slice() is not supported on database backends")
+  cli_abort("{.fun slice} is not supported on database backends")
 }
 
 #' @importFrom dplyr slice_head
 #' @export
 slice_head.tbl_lazy <- function(.data, ..., n, prop) {
-  abort(c(
-    "slice_head() is not supported on database backends",
-    i = "Please use slice_min() instead"
+  cli_abort(c(
+    "{.fun slice_head} is not supported on database backends",
+    i = "Please use {.fun slice_min} instead"
   ))
 }
 
 #' @importFrom dplyr slice_tail
 #' @export
 slice_tail.tbl_lazy <- function(.data, ..., n, prop) {
-  abort(c(
-    "slice_tail() is not supported on database backends",
-    i = "Please use slice_max() instead"
+  cli_abort(c(
+    "{.fun slice_tail} is not supported on database backends",
+    i = "Please use {.fun slice_max} instead"
   ))
 }
 
@@ -75,7 +75,7 @@ slice_tail.tbl_lazy <- function(.data, ..., n, prop) {
 #' @export
 slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) {
   if (missing(order_by)) {
-    abort("Argument `order_by` is missing, with no default.")
+    cli_abort("Argument {.arg order_by} is missing, with no default.")
   }
   size <- check_slice_size(n, prop)
   slice_by(.data, {{order_by}}, size, with_ties = with_ties)
@@ -86,7 +86,7 @@ slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) 
 #' @export
 slice_max.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) {
   if (missing(order_by)) {
-    abort("Argument `order_by` is missing, with no default.")
+    cli_abort("Argument {.arg order_by} is missing, with no default.")
   }
   size <- check_slice_size(n, prop)
 
@@ -100,14 +100,14 @@ slice_sample.tbl_lazy <- function(.data, ..., n, prop, weight_by = NULL, replace
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
-    abort("Sampling by `prop` is not supported on database backends")
+    cli_abort("Sampling by {.arg prop} is not supported on database backends")
   }
 
   if (!quo_is_null(weight_by)) {
-    abort("Weighted resampling is not supported on database backends")
+    cli_abort("Weighted resampling is not supported on database backends")
   }
   if (replace) {
-    abort("Sampling with replacement is not supported on database backends")
+    cli_abort("Sampling with replacement is not supported on database backends")
   }
 
   slice_by(.data, !!sql_random(remote_con(.data)), size, with_ties = FALSE)
@@ -124,7 +124,7 @@ slice_by <- function(.data, order_by, size, with_ties = FALSE) {
   } else {
     window_fun <- switch(size$type,
       n = expr(row_number() <= !!size$n),
-      prop = abort("Can only use `prop` when `with_ties = TRUE`")
+      prop = cli_abort("Can only use {.arg prop} when {.code with_ties = TRUE}")
     )
   }
 
@@ -142,23 +142,23 @@ check_slice_size <- function(n, prop) {
     list(type = "n", n = 1L)
   } else if (!missing(n) && missing(prop)) {
     if (!is.numeric(n) || length(n) != 1) {
-      abort("`n` must be a single number.", call = caller_env())
+      cli_abort("{.arg n} must be a single number.", call = caller_env())
     }
     if (is.na(n) || n < 0) {
-      abort("`n` must be a non-missing positive number.", call = caller_env())
+      cli_abort("{.arg n} must be a non-missing positive number.", call = caller_env())
     }
 
     list(type = "n", n = as.integer(n))
   } else if (!missing(prop) && missing(n)) {
     if (!is.numeric(prop) || length(prop) != 1) {
-      abort("`prop` must be a single number", call = caller_env())
+      cli_abort("{.arg prop} must be a single number", call = caller_env())
     }
     if (is.na(prop) || prop < 0) {
-      abort("`prop` must be a non-missing positive number.", call = caller_env())
+      cli_abort("{.arg prop} must be a non-missing positive number.", call = caller_env())
     }
     list(type = "prop", prop = prop)
   } else {
-    abort("Must supply exactly one of `n` and `prop` arguments.", call = caller_env())
+    cli_abort("Must supply exactly one of {.arg n} and {.arg prop} arguments.", call = caller_env())
   }
 }
 

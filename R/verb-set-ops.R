@@ -53,7 +53,7 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
     # https://www.sqlite.org/syntax/select-core.html
 
     if (identical(x$lazy_query$last_op, "head") || identical(y$lazy_query$last_op, "head")) {
-      abort("SQLite does not support set operations on LIMITs")
+      cli_abort("SQLite does not support set operations on LIMITs")
     }
   }
 

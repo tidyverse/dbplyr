@@ -77,7 +77,7 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
   } else if (is_call(call)) {
     partial_eval_call(call, data, env)
   } else {
-    abort(glue("Unknown input type: ", typeof(call)))
+    cli_abort("Unknown input type: {typeof(call)}")
   }
 }
 

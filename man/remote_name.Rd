@@ -21,7 +21,8 @@ remote_query_plan(x, ...)
 \arguments{
 \item{x}{Remote table, currently must be a \link{tbl_sql}.}
 
-\item{cte}{Use common table expressions in the generated SQL?}
+\item{cte}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Use common table expressions in the generated SQL?}
 
 \item{...}{Additional arguments passed on to methods.}
 }

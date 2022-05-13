@@ -47,7 +47,7 @@ db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
   if (any(c(perl, fixed, useBytes))) {
-    abort("`perl`, `fixed` and `useBytes` parameters are unsupported")
+    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
   }
 
   if (ignore.case) {
@@ -124,7 +124,7 @@ sql_translation.PqConnection <- function(con) {
         } else if (label && abbr) {
           sql_expr(SUBSTR(TO_CHAR(!!x, "Day"), 1, 3))
         } else {
-          abort("Unrecognized arguments to `wday`")
+          cli_abort("Unrecognized arguments to {.arg wday}")
         }
       },
       yday = function(x) sql_expr(EXTRACT(DOY %FROM% !!x)),
@@ -147,7 +147,7 @@ sql_translation.PqConnection <- function(con) {
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          abort("`fiscal_start` is not supported in PostgreSQL translation. Must be 1.")
+          cli_abort("{.arg fiscal_start} is not supported in PostgreSQL translation. Must be 1.")
         }
 
         if (with_year) {
