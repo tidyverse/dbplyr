@@ -259,12 +259,11 @@ sql_query_insert.PqConnection <- function(con, x_name, y, by,
   # https://www.sqlite.org/lang_UPSERT.html
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
-
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
+
   clauses <- list(
-    sql_clause_insert(con, insert_cols, x_name),
+    parts$insert_clause,
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     sql_clause("ON CONFLICT", by_sql),
