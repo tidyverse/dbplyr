@@ -15,10 +15,11 @@
   unique_indexes = list(),
   indexes = list(),
   analyze = TRUE,
-  ...
+  ...,
+  cte = FALSE
 )
 
-\method{collect}{tbl_sql}(x, ..., n = Inf, warn_incomplete = TRUE)
+\method{collect}{tbl_sql}(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE)
 }
 \arguments{
 \item{x}{A lazy data frame backed by a database query.}
@@ -38,6 +39,9 @@ will create a new index.}
 
 \item{analyze}{if \code{TRUE} (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.}
+
+\item{cte}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Use common table expressions in the generated SQL?}
 
 \item{n}{Number of rows to fetch. Defaults to \code{Inf}, meaning all rows.}
 
