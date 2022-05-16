@@ -36,6 +36,22 @@ add_filter <- function(.data, dots) {
   lazy_query <- .data$lazy_query
 
   if (!uses_window_fun(dots, con)) {
+    # TODO check for window_order?
+    # TODO need to check if only grouping columns or aggregated columns?
+    # -> probably not because after a summarise every column should be one of these options
+    if (is_null(op_frame(lazy_query)) &&
+        inherits(lazy_query, "lazy_select_query") &&
+        lazy_query$select_operation == "summarise") {
+      lazy_query$group_by <- syms(op_grps(lazy_query))
+
+      names <- lazy_query$select$name
+      exprs <- lazy_query$select$expr
+      dots <- purrr::map(dots, replace_sym, names, exprs)
+
+      lazy_query$having <- c(lazy_query$having, dots)
+      return(lazy_query)
+    }
+
     lazy_select_query(
       from = lazy_query,
       last_op = "filter",
