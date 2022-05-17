@@ -100,7 +100,7 @@ test_that("generates correct lazy_select_query", {
       from = lf$lazy_query,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
-      where = unclass(quos(x > 1))
+      where = list(quo(x > 1))
     ),
     ignore_formula_env = TRUE
   )
@@ -115,7 +115,7 @@ test_that("generates correct lazy_select_query", {
       from = out$from,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
-      where = set_names(list(expr(q01 > 1)), "")
+      where = list(expr(q01 > 1))
     ),
     ignore_formula_env = TRUE
   )

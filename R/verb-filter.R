@@ -34,6 +34,7 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
 add_filter <- function(.data, dots) {
   con <- remote_con(.data)
   lazy_query <- .data$lazy_query
+  dots <- unname(dots)
 
   if (!uses_window_fun(dots, con)) {
     # TODO check for window_order?
