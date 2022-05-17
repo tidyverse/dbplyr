@@ -285,16 +285,6 @@ sql_query_insert.PqConnection <- function(con,
 #' @export
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
-#' Upsert using the `ON CONFLICT ... DO UPDATE` clause
-#'
-#' The `ON CONFLICT ... DO UPDATE` clause requires a unique index on the columns
-#' in `by`. One of the advantages is better concurrency behaviour. See the
-#' [Postgres Wiki](https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax) for
-#' more information on the advantages and disadvantages compared to other
-#' upsert implementations.
-#'
-#' @inheritParams sql_query_upsert
-#'
 #' @export
 sql_query_upsert.PqConnection <- function(con,
                                           x_name,
