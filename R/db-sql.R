@@ -437,8 +437,89 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 }
 # nocov end
 
+#' Generate SQL for Insert, Update, Upsert, and Delete
+#'
+#' These functions generate the SQL used in `rows_*(in_place = TRUE)`.
+#'
+#' @param con Database connection.
+#' @param x_name Name of the table to update.
+#' @param y A lazy tbl.
+#' @inheritParams dplyr::rows_upsert
+#' @param update_cols Names of columns to update.
+#' @param update_values A named SQL vector that specify how to update the columns.
+#' @param ... Other parameters passed onto methods.
+#' @param returning_cols Optional. Names of columns to return.
+#' @param method Optional. The method to use.
+#'
+#' @details Insert Methods
+#' ## `"where_not_exists"`
+#' The default for most databases.
+#'
+#' ```
+#' INSERT INTO x_name
+#' SELECT *
+#' FROM y
+#' WHERE NOT EXISTS <match on by columns>
+#' ```
+#'
+#' ## `"on_conflict"`
+#' Supported by:
+#' * Postgres
+#' * SQLite
+#'
+#' This method uses the `ON CONFLICT` clause and therefore requires a unique
+#' index on the columns specified in `by`.
+#'
+#' @details Upsert Methods
+#'
+#' ## `"merge"`
+#' The upsert method according to the SQL standard. It uses the `MERGE` statement
+#'
+#' ```
+#' MERGE INTO x_name
+#' USING y
+#'   ON <match on by columns>
+#' WHEN MATCHED THEN
+#'   UPDATE SET ...
+#' WHEN NOT MATCHED THEN
+#'   INSERT ...
+#' ```
+#'
+#' ## `"on_conflict"`
+#' Supported by:
+#' * Postgres
+#' * SQLite
+#'
+#' This method uses the `ON CONFLICT` clause and therefore requires a unique
+#' index on the columns specified in `by`.
+#'
+#' ## `"cte_update"`
+#' Supported by:
+#' * Postgres
+#' * SQLite
+#' * Oracle
+#'
+#' The classical way to upsert in Postgres and SQLite before support for
+#' `ON CONFLICT` was added. The update is done in a CTE clause and the unmatched
+#' values are then inserted outside of the CTE.
+#'
+#' @return A SQL query.
 #' @export
-#' @rdname db-sql
+#'
+#' @examples
+#' lf <- lazy_frame(
+#'   carrier = c("9E", "AA"),
+#'   name = c("Endeavor Air Inc.", "American Airlines Inc."),
+#'   con = simulate_postgres()
+#' )
+#'
+#' sql_query_upsert(
+#'   simulate_postgres(),
+#'   ident("airlines"),
+#'   lf,
+#'   by = "carrier",
+#'   update_cols = "name"
+#' )
 sql_query_insert <- function(con,
                              x_name,
                              y,
@@ -479,7 +560,7 @@ sql_query_insert.DBIConnection <- function(con,
 }
 
 #' @export
-#' @rdname db-sql
+#' @rdname sql_query_insert
 sql_query_append <- function(con, x_name, y, ..., returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_append")
@@ -502,7 +583,7 @@ sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols =
 }
 
 #' @export
-#' @rdname db-sql
+#' @rdname sql_query_insert
 sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
                                   returning_cols = NULL) {
   rlang::check_dots_used()
@@ -528,8 +609,9 @@ sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
   sql_format_clauses(clauses, lvl = 0, con)
 }
 
+
 #' @export
-#' @rdname db-sql
+#' @rdname sql_query_insert
 sql_query_upsert <- function(con,
                              x_name,
                              y,
@@ -590,7 +672,7 @@ sql_query_upsert.DBIConnection <- function(con,
 }
 
 #' @export
-#' @rdname db-sql
+#' @rdname sql_query_insert
 sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_delete")

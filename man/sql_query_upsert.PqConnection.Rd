@@ -15,6 +15,29 @@
   method = NULL
 )
 }
+\arguments{
+\item{con}{Database connection.}
+
+\item{x_name}{Name of the table to update.}
+
+\item{y}{A lazy tbl.}
+
+\item{by}{An unnamed character vector giving the key columns. The key columns
+must exist in both \code{x} and \code{y}. Keys typically uniquely identify each row,
+but this is only enforced for the key values of \code{y} when \code{rows_update()},
+\code{rows_patch()}, or \code{rows_upsert()} are used.
+
+By default, we use the first column in \code{y}, since the first column is
+a reasonable place to put an identifier variable.}
+
+\item{update_cols}{Names of columns to update.}
+
+\item{...}{Other parameters passed onto methods.}
+
+\item{returning_cols}{Optional. Names of columns to return.}
+
+\item{method}{Optional. The method to use.}
+}
 \description{
 The \verb{ON CONFLICT ... DO UPDATE} clause requires a unique index on the columns
 in \code{by}. One of the advantages is better concurrency behaviour. See the
