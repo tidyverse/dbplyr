@@ -91,7 +91,8 @@ generics.</p>
   conflict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span>,
   copy <span class="op">=</span> <span class="cn">FALSE</span>,
   in_place <span class="op">=</span> <span class="cn">FALSE</span>,
-  returning <span class="op">=</span> <span class="cn">NULL</span>
+  returning <span class="op">=</span> <span class="cn">NULL</span>,
+  method <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span>
 
 <span class="co"># S3 method for tbl_lazy</span>
@@ -129,7 +130,8 @@ generics.</p>
   <span class="va">...</span>,
   copy <span class="op">=</span> <span class="cn">FALSE</span>,
   in_place <span class="op">=</span> <span class="cn">FALSE</span>,
-  returning <span class="op">=</span> <span class="cn">NULL</span>
+  returning <span class="op">=</span> <span class="cn">NULL</span>,
+  method <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span>
 
 <span class="co"># S3 method for tbl_lazy</span>
@@ -147,10 +149,7 @@ generics.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>x</dt>
-<dd><p>A pair of data frames or data frame extensions (e.g. a tibble).
-<code>y</code> must have the same columns of <code>x</code> or a subset.</p></dd>
-<dt>y</dt>
+    <dl><dt>x, y</dt>
 <dd><p>A pair of data frames or data frame extensions (e.g. a tibble).
 <code>y</code> must have the same columns of <code>x</code> or a subset.</p></dd>
 <dt>by</dt>
@@ -184,6 +183,9 @@ relevant for mutable backends (e.g. databases, data.tables).</p>
 when <code>FALSE</code>, a new object representing the resulting changes is returned.</p></dd>
 <dt>returning</dt>
 <dd><p>Columns to return.</p></dd>
+<dt>method</dt>
+<dd><p>A string specifying the method to use. This is only relevant for
+<code>in_place = TRUE</code>.</p></dd>
 <dt>unmatched</dt>
 <dd><p>For <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_patch()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_delete()</a></code>,
 how should keys in <code>y</code> that are unmatched by the keys in <code>x</code> be handled?</p>
