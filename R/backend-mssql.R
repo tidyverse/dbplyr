@@ -93,7 +93,10 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
                                                     conflict = c("error", "ignore"),
-                                                    returning_cols = NULL) {
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
+  method <- method %||% "where_not_exists"
+  arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
@@ -146,9 +149,17 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_upsert.Microsoft SQL Server` <- function(con, x_name, y, by,
-                                                    update_cols, ...,
-                                                    returning_cols = NULL) {
+`sql_query_upsert.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    update_cols,
+                                                    ...,
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
+  method <- method %||% "merge"
+  arg_match(method, "merge", error_arg = "method")
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))

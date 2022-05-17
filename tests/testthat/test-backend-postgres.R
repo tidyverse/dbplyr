@@ -109,7 +109,7 @@ test_that("`sql_query_insert()` works", {
   )
 })
 
-test_that("`sql_query_upsert()` is correct", {
+test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
     con = simulate_postgres(),
@@ -124,7 +124,8 @@ test_that("`sql_query_upsert()` is correct", {
       y = df_y,
       by = c("a", "b"),
       update_cols = c("c", "d"),
-      returning_cols = c("a", b2 = "b")
+      returning_cols = c("a", b2 = "b"),
+      method = "on_conflict"
     )
   )
 })
@@ -179,10 +180,24 @@ test_that("can insert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore",
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     )
   })
 
+  expect_error(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything(),
+      method = "where_not_exists"
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
   db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
@@ -191,7 +206,8 @@ test_that("can insert with returning", {
       by = c("a", "b"),
       in_place = TRUE,
       conflict = "ignore",
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     ) %>%
       get_returned_rows(),
     tibble(
@@ -220,15 +236,30 @@ test_that("can upsert with returning", {
     mutate(c = c + 1)
   withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
 
+  # Errors because there is no unique index
   expect_snapshot(error = TRUE, {
     rows_upsert(
       x, y,
       by = c("a", "b"),
       in_place = TRUE,
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     )
   })
 
+  # DBI method does not need a unique index
+  expect_error(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      method = "cte_update"
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
   db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
@@ -236,7 +267,8 @@ test_that("can upsert with returning", {
       x, y,
       by = c("a", "b"),
       in_place = TRUE,
-      returning = everything()
+      returning = everything(),
+      method = "on_conflict"
     ) %>%
       get_returned_rows() %>%
       arrange(a),

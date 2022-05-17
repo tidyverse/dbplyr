@@ -34,11 +34,12 @@
       DO NOTHING
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
-# `sql_query_upsert()` is correct
+# `sql_query_upsert()` with method = 'on_conflict' is correct
 
     Code
       sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
+      method = "on_conflict")
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
@@ -82,7 +83,7 @@
 
     Code
       rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
-      returning = everything())
+      returning = everything(), method = "on_conflict")
     Condition
       Error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
@@ -90,7 +91,8 @@
 # can upsert with returning
 
     Code
-      rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything())
+      rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
+      method = "on_conflict")
     Condition
       Error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification

@@ -34,7 +34,8 @@ test_that("`sql_query_upsert()` is correct", {
       y = df_y,
       by = c("a", "b"),
       update_cols = c("c", "d"),
-      returning_cols = c("a", b2 = "b")
+      returning_cols = c("a", b2 = "b"),
+      method = "merge"
     )
   )
 })

@@ -251,10 +251,20 @@ sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 #' @export
-sql_query_insert.PqConnection <- function(con, x_name, y, by,
+sql_query_insert.PqConnection <- function(con,
+                                          x_name,
+                                          y,
+                                          by,
                                           conflict = c("error", "ignore"),
                                           ...,
-                                          returning_cols = NULL) {
+                                          returning_cols = NULL,
+                                          method = NULL) {
+  method <- method %||% "on_conflict"
+  arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
+  if (method == "where_not_exists") {
+    return(NextMethod("sql_query_insert"))
+  }
+
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
   conflict <- rows_check_conflict(conflict)
@@ -276,9 +286,21 @@ sql_query_insert.PqConnection <- function(con, x_name, y, by,
 sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' @export
-sql_query_upsert.PqConnection <- function(con, x_name, y, by,
-                                          update_cols, ...,
-                                          returning_cols = NULL) {
+sql_query_upsert.PqConnection <- function(con,
+                                          x_name,
+                                          y,
+                                          by,
+                                          update_cols,
+                                          ...,
+                                          returning_cols = NULL,
+                                          method = NULL) {
+  method <- method %||% "on_conflict"
+  arg_match(method, c("cte_update", "on_conflict"), error_arg = "method")
+
+  if (method == "cte_update") {
+    return(NextMethod("sql_query_upsert"))
+  }
+
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
@@ -304,6 +326,7 @@ sql_query_upsert.PqConnection <- function(con, x_name, y, by,
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
+
 #' @export
 sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
 
