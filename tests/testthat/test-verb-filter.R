@@ -76,6 +76,51 @@ test_that("cumulative aggregates generate window function", {
   expect_equal(pull(out, x), c(3L, 3L, 4L))
 })
 
+test_that("filter() after summarise() uses `HAVING`", {
+  lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
+    group_by(g, h) %>%
+    summarise(x_mean = mean(x, na.rm = TRUE))
+
+  # use `HAVING`
+  expect_snapshot((out <- lf %>% filter(g == 1)))
+  expect_equal(
+    out$lazy_query$having, list(quo(g == 1)),
+    ignore_formula_env = TRUE
+  )
+
+  # Can use freshly aggregated column
+  expect_snapshot((out <- lf %>% filter(x_mean > 1)))
+  expect_equal(
+    out$lazy_query$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    ignore_formula_env = TRUE
+  )
+
+  # multiple `filter()` combine instead of overwrite
+  expect_snapshot(
+    (out <- lf %>%
+      filter(g == 1) %>%
+      filter(g == 2))
+  )
+  expect_equal(
+    out$lazy_query$having, list(quo(g == 1), quo(g == 2)),
+    ignore_formula_env = TRUE
+  )
+
+  expect_snapshot(
+    (out <- lf %>%
+      filter(g == 1) %>%
+      filter(h == 2))
+  )
+  expect_equal(
+    out$lazy_query$having, list(quo(g == 1), quo(h == 2)),
+    ignore_formula_env = TRUE
+  )
+
+  # TODO if uses window function
+  # TODO if frame is used
+  # TODO not after summarise
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("filter generates simple expressions", {

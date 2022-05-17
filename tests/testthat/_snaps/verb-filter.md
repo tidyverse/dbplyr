@@ -28,3 +28,55 @@
       Error in `filter()`:
       ! `.preserve` is not supported on database backends
 
+# filter() after summarise() uses `HAVING`
+
+    Code
+      (out <- lf %>% filter(g == 1))
+    Message
+      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
+    Output
+      <SQL>
+      SELECT `g`, `h`, AVG(`x`) AS `x_mean`
+      FROM `df`
+      GROUP BY `g`
+      HAVING `g` = 1.0
+
+---
+
+    Code
+      (out <- lf %>% filter(x_mean > 1))
+    Message
+      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
+    Output
+      <SQL>
+      SELECT `g`, `h`, AVG(`x`) AS `x_mean`
+      FROM `df`
+      GROUP BY `g`
+      HAVING AVG(`x`) > 1.0
+
+---
+
+    Code
+      (out <- lf %>% filter(g == 1) %>% filter(g == 2))
+    Message
+      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
+    Output
+      <SQL>
+      SELECT `g`, `h`, AVG(`x`) AS `x_mean`
+      FROM `df`
+      GROUP BY `g`
+      HAVING `g` = 1.0, `g` = 2.0
+
+---
+
+    Code
+      (out <- lf %>% filter(g == 1) %>% filter(h == 2))
+    Message
+      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
+    Output
+      <SQL>
+      SELECT `g`, `h`, AVG(`x`) AS `x_mean`
+      FROM `df`
+      GROUP BY `g`
+      HAVING `g` = 1.0, `h` = 2.0
+
