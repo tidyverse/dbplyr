@@ -62,6 +62,17 @@ test_that(".preserve is not supported", {
   expect_snapshot(error = TRUE, lf %>% filter(x == 1, .preserve = TRUE))
 })
 
+test_that("filter() inlined after select()", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  out <- lf %>%
+    select(z = x) %>%
+    filter(z == 1)
+  lq <- out$lazy_query
+  expect_equal(lq$select$expr, list(sym("x")))
+  expect_equal(lq$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+})
+
 test_that("filter() inlined after mutate()", {
   lf <- lazy_frame(x = 1, y = 2)
 
