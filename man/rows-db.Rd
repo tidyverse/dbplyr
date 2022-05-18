@@ -17,7 +17,8 @@
   conflict = c("error", "ignore"),
   copy = FALSE,
   in_place = FALSE,
-  returning = NULL
+  returning = NULL,
+  method = NULL
 )
 
 \method{rows_append}{tbl_lazy}(x, y, ..., copy = FALSE, in_place = FALSE, returning = NULL)
@@ -51,7 +52,8 @@
   ...,
   copy = FALSE,
   in_place = FALSE,
-  returning = NULL
+  returning = NULL,
+  method = NULL
 )
 
 \method{rows_delete}{tbl_lazy}(
@@ -66,10 +68,7 @@
 )
 }
 \arguments{
-\item{x}{A pair of data frames or data frame extensions (e.g. a tibble).
-\code{y} must have the same columns of \code{x} or a subset.}
-
-\item{y}{A pair of data frames or data frame extensions (e.g. a tibble).
+\item{x, y}{A pair of data frames or data frame extensions (e.g. a tibble).
 \code{y} must have the same columns of \code{x} or a subset.}
 
 \item{by}{An unnamed character vector giving the key columns. The key columns
@@ -107,6 +106,9 @@ When \code{TRUE}, a modified version of \code{x} is returned invisibly;
 when \code{FALSE}, a new object representing the resulting changes is returned.}
 
 \item{returning}{Columns to return.}
+
+\item{method}{A string specifying the method to use. This is only relevant for
+\code{in_place = TRUE}.}
 
 \item{unmatched}{For \code{rows_update()}, \code{rows_patch()}, and \code{rows_delete()},
 how should keys in \code{y} that are unmatched by the keys in \code{x} be handled?

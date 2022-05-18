@@ -137,7 +137,13 @@ copy_inline <- function(con, df) {
 }
 
 lazy_values_query <- function(df) {
-  structure(list(df = df), class = c("lazy_values_query", "lazy_query"))
+  lazy_query(
+    query_type = "values",
+    x = df,
+    group_vars = character(),
+    order_vars = NULL,
+    frame = NULL
+  )
 }
 
 #' @export
@@ -147,7 +153,7 @@ sql_build.lazy_values_query <- function(op, con, ...) {
 
 #' @export
 sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  sql_values(con, query$df, lvl = lvl)
+  sql_values(con, query$x, lvl = lvl)
 }
 
 #' @export
@@ -157,12 +163,7 @@ flatten_query.lazy_values_query <- function(qry, query_list) {
 
 #' @export
 op_vars.lazy_values_query <- function(op) {
-  colnames(op$df)
-}
-
-#' @export
-op_grps.lazy_values_query <- function(op) {
-  character()
+  colnames(op$x)
 }
 
 sql_values <- function(con, df, lvl = 0, ...) {

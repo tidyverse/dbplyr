@@ -25,29 +25,15 @@ window_order <- function(.data, ...) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
-  lazy_query <- add_order(.data, dots)
-
-  .data$lazy_query <- lazy_query
+  .data$lazy_query <- add_order(.data, dots)
   .data
 }
 
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
 add_order <- function(.data, dots) {
-  lazy_query <- .data$lazy_query
-  if (!inherits(lazy_query, "lazy_select_query")) {
-    out <- lazy_select_query(
-      from = lazy_query,
-      last_op = "window_order",
-      order_vars = dots
-    )
-
-    return(out)
-  }
-
-  # `window_order()` does not produce an `ORDER BY` clause
-  lazy_query$order_vars <- dots
-  lazy_query
+  .data$lazy_query$order_vars <- dots
+  .data$lazy_query
 }
 
 

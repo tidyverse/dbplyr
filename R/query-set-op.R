@@ -1,6 +1,6 @@
 #' @export
 #' @rdname sql_build
-set_op_query <- function(x, y, type = type, all = FALSE) {
+set_op_query <- function(x, y, type, all = FALSE) {
   structure(
     list(
       x = x,

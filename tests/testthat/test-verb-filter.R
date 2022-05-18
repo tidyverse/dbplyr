@@ -142,7 +142,7 @@ test_that("generates correct lazy_select_query", {
       filter(x > 1) %>%
       .$lazy_query,
     lazy_select_query(
-      from = lf$lazy_query,
+      x = lf$lazy_query,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
       where = list(quo(x > 1))
@@ -157,7 +157,7 @@ test_that("generates correct lazy_select_query", {
   expect_equal(
     out,
     lazy_select_query(
-      from = out$from,
+      x = out$x,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
       where = list(expr(q01 > 1))
@@ -166,9 +166,9 @@ test_that("generates correct lazy_select_query", {
   )
 
   expect_equal(
-    out$from,
+    out$x,
     lazy_select_query(
-      from = lf$lazy_query,
+      x = lf$lazy_query,
       last_op = "mutate",
       select = list(x = sym("x"), y = sym("y"), q01 = quo(mean(x, na.rm = TRUE)))
     ),
