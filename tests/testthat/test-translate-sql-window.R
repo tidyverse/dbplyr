@@ -144,6 +144,14 @@ test_that("window_frame()", {
       mutate(z = sum(y)) %>%
       show_query()
   )
+
+  expect_snapshot(
+    lf %>%
+      window_frame(-3) %>%
+      window_order(x) %>%
+      mutate(z = sum(y)) %>%
+      show_query()
+  )
 })
 
 test_that("window_frame() checks arguments", {
