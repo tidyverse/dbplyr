@@ -375,11 +375,11 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, n
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, vars, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
