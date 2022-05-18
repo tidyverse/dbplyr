@@ -105,7 +105,7 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% relocate(), lf)
 })
 
-test_that("select after join is inlined", {
+test_that("select() after left_join() is inlined", {
   lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
 
@@ -124,6 +124,27 @@ test_that("select after join is inlined", {
   expect_equal(out$lazy_query$vars$y, c("b", NA, NA))
 
   out <- left_join(lf1, lf2, by = "x") %>%
+      transmute(b, x = x + 1)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+})
+
+test_that("select() after semi_join() is inlined", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
+
+  expect_snapshot(
+    (out <- semi_join(lf1, lf2, by = "x") %>%
+      select(x, a2 = a))
+  )
+  expect_equal(op_vars(out), c("x", "a2"))
+
+  expect_snapshot(
+    (out <- anti_join(lf1, lf2, by = "x") %>%
+      relocate(a))
+  )
+  expect_equal(op_vars(out), c("a", "x"))
+
+  out <- semi_join(lf1, lf2, by = "x") %>%
       transmute(b, x = x + 1)
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })

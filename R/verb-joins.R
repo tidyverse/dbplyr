@@ -276,9 +276,12 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     indexes = if (auto_index) list(by$y)
   )
 
+  vars <- set_names(op_vars(x))
+
   lazy_semi_join_query(
     x$lazy_query,
     y$lazy_query,
+    vars = vars,
     anti = anti,
     by = by,
     na_matches = na_matches,

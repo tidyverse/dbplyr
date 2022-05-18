@@ -5,7 +5,7 @@
     Message
       Adding missing grouping variables: `b`
 
-# select after join is inlined
+# select() after left_join() is inlined
 
     Code
       (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
@@ -26,6 +26,32 @@
       FROM `lf1` AS `LHS`
       LEFT JOIN `lf2` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x`)
+
+# select() after semi_join() is inlined
+
+    Code
+      (out <- semi_join(lf1, lf2, by = "x") %>% select(x, a2 = a))
+    Output
+      <SQL>
+      SELECT `x`, `a` AS `a2`
+      FROM `lf1` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `lf2` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      (out <- anti_join(lf1, lf2, by = "x") %>% relocate(a))
+    Output
+      <SQL>
+      SELECT `a`, `x`
+      FROM `lf1` AS `LHS`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `lf2` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
 
 # multiple selects are collapsed
 

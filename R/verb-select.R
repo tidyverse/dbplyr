@@ -160,6 +160,15 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     }
   }
 
+  if (inherits(lazy_query, "lazy_semi_join_query")) {
+    if (purrr::every(vars, is.symbol)) {
+      sel_vars <- purrr::map_chr(vars, as_string)
+      lazy_query$vars <- sel_vars
+
+      return(lazy_query)
+    }
+  }
+
   if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with

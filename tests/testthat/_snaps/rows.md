@@ -61,7 +61,8 @@
       )
       UNION ALL
       (
-        SELECT * FROM `df_y` AS `LHS`
+        SELECT *
+        FROM `df_y` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_x` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -234,7 +235,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -295,7 +297,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -336,7 +339,8 @@
       (
         SELECT `x`, NULL AS `y`
         FROM (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y` AS `LHS`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x` AS `RHS`
             WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -352,7 +356,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -371,7 +376,8 @@
         )
         UNION ALL
         (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y` AS `LHS`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x` AS `RHS`
             WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -423,7 +429,8 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT * FROM `df_x` AS `LHS`
+      SELECT *
+      FROM `df_x` AS `LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y` AS `RHS`
         WHERE (`LHS`.`x` = `RHS`.`x`)
