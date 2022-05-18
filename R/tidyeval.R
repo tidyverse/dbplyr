@@ -231,7 +231,11 @@ fun_name <- function(fun) {
 
 replace_sym <- function(call, sym, replace) {
   if (is_symbol(call, sym)) {
-    replace[[which(call == syms(sym))]]
+    if (is_list(replace)) {
+      replace[[which(call == syms(sym))]]
+    } else {
+      replace
+    }
   } else if (is_call(call)) {
     call[] <- lapply(call, replace_sym, sym = sym, replace = replace)
     call
