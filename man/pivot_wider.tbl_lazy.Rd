@@ -110,7 +110,9 @@ identified.
 The translation to SQL code basically works as follows:
 \enumerate{
 \item Get unique keys in \code{names_from} column.
-\item For each key value generate an expression of the form:\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
+\item For each key value generate an expression of the form:
+
+\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
   CASE WHEN (`names from column` == `key value`)
   THEN (`value column`)
   END

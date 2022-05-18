@@ -24,10 +24,18 @@ lazy_join_query(
   type,
   by,
   suffix = c(".x", ".y"),
-  na_matches = c("never", "na")
+  na_matches = c("never", "na"),
+  call = caller_env()
 )
 
-lazy_semi_join_query(x, y, anti, by, na_matches = c("never", "na"))
+lazy_semi_join_query(
+  x,
+  y,
+  anti,
+  by,
+  na_matches = c("never", "na"),
+  call = caller_env()
+)
 
 lazy_query(
   query_type,
@@ -54,7 +62,7 @@ lazy_select_query(
   message_summarise = NULL
 )
 
-lazy_set_op_query(x, y, type, all)
+lazy_set_op_query(x, y, type, all, call = caller_env())
 
 join_query(
   x,
