@@ -221,8 +221,9 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                      auto_index = FALSE,
                      na_matches = "never",
                      x_as = "LHS",
-                     y_as = "RHS") {
-  check_join_as(x_as, y_as, call = caller_env())
+                     y_as = "RHS",
+                     call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -242,7 +243,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
-  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = caller_env())
+  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
   lazy_join_query(
     x$lazy_query,
@@ -251,14 +252,16 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     type = type,
     by = by,
     suffix = suffix,
-    na_matches = na_matches
+    na_matches = na_matches,
+    call = call
   )
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, na_matches = "never",
-                             x_as = "LHS", y_as = "RHS") {
-  check_join_as(x_as, y_as, call = caller_env())
+                          auto_index = FALSE, na_matches = "never",
+                          x_as = "LHS", y_as = "RHS",
+                          call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -278,7 +281,8 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     y$lazy_query,
     anti = anti,
     by = by,
-    na_matches = na_matches
+    na_matches = na_matches,
+    call = call
   )
 }
 

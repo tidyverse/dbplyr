@@ -6,14 +6,15 @@ lazy_join_query <- function(x,
                             type,
                             by,
                             suffix = c(".x", ".y"),
-                            na_matches = c("never", "na")) {
+                            na_matches = c("never", "na"),
+                            call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
-  join_check_vars(vars)
-  type <- arg_match(type, c("left", "right", "inner", "full", "cross"))
-  join_check_by(by)
-  vctrs::vec_assert(suffix, ptype = character(), size = 2L)
-  na_matches <- arg_match(na_matches, c("never", "na"))
+  join_check_vars(vars, call = call)
+  type <- arg_match(type, c("left", "right", "inner", "full", "cross"), error_call = call)
+  join_check_by(by, call = call)
+  vctrs::vec_assert(suffix, ptype = character(), size = 2L, arg = "suffix", call = call)
+  na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
 
   lazy_query(
     query_type = "join",
@@ -28,7 +29,7 @@ lazy_join_query <- function(x,
   )
 }
 
-join_check_vars <- function(vars) {
+join_check_vars <- function(vars, call) {
   if (!vctrs::vec_is_list(vars)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
@@ -42,28 +43,28 @@ join_check_vars <- function(vars) {
   }
 
   n <- vctrs::vec_size(vars$alias)
-  vctrs::vec_assert(vars$alias, character())
-  vctrs::vec_assert(vars$x, character(), size = n)
-  vctrs::vec_assert(vars$y, character(), size = n)
-  vctrs::vec_assert(vars$all_x, character())
-  vctrs::vec_assert(vars$all_y, character())
+  vctrs::vec_assert(vars$alias, character(), arg = "vars$alias", call = call)
+  vctrs::vec_assert(vars$x, character(), size = n, arg = "vars$x", call = call)
+  vctrs::vec_assert(vars$y, character(), size = n, arg = "vars$y", call = call)
+  vctrs::vec_assert(vars$all_x, character(), arg = "vars$all_x", call = call)
+  vctrs::vec_assert(vars$all_y, character(), arg = "vars$all_y", call = call)
 }
 
-join_check_by <- function(by) {
+join_check_by <- function(by, call) {
   if (!vctrs::vec_is_list(by)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
     abort("`by` must be a list", .internal = TRUE)
   }
-  vctrs::vec_assert(by$x, character())
-  vctrs::vec_assert(by$y, character())
+  vctrs::vec_assert(by$x, character(), arg = "by$x", call = call)
+  vctrs::vec_assert(by$y, character(), arg = "by$y", call = call)
   if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
     abort("`by$x` and `by$y` must have the same size", .internal = TRUE)
   }
-  vctrs::vec_assert(by$x_as, ident(), size = 1L)
-  vctrs::vec_assert(by$y_as, ident(), size = 1L)
+  vctrs::vec_assert(by$x_as, ident(), size = 1L, arg = "by$x_as", call = call)
+  vctrs::vec_assert(by$y_as, ident(), size = 1L, arg = "by$y_as", call = call)
 }
 
 #' @export
@@ -72,12 +73,13 @@ lazy_semi_join_query <- function(x,
                                  y,
                                  anti,
                                  by,
-                                 na_matches = c("never", "na")) {
+                                 na_matches = c("never", "na"),
+                                 call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
-  assert_flag(anti, "anti")
-  join_check_by(by)
-  na_matches <- arg_match(na_matches, c("never", "na"))
+  assert_flag(anti, "anti", call = call)
+  join_check_by(by, call)
+  na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
 
   lazy_query(
     query_type = "semi_join",
