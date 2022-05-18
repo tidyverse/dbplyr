@@ -37,7 +37,7 @@
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
       GROUP BY `g`, `h`
-      HAVING `g` = 1.0
+      HAVING (`g` = 1.0)
 
 ---
 
@@ -48,7 +48,7 @@
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
       GROUP BY `g`, `h`
-      HAVING AVG(`x`) > 1.0
+      HAVING (AVG(`x`) > 1.0)
 
 ---
 
@@ -59,7 +59,7 @@
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
       GROUP BY `g`, `h`
-      HAVING `g` = 1.0, `g` = 2.0
+      HAVING (`g` = 1.0) AND (`g` = 2.0)
 
 ---
 
@@ -70,7 +70,7 @@
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
       GROUP BY `g`, `h`
-      HAVING `g` = 1.0, `h` = 2.0
+      HAVING (`g` = 1.0) AND (`h` = 2.0)
 
 # filter() after mutate() does not use `HAVING`
 
