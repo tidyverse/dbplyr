@@ -38,7 +38,7 @@
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
-      GROUP BY `g`
+      GROUP BY `g`, `h`
       HAVING `g` = 1.0
 
 ---
@@ -51,7 +51,7 @@
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
-      GROUP BY `g`
+      GROUP BY `g`, `h`
       HAVING AVG(`x`) > 1.0
 
 ---
@@ -64,7 +64,7 @@
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
-      GROUP BY `g`
+      GROUP BY `g`, `h`
       HAVING `g` = 1.0, `g` = 2.0
 
 ---
@@ -77,6 +77,46 @@
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
       FROM `df`
-      GROUP BY `g`
+      GROUP BY `g`, `h`
       HAVING `g` = 1.0, `h` = 2.0
+
+# filter() after mutate() does not use `HAVING`
+
+    Code
+      (out <- lf %>% filter(x_mean > 1))
+    Output
+      <SQL>
+      SELECT *
+      FROM (
+        SELECT `g`, `h`, `x`, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
+        FROM `df`
+      ) `q01`
+      WHERE (`x_mean` > 1.0)
+
+# filter() using a window function after summarise() does not use `HAVING`
+
+    Code
+      (out <- lf %>% filter(cumsum(x_mean) == 1))
+    Condition
+      Warning:
+      Windowed expression `SUM(`x_mean`)` does not have explicit order.
+      i Please use `arrange()` or `window_order()` to make deterministic.
+    Message
+      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
+    Output
+      <SQL>
+      SELECT `g`, `h`, `x_mean`
+      FROM (
+        SELECT
+          `g`,
+          `h`,
+          `x_mean`,
+          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q02`
+        FROM (
+          SELECT `g`, `h`, AVG(`x`) AS `x_mean`
+          FROM `df`
+          GROUP BY `g`, `h`
+        ) `q01`
+      ) `q02`
+      WHERE (`q02` = 1.0)
 

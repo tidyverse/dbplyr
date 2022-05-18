@@ -36,23 +36,13 @@ add_filter <- function(.data, dots) {
   lazy_query <- .data$lazy_query
   dots <- unname(dots)
 
-  if (!uses_window_fun(dots, con)) {
-    # TODO check for window_order?
-    # TODO need to check if only grouping columns or aggregated columns?
-    # -> probably not because after a summarise every column should be one of these options
-    if (is_null(op_frame(lazy_query)) &&
-        inherits(lazy_query, "lazy_select_query") &&
-        lazy_query$select_operation == "summarise") {
-      lazy_query$group_by <- syms(op_grps(lazy_query))
+  dots_use_window_fun <- uses_window_fun(dots, con)
 
-      names <- lazy_query$select$name
-      exprs <- lazy_query$select$expr
-      dots <- purrr::map(dots, replace_sym, names, exprs)
+  if (filter_can_use_having(lazy_query, dots_use_window_fun)) {
+    return(filter_via_having(lazy_query, dots))
+  }
 
-      lazy_query$having <- c(lazy_query$having, dots)
-      return(lazy_query)
-    }
-
+  if (!dots_use_window_fun) {
     lazy_select_query(
       x = lazy_query,
       last_op = "filter",
@@ -74,6 +64,40 @@ add_filter <- function(.data, dots) {
       where = where$expr
     )
   }
+}
+
+filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
+  # From the Postgres documentation: https://www.postgresql.org/docs/current/sql-select.html#SQL-HAVING
+  # Each column referenced in condition must unambiguously reference a grouping
+  # column, unless the reference appears within an aggregate function or the
+  # ungrouped column is functionally dependent on the grouping columns.
+
+  # After `summarise()` every column is either
+  # * a grouping column
+  # * or an aggregated column
+  # (this is not the case for data frames but valid for SQL tables)
+  #
+  # Therefore, if `filter()` does not use a window function, then we only use
+  # grouping or aggregated columns
+
+  if (dots_use_window_fun) {
+    return(FALSE)
+  }
+
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(FALSE)
+  }
+
+  lazy_query$select_operation == "summarise"
+}
+
+filter_via_having <- function(lazy_query, dots) {
+  names <- lazy_query$select$name
+  exprs <- lazy_query$select$expr
+  dots <- purrr::map(dots, replace_sym, names, exprs)
+
+  lazy_query$having <- c(lazy_query$having, dots)
+  lazy_query
 }
 
 check_filter <- function(...) {

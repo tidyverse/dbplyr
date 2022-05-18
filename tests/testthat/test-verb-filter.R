@@ -80,6 +80,9 @@ test_that("filter() after summarise() uses `HAVING`", {
   lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
     group_by(g, h) %>%
     summarise(x_mean = mean(x, na.rm = TRUE))
+  mf <- memdb_frame(g = c(1, 1, 1, 2, 2), h = 1, x = 1:5) %>%
+    group_by(g, h) %>%
+    summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")
 
   # use `HAVING`
   expect_snapshot((out <- lf %>% filter(g == 1)))
@@ -87,12 +90,31 @@ test_that("filter() after summarise() uses `HAVING`", {
     out$lazy_query$having, list(quo(g == 1)),
     ignore_formula_env = TRUE
   )
+  expect_equal(
+    out$lazy_query$group_by, list(sym("g"), sym("h")),
+    ignore_formula_env = TRUE
+  )
+  expect_equal(op_grps(out), "g")
+
+  expect_equal(
+    mf %>%
+      filter(g == 1) %>%
+      collect(),
+    tibble(g = 1, h = 1, x_mean = 2) %>% group_by(g)
+  )
 
   # Can use freshly aggregated column
   expect_snapshot((out <- lf %>% filter(x_mean > 1)))
   expect_equal(
     out$lazy_query$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
     ignore_formula_env = TRUE
+  )
+
+  expect_equal(
+    mf %>%
+      filter(x_mean > 3) %>%
+      collect(),
+    tibble(g = 2, h = 1, x_mean = 4.5) %>% group_by(g)
   )
 
   # multiple `filter()` combine instead of overwrite
@@ -116,9 +138,42 @@ test_that("filter() after summarise() uses `HAVING`", {
     ignore_formula_env = TRUE
   )
 
-  # TODO if uses window function
-  # TODO if frame is used
-  # TODO not after summarise
+  # `window_order()` and `window_frame()` do not matter
+  out <- lazy_frame(g = 1, h = 1, x = 1) %>%
+    window_order(h) %>%
+    window_frame(-3) %>%
+    group_by(g, h) %>%
+    summarise(x_mean = mean(x, na.rm = TRUE)) %>%
+    filter(x_mean > 1)
+
+  lq <- out$lazy_query
+  expect_equal(
+    lq$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    ignore_formula_env = TRUE
+  )
+  # TODO should the `order_vars` and the `frame` really survive `summarise()`?
+  expect_equal(lq$order_vars, list(quo(h)), ignore_formula_env = TRUE)
+  expect_equal(lq$frame, list(range = c(-3, Inf)))
+})
+
+test_that("filter() after mutate() does not use `HAVING`", {
+  lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
+    group_by(g, h) %>%
+    mutate(x_mean = mean(x, na.rm = TRUE))
+
+  expect_snapshot((out <- lf %>% filter(x_mean > 1)))
+  lq <- out$lazy_query
+  expect_s3_class(lq$x, "lazy_select_query")
+})
+
+test_that("filter() using a window function after summarise() does not use `HAVING`", {
+  lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
+    group_by(g, h) %>%
+    summarise(x_mean = mean(x, na.rm = TRUE))
+
+  expect_snapshot((out <- lf %>% filter(cumsum(x_mean) == 1)))
+  lq <- out$lazy_query
+  expect_s3_class(lq$x, "lazy_select_query")
 })
 
 # sql_build ---------------------------------------------------------------
