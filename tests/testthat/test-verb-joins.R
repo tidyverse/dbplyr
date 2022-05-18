@@ -181,7 +181,7 @@ test_that("select() before join is inlined", {
     by = "x"
   )
   test_vars(out_left$lazy_query, c("a", "x1", NA), c(NA, NA, "b"))
-  test_vars(op_vars(out_left), c("a2", "x", "b"))
+  expect_equal(op_vars(out_left), c("a2", "x", "b"))
   expect_snapshot(out_left)
 
   out_inner <- inner_join(
