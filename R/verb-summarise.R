@@ -96,7 +96,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   select[names(dots)] <- dots
 
   lazy_select_query(
-    from = lazy_query,
+    x = lazy_query,
     last_op = "summarise",
     select = select,
     group_by = syms(grps),

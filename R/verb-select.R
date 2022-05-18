@@ -185,7 +185,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   }
 
   lazy_select_query(
-    from = lazy_query,
+    x = lazy_query,
     last_op = op,
     select = vars
   )

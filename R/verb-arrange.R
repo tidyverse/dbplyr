@@ -51,7 +51,7 @@ add_arrange <- function(.data, dots, .by_group) {
   dots <- dots %||% list()
 
   new_lazy_query <- lazy_select_query(
-    from = lazy_query,
+    x = lazy_query,
     last_op = "arrange",
     order_by = dots,
     order_vars = dots
