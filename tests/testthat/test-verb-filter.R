@@ -62,7 +62,7 @@ test_that(".preserve is not supported", {
   expect_snapshot(error = TRUE, lf %>% filter(x == 1, .preserve = TRUE))
 })
 
-test_that("filter() works with mutate()", {
+test_that("filter() inlined after mutate()", {
   lf <- lazy_frame(x = 1, y = 2)
 
   out <- lf %>%
@@ -72,6 +72,16 @@ test_that("filter() works with mutate()", {
   expect_equal(lq$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
   expect_equal(lq$where, list(quo(y == 1)), ignore_formula_env = TRUE)
 
+  # can rename variable used in `filter()`
+  out <- lf %>%
+    rename(z = x) %>%
+    filter(z == 1)
+  lq <- out$lazy_query
+  expect_equal(lq$select$expr, list(sym("x"), sym("y")))
+  expect_equal(lq$select$name, c("z", "y"))
+  expect_equal(lq$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+
+  # does not inline if uses mutated variable
   out2 <- lf %>%
     mutate(x = x + 1) %>%
     filter(x == 1)
@@ -79,9 +89,18 @@ test_that("filter() works with mutate()", {
   expect_equal(lq2$x$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
   expect_equal(lq2$select$expr, syms(c("x", "y")))
   expect_equal(lq2$where, list(quo(x == 1)), ignore_formula_env = TRUE)
+
+  # does not inline if unclear whether uses mutated variable
+  out3 <- lf %>%
+    mutate(x = x + 1) %>%
+    filter(y == sql("1"))
+  lq3 <- out3$lazy_query
+  expect_equal(lq3$select$expr, syms(c("x", "y")))
+  expect_s3_class(lq3$x, "lazy_select_query")
+  expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
-test_that("filter() works with summarise()", {
+test_that("filter() inlined after summarise()", {
   lf <- lazy_frame(x = 1, y = 2)
 
   out <- lf %>%
