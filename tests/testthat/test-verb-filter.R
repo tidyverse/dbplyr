@@ -143,7 +143,7 @@ test_that("filter() after summarise() uses `HAVING`", {
     window_order(h) %>%
     window_frame(-3) %>%
     group_by(g, h) %>%
-    summarise(x_mean = mean(x, na.rm = TRUE)) %>%
+    summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last") %>%
     filter(x_mean > 1)
 
   lq <- out$lazy_query
@@ -169,7 +169,7 @@ test_that("filter() after mutate() does not use `HAVING`", {
 test_that("filter() using a window function after summarise() does not use `HAVING`", {
   lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
     group_by(g, h) %>%
-    summarise(x_mean = mean(x, na.rm = TRUE))
+    summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")
 
   expect_snapshot((out <- lf %>% filter(cumsum(x_mean) == 1)))
   lq <- out$lazy_query
