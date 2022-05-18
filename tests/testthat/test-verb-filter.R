@@ -70,15 +70,15 @@ test_that("filter() works with mutate()", {
     filter(y == 1)
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
-  expect_equal(lq$where %>% unname(), list(quo(y == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where, list(quo(y == 1)), ignore_formula_env = TRUE)
 
   out2 <- lf %>%
     mutate(x = x + 1) %>%
     filter(x == 1)
   lq2 <- out2$lazy_query
-  expect_equal(lq2$from$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
+  expect_equal(lq2$x$select$expr, list(quo(x + 1), sym("y")), ignore_formula_env = TRUE)
   expect_equal(lq2$select$expr, syms(c("x", "y")))
-  expect_equal(lq2$where %>% unname(), list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$where, list(quo(x == 1)), ignore_formula_env = TRUE)
 })
 
 test_that("filter() works with summarise()", {
@@ -90,16 +90,16 @@ test_that("filter() works with summarise()", {
     filter(y == 1)
   lq <- out$lazy_query
   expect_equal(lq$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
-  expect_equal(lq$where %>% unname(), list(quo(y == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq$where, list(quo(y == 1)), ignore_formula_env = TRUE)
 
   out2 <- lf %>%
     group_by(y) %>%
     summarise(x = x + 1) %>%
     filter(x == 1)
   lq2 <- out2$lazy_query
-  expect_equal(lq2$from$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$x$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
   expect_equal(lq2$select$expr, syms(c("y", "x")))
-  expect_equal(lq2$where %>% unname(), list(quo(x == 1)), ignore_formula_env = TRUE)
+  expect_equal(lq2$where, list(quo(x == 1)), ignore_formula_env = TRUE)
 })
 
 # SQL generation --------------------------------------------------------
@@ -155,7 +155,7 @@ test_that("generates correct lazy_select_query", {
       x = lf$lazy_query,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
-      where = unclass(quos(x > 1))
+      where = list(quo(x > 1))
     ),
     ignore_formula_env = TRUE
   )
@@ -170,7 +170,7 @@ test_that("generates correct lazy_select_query", {
       x = out$x,
       last_op = "filter",
       select = syms(set_names(colnames(lf))),
-      where = set_names(list(expr(q01 > 1)), "")
+      where = list(expr(q01 > 1))
     ),
     ignore_formula_env = TRUE
   )
