@@ -228,8 +228,8 @@ test_that("select() before join is not inlined when using `sql_on`", {
   )
 
   lq <- out$lazy_query
-  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
-  expect_s3_class(lq$y$lazy_query, "lazy_select_query")
+  expect_s3_class(lq$x, "lazy_select_query")
+  expect_s3_class(lq$y, "lazy_select_query")
   expect_equal(lq$vars$x, c("a2", "x", NA, NA))
   expect_equal(lq$vars$y, c(NA, NA, "x", "b"))
 })
@@ -269,7 +269,7 @@ test_that("select() before join is not inlined when using `sql_on`", {
   )
 
   lq <- out$lazy_query
-  expect_s3_class(lq$x$lazy_query, "lazy_select_query")
+  expect_s3_class(lq$x, "lazy_select_query")
   expect_equal(lq$vars, c(a2 = "a2", x = "x"))
 })
 

@@ -37,7 +37,7 @@ add_filter <- function(.data, dots) {
 
   if (!uses_window_fun(dots, con)) {
     lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "filter",
       where = dots
     )
@@ -51,7 +51,7 @@ add_filter <- function(.data, dots) {
     # And filter with the modified `where` using the new columns
     original_vars <- op_vars(.data)
     lazy_select_query(
-      from = mutated$lazy_query,
+      x = mutated$lazy_query,
       last_op = "filter",
       select = syms(set_names(original_vars)),
       where = where$expr

@@ -16,9 +16,7 @@
 \method{setdiff}{tbl_lazy}(x, y, copy = FALSE, ..., all = FALSE)
 }
 \arguments{
-\item{x}{A pair of lazy data frames backed by database queries.}
-
-\item{y}{A pair of lazy data frames backed by database queries.}
+\item{x, y}{A pair of lazy data frames backed by database queries.}
 
 \item{copy}{If \code{x} and \code{y} are not from the same data source,
 and \code{copy} is \code{TRUE}, then \code{y} will be copied into a

@@ -6,7 +6,8 @@
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
-#' @param cte Use common table expressions in the generated SQL?
+#' @param cte `r lifecycle::badge("experimental")`
+#'   Use common table expressions in the generated SQL?
 #' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
@@ -25,7 +26,7 @@
 #' remote_query(mf2)
 remote_name <- function(x) {
   lq <- x$lazy_query
-  if (inherits(lq, "lazy_query_base_remote")) {
+  if (inherits(lq, "lazy_base_remote_query")) {
     return(lq$x)
   }
 
@@ -33,11 +34,7 @@ remote_name <- function(x) {
     return()
   }
 
-  if (!inherits(lq$from, "lazy_query_base_remote")) {
-    return()
-  }
-
-  lq$from$x
+  lq$x$x
 }
 
 #' @export

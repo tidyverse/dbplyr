@@ -221,8 +221,9 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                      auto_index = FALSE,
                      na_matches = "never",
                      x_as = "LHS",
-                     y_as = "RHS") {
-  check_join_as(x_as, y_as, call = caller_env())
+                     y_as = "RHS",
+                     call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -242,7 +243,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
-  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = caller_env())
+  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
   inlined_select_list <- inline_select_in_join(x, y, vars, by)
   vars <- inlined_select_list$vars
@@ -258,40 +259,41 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     na_matches = na_matches,
     group_vars = op_grps(x),
     order_vars = op_sort(x),
-    frame = op_frame(x)
+    frame = op_frame(x),
+    call = call
   )
 }
 
 inline_select_in_join <- function(x, y, vars, by) {
+  x_lq <- x$lazy_query
+  y_lq <- y$lazy_query
   if (!is_empty(by$on)) {
     out <- list(
-      x = x,
-      y = y,
+      x = x_lq,
+      y = y_lq,
       vars = vars,
       by = by
     )
     return(out)
   }
 
-  x_lq <- x$lazy_query
   if (is_lazy_select_query_simple(x_lq, select = "projection")) {
     vars$x <- update_join_vars(vars$x, x_lq$select)
     by$x <- update_join_vars(by$x, x_lq$select)
-    vars$all_x <- op_vars(x_lq$from)
-    x <- x_lq$from
+    vars$all_x <- op_vars(x_lq$x)
+    x_lq <- x_lq$x
   }
 
-  y_lq <- y$lazy_query
   if (is_lazy_select_query_simple(y_lq, select = "projection")) {
     vars$y <- update_join_vars(vars$y, y_lq$select)
     by$y <- update_join_vars(by$y, y_lq$select)
-    vars$all_y <- op_vars(y_lq$from)
-    y <- y_lq$from
+    vars$all_y <- op_vars(y_lq$x)
+    y_lq <- y_lq$x
   }
 
   list(
-    x = x,
-    y = y,
+    x = x_lq,
+    y = y_lq,
     vars = vars,
     by = by
   )
@@ -304,9 +306,10 @@ update_join_vars <- function(vars, select) {
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, na_matches = "never",
-                             x_as = "LHS", y_as = "RHS") {
-  check_join_as(x_as, y_as, call = caller_env())
+                          auto_index = FALSE, na_matches = "never",
+                          x_as = "LHS", y_as = "RHS",
+                          call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -328,24 +331,26 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
 
   x_lq <- x$lazy_query
   if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
-    x <- x_lq$from
-
     if (!is_select_trivial(x_lq$select, op_vars(x_lq))) {
       by$x <- update_join_vars(by$x, x_lq$select)
       vars <- purrr::map_chr(x_lq$select$expr, as_name)
       vars <- purrr::set_names(vars, x_lq$select$name)
     }
+
+    x_lq <- x_lq$x
   }
 
   lazy_semi_join_query(
-    x, y,
+    x_lq,
+    y$lazy_query,
     vars = vars,
     anti = anti,
     by = by,
     na_matches = na_matches,
     group_vars = group_vars,
     order_vars = order_vars,
-    frame = frame
+    frame = frame,
+    call = call
   )
 }
 
