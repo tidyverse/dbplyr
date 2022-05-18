@@ -31,6 +31,7 @@ lazy_join_query(
 lazy_semi_join_query(
   x,
   y,
+  vars,
   anti,
   by,
   na_matches = c("never", "na"),
@@ -86,7 +87,7 @@ select_query(
   distinct = FALSE
 )
 
-semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type, all = FALSE)
 
