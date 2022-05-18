@@ -12,3 +12,15 @@
     Output
       <SQL> last_value(`a`, TRUE)
 
+---
+
+    Code
+      union_all(lf, lf)
+    Output
+      <SQL>
+        SELECT *
+        FROM `df`
+      UNION ALL
+        SELECT *
+        FROM `df`
+

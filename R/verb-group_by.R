@@ -33,10 +33,10 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   }
 
   if (!identical(.drop, TRUE)) {
-    abort("`.drop` is not supported with database backends")
+    cli_abort("{.arg .drop} is not supported with database backends")
   }
 
-  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add)
+  groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())
   names <- purrr::map_chr(groups$groups, as_string)
 
   same_groups <- setequal(groups$group_names, group_vars(.data))
@@ -64,14 +64,6 @@ ungroup.tbl_lazy <- function(x, ...) {
 }
 
 add_group_by <- function(.data, group_vars) {
-  lazy_query <- .data$lazy_query
-  if (!inherits(lazy_query, "lazy_select_query")) {
-    lazy_query <- lazy_select_query(
-      from = lazy_query,
-      last_op = "group_by"
-    )
-  }
-
-  lazy_query$group_vars <- group_vars
-  lazy_query
+  .data$lazy_query$group_vars <- group_vars
+  .data$lazy_query
 }

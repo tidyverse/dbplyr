@@ -1,6 +1,6 @@
 #' @export
 #' @rdname sql_build
-lazy_select_query <- function(from,
+lazy_select_query <- function(x,
                               last_op,
                               select = NULL,
                               where = NULL,
@@ -13,7 +13,7 @@ lazy_select_query <- function(from,
                               frame = NULL,
                               select_operation = c("mutate", "summarise"),
                               message_summarise = NULL) {
-  stopifnot(inherits(from, "lazy_query"))
+  stopifnot(inherits(x, "lazy_query"))
   stopifnot(is_string(last_op))
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
@@ -22,19 +22,15 @@ lazy_select_query <- function(from,
   stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
   stopifnot(is.logical(distinct), length(distinct) == 1L)
 
-  # stopifnot(is.null(group_vars) || (is.character(group_vars) && is.null(names(group_vars))))
-  stopifnot(is_lazy_sql_part(order_vars), is.null(names(order_vars)))
-  stopifnot(is.null(frame) || is_integerish(frame, n = 2, finite = TRUE))
-
-  select <- select %||% syms(set_names(op_vars(from)))
+  select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
 
   stopifnot(is.null(message_summarise) || is_string(message_summarise))
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
-  group_vars <- group_vars %||% op_grps(from)
-  order_vars <- order_vars %||% op_sort(from)
-  frame <- frame %||% op_frame(from)
+  group_vars <- group_vars %||% op_grps(x)
+  order_vars <- order_vars %||% op_sort(x)
+  frame <- frame %||% op_frame(x)
 
   if (last_op == "mutate") {
     select <- new_lazy_select(
@@ -47,23 +43,21 @@ lazy_select_query <- function(from,
     select <- new_lazy_select(select)
   }
 
-  structure(
-    list(
-      from = from,
-      select = select,
-      where = where,
-      group_by = group_by,
-      order_by = order_by,
-      distinct = distinct,
-      limit = limit,
-      group_vars = group_vars,
-      order_vars = order_vars,
-      frame = frame,
-      select_operation = select_operation,
-      last_op = last_op,
-      message_summarise = message_summarise
-    ),
-    class = c("lazy_select_query", "lazy_query")
+  lazy_query(
+    query_type = "select",
+    x = x,
+    select = select,
+    where = where,
+    group_by = group_by,
+    order_by = order_by,
+    distinct = distinct,
+    limit = limit,
+    select_operation = select_operation,
+    last_op = last_op,
+    message_summarise = message_summarise,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame
   )
 }
 
@@ -108,7 +102,7 @@ print.lazy_select_query <- function(x, ...) {
     sep = ""
   )
   cat_line("From:")
-  cat_line(indent_print(sql_build(x$from, simulate_dbi())))
+  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
   if (length(select))   cat("Select:   ", named_commas2(select), "\n", sep = "")
@@ -135,7 +129,7 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_query <- function(op) {
+op_grps.lazy_select_query <- function(op) {
   # Find renamed variables
   vars <- purrr::set_names(op$select$expr, op$select$name)
   symbols <- purrr::keep(vars, is_symbol)
@@ -149,21 +143,8 @@ op_grps.lazy_query <- function(op) {
 }
 
 #' @export
-op_sort.lazy_query <- function(op) {
-  # Renaming (like for groups) cannot be done because:
-  # * `order_vars` is a list of quosures
-  # * variables needed in sorting can be dropped
-  op$order_vars
-}
-
-#' @export
-op_frame.lazy_query <- function(op) {
-  op$frame
-}
-
-#' @export
 op_desc.lazy_query <- function(op) {
-  # TODO
+  "SQL"
 }
 
 #' @export
@@ -172,14 +153,15 @@ sql_build.lazy_select_query <- function(op, con, ...) {
     inform(op$message_summarise)
   }
 
-  select_sql <- get_select_sql(op$select, op$select_operation, op_vars(op$from), con)
+  select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$x), con)
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
-    from = sql_build(op$from, con),
-    select = select_sql,
+    from = sql_build(op$x, con),
+    select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
+    window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
     distinct = op$distinct,
     limit = op$limit
@@ -191,22 +173,56 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     select_expr <- set_names(select$expr, select$name)
     select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
     select_sql <- sql_vector(select_sql_list, parens = FALSE, collapse = NULL, con = con)
-    return(select_sql)
+    return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (identical(select$name, in_vars) &&
-      purrr::every(select$expr, is_symbol) &&
-      identical(syms(select$name), select$expr)) {
-    return(sql("*"))
+  if (is_select_trivial(select, in_vars)) {
+    return(list(select_sql = sql("*"), window_sql = character()))
   }
 
-  select_sql <- purrr::pmap(
-    select %>% transmute(
-      dots = set_names(expr, name),
-      vars_group = .data$group_vars,
-      vars_order = .data$order_vars,
-      vars_frame = .data$frame
-    ),
+  # translate once just to register windows
+  win_register_activate()
+  # Remove known windows before building the next query
+  on.exit(win_reset(), add = TRUE)
+  on.exit(win_register_deactivate(), add = TRUE)
+  select_sql <- translate_select_sql(con, select)
+  win_register_deactivate()
+
+  named_windows <- win_register_names()
+  if (nrow(named_windows) > 0 && supports_window_clause(con)) {
+    # need to translate again and use registered windows names
+    select_sql <- translate_select_sql(con, select)
+
+    # build window sql
+    names_esc <- sql_escape_ident(con, named_windows$name)
+    window_sql <- sql(paste0(names_esc, " AS ", named_windows$key))
+  } else {
+    window_sql <- character()
+  }
+
+  list(
+    select_sql = select_sql,
+    window_sql = window_sql
+  )
+}
+
+is_select_trivial <- function(select, vars_prev) {
+  identical(select$name, vars_prev) &&
+    purrr::every(select$expr, is_symbol) &&
+    identical(syms(select$name), select$expr)
+}
+
+translate_select_sql <- function(con, select_df) {
+  select_df <- transmute(
+    select_df,
+    dots = set_names(expr, name),
+    vars_group = .data$group_vars,
+    vars_order = .data$order_vars,
+    vars_frame = .data$frame
+  )
+
+  out <- purrr::pmap(
+    select_df,
     function(dots, vars_group, vars_order, vars_frame) {
       translate_sql_(
         list(dots), con,
@@ -218,5 +234,5 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     }
   )
 
-  sql(unlist(select_sql))
+  sql(unlist(out))
 }

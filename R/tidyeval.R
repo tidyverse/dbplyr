@@ -77,7 +77,7 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
   } else if (is_call(call)) {
     partial_eval_call(call, data, env)
   } else {
-    abort(glue("Unknown input type: ", typeof(call)))
+    cli_abort("Unknown input type: {typeof(call)}")
   }
 }
 
@@ -143,7 +143,7 @@ partial_eval_call <- function(call, data, env) {
   if (inherits(fun, "inline_colwise_function")) {
     vars <- colnames(simulate_vars(data, drop_groups = FALSE))
     dot_var <- vars[[attr(call, "position")]]
-    call <- replace_dot(attr(fun, "formula")[[2]], sym(dot_var))
+    call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
     # TODO what about environment in `dtplyr`?
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
@@ -229,11 +229,11 @@ fun_name <- function(fun) {
   NULL
 }
 
-replace_dot <- function(call, sym) {
-  if (is_symbol(call, ".") || is_symbol(call, ".x")) {
-    sym
+replace_sym <- function(call, sym, replace) {
+  if (is_symbol(call, sym)) {
+    replace
   } else if (is_call(call)) {
-    call[] <- lapply(call, replace_dot, sym = sym)
+    call[] <- lapply(call, replace_sym, sym = sym, replace = replace)
     call
   } else {
     call

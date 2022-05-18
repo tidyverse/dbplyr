@@ -97,7 +97,7 @@
     Code
       tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
     Condition
-      Error in `stop_vctrs()`:
+      Error in `tidyr::expand()`:
       ! Names must be unique.
       x These names are duplicated:
         * "x" at locations 1 and 2.

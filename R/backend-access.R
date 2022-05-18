@@ -39,7 +39,7 @@ dbplyr_edition.ACCESS <- function(con) {
 #' @export
 sql_query_select.ACCESS <- function(con, select, from,
                               where = NULL,  group_by = NULL,
-                              having = NULL, order_by = NULL,
+                              having = NULL, window = NULL, order_by = NULL,
                               limit = NULL,  distinct = FALSE, ...,
                               subquery = FALSE,
                               lvl = 0) {
@@ -50,6 +50,7 @@ sql_query_select.ACCESS <- function(con, select, from,
     where     = sql_clause_where(where),
     group_by  = sql_clause_group_by(group_by),
     having    = sql_clause_having(having),
+    window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     lvl       = lvl
   )
@@ -185,6 +186,11 @@ sql_escape_datetime.ACCESS <-  function(con, x) {
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
   y[is.na(x)] <- "NULL"
   y
+}
+
+#' @export
+supports_window_clause.ACCESS <- function(con) {
+  TRUE
 }
 
 globalVariables(c("CStr", "iif", "isnull", "text"))

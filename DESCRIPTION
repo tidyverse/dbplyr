@@ -21,19 +21,21 @@ Depends:
 Imports: 
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
+    cli (>= 3.3.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.6),
+    dplyr (>= 1.0.9),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
     methods,
+    pillar (>= 1.5.0),
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
     rlang (>= 1.0.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils,
-    vctrs,
+    vctrs (>= 0.4.1),
     withr
 Suggests:
     bit64,
@@ -56,11 +58,12 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Collate: 
     'utils.R'
     'sql.R'
     'escape.R'
+    'translate-sql-cut.R'
     'translate-sql-quantile.R'
     'translate-sql-string.R'
     'translate-sql-paste.R'
@@ -95,10 +98,12 @@ Collate:
     'ident.R'
     'lazy-join-query.R'
     'lazy-ops.R'
+    'lazy-query.R'
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
     'optimise-utils.R'
+    'pillar.R'
     'progress.R'
     'query-join.R'
     'query-select.R'
@@ -107,6 +112,7 @@ Collate:
     'query.R'
     'reexport.R'
     'remote.R'
+    'rows.R'
     'schema.R'
     'simulate.R'
     'sql-build.R'

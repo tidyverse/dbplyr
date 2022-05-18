@@ -1,6 +1,6 @@
 #' @export
 #' @rdname sql_build
-set_op_query <- function(x, y, type = type, all = FALSE) {
+set_op_query <- function(x, y, type, all = FALSE) {
   structure(
     list(
       x = x,
@@ -34,9 +34,9 @@ sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE, lv
   } else {
     # nocov start
     if (isTRUE(query$all)) {
-      abort("`all` argument not supported by this backend")
+      cli_abort("{.arg all} argument not supported by this backend")
     }
-    dbplyr_query_set_op(con, from_x, from_y, method = query$type, lvl = lvl)
+    dbplyr_query_set_op(con, from_x, from_y, method = query$type)
     # nocov end
   }
 }

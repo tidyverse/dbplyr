@@ -15,7 +15,7 @@ sql_substr <- function(f = "SUBSTR") {
 
 check_integer <- function(x, arg) {
   if (length(x) != 1 || !is.numeric(x)) {
-    abort(paste0("`", arg, "` must be a single number"))
+    cli_abort("{.arg {arg}} must be a single number")
   }
   as.integer(x)
 }

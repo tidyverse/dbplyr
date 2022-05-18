@@ -13,9 +13,9 @@ db_write_table.PostgreSQLConnection <- function(con, table, types, values,
                                                 temporary = TRUE, overwrite = FALSE, ....) {
 
   if (!isFALSE(temporary)) {
-    abort(c(
-      "RPostgreSQL backend does not support creation of temporary tables`",
-      i = "Either set `temporary = FALSE` or switch to RPostgres"
+    cli_abort(c(
+      "RPostgreSQL backend does not support creation of temporary tables",
+      i = "Either set {.code temporary = FALSE} or switch to {.pkg RPostgres}"
     ))
   }
 
@@ -56,4 +56,9 @@ sql_expr_matches.PostgreSQLConnection <- sql_expr_matches.PqConnection
 
 #' @export
 sql_query_explain.PostgreSQLConnection <- sql_query_explain.PqConnection
+
+#' @export
+supports_window_clause.PostgreSQLConnection <- function(con) {
+  TRUE
+}
 # nocov end

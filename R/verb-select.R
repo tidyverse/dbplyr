@@ -36,10 +36,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
   if (length(missing) > 0) {
     vars <- names(data)[missing]
     if (notify) {
-      inform(glue(
-        "Adding missing grouping variables: ",
-        paste0("`", names(data)[missing], "`", collapse = ", ")
-      ))
+      cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
     }
     loc <- c(set_names(missing, vars), loc)
   }
@@ -83,27 +80,60 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
+  # Hack: We want to use `dplyr::relocate.data.frame()` instead of reimplementing it.
+  # Because `relocate()` can rename columns we use an attribute to store the
+  # original column position.
+  sim_data <- simulate_vars(.data)
+  for (i in seq_along(sim_data)) {
+    attr(sim_data[[i]], "dbplyr_org_pos") <- i
+  }
+
   new_vars <- dplyr::relocate(
-    simulate_vars(.data),
+    sim_data,
     ...,
     .before = {{.before}},
     .after = {{.after}}
   )
 
-  .data$lazy_query <- add_select(.data, syms(unlist(new_vars)))
+  old_vars <- colnames(sim_data)
+  vars_mapping <- purrr::map_chr(
+    new_vars,
+    ~ old_vars[[attr(.x, "dbplyr_org_pos")]]
+  )
+
+  .data$lazy_query <- add_select(.data, syms(vars_mapping))
   .data
 }
 
-simulate_vars <- function(x, drop_groups = FALSE) {
+#' Simulate variables to use in tidyselect
+#'
+#' @param x A lazy table
+#' @param drop_groups Should groups be dropped?
+#'
+#' @return A 0 row tibble with the same columns names, and, if possible, types, as `x`.
+#'
+#' @export
+#' @keywords internal
+simulate_vars <- function (x, drop_groups = FALSE) {
+  UseMethod("simulate_vars")
+}
+
+#' @export
+simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
   if (drop_groups) {
     vars <- setdiff(op_vars(x), op_grps(x))
   } else {
     vars <- op_vars(x)
   }
 
-  vars_list <- as.list(vars)
-  as_tibble(set_names(vars_list, vars), .name_repair = "minimal")
+  as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
 }
+
+#' @rdname simulate_vars
+#' @export
+simulate_vars_is_typed <- function(x) UseMethod("simulate_vars_is_typed")
+#' @export
+simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
 
 # op_select ---------------------------------------------------------------
 
@@ -120,7 +150,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
-    # the logic in nest_vars()
+    # the logic in get_mutate_layers()
     select <- lazy_query$select
 
     if (purrr::every(vars, is.symbol)) {
@@ -155,7 +185,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   }
 
   lazy_select_query(
-    from = lazy_query,
+    x = lazy_query,
     last_op = op,
     select = vars
   )

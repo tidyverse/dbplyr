@@ -43,7 +43,7 @@ setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   x
 }
 
-add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
+add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller_env()) {
   y <- auto_copy(x, y, copy)
 
   if (inherits(x$src$con, "SQLiteConnection")) {
@@ -53,7 +53,7 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
     # https://www.sqlite.org/syntax/select-core.html
 
     if (identical(x$lazy_query$last_op, "head") || identical(y$lazy_query$last_op, "head")) {
-      abort("SQLite does not support set operations on LIMITs")
+      cli_abort("SQLite does not support set operations on LIMITs", call = call)
     }
   }
 
@@ -62,7 +62,12 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE) {
   x <- fill_vars(x, vars)
   y <- fill_vars(y, vars)
 
-  lazy_set_op_query(x$lazy_query, y$lazy_query, type = type, all = all)
+  lazy_set_op_query(
+    x$lazy_query, y$lazy_query,
+    type = type,
+    all = all,
+    call = call
+  )
 }
 
 fill_vars <- function(x, vars) {

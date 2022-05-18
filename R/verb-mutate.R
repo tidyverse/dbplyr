@@ -4,6 +4,23 @@
 #' They are translated to computed expressions in the `SELECT` clause of
 #' the SQL query.
 #'
+#' @param .keep `r lifecycle::badge("experimental")`
+#'   Control which columns from `.data` are retained in the output. Grouping
+#'   columns and columns created by `...` are always kept.
+#'
+#'   * `"all"` retains all columns from `.data`. This is the default.
+#'   * `"used"` retains only the columns used in `...` to create new
+#'     columns. This is useful for checking your work, as it displays inputs
+#'     and outputs side-by-side.
+#'   * `"unused"` retains only the columns _not_ used in `...` to create new
+#'     columns. This is useful if you generate new columns, but no longer need
+#'     the columns used to generate them.
+#'   * `"none"` doesn't retain any extra columns from `.data`. Only the grouping
+#'     variables and columns created by `...` are kept.
+#' @param .before,.after `r lifecycle::badge("experimental")`
+#'   <[`tidy-select`][dplyr_tidy_select]> Optionally, control where new columns
+#'   should appear (the default is to add to the right hand side). See
+#'   [relocate()] for more details.
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::mutate
 #' @inherit arrange.tbl_lazy return
@@ -21,68 +38,155 @@
 #' db %>%
 #'   mutate(x1 = x + 1, x2 = x1 * 2) %>%
 #'   show_query()
-mutate.tbl_lazy <- function(.data, ...) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE)
+mutate.tbl_lazy <- function(.data,
+                            ...,
+                            .keep = c("all", "used", "unused", "none"),
+                            .before = NULL,
+                            .after = NULL) {
+  keep <- arg_match(.keep)
+  layer_info <- get_mutate_layers(.data, ...)
+  used <- layer_info$used_vars
+  layers <- layer_info$layers
 
-  nest_vars(.data, dots, union(op_vars(.data), op_grps(.data)))
+  # The layers may contain `var = quo(NULL)` at this point.
+  # They are removed in `add_select()`.
+  out <- .data
+  for (layer in layers) {
+    out$lazy_query <- add_select(out, layer, "mutate")
+  }
+
+  cols_data <- op_vars(.data)
+  cols_group <- group_vars(.data)
+
+  cols_expr <- layer_info$modified_vars
+  cols_expr_modified <- intersect(cols_expr, cols_data)
+  cols_expr_new <- setdiff(cols_expr, cols_expr_modified)
+
+  cols_used <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[!used]))
+  cols_unused <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[used]))
+
+  .before <- enquo(.before)
+  .after <- enquo(.after)
+
+  if (!quo_is_null(.before) || !quo_is_null(.after)) {
+    # Only change the order of new columns
+    out <- relocate(out, all_of(cols_expr_new), .before = !!.before, .after = !!.after)
+  }
+
+  cols_out <- op_vars(out)
+
+  if (keep == "all") {
+    cols_retain <- cols_out
+  } else if (keep == "used") {
+    cols_retain <- setdiff(cols_out, cols_unused)
+  } else if (keep == "unused") {
+    cols_retain <- setdiff(cols_out, cols_used)
+  } else if (keep == "none") {
+    cols_retain <- setdiff(cols_out, c(cols_used, cols_unused))
+  }
+
+
+  select(out, all_of(cols_retain))
 }
 
 #' @export
 #' @importFrom dplyr transmute
 transmute.tbl_lazy <- function(.data, ...) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE)
+  layer_info <- get_mutate_layers(.data, ...)
 
-  nest_vars(.data, dots, character())
+  for (layer in layer_info$layers) {
+    .data$lazy_query <- add_select(.data, layer, "mutate")
+  }
+
+  # Retain expression columns in order of their appearance
+  cols_expr <- layer_info$modified_vars
+
+  # Retain untouched group variables up front
+  cols_group <- group_vars(.data)
+  cols_group <- setdiff(cols_group, cols_expr)
+
+  cols_retain <- c(cols_group, cols_expr)
+
+  select(.data, all_of(cols_retain))
 }
 
 # helpers -----------------------------------------------------------------
 
-# TODO: refactor to remove `.data` argument and return a list of layers.
-nest_vars <- function(.data, dots, all_vars) {
-  # For each expression, check if it uses any newly created variables.
-  # If so, nest the mutate()
-  new_vars <- character()
-  init <- 0L
+# Split mutate expressions in independent layers, e.g.
+#
+# `get_mutate_layers(lf, b = a + 1, c = a - 1, d = b + 1)`
+#
+# creates two layers:
+# 1) a = a, b = a + 1, c = a - 1
+#    because `b` and `c` are independent of each other they can be on the
+#    same layer
+# 2) a = a, b = b, c = c, d = b + 1
+#    because `d` depends on `b` it must be on a new layer
+get_mutate_layers <- function(.data, ...) {
+  dots <- enquos(..., .named = TRUE)
+
+  layer_modified_vars <- character()
+  all_modified_vars <- character()
+  all_used_vars <- character()
+  all_vars <- op_vars(.data)
+  var_is_null <- rep_named(all_vars, FALSE)
+
+  # Each dot may contain an `across()` expression which can refer to freshly
+  # created variables. So, it is necessary to keep track of the current data
+  # to partially evaluate the dot.
+  # `dot_layer` contains the expressions of the current dot and is only needed
+  # to correctly update `cur_data`
+  cur_data <- .data
+  dot_layer <- syms(set_names(all_vars))
+
+  cur_layer <- syms(set_names(all_vars))
+  layers <- list()
+
   for (i in seq_along(dots)) {
-    cur_var <- names(dots)[[i]]
-    used_vars <- all_names(get_expr(dots[[i]]))
-
-    if (any(used_vars %in% new_vars)) {
-      new_actions <- dots[seq2(init, length(dots))][new_vars]
-      .data$lazy_query <- add_select(.data, carry_over(union(all_vars, used_vars), new_actions), "mutate")
-      all_vars <- c(all_vars, setdiff(new_vars, all_vars))
-      new_vars <- cur_var
-      init <- i
-    } else {
-      new_vars <- c(new_vars, cur_var)
+    quosures <- partial_eval_quo(dots[[i]], cur_data)
+    if (!is.list(quosures)) {
+      quosures <- set_names(list(quosures), names(dots)[[i]])
     }
+    quosures <- unclass(quosures)
+
+    for (k in seq_along(quosures)) {
+      cur_quo <- quosures[[k]]
+      cur_var <- names(quosures)[[k]]
+
+      if (quo_is_null(cur_quo)) {
+        var_is_null[[cur_var]] <- TRUE
+        cur_layer[[cur_var]] <- cur_quo
+        dot_layer[[cur_var]] <- cur_quo
+        layer_modified_vars <- setdiff(layer_modified_vars, cur_var)
+        all_modified_vars <- setdiff(all_modified_vars, cur_var)
+        next
+      }
+
+      all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
+
+      used_vars <- all_names(cur_quo)
+      all_used_vars <- c(all_used_vars, used_vars)
+      if (any(used_vars %in% layer_modified_vars)) {
+        layers <- append(layers, list(cur_layer))
+
+        cur_layer[!var_is_null] <- syms(names(cur_layer)[!var_is_null])
+        layer_modified_vars <- character()
+      }
+
+      var_is_null[[cur_var]] <- FALSE
+      cur_layer[[cur_var]] <- cur_quo
+      dot_layer[[cur_var]] <- cur_quo
+      layer_modified_vars <- c(layer_modified_vars, cur_var)
+    }
+
+    all_vars <- names(cur_layer)[!var_is_null]
+    cur_data$lazy_query <- add_select(cur_data, dot_layer, "mutate")
+    dot_layer <- syms(set_names(all_vars))
   }
 
-  if (init != 0L) {
-    dots <- dots[-seq2(1L, init - 1)]
-  }
-  .data$lazy_query <- add_select(.data, carry_over(all_vars, dots), "mutate")
-  .data
+  list(
+    layers = append(layers, list(cur_layer)),
+    modified_vars = all_modified_vars,
+    used_vars = set_names(all_vars %in% all_used_vars, all_vars)
+  )
 }
-
-# Combine a selection (passed through from subquery)
-# with new actions
-carry_over <- function(sel = character(), act = list()) {
-  if (is.null(names(sel))) {
-    names(sel) <- sel
-  }
-  sel <- syms(sel)
-
-  # Keep last of duplicated acts
-  act <- act[!duplicated(names(act), fromLast = TRUE)]
-
-  # Preserve order of sel
-  both <- intersect(names(sel), names(act))
-  sel[both] <- act[both]
-
-  # Adding new variables at end
-  new <- setdiff(names(act), names(sel))
-
-  c(sel, act[new])
-}
-

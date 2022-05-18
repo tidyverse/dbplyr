@@ -23,6 +23,12 @@ test_that("errors for .drop = FALSE", {
   )
 })
 
+test_that("informative errors for missing variables", {
+  expect_snapshot({
+    (expect_error(lazy_frame(x = 1:3) %>% group_by(y)))
+  })
+})
+
 test_that("collect, collapse and compute preserve grouping", {
   g <- memdb_frame(x = 1:3, y = 1:3) %>% group_by(x, y)
 

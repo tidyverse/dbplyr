@@ -3,7 +3,7 @@
 #' `ident()` takes unquoted strings and flags them as identifiers.
 #' `ident_q()` assumes its input has already been quoted, and ensures
 #' it does not get quoted again. This is currently used only for
-#' for `schema.table`.
+#' `schema.table`.
 #'
 #' @param ... A character vector, or name-value pairs
 #' @param x An object

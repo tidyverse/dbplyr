@@ -221,8 +221,9 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                      auto_index = FALSE,
                      na_matches = "never",
                      x_as = "LHS",
-                     y_as = "RHS") {
-  check_join_as(x_as, y_as, call = caller_env())
+                     y_as = "RHS",
+                     call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -232,8 +233,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- x_as
-  by$y_as <- y_as
+  by$x_as <- ident(x_as)
+  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y,
@@ -242,30 +243,33 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
-  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix)
+  vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
   lazy_join_query(
-    x, y,
+    x$lazy_query,
+    y$lazy_query,
     vars = vars,
     type = type,
     by = by,
     suffix = suffix,
-    na_matches = na_matches
+    na_matches = na_matches,
+    call = call
   )
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                             auto_index = FALSE, na_matches = "never",
-                             x_as = "LHS", y_as = "RHS") {
-  check_join_as(x_as, y_as)
+                          auto_index = FALSE, na_matches = "never",
+                          x_as = "LHS", y_as = "RHS",
+                          call = caller_env()) {
+  check_join_as(x_as, y_as, call = call)
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- x_as
-  by$y_as <- y_as
+  by$x_as <- ident(x_as)
+  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y, copy,
@@ -273,27 +277,29 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 
   lazy_semi_join_query(
-    x, y,
+    x$lazy_query,
+    y$lazy_query,
     anti = anti,
     by = by,
-    na_matches = na_matches
+    na_matches = na_matches,
+    call = call
   )
 }
 
 check_join_as <- function(x_as, y_as, call) {
-  vctrs::vec_assert(x_as, character(), size = 1)
-  vctrs::vec_assert(y_as, character(), size = 1)
+  vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
+  vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
   if (x_as == y_as) {
-    abort("`y_as` must be different from `x_as`.", call = call)
+    cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 }
 
-join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
+join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
   # Add suffix where needed
-  suffix <- check_suffix(suffix)
+  suffix <- check_suffix(suffix, call)
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
 
@@ -321,11 +327,8 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
   )
 }
 
-check_suffix <- function(x) {
-  if (!is.character(x) || length(x) != 2) {
-    abort("`suffix` must be a character vector of length 2.")
-  }
-
+check_suffix <- function(x, call) {
+  vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
   list(x = x[1], y = x[2])
 }
 

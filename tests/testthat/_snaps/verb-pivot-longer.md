@@ -111,13 +111,13 @@
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
       <error/rlang_error>
-      Error in `resolve_fun()`:
+      Error in `dbplyr_pivot_longer_spec()`:
       ! Can't convert to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
       <error/rlang_error>
-      Error in `check_list_of_functions()`:
+      Error in `dbplyr_pivot_longer_spec()`:
       ! All elements of `values_transform` must be named.
 
 # can pivot to multiple measure cols
@@ -167,10 +167,10 @@
       out <- df %>% tidyr::pivot_longer(c(x, y), names_repair = "unique")
     Message
       New names:
-      * name -> name...2
-      * value -> value...3
-      * name -> name...4
-      * value -> value...5
+      * `name` -> `name...2`
+      * `value` -> `value...3`
+      * `name` -> `name...4`
+      * `value` -> `value...5`
 
 # values_ptype is not supported
 

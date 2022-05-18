@@ -108,9 +108,9 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
 label_output_dataframe <- function(labels, out, groups) {
   data_frame <- vapply(out[[1]], is.data.frame, logical(1))
   if (any(!data_frame)) {
-    abort(c(
-      "Results are not data frames at positions: ",
-      paste(which(!data_frame), collapse = ", ")
+    cli_abort(c(
+      "Results must be data frames",
+      "Problems at positions {which(!data_frame)}"
     ))
   }
 
@@ -148,18 +148,18 @@ named_args <- function(args) {
   # Arguments must either be all named or all unnamed.
   named <- sum(names2(args) != "")
   if (!(named == 0 || named == length(args))) {
-    abort(
-      "Arguments to do() must either be all named or all unnamed"
+    cli_abort(
+      "Arguments to {.fun do} must either be all named or all unnamed"
     )
   }
   if (named == 0 && length(args) > 1) {
-    abort("Can only supply single unnamed argument to do()")
+    cli_abort("Can only supply single unnamed argument to {.fun do}")
   }
 
   # Check for old syntax
   if (named == 1 && names(args) == ".f") {
-    abort(
-      "do syntax changed in dplyr 0.2. Please see documentation for details"
+    cli_abort(
+      "{.fun do} syntax changed in dplyr 0.2. Please see documentation for details"
     )
   }
 

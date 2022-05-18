@@ -1,9 +1,11 @@
 test_that("dplyr.strict_sql = TRUE prevents auto conversion", {
-  old <- options(dplyr.strict_sql = TRUE)
-  on.exit(options(old))
+  withr::local_options(dplyr.strict_sql = TRUE)
 
   expect_equal(translate_sql(1 + 2), sql("1.0 + 2.0"))
-  expect_error(translate_sql(blah(x)), "could not find function")
+  expect_snapshot(error = TRUE, {
+    translate_sql(blah(x))
+    translate_sql(x %blah% y)
+  })
 })
 
 test_that("namespace calls are translated", {

@@ -14,6 +14,19 @@ test_that("missing columns filled with NULL", {
   expect_equal(out, tibble(x = c(1, NA), y = c(NA, 2)))
 })
 
+test_that("first edition works", {
+  con <- structure(list(), class = c("Test", "DBIConnection"))
+
+  lf <- lazy_frame(x = 1, con = con)
+  local_methods(
+    sql_escape_ident.Test = function(con, x) sql_quote(x, "`")
+  )
+
+  local_options(rlib_warning_verbosity = "quiet")
+
+  expect_error(union_all(lf, lf) %>% remote_query(), NA)
+})
+
 # SQL generation ----------------------------------------------------------
 
 test_that("set ops generates correct sql", {

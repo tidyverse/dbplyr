@@ -95,6 +95,9 @@ unused columns using \code{unused_fn}.}
 decreasing the number of rows. The inverse transformation is
 \code{pivot_longer()}.
 Learn more in \code{vignette("pivot", "tidyr")}.
+
+Note that \code{pivot_wider()} is not and cannot be lazy because we need to look
+at the data to figure out what the new column names will be.
 }
 \details{
 The big difference to \code{pivot_wider()} for local data frames is that
@@ -107,7 +110,9 @@ identified.
 The translation to SQL code basically works as follows:
 \enumerate{
 \item Get unique keys in \code{names_from} column.
-\item For each key value generate an expression of the form:\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
+\item For each key value generate an expression of the form:
+
+\if{html}{\out{<div class="sourceCode sql">}}\preformatted{value_fn(
   CASE WHEN (`names from column` == `key value`)
   THEN (`value column`)
   END

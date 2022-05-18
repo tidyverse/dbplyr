@@ -28,10 +28,10 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   dots <- purrr::discard(quos(...), quo_is_null)
 
   if (is_empty(dots)) {
-    abort("Must supply variables in `...`")
+    cli_abort("Must supply variables in `...`")
   }
 
-  distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars)
+  distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars, call = current_env())
 
   # now that `nesting()` has been unpacked resolve name conflicts
   out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))
@@ -61,7 +61,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   }
 }
 
-extract_expand_dot_vars <- function(dot) {
+extract_expand_dot_vars <- function(dot, call) {
   # ugly hack to deal with `nesting()`
   if (!quo_is_call(dot, name = "nesting", ns = c("", "tidyr"))) {
     return(list(quo_get_expr(dot)))
@@ -74,7 +74,7 @@ extract_expand_dot_vars <- function(dot) {
   args[[".name_repair"]] <- NULL
 
   args_named <- exprs_auto_name(args)
-  nms <- vctrs::vec_as_names(names(args_named), repair = repair)
+  nms <- vctrs::vec_as_names(names(args_named), repair = repair, call = call)
   exprs(!!!set_names(args_named, nms))
 }
 

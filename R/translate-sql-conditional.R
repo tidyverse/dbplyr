@@ -38,7 +38,7 @@ sql_case_when <- function(...) {
   n <- length(formulas)
 
   if (n == 0) {
-    abort("No cases provided")
+    cli_abort("No cases provided")
   }
 
   query <- vector("list", n)
@@ -85,7 +85,7 @@ sql_switch <- function(x, ...) {
   } else if (n_unnamed == 1) {
     clauses <- c(clauses, build_sql("ELSE ", input[!named], " "))
   } else {
-    abort("Can only have one unnamed (ELSE) input")
+    cli_abort("Can only have one unnamed (ELSE) input")
   }
 
   build_sql("CASE ", x, " ", !!!clauses, "END")
@@ -98,7 +98,7 @@ sql_is_null <- function(x) {
 
 enpar <- function(x, tidy = TRUE, env = NULL) {
   if (!is_quosure(x)) {
-    abort("Internal error: `x` must be a quosure.") # nocov
+    cli_abort("Internal error: `x` must be a quosure.") # nocov
   }
 
   if (tidy) {

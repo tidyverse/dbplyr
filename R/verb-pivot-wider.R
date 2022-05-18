@@ -1,9 +1,13 @@
 #' Pivot data from long to wide
 #'
+#' @description
 #' `pivot_wider()` "widens" data, increasing the number of columns and
 #' decreasing the number of rows. The inverse transformation is
 #' `pivot_longer()`.
 #' Learn more in `vignette("pivot", "tidyr")`.
+#'
+#' Note that `pivot_wider()` is not and cannot be lazy because we need to look
+#' at the data to figure out what the new column names will be.
 #'
 #' @details
 #' The big difference to `pivot_wider()` for local data frames is that
@@ -153,12 +157,10 @@ dbplyr_build_wider_spec <- function(data,
                                     names_vary = "fastest",
                                     names_expand = FALSE) {
   if (!inherits(data, "tbl_sql")) {
-    error_message <- c(
-      "`dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.",
-      i = "Use `memdb_frame()` together with `show_query()` to see the SQL code."
-    )
-
-    abort(error_message)
+    cli_abort(c(
+      "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
+      i = "Use {.fun memdb_frame} together with {.fun show_query} to see the SQL code."
+    ))
   }
 
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
@@ -167,14 +169,14 @@ dbplyr_build_wider_spec <- function(data,
   sim_data <- simulate_vars(data)
   names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
   if (is_empty(names_from)) {
-    abort("`names_from` must select at least one column.")
+    cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
   values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
   if (is_empty(values_from)) {
-    abort("`values_from` must select at least one column.")
+    cli_abort("{.arg values_from} must select at least one column.")
   }
   dummy_data <- vctrs::vec_cbind(
     distinct_data,
@@ -222,19 +224,20 @@ dbplyr_pivot_wider_spec <- function(data,
     values_fill <- rep_named(values_from_cols, list(values_fill))
   }
   if (!vctrs::vec_is_list(values_fill)) {
-    abort("`values_fill` must be NULL, a scalar, or a named list")
+    cli_abort("{.arg values_fill} must be NULL, a scalar, or a named list")
   }
   values_fill <- values_fill[intersect(names(values_fill), values_from_cols)]
 
-  values_fn <- check_list_of_functions(values_fn, values_from_cols, "values_fn")
+  call <- current_env()
+  values_fn <- check_list_of_functions(values_fn, values_from_cols, "values_fn", call = call)
   missing_values <- setdiff(values_from_cols, names(values_fn))
   if (!is_empty(missing_values)) {
-    abort("`values_fn` must specify a function for each col in `values_from`")
+    cli_abort("{.arg values_fn} must specify a function for each col in {.arg values_from}")
   }
 
   pivot_exprs <- purrr::map(
     set_names(vctrs::vec_seq_along(spec), spec$.name),
-    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, data)
+    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, data, call = call)
   )
 
   key_vars <- setdiff(id_cols, non_id_cols)
@@ -251,7 +254,7 @@ dbplyr_pivot_wider_spec <- function(data,
 
   unused_cols <- setdiff(colnames(data), c(id_cols, non_id_cols))
   unused_fn <- check_list_of_functions(unused_fn, unused_cols, "unused_fn")
-  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y), data))
+  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y), data, call = call))
 
   data_grouped %>%
     summarise(
@@ -267,25 +270,27 @@ globalVariables(c("name", "value"))
 build_wider_id_cols_expr <- function(data,
                                      id_cols = NULL,
                                      names_from = name,
-                                     values_from = value) {
+                                     values_from = value,
+                                     call = caller_env()) {
   # COPIED FROM tidyr
   # TODO: Use `allow_rename = FALSE`.
   # Requires https://github.com/r-lib/tidyselect/issues/225.
   sim_data <- simulate_vars(data)
-  names_from <- names(tidyselect::eval_select(enquo(names_from), sim_data))
-  values_from <- names(tidyselect::eval_select(enquo(values_from), sim_data))
+  names_from <- names(tidyselect::eval_select(enquo(names_from), sim_data, error_call = call))
+  values_from <- names(tidyselect::eval_select(enquo(values_from), sim_data, error_call = call))
   non_id_cols <- c(names_from, values_from)
 
   out <- select_wider_id_cols(
     data = data,
     id_cols = {{id_cols}},
-    non_id_cols = non_id_cols
+    non_id_cols = non_id_cols,
+    call = call
   )
 
   expr(c(!!!out))
 }
 
-build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data) {
+build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data, call) {
   values_col <- spec[[".value"]][row_id]
   fill_value <- values_fill[[values_col]]
 
@@ -301,12 +306,13 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data) 
   case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
   agg_fn <- values_fn[[values_col]]
-  resolve_fun(agg_fn, case_expr, data = data)
+  resolve_fun(agg_fn, case_expr, data = data, call = call)
 }
 
 select_wider_id_cols <- function(data,
                                  id_cols = NULL,
-                                 non_id_cols = character()) {
+                                 non_id_cols = character(),
+                                 call = caller_env()) {
   # COPIED FROM tidyr
   id_cols <- enquo(id_cols)
   sim_data <- simulate_vars(data)
@@ -319,7 +325,7 @@ select_wider_id_cols <- function(data,
   } else {
     # TODO: Use `allow_rename = FALSE`.
     # Requires https://github.com/r-lib/tidyselect/issues/225.
-    names(tidyselect::eval_select(enquo(id_cols), sim_data))
+    names(tidyselect::eval_select(enquo(id_cols), sim_data, error_call = call))
   }
 }
 
@@ -336,14 +342,14 @@ is_scalar <- function(x) {
 }
 
 
-resolve_fun <- function(x, var, data) {
+resolve_fun <- function(x, var, data, call = caller_env()) {
   if (is_formula(x)) {
     .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
     exec(.fn_expr, var)
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {
-      abort("Can't convert to a function.")
+      cli_abort("Can't convert to a function.", call = call)
     }
     call2(fn_name, var)
   }

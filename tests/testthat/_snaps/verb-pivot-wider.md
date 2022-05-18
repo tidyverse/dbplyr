@@ -29,7 +29,7 @@
     Code
       tidyr::pivot_wider(df, names_from = key, values_from = val)
     Condition
-      Error in `stop_vctrs()`:
+      Error in `dbplyr_pivot_wider_spec()`:
       ! Names must be unique.
       x These names are duplicated:
         * "a" at locations 1 and 2.
@@ -76,7 +76,7 @@
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
       <error/rlang_error>
-      Error in `resolve_fun()`:
+      Error in `dbplyr_pivot_wider_spec()`:
       ! Can't convert to a function.
 
 # can fill in missing cells
@@ -128,7 +128,7 @@
       (expect_error(tidyr::pivot_wider(df, values_from = val)))
     Output
       <error/vctrs_error_subscript_oob>
-      Error in `stop_subscript()`:
+      Error in `chr_as_locations()`:
       ! Can't subset columns that don't exist.
       x Column `name` doesn't exist.
 
@@ -138,7 +138,7 @@
       (expect_error(tidyr::pivot_wider(df, names_from = key)))
     Output
       <error/vctrs_error_subscript_oob>
-      Error in `stop_subscript()`:
+      Error in `chr_as_locations()`:
       ! Can't subset columns that don't exist.
       x Column `value` doesn't exist.
 

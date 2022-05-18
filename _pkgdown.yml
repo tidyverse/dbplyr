@@ -20,6 +20,7 @@ reference:
   - tbl.src_dbi
   - arrange.tbl_lazy
   - copy_to.src_sql
+  - copy_inline
   - collapse.tbl_sql
   - count.tbl_lazy
   - distinct.tbl_lazy
@@ -31,6 +32,9 @@ reference:
   - intersect.tbl_lazy
   - mutate.tbl_lazy
   - pull.tbl_sql
+  - "rows-db"
+  - rows_insert.tbl_lazy
+  - get_returned_rows
   - select.tbl_lazy
   - slice_min.tbl_lazy
   - summarise.tbl_lazy
@@ -73,6 +77,7 @@ reference:
   - db-misc
   - db-sql
   - db-quote
+  - sql_query_insert
 
 news:
   releases:

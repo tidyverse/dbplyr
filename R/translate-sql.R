@@ -1,23 +1,13 @@
-#' Translate an expression to sql
+#' Translate an expression to SQL
 #'
-#' @section Base translation:
-#' The base translator, `base_sql`, provides custom mappings for for
-#' commonly used base functions including logical (`!`, `&`, `|`),
-#' arithmetic (`^`), and comparison (`!=`) operators, as well as common
-#' summary (`mean()`, `var()`) and manipulation functions.
-#'
-#' All other functions will be preserved as is. R's infix functions
+#' @description
+#' dbplyr translates commonly used base functions including logical
+#' (`!`, `&`, `|`), arithmetic (`^`), and comparison (`!=`) operators, as well
+#' as common summary (`mean()`, `var()`), and transformation (`log()`)
+#' functions.  All other functions will be preserved as is. R's infix functions
 #' (e.g. `%like%`) will be converted to their SQL equivalents (e.g. `LIKE`).
-#' You can use this to access SQL string concatenation: `||` is mapped to
-#' `OR`, but `%||%` is mapped to `||`. To suppress this behaviour, and force
-#' errors immediately when dplyr doesn't know how to translate a function it
-#' encounters, using set the `dplyr.strict_sql` option to `TRUE`.
 #'
-#' You can also use [sql()] to insert a raw sql string.
-#'
-#' @section SQLite translation:
-#' The SQLite variant currently only adds one additional function: a mapping
-#' from `sd()` to the SQL aggregation function `STDEV`.
+#' Learn more in `vignette("translation-function")`.
 #'
 #' @param ...,dots Expressions to translate. `translate_sql()`
 #'   automatically quotes them for you.  `translate_sql_()` expects
@@ -84,7 +74,7 @@ translate_sql <- function(...,
                           window = TRUE) {
 
   if (!missing(vars)) {
-    abort("`vars` is deprecated. Please use partial_eval() directly.")
+    cli_abort("{.arg vars} is deprecated. Please use {.fun partial_eval} directly.")
   }
 
   con <- con %||% sql_current_con() %||% simulate_dbi()
@@ -123,7 +113,8 @@ translate_sql_ <- function(dots,
   on.exit(set_current_con(old_con), add = TRUE)
 
   if (length(context) > 0) {
-    local_context(context)
+    old_context <- set_current_context(context)
+    on.exit(set_current_context(old_context), add = TRUE)
   }
 
   if (window) {
@@ -157,12 +148,9 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
   stopifnot(is.sql_variant(variant))
 
   # Default for unknown functions
-  if (!strict) {
-    unknown <- setdiff(all_calls(expr), names(variant))
-    top_env <- ceply(unknown, default_op, parent = empty_env(), env = get_env(expr))
-  } else {
-    top_env <- child_env(NULL)
-  }
+  unknown <- setdiff(all_calls(expr), names(variant))
+  op <- if (strict) missing_op else default_op
+  top_env <- ceply(unknown, op, parent = empty_env(), env = get_env(expr))
 
   # Known R -> SQL functions
   special_calls <- copy_env(variant$scalar, parent = top_env)
@@ -175,16 +163,17 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     pkg <- as.character(substitute(pkg))
     name <- as.character(substitute(name))
     if (!is_installed(pkg)) {
-      abort(glue("There is no package called '{pkg}'"))
+      cli_abort("There is no package called {.pkg {pkg}}")
     }
     if (!env_has(ns_env(pkg), name)) {
-      abort(glue("'{name}' is not an exported object from '{pkg}'"))
+      cli_abort("{.val {name}} is not an exported object from {.pkg {pkg}}")
     }
 
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      abort(glue("No known translation for {pkg}::{name}()"))
+      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+      cli_abort("No known translation for `{pkg}::{name}()`")
     }
   }
 
@@ -224,6 +213,20 @@ default_op <- function(x, env) {
     sql_infix(x)
   } else {
     sql_prefix(x)
+  }
+}
+
+missing_op <- function(x, env) {
+  force(x)
+
+  function(...) {
+    needs_parens <- !is_infix_base(x) && !is_infix_user(x)
+
+    if (needs_parens) {
+      cli_abort("Don't know how to translate {.fun {x}}")
+    } else {
+      cli_abort("Don't know how to translate `{x}`")
+    }
   }
 }
 

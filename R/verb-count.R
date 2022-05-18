@@ -32,7 +32,7 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @export
 add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
   if (!missing(.drop)) {
-    abort("`.drop` argument not supported for lazy tables.")
+    cli_abort("{.arg .drop} argument not supported for lazy tables.")
   }
 
   if (!missing(...)) {
@@ -73,10 +73,10 @@ check_name <- function(name, vars) {
     return(name)
   }
 
-  abort(
+  cli_abort(
     c(
-      glue("'{name}' already present in output"),
-      i = "Use `name = \"new_name\"` to pick a new name."
+      "'{name}' already present in output",
+      i = "Use {.code name = \"new_name\"} to pick a new name."
     ),
     call = caller_env()
   )

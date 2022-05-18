@@ -4,10 +4,10 @@
       translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
     Condition
       Warning:
-      Windowed expression 'SUM(`x`)' does not have explicit order.
-      Please use arrange() or window_order() to make determinstic.
+      Windowed expression `SUM(`x`)` does not have explicit order.
+      i Please use `arrange()` or `window_order()` to make deterministic.
       Error in `rows()`:
-      ! from must be less than to
+      ! `from` (1) must be less than `to` (0)
 
 # window_frame()
 
@@ -22,6 +22,19 @@
     Output
       <SQL>
       SELECT `x`, `y`, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      FROM `df`
+
+---
+
+    Code
+      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y)) %>%
+        show_query()
+    Output
+      <SQL>
+      SELECT
+        `x`,
+        `y`,
+        SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 
 # window_frame() checks arguments

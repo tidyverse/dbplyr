@@ -45,7 +45,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS") {
+sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
   join_vars_list <- mapply(
     FUN = sql_join_var,
     alias = vars$alias,
@@ -73,17 +73,16 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
   } else if (!is.na(y)) {
     sql_table_prefix(con, y, table = if (tolower(y) %in% tolower(all_x)) y_as)
   } else {
-    abort(paste0("No source for join column ", alias)) # nocov
+    cli_abort("No source for join column {alias}") # nocov
   }
 }
 
 sql_join_tbls <- function(con, by, na_matches = "never") {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
-  on <- NULL
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, by$x_as)
-    rhs <- sql_table_prefix(con, by$y, by$y_as)
+    lhs <- sql_table_prefix(con, by$x, by$x_as %||% ident("LHS"))
+    rhs <- sql_table_prefix(con, by$y, by$y_as %||% ident("RHS"))
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
@@ -103,7 +102,7 @@ sql_table_prefix <- function(con, var, table = NULL) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
-    table <- sql_escape_ident(con, table)
+    table <- escape(table, con = con)
     sql(paste0(table, ".", var))
   } else {
     var

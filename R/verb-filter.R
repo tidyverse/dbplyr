@@ -17,7 +17,7 @@
 #' @importFrom dplyr filter
 filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {
-    abort("`.preserve` is not supported on database backends")
+    cli_abort("{.arg .preserve} is not supported on database backends")
   }
   check_filter(...)
 
@@ -38,7 +38,7 @@ add_filter <- function(.data, dots) {
   if (!uses_window_fun(dots, con)) {
     if (uses_mutated_vars(dots, lazy_query$select)) {
       lazy_select_query(
-        from = lazy_query,
+        x = lazy_query,
         last_op = "filter",
         where = dots
       )
@@ -56,7 +56,7 @@ add_filter <- function(.data, dots) {
     # And filter with the modified `where` using the new columns
     original_vars <- op_vars(.data)
     lazy_select_query(
-      from = mutated$lazy_query,
+      x = mutated$lazy_query,
       last_op = "filter",
       select = syms(set_names(original_vars)),
       where = where$expr
@@ -74,11 +74,11 @@ check_filter <- function(...) {
     # Unlike in `dplyr` named logical vectors do not make sense so they are
     # also not allowed
     expr <- quo_get_expr(quo)
-    abort(c(
-      glue::glue("Problem with `filter()` input `..{i}`."),
-      x = glue::glue("Input `..{i}` is named."),
-      i = glue::glue("This usually means that you've used `=` instead of `==`."),
-      i = glue::glue("Did you mean `{name} == {as_label(expr)}`?", name = names(dots)[i])
-    ))
+    cli_abort(c(
+      "Problem with {.fun filter} input `..{i}`.",
+      x = "Input `..{i}` is named.",
+      i = "This usually means that you've used {.code =} instead of {.code ==}.",
+      i = "Did you mean `{names(dots)[i]} == {as_label(expr)}`?"
+    ), call = caller_env())
   }
 }

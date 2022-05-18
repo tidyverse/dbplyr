@@ -51,10 +51,15 @@ test_that("postgres mimics two argument log", {
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_postgres())
 
+  expect_equal(translate_sql(day(x)), sql("EXTRACT(DAY FROM `x`)"))
+  expect_equal(translate_sql(mday(x)), sql("EXTRACT(DAY FROM `x`)"))
   expect_equal(translate_sql(yday(x)), sql("EXTRACT(DOY FROM `x`)"))
+  expect_equal(translate_sql(week(x)), sql("FLOOR((EXTRACT(DOY FROM `x`) - 1) / 7) + 1"))
+  expect_equal(translate_sql(isoweek(x)), sql("EXTRACT(WEEK FROM `x`)"))
   expect_equal(translate_sql(quarter(x)), sql("EXTRACT(QUARTER FROM `x`)"))
   expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
   expect_error(translate_sql(quarter(x, fiscal_start = 2)))
+  expect_equal(translate_sql(isoyear(x)), sql("EXTRACT(YEAR FROM `x`)"))
 
   expect_equal(translate_sql(seconds(x)), sql("CAST('`x` seconds' AS INTERVAL)"))
   expect_equal(translate_sql(minutes(x)), sql("CAST('`x` minutes' AS INTERVAL)"))
@@ -73,15 +78,210 @@ test_that("custom SQL translation", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 })
 
+test_that("`sql_query_insert()` works", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_postgres(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(error = TRUE,
+    (sql_query_insert(
+      con = simulate_postgres(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      conflict = "error",
+      returning_cols = c("a", b2 = "b")
+    ))
+  )
+
+  expect_snapshot(
+    sql_query_insert(
+      con = simulate_postgres(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      conflict = "ignore",
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
+test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = simulate_postgres(),
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_upsert(
+      con = simulate_postgres(),
+      x_name = ident("df_x"),
+      y = df_y,
+      by = c("a", "b"),
+      update_cols = c("c", "d"),
+      returning_cols = c("a", b2 = "b"),
+      method = "on_conflict"
+    )
+  )
+})
+
+
 # live database -----------------------------------------------------------
 
 test_that("can explain", {
   db <- copy_to_test("postgres", data.frame(x = 1:3))
   expect_snapshot(db %>% mutate(y = x + 1) %>% explain())
+
+  # `explain()` passes `...` to methods
+  expect_snapshot(db %>% mutate(y = x + 1) %>% explain(format = "json"))
 })
 
 test_that("can overwrite temp tables", {
   src <- src_test("postgres")
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
+})
+
+test_that("copy_inline works", {
+  src <- src_test("postgres")
+  df <- tibble(
+    lgl = TRUE,
+    int = 1L,
+    dbl = 1.5,
+    chr = "a",
+    date = as.Date("2020-01-01", tz = "UTC"),
+    dtt = as.POSIXct("2020-01-01 01:23:45", tz = "UTC")
+  )
+
+  expect_equal(copy_inline(src, df) %>% collect(), df)
+})
+
+test_that("can insert with returning", {
+  con <- src_test("postgres")
+
+  df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+
+  df_y <- tibble(a = 1:3, b = 11:13, c = -(1:3), d = c("x", "y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
+
+  # This errors because there is no unique constraint on (`a`, `b`)
+  expect_snapshot(error = TRUE, {
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything(),
+      method = "on_conflict"
+    )
+  })
+
+  expect_error(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything(),
+      method = "where_not_exists"
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
+
+  expect_equal(
+    rows_insert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      conflict = "ignore",
+      returning = everything(),
+      method = "on_conflict"
+    ) %>%
+      get_returned_rows(),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+
+  expect_equal(
+    collect(x),
+    tibble(a = 1:3, b = 11:13, c = c(1L, -1L, -2L), d = c("a", "y", "z"))
+  )
+})
+
+test_that("can upsert with returning", {
+  con <- src_test("postgres")
+
+  df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+
+  df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
+  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+    mutate(c = c + 1)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
+
+  # Errors because there is no unique index
+  expect_snapshot(error = TRUE, {
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      method = "on_conflict"
+    )
+  })
+
+  # DBI method does not need a unique index
+  expect_error(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      method = "cte_update"
+    ),
+    NA
+  )
+
+  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
+
+  expect_equal(
+    rows_upsert(
+      x, y,
+      by = c("a", "b"),
+      in_place = TRUE,
+      returning = everything(),
+      method = "on_conflict"
+    ) %>%
+      get_returned_rows() %>%
+      arrange(a),
+    tibble(
+      a = 2:3,
+      b = 12:13,
+      c = c(-1L, -2L),
+      d = c("y", "z")
+    )
+  )
+
+  expect_equal(
+    collect(x),
+    tibble(a = 1:3, b = 11:13, c = c(1L, -1L, -2L), d = c("a", "y", "z"))
+  )
 })

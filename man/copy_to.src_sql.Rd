@@ -81,3 +81,7 @@ df2 <- data.frame(y = c("a", "d"), fruit = c("apple", "date"))
 # in the join functions
 db \%>\% left_join(df2, copy = TRUE)
 }
+\seealso{
+\code{\link[=copy_inline]{copy_inline()}} to use small data in an SQL query without actually
+writing to a table.
+}

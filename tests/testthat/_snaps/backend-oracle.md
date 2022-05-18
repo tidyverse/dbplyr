@@ -8,6 +8,27 @@
       FROM (`df`) 
       FETCH FIRST 6 ROWS ONLY
 
+# `sql_query_upsert()` is correct
+
+    Code
+      sql_query_upsert(con = simulate_oracle(), x_name = ident("df_x"), y = df_y, by = c(
+        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
+      method = "merge")
+    Output
+      <SQL> MERGE INTO `df_x`
+      USING (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM (`df_y`) 
+      ) `...y`
+        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+      WHEN MATCHED THEN
+        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+      WHEN NOT MATCHED THEN
+        INSERT (`c`, `d`)
+        VALUES (`...y`.`c`, `...y`.`d`)
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+      ;
+
 # generates custom sql
 
     Code
