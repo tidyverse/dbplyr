@@ -74,7 +74,7 @@ always call sql_render()."><meta property="og:image" content="https://dbplyr.tid
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Build and render SQL from a sequence of lazy operations</h1>
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-join-query.R" class="external-link"><code>R/lazy-join-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-select-query.R" class="external-link"><code>R/lazy-select-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-set-op-query.R" class="external-link"><code>R/lazy-set-op-query.R</code></a>, and 5 more</small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-join-query.R" class="external-link"><code>R/lazy-join-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-query.R" class="external-link"><code>R/lazy-query.R</code></a>, <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/R/lazy-select-query.R" class="external-link"><code>R/lazy-select-query.R</code></a>, and 6 more</small>
       <div class="d-none name"><code>sql_build.Rd</code></div>
     </div>
 
@@ -92,16 +92,33 @@ always call <code>sql_render()</code>.</p>
   <span class="va">x</span>,
   <span class="va">y</span>,
   <span class="va">vars</span>,
-  type <span class="op">=</span> <span class="st">"inner"</span>,
-  by <span class="op">=</span> <span class="cn">NULL</span>,
+  <span class="va">type</span>,
+  <span class="va">by</span>,
   suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".x"</span>, <span class="st">".y"</span><span class="op">)</span>,
-  na_matches <span class="op">=</span> <span class="cn">FALSE</span>
+  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,
+  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span>
 <span class="op">)</span>
 
-<span class="fu">lazy_semi_join_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, na_matches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu">lazy_semi_join_query</span><span class="op">(</span>
+  <span class="va">x</span>,
+  <span class="va">y</span>,
+  <span class="va">anti</span>,
+  <span class="va">by</span>,
+  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,
+  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="fu">lazy_query</span><span class="op">(</span>
+  <span class="va">query_type</span>,
+  <span class="va">x</span>,
+  <span class="va">...</span>,
+  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,
+  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,
+  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+<span class="op">)</span>
 
 <span class="fu">lazy_select_query</span><span class="op">(</span>
-  <span class="va">from</span>,
+  <span class="va">x</span>,
   <span class="va">last_op</span>,
   select <span class="op">=</span> <span class="cn">NULL</span>,
   where <span class="op">=</span> <span class="cn">NULL</span>,
@@ -116,7 +133,7 @@ always call <code>sql_render()</code>.</p>
   message_summarise <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span>
 
-<span class="fu">lazy_set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type <span class="op">=</span> <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu">lazy_set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, <span class="va">all</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu">join_query</span><span class="op">(</span>
   <span class="va">x</span>,
@@ -142,7 +159,7 @@ always call <code>sql_render()</code>.</p>
 
 <span class="fu">semi_join_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, na_matches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu">set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, type <span class="op">=</span> <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu">set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="fu">sql_build</span><span class="op">(</span><span class="va">op</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -153,14 +170,14 @@ always call <code>sql_render()</code>.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>op</dt>
+    <dl><dt>...</dt>
+<dd><p>Other arguments passed on to the methods. Not currently used.</p></dd>
+<dt>op</dt>
 <dd><p>A sequence of lazy operations</p></dd>
 <dt>con</dt>
 <dd><p>A database connection. The default <code>NULL</code> uses a set of
 rules that should be very similar to ANSI 92, and allows for testing
 without an active database connection.</p></dd>
-<dt>...</dt>
-<dd><p>Other arguments passed on to the methods. Not currently used.</p></dd>
 <dt>subquery</dt>
 <dd><p>Is this SQL going to be used in a subquery?
 This is important because you can place a bare table name in a subquery
