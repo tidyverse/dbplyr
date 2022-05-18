@@ -79,7 +79,7 @@ test_that("cumulative aggregates generate window function", {
 test_that("filter() after summarise() uses `HAVING`", {
   lf <- lazy_frame(g = 1, h = 1, x = 1) %>%
     group_by(g, h) %>%
-    summarise(x_mean = mean(x, na.rm = TRUE))
+    summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")
   mf <- memdb_frame(g = c(1, 1, 1, 2, 2), h = 1, x = 1:5) %>%
     group_by(g, h) %>%
     summarise(x_mean = mean(x, na.rm = TRUE), .groups = "drop_last")

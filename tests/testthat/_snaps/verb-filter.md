@@ -32,8 +32,6 @@
 
     Code
       (out <- lf %>% filter(g == 1))
-    Message
-      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -45,8 +43,6 @@
 
     Code
       (out <- lf %>% filter(x_mean > 1))
-    Message
-      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -58,8 +54,6 @@
 
     Code
       (out <- lf %>% filter(g == 1) %>% filter(g == 2))
-    Message
-      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -71,8 +65,6 @@
 
     Code
       (out <- lf %>% filter(g == 1) %>% filter(h == 2))
-    Message
-      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
     Output
       <SQL>
       SELECT `g`, `h`, AVG(`x`) AS `x_mean`
@@ -101,8 +93,6 @@
       Warning:
       Windowed expression `SUM(`x_mean`)` does not have explicit order.
       i Please use `arrange()` or `window_order()` to make deterministic.
-    Message
-      `summarise()` has grouped output by "g". You can override using the `.groups` argument.
     Output
       <SQL>
       SELECT `g`, `h`, `x_mean`
