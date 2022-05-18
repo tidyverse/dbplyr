@@ -24,6 +24,19 @@
       SELECT `x`, `y`, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
+---
+
+    Code
+      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y)) %>%
+        show_query()
+    Output
+      <SQL>
+      SELECT
+        `x`,
+        `y`,
+        SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
+      FROM `df`
+
 # window_frame() checks arguments
 
     Code
