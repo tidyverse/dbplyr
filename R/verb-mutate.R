@@ -174,6 +174,12 @@ get_mutate_layers <- function(.data, ...) {
       }
 
       var_is_null[[cur_var]] <- FALSE
+      if (quo_is_symbol(cur_quo)) {
+        cur_sym <- quo_get_expr(cur_quo)
+        if (as_name(cur_sym) %in% all_vars) {
+          cur_quo <- cur_sym
+        }
+      }
       cur_layer[[cur_var]] <- cur_quo
       dot_layer[[cur_var]] <- cur_quo
       layer_modified_vars <- c(layer_modified_vars, cur_var)
