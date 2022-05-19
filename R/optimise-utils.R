@@ -5,6 +5,11 @@ uses_mutated_vars <- function(dots, select) {
 
   vars <- set_names(select$expr, select$name)
   mutated_vars <- names(purrr::discard(vars, is_symbol))
+
+  if (is_empty(mutated_vars)) {
+    return(FALSE)
+  }
+
   any(purrr::map_lgl(dots, expr_uses_var, mutated_vars))
 }
 
