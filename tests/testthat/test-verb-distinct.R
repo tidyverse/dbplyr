@@ -111,13 +111,6 @@ test_that("distinct() produces optimized SQL", {
   # optimized `mutate()` resp. `add_select`
   # expect_equal(out$lazy_query$where, syms("y"))
 
-  lf %>%
-    distinct(x, y) %>%
-    # filter(x == 1)
-    # mutate(x = x + 1)
-    # summarise(x = mean(x, na.rm = TRUE))
-    distinct(x)
-
   # TODO should be inlined with `HAVING`
   # -> https://github.com/tidyverse/dbplyr/pull/877
   # lf %>%
