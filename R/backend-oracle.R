@@ -185,19 +185,25 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
 
 #' @export
-sql_translation.OraConnection <- sql_translation.Oracle
-
-#' @export
 sql_query_select.OraConnection <- sql_query_select.Oracle
 
 #' @export
 sql_query_upsert.OraConnection <- sql_query_upsert.Oracle
 
 #' @export
+sql_translation.OraConnection <- sql_translation.Oracle
+
+#' @export
+sql_query_explain.OraConnection <- sql_query_explain.Oracle
+
+#' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
 
 #' @export
 sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
+
+#' @export
+sql_query_save.OraConnection <- sql_query_save.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle

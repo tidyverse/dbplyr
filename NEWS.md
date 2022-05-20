@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* `fill()` now works for connections from RPostgreSQL (@mgirlich).
+
+* `explain()` now work for Redshift and for connections from ROracle (@mgirlich).
+
+* `compute()` now work for connections from ROracle (@mgirlich).
+
 * When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
   column (@mgirlich).
 
