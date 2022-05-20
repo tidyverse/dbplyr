@@ -325,6 +325,11 @@ test_that("mutate() uses star", {
     lf %>% mutate(a = 1L, .before = 1) %>% remote_query(),
     sql("SELECT 1 AS `a`, *\nFROM `df`")
   )
+
+  expect_equal(
+    lf %>% transmute(a = 1L, x, y, z = 2L) %>% remote_query(),
+    sql("SELECT 1 AS `a`, *, 2 AS `z`\nFROM `df`")
+  )
 })
 
 # sql_build ---------------------------------------------------------------
