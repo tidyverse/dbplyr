@@ -16,28 +16,44 @@ home:
 
 reference:
 - title: dplyr verbs
+
+- subtitle: Connecting, copying, and retrieving data
   contents:
   - tbl.src_dbi
-  - arrange.tbl_lazy
   - copy_to.src_sql
   - copy_inline
   - collapse.tbl_sql
-  - count.tbl_lazy
+  - pull.tbl_sql
+
+- subtitle: Verbs that affect rows
+  contents:
+  - arrange.tbl_lazy
   - distinct.tbl_lazy
-  - do.tbl_sql
   - filter.tbl_lazy
   - head.tbl_lazy
+  - slice_min.tbl_lazy
+
+- subtitle: Verbs that affect columns
+  contents:
+  - mutate.tbl_lazy
+  - select.tbl_lazy
+
+- subtitle: Grouping and summarising verbs
+  contents:
+  - count.tbl_lazy
   - group_by.tbl_lazy
+  - summarise.tbl_lazy
+  - do.tbl_sql
+
+- subtitle: Verbs that work with multiple tables
+  contents:
   - inner_join.tbl_lazy
   - intersect.tbl_lazy
-  - mutate.tbl_lazy
-  - pull.tbl_sql
-  - "rows-db"
+
+- subtitle: Verbs that modify the underlying data
+  contents:
   - rows_insert.tbl_lazy
   - get_returned_rows
-  - select.tbl_lazy
-  - slice_min.tbl_lazy
-  - summarise.tbl_lazy
 
 - title: tidyr verbs
   contents:
