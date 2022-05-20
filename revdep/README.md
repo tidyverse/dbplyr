@@ -19,7 +19,7 @@
 |[dittodb](problems.md#dittodb)              |0.1.3   |       |__+1__  |1        |
 |[dlookr](problems.md#dlookr)                |0.5.6   |       |__+1__  |         |
 |[dplyr.teradata](problems.md#dplyrteradata) |0.4.1   |__+1__ |        |1 __+1__ |
-|[taxadb](problems.md#taxadb)                |0.1.4   |__+1__ |        |         |
+|[RClickhouse](problems.md#rclickhouse)      |0.6.3   |       |__+1__  |1        |
 |[tidypredict](problems.md#tidypredict)      |0.4.8   |__+1__ |        |         |
 |[VicmapR](problems.md#vicmapr)              |0.1.8   |__+1__ |        |         |
 
