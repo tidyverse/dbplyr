@@ -50,7 +50,7 @@
     Output
       <SQL> SELECT `x`, SQRT(`y`) AS `y`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
@@ -59,9 +59,9 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, `y`, `y` + 1.0 AS `z`
+      <SQL> SELECT *, `y` + 1.0 AS `z`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
@@ -83,9 +83,9 @@
       lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
-      SELECT `x`, `x1`, `x1` + 1.0 AS `x2`
+      SELECT *, `x1` + 1.0 AS `x2`
       FROM (
-        SELECT `x`, `x` + 1.0 AS `x1`
+        SELECT *, `x` + 1.0 AS `x1`
         FROM `df`
       )
 
@@ -123,7 +123,7 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, 3.0 AS `y`
+      <SQL> SELECT *, 3.0 AS `y`
       FROM `df`
 
 # temp var with nested arguments
@@ -133,7 +133,7 @@
     Output
       <SQL> SELECT `x`, `y` * 2.0 AS `z`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
