@@ -5,11 +5,13 @@
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
@@ -47,6 +49,7 @@
       <error/rlang_error>
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -85,6 +88,7 @@
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
