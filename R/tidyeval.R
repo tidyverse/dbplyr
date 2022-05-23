@@ -232,7 +232,7 @@ fun_name <- function(fun) {
 replace_sym <- function(call, sym, replace) {
   if (is_symbol(call, sym)) {
     if (is_list(replace)) {
-      replace[[which(call == syms(sym))]]
+      replace[[match(as_string(call), sym)]]
     } else {
       replace
     }
