@@ -1,6 +1,6 @@
 ## revdepcheck results
 
-We checked 70 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 71 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
 
  * We saw 9 new problems
  * We failed to check 4 packages
@@ -31,8 +31,8 @@ Issues with CRAN packages are summarised below.
   checking tests ... ERROR
   checking R code for possible problems ... NOTE
 
-* taxadb
-  checking tests ... ERROR
+* RClickhouse
+  checking dependencies in R code ... WARNING
 
 * tidypredict
   checking tests ... ERROR

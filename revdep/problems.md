@@ -450,6 +450,36 @@ ERROR: lazy loading failed for package ‘geospark’
 
 
 ```
+# RClickhouse
+
+<details>
+
+* Version: 0.6.3
+* GitHub: https://github.com/IMSMWU/RClickhouse
+* Source code: https://github.com/cran/RClickhouse
+* Date/Publication: 2022-03-08 13:40:08 UTC
+* Number of recursive dependencies: 42
+
+Run `cloud_details(, "RClickhouse")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking dependencies in R code ... WARNING
+    ```
+    '::' or ':::' import not declared from: ‘cli’
+    ```
+
+## In both
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is 18.5Mb
+      sub-directories of 1Mb or more:
+        libs  18.2Mb
+    ```
+
 # sparklyr
 
 <details>
@@ -585,45 +615,6 @@ ERROR: lazy loading failed for package ‘sparklyr.flint’
 
 
 ```
-# taxadb
-
-<details>
-
-* Version: 0.1.4
-* GitHub: https://github.com/ropensci/taxadb
-* Source code: https://github.com/cran/taxadb
-* Date/Publication: 2022-03-05 15:40:02 UTC
-* Number of recursive dependencies: 89
-
-Run `cloud_details(, "taxadb")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘spelling.R’
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-        5.       ├─dbplyr::db_sql_render(x$src$con, x)
-        6.       └─dbplyr:::db_sql_render.DBIConnection(x$src$con, x)
-        7.         ├─dbplyr::sql_render(sql, con = con, ..., cte = cte)
-        8.         └─dbplyr:::sql_render.tbl_lazy(sql, con = con, ..., cte = cte)
-        9.           ├─dbplyr::sql_render(...)
-       10.           └─dbplyr:::sql_render.lazy_query(...)
-       11.             ├─dbplyr::sql_render(...)
-       12.             └─dbplyr:::sql_render.set_op_query(...)
-       13.               └─dbplyr:::dbplyr_query_set_op(...)
-       14.                 └─dbplyr:::dbplyr_fallback(con, "sql_set_op", ...)
-       15.                   └─rlang::eval_bare(expr((!!fun)(con, ...)))
-      
-      [ FAIL 2 | WARN 1 | SKIP 4 | PASS 59 ]
-      Error: Test failures
-      Execution halted
-    ```
-
 # tidypredict
 
 <details>

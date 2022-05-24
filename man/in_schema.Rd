@@ -2,19 +2,26 @@
 % Please edit documentation in R/schema.R
 \name{in_schema}
 \alias{in_schema}
-\title{Refer to a table in a schema}
+\alias{in_catalog}
+\title{Refer to a table in a schema or a database catalog}
 \usage{
 in_schema(schema, table)
+
+in_catalog(catalog, schema, table)
 }
 \arguments{
-\item{schema, table}{Names of schema and table. These will be automatically
-quoted; use \code{sql()} to pass a raw name that won't get quoted.}
+\item{catalog, schema, table}{Names of catalog, schema, and table.
+These will be automatically quoted; use \code{\link[=sql]{sql()}} to pass a raw name
+that won't get quoted.}
 }
 \description{
-Refer to a table in a schema
+\code{in_schema()} can be used in \code{\link[=tbl]{tbl()}} to indicate a table in a specific
+schema.
+\code{in_catalog()} additionally allows specifying the database catalog.
 }
 \examples{
 in_schema("my_schema", "my_table")
+in_catalog("my_catalog", "my_schema", "my_table")
 # eliminate quotes
 in_schema(sql("my_schema"), sql("my_table"))
 
