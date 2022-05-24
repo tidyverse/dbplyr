@@ -153,6 +153,26 @@ flatten_query.join_query <- function(qry, query_list) {
 }
 
 #' @export
+flatten_query.multi_join_query <- function(qry, query_list) {
+  x <- qry$x
+  query_list_new <- flatten_query(x, query_list)
+  qry$x <- get_subquery_name(x, query_list_new)
+
+  for (i in vctrs::vec_seq_along(qry$joins)) {
+    y <- qry$joins$table[[i]]
+    query_list_new <- flatten_query(y, query_list_new)
+    qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
+  }
+
+  name <- unique_subquery_name()
+  wrapped_query <- set_names(list(qry), name)
+
+  query_list$queries <- c(query_list_new$queries, wrapped_query)
+  query_list$name <- name
+  query_list
+}
+
+#' @export
 flatten_query.semi_join_query <- flatten_query.join_query
 #' @export
 flatten_query.set_op_query <- flatten_query.join_query

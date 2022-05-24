@@ -87,6 +87,18 @@ query_name.lazy_query <- function(x) {
 }
 
 #' @export
+query_name.lazy_multi_join_query <- function(x) {
+  # browser()
+  # name <- x$meta$alias$as[[1]]
+  # if (is.na(name)) {
+  #   NULL
+  # } else {
+  #   ident(name)
+  # }
+  NULL
+}
+
+#' @export
 query_name.lazy_select_query <- function(x) {
   if (!is_empty(x$where)) {
     return()

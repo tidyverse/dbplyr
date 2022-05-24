@@ -29,6 +29,18 @@ lazy_join_query <- function(x,
   )
 }
 
+#' @export
+#' @rdname sql_build
+lazy_multi_join_query <- function(x, joins, meta) {
+  lazy_query(
+    query_type = "multi_join",
+    x = x,
+    joins = joins,
+    meta = meta,
+    last_op = "join"
+  )
+}
+
 join_check_vars <- function(vars, call) {
   if (!vctrs::vec_is_list(vars)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
@@ -125,6 +137,10 @@ op_vars.lazy_join_query <- function(op) {
   op$vars$alias
 }
 #' @export
+op_vars.lazy_multi_join_query <- function(op) {
+  names(op$meta$vars)
+}
+#' @export
 op_vars.lazy_semi_join_query <- function(op) {
   op_vars(op$x)
 }
@@ -139,6 +155,31 @@ sql_build.lazy_join_query <- function(op, con, ...) {
     by = op$by,
     suffix = op$suffix,
     na_matches = op$na_matches
+  )
+}
+
+#' @export
+sql_build.lazy_multi_join_query <- function(op, con, ...) {
+  # TODO calculate table names here
+  alias <- op$meta$alias
+  auto_name <- is.na(alias$as)
+  alias_out <- dplyr::coalesce(alias$as, alias$name)
+  alias_out_repaired <- vctrs::vec_as_names(alias_out, repair = "unique", quiet = TRUE)
+
+  alias_out[auto_name] <- alias_out_repaired[auto_name]
+
+  op$meta$alias <- alias_out
+  all_vars <- c(op_vars(op$x), unlist(purrr::map(op$joins$table, op_vars)))
+  vars_count <- vctrs::vec_count(all_vars)
+  duplicated_vars <- vars_count$key[vars_count$count > 1]
+
+  op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
+
+  multi_join_query(
+    x = sql_optimise(sql_build(op$x, con), con),
+    joins = op$joins,
+    meta = op$meta,
+    duplicated_vars = duplicated_vars
   )
 }
 

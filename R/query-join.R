@@ -14,6 +14,18 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
   )
 }
 
+multi_join_query <- function(x, joins, meta, duplicated_vars) {
+  structure(
+    list(
+      x = x,
+      joins = joins,
+      meta = meta,
+      duplicated_vars = duplicated_vars
+    ),
+    class = c("multi_join_query", "query")
+  )
+}
+
 #' @export
 print.join_query <- function(x, ...) {
   cat_line("<SQL JOIN (", toupper(x$type), ")>")
@@ -26,6 +38,24 @@ print.join_query <- function(x, ...) {
 
   cat_line("Y:")
   cat_line(indent_print(sql_build(x$y)))
+}
+
+#' @export
+print.multi_join_query <- function(x, ...) {
+  cat_line("<SQL JOINS>")
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  for (i in vctrs::vec_seq_along(x$joins)) {
+    cat_line("Type: ", paste0(x$joins$type[[i]]))
+
+    cat_line("By:")
+    cat_line(indent(paste0(x$joins$by_x[[i]], "-", x$joins$by_y[[i]])))
+
+    cat_line("Y:")
+    cat_line(indent_print(sql_build(x$joins$table[[i]])))
+  }
 }
 
 #' @export
@@ -42,7 +72,91 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
   )
 }
 
+#' @export
+sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+  from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  query$joins$table <- purrr::map(
+    query$joins$table,
+    ~ sql_render(.x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  )
+
+  sql_query_multi_join(
+    con,
+    from_x,
+    query$joins,
+    query$meta,
+    query$duplicated_vars,
+    lvl
+  )
+}
+
+
 # SQL generation ----------------------------------------------------------
+
+sql_query_multi_join <- function(con,
+                                 from_x,
+                                 joins,
+                                 meta,
+                                 duplicated_vars,
+                                 lvl = 0) {
+  # TODO check that names are unique
+  table_names <- meta$alias
+
+  select_cols <- purrr::map(
+    meta$vars,
+    function(parts) {
+      used <- !is.na(parts)
+      parts <- parts[used]
+      table_names <- table_names[used]
+
+      parts_escaped <- ifelse(
+        parts %in% duplicated_vars,
+        sql_table_prefix(con, parts, ident(table_names)),
+        sql_escape_ident(con, parts)
+      )
+
+      if (length(parts_escaped) == 1) {
+        return(parts_escaped)
+      }
+
+      parts_escaped2 <- escape(ident(parts_escaped), parens = FALSE, collapse = ", ", con = con)
+      sql_expr(COALESCE(!!(parts_escaped2)), con = con)
+    }
+  )
+
+  select_cols <- sql(unlist(select_cols))
+
+  n <- length(table_names)
+
+  ons <- purrr::pmap(
+    vctrs::vec_cbind(
+      rhs = table_names[-1],
+      select(joins, by_x, by_y, by_on = on, na_matches)
+    ),
+    function(rhs, by_x, by_y, by_on, na_matches) {
+      if (!is.na(by_on)) {
+        return(sql(by_on))
+      }
+      by <- list(x = ident(by_x), y = ident(by_y), x_as = ident(table_names[[1]]), y_as = ident(rhs))
+      sql_join_tbls(con, by, na_matches = na_matches)
+    }
+  )
+
+  froms_rendered <- purrr::map2(joins$table, table_names[-1], ~ dbplyr_sql_subquery(con, .x, name = .y, lvl = lvl))
+  types <- toupper(paste0(joins$type, " JOIN"))
+  join_clauses <- vctrs::vec_interleave(
+    purrr::map2(froms_rendered, types, ~ sql_clause(.y, .x)),
+    purrr::map(ons, ~ sql_clause("ON", .x, sep = " AND", parens = TRUE, lvl = 1))
+  )
+
+  start <- dbplyr_sql_subquery(con, from_x, name = table_names[[1]], lvl = lvl)
+  list2(
+    sql_clause_select(con, select_cols),
+    sql_clause_from(start),
+    !!!join_clauses
+  ) %>%
+    sql_format_clauses(lvl = lvl, con = con)
+}
 
 
 sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
