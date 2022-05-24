@@ -1,5 +1,15 @@
 # dbplyr (development version)
 
+* `fill()` now works for connections from RPostgreSQL (@mgirlich).
+
+* `explain()` now works for connections from ROracle (@mgirlich).
+
+* When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
+  column (@mgirlich).
+
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
+
 ## New features
 
 * SQL formatting has been considerably improved with new wrapping and indenting. 

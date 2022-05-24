@@ -171,6 +171,8 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
 dbplyr_fill0.PostgreSQL <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.PqConnection <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.PostgreSQLConnection <- dbplyr_fill0.SQLiteConnection
 
 #' @export
 dbplyr_fill0.HDB <- dbplyr_fill0.SQLiteConnection
