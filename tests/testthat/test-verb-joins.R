@@ -171,7 +171,7 @@ test_that("join check `x_as` and `y_as`", {
   })
 })
 
-test_that("join check `x_as` and `y_as`", {
+test_that("join uses correct table alias", {
   x <- lazy_frame(a = 1, x = 1, .name = "x")
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
@@ -207,6 +207,10 @@ test_that("join check `x_as` and `y_as`", {
   by <- left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$by
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
+
+  by <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("RHS"))
 })
 
 # sql_build ---------------------------------------------------------------
