@@ -5,8 +5,8 @@
     Output
       <SQL>
       SELECT `df1`.`x` AS `x`, `y`
-      FROM `df` AS `df1`
-      LEFT JOIN `df` AS `df2`
+      FROM `lf1` AS `df1`
+      LEFT JOIN `lf2` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
 
 # complete semi join works with SQLite and table alias
@@ -23,14 +23,6 @@
 # join check `x_as` and `y_as`
 
     Code
-      left_join(x, x, by = "x", x_as = NULL)
-    Condition
-      Error in `left_join()`:
-      ! `x_as` must be a vector, not NULL.
-
----
-
-    Code
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
       Error in `left_join()`:
@@ -40,6 +32,22 @@
 
     Code
       left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS")
+    Condition
+      Error in `left_join()`:
+      ! `y_as` must be different from `x_as`.
+
+---
+
+    Code
+      left_join(x, y, by = "a", x_as = "y")
+    Condition
+      Error in `left_join()`:
+      ! `y_as` must be different from `x_as`.
+
+---
+
+    Code
+      left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS")
     Condition
       Error in `left_join()`:
       ! `y_as` must be different from `x_as`.

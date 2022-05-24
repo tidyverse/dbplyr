@@ -69,9 +69,9 @@
         `LHS`.`x`[34m AS [39m`x`,
         `LHS`.`y`[34m AS [39m`y.x`,
         `LHS`.`z`[34m AS [39m`z.x`,
-        `RHS`.`y`[34m AS [39m`y.y`,
-        `RHS`.`z`[34m AS [39m`z.y`
+        `df`.`y`[34m AS [39m`y.y`,
+        `df`.`z`[34m AS [39m`z.y`
       [34mFROM[39m `q02`[34m AS [39m`LHS`
-      [34mLEFT JOIN[39m `df`[34m AS [39m`RHS`
-        [34mON[39m (`LHS`.`x` = `RHS`.`x`)
+      [34mLEFT JOIN[39m `df`
+        [34mON[39m (`LHS`.`x` = `df`.`x`)
 

@@ -62,6 +62,54 @@ remote_name <- function(x) {
   lq$x$x
 }
 
+query_name <- function(x) {
+  UseMethod("query_name")
+}
+
+#' @export
+query_name.tbl_lazy <- function(x) {
+  query_name(x$lazy_query)
+}
+
+#' @export
+query_name.lazy_base_remote_query <- function(x) {
+  x$x
+}
+
+#' @export
+query_name.lazy_base_local_query <- function(x) {
+  ident(x$name)
+}
+
+#' @export
+query_name.lazy_query <- function(x) {
+  NULL
+}
+
+#' @export
+query_name.lazy_select_query <- function(x) {
+  if (!is_empty(x$where)) {
+    return()
+  }
+
+  if (!is_empty(x$order_by)) {
+    return()
+  }
+
+  if (!is_false(x$distinct)) {
+    return()
+  }
+
+  if (!is_empty(x$limit)) {
+    return()
+  }
+
+  vars_base <- op_vars(x$x)
+  if (!is_select_trivial(x$select, vars_base)) {
+    return()
+  }
+}
+
 #' @export
 #' @rdname remote_name
 remote_src <- function(x) {

@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Joins now don't use the table alias "LHS" and "RHS" unless necessary (@mgirlich).
+
 * `fill()` now works for connections from RPostgreSQL (@mgirlich).
 
 * `explain()` now works for connections from ROracle (@mgirlich).

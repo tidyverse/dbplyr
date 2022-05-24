@@ -165,8 +165,8 @@
         SELECT *
         FROM `df`
       ) `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`a` = `RHS`.`a`)
+      LEFT JOIN `df`
+        ON (`LHS`.`a` = `df`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
     Message
@@ -182,8 +182,8 @@
         FROM `df`
       ) `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (`LHS`.`a` = `RHS`.`a`)
+        SELECT 1 FROM `df`
+        WHERE (`LHS`.`a` = `df`.`a`)
       )
     Code
       lf %>% arrange(a) %>% union(rf)

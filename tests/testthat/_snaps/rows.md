@@ -61,10 +61,10 @@
       )
       UNION ALL
       (
-        SELECT * FROM `df_y` AS `LHS`
+        SELECT * FROM `df_y`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_x` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_x`
+          WHERE (`df_y`.`x` = `df_x`.`x`)
         )
       )
 
@@ -234,10 +234,10 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT * FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
@@ -247,8 +247,8 @@
           SELECT `x`
           FROM `df_x`
         ) `LHS`
-        INNER JOIN `df_y` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+        INNER JOIN `df_y`
+          ON (`LHS`.`x` = `df_y`.`x`)
       )
 
 # `rows_update()` works with `in_place = TRUE`
@@ -295,20 +295,20 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT * FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
       (
         SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
         FROM (
-          SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`y` AS `y...y`
-          FROM `df_x` AS `LHS`
-          INNER JOIN `df_y` AS `RHS`
-            ON (`LHS`.`x` = `RHS`.`x`)
+          SELECT `df_x`.`x` AS `x`, `df_x`.`y` AS `y`, `df_y`.`y` AS `y...y`
+          FROM `df_x`
+          INNER JOIN `df_y`
+            ON (`df_x`.`x` = `df_y`.`x`)
         ) `q01`
       )
 
@@ -336,10 +336,10 @@
       (
         SELECT `x`, NULL AS `y`
         FROM (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT * FROM `df_y`
           WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x` AS `RHS`
-            WHERE (`LHS`.`x` = `RHS`.`x`)
+            SELECT 1 FROM `df_x`
+            WHERE (`df_y`.`x` = `df_x`.`x`)
           )
         ) `q01`
       )
@@ -352,10 +352,10 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT * FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
@@ -366,15 +366,15 @@
             SELECT `x`
             FROM `df_x`
           ) `LHS`
-          INNER JOIN `df_y` AS `RHS`
-            ON (`LHS`.`x` = `RHS`.`x`)
+          INNER JOIN `df_y`
+            ON (`LHS`.`x` = `df_y`.`x`)
         )
         UNION ALL
         (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT * FROM `df_y`
           WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x` AS `RHS`
-            WHERE (`LHS`.`x` = `RHS`.`x`)
+            SELECT 1 FROM `df_x`
+            WHERE (`df_y`.`x` = `df_x`.`x`)
           )
         )
       )
@@ -423,10 +423,10 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT * FROM `df_x` AS `LHS`
+      SELECT * FROM `df_x`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
       )
 
 # `rows_delete()` works with `in_place = TRUE`

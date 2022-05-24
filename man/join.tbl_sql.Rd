@@ -20,8 +20,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 
 \method{left_join}{tbl_lazy}(
@@ -34,8 +34,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 
 \method{right_join}{tbl_lazy}(
@@ -48,8 +48,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 
 \method{full_join}{tbl_lazy}(
@@ -62,8 +62,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 
 \method{semi_join}{tbl_lazy}(
@@ -75,8 +75,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 
 \method{anti_join}{tbl_lazy}(
@@ -88,8 +88,8 @@
   ...,
   sql_on = NULL,
   na_matches = c("never", "na"),
-  x_as = "LHS",
-  y_as = "RHS"
+  x_as = NULL,
+  y_as = NULL
 )
 }
 \arguments{

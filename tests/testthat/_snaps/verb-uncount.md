@@ -7,7 +7,7 @@
       SELECT `x`
       FROM (
         SELECT `x`, `w`, `..dbplyr_row_id`
-        FROM `test` AS `LHS`
+        FROM `test`
         INNER JOIN (
           SELECT CAST(`..dbplyr_row_id` AS INTEGER) AS `..dbplyr_row_id`
           FROM (
@@ -17,6 +17,6 @@
             VALUES (1)
           ) AS `values_table`
         ) AS `RHS`
-          ON (`RHS`.`..dbplyr_row_id` <= `LHS`.`w`)
+          ON (`RHS`.`..dbplyr_row_id` <= `test`.`w`)
       )
 
