@@ -116,7 +116,7 @@ test_that("new columns take precedence over global variables", {
 test_that("constants do not need a new query", {
   expect_equal(
     lazy_frame(x = 1, y = 2) %>% mutate(z = 2, z = 3) %>% remote_query(),
-    sql("SELECT `x`, `y`, 3.0 AS `z`\nFROM `df`")
+    sql("SELECT *, 3.0 AS `z`\nFROM `df`")
   )
 })
 
@@ -313,6 +313,25 @@ test_that("mutate collapses over nested select", {
   expect_snapshot(lf %>% select(y:x) %>% mutate(x = x * 2, y = y * 2))
 })
 
+test_that("mutate() uses star", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_equal(
+    lf %>% mutate(z = 1L) %>% remote_query(),
+    sql("SELECT *, 1 AS `z`\nFROM `df`")
+  )
+
+  expect_equal(
+    lf %>% mutate(a = 1L, .before = 1) %>% remote_query(),
+    sql("SELECT 1 AS `a`, *\nFROM `df`")
+  )
+
+  expect_equal(
+    lf %>% transmute(a = 1L, x, y, z = 2L) %>% remote_query(),
+    sql("SELECT 1 AS `a`, *, 2 AS `z`\nFROM `df`")
+  )
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("mutate generates simple expressions", {
@@ -320,7 +339,7 @@ test_that("mutate generates simple expressions", {
     mutate(y = x + 1L) %>%
     sql_build()
 
-  expect_equal(out$select, sql(x = '`x`', y = '`x` + 1'))
+  expect_equal(out$select, sql('*', y = '`x` + 1'))
 })
 
 test_that("mutate can drop variables with NULL", {
@@ -340,7 +359,7 @@ test_that("var = NULL works when var is in original data", {
 
 test_that("var = NULL when var is in final output", {
   lf <- lazy_frame(x = 1) %>% mutate(y = NULL, y = 3)
-  expect_equal(sql_build(lf)$select, sql(x = "`x`", y = "3.0"))
+  expect_equal(sql_build(lf)$select, sql("*", y = "3.0"))
   expect_equal(op_vars(lf), c("x", "y"))
   expect_snapshot(remote_query(lf))
 })
@@ -362,7 +381,7 @@ test_that("mutate_all generates correct sql", {
   out <- lazy_frame(x = 1) %>%
     dplyr::mutate_all(list(one = ~ . + 1L, two = ~ . + 2L)) %>%
     sql_build()
-  expect_equal(out$select, sql(`x` = '`x`', one = '`x` + 1', two = '`x` + 2'))
+  expect_equal(out$select, sql('*', one = '`x` + 1', two = '`x` + 2'))
 })
 
 test_that("mutate_all scopes nested quosures correctly", {

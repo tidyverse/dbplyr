@@ -42,7 +42,7 @@
       mf %>% mutate(z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT `x`, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT *, IIF(`x` = 1, 1, 2) AS `z`
       FROM `df`
 
 ---
@@ -51,7 +51,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT `x`, CASE WHEN (`x` = 1) THEN 1 END AS `z`
+      SELECT *, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -60,7 +60,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT `x`, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT *, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -205,7 +205,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)

@@ -334,7 +334,7 @@
       )
       UNION ALL
       (
-        SELECT `x`, NULL AS `y`
+        SELECT *, NULL AS `y`
         FROM (
           SELECT * FROM `df_y`
           WHERE NOT EXISTS (

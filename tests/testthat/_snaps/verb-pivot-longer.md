@@ -74,7 +74,7 @@
     Output
       <SQL>
       (
-        SELECT `id`, `n`, `x`, NULL AS `y`
+        SELECT *, NULL AS `y`
         FROM (
           SELECT `id`, '1' AS `n`, `x_1` AS `x`
           FROM `df`

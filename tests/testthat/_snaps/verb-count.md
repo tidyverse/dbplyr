@@ -35,7 +35,7 @@
       db %>% add_count(g, sort = TRUE)
     Output
       <SQL>
-      SELECT `g`, `x`, COUNT(*) OVER (PARTITION BY `g`) AS `n`
+      SELECT *, COUNT(*) OVER (PARTITION BY `g`) AS `n`
       FROM `df`
       ORDER BY `n` DESC
 
@@ -45,7 +45,7 @@
       db %>% group_by(g) %>% add_count()
     Output
       <SQL>
-      SELECT `g`, `x`, COUNT(*) OVER (PARTITION BY `g`) AS `n`
+      SELECT *, COUNT(*) OVER (PARTITION BY `g`) AS `n`
       FROM `df`
 
 # complains about bad names

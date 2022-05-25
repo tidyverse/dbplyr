@@ -190,7 +190,7 @@
     Output
       <SQL>
       (
-        SELECT `a`, `b`, NULL AS `c`
+        SELECT *, NULL AS `c`
         FROM `df`
         ORDER BY `a`
       )
@@ -236,7 +236,7 @@
       SELECT *
       FROM (
         (
-          SELECT `a`, `b`, NULL AS `c`
+          SELECT *, NULL AS `c`
           FROM `df`
         )
         UNION

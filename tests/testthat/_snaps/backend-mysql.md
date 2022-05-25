@@ -39,7 +39,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `lf1`
       ) `q01`
       WHERE (`q01` <= 1)
@@ -81,7 +81,7 @@
       db %>% mutate(y = x + 1) %>% explain()
     Output
       <SQL>
-      SELECT `x`, `x` + 1.0 AS `y`
+      SELECT *, `x` + 1.0 AS `y`
       FROM `test`
       
       <PLAN>

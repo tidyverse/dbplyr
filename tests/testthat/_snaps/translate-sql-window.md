@@ -21,7 +21,7 @@
       This warning is displayed only once per session.
     Output
       <SQL>
-      SELECT `x`, `y`, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
 ---
@@ -32,8 +32,7 @@
     Output
       <SQL>
       SELECT
-        `x`,
-        `y`,
+        *,
         SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 
