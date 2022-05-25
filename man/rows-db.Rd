@@ -100,7 +100,7 @@ same src as \code{x}.  This allows you to join tables across srcs, but
 it is a potentially expensive operation so you must opt into it.}
 
 \item{in_place}{Should \code{x} be modified in place? If \code{FALSE} will
-generate a \code{SELECT} query that returns the modified rows; if \code{TRUE}
+generate a \code{SELECT} query that returns the modified table; if \code{TRUE}
 will modify the underlying table using an \code{INSERT}, \code{UPDATE}, or \code{DELETE}
 operation.}
 

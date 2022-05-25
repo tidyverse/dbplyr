@@ -32,7 +32,7 @@
 #'   - `"ignore"` will ignore rows in `y` with keys that are unmatched by the
 #'     keys in `x`.
 #' @param in_place  Should `x` be modified in place? If `FALSE` will
-#'   generate a `SELECT` query that returns the modified rows; if `TRUE`
+#'   generate a `SELECT` query that returns the modified table; if `TRUE`
 #'   will modify the underlying table using an `INSERT`, `UPDATE`, or `DELETE`
 #'   operation.
 #' @param returning Columns to return. See [get_returned_rows()] for details.
