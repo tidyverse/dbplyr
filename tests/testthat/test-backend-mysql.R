@@ -77,6 +77,7 @@ test_that("can overwrite temp tables", {
   con <- src_test("MariaDB")
 
   df1 <- tibble(x = 1)
+  on.exit(DBI::dbRemoveTable(con, "test-df"))
   copy_to(con, df1, "test-df", temporary = TRUE)
 
   df2 <- tibble(x = 2)
