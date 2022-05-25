@@ -7,7 +7,7 @@
 \alias{rows_patch.tbl_lazy}
 \alias{rows_upsert.tbl_lazy}
 \alias{rows_delete.tbl_lazy}
-\title{Manipulate individual rows}
+\title{Manipulate individual rows, optionally modifying the underlying table.}
 \usage{
 \method{rows_insert}{tbl_lazy}(
   x,
@@ -99,13 +99,12 @@ and \code{copy} is \code{TRUE}, then \code{y} will be copied into the
 same src as \code{x}.  This allows you to join tables across srcs, but
 it is a potentially expensive operation so you must opt into it.}
 
-\item{in_place}{Should \code{x} be modified in place? This argument is only
-relevant for mutable backends (e.g. databases, data.tables).
+\item{in_place}{Should \code{x} be modified in place? If \code{FALSE} will
+generate a \code{SELECT} query that returns the modified table; if \code{TRUE}
+will modify the underlying table using an \code{INSERT}, \code{UPDATE}, or \code{DELETE}
+operation.}
 
-When \code{TRUE}, a modified version of \code{x} is returned invisibly;
-when \code{FALSE}, a new object representing the resulting changes is returned.}
-
-\item{returning}{Columns to return.}
+\item{returning}{Columns to return. See \code{\link[=get_returned_rows]{get_returned_rows()}} for details.}
 
 \item{method}{A string specifying the method to use. This is only relevant for
 \code{in_place = TRUE}.}
@@ -122,8 +121,44 @@ check this behaviour for you.
 keys in \code{x}.
 }}
 }
+\value{
+A new \code{tbl_lazy} of the modified data.
+}
 \description{
 These are methods for the dplyr \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}},
 \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_patch]{rows_patch()}}, \code{\link[=rows_upsert]{rows_upsert()}}, and \code{\link[=rows_delete]{rows_delete()}}
 generics.
+
+When \code{in_place = TRUE} these verbs do not generate \code{SELECT} queries, but
+instead directly modify the underlying data using \code{INSERT}, \code{UPDATE}, or
+\code{DELETE} operators. This will require that you have write access to
+the database.
+}
+\examples{
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+DBI::dbExecute(con, "CREATE TABLE Ponies (
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   name TEXT,
+   cutie_mark TEXT
+)")
+
+ponies <- tbl(con, "Ponies")
+
+applejack <- copy_inline(con, data.frame(
+  name = "Apple Jack",
+  cutie_mark = "three apples"
+))
+
+# The default behavior is to generate a SELECT query
+rows_insert(ponies, applejack, conflict = "ignore")
+# And the original table is left unchanged:
+ponies
+
+# You can also choose to modify the table with in_place = TRUE:
+rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
+# In this case `rows_insert()` returns nothing and the underlying
+# data is modified
+ponies
 }

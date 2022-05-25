@@ -3,7 +3,7 @@
 \name{get_returned_rows}
 \alias{get_returned_rows}
 \alias{has_returned_rows}
-\title{Extract and check the RETURNING rows}
+\title{Extract and check the \code{RETURNING} rows}
 \usage{
 get_returned_rows(x)
 
@@ -20,7 +20,7 @@ For \code{has_returned_rows()}, a scalar logical.
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-\code{get_returned_rows()} extracts the RETURNING rows produced by
+\code{get_returned_rows()} extracts the \code{RETURNING} rows produced by
 \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}},
 or \code{\link[=rows_delete]{rows_delete()}} if these are called with the \code{returning} argument.
 An error is raised if this information is not available.
@@ -28,4 +28,31 @@ An error is raised if this information is not available.
 \code{has_returned_rows()} checks if \code{x} has stored RETURNING rows produced by
 \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}},
 or \code{\link[=rows_delete]{rows_delete()}}.
+}
+\examples{
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+DBI::dbExecute(con, "CREATE TABLE Info (
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   number INTEGER
+)")
+info <- tbl(con, "Info")
+
+rows1 <- copy_inline(con, data.frame(number = c(1, 5)))
+rows_insert(info, rows1, conflict = "ignore", in_place = TRUE)
+info
+
+# If the table has an auto incrementing primary key, you can use
+# the returning argument + `get_returned_rows()` its value
+rows2 <- copy_inline(con, data.frame(number = c(13, 27)))
+info <- rows_insert(
+  info,
+  rows2,
+  conflict = "ignore",
+  in_place = TRUE,
+  returning = id
+)
+info
+get_returned_rows(info)
 }

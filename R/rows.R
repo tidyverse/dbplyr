@@ -1,9 +1,14 @@
-#' Manipulate individual rows
+#' Manipulate individual rows, optionally modifying the underlying table.
 #'
 #' @description
 #' These are methods for the dplyr [rows_insert()], [`rows_append()`],
 #' [`rows_update()`], [`rows_patch()`], [`rows_upsert()`], and [`rows_delete()`]
 #' generics.
+#'
+#' When `in_place = TRUE` these verbs do not generate `SELECT` queries, but
+#' instead directly modify the underlying data using `INSERT`, `UPDATE`, or
+#' `DELETE` operators. This will require that you have write access to
+#' the database.
 #'
 #' @export
 #' @inheritParams dplyr::rows_insert
@@ -26,12 +31,44 @@
 #'     check this behaviour for you.
 #'   - `"ignore"` will ignore rows in `y` with keys that are unmatched by the
 #'     keys in `x`.
-#' @param returning Columns to return.
+#' @param in_place  Should `x` be modified in place? If `FALSE` will
+#'   generate a `SELECT` query that returns the modified table; if `TRUE`
+#'   will modify the underlying table using an `INSERT`, `UPDATE`, or `DELETE`
+#'   operation.
+#' @param returning Columns to return. See [get_returned_rows()] for details.
 #' @param method A string specifying the method to use. This is only relevant for
 #'   `in_place = TRUE`.
 #'
 #' @importFrom dplyr rows_insert
+#' @returns A new `tbl_lazy` of the modified data.
 #' @rdname rows-db
+#' @examples
+#' library(dplyr)
+#'
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#' DBI::dbExecute(con, "CREATE TABLE Ponies (
+#'    id INTEGER PRIMARY KEY AUTOINCREMENT,
+#'    name TEXT,
+#'    cutie_mark TEXT
+#' )")
+#'
+#' ponies <- tbl(con, "Ponies")
+#'
+#' applejack <- copy_inline(con, data.frame(
+#'   name = "Apple Jack",
+#'   cutie_mark = "three apples"
+#' ))
+#'
+#' # The default behavior is to generate a SELECT query
+#' rows_insert(ponies, applejack, conflict = "ignore")
+#' # And the original table is left unchanged:
+#' ponies
+#'
+#' # You can also choose to modify the table with in_place = TRUE:
+#' rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
+#' # In this case `rows_insert()` returns nothing and the underlying
+#' # data is modified
+#' ponies
 rows_insert.tbl_lazy <- function(x,
                                  y,
                                  by = NULL,
@@ -447,12 +484,12 @@ set_returned_rows <- function(x, returned_rows) {
   x
 }
 
-#' Extract and check the RETURNING rows
+#' Extract and check the `RETURNING` rows
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' `get_returned_rows()` extracts the RETURNING rows produced by
+#' `get_returned_rows()` extracts the `RETURNING` rows produced by
 #' [rows_insert()], [rows_append()], [rows_update()], [rows_upsert()],
 #' or [rows_delete()] if these are called with the `returning` argument.
 #' An error is raised if this information is not available.
@@ -462,6 +499,32 @@ set_returned_rows <- function(x, returned_rows) {
 #' @return For `get_returned_rows()`, a tibble.
 #'
 #' @export
+#' @examples
+#' library(dplyr)
+#'
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#' DBI::dbExecute(con, "CREATE TABLE Info (
+#'    id INTEGER PRIMARY KEY AUTOINCREMENT,
+#'    number INTEGER
+#' )")
+#' info <- tbl(con, "Info")
+#'
+#' rows1 <- copy_inline(con, data.frame(number = c(1, 5)))
+#' rows_insert(info, rows1, conflict = "ignore", in_place = TRUE)
+#' info
+#'
+#' # If the table has an auto incrementing primary key, you can use
+#' # the returning argument + `get_returned_rows()` its value
+#' rows2 <- copy_inline(con, data.frame(number = c(13, 27)))
+#' info <- rows_insert(
+#'   info,
+#'   rows2,
+#'   conflict = "ignore",
+#'   in_place = TRUE,
+#'   returning = id
+#' )
+#' info
+#' get_returned_rows(info)
 get_returned_rows <- function(x) {
   out <- attr(x, "returned_rows", TRUE)
   if (is.null(out)) {
@@ -588,7 +651,13 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
   )
 
   if (conflict == "error") {
-    cli_abort('{.code conflict = "error"} is not supported for database tables.', call = error_call)
+    cli_abort(
+      c(
+        '{.code conflict = "error"} is not supported for database tables.',
+        i = 'Please use {.code conflict = "ignore"} instead'
+      ),
+      call = error_call
+    )
   }
 
   conflict
