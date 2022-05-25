@@ -145,7 +145,7 @@
       lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `a`, `b`, `a` > 0.0 AND `b` > 0.0 AS `c`
+      SELECT *, `a` > 0.0 AND `b` > 0.0 AS `c`
       FROM `df`
 
 ---
@@ -154,7 +154,7 @@
       lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
+      SELECT *, `a` > 0.0 OR `b` > 0.0 AS `c`
       FROM `df`
 
 # if_all/any uses every colum as default

@@ -180,6 +180,8 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
+  select <- select_use_star(select, in_vars)
+
   # translate once just to register windows
   win_register_activate()
   # Remove known windows before building the next query
@@ -204,6 +206,34 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     select_sql = select_sql,
     window_sql = window_sql
   )
+}
+
+select_use_star <- function(select, vars_prev) {
+  first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
+  if (is.na(first_match)) {
+    return(select)
+  }
+
+  last <- first_match + length(vars_prev) - 1
+  n <- vctrs::vec_size(select)
+
+  if (n < last) {
+    return(select)
+  }
+
+  test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
+
+  if (is_select_trivial(test_cols, vars_prev)) {
+    idx_start <- seq2(1, first_match - 1)
+    idx_end <- seq2(last + 1, n)
+    vctrs::vec_rbind(
+      vctrs::vec_slice(select, idx_start),
+      tibble(name = "", expr = list(sql("*"))),
+      vctrs::vec_slice(select, idx_end)
+    )
+  } else {
+    select
+  }
 }
 
 is_select_trivial <- function(select, vars_prev) {
