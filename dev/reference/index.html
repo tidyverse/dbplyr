@@ -74,6 +74,12 @@
       
 
       
+    </div><div class="section level2">
+      
+      <h3 id="connecting-copying-and-retrieving-data">Connecting, copying, and retrieving data<a class="anchor" aria-label="anchor" href="#connecting-copying-and-retrieving-data"></a></h3>
+      
+
+      
     </div><div id="" class="section level2">
       
       
@@ -84,11 +90,6 @@
           <code><a href="tbl.src_dbi.html">tbl(<i>&lt;src_dbi&gt;</i>)</a></code> 
         </dt>
         <dd>Use dplyr verbs with a remote database table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="arrange.tbl_lazy.html">arrange(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
-        </dt>
-        <dd>Arrange rows by column values</dd>
       </dl><dl><dt>
           
           <code><a href="copy_to.src_sql.html">copy_to(<i>&lt;src_sql&gt;</i>)</a></code> 
@@ -106,19 +107,30 @@
         <dd>Compute results of a query</dd>
       </dl><dl><dt>
           
-          <code><a href="count.tbl_lazy.html">count(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="count.tbl_lazy.html">add_count(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="count.tbl_lazy.html">tally(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+          <code><a href="pull.tbl_sql.html">pull(<i>&lt;tbl_sql&gt;</i>)</a></code> 
         </dt>
-        <dd>Count observations by group</dd>
+        <dd>Extract a single column</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="verbs-that-affect-rows">Verbs that affect rows<a class="anchor" aria-label="anchor" href="#verbs-that-affect-rows"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="arrange.tbl_lazy.html">arrange(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Arrange rows by column values</dd>
       </dl><dl><dt>
           
           <code><a href="distinct.tbl_lazy.html">distinct(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
         </dt>
         <dd>Subset distinct/unique rows</dd>
-      </dl><dl><dt>
-          
-          <code><a href="do.tbl_sql.html">do(<i>&lt;tbl_sql&gt;</i>)</a></code> 
-        </dt>
-        <dd>Perform arbitrary computation on remote backend</dd>
       </dl><dl><dt>
           
           <code><a href="filter.tbl_lazy.html">filter(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
@@ -131,10 +143,73 @@
         <dd>Subset the first rows</dd>
       </dl><dl><dt>
           
+          <code><a href="dbplyr-slice.html">slice_min(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_max(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_sample(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Subset rows using their positions</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="verbs-that-affect-columns">Verbs that affect columns<a class="anchor" aria-label="anchor" href="#verbs-that-affect-columns"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="mutate.tbl_lazy.html">mutate(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Create, modify, and delete columns</dd>
+      </dl><dl><dt>
+          
+          <code><a href="select.tbl_lazy.html">select(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename_with(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">relocate(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Subset, rename, and reorder columns using their names</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="grouping-and-summarising-verbs">Grouping and summarising verbs<a class="anchor" aria-label="anchor" href="#grouping-and-summarising-verbs"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="count.tbl_lazy.html">count(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="count.tbl_lazy.html">add_count(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="count.tbl_lazy.html">tally(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Count observations by group</dd>
+      </dl><dl><dt>
+          
           <code><a href="group_by.tbl_lazy.html">group_by(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
         </dt>
         <dd>Group by one or more variables</dd>
       </dl><dl><dt>
+          
+          <code><a href="summarise.tbl_lazy.html">summarise(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
+        </dt>
+        <dd>Summarise each group to one row</dd>
+      </dl><dl><dt>
+          
+          <code><a href="do.tbl_sql.html">do(<i>&lt;tbl_sql&gt;</i>)</a></code> 
+        </dt>
+        <dd>Perform arbitrary computation on remote backend</dd>
+      </dl></div><div class="section level2">
+      
+      <h3 id="verbs-that-work-with-multiple-tables">Verbs that work with multiple tables<a class="anchor" aria-label="anchor" href="#verbs-that-work-with-multiple-tables"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="join.tbl_sql.html">inner_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">left_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">right_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">full_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">semi_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="join.tbl_sql.html">anti_join(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
         </dt>
@@ -144,41 +219,27 @@
           <code><a href="intersect.tbl_lazy.html">intersect(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">union(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">union_all(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="intersect.tbl_lazy.html">setdiff(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
         </dt>
         <dd>SQL set operations</dd>
-      </dl><dl><dt>
-          
-          <code><a href="mutate.tbl_lazy.html">mutate(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
-        </dt>
-        <dd>Create, modify, and delete columns</dd>
-      </dl><dl><dt>
-          
-          <code><a href="pull.tbl_sql.html">pull(<i>&lt;tbl_sql&gt;</i>)</a></code> 
-        </dt>
-        <dd>Extract a single column</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      
+      <h3 id="verbs-that-modify-the-underlying-data">Verbs that modify the underlying data<a class="anchor" aria-label="anchor" href="#verbs-that-modify-the-underlying-data"></a></h3>
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="rows-db.html">rows_insert(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="rows-db.html">rows_append(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="rows-db.html">rows_update(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="rows-db.html">rows_patch(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="rows-db.html">rows_upsert(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="rows-db.html">rows_delete(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
         </dt>
-        <dd>Manipulate individual rows</dd>
+        <dd>Manipulate individual rows, optionally modifying the underlying table.</dd>
       </dl><dl><dt>
           
           <code><a href="get_returned_rows.html">get_returned_rows()</a></code> <code><a href="get_returned_rows.html">has_returned_rows()</a></code> 
         </dt>
-        <dd>Extract and check the RETURNING rows</dd>
-      </dl><dl><dt>
-          
-          <code><a href="select.tbl_lazy.html">select(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">rename_with(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="select.tbl_lazy.html">relocate(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
-        </dt>
-        <dd>Subset, rename, and reorder columns using their names</dd>
-      </dl><dl><dt>
-          
-          <code><a href="dbplyr-slice.html">slice_min(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_max(<i>&lt;tbl_lazy&gt;</i>)</a></code> <code><a href="dbplyr-slice.html">slice_sample(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
-        </dt>
-        <dd>Subset rows using their positions</dd>
-      </dl><dl><dt>
-          
-          <code><a href="summarise.tbl_lazy.html">summarise(<i>&lt;tbl_lazy&gt;</i>)</a></code> 
-        </dt>
-        <dd>Summarise each group to one row</dd>
+        <dd>Extract and check the <code>RETURNING</code> rows</dd>
       </dl></div><div class="section level2">
       <h2 id="tidyr-verbs">tidyr verbs<a class="anchor" aria-label="anchor" href="#tidyr-verbs"></a></h2>
       
