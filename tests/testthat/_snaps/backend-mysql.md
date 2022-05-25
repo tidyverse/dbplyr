@@ -15,18 +15,18 @@
 ---
 
     Code
-      left_join(lf, lf, by = "x", na_matches = "na")
+      left_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` <=> `RHS`.`x`)
+      SELECT `lf1`.`x` AS `x`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` <=> `lf2`.`x`)
 
 ---
 
     Code
-      full_join(lf, lf, by = "x")
+      full_join(lf1, lf2, by = "x")
     Condition
       Error in `sql_query_join()`:
       ! MySQL does not support full joins
@@ -34,13 +34,13 @@
 ---
 
     Code
-      slice_sample(lf, 5)
+      slice_sample(lf1, 5)
     Output
       <SQL>
       SELECT `x`
       FROM (
         SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
-        FROM `df`
+        FROM `lf1`
       ) `q01`
       WHERE (`q01` <= 1)
 

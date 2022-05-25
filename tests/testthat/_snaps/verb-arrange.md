@@ -160,13 +160,13 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `...1`.`a` AS `a`, `b`, `c`
       FROM (
         SELECT *
         FROM `df`
-      ) `LHS`
+      ) `...1`
       LEFT JOIN `df`
-        ON (`LHS`.`a` = `df`.`a`)
+        ON (`...1`.`a` = `df`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
     Message
@@ -208,10 +208,10 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT `LHS`.`a` AS `a`, `b`, `c`
-        FROM `df` AS `LHS`
-        LEFT JOIN `df` AS `RHS`
-          ON (`LHS`.`a` = `RHS`.`a`)
+        SELECT `df...1`.`a` AS `a`, `b`, `c`
+        FROM `df` AS `df...1`
+        LEFT JOIN `df` AS `df...2`
+          ON (`df...1`.`a` = `df...2`.`a`)
       ) `q01`
       ORDER BY `a`
     Code

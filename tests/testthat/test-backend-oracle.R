@@ -46,8 +46,9 @@ test_that("generates custom sql", {
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM foo")))
 
-  lf <- lazy_frame(x = 1, con = con)
-  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+  lf1 <- lazy_frame(x = 1, con = con, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, con = con, .name = "lf2")
+  expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
 
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))

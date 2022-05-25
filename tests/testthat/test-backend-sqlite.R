@@ -40,8 +40,9 @@ test_that("custom aggregates translated", {
 })
 
 test_that("custom SQL translation", {
-  lf <- lazy_frame(x = 1, con = simulate_sqlite())
-  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+  lf1 <- lazy_frame(x = 1, con = simulate_postgres(), .name = "lf1")
+  lf2 <- lazy_frame(x = 1, con = simulate_postgres(), .name = "lf2")
+  expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
 })
 
 test_that("case_when translates correctly to ELSE when TRUE ~ is used", {

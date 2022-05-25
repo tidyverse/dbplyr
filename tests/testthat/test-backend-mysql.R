@@ -28,11 +28,12 @@ test_that("generates custom sql", {
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
   expect_snapshot(sql_query_explain(con, sql("SELECT * FROM table")))
 
-  lf <- lazy_frame(x = 1, con = con)
-  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
-  expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
+  lf1 <- lazy_frame(x = 1, con = con, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, con = con, .name = "lf2")
+  expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
+  expect_snapshot(error = TRUE, full_join(lf1, lf2, by = "x"))
 
-  expect_snapshot(slice_sample(lf, 5))
+  expect_snapshot(slice_sample(lf1, 5))
 
   expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
 })

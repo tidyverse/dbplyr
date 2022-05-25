@@ -1,71 +1,91 @@
 # print method doesn't change unexpectedly
 
     Code
-      sql_build(left_join(lf1, lf2))
+      sql_build(left_join(lf1, lf2, by = "x") %>% left_join(lf3, by = c("x", "z")))
+    Output
+      <SQL JOINS>
+      X:
+        <IDENT> lf1
+      Type: left
+      By:
+        x-x
+      Y:
+        <IDENT> lf2
+      Type: left
+      By:
+        x-x
+        z-z
+      Y:
+        <IDENT> lf3
+
+---
+
+    Code
+      sql_build(right_join(lf1, lf2))
     Message
       Joining, by = "x"
     Output
-      <SQL JOIN (LEFT)>
+      <SQL JOIN (RIGHT)>
       By:
         x-x
       X:
-        <IDENT> df
+        <IDENT> lf1
       Y:
-        <IDENT> df
+        <IDENT> lf2
 
 # generated sql doesn't change unexpectedly
 
     Code
-      inner_join(lf, lf)
+      inner_join(lf1, lf2)
     Message
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
-      FROM `df` AS `LHS`
-      INNER JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `lf`.`x` AS `x`, `lf`.`y` AS `y`
+      FROM `lf`
+      INNER JOIN `lf2`
+        ON (`lf`.`x` = `lf2`.`x` AND `lf`.`y` = `lf2`.`y`)
 
 ---
 
     Code
-      left_join(lf, lf)
+      left_join(lf1, lf2)
     Message
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `lf`.`x` AS `x`, `lf`.`y` AS `y`
+      FROM `lf`
+      LEFT JOIN `lf2`
+        ON (`lf`.`x` = `lf2`.`x` AND `lf`.`y` = `lf2`.`y`)
 
 ---
 
     Code
-      right_join(lf, lf)
+      right_join(lf1, lf2)
     Message
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `RHS`.`x` AS `x`, `RHS`.`y` AS `y`
-      FROM `df` AS `LHS`
-      RIGHT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `lf2`.`x` AS `x`, `lf2`.`y` AS `y`
+      FROM `lf`
+      RIGHT JOIN `lf2`
+        ON (`lf`.`x` = `lf2`.`x` AND `lf`.`y` = `lf2`.`y`)
 
 ---
 
     Code
-      full_join(lf, lf)
+      full_join(lf1, lf2)
     Message
       Joining, by = c("x", "y")
     Output
       <SQL>
       SELECT
-        COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
-        COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
-      FROM `df` AS `LHS`
-      FULL JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        COALESCE(`lf`.`x`, `lf2`.`x`) AS `x`,
+        COALESCE(`lf`.`y`, `lf2`.`y`) AS `y`
+      FROM `lf`
+      FULL JOIN `lf2`
+        ON (`lf`.`x` = `lf2`.`x` AND `lf`.`y` = `lf2`.`y`)
 
 # only disambiguates shared variables
 
@@ -75,10 +95,10 @@
       Joining, by = "x"
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `y`, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      SELECT `lf`.`x` AS `x`, `y`, `z`
+      FROM `lf`
+      LEFT JOIN `lf2`
+        ON (`lf`.`x` = `lf2`.`x`)
 
 ---
 
@@ -86,10 +106,10 @@
       left_join(lf1, lf2, by = c(y = "z"))
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`y` = `RHS`.`z`)
+      SELECT `lf`.`x` AS `x.x`, `y`, `lf2`.`x` AS `x.y`
+      FROM `lf`
+      LEFT JOIN `lf2`
+        ON (`lf`.`y` = `lf2`.`z`)
 
 # disambiguate variables that only differ in case
 
@@ -97,10 +117,10 @@
       left_join(lf1, lf2, by = "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`X` AS `X`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`y` = `RHS`.`y`)
+      SELECT `x`, `lf`.`y` AS `y`, `X`
+      FROM `lf`
+      LEFT JOIN `lf2`
+        ON (`lf`.`y` = `lf2`.`y`)
 
 # sql_on query doesn't change unexpectedly
 
@@ -109,8 +129,8 @@
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      INNER JOIN `df` AS `RHS`
+      FROM `lf` AS `LHS`
+      INNER JOIN `lf2` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -120,8 +140,8 @@
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
+      FROM `lf` AS `LHS`
+      LEFT JOIN `lf2` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -131,8 +151,8 @@
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      RIGHT JOIN `df` AS `RHS`
+      FROM `lf` AS `LHS`
+      RIGHT JOIN `lf2` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -142,8 +162,8 @@
     Output
       <SQL>
       SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `LHS`
-      FULL JOIN `df` AS `RHS`
+      FROM `lf` AS `LHS`
+      FULL JOIN `lf2` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -152,9 +172,9 @@
       semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT * FROM `df` AS `LHS`
+      SELECT * FROM `lf` AS `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
+        SELECT 1 FROM `lf2` AS `RHS`
         WHERE (LHS.y < RHS.z)
       )
 
@@ -164,9 +184,9 @@
       anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT * FROM `df` AS `LHS`
+      SELECT * FROM `lf` AS `LHS`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
+        SELECT 1 FROM `lf2` AS `RHS`
         WHERE (LHS.y < RHS.z)
       )
 

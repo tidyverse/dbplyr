@@ -47,13 +47,13 @@
 ---
 
     Code
-      left_join(lf, lf, by = "x", na_matches = "na")
+      left_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM (`df`) `LHS`
-      LEFT JOIN (`df`) `RHS`
-        ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
+      SELECT `lf1`.`x` AS `x`
+      FROM (`lf1`) `lf1`
+      LEFT JOIN (`lf2`) `lf2`
+        ON (decode(`lf1`.`x`, `lf2`.`x`, 0, 1) = 0)
 
 ---
 

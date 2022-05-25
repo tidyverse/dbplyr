@@ -1,34 +1,38 @@
 test_that("print method doesn't change unexpectedly", {
-  lf1 <- lazy_frame(x = 1, y = 2)
-  lf2 <- lazy_frame(x = 1, z = 2)
-  expect_snapshot(sql_build(left_join(lf1, lf2)))
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, z = 2, .name = "lf2")
+  lf3 <- lazy_frame(x = 1, z = 2, .name = "lf3")
+  expect_snapshot(sql_build(left_join(lf1, lf2, by = "x") %>% left_join(lf3, by = c("x", "z"))))
+
+  expect_snapshot(sql_build(right_join(lf1, lf2)))
 })
 
 test_that("generated sql doesn't change unexpectedly", {
-  lf <- lazy_frame(x = 1, y = 2)
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "lf")
+  lf2 <- lazy_frame(x = 1, y = 2, .name = "lf2")
 
-  expect_snapshot(inner_join(lf, lf))
-  expect_snapshot(left_join(lf, lf))
-  expect_snapshot(right_join(lf, lf))
-  expect_snapshot(full_join(lf, lf))
+  expect_snapshot(inner_join(lf1, lf2))
+  expect_snapshot(left_join(lf1, lf2))
+  expect_snapshot(right_join(lf1, lf2))
+  expect_snapshot(full_join(lf1, lf2))
 })
 
 test_that("only disambiguates shared variables", {
-  lf1 <- lazy_frame(x = 1, y = 2)
-  lf2 <- lazy_frame(x = 1, z = 2)
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "lf")
+  lf2 <- lazy_frame(x = 1, z = 2, .name = "lf2")
   expect_snapshot(left_join(lf1, lf2))
   expect_snapshot(left_join(lf1, lf2, by = c("y" = "z")))
 })
 
 test_that("disambiguate variables that only differ in case", {
-  lf1 <- lazy_frame(x = 1, y = 2)
-  lf2 <- lazy_frame(X = 1, y = 2)
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "lf")
+  lf2 <- lazy_frame(X = 1, y = 2, .name = "lf2")
   expect_snapshot(left_join(lf1, lf2, by = "y"))
 })
 
 test_that("sql_on query doesn't change unexpectedly", {
-  lf1 <- lazy_frame(x = 1, y = 2)
-  lf2 <- lazy_frame(x = 1, z = 3)
+  lf1 <- lazy_frame(x = 1, y = 2, .name = "lf")
+  lf2 <- lazy_frame(x = 1, z = 3, .name = "lf2")
 
   expect_snapshot(inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
   expect_snapshot(left_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))

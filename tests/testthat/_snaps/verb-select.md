@@ -66,12 +66,12 @@
         [34mWHERE[39m (`z` = 1.0)
       )
       [34mSELECT[39m
-        `LHS`.`x`[34m AS [39m`x`,
-        `LHS`.`y`[34m AS [39m`y.x`,
-        `LHS`.`z`[34m AS [39m`z.x`,
+        `...1`.`x`[34m AS [39m`x`,
+        `...1`.`y`[34m AS [39m`y.x`,
+        `...1`.`z`[34m AS [39m`z.x`,
         `df`.`y`[34m AS [39m`y.y`,
         `df`.`z`[34m AS [39m`z.y`
-      [34mFROM[39m `q02`[34m AS [39m`LHS`
+      [34mFROM[39m `q02`[34m AS [39m`...1`
       [34mLEFT JOIN[39m `df`
-        [34mON[39m (`LHS`.`x` = `df`.`x`)
+        [34mON[39m (`...1`.`x` = `df`.`x`)
 

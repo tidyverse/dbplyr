@@ -242,13 +242,13 @@
       )
       UNION ALL
       (
-        SELECT `LHS`.`x` AS `x`, `y`
+        SELECT `...1`.`x` AS `x`, `y`
         FROM (
           SELECT `x`
           FROM `df_x`
-        ) `LHS`
+        ) `...1`
         INNER JOIN `df_y`
-          ON (`LHS`.`x` = `df_y`.`x`)
+          ON (`...1`.`x` = `df_y`.`x`)
       )
 
 # `rows_update()` works with `in_place = TRUE`
@@ -361,13 +361,13 @@
       UNION ALL
       (
         (
-          SELECT `LHS`.`x` AS `x`, `y`
+          SELECT `...1`.`x` AS `x`, `y`
           FROM (
             SELECT `x`
             FROM `df_x`
-          ) `LHS`
+          ) `...1`
           INNER JOIN `df_y`
-            ON (`LHS`.`x` = `df_y`.`x`)
+            ON (`...1`.`x` = `df_y`.`x`)
         )
         UNION ALL
         (

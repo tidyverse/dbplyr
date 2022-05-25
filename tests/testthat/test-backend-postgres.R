@@ -74,8 +74,9 @@ test_that("custom lubridate functions translated correctly", {
 })
 
 test_that("custom SQL translation", {
-  lf <- lazy_frame(x = 1, con = simulate_postgres())
-  expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
+  lf1 <- lazy_frame(x = 1, con = simulate_postgres(), .name = "lf1")
+  lf2 <- lazy_frame(x = 1, con = simulate_postgres(), .name = "lf2")
+  expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
 })
 
 test_that("`sql_query_insert()` works", {

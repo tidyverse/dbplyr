@@ -56,16 +56,16 @@
       df_lazy %>% group_by(a) %>% tidyr::expand(b, c)
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `...1`.`a` AS `a`, `b`, `c`
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`
-      ) `LHS`
+      ) `...1`
       LEFT JOIN (
         SELECT DISTINCT `a`, `c`
         FROM `df`
-      ) `RHS`
-        ON (`LHS`.`a` = `RHS`.`a`)
+      ) `...2`
+        ON (`...1`.`a` = `...2`.`a`)
 
 # NULL inputs
 
