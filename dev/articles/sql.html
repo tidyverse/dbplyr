@@ -127,9 +127,9 @@
   <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `y`, `a`, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span>
 <span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span>
-<span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `x`, `y`, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span>
 <span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
 <span class="co">#&gt; )</span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results are about what you expect.</p>
@@ -144,7 +144,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `x`, `y`, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span>
 <span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span>
 
 <span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
