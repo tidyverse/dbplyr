@@ -257,22 +257,15 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   y_lq <- y$lazy_query
 
   # type not "left" or "inner" -> use classical join
-  vars <- join_vars(op_vars(x_lq), op_vars(y_lq), type = type, by = by, suffix = suffix, call = caller_env())
   if (!type %in% c("left", "inner")) {
     # TODO refactor this
     by[c("x_as", "y_as")] <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, call = call)
-    vars2 <- list(
-      alias = colnames(vars),
-      x = as.character(vars[1, , ]),
-      y = as.character(vars[2, , ]),
-      all_x = op_vars(x_lq),
-      all_y = op_vars(y_lq)
-    )
+    vars <- join_vars(op_vars(x_lq), op_vars(y_lq), type = type, by = by, suffix = suffix, call = caller_env())
 
     out <- lazy_join_query(
       x_lq,
       y_lq,
-      vars = vars2,
+      vars = vars,
       type = type,
       by = by,
       suffix = suffix,
@@ -282,6 +275,14 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 
     return(out)
   }
+
+  vars <- multi_join_vars(
+    x_lq,
+    op_vars(y_lq),
+    by_y = by$y,
+    suffix = suffix,
+    call = caller_env()
+  )
 
   by$on <- by$on %||% NA_character_
   if (!is_null(sql_on)) {
@@ -293,14 +294,6 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   }
   x_name <- as.character(query_name(x) %||% NA)
   y_name <- as.character(query_name(y) %||% NA)
-
-  meta <- tibble(
-    alias = tibble(
-      as = c(x_as, y_as),
-      name = c(x_name, y_name)
-    ),
-    vars = vars
-  )
 
   joins <- tibble(
     table = list(y_lq),
@@ -314,7 +307,11 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   out <- lazy_multi_join_query(
     x = x_lq,
     joins = joins,
-    meta = meta
+    table_names = tibble(
+      as = c(x_as, y_as),
+      name = c(x_name, y_name)
+    ),
+    vars = vars
   )
 
   if (!inherits(x$lazy_query, "lazy_multi_join_query")) {
@@ -322,7 +319,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   }
 
   # `x` has a name and should get a different one -> start new join
-  as_current <- x_lq$meta$alias$as
+  as_current <- x_lq$table_names$as
   if (!is.na(x_as)) {
     x_as_current <- as_current[[1]]
     if (!is.na(x_as_current) && !identical(x_as, x_as_current)) {
@@ -333,7 +330,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
       return(out)
     }
 
-    x_lq$meta$alias$as[[1]] <- x_as
+    x_lq$table_names$as[[1]] <- x_as
   }
 
   # `y_as` is already used as name
@@ -348,20 +345,16 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     tibble(table = list(y_lq), type, by_x = list(by$x), by_y = list(by$y), on = by$on, na_matches)
   )
 
-  # TODO need to adapt vars!
-  vars <- join_vars2(x_lq$meta$vars, op_vars(y_lq), type = type, by = by, suffix = suffix, call = caller_env())
-  out_alias <- vctrs::vec_rbind(
-    x_lq$meta$alias,
+  table_names <- vctrs::vec_rbind(
+    x_lq$table_names,
     tibble(as = y_as, name = y_name)
   )
 
   lazy_multi_join_query(
     x = x_lq$x,
     joins = joins,
-    meta = tibble(
-      alias = out_alias,
-      vars = vars
-    )
+    table_names = table_names,
+    vars = vars
   )
 }
 
@@ -448,48 +441,46 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   #  alias - name of column in join result
   #  x - name of column from left table or NA if only from right table
   #  y - name of column from right table or NA if only from left table
-  alias <- c(x_new, y_new)
-
-  dplyr::bind_rows(
-    set_names(c(x_x, y_x), alias),
-    set_names(c(x_y, y_y), alias)
+  list(
+    alias = c(x_new, y_new),
+    x = c(x_x, y_x),
+    y = c(x_y, y_y),
+    all_x = x_names,
+    all_y = c(y_names, by$y)
   )
 }
 
-join_vars2 <- function(vars, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
-  # TODO what if `by$on` is not NA?
-  vars_out <- vars
+multi_join_vars <- function(x_lq, y_names, by_y, suffix = c(".x", ".y"), call = caller_env()) {
+  if (inherits(x_lq, "lazy_multi_join_query")) {
+    vars <- x_lq$vars
+    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
+  } else {
+    x_vars <- op_vars(x_lq)
+    vars <- tibble(
+      name = x_vars,
+      table = rep_along(x_vars, 1L),
+      var = x_vars
+    )
+    table_id <- 2L
+  }
 
   # Remove join keys from y
-  x_names <- names(vars)
-  y_names <- setdiff(y_names, by$y)
+  x_names <- vars$name
+  y_names <- setdiff(y_names, by_y)
 
   # Add suffix where needed
   suffix <- check_suffix(suffix, call)
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
-  vars_out <- vars_out %>%
-    rename(!!!set_names(x_names, x_new))
-  n <- vctrs::vec_size(vars_out)
-  vars_out <- vctrs::vec_cbind(vars_out, !!!rep_named(y_new, list(rep_len(NA_character_, n))))
 
-  # In left and inner joins, return key values only from x
-  # In right joins, return key values only from y
-  # In full joins, return key values by coalescing values from x and y
-  x_y <- by$y[match(x_names, by$x)]
-  x_y[type == "left" | type == "inner"] <- NA
-  if (type == "right") {
-    vars_out[-(1:2)] <- purrr::map(
-      vars_out[-(1:2)],
-      ~ {
-        .x[!is.na(x_y)] <- NA
-        .x
-      }
-    )
-  }
-  y_y <- y_names
-  new_row <- set_names(as.list(c(x_y, y_y)), c(x_new, y_new))
-  vctrs::vec_rbind(vars_out, vctrs::new_data_frame(new_row))
+  vars$name <- x_new
+  y_rows <- tibble(
+    name = y_new,
+    table = table_id,
+    var = y_names
+  )
+
+  vctrs::vec_rbind(vars, y_rows)
 }
 
 check_suffix <- function(x, call) {

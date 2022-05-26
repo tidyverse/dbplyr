@@ -31,12 +31,14 @@ lazy_join_query <- function(x,
 
 #' @export
 #' @rdname sql_build
-lazy_multi_join_query <- function(x, joins, meta) {
+lazy_multi_join_query <- function(x, joins, table_names, vars) {
+  # TODO check arguments
   lazy_query(
     query_type = "multi_join",
     x = x,
     joins = joins,
-    meta = meta,
+    table_names = table_names,
+    vars = vars,
     last_op = "join"
   )
 }
@@ -138,7 +140,7 @@ op_vars.lazy_join_query <- function(op) {
 }
 #' @export
 op_vars.lazy_multi_join_query <- function(op) {
-  names(op$meta$vars)
+  op$vars$name
 }
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
@@ -160,25 +162,22 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ...) {
-  # TODO calculate table names here
-  alias <- op$meta$alias
-  auto_name <- is.na(alias$as)
-  alias_out <- dplyr::coalesce(alias$as, alias$name)
-  alias_out_repaired <- vctrs::vec_as_names(alias_out, repair = "unique", quiet = TRUE)
+  auto_name <- is.na(op$table_names$as)
+  table_names_out <- dplyr::coalesce(op$table_names$as, op$table_names$name)
+  table_names_repaired <- vctrs::vec_as_names(table_names_out, repair = "unique", quiet = TRUE)
+  table_names_out[auto_name] <- table_names_repaired[auto_name]
 
-  alias_out[auto_name] <- alias_out_repaired[auto_name]
-
-  op$meta$alias <- alias_out
   all_vars <- c(op_vars(op$x), unlist(purrr::map(op$joins$table, op_vars)))
-  vars_count <- vctrs::vec_count(all_vars)
-  duplicated_vars <- vars_count$key[vars_count$count > 1]
+  duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
+  duplicated_vars <- unique(duplicated_vars)
 
   op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
 
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con), con),
     joins = op$joins,
-    meta = op$meta,
+    table_names = table_names_out,
+    vars = op$vars,
     duplicated_vars = duplicated_vars
   )
 }

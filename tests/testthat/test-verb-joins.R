@@ -176,38 +176,38 @@ test_that("join uses correct table alias", {
   x <- lazy_frame(a = 1, x = 1, .name = "x")
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
-  meta <- left_join(x, x, by = "a")$lazy_query$meta
-  expect_equal(meta$alias$as, c(NA, NA))
-  expect_equal(meta$alias$name, c("x", "x"))
+  table_names <- left_join(x, x, by = "a")$lazy_query$table_names
+  expect_equal(table_names$as, c(NA, NA))
+  expect_equal(table_names$name, c("x", "x"))
 
-  meta <- left_join(x, x, by = "a", x_as = "my_x")$lazy_query$meta
-  expect_equal(meta$alias$as, c("my_x", NA))
-  expect_equal(meta$alias$name, c("x", "x"))
+  table_names <- left_join(x, x, by = "a", x_as = "my_x")$lazy_query$table_names
+  expect_equal(table_names$as, c("my_x", NA))
+  expect_equal(table_names$name, c("x", "x"))
 
-  meta <- left_join(x, x, by = "a", y_as = "my_y")$lazy_query$meta
-  expect_equal(meta$alias$as, c(NA, "my_y"))
-  expect_equal(meta$alias$name, c("x", "x"))
+  table_names <- left_join(x, x, by = "a", y_as = "my_y")$lazy_query$table_names
+  expect_equal(table_names$as, c(NA, "my_y"))
+  expect_equal(table_names$name, c("x", "x"))
 
-  meta <- left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$meta
-  expect_equal(meta$alias$as, c("my_x", "my_y"))
+  table_names <- left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$table_names
+  expect_equal(table_names$as, c("my_x", "my_y"))
 
-  meta <- left_join(x, y, by = "a")$lazy_query$meta
-  expect_equal(meta$alias$as, c(NA, NA))
-  expect_equal(meta$alias$name, c("x", "y"))
+  table_names <- left_join(x, y, by = "a")$lazy_query$table_names
+  expect_equal(table_names$as, c(NA, NA))
+  expect_equal(table_names$name, c("x", "y"))
 
-  meta <- left_join(x, y, by = "a", x_as = "my_x")$lazy_query$meta
-  expect_equal(meta$alias$as, c("my_x", NA))
-  expect_equal(meta$alias$name, c("x", "y"))
+  table_names <- left_join(x, y, by = "a", x_as = "my_x")$lazy_query$table_names
+  expect_equal(table_names$as, c("my_x", NA))
+  expect_equal(table_names$name, c("x", "y"))
 
-  meta <- left_join(x, y, by = "a", y_as = "my_y")$lazy_query$meta
-  expect_equal(meta$alias$as, c(NA, "my_y"))
-  expect_equal(meta$alias$name, c("x", "y"))
+  table_names <- left_join(x, y, by = "a", y_as = "my_y")$lazy_query$table_names
+  expect_equal(table_names$as, c(NA, "my_y"))
+  expect_equal(table_names$name, c("x", "y"))
 
-  meta <- left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$meta
-  expect_equal(meta$alias$as, c("my_x", "my_y"))
+  table_names <- left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$table_names
+  expect_equal(table_names$as, c("my_x", "my_y"))
 
-  meta <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$meta
-  expect_equal(meta$alias$as, c("my_x", "RHS"))
+  table_names <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$table_names
+  expect_equal(table_names$as, c("my_x", "RHS"))
 })
 
 test_that("multiple joins create a single query", {
@@ -219,13 +219,15 @@ test_that("multiple joins create a single query", {
     inner_join(lf3, by = "x")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$meta$alias, tibble(as = NA, name = c("df1", "df2", "df3")))
-  expect_equal(lq$meta$vars, tibble(x = c("x", NA, NA), a = c("a", NA, NA), b.x = c(NA, "b", NA), b.y = c(NA, NA, "b")))
+  expect_equal(lq$table_names, tibble(as = NA, name = c("df1", "df2", "df3")))
+  expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
+  expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
+  expect_equal(lq$vars$var, c("x", "a", "b", "b"))
 
   expect_equal(
     remote_query(out),
     sql(
-"SELECT `df1`.`x` AS `x`, `a`, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+"SELECT `df1`.`x`, `a`, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
 FROM `df1`
 LEFT JOIN `df2`
   ON (`df1`.`x` = `df2`.`x`)
@@ -265,7 +267,7 @@ test_that("multi joins work with x_as", {
     inner_join(lf3, by = "x", y_as = "lf3")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$meta$alias, tibble(as = c("lf1", "lf2", "lf3"), name = c("df1", "df2", "df3")))
+  expect_equal(lq$table_names, tibble(as = c("lf1", "lf2", "lf3"), name = c("df1", "df2", "df3")))
 
   # `x_as` provided twice with the same name -> one query
   out2 <- left_join(lf, lf2, by = "x", x_as = "lf1", y_as = "lf2") %>%
