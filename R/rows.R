@@ -1,4 +1,4 @@
-#' Manipulate individual rows on the database
+#' Edit individual rows in the underlying database table
 #'
 #' @description
 #' These are methods for the dplyr [rows_insert()], [`rows_append()`],
@@ -15,12 +15,12 @@
 #' `SELECT` queries) that allow previewing the result without actually
 #' modifying the underlying table on the database.
 #'
-#' @details
-#' For `in_place = TRUE`, the `x` argument must refer to a table instantiated
-#' with [tbl()] or [compute()], not to a lazy query. The [remote_name()]
-#' function is used to determine the name of the table to be updated.
-#'
 #' @export
+#' @param x A lazy table.
+#'   For `in_place = TRUE`, this must be a table instantiated with [tbl()] or
+#'   [compute()], not to a lazy query. The [remote_name()] function is used to
+#'   determine the name of the table to be updated.
+#' @param y A lazy table, data frame, or data frame extensions (e.g. a tibble).
 #' @inheritParams dplyr::rows_insert
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
 #'   with keys in `x` be handled? A conflict arises if there is a key in `y`

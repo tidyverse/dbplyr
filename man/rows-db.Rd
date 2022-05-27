@@ -7,7 +7,7 @@
 \alias{rows_patch.tbl_lazy}
 \alias{rows_upsert.tbl_lazy}
 \alias{rows_delete.tbl_lazy}
-\title{Manipulate individual rows on the database}
+\title{Edit individual rows in the underlying database table}
 \usage{
 \method{rows_insert}{tbl_lazy}(
   x,
@@ -68,8 +68,12 @@
 )
 }
 \arguments{
-\item{x, y}{A pair of data frames or data frame extensions (e.g. a tibble).
-\code{y} must have the same columns of \code{x} or a subset.}
+\item{x}{A lazy table.
+For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[=tbl]{tbl()}} or
+\code{\link[=compute]{compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used to
+determine the name of the table to be updated.}
+
+\item{y}{A lazy table, data frame, or data frame extensions (e.g. a tibble).}
 
 \item{by}{An unnamed character vector giving the key columns. The key columns
 must exist in both \code{x} and \code{y}. Keys typically uniquely identify each row,
@@ -143,11 +147,6 @@ rows, but not to alter the structure of the table.
 The default, \code{in_place = FALSE}, generates equivalent lazy tables (using
 \code{SELECT} queries) that allow previewing the result without actually
 modifying the underlying table on the database.
-}
-\details{
-For \code{in_place = TRUE}, the \code{x} argument must refer to a table instantiated
-with \code{\link[=tbl]{tbl()}} or \code{\link[=compute]{compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}}
-function is used to determine the name of the table to be updated.
 }
 \examples{
 library(dplyr)
