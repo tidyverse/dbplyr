@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `na.rm = FALSE` only warns once every 8 hours across all functions (#899).
+
 * `fill()` now works for connections from RPostgreSQL (@mgirlich).
 
 * `explain()` now works for connections from ROracle (@mgirlich).

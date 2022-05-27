@@ -198,9 +198,8 @@ sql_prefix <- function(f, n = NULL) {
 sql_aggregate <- function(f, f_r = f) {
   assert_that(is_string(f))
 
-  warned <- FALSE
   function(x, na.rm = FALSE) {
-    warned <<- check_na_rm(f_r, na.rm, warned)
+    check_na_rm(na.rm)
     build_sql(sql(f), list(x))
   }
 }
@@ -220,9 +219,8 @@ sql_aggregate_2 <- function(f) {
 sql_aggregate_n <- function(f, f_r = f) {
   assert_that(is_string(f))
 
-  warned <- FALSE
   function(..., na.rm = FALSE) {
-    warned <<- check_na_rm(f_r, na.rm, warned)
+    check_na_rm(na.rm)
     build_sql(sql(f), list(...))
   }
 }
@@ -236,18 +234,20 @@ sql_aggregate_win <- function(f) {
   }
 }
 
-check_na_rm <- function(f, na.rm, warned) {
-  if (warned || identical(na.rm, TRUE)) {
-    return(warned)
+check_na_rm <- function(na.rm) {
+  if (identical(na.rm, TRUE)) {
+    return()
   }
 
   # TODO use `{.code ...}` when https://github.com/r-lib/cli/issues/422 is fixed
-  cli::cli_warn(c(
-    "Missing values are always removed in SQL.",
-    "Use `{f}(x, na.rm = TRUE)` to silence this warning",
-    "This warning is displayed only once per session."
-  ))
-  TRUE
+  cli::cli_warn(
+    c(
+      "Missing values are always removed in SQL aggregation functions.",
+      "Use {.code na.rm = TRUE} to silence this warning"
+    ),
+    .frequency = "regularly",
+    .frequency_id = "dbplyr_check_na_rm"
+  )
 }
 
 #' @rdname sql_variant
