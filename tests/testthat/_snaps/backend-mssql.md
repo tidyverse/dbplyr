@@ -213,7 +213,7 @@
 ---
 
     Code
-      sql_values(con, tibble(x = 1:2, y = letters[1:2]))
+      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
       <SQL> SELECT
         TRY_CAST(TRY_CAST(`x` AS NUMERIC) AS INT) AS `x`,
@@ -233,7 +233,7 @@
 ---
 
     Code
-      sql_values(con, trees)
+      copy_inline(con, trees) %>% remote_query()
     Output
       <SQL> SELECT
         TRY_CAST(`Girth` AS FLOAT) AS `Girth`,
