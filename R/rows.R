@@ -17,8 +17,8 @@
 #'
 #' @details
 #' For `in_place = TRUE`, the `x` argument must refer to a table instantiated
-#' with [tbl()], not to a lazy query. The [remote_name()] function is used
-#' to determine the name of the table to be updated.
+#' with [tbl()] or [compute()], not to a lazy query. The [remote_name()]
+#' function is used to determine the name of the table to be updated.
 #'
 #' @export
 #' @inheritParams dplyr::rows_insert

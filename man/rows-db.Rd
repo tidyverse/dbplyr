@@ -146,8 +146,8 @@ modifying the underlying table on the database.
 }
 \details{
 For \code{in_place = TRUE}, the \code{x} argument must refer to a table instantiated
-with \code{\link[=tbl]{tbl()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used
-to determine the name of the table to be updated.
+with \code{\link[=tbl]{tbl()}} or \code{\link[=compute]{compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}}
+function is used to determine the name of the table to be updated.
 }
 \examples{
 library(dplyr)
