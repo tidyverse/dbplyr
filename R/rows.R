@@ -1,4 +1,4 @@
-#' Manipulate individual rows, optionally modifying the underlying table.
+#' Manipulate individual rows on the database
 #'
 #' @description
 #' These are methods for the dplyr [rows_insert()], [`rows_append()`],
@@ -8,7 +8,17 @@
 #' When `in_place = TRUE` these verbs do not generate `SELECT` queries, but
 #' instead directly modify the underlying data using `INSERT`, `UPDATE`, or
 #' `DELETE` operators. This will require that you have write access to
-#' the database.
+#' the database: the connection needs permission to insert, modify or delete
+#' rows, but not to alter the structure of the table.
+#'
+#' The default, `in_place = FALSE`, generates equivalent lazy tables (using
+#' `SELECT` queries) that allow previewing the result without actually
+#' modifying the underlying table on the database.
+#'
+#' @details
+#' For `in_place = TRUE`, the `x` argument must refer to a table instantiated
+#' with [tbl()], not to a lazy query. The [remote_name()] function is used
+#' to determine the name of the table to be updated.
 #'
 #' @export
 #' @inheritParams dplyr::rows_insert
@@ -33,14 +43,19 @@
 #'     keys in `x`.
 #' @param in_place  Should `x` be modified in place? If `FALSE` will
 #'   generate a `SELECT` query that returns the modified table; if `TRUE`
-#'   will modify the underlying table using an `INSERT`, `UPDATE`, or `DELETE`
-#'   operation.
+#'   will modify the underlying table using a DML operation (`INSERT`, `UPDATE`,
+#'   `DELETE` or similar).
 #' @param returning Columns to return. See [get_returned_rows()] for details.
 #' @param method A string specifying the method to use. This is only relevant for
 #'   `in_place = TRUE`.
 #'
 #' @importFrom dplyr rows_insert
 #' @returns A new `tbl_lazy` of the modified data.
+#'   With `in_place = FALSE`, the result is a lazy query that prints visibly,
+#'   because the purpose of this operation is to preview the results.
+#'   With `in_place = TRUE`, `x` is returned invisibly,
+#'   because the purpose of this operation is the side effect of modifying rows
+#'   in the table behind `x`.
 #' @rdname rows-db
 #' @examples
 #' library(dplyr)
