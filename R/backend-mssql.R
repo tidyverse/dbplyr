@@ -427,9 +427,8 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_values.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
-  # https://docs.microsoft.com/en-us/sql/t-sql/queries/table-value-constructor-transact-sql
-  sql_values_clause(con, df, derived = TRUE, lvl = lvl)
+`sql_values_subquery.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, lvl = lvl, row = FALSE, derived = TRUE)
 }
 
 #' @export
