@@ -398,15 +398,7 @@ sql_query_multi_join.DBIConnection <- function(con,
   # TODO check that names are unique
   x_name <- ident(table_names[[1]])
 
-  select_cols <- purrr::map2(
-    vars$var, vars$table,
-    ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
-  )
-  select_cols <- sql(unlist(select_cols))
-  # names(select_cols) <- ifelse(vars$name == vars$var, "", vars$name)
-  names(select_cols) <- vars$name
-
-  n <- length(table_names)
+  select_sql <- sql_multi_join_vars(con, vars, table_names, duplicated_vars)
 
   ons <- purrr::pmap(
     vctrs::vec_cbind(
@@ -431,11 +423,23 @@ sql_query_multi_join.DBIConnection <- function(con,
 
   start <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
   list2(
-    sql_clause_select(con, select_cols),
+    sql_clause_select(con, select_sql),
     sql_clause_from(start),
     !!!join_clauses
   ) %>%
     sql_format_clauses(lvl = lvl, con = con)
+}
+
+sql_multi_join_vars <- function(con, vars, table_names, duplicated_vars) {
+  # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
+  select_sql <- purrr::map2(
+    vars$var, vars$table,
+    ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
+  )
+  select_sql <- sql(unlist(select_sql))
+  # names(select_cols) <- ifelse(vars$name == vars$var, "", vars$name)
+  names(select_sql) <- vars$name
+  select_sql
 }
 
 sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {

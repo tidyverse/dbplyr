@@ -238,29 +238,21 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     indexes = if (auto_index) list(by$y)
   )
 
-  if (!is_null(x_as)) {
-    if (identical(x_as, y_as)) {
-      cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
-    }
-
-    vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
-  }
-
-  if (!is_null(y_as)) {
-    vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
-  }
-
-  na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   x_lq <- x$lazy_query
   y_lq <- y$lazy_query
 
-  # type not "left" or "inner" -> use classical join
+  table_alias <- check_join_as(x_as, x_lq, y_as, y_lq, sql_on = sql_on, type = type, call = call)
+  x_as <- table_alias$x_as
+  y_as <- table_alias$y_as
+
+  # Use classical join if type not "left" or "inner"
   if (!type %in% c("left", "inner")) {
-    # TODO refactor this
-    by[c("x_as", "y_as")] <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, call = call)
     vars <- join_vars(op_vars(x_lq), op_vars(y_lq), type = type, by = by, suffix = suffix, call = caller_env())
+    by$x_as <- ident(x_as)
+    by$y_as <- ident(y_as)
 
     out <- lazy_join_query(
       x_lq,
@@ -276,6 +268,19 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     return(out)
   }
 
+  by$on <- by$on %||% NA_character_
+  x_name <- as.character(query_name(x) %||% NA)
+  y_name <- as.character(query_name(y) %||% NA)
+
+  joins <- tibble(
+    table = list(y_lq),
+    type = type,
+    by_x = list(by$x),
+    by_y = list(by$y),
+    on = by$on,
+    na_matches
+  )
+
   vars <- multi_join_vars(
     x_lq,
     op_vars(y_lq),
@@ -284,65 +289,33 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     call = caller_env()
   )
 
-  by$on <- by$on %||% NA_character_
-  if (!is_null(sql_on)) {
-    x_as <- x_as %||% "LHS"
-    y_as <- y_as %||% "RHS"
-  } else {
-    x_as <- x_as %||% NA
-    y_as <- y_as %||% NA
-  }
-  x_name <- as.character(query_name(x) %||% NA)
-  y_name <- as.character(query_name(y) %||% NA)
-
-  joins <- tibble(
-    table = list(y_lq),
-    type,
-    by_x = list(by$x),
-    by_y = list(by$y),
-    on = by$on,
-    na_matches
-  )
-
-  out <- lazy_multi_join_query(
-    x = x_lq,
-    joins = joins,
-    table_names = tibble(
-      as = c(x_as, y_as),
-      name = c(x_name, y_name)
-    ),
-    vars = vars
-  )
-
-  if (!inherits(x$lazy_query, "lazy_multi_join_query")) {
+  if (join_needs_new_query(x_lq, x_as, y_as)) {
+    out <- lazy_multi_join_query(
+      x = x_lq,
+      joins = joins,
+      table_names = tibble(
+        as = c(x_as, y_as),
+        name = c(x_name, y_name)
+      ),
+      vars = vars
+    )
     return(out)
   }
 
-  # `x` has a name and should get a different one -> start new join
-  as_current <- x_lq$table_names$as
   if (!is.na(x_as)) {
-    x_as_current <- as_current[[1]]
-    if (!is.na(x_as_current) && !identical(x_as, x_as_current)) {
-      return(out)
-    }
-
-    if (!all(is.na(as_current)) && any(x_as == as_current[-1])) {
-      return(out)
-    }
-
     x_lq$table_names$as[[1]] <- x_as
-  }
-
-  # `y_as` is already used as name
-  if (!is.na(y_as)) {
-    if (!all(is.na(as_current)) && any(y_as == as_current)) {
-      return(out)
-    }
   }
 
   joins <- vctrs::vec_rbind(
     x_lq$joins,
-    tibble(table = list(y_lq), type, by_x = list(by$x), by_y = list(by$y), on = by$on, na_matches)
+    tibble(
+      table = list(y_lq),
+      type = type,
+      by_x = list(by$x),
+      by_y = list(by$y),
+      on = by$on,
+      na_matches = na_matches
+    )
   )
 
   table_names <- vctrs::vec_rbind(
@@ -356,6 +329,40 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     table_names = table_names,
     vars = vars
   )
+}
+
+join_needs_new_query <- function(x_lq, x_as, y_as) {
+  if (!inherits(x_lq, "lazy_multi_join_query")) {
+    return(TRUE)
+  }
+
+  as_current <- x_lq$table_names$as
+  if (!is.na(x_as)) {
+    x_as_current <- as_current[[1]]
+    if (!is.na(x_as_current) && !identical(x_as, x_as_current)) {
+      return(TRUE)
+    }
+
+    if (join_as_already_used(x_as, as_current[-1])) {
+      return(TRUE)
+    }
+  }
+
+  if (!is.na(y_as)) {
+    if (join_as_already_used(y_as, as_current)) {
+      return(TRUE)
+    }
+  }
+
+  FALSE
+}
+
+join_as_already_used <- function(as, as_used) {
+  if (all(is.na(as_used))) {
+    return(FALSE)
+  }
+
+  any(as == as_used)
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
@@ -373,7 +380,9 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     indexes = if (auto_index) list(by$y)
   )
 
-  by[c("x_as", "y_as")] <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, call = call)
+  table_alias <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, type = "semi", call = call)
+  by$x_as <- ident(table_alias$x_as)
+  by$y_as <- ident(table_alias$y_as)
 
   lazy_semi_join_query(
     x$lazy_query,
@@ -385,36 +394,45 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 }
 
-check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
-  x_name <- query_name(x)
-  y_name <- query_name(y)
-  if (is_null(x_as) && is_null(y_as)) {
-    if (identical(x_name, y_name)) {
-      return(list(x_as = ident("LHS"), y_as = ident("RHS")))
+check_join_as <- function(x_as, x, y_as, y, sql_on, type, call) {
+  if (type %in% c("inner", "left")) {
+    x_default_name <- NA
+    y_default_name <- NA
+  } else {
+    x_name <- unclass(query_name(x))
+    y_name <- unclass(query_name(y))
+
+    x_default_name <- x_name %||% "LHS"
+    y_default_name <- y_name %||% "RHS"
+
+    if (is_null(x_as) && is_null(y_as)) {
+      if (identical(x_name, y_name)) {
+        return(list(x_as = "LHS", y_as = "RHS"))
+      }
     }
   }
 
-  x_as <- check_join_as1(x_as, x_name, sql_on, "LHS", arg = "x_as", call = call)
-  y_as <- check_join_as1(y_as, y_name, sql_on, "RHS", arg = "y_as", call = call)
+  x_as <- check_join_as1(x_as, sql_on, "LHS", x_default_name, arg = "x_as", call = call)
+  y_as <- check_join_as1(y_as, sql_on, "RHS", y_default_name, arg = "y_as", call = call)
 
-  if (identical(x_as, y_as)) {
+  if (isTRUE(x_as == y_as)) {
     cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 
   list(x_as = x_as, y_as = y_as)
 }
 
-check_join_as1 <- function(as, tbl_name, sql_on, default, arg, call) {
+check_join_as1 <- function(as, sql_on, sql_on_name, default_name, arg, call) {
   if (!is_null(as)) {
     vctrs::vec_assert(as, character(), size = 1, arg = arg, call = call)
-    return(ident(as))
+    return(as)
   }
 
   if (!is_null(sql_on)) {
-    return(ident(default))
+    return(sql_on_name)
   }
 
-  tbl_name %||% ident(default)
+  default_name
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
