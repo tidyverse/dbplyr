@@ -395,7 +395,7 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                duplicated_vars,
                                                ...,
                                                lvl = 0) {
-  # TODO check that names are unique
+  # TODO check that names are unique?
   x_name <- ident(table_names[[1]])
 
   select_sql <- sql_multi_join_vars(con, vars, table_names, duplicated_vars)
@@ -403,28 +403,32 @@ sql_query_multi_join.DBIConnection <- function(con,
   ons <- purrr::pmap(
     vctrs::vec_cbind(
       rhs = table_names[-1],
-      select(joins, by_x, by_y, by_on = on, na_matches)
+      joins[c("by_x", "by_y", "on", "na_matches")]
     ),
-    function(rhs, by_x, by_y, by_on, na_matches) {
-      if (!is.na(by_on)) {
-        return(sql(by_on))
+    function(rhs, by_x, by_y, on, na_matches) {
+      if (!is.na(on)) {
+        return(sql(on))
       }
       by <- list(x = ident(by_x), y = ident(by_y), x_as = x_name, y_as = ident(rhs))
       sql_join_tbls(con, by, na_matches = na_matches)
     }
   )
 
-  froms_rendered <- purrr::map2(joins$table, table_names[-1], ~ dbplyr_sql_subquery(con, .x, name = .y, lvl = lvl))
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+  join_table_queries <- purrr::map2(
+    joins$table,
+    table_names[-1],
+    ~ dbplyr_sql_subquery(con, .x, name = .y, lvl = lvl)
+  )
   types <- toupper(paste0(joins$type, " JOIN"))
   join_clauses <- vctrs::vec_interleave(
-    purrr::map2(froms_rendered, types, ~ sql_clause(.y, .x)),
+    purrr::map2(join_table_queries, types, ~ sql_clause(.y, .x)),
     purrr::map(ons, ~ sql_clause("ON", .x, sep = " AND", parens = TRUE, lvl = 1))
   )
 
-  start <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
   list2(
     sql_clause_select(con, select_sql),
-    sql_clause_from(start),
+    sql_clause_from(from),
     !!!join_clauses
   ) %>%
     sql_format_clauses(lvl = lvl, con = con)

@@ -29,7 +29,7 @@ lazy_join_query(
   call = caller_env()
 )
 
-lazy_multi_join_query(x, joins, meta)
+lazy_multi_join_query(x, joins, table_names, vars, call = caller_env())
 
 lazy_semi_join_query(
   x,

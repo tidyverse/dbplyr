@@ -177,7 +177,7 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   table_names <- left_join(x, x, by = "a")$lazy_query$table_names
-  expect_equal(table_names$as, c(NA, NA))
+  expect_equal(table_names$as, c(NA_character_, NA))
   expect_equal(table_names$name, c("x", "x"))
 
   table_names <- left_join(x, x, by = "a", x_as = "my_x")$lazy_query$table_names
@@ -192,7 +192,7 @@ test_that("join uses correct table alias", {
   expect_equal(table_names$as, c("my_x", "my_y"))
 
   table_names <- left_join(x, y, by = "a")$lazy_query$table_names
-  expect_equal(table_names$as, c(NA, NA))
+  expect_equal(table_names$as, c(NA_character_, NA))
   expect_equal(table_names$name, c("x", "y"))
 
   table_names <- left_join(x, y, by = "a", x_as = "my_x")$lazy_query$table_names
@@ -219,7 +219,7 @@ test_that("multiple joins create a single query", {
     inner_join(lf3, by = "x")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(as = NA, name = c("df1", "df2", "df3")))
+  expect_equal(lq$table_names, tibble(as = NA_character_, name = c("df1", "df2", "df3")))
   expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
   expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
   expect_equal(lq$vars$var, c("x", "a", "b", "b"))

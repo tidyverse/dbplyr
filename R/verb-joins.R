@@ -396,8 +396,8 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
 
 check_join_as <- function(x_as, x, y_as, y, sql_on, type, call) {
   if (type %in% c("inner", "left")) {
-    x_default_name <- NA
-    y_default_name <- NA
+    x_default_name <- NA_character_
+    y_default_name <- NA_character_
   } else {
     x_name <- unclass(query_name(x))
     y_name <- unclass(query_name(y))
