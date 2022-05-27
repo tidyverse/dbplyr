@@ -227,7 +227,7 @@ test_that("multiple joins create a single query", {
   expect_equal(
     remote_query(out),
     sql(
-"SELECT `df1`.`x`, `a`, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+"SELECT `df1`.`x` AS `x`, `a`, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
 FROM `df1`
 LEFT JOIN `df2`
   ON (`df1`.`x` = `df2`.`x`)
