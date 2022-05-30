@@ -55,6 +55,9 @@
 #' lf %>% transmute(x = ifelse(c > d, "c", "d"))
 NULL
 
+#' @include verb-copy-to.R
+NULL
+
 #' @export
 #' @rdname simulate_dbi
 simulate_mssql <- function(version = "15.0") {
@@ -427,10 +430,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_values.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
-  # https://docs.microsoft.com/en-us/sql/t-sql/queries/table-value-constructor-transact-sql
-  sql_values_clause(con, df, derived = TRUE, lvl = lvl)
-}
+`sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
 
 #' @export
 `sql_random.Microsoft SQL Server` <- function(con) {

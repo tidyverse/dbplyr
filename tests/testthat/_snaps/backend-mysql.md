@@ -47,7 +47,7 @@
 ---
 
     Code
-      sql_values(con, tibble(x = 1:2, y = letters[1:2]))
+      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
