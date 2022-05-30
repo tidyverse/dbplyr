@@ -239,7 +239,6 @@ check_na_rm <- function(na.rm) {
     return()
   }
 
-  # TODO use `{.code ...}` when https://github.com/r-lib/cli/issues/422 is fixed
   cli::cli_warn(
     c(
       "Missing values are always removed in SQL aggregation functions.",
