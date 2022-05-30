@@ -22,6 +22,9 @@
 #' lf %>% summarise(y = cor(b, c), z = cov(b, c))
 NULL
 
+#' @include verb-copy-to.R
+NULL
+
 #' @export
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PqConnection")
@@ -331,40 +334,7 @@ sql_query_upsert.PqConnection <- function(con,
 sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
 
 #' @export
-sql_values_subquery.PqConnection <- function(con, df, lvl = 0, ...) {
-  df <- values_prepare(con, df)
-  if (nrow(df) == 0L) {
-    return(sql_values_zero_rows(con, df, lvl))
-  }
-
-  # The query consists of two parts:
-  # 1) An outer select which converts the values to the correct types. This needs
-  # to use the translation of `as.<column type>(<column name>)` (e.g. `as.numeric(mpg)`)
-  # because some backends need a special translation for some types e.g. casting
-  # to logical/bool in MySQL
-  #   `IF(<column name>, TRUE, FALSE)`
-  # This is done with the help of `sql_cast_dispatch()` via dispatch on the
-  # column type. The explicit cast is required so that joins work e.g. on date
-  # columns in Postgres.
-  # 2) The `VALUES` clause
-  rows_clauses <- sql_values_clause(con, df, row = FALSE)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
-
-  cols <- escape(ident(colnames(df)), con = con, collapse = ", ", parens = TRUE)
-  if (grepl("\\n", rows_query)) {
-    rows_query <- sql(paste0("(\n", rows_query, "\n", indent_lvl(") AS inline", lvl), cols))
-  } else {
-    # indent is not perfect but okay
-    rows_query <- sql(paste0("(", rows_query, ") AS inline", cols))
-  }
-
-  sql_query_select(
-    con,
-    select = sql_values_select(con, df),
-    from = rows_query,
-    lvl = lvl
-  )
-}
+sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
 
 #' @export
 sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection

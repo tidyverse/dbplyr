@@ -133,7 +133,7 @@ sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
 sql_values_subquery.MariaDBConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE, derived = FALSE)
+  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE)
 }
 
 #' @export

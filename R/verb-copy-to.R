@@ -173,10 +173,10 @@ sql_values_subquery <- function(con, df, lvl = 0, ...) {
 
 #' @export
 sql_values_subquery.DBIConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, lvl = lvl, row = FALSE, derived = FALSE)
+  sql_values_subquery_default(con, df, lvl = lvl, row = FALSE)
 }
 
-sql_values_subquery_default <- function(con, df, lvl, row, derived) {
+sql_values_subquery_default <- function(con, df, lvl, row) {
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
     return(sql_values_zero_rows(con, df, lvl))
@@ -205,21 +205,7 @@ sql_values_subquery_default <- function(con, df, lvl, row, derived) {
   )
 
   rows_clauses <- sql_values_clause(con, df, row = row)
-  if (derived) {
-    rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 3, con = con)
-
-    derived_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
-
-    rows_query <- sql_query_select(
-      con,
-      sql("*"),
-      # sql_subquery() can't use sql() or ident_q() as `name` argument
-      build_sql(sql_indent_subquery(rows_query, con, lvl + 2), " ", derived_sql, con = con),
-      lvl = lvl + 2
-    )
-  } else {
-    rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
-  }
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
 
   union_query <- set_op_query(null_row_query, rows_query, type = "UNION", all = TRUE)
   subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
@@ -228,6 +214,41 @@ sql_values_subquery_default <- function(con, df, lvl, row, derived) {
     con,
     select = sql_values_select(con, df),
     from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
+    lvl = lvl
+  )
+}
+
+sql_values_subquery_column_alias <- function(con, df, lvl) {
+  df <- values_prepare(con, df)
+  if (nrow(df) == 0L) {
+    return(sql_values_zero_rows(con, df, lvl))
+  }
+
+  # The `SELECT` clause converts the values to the correct types. This needs
+  # to use the translation of `as.<column type>(<column name>)` (e.g. `as.numeric(mpg)`)
+  # because some backends need a special translation for some types e.g. casting
+  # to logical/bool in MySQL
+  #   `IF(<column name>, TRUE, FALSE)`
+  # This is done with the help of `sql_cast_dispatch()` via dispatch on the
+  # column type. The explicit cast is required so that joins work e.g. on date
+  # columns in Postgres.
+  # The `FROM` clause is simply the `VALUES` clause with table and column alias
+  rows_clauses <- sql_values_clause(con, df, row = FALSE)
+  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
+
+  table_alias_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
+
+  if (grepl("\\n", rows_query)) {
+    rows_query <- sql(paste0("(\n", rows_query, "\n", indent_lvl(") AS ", lvl), table_alias_sql))
+  } else {
+    # indent is not perfect but okay
+    rows_query <- sql(paste0("(", rows_query, ") AS ", table_alias_sql))
+  }
+
+  sql_query_select(
+    con,
+    select = sql_values_select(con, df),
+    from = rows_query,
     lvl = lvl
   )
 }

@@ -23,7 +23,7 @@
       copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS TEXT) AS `y`
-      FROM (  VALUES (1, 'a'), (2, 'b')) AS inline(`x`, `y`)
+      FROM (  VALUES (1, 'a'), (2, 'b')) AS drvd(`x`, `y`)
 
 # `sql_query_insert()` works
 

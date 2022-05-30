@@ -55,6 +55,9 @@
 #' lf %>% transmute(x = ifelse(c > d, "c", "d"))
 NULL
 
+#' @include verb-copy-to.R
+NULL
+
 #' @export
 #' @rdname simulate_dbi
 simulate_mssql <- function(version = "15.0") {
@@ -427,40 +430,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_values_subquery.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
-  df <- values_prepare(con, df)
-  if (nrow(df) == 0L) {
-    return(sql_values_zero_rows(con, df, lvl))
-  }
-
-  # The `SELECT` clause converts the values to the correct types. This needs
-  # to use the translation of `as.<column type>(<column name>)` (e.g. `as.numeric(mpg)`)
-  # because some backends need a special translation for some types e.g. casting
-  # to logical/bool in MySQL
-  #   `IF(<column name>, TRUE, FALSE)`
-  # This is done with the help of `sql_cast_dispatch()` via dispatch on the
-  # column type. The explicit cast is required so that joins work e.g. on date
-  # columns in Postgres.
-  # The `FROM` clause is simply the `VALUES` clause with table and column alias
-  rows_clauses <- sql_values_clause(con, df, row = FALSE)
-  rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
-
-  derived_sql <- sql(paste0("drvd(", escape(ident(colnames(df)), con = con), ")"))
-
-  if (grepl("\\n", rows_query)) {
-    rows_query <- sql(paste0("(\n", rows_query, "\n", indent_lvl(") AS ", lvl), derived_sql))
-  } else {
-    # indent is not perfect but okay
-    rows_query <- sql(paste0("(", rows_query, ") AS ", derived_sql))
-  }
-
-  sql_query_select(
-    con,
-    select = sql_values_select(con, df),
-    from = rows_query,
-    lvl = lvl
-  )
-}
+`sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
 
 #' @export
 `sql_random.Microsoft SQL Server` <- function(con) {
