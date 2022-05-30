@@ -218,6 +218,22 @@ test_that("select() before join is inlined", {
   expect_equal(vars$all_y, c("x2", "b", "z"))
 })
 
+test_that("select() before join works for tables with same column name", {
+  lf <- lazy_frame(id = 1, x = 1, .name = "lf1")
+  lf2 <- lazy_frame(id = 12, x = 2, .name = "lf2")
+
+  out <- left_join(
+    lf %>% rename(id1 = id),
+    lf2 %>% rename(id2 = id),
+    by = "x"
+  )
+
+  lq <- out$lazy_query
+  expect_equal(op_vars(lq), c("id1", "x", "id2"))
+  expect_equal(lq$vars$x, c("id", "x", NA))
+  expect_equal(lq$vars$y, c(NA, NA, "id"))
+})
+
 test_that("select() before join is not inlined when using `sql_on`", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
