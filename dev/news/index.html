@@ -71,7 +71,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p><code>fill()</code> now works for connections from RPostgreSQL (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<ul><li><p><code>na.rm = FALSE</code> only warns once every 8 hours across all functions (<a href="https://github.com/tidyverse/dbplyr/issues/899" class="external-link">#899</a>).</p></li>
+<li><p><code>fill()</code> now works for connections from RPostgreSQL (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code> now works for connections from ROracle (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p>When possible dbplyr now uses <code>SELECT *</code> instead of explicitly selecting every column (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p><code><a href="../reference/remote_name.html">remote_name()</a></code> now returns a name in more cases where it makes sense (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/850" class="external-link">#850</a>).</p></li>

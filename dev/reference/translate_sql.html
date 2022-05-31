@@ -180,16 +180,13 @@ SQL for a grouped summary.</p></dd>
 <span class="r-in"><span class="co"># Windowed translation --------------------------------------------</span></span>
 <span class="r-in"><span class="co"># Known window functions automatically get OVER()</span></span>
 <span class="r-in"><span class="fu">translate_sql</span><span class="op">(</span><span class="va">mpg</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Missing values are always removed in SQL.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> This warning is displayed only once per session.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Missing values are always removed in SQL aggregation functions.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use `na.rm = TRUE` to silence this warning</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; `mpg` &gt; AVG(`mpg`) OVER ()</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># Suppress this with window = FALSE</span></span>
 <span class="r-in"><span class="fu">translate_sql</span><span class="op">(</span><span class="va">mpg</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Missing values are always removed in SQL.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> Use `mean(x, na.rm = TRUE)` to silence this warning</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> This warning is displayed only once per session.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; `mpg` &gt; AVG(`mpg`)</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># vars_group controls partition:</span></span>

@@ -225,9 +225,9 @@
 <p>All database provide translation for the basic aggregations: <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd()</a></code>, <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var()</a></code>. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
-<span class="co">#&gt; Use `AVG(x, na.rm = TRUE)` to silence this warning</span>
-<span class="co">#&gt; This warning is displayed only once per session.</span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span>
+<span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span>
+<span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
 <span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span>
 <span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">x</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; AVG(`x`) OVER ()</span></code></pre></div>
