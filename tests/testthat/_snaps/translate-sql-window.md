@@ -12,13 +12,8 @@
 # window_frame()
 
     Code
-      lf %>% window_frame(-3, 0) %>% window_order(x) %>% mutate(z = sum(y)) %>%
+      lf %>% window_frame(-3, 0) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
         show_query()
-    Condition
-      Warning:
-      Missing values are always removed in SQL.
-      Use `SUM(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
     Output
       <SQL>
       SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
@@ -27,7 +22,7 @@
 ---
 
     Code
-      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y)) %>%
+      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
         show_query()
     Output
       <SQL>
