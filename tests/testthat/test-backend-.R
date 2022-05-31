@@ -1,3 +1,11 @@
+test_that("base_no_win inclues all aggregates and window funcitons", {
+  # All aggregates must be included in window functions
+  expect_equal(setdiff(names(base_agg), names(base_win)), character())
+
+  # All window functions all need to be in no_in
+  expect_equal(setdiff(names(base_win), names(base_no_win)), character())
+})
+
 # mathematics --------------------------------------------------------
 
 test_that("basic arithmetic is correct", {
