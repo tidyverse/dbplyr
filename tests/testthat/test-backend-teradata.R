@@ -37,9 +37,6 @@ test_that("custom window functions translated correctly", {
   local_con(simulate_teradata())
 
   expect_equal(translate_sql(var(x, na.rm = TRUE)), sql("VAR_SAMP(`x`) OVER ()"))
-
-  expect_error(translate_sql(cor(x)), "not supported")
-  expect_error(translate_sql(cov(x)), "not supported")
 })
 
 test_that("generates custom sql", {

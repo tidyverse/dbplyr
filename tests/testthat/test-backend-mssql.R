@@ -69,9 +69,6 @@ test_that("custom window functions translated correctly", {
   expect_equal(translate_sql(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
   expect_equal(translate_sql(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
 
-  expect_error(translate_sql(cor(x)), "not supported")
-  expect_error(translate_sql(cov(x)), "not supported")
-
   expect_equal(translate_sql(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
 
