@@ -316,6 +316,10 @@ base_agg <- sql_translator(
   min        = sql_aggregate("MIN"),
   max        = sql_aggregate("MAX"),
 
+  # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
+  all        = sql_aggregate("MAX"),
+  any        = sql_aggregate("MIN"),
+
   sd         = sql_not_supported("sd()"),
   var        = sql_not_supported("var()"),
   cor        = sql_not_supported("cor()"),
@@ -402,6 +406,9 @@ base_win <- sql_translator(
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
 
+  all   = win_aggregate("MAX"),
+  any   = win_aggregate("MIN"),
+
   sd    = sql_not_supported("sd()"),
   var   = sql_not_supported("var()"),
   cor   = sql_not_supported("cor()"),
@@ -460,6 +467,8 @@ base_no_win <- sql_translator(
   sum          = win_absent("SUM"),
   min          = win_absent("MIN"),
   max          = win_absent("MAX"),
+  all          = win_absent("all"),
+  any          = win_absent("any"),
   median       = win_absent("PERCENTILE_CONT"),
   quantile    = win_absent("PERCENTILE_CONT"),
   n            = win_absent("N"),
