@@ -312,10 +312,14 @@ base_agg <- sql_translator(
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
   n          = function() sql("COUNT(*)"),
   mean       = sql_aggregate("AVG", "mean"),
-  var        = sql_aggregate("VARIANCE", "var"),
   sum        = sql_aggregate("SUM"),
   min        = sql_aggregate("MIN"),
   max        = sql_aggregate("MAX"),
+
+  sd         = sql_not_supported("sd()"),
+  var        = sql_not_supported("var()"),
+  cor        = sql_not_supported("cor()"),
+  cov        = sql_not_supported("cov()"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
@@ -394,10 +398,14 @@ base_win <- sql_translator(
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_aggregate("AVG"),
-  var   = win_aggregate("VARIANCE"),
   sum   = win_aggregate("SUM"),
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
+
+  sd    = sql_not_supported("sd()"),
+  var   = sql_not_supported("var()"),
+  cor   = sql_not_supported("cor()"),
+  cov   = sql_not_supported("cov()"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),

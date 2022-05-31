@@ -31,9 +31,6 @@ test_that("custom aggregators translated correctly", {
   local_con(simulate_teradata())
 
   expect_equal(translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR_SAMP(`x`)"))
-
-  expect_error(translate_sql(cor(x), window = FALSE), "not available")
-  expect_error(translate_sql(cov(x), window = FALSE), "not available")
 })
 
 test_that("custom window functions translated correctly", {
