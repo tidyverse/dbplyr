@@ -7,7 +7,9 @@
       }))))
     Output
       <error/rlang_error>
-      Error in `partial_eval_fun()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! Cannot translate functions consisting of more than one statement.
 
 # across() does not support formulas with dots
@@ -16,7 +18,9 @@
       (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
     Output
       <error/rlang_error>
-      Error in `across_fun()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
@@ -25,7 +29,9 @@
       )
     Output
       <error/rlang_error>
-      Error in `FUN()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
@@ -35,23 +41,29 @@
     Code
       capture_across(lf, across(a, 1))
     Condition
-      Error in `across_funs()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(a, list(1)))
     Condition
-      Error in `FUN()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
     Condition
-      Error in `across_funs()`:
+      Error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(c, mean))
     Condition
-      Error in `capture_across()`:
+      Error in `across()`:
       ! Can't subset columns that don't exist.
       x Column `c` doesn't exist.
 
@@ -110,12 +122,16 @@
     Code
       capture_if_all(lf, if_all(a, 1))
     Condition
-      Error in `across_funs()`:
+      Error in `if_all()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
-      Error in `FUN()`:
+      Error in `if_all()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
       ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
 
@@ -203,6 +219,6 @@
       (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
     Output
       <error/rlang_error>
-      Error in `capture_if_all()`:
+      Error in `if_all()`:
       ! Can't rename variables in this context.
 

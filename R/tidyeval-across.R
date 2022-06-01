@@ -60,7 +60,10 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     funs <- eval(funs, env)
     return(across_funs(funs, env, data = data, dots = dots, names_spec = NULL, fn = fn, evaluated = TRUE))
   } else {
-    cli_abort("{.arg .fns} argument to {.fun dbplyr::across} must be a NULL, a function, formula, or list")
+    cli_abort(
+      "{.arg .fns} argument to {.fun dbplyr::across} must be a NULL, a function, formula, or list",
+      call = NULL
+    )
   }
 
   list(fns = fns, names = names_spec)
@@ -82,7 +85,8 @@ across_fun <- function(fun, env, data, dots, fn) {
         "`dbplyr::{fn}` does not support `...` when a purrr-style lambda is used in {.arg .fns}.",
         i = "Use a lambda instead.",
         i = "Or inline them via a purrr-style lambda."
-      ))
+      ),
+      call = NULL)
     }
     call <- partial_eval_body(f_rhs(fun), env, data, sym = c(".", ".x"), replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
@@ -93,14 +97,17 @@ across_fun <- function(fun, env, data, dots, fn) {
     cli_abort(c(
       "{.arg .fns} argument to {.fun dbplyr::across} must contain a function or a formula",
       x = "Problem with {expr_deparse(fun)}"
-    ))
+    ), call = NULL)
   }
 }
 
 partial_eval_fun <- function(fun, env, data) {
   body <- fn_body(fun)
   if (length(body) > 2) {
-    cli_abort("Cannot translate functions consisting of more than one statement.")
+    cli_abort(
+      "Cannot translate functions consisting of more than one statement.",
+      call = NULL
+    )
   }
   args <- fn_fmls_names(fun)
 
@@ -127,7 +134,7 @@ across_setup <- function(data,
   .cols <- call$.cols %||% expr(everything())
   locs <- fix_call(
     tidyselect::eval_select(.cols, tbl, env = env, allow_rename = allow_rename),
-    error_call
+    call(fn)
   )
 
   vars <- syms(names(tbl))[locs]
@@ -137,16 +144,28 @@ across_setup <- function(data,
     names_vars <- names(tbl)[locs]
   }
 
-  dots <- lapply(call$..., partial_eval, data = data, env = env)
-  names_spec <- eval(call$.names, env)
-  funs_across_data <- across_funs(
-    funs = call$.fns,
-    env = env,
-    data = data,
-    dots = dots,
-    names_spec = names_spec,
-    fn = fn
-  )
+  try_fetch({
+    dots <- lapply(call$..., partial_eval, data = data, env = env, error_call = error_call)
+  }, error = function(cnd) {
+    msg <- "Problem while evaluating {.arg ...}."
+    cli_abort(msg, call = call(fn), parent = cnd)
+  })
+
+  try_fetch({
+    names_spec <- eval(call$.names, env)
+    funs_across_data <- across_funs(
+      funs = call$.fns,
+      env = env,
+      data = data,
+      dots = dots,
+      names_spec = names_spec,
+      fn = fn
+    )
+  }, error = function(cnd) {
+    msg <- "Problem while evaluating {.arg .fns}."
+    cli_abort(msg, call = call(fn), parent = cnd)
+  })
+
   fns_is_null <- funs_across_data$fns_is_null
   fns <- funs_across_data$fns
   names_spec <- funs_across_data$names

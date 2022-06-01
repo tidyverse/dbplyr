@@ -123,7 +123,8 @@ transmute.tbl_lazy <- function(.data, ...) {
 # 2) a = a, b = b, c = c, d = b + 1
 #    because `d` depends on `b` it must be on a new layer
 get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
-  dots <- enquos(..., .named = TRUE)
+  dots <- as.list(enquos(..., .named = TRUE))
+  was_named <- have_name(exprs(...))
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
@@ -143,7 +144,22 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   layers <- list()
 
   for (i in seq_along(dots)) {
-    quosures <- partial_eval_quo(dots[[i]], cur_data, error_call = error_call)
+    # TODO refactor common code with `partial_eval_dots()`
+    dot <- dots[[i]]
+    try_fetch(
+      quosures <- partial_eval_quo(dot, cur_data, error_call),
+      error = function(cnd) {
+        name <- names2(dots)[[i]]
+        if (!was_named[[i]]) {
+          name <- paste0("..", i)
+        }
+
+        expr <- glue::glue("{name} = {as_label(dot)}")
+        msg <- "Problem while computing {.code {expr}}"
+        cli_abort(msg, call = error_call, parent = cnd)
+      }
+    )
+
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
     }

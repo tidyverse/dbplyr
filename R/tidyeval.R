@@ -51,7 +51,7 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
-partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call = caller_env()) {
+partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call) {
   if (!is_null(vars)) {
     lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
     data <- lazy_frame(!!!rep_named(vars, list(logical())))
@@ -85,21 +85,38 @@ capture_dot <- function(.data, x) {
   partial_eval(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE) {
+partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env()) {
   # corresponds to `capture_dots()`
-  dots <- enquos(..., .named = .named)
-  dots <- lapply(dots, partial_eval_quo, data = .data)
+  dots <- as.list(enquos(..., .named = .named))
+  was_named <- have_name(exprs(...))
+
+  for (i in seq_along(dots)) {
+    dot <- dots[[i]]
+    try_fetch(
+      dots[[i]] <- partial_eval_quo(dot, .data, error_call),
+      error = function(cnd) {
+        name <- names2(dots)[[i]]
+        if (!was_named[[i]]) {
+          name <- paste0("..", i)
+        }
+
+        expr <- glue::glue("{name} = {as_label(dot)}")
+        msg <- "Problem while computing {.code {expr}}"
+        cli_abort(msg, call = error_call, parent = cnd)
+      }
+    )
+  }
 
   # Remove names from any list elements
   is_list <- purrr::map_lgl(dots, is.list)
-  names(dots)[is_list] <- ""
+  names2(dots)[is_list] <- ""
 
   # Auto-splice list results from partial_eval_quo()
   dots[!is_list] <- lapply(dots[!is_list], list)
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, error_call = caller_env()) {
+partial_eval_quo <- function(x, data, error_call) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call)
   if (is.list(expr)) {
@@ -119,7 +136,7 @@ partial_eval_sym <- function(sym, data, env) {
   } else {
     cli::cli_abort(
       "object {.var {name}} not found.",
-      class = "dbplyr_symbol_not_found"
+      call = NULL
     )
   }
 }

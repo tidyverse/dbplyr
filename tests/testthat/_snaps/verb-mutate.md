@@ -65,6 +65,34 @@
         FROM `df`
       ) `q01`
 
+# mutate() produces nice error messages
+
+    Code
+      lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `z = non_existent + 1`
+      Caused by error:
+      ! object `non_existent` not found.
+    Code
+      lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, mean, na.rm = z)`
+      Caused by error in `across()`:
+      ! Problem while evaluating `...`.
+      Caused by error:
+      ! object `z` not found.
+    Code
+      lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, .fns = "a")`
+      Caused by error in `across()`:
+      ! Problem while evaluating `.fns`.
+      Caused by error:
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+
 # mutate generates subqueries as needed
 
     Code
