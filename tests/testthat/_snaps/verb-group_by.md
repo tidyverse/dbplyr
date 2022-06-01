@@ -20,6 +20,13 @@
 # group_by() produces nice error messages
 
     Code
+      lf %>% group_by(z = non_existent + 1)
+    Condition
+      Error in `group_by()`:
+      ! Problem while computing `z = non_existent + 1`
+      Caused by error:
+      ! object `non_existent` not found.
+    Code
       lf %>% group_by(across(non_existent))
     Condition
       Error in `group_by()`:
