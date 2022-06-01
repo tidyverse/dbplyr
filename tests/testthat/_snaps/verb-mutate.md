@@ -73,7 +73,7 @@
       Error in `mutate()`:
       ! Problem while computing `z = non_existent + 1`
       Caused by error:
-      ! object `non_existent` not found.
+      ! Object `non_existent` not found.
     Code
       lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
     Condition
@@ -82,7 +82,7 @@
       Caused by error in `across()`:
       ! Problem while evaluating `na.rm = z`.
       Caused by error:
-      ! object `z` not found.
+      ! Object `z` not found.
     Code
       lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
     Condition

@@ -15,7 +15,7 @@
       Error in `group_by()`:
       ! Problem while computing `..1 = y`
       Caused by error:
-      ! object `y` not found.
+      ! Object `y` not found.
 
 # group_by() produces nice error messages
 
@@ -25,7 +25,7 @@
       Error in `group_by()`:
       ! Problem while computing `z = non_existent + 1`
       Caused by error:
-      ! object `non_existent` not found.
+      ! Object `non_existent` not found.
     Code
       lf %>% group_by(across(non_existent))
     Condition
