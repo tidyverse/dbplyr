@@ -92,19 +92,8 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
-    try_fetch(
-      dots[[i]] <- partial_eval_quo(dot, .data, error_call),
-      error = function(cnd) {
-        name <- names2(dots)[[i]]
-        if (!was_named[[i]]) {
-          name <- paste0("..", i)
-        }
-
-        expr <- glue::glue("{name} = {as_label(dot)}")
-        msg <- "Problem while computing {.code {expr}}"
-        cli_abort(msg, call = error_call, parent = cnd)
-      }
-    )
+    dot_name <- get_dot_name(dots, i, was_named)
+    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name)
   }
 
   # Remove names from any list elements
@@ -116,9 +105,17 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, error_call) {
+partial_eval_quo <- function(x, data, error_call, dot_name) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call)
+  try_fetch(
+    expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
+    error = function(cnd) {
+      expr <- glue::glue("{dot_name} = {as_label(x)}")
+      msg <- "Problem while computing {.code {expr}}"
+      cli_abort(msg, call = error_call, parent = cnd)
+    }
+  )
+
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
   } else {

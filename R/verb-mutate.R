@@ -146,19 +146,8 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   for (i in seq_along(dots)) {
     # TODO refactor common code with `partial_eval_dots()`
     dot <- dots[[i]]
-    try_fetch(
-      quosures <- partial_eval_quo(dot, cur_data, error_call),
-      error = function(cnd) {
-        name <- names2(dots)[[i]]
-        if (!was_named[[i]]) {
-          name <- paste0("..", i)
-        }
-
-        expr <- glue::glue("{name} = {as_label(dot)}")
-        msg <- "Problem while computing {.code {expr}}"
-        cli_abort(msg, call = error_call, parent = cnd)
-      }
-    )
+    dot_name <- get_dot_name(dots, i, was_named)
+    quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name)
 
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
@@ -211,4 +200,13 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
     modified_vars = all_modified_vars,
     used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
+}
+
+get_dot_name <- function(dots, i, was_named) {
+  dot_name <- names2(dots)[[i]]
+  if (!was_named[[i]]) {
+    dot_name <- paste0("..", i)
+  }
+
+  dot_name
 }
