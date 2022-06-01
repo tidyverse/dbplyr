@@ -110,9 +110,10 @@ partial_eval_fun <- function(fun, env, data) {
 
 partial_eval_body <- function(x, env, data, sym, replace = quote(!!.x)) {
   call <- replace_sym(x, sym, replace)
-  if (is_call(call)) {
-    call <- partial_eval_call(call, data, env)
-  }
+  # TODO Is there any reason to do this?
+  # if (is_call(call)) {
+  #   call <- partial_eval_call(call, data, env)
+  # }
   call
 }
 

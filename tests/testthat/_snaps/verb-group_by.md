@@ -11,19 +11,12 @@
     Code
       (expect_error(lazy_frame(x = 1:3) %>% group_by(y)))
     Output
-      <error/rlang_error>
-      Error in `group_by.tbl_lazy()`:
-      ! Must group by variables found in `.data`.
-      x Column `y` is not found.
+      <error/dbplyr_symbol_not_found>
+      Error in `partial_eval_sym()`:
+      ! object `y` not found.
 
 # group_by() produces nice error messages
 
-    Code
-      lf %>% group_by(non_existent)
-    Condition
-      Error in `group_by.tbl_lazy()`:
-      ! Must group by variables found in `.data`.
-      x Column `non_existent` is not found.
     Code
       lf %>% group_by(across(non_existent))
     Condition

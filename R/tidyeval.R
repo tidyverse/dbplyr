@@ -117,7 +117,10 @@ partial_eval_sym <- function(sym, data, env) {
   } else if (env_has(env, name, inherit = TRUE)) {
     eval_bare(sym, env)
   } else {
-    sym
+    cli::cli_abort(
+      "object {.var {name}} not found.",
+      class = "dbplyr_symbol_not_found"
+    )
   }
 }
 
