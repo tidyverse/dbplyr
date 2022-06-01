@@ -80,7 +80,7 @@
       Error in `mutate()`:
       ! Problem while computing `..1 = across(x, mean, na.rm = z)`
       Caused by error in `across()`:
-      ! Problem while evaluating `...`.
+      ! Problem while evaluating `na.rm = z`.
       Caused by error:
       ! object `z` not found.
     Code

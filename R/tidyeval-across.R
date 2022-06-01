@@ -135,12 +135,18 @@ across_setup <- function(data,
     names_vars <- names(tbl)[locs]
   }
 
-  try_fetch({
-    dots <- lapply(call$..., partial_eval, data = data, env = env, error_call = error_call)
-  }, error = function(cnd) {
-    msg <- "Problem while evaluating {.arg ...}."
-    cli_abort(msg, call = call(fn), parent = cnd)
-  })
+  dots <- call$...
+  for (i in seq_along(call$...)) {
+    dot <- call$...[[i]]
+    try_fetch({
+      dots[[i]] <- partial_eval(dot, data = data, env = env, error_call = error_call)
+    }, error = function(cnd) {
+      dot_name <- get_dot_name(call$..., i, have_name(call$...))
+      expr <- glue::glue("{dot_name} = {as_label(dot)}")
+      msg <- "Problem while evaluating {.code {expr}}."
+      cli_abort(msg, call = call(fn), parent = cnd)
+    })
+  }
 
   try_fetch({
     names_spec <- eval(call$.names, env)

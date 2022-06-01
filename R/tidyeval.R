@@ -132,7 +132,7 @@ partial_eval_sym <- function(sym, data, env) {
     eval_bare(sym, env)
   } else {
     cli::cli_abort(
-      "object {.var {name}} not found.",
+      "Object {.var {name}} not found.",
       call = NULL
     )
   }
