@@ -88,7 +88,7 @@ across_fun <- function(fun, env, data, dots, fn) {
       ),
       call = NULL)
     }
-    call <- partial_eval_body(f_rhs(fun), env, data, sym = c(".", ".x"), replace = quote(!!.x))
+    call <- replace_sym(f_rhs(fun), sym = c(".", ".x"), replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
@@ -111,12 +111,8 @@ partial_eval_fun <- function(fun, env, data) {
   }
   args <- fn_fmls_names(fun)
 
-  call <- partial_eval_body(body[[2]], env, data, sym = args[[1]], replace = quote(!!.x))
+  call <- replace_sym(body[[2]], sym = args[[1]], replace = quote(!!.x))
   function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
-}
-
-partial_eval_body <- function(x, env, data, sym, replace = quote(!!.x)) {
-  replace_sym(x, sym, replace)
 }
 
 across_setup <- function(data,
