@@ -24,7 +24,6 @@ test_that("errors for .drop = FALSE", {
 })
 
 test_that("informative errors for missing variables", {
-  # TODO think about whether it is worth trying to get the dplyr error message
   expect_snapshot({
     (expect_error(lazy_frame(x = 1:3) %>% group_by(y)))
   })
@@ -34,8 +33,7 @@ test_that("group_by() produces nice error messages", {
   lf <- lazy_frame(x = 1)
 
   expect_snapshot(error = TRUE, {
-    # TODO
-    # lf %>% group_by(z = non_existent + 1)
+    lf %>% group_by(z = non_existent + 1)
     lf %>% group_by(across(non_existent))
   })
 })

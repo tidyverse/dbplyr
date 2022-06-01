@@ -144,7 +144,6 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   layers <- list()
 
   for (i in seq_along(dots)) {
-    # TODO refactor common code with `partial_eval_dots()`
     dot <- dots[[i]]
     dot_name <- get_dot_name(dots, i, was_named)
     quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name)
