@@ -122,7 +122,7 @@ transmute.tbl_lazy <- function(.data, ...) {
 #    same layer
 # 2) a = a, b = b, c = c, d = b + 1
 #    because `d` depends on `b` it must be on a new layer
-get_mutate_layers <- function(.data, ...) {
+get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   dots <- enquos(..., .named = TRUE)
 
   layer_modified_vars <- character()
@@ -143,7 +143,7 @@ get_mutate_layers <- function(.data, ...) {
   layers <- list()
 
   for (i in seq_along(dots)) {
-    quosures <- partial_eval_quo(dots[[i]], cur_data)
+    quosures <- partial_eval_quo(dots[[i]], cur_data, error_call = error_call)
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
     }

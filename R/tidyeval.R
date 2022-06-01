@@ -51,7 +51,7 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
-partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
+partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call = caller_env()) {
   if (!is_null(vars)) {
     lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
     data <- lazy_frame(!!!rep_named(vars, list(logical())))
@@ -67,13 +67,13 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
   } else if (is_symbol(call)) {
     partial_eval_sym(call, data, env)
   } else if (is_quosure(call)) {
-    partial_eval(get_expr(call), data, get_env(call))
+    partial_eval(get_expr(call), data, get_env(call), error_call = error_call)
   } else if (is_call(call, "if_any")) {
-    partial_eval_if(call, data, env, reduce = "|")
+    partial_eval_if(call, data, env, reduce = "|", error_call = error_call)
   } else if (is_call(call, "if_all")) {
-    partial_eval_if(call, data, env, reduce = "&")
+    partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
   } else if (is_call(call, "across")) {
-    partial_eval_across(call, data, env)
+    partial_eval_across(call, data, env, error_call)
   } else if (is_call(call)) {
     partial_eval_call(call, data, env)
   } else {
@@ -99,9 +99,9 @@ partial_eval_dots <- function(.data, ..., .named = TRUE) {
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data) {
+partial_eval_quo <- function(x, data, error_call = caller_env()) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  expr <- partial_eval(get_expr(x), data, get_env(x))
+  expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call)
   if (is.list(expr)) {
     lapply(expr, new_quosure, env = get_env(x))
   } else {

@@ -40,6 +40,15 @@
       Error in `target_table_name()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
+---
+
+    Code
+      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+    Condition
+      Error in `rows_insert()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code

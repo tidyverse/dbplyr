@@ -3,9 +3,9 @@ capture_across <- function(data, x) {
   partial_eval_across(get_expr(x), data, get_env(x))
 }
 
-partial_eval_across <- function(call, data, env) {
+partial_eval_across <- function(call, data, env, error_call = caller_env()) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
-  across_setup(data, call, env, allow_rename = TRUE, fn = "across()")
+  across_setup(data, call, env, allow_rename = TRUE, fn = "across()", error_call = error_call)
 }
 
 capture_if_all <- function(data, x) {
@@ -13,14 +13,14 @@ capture_if_all <- function(data, x) {
   partial_eval_if(get_expr(x), data, get_env(x))
 }
 
-partial_eval_if <- function(call, data, env, reduce = "&") {
+partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_env()) {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
   if (reduce == "&") {
     fn <- "if_all()"
   } else {
     fn <- "if_any()"
   }
-  out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn)
+  out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
   Reduce(function(x, y) call2(reduce, x, y), out)
 }
 
@@ -120,10 +120,14 @@ across_setup <- function(data,
                          call,
                          env,
                          allow_rename,
-                         fn) {
+                         fn,
+                         error_call) {
   tbl <- simulate_vars(data, drop_groups = TRUE)
   .cols <- call$.cols %||% expr(everything())
-  locs <- tidyselect::eval_select(.cols, tbl, env = env, allow_rename = allow_rename)
+  locs <- fix_call(
+    tidyselect::eval_select(.cols, tbl, env = env, allow_rename = allow_rename),
+    error_call
+  )
 
   vars <- syms(names(tbl))[locs]
   if (allow_rename) {

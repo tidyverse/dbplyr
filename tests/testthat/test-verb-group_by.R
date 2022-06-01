@@ -134,3 +134,20 @@ test_that("ungroup drops all groups", {
   expect_equal(op_grps(out1), character())
   expect_equal(op_grps(out2), character())
 })
+
+test_that("group_by() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% group_by(non_existent)
+    # TODO
+    # lf %>% group_by(z = non_existent + 1)
+    lf %>% group_by(across(non_existent))
+  })
+})
+
+test_that("ungroup() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% ungroup(non_existent)
+  })
+})

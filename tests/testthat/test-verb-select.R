@@ -105,6 +105,33 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% relocate(), lf)
 })
 
+test_that("select() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% select(non_existent)
+    lf %>% select(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% relocate(non_existent)
+    lf %>% relocate(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    # no name
+    lf %>% rename(x)
+    # non-existing column
+    lf %>% rename(y = non_existent)
+    lf %>% rename(y = non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% rename_with(toupper, .cols = non_existent)
+    lf %>% rename_with(toupper, .cols = non_existent + 1)
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

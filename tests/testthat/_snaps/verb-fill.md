@@ -84,3 +84,12 @@
     Code
       expect_error(df_db %>% tidyr::fill(n1))
 
+# fill() produces nice error messages
+
+    Code
+      lazy_frame(x = 1) %>% tidyr::fill(non_existent)
+    Condition
+      Error in `tidyr::fill()`:
+      ! Can't subset columns that don't exist.
+      x Column `non_existent` doesn't exist.
+

@@ -51,7 +51,7 @@
     Code
       capture_across(lf, across(c, mean))
     Condition
-      Error in `chr_as_locations()`:
+      Error in `capture_across()`:
       ! Can't subset columns that don't exist.
       x Column `c` doesn't exist.
 
@@ -203,6 +203,6 @@
       (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
     Output
       <error/rlang_error>
-      Error in `across_setup()`:
+      Error in `capture_if_all()`:
       ! Can't rename variables in this context.
 
