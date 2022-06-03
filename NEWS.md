@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 2.2.0
 
 * `na.rm = FALSE` only warns once every 8 hours across all functions (#899).
 
