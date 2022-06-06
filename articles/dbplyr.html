@@ -15,8 +15,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
-<link href="../deps/_Source%20Code%20Pro-0.4.0/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.1/font.css" rel="stylesheet">
+<link href="../deps/_Source%20Code%20Pro-0.4.1/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to dbplyr">
@@ -35,7 +35,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    <a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a>
     <a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a>
     <a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a>
     <a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a>
@@ -168,7 +168,7 @@
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_db</span> 
 <span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;flights&gt; [?? x 19]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.37.2 [:memory:]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [:memory:]</span></span>
 <span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1      517            515         2      830</span>
@@ -190,8 +190,8 @@
 <p>Most of the time you don’t need to know anything about SQL, and you can continue to use the dplyr verbs that you’re already familiar with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># Source:   lazy query [?? x 5]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.37.2 [:memory:]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [:memory:]</span></span>
 <span class="co">#&gt;    year month   day dep_delay arr_delay</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1         2        11</span>
@@ -203,8 +203,8 @@
 <span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span>
 
 <span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># Source:   lazy query [?? x 19]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.37.2 [:memory:]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 19]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [:memory:]</span></span>
 <span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1      848           <span style="text-decoration: underline;">1</span>835       853     <span style="text-decoration: underline;">1</span>001</span>
@@ -221,11 +221,11 @@
 <span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_time</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Missing values are always removed in SQL.</span>
-<span class="co">#&gt; Use `mean(x, na.rm = TRUE)` to silence this warning</span>
-<span class="co">#&gt; This warning is displayed only once per session.</span>
-<span class="co">#&gt; <span style="color: #949494;"># Source:   lazy query [?? x 2]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.37.2 [:memory:]</span></span>
+<span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span>
+<span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span>
+<span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 2]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5 [:memory:]</span></span>
 <span class="co">#&gt;   dest  delay</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ABQ   <span style="text-decoration: underline;">2</span>006.</span>
@@ -256,8 +256,8 @@
 <code class="sourceCode R"><span class="va">tailnum_delay_db</span>
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
-<span class="co">#&gt; <span style="color: #949494;"># Source:     lazy query [?? x 3]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.37.2 [:memory:]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Source:     SQL [?? x 3]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.38.5 [:memory:]</span></span>
 <span class="co">#&gt; <span style="color: #949494;"># Ordered by: desc(delay)</span></span>
 <span class="co">#&gt;   tailnum delay     n</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
@@ -274,11 +274,13 @@
 <span class="co">#&gt; Warning: ORDER BY is ignored in subqueries without LIMIT</span>
 <span class="co">#&gt; <span style="color: #0000BB;">ℹ</span> Do you need to move arrange() later in the pipeline or use window_order() instead?</span>
 <span class="co">#&gt; &lt;SQL&gt;</span>
-<span class="co">#&gt; SELECT *</span>
-<span class="co">#&gt; FROM (SELECT `tailnum`, AVG(`arr_delay`) AS `delay`, COUNT(*) AS `n`</span>
-<span class="co">#&gt; FROM `flights`</span>
-<span class="co">#&gt; GROUP BY `tailnum`)</span>
-<span class="co">#&gt; WHERE (`n` &gt; 100.0)</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span>
+<span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `tailnum`, AVG(`arr_delay`)<span style="color: #0000BB;"> AS </span>`delay`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `flights`</span>
+<span class="co">#&gt;   <span style="color: #0000BB;">GROUP BY</span> `tailnum`</span>
+<span class="co">#&gt; )</span>
+<span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`n` &gt; 100.0)</span></code></pre></div>
 <p>If you’re familiar with SQL, this probably isn’t exactly what you’d write by hand, but it does the job. You can learn more about the SQL translation in <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> and <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code>.</p>
 <p>Typically, you’ll iterate a few times before you figure out what data you need from the database. Once you’ve figured it out, use <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> to pull all the data down into a local tibble:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -306,7 +308,8 @@
 <span class="co">#&gt; [1] NA</span>
 
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span>
-<span class="co">#&gt; Error: tail() is not supported by sql sources</span></code></pre></div>
+<span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tail()`:</span></span>
+<span class="co">#&gt; <span style="color: #BBBB00;">!</span> `tail()` is not supported by sql sources</span></code></pre></div>
 <p>You can also ask the database how it plans to execute the query with <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code>. The output is database dependent, and can be esoteric, but learning a bit about it can be very useful because it helps you understand if the database can execute the query efficiently, or if you need to create new indices.</p>
 </div>
 <div class="section level2">
@@ -328,7 +331,7 @@
 <h3 id="bigquery">BigQuery<a class="anchor" aria-label="anchor" href="#bigquery"></a>
 </h3>
 <p>BigQuery is a hosted database server provided by Google. To connect, you need to provide your <code>project</code>, <code>dataset</code> and optionally a project for <code>billing</code> (if billing for <code>project</code> isn’t enabled).</p>
-<p>It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it’s a hosted solution, there’s no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can <a href="https://cloud.google.com/products/data-transfer" class="external-link">ship hard drives</a>!)</p>
+<p>It provides a similar set of functions to Postgres and is designed specifically for analytic workflows. Because it’s a hosted solution, there’s no setup involved, but if you have a lot of data, getting it to Google can be an ordeal (especially because upload support from R is not great currently). (If you have lots of data, you can <a href="https://cloud.google.com/storage-transfer-service" class="external-link">ship hard drives</a>!)</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -346,7 +349,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
   </div></footer>

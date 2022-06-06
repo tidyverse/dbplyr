@@ -103,6 +103,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/complete.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/copy_inline.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/copy_to.src_sql.html</loc>
   </url>
   <url>
@@ -146,6 +149,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/filter.tbl_lazy.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/get_returned_rows.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/group_by.tbl_lazy.html</loc>
@@ -211,10 +217,16 @@
     <loc>https://dbplyr.tidyverse.org/reference/replace_na.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/rows-db.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/select.tbl_lazy.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/simulate_dbi.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/simulate_vars.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql.html</loc>
@@ -224,6 +236,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_expr.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/sql_query_insert.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_quote.html</loc>

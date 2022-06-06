@@ -4,6 +4,9 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
+sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample().
+supports_window_clause(con) does the backend support named windows?
 
 
 Tables:
@@ -25,18 +28,33 @@ sql_query_wrap(con, from) generates SQL for wrapping a query into a
 subquery.
 
 
+Query indentation:
+sql_indent_subquery(from, con, lvl) helps indenting a subquery.
+
+
 Query generation:
-sql_query_select() generate SQL for a SELECT query
-sql_query_join() generate SQL for joins
-sql_query_semi_join() generate SQL for semi- and anti-joins
-sql_query_set_op() generate SQL for UNION, INTERSECT, and EXCEPT
+sql_query_select() generates SQL for a SELECT query
+sql_query_join() generates SQL for joins
+sql_query_semi_join() generates SQL for semi- and anti-joins
+sql_query_set_op() generates SQL for UNION, INTERSECT, and EXCEPT
 queries.
 
-'><title>SQL generation generics — db-sql • dbplyr</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet"><link href="../deps/_Source%20Code%20Pro-0.4.0/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="SQL generation generics — db-sql"><meta property="og:description" content='SQL translation:
+
+Query generation for manipulation:
+sql_query_insert() and sql_query_append() generate SQL for an INSERT FROM query.
+sql_query_update_from() generates SQL for an UPDATE FROM query.
+sql_query_upsert() generates SQL for an UPSERT query.
+sql_query_delete() generates SQL for an DELETE FROM query
+sql_returning_cols() generates SQL for a RETURNING clause
+
+'><title>SQL generation generics — db-sql • dbplyr</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="../deps/_Source%20Sans%20Pro-0.4.1/font.css" rel="stylesheet"><link href="../deps/_Source%20Code%20Pro-0.4.1/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="SQL generation generics — db-sql"><meta property="og:description" content='SQL translation:
 sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
+sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample().
+supports_window_clause(con) does the backend support named windows?
 
 
 Tables:
@@ -58,12 +76,24 @@ sql_query_wrap(con, from) generates SQL for wrapping a query into a
 subquery.
 
 
+Query indentation:
+sql_indent_subquery(from, con, lvl) helps indenting a subquery.
+
+
 Query generation:
-sql_query_select() generate SQL for a SELECT query
-sql_query_join() generate SQL for joins
-sql_query_semi_join() generate SQL for semi- and anti-joins
-sql_query_set_op() generate SQL for UNION, INTERSECT, and EXCEPT
+sql_query_select() generates SQL for a SELECT query
+sql_query_join() generates SQL for joins
+sql_query_semi_join() generates SQL for semi- and anti-joins
+sql_query_set_op() generates SQL for UNION, INTERSECT, and EXCEPT
 queries.
+
+
+Query generation for manipulation:
+sql_query_insert() and sql_query_append() generate SQL for an INSERT FROM query.
+sql_query_update_from() generates SQL for an UPDATE FROM query.
+sql_query_upsert() generates SQL for an UPSERT query.
+sql_query_delete() generates SQL for an DELETE FROM query
+sql_returning_cols() generates SQL for a RETURNING clause
 
 '><meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -76,7 +106,7 @@ queries.
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +123,7 @@ queries.
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/backend-2.html">dplyr 2.0.0 backend API</a>
+    <a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a>
     <a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a>
     <a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a>
     <a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a>
@@ -141,6 +171,9 @@ queries.
 pair of <code>NULL</code>s should match. The default translation uses a <code>CASE WHEN</code>
 as described in <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link">https://modern-sql.com/feature/is-distinct-from</a>.</p></li>
 <li><p><code>sql_translation(con)</code> generates a SQL translation environment.</p></li>
+<li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
+to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
+<li><p><code>supports_window_clause(con)</code> does the backend support named windows?</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
@@ -154,11 +187,17 @@ capture field names in <code><a href="tbl_sql.html">tbl_sql()</a></code></p></li
 (temporary) table.</p></li>
 <li><p><code>sql_query_wrap(con, from)</code> generates SQL for wrapping a query into a
 subquery.</p></li>
-</ul><p>Query generation:</p><ul><li><p><code>sql_query_select()</code> generate SQL for a <code>SELECT</code> query</p></li>
-<li><p><code>sql_query_join()</code> generate SQL for joins</p></li>
-<li><p><code>sql_query_semi_join()</code> generate SQL for semi- and anti-joins</p></li>
-<li><p><code>sql_query_set_op()</code> generate SQL for <code>UNION</code>, <code>INTERSECT</code>, and <code>EXCEPT</code>
+</ul><p>Query indentation:</p><ul><li><p><code>sql_indent_subquery(from, con, lvl)</code> helps indenting a subquery.</p></li>
+</ul><p>Query generation:</p><ul><li><p><code>sql_query_select()</code> generates SQL for a <code>SELECT</code> query</p></li>
+<li><p><code>sql_query_join()</code> generates SQL for joins</p></li>
+<li><p><code>sql_query_semi_join()</code> generates SQL for semi- and anti-joins</p></li>
+<li><p><code>sql_query_set_op()</code> generates SQL for <code>UNION</code>, <code>INTERSECT</code>, and <code>EXCEPT</code>
 queries.</p></li>
+</ul><p>Query generation for manipulation:</p><ul><li><p><code><a href="sql_query_insert.html">sql_query_insert()</a></code> and <code><a href="sql_query_insert.html">sql_query_append()</a></code> generate SQL for an <code>INSERT FROM</code> query.</p></li>
+<li><p><code><a href="sql_query_insert.html">sql_query_update_from()</a></code> generates SQL for an <code>UPDATE FROM</code> query.</p></li>
+<li><p><code><a href="sql_query_insert.html">sql_query_upsert()</a></code> generates SQL for an <code>UPSERT</code> query.</p></li>
+<li><p><code><a href="sql_query_insert.html">sql_query_delete()</a></code> generates SQL for an <code>DELETE FROM</code> query</p></li>
+<li><p><code>sql_returning_cols()</code> generates SQL for a <code>RETURNING</code> clause</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -166,6 +205,8 @@ queries.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">sql_expr_matches</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span>
 
 <span class="fu">sql_translation</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
+<span class="fu">sql_random</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
 
 <span class="fu">sql_table_analyze</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span>
 
@@ -177,9 +218,13 @@ queries.</p></li>
 
 <span class="fu">sql_query_save</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">name</span>, temporary <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
 
-<span class="fu">sql_query_wrap</span><span class="op">(</span><span class="va">con</span>, <span class="va">from</span>, name <span class="op">=</span> <span class="fu">unique_subquery_name</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">sql_query_wrap</span><span class="op">(</span><span class="va">con</span>, <span class="va">from</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+
+<span class="fu">sql_indent_subquery</span><span class="op">(</span><span class="va">from</span>, <span class="va">con</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
 
 <span class="fu">sql_query_rows</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span>
+
+<span class="fu">supports_window_clause</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
 
 <span class="fu">sql_query_select</span><span class="op">(</span>
   <span class="va">con</span>,
@@ -188,11 +233,13 @@ queries.</p></li>
   where <span class="op">=</span> <span class="cn">NULL</span>,
   group_by <span class="op">=</span> <span class="cn">NULL</span>,
   having <span class="op">=</span> <span class="cn">NULL</span>,
+  window <span class="op">=</span> <span class="cn">NULL</span>,
   order_by <span class="op">=</span> <span class="cn">NULL</span>,
   limit <span class="op">=</span> <span class="cn">NULL</span>,
   distinct <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>,
-  subquery <span class="op">=</span> <span class="cn">FALSE</span>
+  subquery <span class="op">=</span> <span class="cn">FALSE</span>,
+  lvl <span class="op">=</span> <span class="fl">0</span>
 <span class="op">)</span>
 
 <span class="fu">sql_query_join</span><span class="op">(</span>
@@ -203,12 +250,15 @@ queries.</p></li>
   type <span class="op">=</span> <span class="st">"inner"</span>,
   by <span class="op">=</span> <span class="cn">NULL</span>,
   na_matches <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
+  <span class="va">...</span>,
+  lvl <span class="op">=</span> <span class="fl">0</span>
 <span class="op">)</span>
 
-<span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
 
-<span class="fu">sql_query_set_op</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">method</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<span class="fu">sql_query_set_op</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">method</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>
+
+<span class="fu">sql_returning_cols</span><span class="op">(</span><span class="va">con</span>, <span class="va">cols</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -252,7 +302,7 @@ instead of dplyr.</p><ul><li><p><code><a href="https://dplyr.tidyverse.org/refer
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
   </div></footer></body></html>
