@@ -317,8 +317,8 @@ base_agg <- sql_translator(
   max        = sql_aggregate("MAX"),
 
   # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
-  all        = sql_aggregate("MAX"),
-  any        = sql_aggregate("MIN"),
+  all        = sql_aggregate("MIN"),
+  any        = sql_aggregate("MAX"),
 
   sd         = sql_not_supported("sd()"),
   var        = sql_not_supported("var()"),
@@ -406,8 +406,8 @@ base_win <- sql_translator(
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
 
-  all   = win_aggregate("MAX"),
-  any   = win_aggregate("MIN"),
+  all   = win_aggregate("MIN"),
+  any   = win_aggregate("MAX"),
 
   sd    = sql_not_supported("sd()"),
   var   = sql_not_supported("var()"),
