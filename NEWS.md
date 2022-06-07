@@ -1,22 +1,13 @@
 # dbplyr (development version)
 
-* `na.rm = FALSE` only warns once every 8 hours across all functions (#899).
-
-* `fill()` now works for connections from RPostgreSQL (@mgirlich).
-
-* `explain()` now works for connections from ROracle (@mgirlich).
-
-* When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
-  column (@mgirlich).
-
-* `remote_name()` now returns a name in more cases where it makes sense
-  (@mgirlich, #850).
+# dbplyr 2.2.0
 
 ## New features
 
 * SQL formatting has been considerably improved with new wrapping and indenting. 
   `show_query()` creates more readable queries by printing the keywords in blue 
-  (@mgirlich, #644).
+  (@mgirlich, #644). When possible dbplyr now uses `SELECT *` instead of 
+  explicitly selecting every column (@mgirlich).
   
 * Added support for `rows_insert()`, `rows_append()`, `rows_update()`, 
   `rows_patch()`, `rows_upsert()`, and `rows_delete()` (@mgirlich, #736).
@@ -44,7 +35,8 @@
   * `case_when()` with a final clause of the form `TRUE ~ ...` uses `ELSE ...` 
      for SQLite (@mgirlich, #754).
   * `day()`, `week()`, `isoweek()`, and `isoyear()` for Postgres (@mgirlich, #675).
-  * `fill()` for SQL Server (#651, @mgirlich).
+  * `explain()` for ROracle (@mgirlich).
+  * `fill()` for SQL Server (#651, @mgirlich) and RPostgreSQL (@mgirlich).
   * `quantile()` for SQL Server (@mgirlich, #620).
   * `str_flatten()` for Redshift (@hdplsa, #804) 
   * `slice_sample()` for MySQL/MariaDB and SQL Server (@mgirlich, #617).
@@ -67,6 +59,9 @@
 * `n()` now respects the window frame (@mgirlich, #700).
 
 * `quantile()` no longer errors when using the `na.rm` argument (@mgirlich, #600).
+
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
 
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
   easier to transfer bug fixes and new features from one package to the other.
@@ -121,6 +116,8 @@
 
 * `mutate()` now supports the arguments `.keep`, `.before`, and `.after`
   (@mgirlich, #802).
+
+* `na.rm = FALSE` only warns once every 8 hours across all functions (#899).
 
 * `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
 
