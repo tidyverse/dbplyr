@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
+  databases that don't support them.
+  
+* `any()` and `all()` gain default translations for all backends.
+
 # dbplyr 2.2.0
 
 ## New features

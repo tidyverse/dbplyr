@@ -354,9 +354,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
-                      # MSSQL does not have function for: cor and cov
-      cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
       # percentile_cont needs `OVER()` in mssql
@@ -367,9 +364,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
-      # MSSQL does not have function for: cor and cov
-      cor           = win_absent("cor"),
-      cov           = win_absent("cov"),
       str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
