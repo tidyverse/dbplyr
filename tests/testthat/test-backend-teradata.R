@@ -82,3 +82,4 @@ test_that("row_number with and without group_by", {
   expect_snapshot(mf %>% mutate(rown = row_number()))
   expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
 })
+
