@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Querying Oracle databases works again. Unfortunately, the fix caused to
+  explicitly select every column again for Oracle databases (@mgirlich, #908).
+
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.
   
