@@ -123,7 +123,9 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
     disco <- db_disconnector(con, quiet = is_true(auto_disconnect)) # nocov
   }
 
-  subclass <- paste0("src_", class(con)[[1]])
+  con_classes <- extends(class(con))[
+    grepl("(?<!DBI)Connection$", extends(class(con)), perl = TRUE)]
+  subclass <- paste0("src_", con_classes)
 
   structure(
     list(
