@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `semi_join()` and `anti_join()` work again for Spark (@mgirlich, #915).
+
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.
   
