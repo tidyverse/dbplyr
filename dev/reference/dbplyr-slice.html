@@ -112,10 +112,16 @@ value of <code>x</code> in each group.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>.data</dt>
 <dd><p>A lazy data frame backed by a database query.</p></dd>
+
+
 <dt>order_by</dt>
 <dd><p>Variable or function of variables to order by.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Not used.</p></dd>
+
+
 <dt>n, prop</dt>
 <dd><p>Provide either <code>n</code>, the number of rows, or <code>prop</code>, the
 proportion of rows to select. If neither are supplied, <code>n = 1</code> will be
@@ -123,12 +129,17 @@ used.</p>
 <p>If <code>n</code> is greater than the number of rows in the group (or <code>prop</code> &gt; 1),
 the result will be silently truncated to the group size. If the proportion
 of a group size is not an integer, it is rounded down.</p></dd>
+
+
 <dt>with_ties</dt>
 <dd><p>Should ties be kept together? The default, <code>TRUE</code>, may
 return more rows than you request. Use FALSE to ignore ties, and return
 the first n rows.</p></dd>
+
+
 <dt>weight_by, replace</dt>
 <dd><p>Not supported for database backends.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
@@ -206,7 +217,7 @@ the first n rows.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
   </div></footer></body></html>

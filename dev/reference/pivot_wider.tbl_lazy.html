@@ -115,8 +115,12 @@ at the data to figure out what the new column names will be.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>data</dt>
 <dd><p>A lazy data frame backed by a database query.</p></dd>
+
+
 <dt>id_cols</dt>
 <dd><p>A set of columns that uniquely identifies each observation.</p></dd>
+
+
 <dt>names_from, values_from</dt>
 <dd><p>A pair of
 arguments describing which column (or columns) to get the name of the
@@ -124,19 +128,29 @@ output column (<code>names_from</code>), and which column (or columns) to get th
 cell values from (<code>values_from</code>).</p>
 <p>If <code>values_from</code> contains multiple values, the value will be added to the
 front of the output column.</p></dd>
+
+
 <dt>names_prefix</dt>
 <dd><p>String added to the start of every variable name.</p></dd>
+
+
 <dt>names_sep</dt>
 <dd><p>If <code>names_from</code> or <code>values_from</code> contains multiple
 variables, this will be used to join their values together into a single
 string to use as a column name.</p></dd>
+
+
 <dt>names_glue</dt>
 <dd><p>Instead of <code>names_sep</code> and <code>names_prefix</code>, you can supply
 a glue specification that uses the <code>names_from</code> columns (and special
 <code>.value</code>) to create custom column names.</p></dd>
+
+
 <dt>names_sort</dt>
 <dd><p>Should the column names be sorted? If <code>FALSE</code>, the default,
 column names are ordered by first appearance.</p></dd>
+
+
 <dt>names_vary</dt>
 <dd><p>When <code>names_from</code> identifies a column (or columns) with
 multiple unique values, and multiple <code>values_from</code> columns are provided,
@@ -145,21 +159,31 @@ naming scheme of the form: <code>value1_name1, value1_name2, value2_name1, value
 <li><p><code>"slowest"</code> varies <code>names_from</code> values slowest, resulting in a column
 naming scheme of the form: <code>value1_name1, value2_name1, value1_name2, value2_name2</code>.</p></li>
 </ul></dd>
+
+
 <dt>names_expand</dt>
 <dd><p>Should the values in the <code>names_from</code> columns be expanded
 by <code>expand()</code> before pivoting? This results in more columns, the output
 will contain column names corresponding to a complete expansion of all
 possible values in <code>names_from</code>. Additionally, the column names will be
 sorted, identical to what <code>names_sort</code> would produce.</p></dd>
+
+
 <dt>names_repair</dt>
 <dd><p>What happens if the output has invalid column names?</p></dd>
+
+
 <dt>values_fill</dt>
 <dd><p>Optionally, a (scalar) value that specifies what each
 <code>value</code> should be filled in with when missing.</p></dd>
+
+
 <dt>values_fn</dt>
 <dd><p>A function, the default is <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code>, applied to the <code>value</code>
 in each cell in the output. In contrast to local data frames it must not be
 <code>NULL</code>.</p></dd>
+
+
 <dt>unused_fn</dt>
 <dd><p>Optionally, a function applied to summarize the values from
 the unused columns (i.e. columns not identified by <code>id_cols</code>,
@@ -171,8 +195,11 @@ to different unused columns.</p>
 all unspecified columns will be considered <code>id_cols</code>.</p>
 <p>This is similar to grouping by the <code>id_cols</code> then summarizing the
 unused columns using <code>unused_fn</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Unused; included for compatibility with generic.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -223,7 +250,7 @@ identified.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
   </div></footer></body></html>
