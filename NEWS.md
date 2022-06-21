@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `str_c()` is now translated to `||` in Oracle (@mgirlich, #921).
+
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.
   
