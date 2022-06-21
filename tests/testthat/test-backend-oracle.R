@@ -12,6 +12,7 @@ test_that("paste and paste0 translate correctly", {
 
   expect_equal(translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
   expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
+  expect_equal(translate_sql(str_c(x, y)), sql("`x` || `y`"))
 })
 
 test_that("queries translate correctly", {
