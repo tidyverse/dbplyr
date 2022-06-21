@@ -3,6 +3,8 @@
 * Querying Oracle databases works again. Unfortunately, the fix caused to
   explicitly select every column again for Oracle databases (@mgirlich, #908).
 
+* `semi_join()` and `anti_join()` work again for Spark (@mgirlich, #915).
+
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.
   

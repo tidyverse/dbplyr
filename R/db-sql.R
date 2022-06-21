@@ -397,9 +397,6 @@ sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
-  lhs <- escape(ident(by$x_as), con = con)
-  rhs <- escape(ident(by$y_as), con = con)
-
   on <- sql_join_tbls(con, by)
 
   lines <- list(
