@@ -3,6 +3,7 @@ test_that("custom scalar translated correctly", {
 
   expect_equal(translate_sql(x != y),          sql("`x` <> `y`"))
   expect_equal(translate_sql(as.numeric(x)),   sql("CAST(`x` AS DECIMAL(12, 9))"))
+  expect_equal(translate_sql(as.numeric(x, 8)),   sql("CAST(`x` AS DECIMAL(12, 8))"))
   expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS NUMERIC)"))
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR(MAX))"))
   expect_equal(translate_sql(log(x)),          sql("LN(`x`)"))

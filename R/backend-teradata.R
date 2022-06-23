@@ -64,7 +64,8 @@ sql_translation.Teradata <- function(con) {
       bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
       bitwShiftR    = sql_prefix("SHIFTRIGHT", 2),
       as.numeric    = function(x, digits = 9L) {
-                        sql_expr(CAST(!!x %as% DECIMAL(12L,9L)))
+                        digits <- vctrs::vec_cast(digits, integer())
+                        sql_expr(CAST(!!x %as% DECIMAL(12L, !!digits)))
                       },
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
