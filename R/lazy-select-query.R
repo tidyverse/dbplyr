@@ -180,7 +180,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
-  select <- select_use_star(select, in_vars)
+  select <- select_use_star(select, in_vars, con)
 
   # translate once just to register windows
   win_register_activate()
@@ -208,7 +208,11 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   )
 }
 
-select_use_star <- function(select, vars_prev) {
+select_use_star <- function(select, vars_prev, con) {
+  if (!supports_star_without_alias(con)) {
+    return(select)
+  }
+
   first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
   if (is.na(first_match)) {
     return(select)
