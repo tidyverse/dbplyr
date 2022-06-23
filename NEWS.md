@@ -1,11 +1,11 @@
-# dbplyr (development version)
+# dbplyr 2.2.1
 
 * Querying Oracle databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #908).
 
-* `str_c()` is now translated to `||` in Oracle (@mgirlich, #921).
-
 * `semi_join()` and `anti_join()` work again for Spark (@mgirlich, #915).
+
+* `str_c()` is now translated to `||` in Oracle (@mgirlich, #921).
 
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.
