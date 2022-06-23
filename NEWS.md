@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
+  `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
+  `cumsum()` (@overmar, #913).
+
 * Querying Oracle databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #908).
 
