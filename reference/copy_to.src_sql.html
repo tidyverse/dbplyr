@@ -18,7 +18,7 @@ only visible within the current connection to the database."><meta property="og:
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@ only visible within the current connection to the database."><meta property="og:
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
@@ -108,45 +109,68 @@ only visible within the current connection to the database.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>dest</dt>
 <dd><p>remote data source</p></dd>
+
+
 <dt>df</dt>
 <dd><p>A local data frame, a <code>tbl_sql</code> from same source, or a <code>tbl_sql</code>
 from another source. If from another source, all data must transition
 through R in one pass, so it is only suitable for transferring small
 amounts of data.</p></dd>
+
+
 <dt>name</dt>
 <dd><p>name for new remote table.</p></dd>
+
+
 <dt>overwrite</dt>
 <dd><p>If <code>TRUE</code>, will overwrite an existing table with
 name <code>name</code>. If <code>FALSE</code>, will throw an error if <code>name</code> already
 exists.</p></dd>
+
+
 <dt>types</dt>
 <dd><p>a character vector giving variable types to use for the columns.
 See <a href="https://www.sqlite.org/datatype3.html" class="external-link">https://www.sqlite.org/datatype3.html</a> for available types.</p></dd>
+
+
 <dt>temporary</dt>
 <dd><p>if <code>TRUE</code>, will create a temporary table that is
 local to this connection and will be automatically deleted when the
 connection expires</p></dd>
+
+
 <dt>unique_indexes</dt>
 <dd><p>a list of character vectors. Each element of the list
 will create a new unique index over the specified column(s). Duplicate rows
 will result in failure.</p></dd>
+
+
 <dt>indexes</dt>
 <dd><p>a list of character vectors. Each element of the list
 will create a new index.</p></dd>
+
+
 <dt>analyze</dt>
 <dd><p>if <code>TRUE</code> (the default), will automatically ANALYZE the
 new table so that the query optimiser has useful information.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>other parameters passed to methods.</p></dd>
+
+
 <dt>in_transaction</dt>
 <dd><p>Should the table creation be wrapped in a transaction?
 This typically makes things faster, but you may want to suppress if the
 database doesn't support transactions, or you're wrapping in a transaction
 higher up (and your database doesn't support nested transactions.)</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Another <code>tbl_lazy</code>. Use <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code> to see the generated
+    
+
+<p>Another <code>tbl_lazy</code>. Use <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code> to see the generated
 query, and use <code><a href="collapse.tbl_sql.html">collect()</a></code> to execute the query
 and return data to R.</p>
     </div>
@@ -200,7 +224,7 @@ writing to a table.</p></div>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
   </div></footer></body></html>

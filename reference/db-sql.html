@@ -7,6 +7,8 @@ sql_translation(con) generates a SQL translation environment.
 sql_random(con) generates SQL to get a random number which can be used
 to select random rows in slice_sample().
 supports_window_clause(con) does the backend support named windows?
+supports_star_without_alias(con) does the backend support using *
+in a SELECT query without prefixing by a table alias?
 
 
 Tables:
@@ -55,6 +57,8 @@ sql_translation(con) generates a SQL translation environment.
 sql_random(con) generates SQL to get a random number which can be used
 to select random rows in slice_sample().
 supports_window_clause(con) does the backend support named windows?
+supports_star_without_alias(con) does the backend support using *
+in a SELECT query without prefixing by a table alias?
 
 
 Tables:
@@ -106,7 +110,7 @@ sql_returning_cols() generates SQL for a RETURNING clause
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,6 +139,7 @@ sql_returning_cols() generates SQL for a RETURNING clause
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
@@ -174,6 +179,8 @@ as described in <a href="https://modern-sql.com/feature/is-distinct-from" class=
 <li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
 to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
 <li><p><code>supports_window_clause(con)</code> does the backend support named windows?</p></li>
+<li><p><code>supports_star_without_alias(con)</code> does the backend support using <code>*</code>
+in a <code>SELECT</code> query without prefixing by a table alias?</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
@@ -225,6 +232,8 @@ queries.</p></li>
 <span class="fu">sql_query_rows</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="fu">supports_window_clause</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
+<span class="fu">supports_star_without_alias</span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
 
 <span class="fu">sql_query_select</span><span class="op">(</span>
   <span class="va">con</span>,
@@ -302,7 +311,7 @@ instead of dplyr.</p><ul><li><p><code><a href="https://dplyr.tidyverse.org/refer
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
   </div></footer></body></html>

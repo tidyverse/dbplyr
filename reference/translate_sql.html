@@ -20,7 +20,7 @@ Learn more in vignette(&quot;translation-function&quot;)."><meta property="og:im
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,6 +49,7 @@ Learn more in vignette(&quot;translation-function&quot;)."><meta property="og:im
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
@@ -118,20 +119,31 @@ functions.  All other functions will be preserved as is. R's infix functions
 <dd><p>Expressions to translate. <code>translate_sql()</code>
 automatically quotes them for you.  <code>translate_sql_()</code> expects
 a list of already quoted objects.</p></dd>
+
+
 <dt>con</dt>
 <dd><p>An optional database connection to control the details of
 the translation. The default, <code>NULL</code>, generates ANSI SQL.</p></dd>
+
+
 <dt>vars</dt>
 <dd><p>Deprecated. Now call <code><a href="partial_eval.html">partial_eval()</a></code> directly.</p></dd>
+
+
 <dt>vars_group, vars_order, vars_frame</dt>
 <dd><p>Parameters used in the <code>OVER</code>
 expression of windowed functions.</p></dd>
+
+
 <dt>window</dt>
 <dd><p>Use <code>FALSE</code> to suppress generation of the <code>OVER</code>
 statement used for window functions. This is necessary when generating
 SQL for a grouped summary.</p></dd>
+
+
 <dt>context</dt>
 <dd><p>Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
@@ -213,7 +225,7 @@ SQL for a grouped summary.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
   </div></footer></body></html>

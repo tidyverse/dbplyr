@@ -18,7 +18,7 @@ always call sql_render()."><meta property="og:image" content="https://dbplyr.tid
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@ always call sql_render()."><meta property="og:image" content="https://dbplyr.tid
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
@@ -172,16 +173,23 @@ always call <code>sql_render()</code>.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>...</dt>
 <dd><p>Other arguments passed on to the methods. Not currently used.</p></dd>
+
+
 <dt>op</dt>
 <dd><p>A sequence of lazy operations</p></dd>
+
+
 <dt>con</dt>
 <dd><p>A database connection. The default <code>NULL</code> uses a set of
 rules that should be very similar to ANSI 92, and allows for testing
 without an active database connection.</p></dd>
+
+
 <dt>subquery</dt>
 <dd><p>Is this SQL going to be used in a subquery?
 This is important because you can place a bare table name in a subquery
 and  ORDER BY does not work in subqueries.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -207,7 +215,7 @@ compliant.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
   </div></footer></body></html>
