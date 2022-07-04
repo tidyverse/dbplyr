@@ -39,6 +39,24 @@ dbGetQuery <- function(conn, statement, ...) {
   DBI::dbGetQuery(conn, statement, ...)
 }
 
+dbSendQuery <- function(conn, statement, ...) {
+  level <- tracing_level()
+  id <- tracing_id()
+
+  if (level >= 1) {
+    message_base <- paste0("[", id, "]: dbSendQuery()")
+    message_pre <- paste0(message_base, "\n", statement)
+    message_post <- paste0(message_base, " done")
+    class <- c("dplyr_message_trace_send_query", "dplyr_message_trace", "dplyr_message")
+    inform(message_pre, class = class)
+    on.exit({
+      inform(message_post, class = class)
+    })
+  }
+
+  DBI::dbSendQuery(conn, statement, ...)
+}
+
 dbExecute <- function(conn, statement, ...) {
   level <- tracing_level()
   id <- tracing_id()
