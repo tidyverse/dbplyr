@@ -2,8 +2,6 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_snowflake())
   expect_equal(translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
-<<<<<<< HEAD
-=======
   expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || 'exp' || '.*')"))
   expect_equal(translate_sql(grepl("exp", x, TRUE)),  sql("LOWER(`x`) REGEXP ('.*' || LOWER('exp') || '.*')"))
 })
@@ -99,5 +97,4 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_equal(translate_sql(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
   expect_equal(translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
->>>>>>> 6f33bc21 (add local_con tests for snowflake)
 })
