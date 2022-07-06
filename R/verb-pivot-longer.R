@@ -73,7 +73,7 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_transform = NULL,
                                   ...) {
   if (!is_missing(values_ptypes)) {
-    abort("The `values_ptypes` argument is not supported for remote back-ends")
+    cli_abort("The {.arg values_ptypes} argument is not supported for remote back-ends")
   }
 
   rlang::check_dots_empty()
@@ -265,11 +265,11 @@ check_list_of_functions <- function(x, names, arg, call = caller_env()) {
   }
 
   if (length(x) > 0L && !is_named(x)) {
-    abort(glue("All elements of `{arg}` must be named."), call = call)
+    cli_abort("All elements of {.arg {arg}} must be named.", call = call)
   }
 
   if (vctrs::vec_duplicate_any(names(x))) {
-    abort(glue("The names of `{arg}` must be unique."), call = call)
+    cli_abort("The names of {.arg {arg}} must be unique.", call = call)
   }
 
   # Silently drop user supplied names not found in the data

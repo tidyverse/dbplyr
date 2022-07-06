@@ -53,11 +53,11 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
-      warning(
-        "Windowed expression '", expr, "' does not have explicit order.\n",
-        "Please use arrange() or window_order() to make determinstic.",
-        call. = FALSE
-      )
+      # TODO use {.code {expr}} after https://github.com/r-lib/cli/issues/422 is fixed
+      cli::cli_warn(c(
+        "Windowed expression `{expr}` does not have explicit order.",
+        i = "Please use {.fun arrange} or {.fun window_order} to make deterministic."
+      ))
     }
 
     if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
@@ -121,7 +121,7 @@ win_reset <- function() {
 }
 
 rows <- function(from = -Inf, to = 0) {
-  if (from >= to) abort("from must be less than to")
+  if (from >= to) cli_abort("{.arg from} ({from}) must be less than {.arg to} ({to})")
 
   dir <- function(x) if (x < 0) "PRECEDING" else "FOLLOWING"
   val <- function(x) if (is.finite(x)) as.integer(abs(x)) else "UNBOUNDED"
@@ -156,9 +156,8 @@ win_rank <- function(f) {
 #' @export
 win_aggregate <- function(f) {
   force(f)
-  warned <- FALSE
   function(x, na.rm = FALSE) {
-    warned <<- check_na_rm(f, na.rm, warned)
+    check_na_rm(na.rm)
     frame <- win_current_frame()
 
     win_over(
@@ -212,9 +211,8 @@ win_absent <- function(f) {
   force(f)
 
   function(...) {
-    abort(
-      paste0("Window function `", f, "()` is not supported by this database")
-    )
+    # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+    cli_abort("Window function `{f}()` is not supported by this database.")
   }
 }
 
@@ -351,7 +349,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
 
       }
     },
-    abort(glue("Unknown type: ", typeof(expr))) # nocov
+    cli_abort("Unknown type: {typeof(expr)}") # nocov
   )
 }
 

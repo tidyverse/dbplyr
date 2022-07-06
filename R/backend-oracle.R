@@ -61,6 +61,43 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 }
 
 #' @export
+sql_query_upsert.Oracle <- function(con,
+                                    x_name,
+                                    y,
+                                    by,
+                                    update_cols,
+                                    ...,
+                                    returning_cols = NULL,
+                                    method = NULL) {
+  method <- method %||% "merge"
+  arg_match(method, c("merge", "cte_update"), error_arg = "method")
+  if (method == "cte_update") {
+    return(NextMethod("sql_query_upsert"))
+  }
+
+  # https://oracle-base.com/articles/9i/merge-statement
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
+  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  clauses <- list(
+    sql_clause("MERGE INTO", x_name),
+    sql_clause("USING", parts$from),
+    sql_clause_on(parts$where, lvl = 1),
+    sql("WHEN MATCHED THEN"),
+    sql_clause("UPDATE SET", update_clause, lvl = 1),
+    sql("WHEN NOT MATCHED THEN"),
+    sql_clause_insert(con, update_cols_esc, lvl = 1),
+    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, x_name),
+    sql(";")
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
 sql_translation.Oracle <- function(con) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
@@ -83,6 +120,7 @@ sql_translation.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
@@ -141,6 +179,11 @@ sql_expr_matches.Oracle <- function(con, x, y) {
   build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
 }
 
+#' @export
+supports_star_without_alias.Oracle <- function(con) {
+  FALSE
+}
+
 
 # roacle package ----------------------------------------------------------
 
@@ -148,16 +191,25 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 dbplyr_edition.OraConnection <- dbplyr_edition.Oracle
 
 #' @export
+sql_query_select.OraConnection <- sql_query_select.Oracle
+
+#' @export
+sql_query_upsert.OraConnection <- sql_query_upsert.Oracle
+
+#' @export
 sql_translation.OraConnection <- sql_translation.Oracle
 
 #' @export
-sql_query_select.OraConnection <- sql_query_select.Oracle
+sql_query_explain.OraConnection <- sql_query_explain.Oracle
 
 #' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
 
 #' @export
 sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
+
+#' @export
+sql_query_save.OraConnection <- sql_query_save.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle
@@ -166,13 +218,6 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
 #' @export
-supports_window_clause.Oracle <- function(con) {
-  TRUE
-}
-
-#' @export
-supports_window_clause.OraConnection <- function(con) {
-  TRUE
-}
+supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))

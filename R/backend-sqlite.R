@@ -45,6 +45,9 @@ sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
 #' @export
 sql_query_set_op.SQLiteConnection <- sql_query_set_op.Hive
 
+#' @export
+sql_query_upsert.SQLiteConnection <- sql_query_upsert.PqConnection
+
 sqlite_version <- function() {
   numeric_version(RSQLite::rsqliteVersion()[[2]])
 }
@@ -174,6 +177,12 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   } else if (type == "right") {
     sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl)
   }
+}
+
+#' @export
+values_prepare.SQLiteConnection <- function(con, df) {
+  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
 }
 
 #' @export

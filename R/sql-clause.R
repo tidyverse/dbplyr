@@ -37,7 +37,7 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
 sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0) {
   assert_that(is.character(select))
   if (is_empty(select)) {
-    abort("Query contains no columns")
+    cli_abort("Query contains no columns")
   }
 
   clause <- build_sql(
@@ -91,6 +91,39 @@ sql_clause_limit <- function(con, limit, lvl = 0){
   }
 }
 
+sql_clause_update <- function(table) {
+  sql_clause("UPDATE", table)
+}
+
+sql_clause_set <- function(lhs, rhs) {
+  update_clauses <- sql(paste0(lhs, " = ", rhs))
+
+  sql_clause("SET", update_clauses)
+}
+
+sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
+  if (is.null(into)) {
+    sql_clause("INSERT", cols, parens = TRUE, lvl = lvl)
+  } else {
+    kw <- paste0("INSERT INTO ", escape(into, con = con))
+    sql_clause(kw, cols, lvl = lvl)
+  }
+}
+
+sql_clause_on <- function(on, lvl = 0) {
+  sql_clause("ON", on, sep = " AND", lvl = lvl)
+}
+
+sql_clause_where_exists <- function(table, where, not) {
+  list(
+    sql(paste0("WHERE ", if (not) "NOT ", "EXISTS (")),
+    # lvl = 1 because they are basically in a subquery
+    sql_clause("SELECT 1 FROM", table, lvl = 1),
+    sql_clause_where(where, lvl = 1),
+    sql(")")
+  )
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {
@@ -112,12 +145,18 @@ sql_format_clause <- function(x, lvl, con, nchar_max = 80) {
   lvl <- lvl + x$lvl
 
   # check length without starting a new line
+  if (x$sep == " AND") {
+    x$sep <- style_kw(x$sep)
+  }
+
   fields_same_line <- escape(x$parts, collapse = paste0(x$sep, " "), con = con)
   if (x$parens) {
     fields_same_line <- paste0("(", fields_same_line, ")")
   }
+
+  x$kw <- style_kw(x$kw)
   same_line_clause <- paste0(x$kw, " ", fields_same_line)
-  nchar_same_line <- nchar(lvl_indent(lvl)) + nchar(same_line_clause)
+  nchar_same_line <- cli::ansi_nchar(lvl_indent(lvl)) + cli::ansi_nchar(same_line_clause)
 
   if (length(x$parts) == 1 || nchar_same_line <= nchar_max) {
     return(sql(same_line_clause))

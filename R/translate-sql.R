@@ -74,7 +74,7 @@ translate_sql <- function(...,
                           window = TRUE) {
 
   if (!missing(vars)) {
-    abort("`vars` is deprecated. Please use partial_eval() directly.")
+    cli_abort("{.arg vars} is deprecated. Please use {.fun partial_eval} directly.")
   }
 
   con <- con %||% sql_current_con() %||% simulate_dbi()
@@ -163,16 +163,17 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     pkg <- as.character(substitute(pkg))
     name <- as.character(substitute(name))
     if (!is_installed(pkg)) {
-      abort(glue("There is no package called '{pkg}'"))
+      cli_abort("There is no package called {.pkg {pkg}}")
     }
     if (!env_has(ns_env(pkg), name)) {
-      abort(glue("'{name}' is not an exported object from '{pkg}'"))
+      cli_abort("{.val {name}} is not an exported object from {.pkg {pkg}}")
     }
 
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      abort(glue("No known translation for {pkg}::{name}()"))
+      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+      cli_abort("No known translation for `{pkg}::{name}()`")
     }
   }
 
@@ -221,7 +222,11 @@ missing_op <- function(x, env) {
   function(...) {
     needs_parens <- !is_infix_base(x) && !is_infix_user(x)
 
-    abort(paste0("Don't know how to translate ", x, if (needs_parens) "()"))
+    if (needs_parens) {
+      cli_abort("Don't know how to translate {.fun {x}}")
+    } else {
+      cli_abort("Don't know how to translate `{x}`")
+    }
   }
 }
 

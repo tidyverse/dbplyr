@@ -111,7 +111,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 #' @export
 sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
   if (identical(type, "full")) {
-    abort("MySQL does not support full joins")
+    cli_abort("MySQL does not support full joins")
   }
   NextMethod()
 }
@@ -132,14 +132,14 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
-sql_values.MariaDBConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_clause(con, df, row = TRUE, lvl = lvl)
+sql_values_subquery.MariaDBConnection <- function(con, df, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE)
 }
 
 #' @export
-sql_values.MySQL <- sql_values.MariaDBConnection
+sql_values_subquery.MySQL <- sql_values_subquery.MariaDBConnection
 #' @export
-sql_values.MySQLConnection <- sql_values.MariaDBConnection
+sql_values_subquery.MySQLConnection <- sql_values_subquery.MariaDBConnection
 
 #' @export
 sql_random.MariaDBConnection <- function(con) {
@@ -149,6 +149,29 @@ sql_random.MariaDBConnection <- function(con) {
 sql_random.MySQLConnection <- sql_random.MariaDBConnection
 #' @export
 sql_random.MySQL <- sql_random.MariaDBConnection
+
+#' @export
+sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
+                                                    update_values, ...,
+                                                    returning_cols = NULL) {
+  # https://stackoverflow.com/a/19346375/946850
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols <- sql_table_prefix(con, names(update_values), x_name)
+
+  clauses <- list(
+    sql_clause_update(x_name),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause_on(parts$where, lvl = 1),
+    sql_clause_set(update_cols, update_values),
+    sql_returning_cols(con, returning_cols, x_name)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
+#' @export
+sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
 #' @export
 supports_window_clause.MariaDBConnection <- function(con) {

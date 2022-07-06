@@ -85,6 +85,16 @@ tbl.src_dbi <- function(src, from, ...) {
   tbl_sql(c(subclass, "dbi"), src = src, from = from, ...)
 }
 
+# Internal calls to `tbl()` should be avoided in favor of tbl_src_dbi().
+# The former may query the database for column names if `vars` is omitted,
+# the latter always requires `vars`.
+tbl_src_dbi <- function(src, from, vars) {
+  force(vars)
+  tbl(src, from, vars = vars)
+}
+
+
+
 #' Database src
 #'
 #' @description

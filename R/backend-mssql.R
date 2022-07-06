@@ -55,6 +55,9 @@
 #' lf %>% transmute(x = ifelse(c > d, "c", "d"))
 NULL
 
+#' @include verb-copy-to.R
+NULL
+
 #' @export
 #' @rdname simulate_dbi
 simulate_mssql <- function(version = "15.0") {
@@ -88,6 +91,113 @@ simulate_mssql <- function(version = "15.0") {
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     lvl       = lvl
   )
+}
+
+#' @export
+`sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+                                                    conflict = c("error", "ignore"),
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
+  method <- method %||% "where_not_exists"
+  arg_match(method, "where_not_exists", error_arg = "method")
+  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
+  conflict <- rows_check_conflict(conflict)
+
+  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+
+  clauses <- list2(
+    parts$insert_clause,
+    sql_returning_cols(con, returning_cols, "INSERTED"),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from),
+    !!!parts$conflict_clauses
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+`sql_query_append.Microsoft SQL Server` <- function(con, x_name, y, ...,
+                                                    returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
+  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+
+  clauses <- list2(
+    sql_clause_insert(con, insert_cols, x_name),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
+    sql_clause_select(con, sql("*")),
+    sql_clause_from(parts$from)
+  )
+
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+`sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
+                                                         update_values, ...,
+                                                         returning_cols = NULL) {
+  # https://stackoverflow.com/a/2334741/946850
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  update_cols <- sql_escape_ident(con, names(update_values))
+
+  clauses <- list(
+    sql_clause_update(x_name),
+    sql_clause_set(update_cols, update_values),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
+    sql_clause_from(x_name),
+    sql_clause("INNER JOIN", parts$from),
+    sql_clause_on(parts$where, lvl = 1)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+`sql_query_upsert.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    update_cols,
+                                                    ...,
+                                                    returning_cols = NULL,
+                                                    method = NULL) {
+  method <- method %||% "merge"
+  arg_match(method, "merge", error_arg = "method")
+
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  update_cols_esc <- sql(sql_escape_ident(con, update_cols))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
+
+  insert_cols <- c(by, update_cols)
+  insert_cols_esc <- sql(sql_escape_ident(con, insert_cols))
+  insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
+
+  clauses <- list(
+    sql_clause("MERGE INTO", x_name),
+    sql_clause("USING", parts$from),
+    sql_clause_on(parts$where, lvl = 1),
+    sql("WHEN MATCHED THEN"),
+    sql_clause("UPDATE SET", update_clause, lvl = 1),
+    sql("WHEN NOT MATCHED THEN"),
+    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause("VALUES", insert_cols_qual, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, "INSERTED"),
+    sql(";")
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
+}
+
+#' @export
+`sql_query_delete.Microsoft SQL Server` <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+
+  clauses <- list2(
+    sql_clause("DELETE FROM", x_name),
+    sql_returning_cols(con, returning_cols, table = "DELETED"),
+    !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
+  )
+  sql_format_clauses(clauses, lvl = 0, con)
 }
 
 #' @export
@@ -195,13 +305,14 @@ simulate_mssql <- function(version = "15.0") {
           if (!abbr) {
             sql_expr(DATENAME(MONTH, !!x))
           } else {
-            abort("`abbr` is not supported in SQL Server translation")          }
+            cli_abort("{.arg abbr} is not supported in SQL Server translation")
+          }
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
         if (fiscal_start != 1) {
-          abort("`fiscal_start` is not supported in SQL Server translation. Must be 1.")
+          cli_abort("{.arg fiscal_start} is not supported in SQL Server translation. Must be 1.")
         }
 
         if (with_year) {
@@ -243,9 +354,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
-                      # MSSQL does not have function for: cor and cov
-      cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
       # percentile_cont needs `OVER()` in mssql
@@ -256,9 +364,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
-      # MSSQL does not have function for: cor and cov
-      cor           = win_absent("cor"),
-      cov           = win_absent("cov"),
       str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
@@ -319,14 +424,19 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_values.Microsoft SQL Server` <- function(con, df, lvl = 0, ...) {
-  # https://docs.microsoft.com/en-us/sql/t-sql/queries/table-value-constructor-transact-sql
-  sql_values_clause(con, df, derived = TRUE, lvl = lvl)
-}
+`sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
 
 #' @export
 `sql_random.Microsoft SQL Server` <- function(con) {
   sql_expr(RAND())
+}
+
+#' @export
+`sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
+  stopifnot(table %in% c("DELETED", "INSERTED"))
+  returning_cols <- sql_named_cols(con, cols, table = ident(table))
+
+  sql_clause("OUTPUT", returning_cols)
 }
 
 # Bit vs boolean ----------------------------------------------------------

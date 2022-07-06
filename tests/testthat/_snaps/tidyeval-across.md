@@ -36,18 +36,18 @@
       capture_across(lf, across(a, 1))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(a, list(1)))
     Condition
       Error in `FUN()`:
-      ! .fns argument to dbplyr::across() must contain a function or a formula
+      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(c, mean))
     Condition
@@ -79,9 +79,9 @@
       lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum")
     Condition
       Warning:
-      Missing values are always removed in SQL.
-      Use `SUM(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
+      Missing values are always removed in SQL aggregation functions.
+      Use `na.rm = TRUE` to silence this warning
+      This warning is displayed once every 8 hours.
     Output
       <SQL>
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
@@ -111,12 +111,12 @@
       capture_if_all(lf, if_all(a, 1))
     Condition
       Error in `across_funs()`:
-      ! `.fns` argument to dbplyr::across() must be a NULL, a function, formula, or list
+      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
       Error in `FUN()`:
-      ! .fns argument to dbplyr::across() must contain a function or a formula
+      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
       x Problem with 1
 
 # if_all/any works in filter()
@@ -145,7 +145,7 @@
       lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `a`, `b`, `a` > 0.0 AND `b` > 0.0 AS `c`
+      SELECT *, `a` > 0.0 AND `b` > 0.0 AS `c`
       FROM `df`
 
 ---
@@ -154,7 +154,7 @@
       lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT `a`, `b`, `a` > 0.0 OR `b` > 0.0 AS `c`
+      SELECT *, `a` > 0.0 OR `b` > 0.0 AS `c`
       FROM `df`
 
 # if_all/any uses every colum as default

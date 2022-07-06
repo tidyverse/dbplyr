@@ -14,7 +14,7 @@
       Warning:
       `src` is deprecated; please use `con` instead
       Error in `as.data.frame()`:
-      ! Can not coerce `tbl_lazy` to data.frame
+      ! Can not coerce <tbl_lazy> to <data.frame>
 
 # has print method
 

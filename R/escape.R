@@ -33,7 +33,7 @@
 #' escape_ansi(escape_ansi(escape_ansi("X")))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
-    abort("`con` must not be NULL")
+    cli_abort("{.arg con} must not be NULL")
   }
 
   UseMethod("escape")
@@ -137,9 +137,10 @@ escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL)
 
 # Also used in default_ops() for reactives
 error_embed <- function(type, expr) {
-  abort(c(
-    glue("Cannot translate {type} to SQL."),
-    glue("Force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`")
+  # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
+  cli_abort(c(
+    "Cannot translate {type} to SQL.",
+    `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"
   ), call = NULL)
 }
 
@@ -147,7 +148,7 @@ error_embed <- function(type, expr) {
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
   if (is.null(con)) {
-    abort("`con` must not be NULL")
+    cli_abort("{.arg con} must not be NULL")
   }
 
   if (length(x) == 0) {
@@ -174,7 +175,8 @@ names_to_as <- function(x, names = names2(x), con = NULL) {
   }
 
   names_esc <- sql_escape_ident(con, names)
-  as <- ifelse(names == "" | names_esc == x, "", paste0(" AS ", names_esc))
+  as_sql <- style_kw(" AS ")
+  as <- ifelse(names == "" | names_esc == x, "", paste0(as_sql, names_esc))
 
   paste0(x, as)
 }

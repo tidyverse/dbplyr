@@ -27,7 +27,7 @@
 #' db2 %>% head() %>% show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
   if (!is.numeric(n) || length(n) != 1L || n < 0) {
-    abort("`n` must be a non-negative integer")
+    cli_abort("{.arg n} must be a non-negative integer")
   }
   n <- trunc(n)
 
@@ -39,7 +39,7 @@ add_head <- function(x, n) {
   lazy_query <- x$lazy_query
   if (!inherits(lazy_query, "lazy_select_query")) {
     lazy_query <- lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "head",
       limit = n
     )
@@ -51,7 +51,7 @@ add_head <- function(x, n) {
     lazy_query$limit <- min(lazy_query$limit, n)
   } else {
     lazy_query <- lazy_select_query(
-      from = lazy_query,
+      x = lazy_query,
       last_op = "head",
       limit = n
     )
@@ -62,5 +62,5 @@ add_head <- function(x, n) {
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
-  abort("tail() is not supported by sql sources")
+  cli_abort("{.fun tail} is not supported by sql sources")
 }

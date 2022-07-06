@@ -5,10 +5,9 @@ sql_quantile <- function(f,
   style <- match.arg(style)
   force(window)
 
-  warned <- FALSE
   function(x, probs, na.rm = FALSE) {
     check_probs(probs)
-    warned <<- check_na_rm(f, na.rm, warned)
+    check_na_rm(na.rm)
 
     sql <- switch(style,
       infix = sql_call2(f, x, probs),
@@ -38,10 +37,10 @@ sql_median <- function(f,
 
 check_probs <- function(probs) {
   if (!is.numeric(probs)) {
-    abort("`probs` must be numeric")
+    cli_abort("{.arg probs} must be numeric")
   }
 
   if (length(probs) > 1) {
-    abort("SQL translation only supports single value for `probs`.")
+    cli_abort("SQL translation only supports single value for {.arg probs}.")
   }
 }

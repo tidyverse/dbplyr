@@ -80,6 +80,15 @@ dbplyr_fallback <- function(con, .generic, ...) {
     # Always call DBIConnection method which contains the default implementation
     fun <- sym(paste0(.generic, ".DBIConnection"))
   } else {
+    class <- class(con)[[1]]
+    warn(
+      c(
+        paste0("<", class, "> uses an old dbplyr interface"),
+        i = "Please install a newer version of the package or contact the maintainer"
+      ),
+      .frequency = "regularly",
+      .frequency_id = paste0(class, "-edition")
+    )
     fun <- call("::", quote(dplyr), sym(.generic))
   }
   eval_bare(expr((!!fun)(con, ...)))

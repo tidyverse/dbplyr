@@ -157,12 +157,10 @@ dbplyr_build_wider_spec <- function(data,
                                     names_vary = "fastest",
                                     names_expand = FALSE) {
   if (!inherits(data, "tbl_sql")) {
-    error_message <- c(
-      "`dbplyr_build_wider_spec()` doesn't work with local lazy tibbles.",
-      i = "Use `memdb_frame()` together with `show_query()` to see the SQL code."
-    )
-
-    abort(error_message)
+    cli_abort(c(
+      "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
+      i = "Use {.fun memdb_frame} together with {.fun show_query} to see the SQL code."
+    ))
   }
 
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
@@ -171,14 +169,14 @@ dbplyr_build_wider_spec <- function(data,
   sim_data <- simulate_vars(data)
   names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
   if (is_empty(names_from)) {
-    abort("`names_from` must select at least one column.")
+    cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
   values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
   if (is_empty(values_from)) {
-    abort("`values_from` must select at least one column.")
+    cli_abort("{.arg values_from} must select at least one column.")
   }
   dummy_data <- vctrs::vec_cbind(
     distinct_data,
@@ -226,7 +224,7 @@ dbplyr_pivot_wider_spec <- function(data,
     values_fill <- rep_named(values_from_cols, list(values_fill))
   }
   if (!vctrs::vec_is_list(values_fill)) {
-    abort("`values_fill` must be NULL, a scalar, or a named list")
+    cli_abort("{.arg values_fill} must be NULL, a scalar, or a named list")
   }
   values_fill <- values_fill[intersect(names(values_fill), values_from_cols)]
 
@@ -234,7 +232,7 @@ dbplyr_pivot_wider_spec <- function(data,
   values_fn <- check_list_of_functions(values_fn, values_from_cols, "values_fn", call = call)
   missing_values <- setdiff(values_from_cols, names(values_fn))
   if (!is_empty(missing_values)) {
-    abort("`values_fn` must specify a function for each col in `values_from`")
+    cli_abort("{.arg values_fn} must specify a function for each col in {.arg values_from}")
   }
 
   pivot_exprs <- purrr::map(
@@ -351,7 +349,7 @@ resolve_fun <- function(x, var, data, call = caller_env()) {
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {
-      abort("Can't convert to a function.", call = call)
+      cli_abort("Can't convert to a function.", call = call)
     }
     call2(fn_name, var)
   }

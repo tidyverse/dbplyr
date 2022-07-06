@@ -14,10 +14,12 @@
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{supports_window_clause}
+\alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
 sql_expr_matches(con, x, y)
@@ -43,6 +45,8 @@ sql_indent_subquery(from, con, lvl = 0)
 sql_query_rows(con, sql, ...)
 
 supports_window_clause(con)
+
+supports_star_without_alias(con)
 
 sql_query_select(
   con,
@@ -75,6 +79,8 @@ sql_query_join(
 sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_returning_cols(con, cols, table, ...)
 }
 \description{
 SQL translation:
@@ -86,6 +92,8 @@ as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
+\item \code{supports_star_without_alias(con)} does the backend support using \code{*}
+in a \code{SELECT} query without prefixing by a table alias?
 }
 
 Tables:
@@ -116,11 +124,20 @@ Query indentation:
 
 Query generation:
 \itemize{
-\item \code{sql_query_select()} generate SQL for a \code{SELECT} query
-\item \code{sql_query_join()} generate SQL for joins
-\item \code{sql_query_semi_join()} generate SQL for semi- and anti-joins
-\item \code{sql_query_set_op()} generate SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
+\item \code{sql_query_select()} generates SQL for a \code{SELECT} query
+\item \code{sql_query_join()} generates SQL for joins
+\item \code{sql_query_semi_join()} generates SQL for semi- and anti-joins
+\item \code{sql_query_set_op()} generates SQL for \code{UNION}, \code{INTERSECT}, and \code{EXCEPT}
 queries.
+}
+
+Query generation for manipulation:
+\itemize{
+\item \code{sql_query_insert()} and \code{sql_query_append()} generate SQL for an \verb{INSERT FROM} query.
+\item \code{sql_query_update_from()} generates SQL for an \verb{UPDATE FROM} query.
+\item \code{sql_query_upsert()} generates SQL for an \code{UPSERT} query.
+\item \code{sql_query_delete()} generates SQL for an \verb{DELETE FROM} query
+\item \code{sql_returning_cols()} generates SQL for a \code{RETURNING} clause
 }
 }
 \section{dbplyr 2.0.0}{

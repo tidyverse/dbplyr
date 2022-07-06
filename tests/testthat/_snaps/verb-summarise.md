@@ -4,9 +4,9 @@
       summarise(mf1, y = sum(x), z = sum(y))
     Condition
       Error in `summarise()`:
-      ! In `dbplyr` you cannot use a variable created in the same summarise.
-      x `z` refers to `y` which was created earlier in this summarise().
-      i You need an extra mutate() step to use it.
+      ! In dbplyr you cannot use a variable created in the same `summarise()`.
+      x `z` refers to `y` which was created earlier in this `summarise()`.
+      i You need an extra `mutate()` step to use it.
 
 # summarise(.groups=)
 
@@ -14,7 +14,7 @@
       eval_bare(expr(lazy_frame(x = 1, y = 2) %>% dplyr::group_by(x, y) %>% dplyr::summarise() %>%
         remote_query()), env(global_env()))
     Message
-      `summarise()` has grouped output by 'x'. You can override using the `.groups` argument.
+      `summarise()` has grouped output by "x". You can override using the `.groups` argument.
     Output
       <SQL> SELECT `x`, `y`
       FROM `df`

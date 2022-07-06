@@ -2,14 +2,14 @@
 % Please edit documentation in R/lazy-ops.R
 \name{lazy_ops}
 \alias{lazy_ops}
-\alias{lazy_query_base}
+\alias{lazy_base_query}
 \alias{op_grps}
 \alias{op_vars}
 \alias{op_sort}
 \alias{op_frame}
 \title{Lazy operations}
 \usage{
-lazy_query_base(x, vars, class = character())
+lazy_base_query(x, vars, class = character(), ...)
 
 op_grps(op)
 

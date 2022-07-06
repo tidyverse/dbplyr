@@ -1,14 +1,14 @@
 sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TRUE) {
   breaks <- sort.int(as.double(breaks), na.last = TRUE)
   if (anyDuplicated(breaks)) {
-    abort("`breaks` are not unique.")
+    cli_abort("{.arg breaks} are not unique.")
   }
   n <- length(breaks)
   if (n == 1) {
-    abort("`breaks` must have at least two values.")
+    cli_abort("{.arg breaks} must have at least two values.")
   }
   if (any(is.na(breaks))) {
-    abort("`breaks` values must not be missing.")
+    cli_abort("{.arg breaks} values must not be missing.")
   }
 
   include.lowest <- vctrs::vec_cast(include.lowest, logical())
@@ -69,7 +69,7 @@ check_cut_labels <- function(labels, breaks, include.lowest, right, call = calle
 
   vctrs::vec_assert(labels, size = 1L)
   if (!vctrs::vec_is(labels, logical()) || is.na(labels)) {
-    abort("`labels` must be a bool or a character.", call = call)
+    cli_abort("{.arg labels} must be a bool or a character.", call = call)
   }
 
   if (is_false(labels)) {

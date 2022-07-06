@@ -1,3 +1,11 @@
+test_that("base_no_win inclues all aggregates and window funcitons", {
+  # All aggregates must be included in window functions
+  expect_equal(setdiff(names(base_agg), names(base_win)), character())
+
+  # All window functions all need to be in no_in
+  expect_equal(setdiff(names(base_win), names(base_no_win)), character())
+})
+
 # mathematics --------------------------------------------------------
 
 test_that("basic arithmetic is correct", {
@@ -54,6 +62,38 @@ test_that("can translate subsetting", {
   expect_equal(translate_sql(a[["b"]][[1]]), sql('`a`.`b`[1]'))
 })
 
+
+# aggregates --------------------------------------------------------------
+
+test_that("all and any translated correctly", {
+  db <- memdb_frame(g = c(1, 1, 2, 2, 3, 3), x = c(0, 0, 0, 1, 1, 1))
+
+  sum_all_g <- db %>%
+    group_by(g) %>%
+    summarise(all = all(x == 1, na.rm = TRUE)) %>%
+    filter(all) %>%
+    pull(g)
+  expect_equal(sum_all_g, 3)
+
+  sum_any_g <- db %>%
+    group_by(g) %>%
+    summarise(any = any(x == 1, na.rm = TRUE)) %>%
+    filter(any) %>%
+    pull(g)
+  expect_equal(sum_any_g, c(2, 3))
+
+  win_all_g <- db %>%
+    group_by(g) %>%
+    filter(all(x == 1, na.rm = TRUE)) %>%
+    pull(g)
+  expect_equal(win_all_g, c(3, 3))
+
+  win_any_g <- db %>%
+    group_by(g) %>%
+    filter(any(x == 1, na.rm = TRUE)) %>%
+    pull(g)
+  expect_equal(win_any_g, c(2, 2, 3, 3))
+})
 
 # binary/bitwise ---------------------------------------------------------------
 

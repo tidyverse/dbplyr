@@ -47,7 +47,7 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     )
   }
 
-  n_max <- summarise(ungroup(data), max(!!sym(weights_col), na.rm = TRUE)) %>% pull()
+  n_max <- pull(summarise(ungroup(data), max(!!sym(weights_col), na.rm = TRUE)))
   n_max <- vctrs::vec_cast(n_max, integer(), x_arg = "weights")
 
   if (is_null(.id)) {
@@ -58,17 +58,12 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   sql_on_expr <- expr(RHS[[!!row_id_col]] <= LHS[[!!weights_col]])
 
   con <- remote_con(data)
-  helper_table <- db_copy_to(
-    con = con,
-    table = unique_table_name(),
-    values = tibble(!!row_id_col := seq2(1, n_max)),
-    temporary = TRUE,
-    in_transaction = FALSE
-  )
+  # FIXME: Use generate_series() if available on database
+  helper_table <- copy_inline(con, tibble(!!row_id_col := seq2(1, n_max)))
 
   data_uncounted <- inner_join(
     data,
-    tbl(con, helper_table),
+    helper_table,
     by = character(),
     sql_on = translate_sql(!!sql_on_expr, con = con)
   )

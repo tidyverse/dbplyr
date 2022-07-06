@@ -54,15 +54,11 @@ check_summarise_vars <- function(dots) {
 
     if (any(used_vars %in% cur_vars)) {
       first_used_var <- used_vars[used_vars %in% cur_vars][[1]]
-      message <- c(
-        "In `dbplyr` you cannot use a variable created in the same summarise.",
-        `x` = paste0(
-          "`", names(dots)[[i]],
-          "` refers to `", first_used_var, "` which was created earlier in this summarise()."
-        ),
-        `i` = "You need an extra mutate() step to use it."
-      )
-      abort(message, call = caller_env())
+      cli_abort(c(
+        "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
+        x = "{.var {names(dots)[[i]]}} refers to {.var {first_used_var}} which was created earlier in this {.fun summarise}.",
+        i = "You need an extra {.fun mutate} step to use it."
+      ), call = caller_env())
     }
   }
 }
@@ -76,14 +72,10 @@ check_groups <- function(.groups) {
     return()
   }
 
-  message <- c(
-    paste0(
-      "`.groups` can't be ", as_label(.groups),
-      if (.groups == "rowwise") " in dbplyr"
-    ),
+  cli_abort(c(
+    paste0("{.arg .groups} can't be {as_label(.groups)}", if (.groups == "rowwise") " in dbplyr"),
     i = 'Possible values are NULL (default), "drop_last", "drop", and "keep"'
-  )
-  abort(message, call = caller_env())
+  ), call = caller_env())
 }
 
 add_summarise <- function(.data, dots, .groups, env_caller) {
@@ -104,7 +96,7 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
   select[names(dots)] <- dots
 
   lazy_select_query(
-    from = lazy_query,
+    x = lazy_query,
     last_op = "summarise",
     select = select,
     group_by = syms(grps),
@@ -121,10 +113,7 @@ summarise_message <- function(grps, .groups, env_caller) {
     return(NULL)
   }
 
-  new_groups <- glue::glue_collapse(paste0("'", grps[-n], "'"), sep = ", ")
-  summarise_message <- paste0(
-    "`summarise()` has grouped output by ", new_groups, '. You can override using the `.groups` argument.'
-  )
+  summarise_message <- cli::format_message("{.fun summarise} has grouped output by {.val {grps[-n]}}. You can override using the {.arg .groups} argument.")
 }
 
 summarise_verbose <- function(.groups, .env) {

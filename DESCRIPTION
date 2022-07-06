@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.1.1.9000
+Version: 2.2.1.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -21,19 +21,21 @@ Depends:
 Imports: 
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
+    cli (>= 3.3.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.6),
+    dplyr (>= 1.0.9),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
     methods,
+    pillar (>= 1.5.0),
     purrr (>= 0.2.5),
     R6 (>= 2.2.2),
     rlang (>= 1.0.0),
     tibble (>= 1.4.2),
     tidyselect (>= 0.2.4),
     utils,
-    vctrs (>= 0.4.0),
+    vctrs (>= 0.4.1),
     withr
 Suggests:
     bit64,
@@ -56,7 +58,7 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Collate: 
     'utils.R'
     'sql.R'
@@ -73,6 +75,7 @@ Collate:
     'backend-hana.R'
     'backend-hive.R'
     'backend-impala.R'
+    'verb-copy-to.R'
     'backend-mssql.R'
     'backend-mysql.R'
     'backend-odbc.R'
@@ -96,9 +99,11 @@ Collate:
     'ident.R'
     'lazy-join-query.R'
     'lazy-ops.R'
+    'lazy-query.R'
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'pillar.R'
     'progress.R'
     'query-join.R'
     'query-select.R'
@@ -107,6 +112,7 @@ Collate:
     'query.R'
     'reexport.R'
     'remote.R'
+    'rows.R'
     'schema.R'
     'simulate.R'
     'sql-build.R'
@@ -124,7 +130,6 @@ Collate:
     'utils-format.R'
     'verb-arrange.R'
     'verb-compute.R'
-    'verb-copy-to.R'
     'verb-count.R'
     'verb-distinct.R'
     'verb-do-query.R'
