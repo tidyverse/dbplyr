@@ -1,9 +1,10 @@
 #' @importFrom pillar tbl_format_header style_subtle align
 #' @export
 tbl_format_header.tbl_sql <- function(x, setup, ...) {
+  named_header <- tbl_sum(x)
+
   # The setup object may know the total number of rows
-  desc <- tbl_desc(x, rows_total = setup$rows_total)
-  named_header <- tbl_sum_tbl_sql(x, desc = desc)
+  named_header["Source"] <- tbl_desc(x, rows_total = setup$rows_total)
 
   # Adapted from pillar
   header <- paste0(
