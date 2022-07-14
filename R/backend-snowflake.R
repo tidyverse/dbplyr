@@ -26,7 +26,15 @@ sql_translation.Snowflake <- function(con) {
       round = snowflake_round,
       paste = snowflake_paste(" "),
       paste0 = snowflake_paste(""),
-      str_c = snowflake_paste(""),
+      str_c = function(..., sep = "", collapse = NULL) {
+        if (!is.null(collapse)) {
+          abort(c(
+            "`collapse` not supported in DB translation of `str_c()`.",
+            i = "Please use `str_flatten()` instead."
+          ))
+        }
+        sql_call2("CONCAT_WS", sep, ...)
+      },
       str_locate = function(string, pattern) {
         sql_expr(POSITION(!!pattern, !!string))
       },
@@ -48,19 +56,19 @@ sql_translation.Snowflake <- function(con) {
       # Also, Snowflake needs backslashes escaped, so we must increase the
       # level of escaping by 1
       str_replace = function(string, pattern, replacement) {
-        pattern <- gsub("\\\\", "\\\\\\\\", pattern)
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1, 1))
       },
       str_replace_all = function(string, pattern, replacement) {
-        pattern <- gsub("\\\\", "\\\\\\\\", pattern)
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },
       str_remove = function(string, pattern) {
-        pattern <- gsub("\\\\", "\\\\\\\\", pattern)
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_expr(regexp_replace(!!string, !!pattern, "", 1, 1))
       },
       str_remove_all = function(string, pattern) {
-        pattern <- gsub("\\\\", "\\\\\\\\", pattern)
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
         sql_expr(regexp_replace(!!string, !!pattern))
       },
       str_trim = function(string) {
@@ -108,7 +116,6 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(FLOOR((EXTRACT("dayofyear", !!x) - 1L) / 7L) + 1L)
       },
       isoweek = function(x) sql_expr(EXTRACT("weekiso", !!x)),
-      # For consistency with postgres, right-pad month names for uniform size
       month = function(x, label = FALSE, abbr = TRUE) {
         if (!label) {
           sql_expr(EXTRACT("month", !!x))
@@ -119,18 +126,18 @@ sql_translation.Snowflake <- function(con) {
             sql_expr(
               DECODE(
                 EXTRACT("month", !!x),
-                1, "January  ",
-                2, "February ",
-                3, "March    ",
-                4, "April    ",
-                5, "May      ",
-                6, "June     ",
-                7, "July     ",
-                8, "August   ",
+                1, "January",
+                2, "February",
+                3, "March",
+                4, "April",
+                5, "May",
+                6, "June",
+                7, "July",
+                8, "August",
                 9, "September",
-                10, "October  ",
-                11, "November ",
-                12, "December "
+                10, "October",
+                11, "November",
+                12, "December"
               )
             )
           }
@@ -185,7 +192,6 @@ sql_translation.Snowflake <- function(con) {
       cov = sql_aggregate_2("COVAR_SAMP"),
       all = sql_aggregate("BOOLAND_AGG", "all"),
       any = sql_aggregate("BOOLOR_AGG", "any"),
-      exactly_one = sql_aggregate("BOOLXOR_AGG", "exactly_one"),
       sd = sql_aggregate("STDDEV", "sd"),
       str_flatten = function(x, collapse) sql_expr(LISTAGG(!!x, !!collapse))
     ),
@@ -195,7 +201,6 @@ sql_translation.Snowflake <- function(con) {
       cov = win_aggregate_2("COVAR_SAMP"),
       all = win_aggregate("BOOLAND_AGG"),
       any = win_aggregate("BOOLOR_AGG"),
-      exactly_one = win_aggregate("BOOLXOR_AGG"),
       sd = win_aggregate("STDDEV"),
       str_flatten = function(x, collapse) {
         win_over(
@@ -220,17 +225,13 @@ sql_table_analyze.Snowflake <- function(con, table, ...) {}
 
 snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
-  if (any(c(perl, fixed, useBytes))) {
-    abort("`perl`, `fixed` and `useBytes` parameters are unsupported")
+  if (perl || fixed || useBytes || ignore.case) {
+    abort("`perl`, `fixed`, `useBytes`, and `ignore.case` parameters are unsupported")
   }
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
   # behavior
-  if (ignore.case) {
-    sql_expr(LOWER((!!x)) %REGEXP% (".*" || LOWER((!!pattern)) || ".*"))
-  } else {
-    sql_expr(((!!x)) %REGEXP% (".*" || (!!pattern) || ".*"))
-  }
+  sql_expr(((!!x)) %REGEXP% (".*" || (!!pattern) || ".*"))
 }
 snowflake_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
@@ -242,12 +243,6 @@ snowflake_round <- function(x, digits = 0L) {
 snowflake_paste <- function(default_sep) {
   function(..., sep = default_sep, collapse = NULL) {
     check_collapse(collapse)
-    if (!is.null(collapse)) {
-      abort(c(
-        "`collapse` not supported in DB translation of `paste()`.",
-        i = "Please use `str_flatten()` instead."
-      ))
-    }
     sql_call2(
       "ARRAY_TO_STRING",
       sql_call2("ARRAY_CONSTRUCT_COMPACT", ...), sep

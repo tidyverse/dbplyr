@@ -3,7 +3,8 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
   expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || 'exp' || '.*')"))
-  expect_equal(translate_sql(grepl("exp", x, TRUE)),  sql("LOWER(`x`) REGEXP ('.*' || LOWER('exp') || '.*')"))
+  expect_error(translate_sql(grepl("exp", x, ignore.case = TRUE)),
+               "`perl`, `fixed`, `useBytes`, and `ignore.case` parameters are unsupported")
 })
 
 test_that("pasting translated correctly", {
@@ -11,7 +12,8 @@ test_that("pasting translated correctly", {
 
   expect_equal(translate_sql(paste(x, y)),  sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), ' ')"))
   expect_equal(translate_sql(paste0(x, y)), sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), '')"))
-  expect_equal(translate_sql(str_c(x, y)), sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), '')"))
+  expect_equal(translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(translate_sql(str_c(x, y, sep = '|')), sql("CONCAT_WS('|', `x`, `y`)"))
 
   expect_error(translate_sql(paste0(x, collapse = "")), "`collapse` not supported")
 
@@ -27,6 +29,7 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(translate_sql(str_detect(x, y)), sql("(`x`) REGEXP ('.*' || `y` || '.*')"))
   expect_equal(translate_sql(str_detect(x, y, negate = TRUE)), sql("!((`x`) REGEXP ('.*' || `y` || '.*'))"))
   expect_equal(translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 1.0, 1.0)"))
+  expect_equal(translate_sql(str_replace(x, "\\d", z)), sql("REGEXP_REPLACE(`x`, '\\\\d', `z`, 1.0, 1.0)"))
   expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
   expect_equal(translate_sql(str_squish(x)), sql("REGEXP_REPLACE(TRIM(`x`), '\\\\s+', ' ')"))
   expect_equal(translate_sql(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 1.0, 1.0)"))
@@ -48,9 +51,6 @@ test_that("aggregates are translated correctly", {
 
   expect_equal(translate_sql(any(x, na.rm = TRUE), window = FALSE), sql("BOOLOR_AGG(`x`)"))
   expect_equal(translate_sql(any(x, na.rm = TRUE), window = TRUE),  sql("BOOLOR_AGG(`x`) OVER ()"))
-
-  expect_equal(translate_sql(exactly_one(x, na.rm = TRUE), window = FALSE), sql("BOOLXOR_AGG(`x`)"))
-  expect_equal(translate_sql(exactly_one(x, na.rm = TRUE), window = TRUE),  sql("BOOLXOR_AGG(`x`) OVER ()"))
 
   expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql("STDDEV(`x`)"))
   expect_equal(translate_sql(sd(x, na.rm = TRUE), window = TRUE),  sql("STDDEV(`x`) OVER ()"))
@@ -80,7 +80,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(translate_sql(month(x)), sql("EXTRACT('month', `x`)"))
   expect_equal(translate_sql(month(x, label = TRUE)), sql("MONTHNAME(`x`)"))
   expect_equal(translate_sql(month(x, label = TRUE, abbr = FALSE)), sql(
-    "DECODE(EXTRACT('month', `x`), 1.0, 'January  ', 2.0, 'February ', 3.0, 'March    ', 4.0, 'April    ', 5.0, 'May      ', 6.0, 'June     ', 7.0, 'July     ', 8.0, 'August   ', 9.0, 'September', 10.0, 'October  ', 11.0, 'November ', 12.0, 'December ')"
+    "DECODE(EXTRACT('month', `x`), 1.0, 'January', 2.0, 'February', 3.0, 'March', 4.0, 'April', 5.0, 'May', 6.0, 'June', 7.0, 'July', 8.0, 'August', 9.0, 'September', 10.0, 'October', 11.0, 'November', 12.0, 'December')"
   ))
   expect_equal(translate_sql(quarter(x)), sql("EXTRACT('quarter', `x`)"))
   expect_equal(translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT('year', `x`) || '.' || EXTRACT('quarter', `x`))"))
