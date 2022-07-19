@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Grouping by renamed columns works again (@mgirlich, #928).
+
 # dbplyr 2.2.1
 
 * Querying Oracle databases works again. Unfortunately, the fix requires every
