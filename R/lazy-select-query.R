@@ -129,20 +129,6 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_select_query <- function(op) {
-  # Find renamed variables
-  vars <- purrr::set_names(op$select$expr, op$select$name)
-  symbols <- purrr::keep(vars, is_symbol)
-  new2old <- purrr::map_chr(symbols, as_string)
-  old2new <- set_names(names(new2old), new2old)
-
-  grps <- op$group_vars
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  grps
-}
-
-#' @export
 op_desc.lazy_query <- function(op) {
   "SQL"
 }
