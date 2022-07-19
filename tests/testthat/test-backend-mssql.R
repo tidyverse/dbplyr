@@ -26,6 +26,10 @@ test_that("custom scalar translated correctly", {
     sql("IIF(`x`, 'true', 'false')")
   )
   expect_equal(
+    translate_sql(ifelse(x, "true", NULL)),
+    sql("IIF(`x`, 'true', NULL)")
+  )
+  expect_equal(
     translate_sql(if(x) "true" else "false"),
     sql("IIF(`x`, 'true', 'false')")
   )

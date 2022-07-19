@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+
 # dbplyr 2.2.1
 
 * Querying Oracle databases works again. Unfortunately, the fix requires every
