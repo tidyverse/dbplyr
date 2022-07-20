@@ -19,6 +19,27 @@ test_that("preserves group of input", {
   expect_equal(db %>% add_count(g) %>% group_vars(), character())
 })
 
+test_that("count() does not create groups", {
+  # https://github.com/tidyverse/dbplyr/issues/940
+  db <- dbplyr::memdb_frame(
+    x = c(1, 1, 1, 2, 2),
+    y = c("a", "a", "b", "c", "c")
+  )
+
+  df <- db %>%
+    count(x, y) %>%
+    collect()
+
+  expect <- tibble(
+    x = c(1, 1, 2),
+    y = c("a", "b", "c"),
+    n = c(2L, 1L, 2L)
+  )
+
+  expect_equal(group_vars(df), character())
+  expect_identical(df, expect)
+})
+
 test_that("complains about bad names", {
   expect_snapshot(error = TRUE, {
     db <- lazy_frame(g = 1, x = 2)
