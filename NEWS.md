@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* A call to `sql()` is now translated differently. The `...` are now evaluated
+  locally instead of being translated with `translate_sql()` (@mgirlich, #952).
+
 * Fixed an installation issue due to missing namespace for `setOldClass()`
   (@mgirlich, #927).
 
