@@ -490,7 +490,11 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
   cond_sql <- with_mssql_bool(eval_tidy(cond))
   if (is_null(missing) || quo_is_null(missing)) {
     if_true_sql <- build_sql(eval_tidy(if_true))
-    if_false_sql <- build_sql(eval_tidy(if_false))
+    if (is_null(if_false) || quo_is_null(if_false)) {
+      if_false_sql <- NULL
+    } else {
+      if_false_sql <- build_sql(eval_tidy(if_false))
+    }
     sql_expr(IIF(!!cond_sql, !!if_true_sql, !!if_false_sql))
   } else {
     sql_if(cond, if_true, if_false, missing)

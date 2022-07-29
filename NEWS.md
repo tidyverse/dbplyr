@@ -1,5 +1,12 @@
 # dbplyr (development version)
 
+* Fixed an installation issue due to missing namespace for `setOldClass()`
+  (@mgirlich, #927).
+
+* Grouping by renamed columns works again (@mgirlich, #928).
+
+* `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+
 # dbplyr 2.2.1
 
 * Querying Oracle databases works again. Unfortunately, the fix requires every
