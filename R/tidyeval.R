@@ -103,7 +103,7 @@ partial_eval_quo <- function(x, data) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   expr <- partial_eval(get_expr(x), data, get_env(x))
   if (is.list(expr)) {
-    lapply(expr, new_quosure, env = get_env(x))
+    lapply(expr, as_quosure, env = get_env(x))
   } else {
     new_quosure(expr, get_env(x))
   }

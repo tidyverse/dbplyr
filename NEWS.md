@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `cur_column()` is now supported (@mgirlich, #951).
+
 * Fixed an installation issue due to missing namespace for `setOldClass()`
   (@mgirlich, #927).
 

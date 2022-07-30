@@ -159,20 +159,37 @@ across_setup <- function(data,
   )
   names_out <- vctrs::vec_as_names(glue(names_spec, .envir = glue_mask), repair = "check_unique")
 
-  across_apply_fns(vars, fns, names_out)
+  across_apply_fns(vars, fns, names_out, env)
 }
 
-across_apply_fns <- function(vars, fns, names) {
+across_apply_fns <- function(vars, fns, names, env) {
   out <- vector("list", length(vars) * length(fns))
   out <- set_names(out, names)
   k <- 1
   for (i in seq_along(vars)) {
     for (j in seq_along(fns)) {
+      env <- fn_env(fns[[j]])
+      env$call <- replace_call(env$call, replace = as_name(vars[[i]]))
+      fn_env(fns[[j]]) <- env
+
       out[[k]] <- exec(fns[[j]], vars[[i]])
       k <- k + 1
     }
   }
   out
+}
+
+replace_call <- function(call, replace) {
+  if (is_call(call)) {
+    if (is_call(call, "cur_column")) {
+      replace
+    } else {
+      call[] <- lapply(call, replace_call, replace = replace)
+      call
+    }
+  } else {
+    call
+  }
 }
 
 across_glue_mask <- function(.col, .fn, .caller_env) {
