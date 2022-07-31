@@ -34,7 +34,8 @@
 #'   )
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   sim_data <- simulate_vars(.data)
-  cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
+  cols_to_fill <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
+  cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
   .direction <- arg_match0(.direction, c("down", "up"))
 
@@ -171,6 +172,8 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
 dbplyr_fill0.PostgreSQL <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.PqConnection <- dbplyr_fill0.SQLiteConnection
+#' @export
+dbplyr_fill0.PostgreSQLConnection <- dbplyr_fill0.SQLiteConnection
 
 #' @export
 dbplyr_fill0.HDB <- dbplyr_fill0.SQLiteConnection

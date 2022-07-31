@@ -5,10 +5,9 @@ sql_quantile <- function(f,
   style <- match.arg(style)
   force(window)
 
-  warned <- FALSE
   function(x, probs, na.rm = FALSE) {
     check_probs(probs)
-    warned <<- check_na_rm(f, na.rm, warned)
+    check_na_rm(na.rm)
 
     sql <- switch(style,
       infix = sql_call2(f, x, probs),

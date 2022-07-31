@@ -61,4 +61,10 @@ sql_query_explain.PostgreSQLConnection <- sql_query_explain.PqConnection
 supports_window_clause.PostgreSQLConnection <- function(con) {
   TRUE
 }
+
+#' @export
+sql_query_insert.PostgreSQLConnection <- sql_query_insert.PostgreSQL
+
+#' @export
+sql_query_upsert.PostgreSQLConnection <- sql_query_upsert.PostgreSQL
 # nocov end

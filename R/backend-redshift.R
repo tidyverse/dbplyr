@@ -116,4 +116,7 @@ sql_query_explain.Redshift <- function(con, sql, ...) {
   build_sql("EXPLAIN ", sql, con = con)
 }
 
+#' @export
+sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
+
 utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))

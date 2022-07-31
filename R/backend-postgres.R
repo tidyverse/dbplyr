@@ -22,6 +22,9 @@
 #' lf %>% summarise(y = cor(b, c), z = cov(b, c))
 NULL
 
+#' @include verb-copy-to.R
+NULL
+
 #' @export
 #' @rdname backend-postgres
 simulate_postgres <- function() simulate_dbi("PqConnection")
@@ -329,6 +332,12 @@ sql_query_upsert.PqConnection <- function(con,
 
 #' @export
 sql_query_upsert.PostgreSQL <- sql_query_upsert.PqConnection
+
+#' @export
+sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
+
+#' @export
+sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
 supports_window_clause.PqConnection <- function(con) {

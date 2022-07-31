@@ -28,6 +28,11 @@ test_that("rows_insert() checks arguments", {
       mutate(x = x + 1) %>%
       rows_insert(df, by = "x", conflict = "ignore", in_place = TRUE))
   )
+
+  expect_snapshot(error = TRUE,
+    (df %>%
+      rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+  )
 })
 
 

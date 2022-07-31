@@ -50,7 +50,7 @@
     Output
       <SQL> SELECT `x`, SQRT(`y`) AS `y`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
@@ -59,11 +59,37 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, `y`, `y` + 1.0 AS `z`
+      <SQL> SELECT *, `y` + 1.0 AS `z`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
+
+# mutate() produces nice error messages
+
+    Code
+      lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `z = non_existent + 1`
+      Caused by error:
+      ! Object `non_existent` not found.
+    Code
+      lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, mean, na.rm = z)`
+      Caused by error in `across()`:
+      ! Problem while evaluating `na.rm = z`.
+      Caused by error:
+      ! Object `z` not found.
+    Code
+      lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
+    Condition
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, .fns = "a")`
+      Caused by error in `across()`:
+      ! `.fns` must be a NULL, a function, formula, or list
 
 # mutate generates subqueries as needed
 
@@ -83,9 +109,9 @@
       lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
-      SELECT `x`, `x1`, `x1` + 1.0 AS `x2`
+      SELECT *, `x1` + 1.0 AS `x2`
       FROM (
-        SELECT `x`, `x` + 1.0 AS `x1`
+        SELECT *, `x` + 1.0 AS `x1`
         FROM `df`
       )
 
@@ -123,7 +149,7 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT `x`, 3.0 AS `y`
+      <SQL> SELECT *, 3.0 AS `y`
       FROM `df`
 
 # temp var with nested arguments
@@ -133,7 +159,7 @@
     Output
       <SQL> SELECT `x`, `y` * 2.0 AS `z`
       FROM (
-        SELECT `x`, 2.0 AS `y`
+        SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
