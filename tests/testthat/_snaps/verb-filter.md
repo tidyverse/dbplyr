@@ -80,7 +80,7 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT `g`, `h`, `x`, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
+        SELECT *, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
         FROM `df`
       ) `q01`
       WHERE (`x_mean` > 1.0)
@@ -98,9 +98,7 @@
       SELECT `g`, `h`, `x_mean`
       FROM (
         SELECT
-          `g`,
-          `h`,
-          `x_mean`,
+          *,
           SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q02`
         FROM (
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`
