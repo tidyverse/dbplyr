@@ -9,7 +9,7 @@
       <error/rlang_error>
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
+      Caused by error in `across()`:
       ! Cannot translate functions consisting of more than one statement.
 
 # across() does not support formulas with dots

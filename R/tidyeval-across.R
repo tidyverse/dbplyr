@@ -75,7 +75,7 @@ across_fun <- function(fun, env, data, dots, fn) {
     if (!is_null(fn_name)) {
       return(function(x) call2(fn_name, x, !!!dots))
     }
-    partial_eval_fun(fun, env, data)
+    partial_eval_fun(fun, env, data, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
     function(x) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
@@ -92,7 +92,7 @@ across_fun <- function(fun, env, data, dots, fn) {
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
-    partial_eval_fun(fun, env, data)
+    partial_eval_fun(fun, env, data, fn)
   } else {
     cli_abort(c(
       "{.arg .fns} must contain a function or a formula.",
@@ -102,12 +102,12 @@ across_fun <- function(fun, env, data, dots, fn) {
   }
 }
 
-partial_eval_fun <- function(fun, env, data) {
+partial_eval_fun <- function(fun, env, data, fn) {
   body <- fn_body(fun)
   if (length(body) > 2) {
     cli_abort(
       "Cannot translate functions consisting of more than one statement.",
-      call = NULL
+      call = call2(fn, .ns = "dbplyr")
     )
   }
   args <- fn_fmls_names(fun)
