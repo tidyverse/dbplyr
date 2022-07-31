@@ -7,7 +7,7 @@
 \alias{rows_patch.tbl_lazy}
 \alias{rows_upsert.tbl_lazy}
 \alias{rows_delete.tbl_lazy}
-\title{Manipulate individual rows}
+\title{Edit individual rows in the underlying database table}
 \usage{
 \method{rows_insert}{tbl_lazy}(
   x,
@@ -68,8 +68,12 @@
 )
 }
 \arguments{
-\item{x, y}{A pair of data frames or data frame extensions (e.g. a tibble).
-\code{y} must have the same columns of \code{x} or a subset.}
+\item{x}{A lazy table.
+For \code{in_place = TRUE}, this must be a table instantiated with \code{\link[=tbl]{tbl()}} or
+\code{\link[=compute]{compute()}}, not to a lazy query. The \code{\link[=remote_name]{remote_name()}} function is used to
+determine the name of the table to be updated.}
+
+\item{y}{A lazy table, data frame, or data frame extensions (e.g. a tibble).}
 
 \item{by}{An unnamed character vector giving the key columns. The key columns
 must exist in both \code{x} and \code{y}. Keys typically uniquely identify each row,
@@ -99,13 +103,12 @@ and \code{copy} is \code{TRUE}, then \code{y} will be copied into the
 same src as \code{x}.  This allows you to join tables across srcs, but
 it is a potentially expensive operation so you must opt into it.}
 
-\item{in_place}{Should \code{x} be modified in place? This argument is only
-relevant for mutable backends (e.g. databases, data.tables).
+\item{in_place}{Should \code{x} be modified in place? If \code{FALSE} will
+generate a \code{SELECT} query that returns the modified table; if \code{TRUE}
+will modify the underlying table using a DML operation (\code{INSERT}, \code{UPDATE},
+\code{DELETE} or similar).}
 
-When \code{TRUE}, a modified version of \code{x} is returned invisibly;
-when \code{FALSE}, a new object representing the resulting changes is returned.}
-
-\item{returning}{Columns to return.}
+\item{returning}{Columns to return. See \code{\link[=get_returned_rows]{get_returned_rows()}} for details.}
 
 \item{method}{A string specifying the method to use. This is only relevant for
 \code{in_place = TRUE}.}
@@ -122,8 +125,54 @@ check this behaviour for you.
 keys in \code{x}.
 }}
 }
+\value{
+A new \code{tbl_lazy} of the modified data.
+With \code{in_place = FALSE}, the result is a lazy query that prints visibly,
+because the purpose of this operation is to preview the results.
+With \code{in_place = TRUE}, \code{x} is returned invisibly,
+because the purpose of this operation is the side effect of modifying rows
+in the table behind \code{x}.
+}
 \description{
 These are methods for the dplyr \code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}},
 \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_patch]{rows_patch()}}, \code{\link[=rows_upsert]{rows_upsert()}}, and \code{\link[=rows_delete]{rows_delete()}}
 generics.
+
+When \code{in_place = TRUE} these verbs do not generate \code{SELECT} queries, but
+instead directly modify the underlying data using \code{INSERT}, \code{UPDATE}, or
+\code{DELETE} operators. This will require that you have write access to
+the database: the connection needs permission to insert, modify or delete
+rows, but not to alter the structure of the table.
+
+The default, \code{in_place = FALSE}, generates equivalent lazy tables (using
+\code{SELECT} queries) that allow previewing the result without actually
+modifying the underlying table on the database.
+}
+\examples{
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+DBI::dbExecute(con, "CREATE TABLE Ponies (
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   name TEXT,
+   cutie_mark TEXT
+)")
+
+ponies <- tbl(con, "Ponies")
+
+applejack <- copy_inline(con, data.frame(
+  name = "Apple Jack",
+  cutie_mark = "three apples"
+))
+
+# The default behavior is to generate a SELECT query
+rows_insert(ponies, applejack, conflict = "ignore")
+# And the original table is left unchanged:
+ponies
+
+# You can also choose to modify the table with in_place = TRUE:
+rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
+# In this case `rows_insert()` returns nothing and the underlying
+# data is modified
+ponies
 }

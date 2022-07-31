@@ -71,7 +71,7 @@ copy_lahman <- function(con, ...) {
     copy_to(con, df, table, indexes = ids, temporary = FALSE)
   }
 
-  con
+  invisible(con)
 }
 # Get list of all non-label data frames in package
 lahman_tables <- function() {

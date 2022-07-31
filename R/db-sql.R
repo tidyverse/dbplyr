@@ -15,6 +15,9 @@
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
+#' * `supports_star_without_alias(con)` does the backend support using `*`
+#'   in a `SELECT` query without prefixing by a table alias?
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -147,7 +150,7 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
 #' @export
 sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
                                            unique = FALSE, ...) {
-  assert_that(is_string(table) | is.schema(table), is.character(columns))
+  assert_that(is_string(table) || is_schema(table), is.character(columns))
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
@@ -202,7 +205,7 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
   if (is.ident(from)) {
     setNames(from, name)
-  } else if (is.schema(from)) {
+  } else if (is_schema(from) || is_catalog(from)) {
     setNames(as.sql(from, con), name)
   } else {
     build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
@@ -257,6 +260,17 @@ supports_window_clause <- function(con) {
 #' @export
 supports_window_clause.DBIConnection <- function(con) {
   FALSE
+}
+
+#' @rdname db-sql
+#' @export
+supports_star_without_alias <- function(con) {
+  UseMethod("supports_star_without_alias")
+}
+
+#' @export
+supports_star_without_alias.DBIConnection <- function(con) {
+  TRUE
 }
 
 
@@ -382,9 +396,6 @@ sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0
 sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
-
-  lhs <- escape(ident(by$x_as), con = con)
-  rhs <- escape(ident(by$y_as), con = con)
 
   on <- sql_join_tbls(con, by)
 

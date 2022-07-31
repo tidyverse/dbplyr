@@ -1,12 +1,3 @@
-test_that("aggregation functions warn once if na.rm = FALSE", {
-  local_con(simulate_dbi())
-  sql_mean <- win_aggregate("MEAN")
-
-  expect_warning(sql_mean("x"), "Missing values")
-  expect_warning(sql_mean("x"), NA)
-  expect_warning(sql_mean("x", na.rm = TRUE), NA)
-})
-
 test_that("window functions without group have empty over", {
   expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
   expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql("SUM(`x`) OVER ()"))
@@ -141,7 +132,15 @@ test_that("window_frame()", {
     lf %>%
       window_frame(-3, 0) %>%
       window_order(x) %>%
-      mutate(z = sum(y)) %>%
+      mutate(z = sum(y, na.rm = TRUE)) %>%
+      show_query()
+  )
+
+  expect_snapshot(
+    lf %>%
+      window_frame(-3) %>%
+      window_order(x) %>%
+      mutate(z = sum(y, na.rm = TRUE)) %>%
       show_query()
   )
 })

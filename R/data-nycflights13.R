@@ -75,6 +75,6 @@ copy_nycflights13 <- function(con, ...) {
       temporary = FALSE
     )
   }
-  con
+  invisible(con)
 }
 # nocov end

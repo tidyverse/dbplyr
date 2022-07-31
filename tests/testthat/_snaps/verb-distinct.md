@@ -6,10 +6,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT
-          `x`,
-          `y`,
-          ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` = 1)

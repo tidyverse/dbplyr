@@ -122,8 +122,9 @@ transmute.tbl_lazy <- function(.data, ...) {
 #    same layer
 # 2) a = a, b = b, c = c, d = b + 1
 #    because `d` depends on `b` it must be on a new layer
-get_mutate_layers <- function(.data, ...) {
-  dots <- enquos(..., .named = TRUE)
+get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
+  dots <- as.list(enquos(..., .named = TRUE))
+  was_named <- have_name(exprs(...))
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
@@ -143,7 +144,10 @@ get_mutate_layers <- function(.data, ...) {
   layers <- list()
 
   for (i in seq_along(dots)) {
-    quosures <- partial_eval_quo(dots[[i]], cur_data)
+    dot <- dots[[i]]
+    dot_name <- get_dot_name(dots, i, was_named)
+    quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name)
+
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
     }
@@ -174,6 +178,12 @@ get_mutate_layers <- function(.data, ...) {
       }
 
       var_is_null[[cur_var]] <- FALSE
+      if (quo_is_symbol(cur_quo)) {
+        cur_sym <- quo_get_expr(cur_quo)
+        if (as_name(cur_sym) %in% all_vars) {
+          cur_quo <- cur_sym
+        }
+      }
       cur_layer[[cur_var]] <- cur_quo
       dot_layer[[cur_var]] <- cur_quo
       layer_modified_vars <- c(layer_modified_vars, cur_var)
@@ -189,4 +199,13 @@ get_mutate_layers <- function(.data, ...) {
     modified_vars = all_modified_vars,
     used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
+}
+
+get_dot_name <- function(dots, i, was_named) {
+  dot_name <- names2(dots)[[i]]
+  if (!was_named[[i]]) {
+    dot_name <- paste0("..", i)
+  }
+
+  dot_name
 }

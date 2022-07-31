@@ -89,8 +89,8 @@ tbl.src_dbi <- function(src, from, ...) {
 # The former may query the database for column names if `vars` is omitted,
 # the latter always requires `vars`.
 tbl_src_dbi <- function(src, from, vars) {
-  subclass <- class(src$con)[[1]] # prefix added by dplyr::make_tbl
-  tbl_sql_impl(c(subclass, "dbi"), src, from, vars)
+  force(vars)
+  tbl(src, from, vars = vars)
 }
 
 
@@ -134,7 +134,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
   )
 }
 
-setOldClass(c("src_dbi", "src_sql", "src"))
+methods::setOldClass(c("src_dbi", "src_sql", "src"))
 
 # nocov start
 # Creates an environment that disconnects the database when it's GC'd

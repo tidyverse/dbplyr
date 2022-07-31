@@ -88,13 +88,9 @@ sql_translation.Teradata <- function(con) {
                       }
     ),
     sql_translator(.parent = base_odbc_agg,
-      cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()"),
       var           = sql_aggregate("VAR_SAMP", "var"),
     ),
     sql_translator(.parent = base_odbc_win,
-      cor           = win_absent("cor"),
-      cov           = win_absent("cov"),
       var           = win_recycled("VAR_SAMP")
     )
 

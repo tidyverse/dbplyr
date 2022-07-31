@@ -14,6 +14,7 @@
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{supports_window_clause}
+\alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_semi_join}
@@ -44,6 +45,8 @@ sql_indent_subquery(from, con, lvl = 0)
 sql_query_rows(con, sql, ...)
 
 supports_window_clause(con)
+
+supports_star_without_alias(con)
 
 sql_query_select(
   con,
@@ -89,6 +92,8 @@ as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_random(con)} generates SQL to get a random number which can be used
 to select random rows in \code{slice_sample()}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
+\item \code{supports_star_without_alias(con)} does the backend support using \code{*}
+in a \code{SELECT} query without prefixing by a table alias?
 }
 
 Tables:

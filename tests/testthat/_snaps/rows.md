@@ -5,11 +5,13 @@
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
@@ -38,6 +40,15 @@
       Error in `target_table_name()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
+---
+
+    Code
+      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+    Condition
+      Error in `rows_insert()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code
@@ -47,6 +58,7 @@
       <error/rlang_error>
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -85,6 +97,7 @@
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
@@ -334,7 +347,7 @@
       )
       UNION ALL
       (
-        SELECT `x`, NULL AS `y`
+        SELECT *, NULL AS `y`
         FROM (
           SELECT * FROM `df_y` AS `LHS`
           WHERE NOT EXISTS (
