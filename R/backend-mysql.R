@@ -19,7 +19,7 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
-#' lf %>% transmute(x = paste0(z, " times"))
+#' lf %>% transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
@@ -132,14 +132,14 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
-sql_values.MariaDBConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_clause(con, df, row = TRUE, lvl = lvl)
+sql_values_subquery.MariaDBConnection <- function(con, df, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE)
 }
 
 #' @export
-sql_values.MySQL <- sql_values.MariaDBConnection
+sql_values_subquery.MySQL <- sql_values_subquery.MariaDBConnection
 #' @export
-sql_values.MySQLConnection <- sql_values.MariaDBConnection
+sql_values_subquery.MySQLConnection <- sql_values_subquery.MariaDBConnection
 
 #' @export
 sql_random.MariaDBConnection <- function(con) {

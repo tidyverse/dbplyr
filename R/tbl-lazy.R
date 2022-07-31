@@ -27,7 +27,7 @@ tbl_lazy <- function(df, con = NULL, src = NULL, name = "df") {
     src = src_dbi(con)
   )
 }
-setOldClass(c("tbl_lazy", "tbl"))
+methods::setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy

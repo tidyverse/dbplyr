@@ -12,11 +12,20 @@ test_that("paste and paste0 translate correctly", {
 
   expect_equal(translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
   expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
+  expect_equal(translate_sql(str_c(x, y)), sql("`x` || `y`"))
 })
 
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
   expect_snapshot(mf %>% head())
+})
+
+test_that("queries do not use *", {
+  lf <- lazy_frame(x = 1L, con = simulate_oracle())
+  expect_equal(
+    lf %>% mutate(y = x) %>% remote_query(),
+    sql("SELECT `x`, `x` AS `y`\nFROM (`df`) ")
+  )
 })
 
 test_that("`sql_query_upsert()` is correct", {

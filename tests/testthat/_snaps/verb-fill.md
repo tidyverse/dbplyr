@@ -7,9 +7,7 @@
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          `id`,
-          `group`,
-          `n1`,
+          *,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY -`id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       )
@@ -35,9 +33,7 @@
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          `id`,
-          `group`,
-          `n1`,
+          *,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY -`id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       )
@@ -66,9 +62,7 @@
         MAX(`n1`) OVER (PARTITION BY `group`, `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          `id`,
-          `group`,
-          `n1`,
+          *,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (PARTITION BY `group` ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       )
@@ -89,4 +83,13 @@
 
     Code
       expect_error(df_db %>% tidyr::fill(n1))
+
+# fill() produces nice error messages
+
+    Code
+      lazy_frame(x = 1) %>% tidyr::fill(non_existent)
+    Condition
+      Error in `tidyr::fill()`:
+      ! Can't subset columns that don't exist.
+      x Column `non_existent` doesn't exist.
 
