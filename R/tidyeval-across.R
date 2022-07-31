@@ -61,8 +61,8 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     return(across_funs(funs, env, data = data, dots = dots, names_spec = NULL, fn = fn, evaluated = TRUE))
   } else {
     cli_abort(
-      "{.arg .fns} argument to {.fun dbplyr::across} must be a NULL, a function, formula, or list",
-      call = NULL
+      "{.arg .fns} must be a NULL, a function, formula, or list",
+      call = call2(fn, .ns = "dbplyr")
     )
   }
 
@@ -82,11 +82,11 @@ across_fun <- function(fun, env, data, dots, fn) {
     if (!is_empty(dots)) {
       # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
       cli_abort(c(
-        "`dbplyr::{fn}` does not support `...` when a purrr-style lambda is used in {.arg .fns}.",
+        "Can't use `...` when a purrr-style lambda is used in {.arg .fns}.",
         i = "Use a lambda instead.",
         i = "Or inline them via a purrr-style lambda."
       ),
-      call = NULL)
+      call = call2(fn, .ns = "dbplyr"))
     }
     call <- replace_sym(f_rhs(fun), sym = c(".", ".x"), replace = quote(!!.x))
     function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
@@ -98,7 +98,7 @@ across_fun <- function(fun, env, data, dots, fn) {
       "{.arg .fns} must contain a function or a formula.",
       x = "Problem with {expr_deparse(fun)}"
     ),
-    call = quote(dbplyr::across()))
+    call = call2(fn, .ns = "dbplyr"))
   }
 }
 

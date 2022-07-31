@@ -20,8 +20,8 @@
       <error/rlang_error>
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
+      Caused by error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
     Code
@@ -31,8 +31,8 @@
       <error/rlang_error>
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
+      Caused by error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
 
@@ -43,14 +43,14 @@
     Condition
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Caused by error in `across()`:
+      ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(a, list(1)))
     Condition
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error in `dbplyr::across()`:
+      Caused by error in `across()`:
       ! `.fns` must contain a function or a formula.
       x Problem with 1
     Code
@@ -58,8 +58,8 @@
     Condition
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Caused by error in `across()`:
+      ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(c, mean))
     Condition
@@ -124,14 +124,14 @@
     Condition
       Error in `if_all()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Caused by error in `if_all()`:
+      ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
       Error in `if_all()`:
       ! Problem while evaluating `.fns`.
-      Caused by error in `dbplyr::across()`:
+      Caused by error in `if_all()`:
       ! `.fns` must contain a function or a formula.
       x Problem with 1
 
