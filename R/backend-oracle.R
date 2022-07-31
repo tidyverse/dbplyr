@@ -120,6 +120,7 @@ sql_translation.Oracle <- function(con) {
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
@@ -178,6 +179,11 @@ sql_expr_matches.Oracle <- function(con, x, y) {
   build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
 }
 
+#' @export
+supports_star_without_alias.Oracle <- function(con) {
+  FALSE
+}
+
 
 # roacle package ----------------------------------------------------------
 
@@ -210,5 +216,8 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
+
+#' @export
+supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))

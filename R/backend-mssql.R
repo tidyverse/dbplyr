@@ -354,9 +354,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_agg,
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
-                      # MSSQL does not have function for: cor and cov
-      cor           = sql_not_supported("cor()"),
-      cov           = sql_not_supported("cov()"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
       # percentile_cont needs `OVER()` in mssql
@@ -367,9 +364,6 @@ simulate_mssql <- function(version = "15.0") {
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
       var           = win_aggregate("VAR"),
-      # MSSQL does not have function for: cor and cov
-      cor           = win_absent("cor"),
-      cov           = win_absent("cov"),
       str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
@@ -496,7 +490,11 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
   cond_sql <- with_mssql_bool(eval_tidy(cond))
   if (is_null(missing) || quo_is_null(missing)) {
     if_true_sql <- build_sql(eval_tidy(if_true))
-    if_false_sql <- build_sql(eval_tidy(if_false))
+    if (is_null(if_false) || quo_is_null(if_false)) {
+      if_false_sql <- NULL
+    } else {
+      if_false_sql <- build_sql(eval_tidy(if_false))
+    }
     sql_expr(IIF(!!cond_sql, !!if_true_sql, !!if_false_sql))
   } else {
     sql_if(cond, if_true, if_false, missing)

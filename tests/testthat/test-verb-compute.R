@@ -84,6 +84,18 @@ test_that("compute can handle named name", {
   )
 })
 
+test_that("compute can handle schema", {
+  df <- memdb_frame(x = 1:10)
+  on.exit(DBI::dbRemoveTable(remote_con(df), "db1"))
+
+  expect_equal(
+    df %>%
+      compute(name = in_schema("main", "db1"), temporary = FALSE) %>%
+      collect(),
+    tibble(x = 1:10)
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("sorting preserved across compute and collapse", {

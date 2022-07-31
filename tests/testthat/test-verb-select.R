@@ -263,7 +263,7 @@ test_that("renaming handles groups correctly", {
     new_lazy_select(exprs(ax = x, y = y))
   )
 
-  expect_equal(result$group_vars, "x")
+  expect_equal(result$group_vars, "ax")
   expect_equal(op_grps(result), "ax")
 
   result <- lf %>%
@@ -277,4 +277,10 @@ test_that("renaming handles groups correctly", {
 
   expect_equal(result$group_vars, "x")
   expect_equal(op_grps(result), "x")
+
+  # https://github.com/tidyverse/dbplyr/issues/928
+  result <- lazy_frame(cyl = 1, vs = 1) %>%
+    rename(vs = cyl, new_vs = vs) %>%
+    group_by(vs)
+  expect_equal(op_grps(result), "vs")
 })

@@ -129,20 +129,6 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_select_query <- function(op) {
-  # Find renamed variables
-  vars <- purrr::set_names(op$select$expr, op$select$name)
-  symbols <- purrr::keep(vars, is_symbol)
-  new2old <- purrr::map_chr(symbols, as_string)
-  old2new <- set_names(names(new2old), new2old)
-
-  grps <- op$group_vars
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  grps
-}
-
-#' @export
 op_desc.lazy_query <- function(op) {
   "SQL"
 }
@@ -180,7 +166,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
-  select <- select_use_star(select, in_vars)
+  select <- select_use_star(select, in_vars, con)
 
   # translate once just to register windows
   win_register_activate()
@@ -208,7 +194,11 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   )
 }
 
-select_use_star <- function(select, vars_prev) {
+select_use_star <- function(select, vars_prev, con) {
+  if (!supports_star_without_alias(con)) {
+    return(select)
+  }
+
   first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
   if (is.na(first_match)) {
     return(select)
