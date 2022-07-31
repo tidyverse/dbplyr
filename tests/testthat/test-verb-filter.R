@@ -66,6 +66,15 @@ test_that("filter() inlined after select()", {
   lf <- lazy_frame(x = 1, y = 2)
 
   out <- lf %>%
+    select(y) %>%
+    filter(y > 1)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT `y`\nFROM `df`\nWHERE (`y` > 1.0)")
+  )
+
+  out <- lf %>%
     select(z = x) %>%
     filter(z == 1)
   lq <- out$lazy_query
