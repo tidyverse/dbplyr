@@ -22,3 +22,11 @@ test_that("doesn't unnecessarily select", {
   expect_warning(out <- mf %>% arrange(x) %>% pull(), NA)
   expect_equal(out, 1:3)
 })
+
+test_that("ungroup() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    memdb_frame(x = 1) %>% pull(non_existent)
+    memdb_frame(x = 1) %>% pull(1000)
+  })
+})
+

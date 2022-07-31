@@ -19,7 +19,7 @@
 #'   group_by(g) %>%
 #'   window_frame(-3, 0) %>%
 #'   window_order(z) %>%
-#'   mutate(z = sum(x)) %>%
+#'   mutate(z = sum(y)) %>%
 #'   show_query()
 window_order <- function(.data, ...) {
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
