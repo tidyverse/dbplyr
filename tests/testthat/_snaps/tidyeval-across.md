@@ -50,8 +50,8 @@
     Condition
       Error in `across()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
+      Caused by error in `dbplyr::across()`:
+      ! `.fns` must contain a function or a formula.
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
@@ -131,8 +131,8 @@
     Condition
       Error in `if_all()`:
       ! Problem while evaluating `.fns`.
-      Caused by error:
-      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
+      Caused by error in `dbplyr::across()`:
+      ! `.fns` must contain a function or a formula.
       x Problem with 1
 
 # if_all/any works in filter()

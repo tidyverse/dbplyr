@@ -95,9 +95,10 @@ across_fun <- function(fun, env, data, dots, fn) {
     partial_eval_fun(fun, env, data)
   } else {
     cli_abort(c(
-      "{.arg .fns} argument to {.fun dbplyr::across} must contain a function or a formula",
+      "{.arg .fns} must contain a function or a formula.",
       x = "Problem with {expr_deparse(fun)}"
-    ), call = NULL)
+    ),
+    call = quote(dbplyr::across()))
   }
 }
 
