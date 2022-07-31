@@ -131,7 +131,7 @@ test_that("distinct() produces optimized SQL", {
   expect_snapshot(
     (out <- lf %>%
        head(2) %>%
-       distinct(x))
+       distinct(x, y))
   )
 
   expect_s3_class(out$lazy_query$x, "lazy_select_query")
