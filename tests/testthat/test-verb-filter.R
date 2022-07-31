@@ -111,27 +111,6 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
-test_that("filter() inlined after summarise()", {
-  lf <- lazy_frame(x = 1, y = 2)
-
-  out <- lf %>%
-    group_by(y) %>%
-    summarise(x = x + 1) %>%
-    filter(y == 1)
-  lq <- out$lazy_query
-  expect_equal(lq$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
-  expect_equal(lq$where, list(quo(y == 1)), ignore_formula_env = TRUE)
-
-  out2 <- lf %>%
-    group_by(y) %>%
-    summarise(x = x + 1) %>%
-    filter(x == 1)
-  lq2 <- out2$lazy_query
-  expect_equal(lq2$x$select$expr, list(sym("y"), quo(x + 1)), ignore_formula_env = TRUE)
-  expect_equal(lq2$select$expr, syms(c("y", "x")))
-  expect_equal(lq2$where, list(quo(x == 1)), ignore_formula_env = TRUE)
-})
-
 # SQL generation --------------------------------------------------------
 
 test_that("filter calls windowed versions of sql functions", {
