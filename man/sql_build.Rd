@@ -52,6 +52,7 @@ lazy_select_query(
   select = NULL,
   where = NULL,
   group_by = NULL,
+  having = NULL,
   order_by = NULL,
   limit = NULL,
   distinct = FALSE,

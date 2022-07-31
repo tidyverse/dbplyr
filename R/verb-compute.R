@@ -39,7 +39,9 @@ compute.tbl_sql <- function(x,
                             analyze = TRUE,
                             ...,
                             cte = FALSE) {
-  name <- unname(name)
+  if (is_bare_character(x) || is.ident(x) || is.sql(x)) {
+    name <- unname(name)
+  }
   vars <- op_vars(x)
   assert_that(all(unlist(indexes) %in% vars))
   assert_that(all(unlist(unique_indexes) %in% vars))
@@ -55,7 +57,7 @@ compute.tbl_sql <- function(x,
     ...
   )
 
-  tbl_src_dbi(x$src, as.sql(name), colnames(x)) %>%
+  tbl_src_dbi(x$src, as.sql(name, x$src$con), colnames(x)) %>%
     group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
 }

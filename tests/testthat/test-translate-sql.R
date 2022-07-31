@@ -93,11 +93,8 @@ test_that("hypergeometric functions use manual calculation", {
   expect_equal(translate_sql(coth(x)), sql("(EXP(2 * (`x`)) + 1) / (EXP(2 * (`x`)) - 1)"))
 })
 
-
 test_that("pmin and max use GREATEST and LEAST", {
-  expect_warning(translate_sql(pmin(x, y)), "always removed")
-  expect_equal(translate_sql(pmin(x, y, z)), sql("LEAST(`x`, `y`, `z`)"))
-
+  expect_equal(translate_sql(pmin(x, y, z, na.rm = TRUE)), sql("LEAST(`x`, `y`, `z`)"))
   expect_equal(translate_sql(pmax(x, y, na.rm = TRUE)), sql("GREATEST(`x`, `y`)"))
 })
 

@@ -39,7 +39,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)
@@ -47,7 +47,7 @@
 ---
 
     Code
-      sql_values(con, tibble(x = 1:2, y = letters[1:2]))
+      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
@@ -81,7 +81,7 @@
       db %>% mutate(y = x + 1) %>% explain()
     Output
       <SQL>
-      SELECT `x`, `x` + 1.0 AS `y`
+      SELECT *, `x` + 1.0 AS `y`
       FROM `test`
       
       <PLAN>

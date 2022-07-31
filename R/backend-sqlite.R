@@ -180,6 +180,12 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
 }
 
 #' @export
+values_prepare.SQLiteConnection <- function(con, df) {
+  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
+}
+
+#' @export
 supports_window_clause.SQLiteConnection <- function(con) {
   TRUE
 }

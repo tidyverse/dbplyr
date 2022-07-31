@@ -312,10 +312,18 @@ base_agg <- sql_translator(
   # http://db.apache.org/derby/docs/10.7/ref/rrefsqlj33923.html
   n          = function() sql("COUNT(*)"),
   mean       = sql_aggregate("AVG", "mean"),
-  var        = sql_aggregate("VARIANCE", "var"),
   sum        = sql_aggregate("SUM"),
   min        = sql_aggregate("MIN"),
   max        = sql_aggregate("MAX"),
+
+  # https://blog.jooq.org/a-true-sql-gem-you-didnt-know-yet-the-every-aggregate-function/#comment-344695
+  all        = sql_aggregate("MIN"),
+  any        = sql_aggregate("MAX"),
+
+  sd         = sql_not_supported("sd()"),
+  var        = sql_not_supported("var()"),
+  cor        = sql_not_supported("cor()"),
+  cov        = sql_not_supported("cov()"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
@@ -394,10 +402,17 @@ base_win <- sql_translator(
   # Recycled aggregate fuctions take single argument, don't need order and
   # include entire partition in frame.
   mean  = win_aggregate("AVG"),
-  var   = win_aggregate("VARIANCE"),
   sum   = win_aggregate("SUM"),
   min   = win_aggregate("MIN"),
   max   = win_aggregate("MAX"),
+
+  all   = win_aggregate("MIN"),
+  any   = win_aggregate("MAX"),
+
+  sd    = sql_not_supported("sd()"),
+  var   = sql_not_supported("var()"),
+  cor   = sql_not_supported("cor()"),
+  cov   = sql_not_supported("cov()"),
 
   # Ordered set functions
   quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),
@@ -437,37 +452,39 @@ base_win <- sql_translator(
 #' @rdname sql_variant
 #' @format NULL
 base_no_win <- sql_translator(
-  row_number   = win_absent("ROW_NUMBER"),
-  min_rank     = win_absent("RANK"),
-  rank         = win_absent("RANK"),
-  dense_rank   = win_absent("DENSE_RANK"),
-  percent_rank = win_absent("PERCENT_RANK"),
-  cume_dist    = win_absent("CUME_DIST"),
-  ntile        = win_absent("NTILE"),
-  mean         = win_absent("AVG"),
-  sd           = win_absent("SD"),
-  var          = win_absent("VAR"),
-  cov          = win_absent("COV"),
-  cor          = win_absent("COR"),
-  sum          = win_absent("SUM"),
-  min          = win_absent("MIN"),
-  max          = win_absent("MAX"),
-  median       = win_absent("PERCENTILE_CONT"),
-  quantile    = win_absent("PERCENTILE_CONT"),
-  n            = win_absent("N"),
-  n_distinct   = win_absent("N_DISTINCT"),
-  cummean      = win_absent("MEAN"),
-  cumsum       = win_absent("SUM"),
-  cummin       = win_absent("MIN"),
-  cummax       = win_absent("MAX"),
-  nth          = win_absent("NTH_VALUE"),
-  first        = win_absent("FIRST_VALUE"),
-  last         = win_absent("LAST_VALUE"),
-  lead         = win_absent("LEAD"),
-  lag          = win_absent("LAG"),
-  order_by     = win_absent("ORDER_BY"),
-  str_flatten  = win_absent("STR_FLATTEN"),
-  count        = win_absent("COUNT")
+  row_number   = win_absent("row_number"),
+  min_rank     = win_absent("min_rank"),
+  rank         = win_absent("rank"),
+  dense_rank   = win_absent("dense_rank"),
+  percent_rank = win_absent("percent_rank"),
+  cume_dist    = win_absent("cume_dist"),
+  ntile        = win_absent("ntile"),
+  mean         = win_absent("mean"),
+  sd           = win_absent("sd"),
+  var          = win_absent("var"),
+  cov          = win_absent("cov"),
+  cor          = win_absent("cor"),
+  sum          = win_absent("sum"),
+  min          = win_absent("min"),
+  max          = win_absent("max"),
+  all          = win_absent("all"),
+  any          = win_absent("any"),
+  median       = win_absent("median"),
+  quantile     = win_absent("quantile"),
+  n            = win_absent("n"),
+  n_distinct   = win_absent("n_distinct"),
+  cummean      = win_absent("cummean"),
+  cumsum       = win_absent("cumsum"),
+  cummin       = win_absent("cummin"),
+  cummax       = win_absent("cummax"),
+  nth          = win_absent("nth"),
+  first        = win_absent("first"),
+  last         = win_absent("last"),
+  lead         = win_absent("lead"),
+  lag          = win_absent("lad"),
+  order_by     = win_absent("order_by"),
+  str_flatten  = win_absent("str_flatten"),
+  count        = win_absent("count")
 )
 
 #' @export

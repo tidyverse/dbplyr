@@ -21,7 +21,7 @@
 select.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
   sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
-  loc <- tidyselect::eval_select(expr(c(...)), sim_data)
+  loc <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
   loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
@@ -50,7 +50,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
-  loc <- tidyselect::eval_rename(expr(c(...)), sim_data)
+  loc <- fix_call(tidyselect::eval_rename(expr(c(...)), sim_data))
 
   new_vars <- set_names(names(sim_data), names(sim_data))
   names(new_vars)[loc] <- names(loc)
@@ -66,7 +66,7 @@ rename.tbl_lazy <- function(.data, ...) {
 #' @export
 rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   .fn <- as_function(.fn)
-  cols <- tidyselect::eval_select(enquo(.cols), simulate_vars(.data))
+  cols <- fix_call(tidyselect::eval_select(enquo(.cols), simulate_vars(.data)))
 
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
@@ -88,11 +88,13 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     attr(sim_data[[i]], "dbplyr_org_pos") <- i
   }
 
-  new_vars <- dplyr::relocate(
-    sim_data,
-    ...,
-    .before = {{.before}},
-    .after = {{.after}}
+  new_vars <- fix_call(
+    dplyr::relocate(
+      sim_data,
+      ...,
+      .before = {{.before}},
+      .after = {{.after}}
+    )
   )
 
   old_vars <- colnames(sim_data)
@@ -147,6 +149,14 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     return(lazy_query)
   }
 
+  symbols <- purrr::keep(vars, is_symbol)
+  new2old <- purrr::map_chr(symbols, as_string)
+  old2new <- set_names(names(new2old), new2old)
+
+  grps <- op_grps(.data)
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
+
   if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
@@ -156,8 +166,10 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     if (purrr::every(vars, is.symbol)) {
       # if current operation is pure projection
       # we can just subset the previous selection
+      # TODO test grps update
       sel_vars <- purrr::map_chr(vars, as_string)
       lazy_query$select <- update_lazy_select(select, sel_vars)
+      lazy_query$group_vars <- grps
 
       return(lazy_query)
     }
@@ -167,6 +179,8 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
       # if previous operation is pure projection
       sel_vars <- purrr::map_chr(prev_vars, as_string)
       if (all(select$name == sel_vars)) {
+        # TODO update grps?
+
         # and there's no renaming
         # we can just ignore the previous step
         if (op == "select") {
@@ -187,7 +201,8 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   lazy_select_query(
     x = lazy_query,
     last_op = op,
-    select = vars
+    select = vars,
+    group_vars = grps
   )
 }
 
@@ -201,4 +216,11 @@ selects_same_variables <- function(x, vars) {
   }
 
   identical(syms(op_vars(x)), unname(vars))
+}
+
+fix_call <- function(expr, call = caller_env()) {
+  withCallingHandlers(expr, error = function(cnd) {
+    cnd$call <- call
+    cnd_signal(cnd)
+  })
 }

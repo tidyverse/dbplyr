@@ -1,11 +1,14 @@
 test_that("can construct and print", {
   expect_snapshot(in_schema("schema", "table"))
+  expect_snapshot(in_catalog("catalog", "schema", "table"))
 })
 
 test_that("escaped as needed", {
   con <- simulate_dbi()
   expect_equal(as.sql(in_schema("s", "t"), con), ident_q("`s`.`t`"))
   expect_equal(as.sql(in_schema(sql("s"), sql("t")), con), ident_q("s.t"))
+  expect_equal(as.sql(in_catalog("c", "s", "t"), con), ident_q("`c`.`s`.`t`"))
+  expect_equal(as.sql(in_catalog(sql("c"), sql("s"), sql("t")), con), ident_q("c.s.t"))
 })
 
 test_that("can copy and collect with schema or Id", {
