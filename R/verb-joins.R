@@ -267,6 +267,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 inline_select_in_join <- function(x, y, vars, by) {
   x_lq <- x$lazy_query
   y_lq <- y$lazy_query
+  # Cannot inline select if `on` is used because the user might have
+  # used a renamed column.
   if (!is_empty(by$on)) {
     out <- list(
       x = x_lq,
@@ -277,6 +279,9 @@ inline_select_in_join <- function(x, y, vars, by) {
     return(out)
   }
 
+  # In some cases it would also be possible to inline mutate but this would
+  # require careful analysis to not introduce bugs which does not really seem
+  # worth it currently.
   if (is_lazy_select_query_simple(x_lq, select = "projection")) {
     vars$x <- update_join_vars(vars$x, x_lq$select)
     by$x <- update_join_vars(by$x, x_lq$select)
