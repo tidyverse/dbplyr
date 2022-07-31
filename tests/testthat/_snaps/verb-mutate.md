@@ -89,8 +89,6 @@
       Error in `mutate()`:
       ! Problem while computing `..1 = across(x, .fns = "a")`
       Caused by error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! `.fns` must be a NULL, a function, formula, or list
 
 # mutate generates subqueries as needed

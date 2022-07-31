@@ -8,8 +8,6 @@
     Output
       <error/rlang_error>
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! Cannot translate functions consisting of more than one statement.
 
 # across() does not support formulas with dots
@@ -19,8 +17,6 @@
     Output
       <error/rlang_error>
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! Can't use `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
@@ -30,8 +26,6 @@
     Output
       <error/rlang_error>
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! Can't use `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
@@ -42,23 +36,17 @@
       capture_across(lf, across(a, 1))
     Condition
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(a, list(1)))
     Condition
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! `.fns` must contain a function or a formula.
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
     Condition
       Error in `across()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `across()`:
       ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_across(lf, across(c, mean))
@@ -123,15 +111,11 @@
       capture_if_all(lf, if_all(a, 1))
     Condition
       Error in `if_all()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `if_all()`:
       ! `.fns` must be a NULL, a function, formula, or list
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
       Error in `if_all()`:
-      ! Problem while evaluating `.fns`.
-      Caused by error in `if_all()`:
       ! `.fns` must contain a function or a formula.
       x Problem with 1
 

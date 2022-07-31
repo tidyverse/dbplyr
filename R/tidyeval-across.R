@@ -149,20 +149,15 @@ across_setup <- function(data,
     })
   }
 
-  try_fetch({
-    names_spec <- eval(call$.names, env)
-    funs_across_data <- across_funs(
-      funs = call$.fns,
-      env = env,
-      data = data,
-      dots = dots,
-      names_spec = names_spec,
-      fn = fn
-    )
-  }, error = function(cnd) {
-    msg <- "Problem while evaluating {.arg .fns}."
-    cli_abort(msg, call = call(fn), parent = cnd)
-  })
+  names_spec <- eval(call$.names, env)
+  funs_across_data <- across_funs(
+    funs = call$.fns,
+    env = env,
+    data = data,
+    dots = dots,
+    names_spec = names_spec,
+    fn = fn
+  )
 
   fns_is_null <- funs_across_data$fns_is_null
   fns <- funs_across_data$fns
