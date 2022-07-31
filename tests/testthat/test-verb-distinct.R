@@ -111,13 +111,25 @@ test_that("distinct() produces optimized SQL", {
   # optimized `mutate()` resp. `add_select`
   # expect_equal(out$lazy_query$where, syms("y"))
 
-  # TODO should be inlined with `HAVING`
-  # -> https://github.com/tidyverse/dbplyr/pull/877
-  # lf %>%
-  #   group_by(x) %>%
-  #   summarise(y = mean(y, na.rm = TRUE)) %>%
-  #   filter(x == 1) %>%
-  #   distinct(y)
+  # Note: currently this needs `distinct()` or `distinct(x, y)` because
+  # `summarise()` + `select()` is not inlined.
+  out <- lf %>%
+    group_by(x) %>%
+    summarise(y = mean(y, na.rm = TRUE)) %>%
+    filter(x == 1) %>%
+    distinct(x, y)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`\nHAVING (`x` = 1.0)")
+  )
+  expect_true(out$lazy_query$distinct)
+  expect_equal(out$lazy_query$select$name, c("x", "y"))
+  expect_equal(
+    out$lazy_query$select$expr,
+    list(sym("x"), quo(mean(y, na.rm = TRUE))),
+    ignore_formula_env = TRUE
+  )
 
   out <- lf %>%
     arrange(y) %>%
