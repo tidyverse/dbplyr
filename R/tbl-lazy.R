@@ -86,3 +86,7 @@ group_by_drop_default.tbl_lazy <- function(x) {
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$lazy_query)
 }
+
+is_tbl_lazy <- function(x) {
+  inherits(x, "tbl_lazy")
+}
