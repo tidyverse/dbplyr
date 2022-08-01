@@ -95,10 +95,12 @@ update_lazy_select <- function(select, vars) {
   select
 }
 
+# projection = only select (including rename) from parent query
+# identity = selects exactly the same variable as the parent query
 is_lazy_select_query_simple <- function(x,
                                         ignore_group_by = FALSE,
-                                        select = c("projection", "trivial")) {
-  select <- arg_match(select, c("projection", "trivial"))
+                                        select = c("projection", "identity")) {
+  select <- arg_match(select, c("projection", "identity"))
   if (!inherits(x, "lazy_select_query")) {
     return(FALSE)
   }
@@ -108,7 +110,7 @@ is_lazy_select_query_simple <- function(x,
   }
 
   vars_prev <- op_vars(x$x)
-  if (select == "trivial" && !is_select_trivial(x$select, vars_prev)) {
+  if (select == "identity" && !is_select_identity(x$select, vars_prev)) {
     return(FALSE)
   }
 
@@ -130,6 +132,13 @@ is_lazy_select_query_simple <- function(x,
 
   TRUE
 }
+
+is_select_identity <- function(select, vars_prev) {
+  identical(select$name, vars_prev) &&
+    purrr::every(select$expr, is_symbol) &&
+    identical(syms(select$name), select$expr)
+}
+
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
@@ -200,7 +209,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (is_select_trivial(select, in_vars)) {
+  if (is_select_identity(select, in_vars)) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
@@ -251,7 +260,7 @@ select_use_star <- function(select, vars_prev, con) {
 
   test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
 
-  if (is_select_trivial(test_cols, vars_prev)) {
+  if (is_select_identity(test_cols, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
@@ -262,12 +271,6 @@ select_use_star <- function(select, vars_prev, con) {
   } else {
     select
   }
-}
-
-is_select_trivial <- function(select, vars_prev) {
-  identical(select$name, vars_prev) &&
-    purrr::every(select$expr, is_symbol) &&
-    identical(syms(select$name), select$expr)
 }
 
 translate_select_sql <- function(con, select_df) {

@@ -336,7 +336,7 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
 
   x_lq <- x$lazy_query
   if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
-    if (!is_select_trivial(x_lq$select, op_vars(x_lq))) {
+    if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
       by$x <- update_join_vars(by$x, x_lq$select)
       vars <- purrr::map_chr(x_lq$select$expr, as_name)
       vars <- purrr::set_names(vars, x_lq$select$name)

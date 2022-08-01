@@ -30,7 +30,7 @@ remote_name <- function(x) {
     return(lq$x)
   }
 
-  if (!is_lazy_select_query_simple(lq, ignore_group_by = TRUE, select = "trivial")) {
+  if (!is_lazy_select_query_simple(lq, ignore_group_by = TRUE, select = "identity")) {
     return()
   }
 
