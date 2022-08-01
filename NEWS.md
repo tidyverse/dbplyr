@@ -5,6 +5,12 @@
 
 * When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
   column (@mgirlich).
+* `distinct()` now avoids creating an unnecessary subquery and instead uses
+  the `DISTINCT` clause directly on the current query (@mgirlich, #880).
+
+* `window_order()` now produces a better error message when applied to a data
+  frame (@mgirlich, #947).
+
 * Fixed an installation issue due to missing namespace for `setOldClass()`
   (@mgirlich, #927).
 
