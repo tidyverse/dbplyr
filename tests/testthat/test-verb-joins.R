@@ -234,6 +234,40 @@ test_that("select() before join works for tables with same column name", {
   expect_equal(lq$vars$y, c(NA, NA, "id"))
 })
 
+test_that("named by works in combination with inlined select", {
+  lf <- lazy_frame(id_x = 1, x = 1, .name = "lf1")
+  lf2 <- lazy_frame(id_y = 12, x = 2, .name = "lf2")
+
+  out <- left_join(
+    lf %>% select(id_x, x.x = x),
+    lf2 %>% select(id_y, x.y = x),
+    by = c(id_x = "id_y", x.x = "x.y")
+  )
+
+  lq <- out$lazy_query
+  expect_equal(op_vars(lq), c("id_x", "x.x"))
+  expect_equal(lq$vars$x, c("id_x", "x"))
+  expect_equal(lq$vars$y, c(NA_character_, NA_character_))
+  expect_equal(lq$by$x, c("id_x", "x"))
+  expect_equal(lq$by$y, c("id_y", "x"))
+})
+
+test_that("suffix works in combination with inlined select", {
+  lf <- lazy_frame(id = 1, x = 1, .name = "lf1")
+  lf2 <- lazy_frame(id = 12, x = 2, .name = "lf2")
+
+  out <- left_join(
+    lf %>% rename(x2 = x),
+    lf2 %>% rename(x2 = x),
+    by = "id"
+  )
+
+  lq <- out$lazy_query
+  expect_equal(op_vars(lq), c("id", "x2.x", "x2.y"))
+  expect_equal(lq$vars$x, c("id", "x", NA))
+  expect_equal(lq$vars$y, c(NA, NA, "x"))
+})
+
 test_that("select() before join is not inlined when using `sql_on`", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
