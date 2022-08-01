@@ -72,13 +72,15 @@ sql_variant <- function(scalar = sql_translator(),
     ))
   }
 
+  aggregate_fns <- ls(envir = aggregate)
+
   # An ensure that every window function is flagged in aggregate context
   missing <- setdiff(ls(window), ls(aggregate))
   missing_funs <- lapply(missing, sql_aggregate_win)
   env_bind(aggregate, !!!set_names(missing_funs, missing))
 
   structure(
-    list(scalar = scalar, aggregate = aggregate, window = window),
+    list(scalar = scalar, aggregate = aggregate, window = window, aggregate_fns = aggregate_fns),
     class = "sql_variant"
   )
 }
