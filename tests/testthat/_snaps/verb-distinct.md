@@ -1,3 +1,16 @@
+# distinct() produces optimized SQL
+
+    Code
+      (out <- lf %>% head(2) %>% distinct(x, y))
+    Output
+      <SQL>
+      SELECT DISTINCT *
+      FROM (
+        SELECT *
+        FROM `df`
+        LIMIT 2
+      ) `q01`
+
 # distinct respects window_order when .keep_all is TRUE
 
     Code
@@ -6,10 +19,7 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT
-          `x`,
-          `y`,
-          ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` = 1)

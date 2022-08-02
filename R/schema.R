@@ -1,10 +1,16 @@
-#' Refer to a table in a schema
+#' Refer to a table in a schema or a database catalog
 #'
-#' @param schema,table Names of schema and table. These will be automatically
-#'   quoted; use `sql()` to pass a raw name that won't get quoted.
+#' `in_schema()` can be used in [tbl()] to indicate a table in a specific
+#' schema.
+#' `in_catalog()` additionally allows specifying the database catalog.
+#'
+#' @param catalog,schema,table Names of catalog, schema, and table.
+#'   These will be automatically quoted; use [sql()] to pass a raw name
+#'   that won't get quoted.
 #' @export
 #' @examples
 #' in_schema("my_schema", "my_table")
+#' in_catalog("my_catalog", "my_schema", "my_table")
 #' # eliminate quotes
 #' in_schema(sql("my_schema"), sql("my_table"))
 #'
@@ -23,8 +29,24 @@
 #' con %>% tbl(in_schema("aux", "df"))
 in_schema <- function(schema, table) {
   structure(
-    list(schema = as.sql(schema), table = as.sql(table)),
+    list(
+      schema = as.sql(schema),
+      table = as.sql(table)
+    ),
     class = "dbplyr_schema"
+  )
+}
+
+#' @rdname in_schema
+#' @export
+in_catalog <- function(catalog, schema, table) {
+  structure(
+    list(
+      schema = as.sql(schema),
+      table = as.sql(table),
+      catalog = as.sql(catalog)
+    ),
+    class = "dbplyr_catalog"
   )
 }
 
@@ -34,11 +56,25 @@ print.dbplyr_schema <- function(x, ...) {
 }
 
 #' @export
+print.dbplyr_catalog <- function(x, ...) {
+  cat_line("<CATALOG> ", escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+
+#' @export
 as.sql.dbplyr_schema <- function(x, con) {
   ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
 }
 
-is.schema <- function(x) inherits(x, "dbplyr_schema")
+#' @export
+as.sql.dbplyr_catalog <- function(x, con) {
+  ident_q(paste0(
+    escape(x$catalog, con = con), ".", escape(x$schema, con = con), ".", escape(x$table, con = con)
+  ))
+}
+
+is_schema <- function(x) inherits(x, "dbplyr_schema")
+
+is_catalog <- function(x) inherits(x, "dbplyr_catalog")
 
 # Support for DBI::Id() ---------------------------------------------------
 

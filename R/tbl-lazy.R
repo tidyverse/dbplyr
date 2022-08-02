@@ -27,7 +27,7 @@ tbl_lazy <- function(df, con = NULL, src = NULL, name = "df") {
     src = src_dbi(con)
   )
 }
-setOldClass(c("tbl_lazy", "tbl"))
+methods::setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy
@@ -85,4 +85,8 @@ group_by_drop_default.tbl_lazy <- function(x) {
 #' @export
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$lazy_query)
+}
+
+is_tbl_lazy <- function(x) {
+  inherits(x, "tbl_lazy")
 }

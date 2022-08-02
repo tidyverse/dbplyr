@@ -1,19 +1,48 @@
 # dbplyr (development version)
 
+* Using `mutate()` + `filter()` and `filter()` + `filter()` do not generate a
+  subquery anymore unless it is necessary (@mgirlich, #792).
+
 * When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
   column (@mgirlich).
+* `distinct()` now avoids creating an unnecessary subquery and instead uses
+  the `DISTINCT` clause directly on the current query (@mgirlich, #880).
 
-* `remote_name()` now returns a name in more cases where it makes sense
-  (@mgirlich, #850).
+* `window_order()` now produces a better error message when applied to a data
+  frame (@mgirlich, #947).
+
+* Fixed an installation issue due to missing namespace for `setOldClass()`
+  (@mgirlich, #927).
+
+* Grouping by renamed columns works again (@mgirlich, #928).
+
+* `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+
+# dbplyr 2.2.1
+
+* Querying Oracle databases works again. Unfortunately, the fix requires every
+  column to be explicitly selected again (@mgirlich, #908).
+
+* `semi_join()` and `anti_join()` work again for Spark (@mgirlich, #915).
+
+* `str_c()` is now translated to `||` in Oracle (@mgirlich, #921).
+
+* `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
+  databases that don't support them.
+  
+* `any()` and `all()` gain default translations for all backends.
+
+# dbplyr 2.2.0
 
 ## New features
 
-* Support `rows_insert()`, `rows_append()`, `rows_update()`, `rows_patch()`, `rows_upsert()`, and `rows_delete()`
-  (@mgirlich, #736).
-
 * SQL formatting has been considerably improved with new wrapping and indenting. 
   `show_query()` creates more readable queries by printing the keywords in blue 
-  (@mgirlich, #644).
+  (@mgirlich, #644). When possible dbplyr now uses `SELECT *` instead of 
+  explicitly selecting every column (@mgirlich).
+  
+* Added support for `rows_insert()`, `rows_append()`, `rows_update()`, 
+  `rows_patch()`, `rows_upsert()`, and `rows_delete()` (@mgirlich, #736).
 
 * Added `copy_inline()` as a `copy_to()` equivalent that does not need write
   access (@mgirlich, #628).
@@ -22,17 +51,32 @@
   experimental `cte` argument. If `TRUE` the SQL query will use common table
   expressions instead of nested queries (@mgirlich, #638).
 
-## Function translations
+* New `in_catalog()`, which works like `in_schema()`, but allows creation of 
+  table identifiers consisting of three components: catalog, schema, name 
+  (#806, @krlmlr).
+
+## Improvements to SQL generation
+
+* When possible, dbplyr now uses `SELECT *` instead of explicitly selecting 
+  every column (@mgirlich).
 
 * New translation for `cut()` (@mgirlich, #697).
 
 * Improved translations for specific backends:
   * `as.Date()` for Oracle (@mgirlich, #661).
-  * `str_flatten()` for Redshift (@hdplsa, #804) 
-  * `quantile()` for MS SQL (@mgirlich, #620).
-  * `day()`, `week()`, `isoweek()`, and `isoyear()` for Postgres (@mgirlich, #675).
   * `case_when()` with a final clause of the form `TRUE ~ ...` uses `ELSE ...` 
-     in SQLite too (@mgirlich, #754).
+     for SQLite (@mgirlich, #754).
+  * `day()`, `week()`, `isoweek()`, and `isoyear()` for Postgres (@mgirlich, #675).
+  * `explain()` for ROracle (@mgirlich).
+  * `fill()` for SQL Server (#651, @mgirlich) and RPostgreSQL (@mgirlich).
+  * `quantile()` for SQL Server (@mgirlich, #620).
+  * `str_flatten()` for Redshift (@hdplsa, #804) 
+  * `slice_sample()` for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+  * `union()` for Hive (@mgirlich, #663).
+
+* The backend function `dbplyr_fill0()` (used for databases that lack 
+  `IGNORE NULLS` support) now respects database specific translations 
+  (@rsund, #753).
 
 * Calls of the form `stringr::foo()` or `lubridate::foo()` are now evaluated in
   the database, rather than locally (#197).
@@ -47,6 +91,9 @@
 * `n()` now respects the window frame (@mgirlich, #700).
 
 * `quantile()` no longer errors when using the `na.rm` argument (@mgirlich, #600).
+
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
 
 * The partial evaluation code is now more aligned with `dtplyr`. This makes it
   easier to transfer bug fixes and new features from one package to the other.
@@ -70,10 +117,8 @@
   like a parallel version of `any()`/`any()` (@mgirlich, #734).
 
 * `across()`, `if_any()`, and `if_all()` can now translate evaluated lists
-  and functions (@mgirlich, #796).
-
-* `across()` now works if passing the name of a list of functions to the 
-  `.fns` argument (@mgirlich, #817).
+  and functions (@mgirlich, #796), and accept the name of a list of functions 
+  (@mgirlich, #817).
 
 * Multiple `across()` calls in `mutate()` and `transmute()` can now access
   freshly created variables (@mgirlich, #802).
@@ -81,9 +126,8 @@
 * `add_count()` now doesn't change the groups of the input (@mgirlich, #614).
 
 * `compute()` can now handle when `name` is named by unnaming it first
-  (@mgirlich, #623).
-
-* `compute()` now works with `temporary = TRUE` for Oracle (@mgirlich, #621).
+  (@mgirlich, #623), and now works when `temporary = TRUE` for Oracle 
+  (@mgirlich, #621).
 
 * `distinct()` now supports `.keep_all = TRUE` (@mgirlich, #756).
 
@@ -92,16 +136,22 @@
 * `explain()` passes `...` to methods (@mgirlich, #783), and 
   works for Redshift (@mgirlich, #740).
 
-* `fill()` now works for SQL Server (#651, @mgirlich). The backend
-  function `dbplyr_fill0()` (used for databases that lack `IGNORE NULLS`
-  support) now respects database specific translations (@rsund, #753).
-
 * `filter()` throws an error if you supply a named argument (@mgirlich, #764).
 
 * Joins disambiguates columns that only differ in case (@mgirlich, #702).
   New arguments `x_as` and `y_as` allow you to control the table alias 
   used in SQL query (@mgirlich, #637). Joins with `na_matches = "na"` now work 
   for DuckDB (@mgirlich, #704).
+
+* `mutate()` and `transmute()` use named windows if a window definition is 
+  used at least twice and the backend supports named windows (@mgirlich, #624).
+
+* `mutate()` now supports the arguments `.keep`, `.before`, and `.after`
+  (@mgirlich, #802).
+
+* `na.rm = FALSE` only warns once every 8 hours across all functions (#899).
+
+* `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
 
 * `pivot_longer()` can now pivot a column named `name` (@mgirlich, #692),
   can repair names (@mgirlich, #694), and can work with multiple `names_from` 
@@ -113,23 +163,14 @@
 * `pivot_wider()` now supports the arguments `names_vary`, `names_expand`, and
   `unused_fn` (@mgirlich, #774).
 
-* `mutate()` and `transmute()` use named windows if a window definition is 
-  used at least twice and the backend supports named windows (@mgirlich, #624).
-
-* `mutate()` now supports the arguments `.keep`, `.before`, and `.after`
-  (@mgirlich, #802).
-
-* `nesting()` now supports the `.name_repair` argument (@mgirlich, #654).
-
-* `transmute()` now keeps grouping variables (@mgirlich, #802).
-
-* `slice_sample()` now works for MySQL/MariaDB and SQL Server (@mgirlich, #617).
+* `remote_name()` now returns a name in more cases where it makes sense
+  (@mgirlich, #850).
 
 * `sql_random()` is now exported.
 
 * `ungroup()` removes variables in `...` from grouping (@mgirlich, #689).
 
-* `union()` now works for Hive (@mgirlich, #663).
+* `transmute()` now keeps grouping variables (@mgirlich, #802).
 
 # dbplyr 2.1.1
 

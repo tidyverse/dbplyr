@@ -149,6 +149,33 @@ test_that("select() after semi_join() is inlined", {
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
+test_that("select() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% select(non_existent)
+    lf %>% select(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% relocate(non_existent)
+    lf %>% relocate(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    # no name
+    lf %>% rename(x)
+    # non-existing column
+    lf %>% rename(y = non_existent)
+    lf %>% rename(y = non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% rename_with(toupper, .cols = non_existent)
+    lf %>% rename_with(toupper, .cols = non_existent + 1)
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
@@ -280,7 +307,7 @@ test_that("renaming handles groups correctly", {
     new_lazy_select(exprs(ax = x, y = y))
   )
 
-  expect_equal(result$group_vars, "x")
+  expect_equal(result$group_vars, "ax")
   expect_equal(op_grps(result), "ax")
 
   result <- lf %>%
@@ -294,4 +321,10 @@ test_that("renaming handles groups correctly", {
 
   expect_equal(result$group_vars, "x")
   expect_equal(op_grps(result), "x")
+
+  # https://github.com/tidyverse/dbplyr/issues/928
+  result <- lazy_frame(cyl = 1, vs = 1) %>%
+    rename(vs = cyl, new_vs = vs) %>%
+    group_by(vs)
+  expect_equal(op_grps(result), "vs")
 })

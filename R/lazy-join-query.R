@@ -7,6 +7,9 @@ lazy_join_query <- function(x,
                             by,
                             suffix = c(".x", ".y"),
                             na_matches = c("never", "na"),
+                            group_vars = NULL,
+                            order_vars = NULL,
+                            frame = NULL,
                             call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -25,6 +28,9 @@ lazy_join_query <- function(x,
     by = by,
     suffix = suffix,
     na_matches = na_matches,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     last_op = "join"
   )
 }
@@ -75,6 +81,9 @@ lazy_semi_join_query <- function(x,
                                  anti,
                                  by,
                                  na_matches = c("never", "na"),
+                                 group_vars = NULL,
+                                 order_vars = NULL,
+                                 frame = NULL,
                                  call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -90,6 +99,9 @@ lazy_semi_join_query <- function(x,
     by = by,
     na_matches = na_matches,
     vars = vars,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     last_op = "semi_join"
   )
 }

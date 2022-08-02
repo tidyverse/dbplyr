@@ -245,16 +245,69 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
+  inlined_select_list <- inline_select_in_join(x, y, vars, by)
+  vars <- inlined_select_list$vars
+  by <- inlined_select_list$by
+
   lazy_join_query(
-    x$lazy_query,
-    y$lazy_query,
+    x = inlined_select_list$x,
+    y = inlined_select_list$y,
     vars = vars,
     type = type,
     by = by,
     suffix = suffix,
     na_matches = na_matches,
+    group_vars = op_grps(x),
+    order_vars = op_sort(x),
+    frame = op_frame(x),
     call = call
   )
+}
+
+inline_select_in_join <- function(x, y, vars, by) {
+  x_lq <- x$lazy_query
+  y_lq <- y$lazy_query
+  # Cannot inline select if `on` is used because the user might have
+  # used a renamed column.
+  if (!is_empty(by$on)) {
+    out <- list(
+      x = x_lq,
+      y = y_lq,
+      vars = vars,
+      by = by
+    )
+    return(out)
+  }
+
+  # In some cases it would also be possible to inline mutate but this would
+  # require careful analysis to not introduce bugs which does not really seem
+  # worth it currently.
+  if (is_lazy_select_query_simple(x_lq, select = "projection")) {
+    vars$x <- update_join_vars(vars$x, x_lq$select)
+    by$x <- update_join_vars(by$x, x_lq$select)
+    vars$all_x <- op_vars(x_lq$x)
+    x_lq <- x_lq$x
+  }
+
+  if (is_lazy_select_query_simple(y_lq, select = "projection")) {
+    vars$y <- update_join_vars(vars$y, y_lq$select)
+    by$y <- update_join_vars(by$y, y_lq$select)
+    vars$all_y <- op_vars(y_lq$x)
+    y_lq <- y_lq$x
+  }
+
+  list(
+    x = x_lq,
+    y = y_lq,
+    vars = vars,
+    by = by
+  )
+}
+
+update_join_vars <- function(vars, select) {
+  idx <- vctrs::vec_match(select$name, vars)
+  prev_vars <- purrr::map_chr(select$expr, as_string)
+  vctrs::vec_assign(vars, idx, prev_vars)
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
@@ -277,14 +330,31 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 
   vars <- set_names(op_vars(x))
+  group_vars <- op_grps(x)
+  order_vars <- op_sort(x)
+  frame <- op_frame(x)
+
+  x_lq <- x$lazy_query
+  if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
+    if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
+      by$x <- update_join_vars(by$x, x_lq$select)
+      vars <- purrr::map_chr(x_lq$select$expr, as_name)
+      vars <- purrr::set_names(vars, x_lq$select$name)
+    }
+
+    x_lq <- x_lq$x
+  }
 
   lazy_semi_join_query(
-    x$lazy_query,
+    x_lq,
     y$lazy_query,
     vars = vars,
     anti = anti,
     by = by,
     na_matches = na_matches,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     call = call
   )
 }

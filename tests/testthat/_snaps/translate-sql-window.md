@@ -12,16 +12,23 @@
 # window_frame()
 
     Code
-      lf %>% window_frame(-3, 0) %>% window_order(x) %>% mutate(z = sum(y)) %>%
+      lf %>% window_frame(-3, 0) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
         show_query()
-    Condition
-      Warning:
-      Missing values are always removed in SQL.
-      Use `SUM(x, na.rm = TRUE)` to silence this warning
-      This warning is displayed only once per session.
     Output
       <SQL>
-      SELECT `x`, `y`, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      FROM `df`
+
+---
+
+    Code
+      lf %>% window_frame(-3) %>% window_order(x) %>% mutate(z = sum(y, na.rm = TRUE)) %>%
+        show_query()
+    Output
+      <SQL>
+      SELECT
+        *,
+        SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 
 # window_frame() checks arguments
