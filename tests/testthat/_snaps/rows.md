@@ -5,11 +5,13 @@
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
@@ -38,6 +40,15 @@
       Error in `target_table_name()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
+---
+
+    Code
+      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+    Condition
+      Error in `rows_insert()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code
@@ -47,6 +58,7 @@
       <error/rlang_error>
       Error in `rows_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -61,7 +73,8 @@
       )
       UNION ALL
       (
-        SELECT * FROM `df_y`
+        SELECT *
+        FROM `df_y`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_x`
           WHERE (`df_y`.`x` = `df_x`.`x`)
@@ -85,6 +98,7 @@
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` is not supported for database tables.
+      i Please use `conflict = "ignore"` instead
 
 ---
 
@@ -234,7 +248,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y`
           WHERE (`df_x`.`x` = `df_y`.`x`)
@@ -242,11 +257,8 @@
       )
       UNION ALL
       (
-        SELECT `LHS`.`x` AS `x`, `y`
-        FROM (
-          SELECT `x`
-          FROM `df_x`
-        ) `LHS`
+        SELECT `LHS`.`x` AS `x`, `df_y`.`y` AS `y`
+        FROM `df_x` AS `LHS`
         INNER JOIN `df_y`
           ON (`LHS`.`x` = `df_y`.`x`)
       )
@@ -295,7 +307,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y`
           WHERE (`df_x`.`x` = `df_y`.`x`)
@@ -334,9 +347,10 @@
       )
       UNION ALL
       (
-        SELECT `x`, NULL AS `y`
+        SELECT *, NULL AS `y`
         FROM (
-          SELECT * FROM `df_y`
+          SELECT *
+          FROM `df_y`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x`
             WHERE (`df_y`.`x` = `df_x`.`x`)
@@ -352,7 +366,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y`
           WHERE (`df_x`.`x` = `df_y`.`x`)
@@ -361,17 +376,15 @@
       UNION ALL
       (
         (
-          SELECT `LHS`.`x` AS `x`, `y`
-          FROM (
-            SELECT `x`
-            FROM `df_x`
-          ) `LHS`
+          SELECT `LHS`.`x` AS `x`, `df_y`.`y` AS `y`
+          FROM `df_x` AS `LHS`
           INNER JOIN `df_y`
             ON (`LHS`.`x` = `df_y`.`x`)
         )
         UNION ALL
         (
-          SELECT * FROM `df_y`
+          SELECT *
+          FROM `df_y`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x`
             WHERE (`df_y`.`x` = `df_x`.`x`)
@@ -423,7 +436,8 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT * FROM `df_x`
+      SELECT *
+      FROM `df_x`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y`
         WHERE (`df_x`.`x` = `df_y`.`x`)

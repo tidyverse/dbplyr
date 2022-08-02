@@ -8,7 +8,7 @@
         <SQL SELECT>
         From:
           <IDENT> df
-        Select:   `x`, `y`, NULL
+        Select:   *, NULL
       Y:
         <SQL SELECT>
         From:

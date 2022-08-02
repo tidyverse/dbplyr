@@ -1,11 +1,26 @@
-#' Manipulate individual rows
+#' Edit individual rows in the underlying database table
 #'
 #' @description
 #' These are methods for the dplyr [rows_insert()], [`rows_append()`],
 #' [`rows_update()`], [`rows_patch()`], [`rows_upsert()`], and [`rows_delete()`]
 #' generics.
 #'
+#' When `in_place = TRUE` these verbs do not generate `SELECT` queries, but
+#' instead directly modify the underlying data using `INSERT`, `UPDATE`, or
+#' `DELETE` operators. This will require that you have write access to
+#' the database: the connection needs permission to insert, modify or delete
+#' rows, but not to alter the structure of the table.
+#'
+#' The default, `in_place = FALSE`, generates equivalent lazy tables (using
+#' `SELECT` queries) that allow previewing the result without actually
+#' modifying the underlying table on the database.
+#'
 #' @export
+#' @param x A lazy table.
+#'   For `in_place = TRUE`, this must be a table instantiated with [tbl()] or
+#'   [compute()], not to a lazy query. The [remote_name()] function is used to
+#'   determine the name of the table to be updated.
+#' @param y A lazy table, data frame, or data frame extensions (e.g. a tibble).
 #' @inheritParams dplyr::rows_insert
 #' @param conflict For `rows_insert()`, how should keys in `y` that conflict
 #'   with keys in `x` be handled? A conflict arises if there is a key in `y`
@@ -26,12 +41,49 @@
 #'     check this behaviour for you.
 #'   - `"ignore"` will ignore rows in `y` with keys that are unmatched by the
 #'     keys in `x`.
-#' @param returning Columns to return.
+#' @param in_place  Should `x` be modified in place? If `FALSE` will
+#'   generate a `SELECT` query that returns the modified table; if `TRUE`
+#'   will modify the underlying table using a DML operation (`INSERT`, `UPDATE`,
+#'   `DELETE` or similar).
+#' @param returning Columns to return. See [get_returned_rows()] for details.
 #' @param method A string specifying the method to use. This is only relevant for
 #'   `in_place = TRUE`.
 #'
 #' @importFrom dplyr rows_insert
+#' @returns A new `tbl_lazy` of the modified data.
+#'   With `in_place = FALSE`, the result is a lazy query that prints visibly,
+#'   because the purpose of this operation is to preview the results.
+#'   With `in_place = TRUE`, `x` is returned invisibly,
+#'   because the purpose of this operation is the side effect of modifying rows
+#'   in the table behind `x`.
 #' @rdname rows-db
+#' @examples
+#' library(dplyr)
+#'
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#' DBI::dbExecute(con, "CREATE TABLE Ponies (
+#'    id INTEGER PRIMARY KEY AUTOINCREMENT,
+#'    name TEXT,
+#'    cutie_mark TEXT
+#' )")
+#'
+#' ponies <- tbl(con, "Ponies")
+#'
+#' applejack <- copy_inline(con, data.frame(
+#'   name = "Apple Jack",
+#'   cutie_mark = "three apples"
+#' ))
+#'
+#' # The default behavior is to generate a SELECT query
+#' rows_insert(ponies, applejack, conflict = "ignore")
+#' # And the original table is left unchanged:
+#' ponies
+#'
+#' # You can also choose to modify the table with in_place = TRUE:
+#' rows_insert(ponies, applejack, conflict = "ignore", in_place = TRUE)
+#' # In this case `rows_insert()` returns nothing and the underlying
+#' # data is modified
+#' ponies
 rows_insert.tbl_lazy <- function(x,
                                  y,
                                  by = NULL,
@@ -447,12 +499,12 @@ set_returned_rows <- function(x, returned_rows) {
   x
 }
 
-#' Extract and check the RETURNING rows
+#' Extract and check the `RETURNING` rows
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
 #'
-#' `get_returned_rows()` extracts the RETURNING rows produced by
+#' `get_returned_rows()` extracts the `RETURNING` rows produced by
 #' [rows_insert()], [rows_append()], [rows_update()], [rows_upsert()],
 #' or [rows_delete()] if these are called with the `returning` argument.
 #' An error is raised if this information is not available.
@@ -462,6 +514,32 @@ set_returned_rows <- function(x, returned_rows) {
 #' @return For `get_returned_rows()`, a tibble.
 #'
 #' @export
+#' @examples
+#' library(dplyr)
+#'
+#' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+#' DBI::dbExecute(con, "CREATE TABLE Info (
+#'    id INTEGER PRIMARY KEY AUTOINCREMENT,
+#'    number INTEGER
+#' )")
+#' info <- tbl(con, "Info")
+#'
+#' rows1 <- copy_inline(con, data.frame(number = c(1, 5)))
+#' rows_insert(info, rows1, conflict = "ignore", in_place = TRUE)
+#' info
+#'
+#' # If the table has an auto incrementing primary key, you can use
+#' # the returning argument + `get_returned_rows()` its value
+#' rows2 <- copy_inline(con, data.frame(number = c(13, 27)))
+#' info <- rows_insert(
+#'   info,
+#'   rows2,
+#'   conflict = "ignore",
+#'   in_place = TRUE,
+#'   returning = id
+#' )
+#' info
+#' get_returned_rows(info)
 get_returned_rows <- function(x) {
   out <- attr(x, "returned_rows", TRUE)
   if (is.null(out)) {
@@ -588,7 +666,13 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
   )
 
   if (conflict == "error") {
-    cli_abort('{.code conflict = "error"} is not supported for database tables.', call = error_call)
+    cli_abort(
+      c(
+        '{.code conflict = "error"} is not supported for database tables.',
+        i = 'Please use {.code conflict = "ignore"} instead'
+      ),
+      call = error_call
+    )
   }
 
   conflict
@@ -610,7 +694,7 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
 }
 
 rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
-  returning_cols <- eval_select2(returning_expr, df)
+  returning_cols <- eval_select2(returning_expr, df, error_call)
 
   if (is_empty(returning_cols)) return(returning_cols)
 
@@ -640,9 +724,9 @@ tick <- function(x) {
 
 # other helpers -----------------------------------------------------------
 
-eval_select2 <- function(expr, data) {
+eval_select2 <- function(expr, data, error_call) {
   sim_data <- simulate_vars(data)
-  locs <- tidyselect::eval_select(expr, sim_data)
+  locs <- fix_call(tidyselect::eval_select(expr, sim_data, error_call = error_call), error_call)
   names_out <- names(locs)
   set_names(colnames(sim_data)[locs], names_out)
 }

@@ -18,7 +18,7 @@
 pull.tbl_sql <- function(.data, var = -1) {
   vars <- tbl_vars(.data)
   if (length(vars) > 1 || !missing(var)) {
-    var <- tidyselect::vars_pull(vars, {{ var }})
+    var <- fix_call(tidyselect::vars_pull(vars, {{ var }}))
     .data <- ungroup(.data)
     .data <- select(.data, !! sym(var))
   }

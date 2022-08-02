@@ -26,6 +26,10 @@ test_that("custom scalar translated correctly", {
     sql("IIF(`x`, 'true', 'false')")
   )
   expect_equal(
+    translate_sql(ifelse(x, "true", NULL)),
+    sql("IIF(`x`, 'true', NULL)")
+  )
+  expect_equal(
     translate_sql(if(x) "true" else "false"),
     sql("IIF(`x`, 'true', 'false')")
   )
@@ -68,9 +72,6 @@ test_that("custom window functions translated correctly", {
 
   expect_equal(translate_sql(sd(x, na.rm = TRUE)),  sql("STDEV(`x`) OVER ()"))
   expect_equal(translate_sql(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
-
-  expect_error(translate_sql(cor(x)), "not supported")
-  expect_error(translate_sql(cov(x)), "not supported")
 
   expect_equal(translate_sql(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
 })
@@ -166,8 +167,8 @@ test_that("generates custom sql", {
   lf <- lazy_frame(x = 1:3, con = simulate_mssql())
   expect_snapshot(lf %>% slice_sample(x))
 
-  expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
-  expect_snapshot(sql_values(con, trees))
+  expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(copy_inline(con, trees) %>% remote_query())
 })
 
 test_that("`sql_query_insert()` is correct", {

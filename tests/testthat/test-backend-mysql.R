@@ -34,7 +34,7 @@ test_that("generates custom sql", {
 
   expect_snapshot(slice_sample(lf, 5))
 
-  expect_snapshot(sql_values(con, tibble(x = 1:2, y = letters[1:2])))
+  expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
 
 test_that("`sql_query_update_from()` is correct", {

@@ -5,6 +5,67 @@
     Message
       Adding missing grouping variables: `b`
 
+# select() produces nice error messages
+
+    Code
+      lf %>% select(non_existent)
+    Condition
+      Error in `select()`:
+      ! Can't subset columns that don't exist.
+      x Column `non_existent` doesn't exist.
+    Code
+      lf %>% select(non_existent + 1)
+    Condition
+      Error in `select()`:
+      ! object 'non_existent' not found
+
+---
+
+    Code
+      lf %>% relocate(non_existent)
+    Condition
+      Error in `relocate()`:
+      ! Can't subset columns that don't exist.
+      x Column `non_existent` doesn't exist.
+    Code
+      lf %>% relocate(non_existent + 1)
+    Condition
+      Error in `relocate()`:
+      ! object 'non_existent' not found
+
+---
+
+    Code
+      lf %>% rename(x)
+    Condition
+      Error in `rename()`:
+      ! All renaming inputs must be named.
+    Code
+      lf %>% rename(y = non_existent)
+    Condition
+      Error in `rename()`:
+      ! Can't rename columns that don't exist.
+      x Column `non_existent` doesn't exist.
+    Code
+      lf %>% rename(y = non_existent + 1)
+    Condition
+      Error in `rename()`:
+      ! object 'non_existent' not found
+
+---
+
+    Code
+      lf %>% rename_with(toupper, .cols = non_existent)
+    Condition
+      Error in `rename_with()`:
+      ! Can't subset columns that don't exist.
+      x Column `non_existent` doesn't exist.
+    Code
+      lf %>% rename_with(toupper, .cols = non_existent + 1)
+    Condition
+      Error in `rename_with()`:
+      ! object 'non_existent' not found
+
 # multiple selects are collapsed
 
     Code

@@ -15,6 +15,9 @@
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
+#' * `supports_star_without_alias(con)` does the backend support using `*`
+#'   in a `SELECT` query without prefixing by a table alias?
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -259,6 +262,17 @@ supports_window_clause.DBIConnection <- function(con) {
   FALSE
 }
 
+#' @rdname db-sql
+#' @export
+supports_star_without_alias <- function(con) {
+  UseMethod("supports_star_without_alias")
+}
+
+#' @export
+supports_star_without_alias.DBIConnection <- function(con) {
+  TRUE
+}
+
 
 # Query generation --------------------------------------------------------
 
@@ -375,21 +389,19 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, n
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
-
-  lhs <- escape(ident(by$x_as), con = con)
-  rhs <- escape(ident(by$y_as), con = con)
 
   on <- sql_join_tbls(con, by)
 
   lines <- list(
-    build_sql("SELECT * FROM ", x, con = con),
+    sql_clause_select(con, vars),
+    sql_clause_from(x),
     build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
