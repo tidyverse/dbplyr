@@ -149,6 +149,22 @@ test_that("select() after semi_join() is inlined", {
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
+test_that("select() afer join keeps grouping", {
+  lf1 <- lazy_frame(x = 1, y = 1) %>% group_by(y)
+  lf2 <- lazy_frame(x = 1, z = 1) %>% group_by(z)
+
+  # just to be sure check without select/renaming
+  expect_equal(left_join(lf1, lf2, by = "x") %>% op_grps(), "y")
+
+  # rename grouping variable
+  expect_equal(
+    left_join(lf1, lf2, by = "x") %>%
+      select(y2 = y) %>%
+      op_grps(),
+    "y2"
+  )
+})
+
 test_that("select() produces nice error messages", {
   lf <- lazy_frame(x = 1)
 
