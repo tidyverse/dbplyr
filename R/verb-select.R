@@ -175,7 +175,11 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   if (inherits(lazy_query, "lazy_semi_join_query")) {
     if (purrr::every(vars, is.symbol)) {
       sel_vars <- purrr::map_chr(vars, as_string)
-      lazy_query$vars <- sel_vars
+      vars_prev <- lazy_query$vars
+      idx <- vctrs::vec_match(sel_vars, names(vars_prev))
+      vars_out <- set_names(vars_prev[idx], names(sel_vars))
+
+      lazy_query$vars <- vars_out
 
       lazy_query$group_vars <- grps
 

@@ -53,6 +53,30 @@
         WHERE (`LHS`.`x` = `RHS`.`x`)
       )
 
+# select() after join handles previous select
+
+    Code
+      print(lf)
+    Output
+      <SQL>
+      SELECT `x` AS `x2`, `y` AS `y3`, `z`
+      FROM `df` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      print(lf2)
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x2`, `LHS`.`y` AS `y3`, `z`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
 # select() produces nice error messages
 
     Code
