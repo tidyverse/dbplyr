@@ -145,7 +145,7 @@ test_that("select() after semi_join() is inlined", {
   expect_equal(op_vars(out), c("a", "x"))
 
   out <- semi_join(lf1, lf2, by = "x") %>%
-      transmute(b, x = x + 1)
+      transmute(a, x = x + 1)
   expect_s3_class(out$lazy_query, "lazy_select_query")
 })
 
