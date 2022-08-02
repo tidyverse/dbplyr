@@ -157,53 +157,41 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
 
-  if (inherits(lazy_query, "lazy_join_query")) {
-    if (purrr::every(vars, is.symbol)) {
-      sel_vars <- purrr::map_chr(vars, as_string)
+  if (purrr::every(vars, is.symbol)) {
+    sel_vars <- purrr::map_chr(vars, as_string)
+    names_prev <- op_vars(lazy_query)
+    idx <- vctrs::vec_match(sel_vars, names_prev)
 
-      idx <- vctrs::vec_match(sel_vars, lazy_query$vars$alias)
-      lazy_query$vars$alias <- names(sel_vars)
-      lazy_query$vars$x <- lazy_query$vars$x[idx]
-      lazy_query$vars$y <- lazy_query$vars$y[idx]
+    out <- lazy_query
+    out$group_vars <- grps
 
-      lazy_query$group_vars <- grps
+    if (inherits(lazy_query, "lazy_join_query")) {
+      out$vars$alias <- names(sel_vars)
+      out$vars$x <- lazy_query$vars$x[idx]
+      out$vars$y <- lazy_query$vars$y[idx]
 
-      return(lazy_query)
+      return(out)
+    }
+
+    if (inherits(lazy_query, "lazy_semi_join_query")) {
+      out$vars <- set_names(lazy_query$vars[idx], names(sel_vars))
+
+      return(out)
+    }
+
+    if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
+      out$select <- vctrs::vec_slice(lazy_query$select, idx)
+      out$select$name <- names(vars)
+
+      return(out)
     }
   }
 
-  if (inherits(lazy_query, "lazy_semi_join_query")) {
-    if (purrr::every(vars, is.symbol)) {
-      sel_vars <- purrr::map_chr(vars, as_string)
-      vars_prev <- lazy_query$vars
-      idx <- vctrs::vec_match(sel_vars, names(vars_prev))
-      vars_out <- set_names(vars_prev[idx], names(sel_vars))
-
-      lazy_query$vars <- vars_out
-
-      lazy_query$group_vars <- grps
-
-      return(lazy_query)
-    }
-  }
-
-  if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
+  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
     select <- lazy_query$select
-
-    if (purrr::every(vars, is.symbol)) {
-      # if current operation is pure projection
-      # we can just subset the previous selection
-      # TODO test grps update
-      sel_vars <- purrr::map_chr(vars, as_string)
-      lazy_query$select <- update_lazy_select(select, sel_vars)
-      lazy_query$group_vars <- grps
-
-      return(lazy_query)
-    }
-
     prev_vars <- select$expr
     if (purrr::every(prev_vars, is.symbol)) {
       # if previous operation is pure projection
