@@ -42,12 +42,25 @@ add_filter <- function(.data, dots) {
     return(filter_via_having(lazy_query, dots))
   }
 
-  if (!dots_use_window_fun) {
-    lazy_select_query(
-      x = lazy_query,
-      last_op = "filter",
-      where = dots
-    )
+  if (!uses_window_fun(dots, con)) {
+    if (uses_mutated_vars(dots, lazy_query$select)) {
+      lazy_select_query(
+        x = lazy_query,
+        last_op = "filter",
+        where = dots
+      )
+    } else {
+      exprs <- lazy_query$select$expr
+      nms <- lazy_query$select$name
+      projection <- purrr::map2_lgl(exprs, nms, ~ is_symbol(.x) && !identical(.x, sym(.y)))
+
+      if (any(projection)) {
+        dots <- purrr::map(dots, replace_sym, nms[projection], exprs[projection])
+      }
+
+      lazy_query$where <- c(lazy_query$where, dots)
+      lazy_query
+    }
   } else {
     # Do partial evaluation, then extract out window functions
     where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))

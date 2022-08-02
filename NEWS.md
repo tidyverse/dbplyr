@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* Using `mutate()` + `filter()` and `filter()` + `filter()` do not generate a
+  subquery anymore unless it is necessary (@mgirlich, #792).
+
+* When possible dbplyr now uses `SELECT *` instead of explicitly selecting every
+  column (@mgirlich).
 * `distinct()` now avoids creating an unnecessary subquery and instead uses
   the `DISTINCT` clause directly on the current query (@mgirlich, #880).
 

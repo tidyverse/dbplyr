@@ -103,6 +103,7 @@ Collate:
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'optimise-utils.R'
     'pillar.R'
     'progress.R'
     'query-join.R'
