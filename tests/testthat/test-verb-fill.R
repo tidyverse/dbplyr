@@ -86,3 +86,9 @@ test_that("fill errors on unsorted data", {
     expect_error(df_db %>% tidyr::fill(n1))
   })
 })
+
+test_that("fill() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% tidyr::fill(non_existent)
+  })
+})

@@ -7,6 +7,9 @@ lazy_join_query <- function(x,
                             by,
                             suffix = c(".x", ".y"),
                             na_matches = c("never", "na"),
+                            group_vars = NULL,
+                            order_vars = NULL,
+                            frame = NULL,
                             call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -25,6 +28,9 @@ lazy_join_query <- function(x,
     by = by,
     suffix = suffix,
     na_matches = na_matches,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     last_op = "join"
   )
 }
@@ -71,9 +77,13 @@ join_check_by <- function(by, call) {
 #' @rdname sql_build
 lazy_semi_join_query <- function(x,
                                  y,
+                                 vars,
                                  anti,
                                  by,
                                  na_matches = c("never", "na"),
+                                 group_vars = NULL,
+                                 order_vars = NULL,
+                                 frame = NULL,
                                  call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -88,6 +98,10 @@ lazy_semi_join_query <- function(x,
     anti = anti,
     by = by,
     na_matches = na_matches,
+    vars = vars,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     last_op = "semi_join"
   )
 }
@@ -126,7 +140,7 @@ op_vars.lazy_join_query <- function(op) {
 }
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
-  op_vars(op$x)
+  names(op$vars)
 }
 
 #' @export
@@ -144,9 +158,19 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
+  vars <- op$vars
+  vars_prev <- op_vars(op$x)
+  if (identical(unname(vars), names(vars)) &&
+      identical(unname(vars), vars_prev)) {
+    vars <- sql("*")
+  } else {
+    vars <- ident(vars)
+  }
+
   semi_join_query(
     sql_optimise(sql_build(op$x, con), con),
     sql_optimise(sql_build(op$y, con), con),
+    vars = vars,
     anti = op$anti,
     by = op$by,
     na_matches = op$na_matches
