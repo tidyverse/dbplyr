@@ -73,11 +73,11 @@ across_fun <- function(fun, env, data, dots, fn) {
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
-      return(function(x) call2(fn_name, x, !!!dots))
+      return(function(x, cur_col) call2(fn_name, x, !!!dots))
     }
     partial_eval_fun(fun, env, data, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
-    function(x) call2(fun, x, !!!dots)
+    function(x, cur_col) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
       # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
@@ -118,9 +118,9 @@ partial_eval_fun <- function(fun, env, data, fn) {
 partial_eval_prepare_fun <- function(call, sym) {
   call <- replace_sym(call, sym, replace = quote(!!.x))
   call <- replace_call(call, replace = quote(!!.cur_col))
-  function(x) inject(
+  function(x, .cur_col) inject(
     expr(!!call),
-    child_env(empty_env(), .x = x, expr = rlang::expr, .cur_col = as_name(x))
+    child_env(empty_env(), .x = x, expr = rlang::expr, .cur_col = .cur_col)
   )
 }
 
@@ -193,7 +193,7 @@ across_apply_fns <- function(vars, fns, names, env) {
   k <- 1
   for (i in seq_along(vars)) {
     for (j in seq_along(fns)) {
-      out[[k]] <- exec(fns[[j]], vars[[i]])
+      out[[k]] <- exec(fns[[j]], vars[[i]], as_name(vars[[i]]))
       k <- k + 1
     }
   }
