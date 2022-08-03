@@ -164,7 +164,6 @@ base_scalar <- sql_translator(
   switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),
 
-  sql = function(...) sql(...),
   `(` = function(x) {
     sql_expr(((!!x)))
   },

@@ -76,6 +76,18 @@ test_that("user infix functions are translated", {
   expect_equal(translate_sql(x %like% y), sql("`x` like `y`"))
 })
 
+test_that("sql() evaluates input locally", {
+  a <- "x"
+  expect_equal(translate_sql(a), sql("`a`"))
+  expect_equal(translate_sql(sql(a)), sql("x"))
+
+  f <- function() {
+    a <- "y"
+    translate_sql(sql(paste0(a)))
+  }
+  expect_equal(f(), sql("y"))
+})
+
 # casts -------------------------------------------------------------------
 
 test_that("casts as expected", {
