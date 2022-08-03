@@ -73,11 +73,11 @@ across_fun <- function(fun, env, data, dots, fn) {
   if (is_function(fun)) {
     fn_name <- find_fun(fun)
     if (!is_null(fn_name)) {
-      return(function(x) call2(fn_name, x, !!!dots))
+      return(function(x, cur_col) call2(fn_name, x, !!!dots))
     }
     partial_eval_fun(fun, env, data, fn)
   } else if (is_symbol(fun) || is_string(fun)) {
-    function(x) call2(fun, x, !!!dots)
+    function(x, cur_col) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
       # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
@@ -88,8 +88,8 @@ across_fun <- function(fun, env, data, dots, fn) {
       ),
       call = call2(fn, .ns = "dbplyr"))
     }
-    call <- replace_sym(f_rhs(fun), sym = c(".", ".x"), replace = quote(!!.x))
-    function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
+
+    partial_eval_prepare_fun(f_rhs(fun), c(".", ".x"))
   } else if (is_call(fun, "function")) {
     fun <- eval(fun, env)
     partial_eval_fun(fun, env, data, fn)
@@ -112,8 +112,16 @@ partial_eval_fun <- function(fun, env, data, fn) {
   }
   args <- fn_fmls_names(fun)
 
-  call <- replace_sym(body[[2]], sym = args[[1]], replace = quote(!!.x))
-  function(x) inject(expr(!!call), child_env(empty_env(), .x = x, expr = rlang::expr))
+  partial_eval_prepare_fun(body[[2]], args[[1]])
+}
+
+partial_eval_prepare_fun <- function(call, sym) {
+  call <- replace_sym(call, sym, replace = quote(!!.x))
+  call <- replace_call(call, replace = quote(!!.cur_col))
+  function(x, .cur_col) inject(
+    expr(!!call),
+    child_env(empty_env(), .x = x, expr = rlang::expr, .cur_col = .cur_col)
+  )
 }
 
 across_setup <- function(data,
@@ -185,11 +193,7 @@ across_apply_fns <- function(vars, fns, names, env) {
   k <- 1
   for (i in seq_along(vars)) {
     for (j in seq_along(fns)) {
-      env <- fn_env(fns[[j]])
-      env$call <- replace_call(env$call, replace = as_name(vars[[i]]))
-      fn_env(fns[[j]]) <- env
-
-      out[[k]] <- exec(fns[[j]], vars[[i]])
+      out[[k]] <- exec(fns[[j]], vars[[i]], as_name(vars[[i]]))
       k <- k + 1
     }
   }
