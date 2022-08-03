@@ -76,7 +76,7 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
+sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 

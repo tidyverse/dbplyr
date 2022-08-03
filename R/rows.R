@@ -694,7 +694,7 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
 }
 
 rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
-  returning_cols <- eval_select2(returning_expr, df)
+  returning_cols <- eval_select2(returning_expr, df, error_call)
 
   if (is_empty(returning_cols)) return(returning_cols)
 
@@ -724,9 +724,9 @@ tick <- function(x) {
 
 # other helpers -----------------------------------------------------------
 
-eval_select2 <- function(expr, data) {
+eval_select2 <- function(expr, data, error_call) {
   sim_data <- simulate_vars(data)
-  locs <- tidyselect::eval_select(expr, sim_data)
+  locs <- fix_call(tidyselect::eval_select(expr, sim_data, error_call = error_call), error_call)
   names_out <- names(locs)
   set_names(colnames(sim_data)[locs], names_out)
 }
