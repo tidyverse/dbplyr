@@ -117,7 +117,7 @@ partial_eval_quo <- function(x, data, error_call, dot_name) {
   )
 
   if (is.list(expr)) {
-    lapply(expr, as_quosure, env = get_env(x))
+    lapply(expr, new_quosure, env = get_env(x))
   } else {
     new_quosure(expr, get_env(x))
   }
