@@ -145,7 +145,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
 
   # drop NULLs
   vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
-  if (selects_same_variables(.data, vars)) {
+  if (is_identity(vars, names(vars), op_vars(.data))) {
     return(lazy_query)
   }
 
@@ -157,7 +157,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
 
-  if (purrr::every(vars, is.symbol)) {
+  if (is_projection(vars)) {
     sel_vars <- purrr::map_chr(vars, as_string)
     names_prev <- op_vars(lazy_query)
     idx <- vctrs::vec_match(sel_vars, names_prev)
@@ -192,16 +192,8 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
     select <- lazy_query$select
-    prev_vars <- select$expr
-    if (purrr::every(prev_vars, is.symbol)) {
-      # if previous operation is pure projection
-      sel_vars <- purrr::map_chr(prev_vars, as_string)
-      if (all(select$name == sel_vars)) {
-        # TODO update grps?
-
-        # and there's no renaming
-        # we can just ignore the previous step
-        if (op == "select") {
+    if (is_pure_projection(select$expr, select$name)) {
+      if (op == "select") {
           lazy_query$select <- update_lazy_select(select, vars)
         } else {
           lazy_query$select <- new_lazy_select(
@@ -212,7 +204,6 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
           )
         }
         return(lazy_query)
-      }
     }
   }
 
@@ -224,16 +215,25 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   )
 }
 
-selects_same_variables <- function(x, vars) {
-  if (!all(vapply(vars, is_symbol, logical(1)))) {
+is_projection <- function(exprs) {
+  purrr::every(exprs, is_symbol)
+}
+
+is_pure_projection <- function(exprs, names) {
+  if (!is_projection(exprs)) {
     return(FALSE)
   }
 
-  if (!identical(op_vars(x), names(vars))) {
+  expr_vars <- purrr::map_chr(unname(exprs), as_string)
+  identical(expr_vars, names)
+}
+
+is_identity <- function(exprs, names, names_prev) {
+  if (!is_pure_projection(exprs, names)) {
     return(FALSE)
   }
 
-  identical(syms(op_vars(x)), unname(vars))
+  identical(names, names_prev)
 }
 
 fix_call <- function(expr, call = caller_env()) {
