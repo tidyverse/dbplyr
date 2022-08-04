@@ -105,6 +105,23 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
+# across() errors if named
+
+    Code
+      (expect_error(mutate(lf, x = across())))
+    Output
+      <error/rlang_error>
+      Error in `mutate()`:
+      ! `across()` must be unnamed in dbplyr.
+      i `x = across()` is named.
+    Code
+      (expect_error(group_by(lf, x = across())))
+    Output
+      <error/rlang_error>
+      Error in `group_by()`:
+      ! `across()` must be unnamed in dbplyr.
+      i `x = across()` is named.
+
 # if_all() gives informative errors
 
     Code
