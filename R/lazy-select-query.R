@@ -5,6 +5,7 @@ lazy_select_query <- function(x,
                               select = NULL,
                               where = NULL,
                               group_by = NULL,
+                              having = NULL,
                               order_by = NULL,
                               limit = NULL,
                               distinct = FALSE,
@@ -94,6 +95,48 @@ update_lazy_select <- function(select, vars) {
   select
 }
 
+# projection = only select (including rename) from parent query
+# identity = selects exactly the same variable as the parent query
+is_lazy_select_query_simple <- function(x,
+                                        ignore_group_by = FALSE,
+                                        select = c("projection", "identity")) {
+  select <- arg_match(select, c("projection", "identity"))
+  if (!inherits(x, "lazy_select_query")) {
+    return(FALSE)
+  }
+
+  if (select == "projection" && !is_projection(x$select$expr)) {
+    return(FALSE)
+  }
+
+  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
+    return(FALSE)
+  }
+
+  if (!is_empty(x$where)) {
+    return(FALSE)
+  }
+  if (!ignore_group_by && !is_empty(x$group_by)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$order_by)) {
+    return(FALSE)
+  }
+  if (is_true(x$distinct)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$limit)) {
+    return(FALSE)
+  }
+
+  TRUE
+}
+
+is_select_identity <- function(select, vars_prev) {
+  is_identity(select$expr, select$name, vars_prev)
+}
+
+
 #' @export
 print.lazy_select_query <- function(x, ...) {
   cat(
@@ -129,20 +172,6 @@ op_vars.lazy_query <- function(op) {
 }
 
 #' @export
-op_grps.lazy_select_query <- function(op) {
-  # Find renamed variables
-  vars <- purrr::set_names(op$select$expr, op$select$name)
-  symbols <- purrr::keep(vars, is_symbol)
-  new2old <- purrr::map_chr(symbols, as_string)
-  old2new <- set_names(names(new2old), new2old)
-
-  grps <- op$group_vars
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  grps
-}
-
-#' @export
 op_desc.lazy_query <- function(op) {
   "SQL"
 }
@@ -161,6 +190,7 @@ sql_build.lazy_select_query <- function(op, con, ...) {
     select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
+    having = translate_sql_(op$having, con = con, window = FALSE),
     window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
     distinct = op$distinct,
@@ -176,7 +206,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (is_select_trivial(select, in_vars)) {
+  if (is_select_identity(select, in_vars)) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
@@ -227,7 +257,7 @@ select_use_star <- function(select, vars_prev, con) {
 
   test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
 
-  if (is_select_trivial(test_cols, vars_prev)) {
+  if (is_select_identity(test_cols, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
@@ -238,12 +268,6 @@ select_use_star <- function(select, vars_prev, con) {
   } else {
     select
   }
-}
-
-is_select_trivial <- function(select, vars_prev) {
-  identical(select$name, vars_prev) &&
-    purrr::every(select$expr, is_symbol) &&
-    identical(syms(select$name), select$expr)
 }
 
 translate_select_sql <- function(con, select_df) {

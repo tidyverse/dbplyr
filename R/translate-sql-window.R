@@ -303,12 +303,34 @@ local_context <- function(x, env = parent.frame()) {
 
 # Where translation -------------------------------------------------------
 
-uses_window_fun <- function(x, con) {
+uses_window_fun <- function(x, con, lq) {
   stopifnot(is.list(x))
 
   calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
+}
+
+is_aggregating <- function(x, non_group_cols, agg_f) {
+  if (is_quosure(x)) {
+    x <- quo_get_expr(x)
+  }
+
+  if (is_symbol(x)) {
+    xc <- as_name(x)
+    return(!(xc %in% non_group_cols))
+  }
+
+  if (is_call(x)) {
+    fname <- as.character(x[[1]])
+    if (fname %in% agg_f) {
+      return(TRUE)
+    }
+
+    return(all(purrr::map_lgl(x[-1], is_aggregating, non_group_cols, agg_f)))
+  }
+
+  return(TRUE)
 }
 
 common_window_funs <- function() {

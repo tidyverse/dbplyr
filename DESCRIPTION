@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.2.0.9000
+Version: 2.2.1.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -103,6 +103,7 @@ Collate:
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'optimise-utils.R'
     'pillar.R'
     'progress.R'
     'query-join.R'

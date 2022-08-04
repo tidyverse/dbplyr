@@ -4,10 +4,38 @@
   `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
   `cumsum()` (@overmar, #913).
 
+* `cur_column()` is now supported (@mgirlich, #951).
+
+* `*_join()` + `select()` now does not create an unnecessary subquery anymore
+  (@mgirlich, #876).
+
+* A call to `sql()` is now translated differently. The `...` are now evaluated
+  locally instead of being translated with `translate_sql()` (@mgirlich, #952).
+
+* Using `mutate()` + `filter()` and `filter()` + `filter()` do not generate a
+  subquery anymore unless it is necessary (@mgirlich, #792).
+
+* `distinct()` now avoids creating an unnecessary subquery and instead uses
+  the `DISTINCT` clause directly on the current query (@mgirlich, #880).
+
+* `window_order()` now produces a better error message when applied to a data
+  frame (@mgirlich, #947).
+
+* Fixed an installation issue due to missing namespace for `setOldClass()`
+  (@mgirlich, #927).
+
+* Grouping by renamed columns works again (@mgirlich, #928).
+
+* `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+
+# dbplyr 2.2.1
+
 * Querying Oracle databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #908).
 
 * `semi_join()` and `anti_join()` work again for Spark (@mgirlich, #915).
+
+* `str_c()` is now translated to `||` in Oracle (@mgirlich, #921).
 
 * `sd()`, `var()`, `cor()` and `cov()` now give clear error messages on 
   databases that don't support them.

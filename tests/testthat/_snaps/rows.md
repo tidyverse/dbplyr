@@ -40,6 +40,15 @@
       Error in `target_table_name()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
+---
+
+    Code
+      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+    Condition
+      Error in `rows_insert()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code
@@ -64,7 +73,8 @@
       )
       UNION ALL
       (
-        SELECT * FROM `df_y` AS `LHS`
+        SELECT *
+        FROM `df_y` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_x` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -238,7 +248,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -246,11 +257,8 @@
       )
       UNION ALL
       (
-        SELECT `LHS`.`x` AS `x`, `y`
-        FROM (
-          SELECT `x`
-          FROM `df_x`
-        ) `LHS`
+        SELECT `LHS`.`x` AS `x`, `RHS`.`y` AS `y`
+        FROM `df_x` AS `LHS`
         INNER JOIN `df_y` AS `RHS`
           ON (`LHS`.`x` = `RHS`.`x`)
       )
@@ -299,7 +307,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -340,7 +349,8 @@
       (
         SELECT *, NULL AS `y`
         FROM (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y` AS `LHS`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x` AS `RHS`
             WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -356,7 +366,8 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x` AS `LHS`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_y` AS `RHS`
           WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -365,17 +376,15 @@
       UNION ALL
       (
         (
-          SELECT `LHS`.`x` AS `x`, `y`
-          FROM (
-            SELECT `x`
-            FROM `df_x`
-          ) `LHS`
+          SELECT `LHS`.`x` AS `x`, `RHS`.`y` AS `y`
+          FROM `df_x` AS `LHS`
           INNER JOIN `df_y` AS `RHS`
             ON (`LHS`.`x` = `RHS`.`x`)
         )
         UNION ALL
         (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y` AS `LHS`
           WHERE NOT EXISTS (
             SELECT 1 FROM `df_x` AS `RHS`
             WHERE (`LHS`.`x` = `RHS`.`x`)
@@ -427,7 +436,8 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT * FROM `df_x` AS `LHS`
+      SELECT *
+      FROM `df_x` AS `LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y` AS `RHS`
         WHERE (`LHS`.`x` = `RHS`.`x`)
