@@ -119,7 +119,7 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   if (is.list(expr)) {
     if (was_named) {
       msg <- c(
-        "`across()` must be unnamed in dbplyr.",
+        "In dbplyr, the result of `across()` must be unnamed.",
         i = "`{dot_name} = {as_label(x)}` is named."
       )
       cli_abort(msg, call = error_call)
