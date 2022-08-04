@@ -3,6 +3,9 @@
 * `*_join()` + `select()` now does not create an unnecessary subquery anymore
   (@mgirlich, #876).
 
+* A call to `sql()` is now translated differently. The `...` are now evaluated
+  locally instead of being translated with `translate_sql()` (@mgirlich, #952).
+
 * Using `mutate()` + `filter()` and `filter()` + `filter()` do not generate a
   subquery anymore unless it is necessary (@mgirlich, #792).
 
