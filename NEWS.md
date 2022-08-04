@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `cur_column()` is now supported (@mgirlich, #951).
+
 * `*_join()` + `select()` now does not create an unnecessary subquery anymore
   (@mgirlich, #876).
 
