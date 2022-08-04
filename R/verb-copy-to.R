@@ -256,9 +256,14 @@ sql_values_subquery_column_alias <- function(con, df, lvl) {
 sql_values_clause <- function(con, df, row = FALSE) {
   escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
-  rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
 
-  list(sql_clause("VALUES", rows_sql))
+  if (inherits(con, "Redshift")) {
+    rows_sql <- sql(paste0("SELECT ", rows, collapse = " UNION ALL "))
+    list(sql_clause("", rows_sql))
+  } else {
+    rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
+    list(sql_clause("VALUES", rows_sql))
+  }
 }
 
 sql_values_zero_rows <- function(con, df, lvl) {
