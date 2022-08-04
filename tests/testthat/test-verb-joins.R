@@ -423,7 +423,7 @@ test_that("join uses *", {
   lf2 <- lazy_frame(a = 1, b = 2, z = 1)
 
   con <- simulate_dbi()
-  out <- lf1 |>
+  out <- lf1 %>%
     left_join(lf2, by = c("a", "b"))
 
   expect_equal(
@@ -432,7 +432,7 @@ test_that("join uses *", {
   )
 
   # also works after relocate
-  out <- lf1 |>
+  out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
     relocate(z)
 
@@ -442,7 +442,7 @@ test_that("join uses *", {
   )
 
   # does not use * if variable are missing
-  out <- lf1 |>
+  out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
     select(a, z)
 
@@ -454,7 +454,7 @@ test_that("join uses *", {
   # does not use * if variable names changed
   lf1 <- lazy_frame(a = 1, b = 2)
   lf2 <- lazy_frame(a = 1, b = 2)
-  out <- lf1 |>
+  out <- lf1 %>%
     left_join(lf2, by = c("a"))
 
   expect_equal(
@@ -463,7 +463,7 @@ test_that("join uses *", {
   )
 
   # does not use * for `full_join()`
-  out <- lf1 |>
+  out <- lf1 %>%
     full_join(lf2, by = c("a", "b"))
 
   expect_equal(
