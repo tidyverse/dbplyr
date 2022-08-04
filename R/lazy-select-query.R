@@ -105,12 +105,11 @@ is_lazy_select_query_simple <- function(x,
     return(FALSE)
   }
 
-  if (!purrr::every(x$select$expr, is_symbol)) {
+  if (select == "projection" && !is_projection(x$select$expr)) {
     return(FALSE)
   }
 
-  vars_prev <- op_vars(x$x)
-  if (select == "identity" && !is_select_identity(x$select, vars_prev)) {
+  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
     return(FALSE)
   }
 
@@ -134,9 +133,7 @@ is_lazy_select_query_simple <- function(x,
 }
 
 is_select_identity <- function(select, vars_prev) {
-  identical(select$name, vars_prev) &&
-    purrr::every(select$expr, is_symbol) &&
-    identical(syms(select$name), select$expr)
+  is_identity(select$expr, select$name, vars_prev)
 }
 
 
