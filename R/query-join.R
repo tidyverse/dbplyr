@@ -56,6 +56,8 @@ sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
     USE.NAMES = TRUE
   )
 
+  join_vars_list <- join_use_star(con, vars, join_vars_list, x_as)
+
   sql(unlist(join_vars_list))
 }
 
@@ -74,6 +76,43 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
     sql_table_prefix(con, y, table = if (tolower(y) %in% tolower(all_x)) y_as)
   } else {
     cli_abort("No source for join column {alias}") # nocov
+  }
+}
+
+join_use_star <- function(con,
+                          vars,
+                          join_vars_list,
+                          x_as) {
+  first_match <- vctrs::vec_match(vars$all_x[[1]], vars$x)
+  if (is.na(first_match)) {
+    return(join_vars_list)
+  }
+
+  last <- first_match + length(vars$all_x) - 1
+  n <- vctrs::vec_size(vars$x)
+
+  if (n < last) {
+    return(join_vars_list)
+  }
+
+  test_cols <- vctrs::vec_slice(vars$x, seq2(first_match, last))
+  y_vars <- vctrs::vec_slice(vars$y, seq2(first_match, last))
+  x_alias <- vctrs::vec_slice(vars$alias, seq2(first_match, last))
+
+  if (identical(test_cols, vars$all_x) &&
+      all(is.na(y_vars)) &&
+      all(identical(test_cols, x_alias))) {
+    idx_start <- seq2(1, first_match - 1)
+    idx_end <- seq2(last + 1, n)
+
+    x_as <- escape(x_as, con = con)
+    vctrs::vec_c(
+      vctrs::vec_slice(join_vars_list, idx_start),
+      list(sql(paste0(x_as, ".*"))),
+      vctrs::vec_slice(join_vars_list, idx_end)
+    )
+  } else {
+    join_vars_list
   }
 }
 

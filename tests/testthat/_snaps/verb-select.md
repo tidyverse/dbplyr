@@ -22,7 +22,7 @@
       (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
     Output
       <SQL>
-      SELECT `b`, `LHS`.`x` AS `x`, `a`
+      SELECT `b`, `LHS`.*
       FROM `lf1` AS `LHS`
       LEFT JOIN `lf2` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x`)

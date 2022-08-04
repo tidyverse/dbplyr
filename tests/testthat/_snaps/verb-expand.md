@@ -4,7 +4,7 @@
       lazy_frame(x = 1, y = 1) %>% tidyr::expand(x, y)
     Output
       <SQL>
-      SELECT `x`, `y`
+      SELECT `LHS`.*, `y`
       FROM (
         SELECT DISTINCT `x`
         FROM `df`
@@ -56,7 +56,7 @@
       df_lazy %>% group_by(a) %>% tidyr::expand(b, c)
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `LHS`.*, `c`
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`
@@ -133,7 +133,7 @@
           COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`,
           `z`
         FROM (
-          SELECT `x`, `y`
+          SELECT `LHS`.*, `y`
           FROM (
             SELECT DISTINCT `x`
             FROM `df`

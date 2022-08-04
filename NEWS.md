@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* When possible, dbplyr now uses `SELECT *` after a left join instead of
+  explicitly selecting every column (@mgirlich, #898).
+  
 * `cur_column()` is now supported (@mgirlich, #951).
 
 * `*_join()` + `select()` now does not create an unnecessary subquery anymore

@@ -4,7 +4,7 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
