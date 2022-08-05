@@ -258,8 +258,9 @@ sql_values_clause <- function(con, df, row = FALSE) {
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
 
   if (inherits(con, "Redshift")) {
-    rows_sql <- sql(paste0("SELECT ", rows, collapse = " UNION ALL "))
-    list(sql_clause("", rows_sql))
+    select_values <- purrr::map(rows, ~ sql_clause("SELECT", sql(.x)))
+    unioned <- rep_along(select_values, list(sql_clause("UNION ALL", sql(""))))
+    rbind(select_values, unioned)[1:(2 * length(unioned) - 1)]
   } else {
     rows_sql <- sql(paste0(if (row) "ROW", "(", rows, ")"))
     list(sql_clause("VALUES", rows_sql))
