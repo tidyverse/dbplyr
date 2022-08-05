@@ -741,7 +741,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  dbExecute(con, sql)
+  safe_db_execute(con, sql, .msg = "Can't analyze table {.val {table}}.")
 }
 
 dbplyr_create_index <- function(con, ...) {
@@ -752,7 +752,7 @@ dbplyr_create_index <- function(con, ...) {
 db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
                                           unique = FALSE, ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  dbExecute(con, sql)
+  safe_db_execute(con, sql, .msg = "Can't create index on {.val {table}}.")
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -762,7 +762,9 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  expl <- dbGetQuery(con, sql)
+  call <- current_call()
+  expl <- safe_db_get_query(con, sql, .msg = "Can't explain query.")
+
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
@@ -774,7 +776,8 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  names(dbGetQuery(con, sql))
+  df <- safe_db_get_query(con, sql, .msg = "Can't query fields.")
+  names(df)
 }
 
 dbplyr_save_query <- function(con, ...) {
@@ -784,7 +787,12 @@ dbplyr_save_query <- function(con, ...) {
 #' @importFrom dplyr db_save_query
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  dbExecute(con, sql, immediate = TRUE)
+  safe_db_execute(
+    con = con,
+    sql = sql,
+    immediate = TRUE,
+    .msg = "Can't save query to {.val {name}}."
+  )
   name
 }
 
@@ -795,4 +803,36 @@ dbplyr_sql_subquery <- function(con, ...) {
 #' @importFrom dplyr sql_subquery
 sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
+}
+
+safe_db_get_query <- function(con, sql, ..., .msg, .call = caller_env()) {
+  glue_envir <- caller_env()
+  tryCatch(
+    DBI::dbGetQuery(con, sql, ...),
+    error = function(cnd) {
+      cli_abort(
+        .msg,
+        parent = cnd,
+        .envir = glue_envir,
+        call = .call,
+        class = "dbplyr_error_dbi"
+      )
+    }
+  )
+}
+
+safe_db_execute <- function(con, sql, ..., .msg, .call = caller_env()) {
+  glue_envir <- caller_env()
+  tryCatch(
+    DBI::dbExecute(con, sql, ...),
+    error = function(cnd) {
+      cli_abort(
+        .msg,
+        parent = cnd,
+        .envir = glue_envir,
+        call = .call,
+        class = "dbplyr_error_dbi"
+      )
+    }
+  )
 }

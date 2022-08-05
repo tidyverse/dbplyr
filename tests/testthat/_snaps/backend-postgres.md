@@ -102,7 +102,9 @@
       rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
       returning = everything(), method = "on_conflict")
     Condition
-      Error:
+      Error in `rows_insert()`:
+      ! Can't modify database table "df_x".
+      Caused by error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
 
 # can upsert with returning
@@ -111,6 +113,8 @@
       rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
       method = "on_conflict")
     Condition
-      Error:
+      Error in `rows_upsert()`:
+      ! Can't modify database table "df_x".
+      Caused by error:
       ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
 

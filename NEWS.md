@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
+  the verb where the error happened (@mgirlich).
+
 * Using a named `across()` now gives a clear error message (@mgirlich, #761).
 
 * `cur_column()` is now supported (@mgirlich, #951).

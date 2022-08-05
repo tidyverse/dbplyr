@@ -775,12 +775,19 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out
 }
 
-rows_get_or_execute <- function(x, sql, returning_cols) {
+rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
   con <- remote_con(x)
+  msg <- "Can't modify database table {.val {remote_name(x)}}."
   if (is_empty(returning_cols)) {
-    dbExecute(con, sql, immediate = TRUE)
+    safe_db_execute(con, sql, immediate = TRUE, .msg = msg, .call = call)
   } else {
-    returned_rows <- dbGetQuery(con, sql, immediate = TRUE)
+    returned_rows <- safe_db_get_query(
+      con = con,
+      sql = sql,
+      immediate = TRUE,
+      .msg = msg,
+      .call = call
+    )
     x <- set_returned_rows(x, returned_rows)
   }
 

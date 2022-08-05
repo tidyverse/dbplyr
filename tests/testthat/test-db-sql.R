@@ -19,3 +19,14 @@ test_that("sql_query_rows() works", {
     sql("SELECT COUNT(*) FROM `abc` AS `master`")
   )
 })
+
+test_that("handles DBI error", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+
+  expect_error(db_analyze(con, "tbl"), class = "dbplyr_error_dbi")
+  expect_error(db_create_index(con, "tbl", "col"), class = "dbplyr_error_dbi")
+
+  expect_error(db_explain(con, "invalid sql"), class = "dbplyr_error_dbi")
+  expect_error(db_query_fields(con, "does not exist"), class = "dbplyr_error_dbi")
+  expect_error(db_save_query(con, "invalid sql", "tbl"), class = "dbplyr_error_dbi")
+})

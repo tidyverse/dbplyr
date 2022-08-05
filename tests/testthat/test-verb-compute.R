@@ -96,6 +96,14 @@ test_that("compute can handle schema", {
   )
 })
 
+test_that("collect() handles DBI error", {
+  mf <- memdb_frame(x = 1)
+  expect_error(
+    mf %>% mutate(a = sql("invalid sql")) %>% collect(),
+    regexp = "Can't collect lazy table"
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("sorting preserved across compute and collapse", {
