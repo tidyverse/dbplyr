@@ -379,6 +379,15 @@ test_that("across() handles cur_column()", {
   )
 })
 
+test_that("across() errors if named", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_snapshot({
+    (expect_error(mutate(lf, x = across())))
+    (expect_error(group_by(lf, x = across())))
+  })
+})
+
 
 # if_all ------------------------------------------------------------------
 

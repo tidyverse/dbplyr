@@ -146,7 +146,7 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
     dot_name <- get_dot_name(dots, i, was_named)
-    quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name)
+    quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name, was_named[[i]])
 
     if (!is.list(quosures)) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
