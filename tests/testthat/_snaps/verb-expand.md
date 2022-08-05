@@ -4,7 +4,7 @@
       lazy_frame(x = 1, y = 1) %>% tidyr::expand(x, y)
     Output
       <SQL>
-      SELECT `LHS`.*, `y`
+      SELECT `LHS`.*, `RHS`.*
       FROM (
         SELECT DISTINCT `x`
         FROM `df`
@@ -133,7 +133,7 @@
           COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`,
           `z`
         FROM (
-          SELECT `LHS`.*, `y`
+          SELECT `LHS`.*, `RHS`.*
           FROM (
             SELECT DISTINCT `x`
             FROM `df`

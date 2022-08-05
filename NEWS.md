@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
-* When possible, dbplyr now uses `SELECT *` after a left join instead of
-  explicitly selecting every column (@mgirlich, #898).
+* When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
+  selecting every column (@mgirlich, #898).
   
 * Using a named `across()` now gives a clear error message (@mgirlich, #761).
 

@@ -45,7 +45,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
+sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS"), type) {
   join_vars_list <- mapply(
     FUN = sql_join_var,
     alias = vars$alias,
@@ -56,7 +56,22 @@ sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
     USE.NAMES = TRUE
   )
 
-  join_vars_list <- join_use_star(con, vars, join_vars_list, x_as)
+  x_start <- min(c(Inf, which(!is.na(vars$x))))
+  y_start <- min(c(Inf, which(!is.na(vars$y))))
+
+  if (type == "left" || type == "inner") {
+    join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+  } else if (type == "right") {
+    join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+  } else if (type == "cross") {
+    if (x_start < y_start) {
+      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+    } else {
+      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+    }
+  }
 
   sql(unlist(join_vars_list))
 }
@@ -80,40 +95,46 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
 }
 
 join_use_star <- function(con,
-                          vars,
+                          out_vars,
+                          used_vars,
+                          in_vars,
                           join_vars_list,
-                          x_as) {
-  first_match <- vctrs::vec_match(vars$all_x[[1]], vars$x)
-  if (is.na(first_match)) {
+                          tbl_alias) {
+  loc_start <- vctrs::vec_match(in_vars[[1]], used_vars)
+  if (is.na(loc_start)) {
     return(join_vars_list)
   }
 
-  last <- first_match + length(vars$all_x) - 1
-  n <- vctrs::vec_size(vars$x)
+  loc_end <- loc_start + length(in_vars) - 1
+  n <- vctrs::vec_size(used_vars)
 
-  if (n < last) {
+  if (n < loc_end) {
     return(join_vars_list)
   }
 
-  test_cols <- vctrs::vec_slice(vars$x, seq2(first_match, last))
-  y_vars <- vctrs::vec_slice(vars$y, seq2(first_match, last))
-  x_alias <- vctrs::vec_slice(vars$alias, seq2(first_match, last))
+  idx <- seq2(loc_start, loc_end)
+  alias <- vctrs::vec_slice(out_vars, idx)
+  x <- vctrs::vec_slice(used_vars, idx)
 
-  if (identical(test_cols, vars$all_x) &&
-      all(is.na(y_vars)) &&
-      all(identical(test_cols, x_alias))) {
-    idx_start <- seq2(1, first_match - 1)
-    idx_end <- seq2(last + 1, n)
-
-    x_as <- escape(x_as, con = con)
-    vctrs::vec_c(
-      vctrs::vec_slice(join_vars_list, idx_start),
-      list(sql(paste0(x_as, ".*"))),
-      vctrs::vec_slice(join_vars_list, idx_end)
-    )
-  } else {
-    join_vars_list
+  renamed <- !identical(x, alias)
+  if (renamed) {
+    return(join_vars_list)
   }
+
+  moved <- !identical(x, in_vars)
+  if (moved) {
+    return(join_vars_list)
+  }
+
+  idx_start <- seq2(1, loc_start - 1)
+  idx_end <- seq2(loc_end + 1, length(join_vars_list))
+
+  tbl_alias <- escape(tbl_alias, con = con)
+  vctrs::vec_c(
+    vctrs::vec_slice(join_vars_list, idx_start),
+    list(sql(paste0(tbl_alias, ".*"))),
+    vctrs::vec_slice(join_vars_list, idx_end)
+  )
 }
 
 sql_join_tbls <- function(con, by, na_matches = "never") {

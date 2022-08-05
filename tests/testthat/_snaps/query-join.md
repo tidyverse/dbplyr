@@ -47,7 +47,7 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `RHS`.`x` AS `x`, `RHS`.`y` AS `y`
+      SELECT `RHS`.*
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
