@@ -64,6 +64,7 @@ sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS"), t
   } else if (type == "right") {
     join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
   } else if (type == "cross") {
+    # shrink `join_vars_list` from the back to not mess up the indices
     if (x_start < y_start) {
       join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
       join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
@@ -100,32 +101,31 @@ join_use_star <- function(con,
                           in_vars,
                           join_vars_list,
                           tbl_alias) {
+  if (!all(in_vars %in% used_vars)) {
+    return(join_vars_list)
+  }
+
   loc_start <- vctrs::vec_match(in_vars[[1]], used_vars)
-  if (is.na(loc_start)) {
-    return(join_vars_list)
-  }
-
   loc_end <- loc_start + length(in_vars) - 1
-  n <- vctrs::vec_size(used_vars)
 
-  if (n < loc_end) {
-    return(join_vars_list)
-  }
-
+  # shrink `out_vars` and `used_vars` to the actual part corresponding to the
+  # table
   idx <- seq2(loc_start, loc_end)
   alias <- vctrs::vec_slice(out_vars, idx)
-  x <- vctrs::vec_slice(used_vars, idx)
+  used_vars <- vctrs::vec_slice(used_vars, idx)
 
-  renamed <- !identical(x, alias)
+  renamed <- !identical(used_vars, alias)
   if (renamed) {
     return(join_vars_list)
   }
 
-  moved <- !identical(x, in_vars)
+  moved <- !identical(used_vars, in_vars)
   if (moved) {
     return(join_vars_list)
   }
 
+  # the part of `join_vars_list` corresponding to the vars of the input tbl can
+  # now be replaced by `tbl_alias.*`
   idx_start <- seq2(1, loc_start - 1)
   idx_end <- seq2(loc_end + 1, length(join_vars_list))
 
