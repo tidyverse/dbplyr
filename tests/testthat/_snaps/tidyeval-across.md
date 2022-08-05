@@ -112,14 +112,14 @@
     Output
       <error/rlang_error>
       Error in `mutate()`:
-      ! `across()` must be unnamed in dbplyr.
+      ! In dbplyr, the result of `across()` must be unnamed.
       i `x = across()` is named.
     Code
       (expect_error(group_by(lf, x = across())))
     Output
       <error/rlang_error>
       Error in `group_by()`:
-      ! `across()` must be unnamed in dbplyr.
+      ! In dbplyr, the result of `across()` must be unnamed.
       i `x = across()` is named.
 
 # if_all() gives informative errors
