@@ -62,30 +62,6 @@ query_name.lazy_query <- function(x) {
 }
 
 #' @export
-query_name.lazy_select_query <- function(x) {
-  if (!is_empty(x$where)) {
-    return()
-  }
-
-  if (!is_empty(x$order_by)) {
-    return()
-  }
-
-  if (!is_false(x$distinct)) {
-    return()
-  }
-
-  if (!is_empty(x$limit)) {
-    return()
-  }
-
-  vars_base <- op_vars(x$x)
-  if (!is_select_identity(x$select, vars_base)) {
-    return()
-  }
-}
-
-#' @export
 #' @rdname remote_name
 remote_src <- function(x) {
   x$src
