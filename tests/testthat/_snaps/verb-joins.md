@@ -4,7 +4,7 @@
       left_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
     Output
       <SQL>
-      SELECT `df1`.*, `y`
+      SELECT `df1`.`x` AS `x`, `y`
       FROM `df` AS `df1`
       LEFT JOIN `df` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
@@ -77,7 +77,7 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.*
+      SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (CASE WHEN (`LHS`.`x` = `RHS`.`x`) OR (`LHS`.`x` IS NULL AND `RHS`.`x` IS NULL) THEN 0 ELSE 1 END = 0)

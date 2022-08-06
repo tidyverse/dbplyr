@@ -18,7 +18,7 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.*
+      SELECT `LHS`.`x` AS `x`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` <=> `RHS`.`x`)

@@ -101,6 +101,10 @@ join_use_star <- function(con,
                           in_vars,
                           join_vars_list,
                           tbl_alias) {
+  if (length(in_vars) <= 1) {
+    return(join_vars_list)
+  }
+
   if (!all(in_vars %in% used_vars)) {
     return(join_vars_list)
   }
