@@ -176,8 +176,8 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   by <- left_join(x, x, by = "a")$lazy_query$by
-  expect_equal(by$x_as, ident("LHS"))
-  expect_equal(by$y_as, ident("RHS"))
+  expect_equal(by$x_as, ident("x_LHS"))
+  expect_equal(by$y_as, ident("x_RHS"))
 
   by <- left_join(x, x, by = "a", x_as = "my_x")$lazy_query$by
   expect_equal(by$x_as, ident("my_x"))

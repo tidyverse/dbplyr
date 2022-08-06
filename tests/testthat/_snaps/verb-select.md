@@ -11,10 +11,10 @@
       (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
     Output
       <SQL>
-      SELECT `b`, `LHS`.`x` AS `x`
-      FROM `lf1` AS `LHS`
-      LEFT JOIN `lf2` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      SELECT `b`, `lf1`.`x` AS `x`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
 
 ---
 
@@ -22,10 +22,10 @@
       (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
     Output
       <SQL>
-      SELECT `b`, `LHS`.`x` AS `x`, `a`
-      FROM `lf1` AS `LHS`
-      LEFT JOIN `lf2` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      SELECT `b`, `lf1`.`x` AS `x`, `a`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
 
 # select() after semi_join() is inlined
 
@@ -34,10 +34,10 @@
     Output
       <SQL>
       SELECT `x`, `a` AS `a2`
-      FROM `lf1` AS `LHS`
+      FROM `lf1`
       WHERE EXISTS (
-        SELECT 1 FROM `lf2` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` = `lf2`.`x`)
       )
 
 ---
@@ -47,10 +47,10 @@
     Output
       <SQL>
       SELECT `a`, `x`
-      FROM `lf1` AS `LHS`
+      FROM `lf1`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `lf2` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` = `lf2`.`x`)
       )
 
 # select() after join handles previous select
@@ -62,8 +62,8 @@
       SELECT `x` AS `x2`, `y` AS `y3`, `z`
       FROM `df` AS `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `df`
+        WHERE (`LHS`.`x` = `df`.`x`)
       )
 
 ---
@@ -74,8 +74,8 @@
       <SQL>
       SELECT `LHS`.`x` AS `x2`, `LHS`.`y` AS `y3`, `z`
       FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      LEFT JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
 
 # select() produces nice error messages
 

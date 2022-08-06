@@ -360,7 +360,14 @@ check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
   y_name <- query_name(y)
   if (is_null(x_as) && is_null(y_as)) {
     if (identical(x_name, y_name)) {
-      return(list(x_as = ident("LHS"), y_as = ident("RHS")))
+      # needed to avoid `c.ident()`
+      x_name <- unclass(x_name)
+      y_name <- unclass(y_name)
+
+      # minor hack to deal with `*_name` = NULL
+      x_as <- paste0(c(x_name, "LHS"), collapse = "_")
+      y_as <- paste0(c(y_name, "RHS"), collapse = "_")
+      return(list(x_as = ident(x_as), y_as = ident(y_as)))
     }
   }
 

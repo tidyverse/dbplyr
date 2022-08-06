@@ -50,10 +50,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM (`df`) `LHS`
-      LEFT JOIN (`df`) `RHS`
-        ON (decode(`LHS`.`x`, `RHS`.`x`, 0, 1) = 0)
+      SELECT `df_LHS`.`x` AS `x`
+      FROM (`df`) `df_LHS`
+      LEFT JOIN (`df`) `df_RHS`
+        ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---
 
