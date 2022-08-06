@@ -5,6 +5,78 @@
     Message
       Adding missing grouping variables: `b`
 
+# select() after left_join() is inlined
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
+    Output
+      <SQL>
+      SELECT `b`, `LHS`.`x` AS `x`
+      FROM `lf1` AS `LHS`
+      LEFT JOIN `lf2` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
+---
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
+    Output
+      <SQL>
+      SELECT `b`, `LHS`.`x` AS `x`, `a`
+      FROM `lf1` AS `LHS`
+      LEFT JOIN `lf2` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
+# select() after semi_join() is inlined
+
+    Code
+      (out <- semi_join(lf1, lf2, by = "x") %>% select(x, a2 = a))
+    Output
+      <SQL>
+      SELECT `x`, `a` AS `a2`
+      FROM `lf1` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `lf2` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      (out <- anti_join(lf1, lf2, by = "x") %>% relocate(a))
+    Output
+      <SQL>
+      SELECT `a`, `x`
+      FROM `lf1` AS `LHS`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `lf2` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+# select() after join handles previous select
+
+    Code
+      print(lf)
+    Output
+      <SQL>
+      SELECT `x` AS `x2`, `y` AS `y3`, `z`
+      FROM `df` AS `LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x`)
+      )
+
+---
+
+    Code
+      print(lf2)
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x2`, `LHS`.`y` AS `y3`, `z`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
 # select() produces nice error messages
 
     Code
