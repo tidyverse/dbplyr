@@ -59,9 +59,9 @@
     Output
       <SQL>
       SELECT `a` AS `a2`, `x1` AS `x`, `b`
-      FROM `lf1` AS `LHS`
-      LEFT JOIN `lf2` AS `RHS`
-        ON (`LHS`.`x1` = `RHS`.`x2`)
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x1` = `lf2`.`x2`)
 
 # select() before semi_join is inlined
 
@@ -70,13 +70,13 @@
     Output
       <SQL>
       SELECT `a` AS `a2`, `x1` AS `x`
-      FROM `lf1` AS `LHS`
+      FROM `lf1`
       WHERE EXISTS (
         SELECT 1 FROM (
         SELECT `x2` AS `x`, `b`
         FROM `lf2`
       ) `RHS`
-        WHERE (`LHS`.`x1` = `RHS`.`x`)
+        WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
 # can optionally match NA values

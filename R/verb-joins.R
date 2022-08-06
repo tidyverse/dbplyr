@@ -238,14 +238,24 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     indexes = if (auto_index) list(by$y)
   )
 
-  by[c("x_as", "y_as")] <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, call = call)
-
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
   inlined_select_list <- inline_select_in_join(x, y, vars, by)
   vars <- inlined_select_list$vars
   by <- inlined_select_list$by
+
+  # the table alias can only be determined after `select()` was inlined.
+  # This works even though `by` is used in `inline_select_in_join()` and updated
+  # because this does not touch `by$x_as` and `by$y_as`.
+  by[c("x_as", "y_as")] <- check_join_as(
+    x_as,
+    inlined_select_list$x,
+    y_as,
+    inlined_select_list$y,
+    sql_on = sql_on,
+    call = call
+  )
 
   lazy_join_query(
     x = inlined_select_list$x,
@@ -323,8 +333,6 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     indexes = if (auto_index) list(by$y)
   )
 
-  by[c("x_as", "y_as")] <- check_join_as(x_as, x, y_as, y, sql_on = sql_on, call = call)
-
   vars <- set_names(op_vars(x))
   group_vars <- op_grps(x)
   order_vars <- op_sort(x)
@@ -340,6 +348,9 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
 
     x_lq <- x_lq$x
   }
+
+  # the table alias can only be determined after `select()` was inlined
+  by[c("x_as", "y_as")] <- check_join_as(x_as, x_lq, y_as, y, sql_on = sql_on, call = call)
 
   lazy_semi_join_query(
     x_lq,
