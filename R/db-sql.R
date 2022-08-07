@@ -749,10 +749,15 @@ dbplyr_create_index <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_create_index
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
+db_create_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...,
+                                          .call = caller_env()) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  safe_db_execute(con, sql, .msg = "Can't create index on {.val {table}}.")
+  safe_db_execute(con, sql, .msg = "Can't create index on {.val {table}}.", .call = .call)
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -835,4 +840,38 @@ safe_db_execute <- function(con, sql, ..., .msg, .call = caller_env()) {
       )
     }
   )
+}
+
+safe_db_write_table <- function(con,
+                                name,
+                                field.types,
+                                value,
+                                temporary = TRUE,
+                                overwrite = FALSE,
+                                ...,
+                                .msg,
+                                .call = caller_env()) {
+  glue_envir <- caller_env()
+  tryCatch(
+    dbWriteTable(
+      con,
+      name = name,
+      value = value,
+      field.types = field.types,
+      temporary = temporary,
+      overwrite = overwrite,
+      row.names = FALSE
+    ),
+    error = function(cnd) {
+      cli_abort(
+        .msg,
+        parent = cnd,
+        .envir = glue_envir,
+        call = .call,
+        class = "dbplyr_error_dbi"
+      )
+    }
+  )
+
+  table
 }
