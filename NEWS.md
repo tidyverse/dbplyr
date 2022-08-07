@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `rows_*()` now uses the column types of `x` when copying a local data frame `y`
+  to the database (@mgirlich, #909).
+
 * New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
   `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
   `cumsum()` (@overmar, #913).

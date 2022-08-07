@@ -99,7 +99,7 @@ rows_insert.tbl_lazy <- function(x,
 
   conflict <- rows_check_conflict(conflict)
 
-  y <- auto_copy(x, y, copy = copy)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   rows_check_containment(x, y)
 
@@ -156,7 +156,7 @@ rows_append.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   rows_check_containment(x, y)
 
@@ -204,7 +204,7 @@ rows_update.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   rows_check_containment(x, y)
 
@@ -285,7 +285,7 @@ rows_patch.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   rows_check_containment(x, y)
 
@@ -307,6 +307,7 @@ rows_patch.tbl_lazy <- function(x,
     }
 
     con <- remote_con(x)
+
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
       sql_table_prefix(con, update_cols, name),
@@ -374,7 +375,7 @@ rows_upsert.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   rows_check_containment(x, y)
 
@@ -450,8 +451,7 @@ rows_delete.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
+  y <- rows_auto_copy(x, y, copy = copy)
   rows_check_containment(x, y)
 
   by <- rows_check_by(by, y)
@@ -773,6 +773,24 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out$insert_clause <- sql_clause_insert(con, insert_cols, x_name)
 
   out
+}
+
+rows_auto_copy <- function(x, y, copy) {
+  name <- remote_name(x)
+  x_types <- get_col_types(remote_con(x), name)
+  auto_copy(x, y, copy = copy, types = x_types)
+}
+
+get_col_types <- function(con, name) {
+  if (inherits(con, "TestConnection")) {
+    return(NULL)
+  }
+  res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
+  on.exit(DBI::dbClearResult(res))
+  DBI::dbFetch(res, n = 0)
+  out <- DBI::dbColumnInfo(res)
+
+  set_names(out[[".typname"]] %||% out[["type"]], out[["name"]])
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols) {
