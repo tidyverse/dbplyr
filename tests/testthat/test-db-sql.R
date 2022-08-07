@@ -22,6 +22,7 @@ test_that("sql_query_rows() works", {
 
 test_that("handles DBI error", {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con))
 
   expect_error(db_analyze(con, "tbl"), class = "dbplyr_error_dbi")
   expect_error(db_create_index(con, "tbl", "col"), class = "dbplyr_error_dbi")
