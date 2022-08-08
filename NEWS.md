@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
+  selecting every column (@mgirlich, #898).
+  
 * New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
   `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
   `cumsum()` (@overmar, #913).
