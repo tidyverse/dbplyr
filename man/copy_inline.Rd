@@ -4,13 +4,17 @@
 \alias{copy_inline}
 \title{Use a local data frame in a dbplyr query}
 \usage{
-copy_inline(con, df)
+copy_inline(con, df, types = NULL)
 }
 \arguments{
 \item{con}{A database connection.}
 
 \item{df}{A local data frame. The data is written directly in the SQL query
 so it should be small.}
+
+\item{types}{a character vector giving variable types to use for the columns.
+See \url{https://www.sqlite.org/datatype3.html} for available types.
+If \code{NULL}, the default, the types are determined from \code{df}.}
 }
 \value{
 A \code{tbl_lazy}.
