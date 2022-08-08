@@ -785,6 +785,9 @@ get_col_types <- function(con, name) {
   if (inherits(con, "TestConnection")) {
     return(NULL)
   }
+  if (is_null(name)) {
+    return(NULL)
+  }
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
