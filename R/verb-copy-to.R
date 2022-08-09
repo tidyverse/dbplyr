@@ -272,13 +272,6 @@ sql_values_zero_rows <- function(con, df, types, lvl) {
     abort("`df` does not have 0 rows", .internal = TRUE)
   }
 
-  # typed_cols <- purrr::map_chr(
-  #   vctrs::vec_init(df),
-  #   ~ {
-  #     cast_expr <- call2(sql_cast_dispatch(.x), NA)
-  #     translate_sql(!!cast_expr, con = con)
-  #   }
-  # )
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
 
   query <- select_query(
