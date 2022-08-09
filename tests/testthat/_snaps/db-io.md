@@ -2,10 +2,12 @@
 
     Code
       (expect_error(db_copy_to(con = con, table = "tmp", values = data.frame(x = c(1,
-        1))), "Can't write"))
+        1)))))
     Output
       <error/rlang_error>
-      Error in `dplyr::db_write_table()`:
+      Error in `db_copy_to()`:
+      ! Can't copy to table "tmp"
+      Caused by error in `dplyr::db_write_table()`:
       ! Can't write table "tmp".
       Caused by error:
       ! table 'tmp' already exists
@@ -14,10 +16,12 @@
 
     Code
       (expect_error(db_copy_to(con = con, table = "tmp2", values = data.frame(x = c(1,
-        1)), unique_indexes = list("x")), "Can't create"))
+        1)), unique_indexes = list("x"))))
     Output
       <error/rlang_error>
-      Error in `db_create_index.DBIConnection()`:
+      Error in `db_copy_to()`:
+      ! Can't copy to table "tmp2"
+      Caused by error in `db_create_index.DBIConnection()`:
       ! Can't create index on "tmp2".
       Caused by error:
       ! UNIQUE constraint failed: tmp2.x

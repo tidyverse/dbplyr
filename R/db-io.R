@@ -51,15 +51,22 @@ db_copy_to.DBIConnection <- function(con, table, values,
   call <- current_env()
 
   with_transaction(con, in_transaction, {
-    table <- dplyr::db_write_table(con, table,
-      types = types,
-      values = values,
-      temporary = temporary,
-      overwrite = overwrite
+    tryCatch(
+      {
+        table <- dplyr::db_write_table(con, table,
+          types = types,
+          values = values,
+          temporary = temporary,
+          overwrite = overwrite
+        )
+        create_indexes(con, table, unique_indexes, unique = TRUE)
+        create_indexes(con, table, indexes)
+        if (analyze) dbplyr_analyze(con, table)
+      },
+      error = function(cnd) {
+        cli_abort("Can't copy to table {.val {table}}", parent = cnd, call = call)
+      }
     )
-    create_indexes(con, table, unique_indexes, unique = TRUE)
-    create_indexes(con, table, indexes)
-    if (analyze) dbplyr_analyze(con, table)
   })
 
   table
