@@ -118,6 +118,19 @@ test_that("zero row table works", {
   )
 })
 
+test_that("types argument works", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  df <- tibble(x = "1", y = 2L)
+  expect_equal(copy_inline(con, df) %>% collect(), df)
+
+  expect_equal(
+    copy_inline(con, df, types = c(x = "INTEGER", y = "TEXT")) %>% collect(),
+    tibble(x = 1L, y = "2")
+  )
+})
+
 test_that("checks inputs", {
   con <- simulate_dbi()
 
