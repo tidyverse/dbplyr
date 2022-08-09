@@ -107,8 +107,9 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' @param con A database connection.
 #' @param df A local data frame. The data is written directly in the SQL query
 #'   so it should be small.
-#' @param types a character vector giving variable types to use for the columns.
-#'    See <https://www.sqlite.org/datatype3.html> for available types.
+#' @param types A named character vector of SQL data types to use for the columns.
+#'    The data types are backend specific. For example for Postgres this could
+#'    be `c(id = "bigint", created_at = "timestamp", values = "integer[]")`.
 #'    If `NULL`, the default, the types are determined from `df`.
 #' @return A `tbl_lazy`.
 #'

@@ -12,8 +12,9 @@ copy_inline(con, df, types = NULL)
 \item{df}{A local data frame. The data is written directly in the SQL query
 so it should be small.}
 
-\item{types}{a character vector giving variable types to use for the columns.
-See \url{https://www.sqlite.org/datatype3.html} for available types.
+\item{types}{A named character vector of SQL data types to use for the columns.
+The data types are backend specific. For example for Postgres this could
+be \code{c(id = "bigint", created_at = "timestamp", values = "integer[]")}.
 If \code{NULL}, the default, the types are determined from \code{df}.}
 }
 \value{
