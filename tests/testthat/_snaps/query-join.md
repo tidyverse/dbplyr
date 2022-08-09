@@ -21,7 +21,7 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       INNER JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
@@ -34,7 +34,7 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
@@ -47,7 +47,7 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `RHS`.`x` AS `x`, `RHS`.`y` AS `y`
+      SELECT `RHS`.*
       FROM `df` AS `LHS`
       RIGHT JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
@@ -75,7 +75,7 @@
       Joining, by = "x"
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `y`, `z`
+      SELECT `LHS`.*, `z`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`x` = `RHS`.`x`)
@@ -97,7 +97,7 @@
       left_join(lf1, lf2, by = "y")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`X` AS `X`
+      SELECT `LHS`.*, `RHS`.`X` AS `X`
       FROM `df` AS `LHS`
       LEFT JOIN `df` AS `RHS`
         ON (`LHS`.`y` = `RHS`.`y`)

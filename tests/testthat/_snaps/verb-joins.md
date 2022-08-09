@@ -15,7 +15,7 @@
       inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
     Output
       <SQL>
-      SELECT `df1`.`x` AS `x`, `y`
+      SELECT `df1`.*
       FROM `df` AS `df1`
       INNER JOIN `df` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
