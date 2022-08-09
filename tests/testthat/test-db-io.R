@@ -10,8 +10,7 @@ test_that("db_copy_to() wraps DBI errors", {
         con = con,
         table = "tmp",
         values = data.frame(x = c(1, 1))
-      ),
-      "Can't write"
+      )
     ))
   )
 
@@ -23,8 +22,7 @@ test_that("db_copy_to() wraps DBI errors", {
         table = "tmp2",
         values = data.frame(x = c(1, 1)),
         unique_indexes = list("x")
-      ),
-      "Can't create"
+      )
     ))
   )
 })
