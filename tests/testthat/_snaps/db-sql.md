@@ -8,3 +8,46 @@
       i Please install a newer version of the package or contact the maintainer
       This warning is displayed once every 8 hours.
 
+# handles DBI error
+
+    Code
+      (expect_error(db_analyze(con, "tbl")))
+    Output
+      <error/rlang_error>
+      Error in `db_analyze()`:
+      ! Can't analyze table "tbl".
+      Caused by error:
+      ! no such table: tbl
+    Code
+      (expect_error(db_create_index(con, "tbl", "col")))
+    Output
+      <error/rlang_error>
+      Error in `db_create_index()`:
+      ! Can't create index on "tbl".
+      Caused by error:
+      ! no such table: main.tbl
+    Code
+      (expect_error(db_explain(con, "invalid sql")))
+    Output
+      <error/rlang_error>
+      Error in `db_explain()`:
+      ! Can't explain query.
+      Caused by error:
+      ! near "'invalid sql'": syntax error
+    Code
+      (expect_error(db_query_fields(con, "does not exist")))
+    Output
+      <error/rlang_error>
+      Error in `db_query_fields()`:
+      ! Can't query fields.
+      Caused by error:
+      ! no such table: does not exist
+    Code
+      (expect_error(db_save_query(con, "invalid sql", "tbl")))
+    Output
+      <error/rlang_error>
+      Error in `db_save_query()`:
+      ! Can't save query to "tbl".
+      Caused by error:
+      ! near "'invalid sql'": syntax error
+

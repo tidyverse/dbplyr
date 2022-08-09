@@ -24,10 +24,12 @@ test_that("handles DBI error", {
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con))
 
-  expect_error(db_analyze(con, "tbl"), "Can't analyze")
-  expect_error(db_create_index(con, "tbl", "col"), "Can't create")
+  expect_snapshot({
+    (expect_error(db_analyze(con, "tbl")))
+    (expect_error(db_create_index(con, "tbl", "col")))
 
-  expect_error(db_explain(con, "invalid sql"), "Can't explain")
-  expect_error(db_query_fields(con, "does not exist"), "Can't query fields")
-  expect_error(db_save_query(con, "invalid sql", "tbl"), "Can't save")
+    (expect_error(db_explain(con, "invalid sql")))
+    (expect_error(db_query_fields(con, "does not exist")))
+    (expect_error(db_save_query(con, "invalid sql", "tbl")))
+  })
 })

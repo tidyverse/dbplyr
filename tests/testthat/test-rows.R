@@ -160,24 +160,26 @@ test_that("rows_get_or_execute() gives error context", {
   DBI::dbWriteTable(con, "mtcars", tibble(x = 1, y = 1), overwrite = TRUE, temporary = TRUE)
   DBI::dbExecute(con, "CREATE UNIQUE INDEX `mtcars_x` ON `mtcars` (`x`)")
 
-  expect_error(
-    rows_append(
-      tbl(con, "mtcars"),
-      tibble(x = 1),
-      copy = TRUE,
-      in_place = TRUE
-    )
-  )
+  expect_snapshot({
+    (expect_error(
+      rows_append(
+        tbl(con, "mtcars"),
+        tibble(x = 1),
+        copy = TRUE,
+        in_place = TRUE
+      )
+    ))
 
-  expect_error(
-    rows_append(
-      tbl(con, "mtcars"),
-      tibble(x = 1),
-      copy = TRUE,
-      in_place = TRUE,
-      returning = x
-    )
-  )
+    (expect_error(
+      rows_append(
+        tbl(con, "mtcars"),
+        tibble(x = 1),
+        copy = TRUE,
+        in_place = TRUE,
+        returning = x
+      )
+    ))
+  })
 })
 
 test_that("`sql_query_insert()` works", {
