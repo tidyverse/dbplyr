@@ -129,6 +129,14 @@ copy_inline <- function(con, df, types = NULL) {
     cli_abort("{.var df} needs at least one column.")
   }
 
+  if (!is_null(types)) {
+    vctrs::vec_assert(types, character())
+
+    if (!setequal(colnames(df), names(types))) {
+      cli_abort("Names of {.arg df} and {.arg types} must be the same.")
+    }
+  }
+
   # This workaround is needed because `tbl_sql()` applies `as.sql()` on `from`
   subclass <- class(con)[[1]] # prefix added by dplyr::make_tbl
   dplyr::make_tbl(

@@ -119,8 +119,13 @@ test_that("zero row table works", {
 })
 
 test_that("checks inputs", {
+  con <- simulate_dbi()
+
   expect_snapshot({
-    (expect_error(copy_inline(simulate_dbi(), tibble())))
-    (expect_error(copy_inline(simulate_dbi(), lazy_frame(a = 1))))
+    (expect_error(copy_inline(con, tibble())))
+    (expect_error(copy_inline(con, lazy_frame(a = 1))))
+
+    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = "bigint"))))
+    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = 1))))
   })
 })
