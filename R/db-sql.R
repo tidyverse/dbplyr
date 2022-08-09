@@ -741,7 +741,13 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  safe_db_execute(con, sql, .msg = "Can't analyze table {.val {table}}.")
+  tryCatch(
+    DBI::dbExecute(con, sql),
+    error = function(cnd) {
+      msg <- "Can't analyze table {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_create_index <- function(con, ...) {
@@ -757,7 +763,13 @@ db_create_index.DBIConnection <- function(con,
                                           ...,
                                           .call = caller_env()) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  safe_db_execute(con, sql, .msg = "Can't create index on {.val {table}}.", .call = .call)
+  tryCatch(
+    DBI::dbExecute(con, sql, .call = .call),
+    error = function(cnd) {
+      msg <- "Can't create index on {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -768,7 +780,13 @@ dbplyr_explain <- function(con, ...) {
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
   call <- current_call()
-  expl <- safe_db_get_query(con, sql, .msg = "Can't explain query.")
+  tryCatch(
+    {
+      expl <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't explain query.", parent = cnd)
+    }
+  )
 
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
@@ -781,7 +799,13 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  df <- safe_db_get_query(con, sql, .msg = "Can't query fields.")
+  tryCatch(
+    {
+      df <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't query fields.", parent = cnd)
+    }
+  )
   names(df)
 }
 
@@ -792,11 +816,11 @@ dbplyr_save_query <- function(con, ...) {
 #' @importFrom dplyr db_save_query
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  safe_db_execute(
-    con = con,
-    sql = sql,
-    immediate = TRUE,
-    .msg = "Can't save query to {.val {name}}."
+  tryCatch(
+    DBI::dbExecute(con, sql, immediate = TRUE),
+    error = function(cnd) {
+      cli_abort("Can't save query to {.val {name}}.", parent = cnd)
+    }
   )
   name
 }
@@ -808,70 +832,4 @@ dbplyr_sql_subquery <- function(con, ...) {
 #' @importFrom dplyr sql_subquery
 sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
-}
-
-safe_db_get_query <- function(con, sql, ..., .msg, .call = caller_env()) {
-  glue_envir <- caller_env()
-  tryCatch(
-    DBI::dbGetQuery(con, sql, ...),
-    error = function(cnd) {
-      cli_abort(
-        .msg,
-        parent = cnd,
-        .envir = glue_envir,
-        call = .call,
-        class = "dbplyr_error_dbi"
-      )
-    }
-  )
-}
-
-safe_db_execute <- function(con, sql, ..., .msg, .call = caller_env()) {
-  glue_envir <- caller_env()
-  tryCatch(
-    DBI::dbExecute(con, sql, ...),
-    error = function(cnd) {
-      cli_abort(
-        .msg,
-        parent = cnd,
-        .envir = glue_envir,
-        call = .call,
-        class = "dbplyr_error_dbi"
-      )
-    }
-  )
-}
-
-safe_db_write_table <- function(con,
-                                name,
-                                field.types,
-                                value,
-                                temporary = TRUE,
-                                overwrite = FALSE,
-                                ...,
-                                .msg,
-                                .call = caller_env()) {
-  glue_envir <- caller_env()
-  tryCatch(
-    dbWriteTable(
-      con,
-      name = name,
-      value = value,
-      field.types = field.types,
-      temporary = temporary,
-      overwrite = overwrite,
-      row.names = FALSE
-    ),
-    error = function(cnd) {
-      cli_abort(
-        .msg,
-        parent = cnd,
-        .envir = glue_envir,
-        call = .call,
-        class = "dbplyr_error_dbi"
-      )
-    }
-  )
-
-  table
 }

@@ -55,11 +55,10 @@ db_copy_to.DBIConnection <- function(con, table, values,
       types = types,
       values = values,
       temporary = temporary,
-      overwrite = overwrite,
-      .call = call
+      overwrite = overwrite
     )
-    create_indexes(con, table, unique_indexes, unique = TRUE, .call = call)
-    create_indexes(con, table, indexes, .call = call)
+    create_indexes(con, table, unique_indexes, unique = TRUE)
+    create_indexes(con, table, indexes)
     if (analyze) dbplyr_analyze(con, table)
   })
 
@@ -128,18 +127,21 @@ db_write_table.DBIConnection <- function(con,
                                          values,
                                          temporary = TRUE,
                                          overwrite = FALSE,
-                                         ...,
-                                         .call = caller_env()) {
-  safe_db_write_table(
-    con,
-    name = dbi_quote(table, con),
-    value = values,
-    field.types = types,
-    temporary = temporary,
-    overwrite = overwrite,
-    row.names = FALSE,
-    .msg = "Can't write write table {.val {table}}.",
-    .call = .call
+                                         ...) {
+  tryCatch(
+    dbWriteTable(
+      con,
+      name = dbi_quote(table, con),
+      value = values,
+      field.types = types,
+      temporary = temporary,
+      overwrite = overwrite,
+      row.names = FALSE
+    ),
+    error = function(cnd) {
+      msg <- "Can't write table {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
   )
 
   table
@@ -152,14 +154,14 @@ dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
 dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
 dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x)) # nocov
 
-create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ..., .call = caller_env()) {
+create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   if (is.null(indexes)) {
     return()
   }
 
   indexes <- as.list(indexes)
   for (index in indexes) {
-    dbplyr_create_index(con, table, index, unique = unique, ..., .call = .call)
+    dbplyr_create_index(con, table, index, unique = unique, ...)
   }
 }
 

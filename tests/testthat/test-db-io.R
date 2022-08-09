@@ -10,7 +10,7 @@ test_that("db_copy_to() wraps DBI errors", {
       table = "tmp",
       values = data.frame(x = c(1, 1))
     ),
-    class = "dbplyr_error_dbi"
+    "Can't write"
   )
 
   # error when creating unique index
@@ -21,6 +21,6 @@ test_that("db_copy_to() wraps DBI errors", {
       values = data.frame(x = c(1, 1)),
       unique_indexes = list("x")
     ),
-    class = "dbplyr_error_dbi"
+    "Can't create"
   )
 })

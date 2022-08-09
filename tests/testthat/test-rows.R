@@ -166,8 +166,7 @@ test_that("rows_get_or_execute() gives error context", {
       tibble(x = 1),
       copy = TRUE,
       in_place = TRUE
-    ),
-    class = "dbplyr_error_dbi"
+    )
   )
 
   expect_error(
@@ -177,8 +176,7 @@ test_that("rows_get_or_execute() gives error context", {
       copy = TRUE,
       in_place = TRUE,
       returning = x
-    ),
-    class = "dbplyr_error_dbi"
+    )
   )
 })
 
