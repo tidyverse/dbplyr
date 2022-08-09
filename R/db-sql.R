@@ -760,11 +760,10 @@ db_create_index.DBIConnection <- function(con,
                                           columns,
                                           name = NULL,
                                           unique = FALSE,
-                                          ...,
-                                          .call = caller_env()) {
+                                          ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
   tryCatch(
-    DBI::dbExecute(con, sql, .call = .call),
+    DBI::dbExecute(con, sql),
     error = function(cnd) {
       msg <- "Can't create index on {.val {table}}."
       cli_abort(msg, parent = cnd)
