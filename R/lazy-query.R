@@ -13,7 +13,6 @@ lazy_query <- function(query_type,
   structure(
     list(
       x = x,
-      types = types,
       ...,
       group_vars = group_vars,
       order_vars = order_vars,
