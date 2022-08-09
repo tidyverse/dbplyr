@@ -339,7 +339,7 @@
       (
         SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
         FROM (
-          SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`y` AS `y...y`
+          SELECT `LHS`.*, `RHS`.`y` AS `y...y`
           FROM `df_x` AS `LHS`
           INNER JOIN `df_y` AS `RHS`
             ON (`LHS`.`x` = `RHS`.`x`)

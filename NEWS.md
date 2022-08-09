@@ -3,6 +3,13 @@
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
 
+* When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
+  selecting every column (@mgirlich, #898).
+  
+* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
+  `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
+  `cumsum()` (@overmar, #913).
+
 * Using a named `across()` now gives a clear error message (@mgirlich, #761).
 
 * `cur_column()` is now supported (@mgirlich, #951).
