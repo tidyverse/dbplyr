@@ -5,6 +5,13 @@
 * `fill()` now works for connections from RPostgreSQL (@mgirlich).
 
 * `explain()` now works for connections from ROracle (@mgirlich).
+* When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
+  selecting every column (@mgirlich, #898).
+  
+* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
+  `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
+  `cumsum()` (@overmar, #913).
+
 * Using a named `across()` now gives a clear error message (@mgirlich, #761).
 
 * `cur_column()` is now supported (@mgirlich, #951).

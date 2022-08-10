@@ -471,6 +471,156 @@ test_that("copy = TRUE works", {
   )
 })
 
+test_that("left_join/inner_join uses *", {
+  lf1 <- lazy_frame(a = 1, b = 2, c = 1)
+  lf2 <- lazy_frame(a = 1, b = 2, z = 1)
+
+  con <- simulate_dbi()
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b"))
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "left"),
+    sql("`LHS`.*", z = "`z`")
+  )
+
+  # also works after relocate
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b")) %>%
+    relocate(z)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "left"),
+    sql(z = "`z`", "`LHS`.*")
+  )
+
+  # does not use * if variable are missing
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b")) %>%
+    select(a, c)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "left"),
+    sql(a = "`LHS`.`a`", c = "`c`")
+  )
+
+  # does not use * if variable names changed
+  lf1 <- lazy_frame(a = 1, b = 2)
+  lf2 <- lazy_frame(a = 1, b = 2)
+  out <- lf1 %>%
+    left_join(lf2, by = c("a"))
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "left"),
+    sql(a = "`LHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
+  )
+})
+
+test_that("right_join uses *", {
+  lf1 <- lazy_frame(a = 1, b = 2, c = 1)
+  lf2 <- lazy_frame(a = 1, b = 2, z = 1)
+
+  con <- simulate_dbi()
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b"))
+
+  # cannot use * without relocate or select
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "right"),
+    sql(a = "`RHS`.`a`", b = "`RHS`.`b`", c = "`c`", z = "`z`")
+  )
+
+  # also works after relocate
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b")) %>%
+    select(a, b, z, c)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "right"),
+    sql("`RHS`.*", c = "`c`")
+  )
+
+  # does not use * if variable are missing
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b")) %>%
+    select(a, z)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "right"),
+    sql(a = "`RHS`.`a`", z = "`z`")
+  )
+
+  # does not use * if variable names changed
+  lf1 <- lazy_frame(a = 1, b = 2)
+  lf2 <- lazy_frame(a = 1, b = 2)
+  out <- lf1 %>%
+    right_join(lf2, by = c("a"))
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "right"),
+    sql(a = "`RHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
+  )
+})
+
+test_that("cross_join uses *", {
+  lf1 <- lazy_frame(a = 1, b = 1)
+  lf2 <- lazy_frame(x = 1, y = 1)
+
+  con <- simulate_dbi()
+  out <- lf1 %>%
+    full_join(lf2, by = character())
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "cross"),
+    set_names(sql("`LHS`.*", "`RHS`.*"), c("", ""))
+  )
+
+  # also works after relocate
+  out <- lf1 %>%
+    full_join(lf2, by = character()) %>%
+    select(x, y, a, b)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "cross"),
+    set_names(sql("`RHS`.*", "`LHS`.*"), c("", ""))
+  )
+
+  out <- lf1 %>%
+    full_join(lf2, by = character()) %>%
+    select(x, a, b, y)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "cross"),
+    sql(x = "`x`", "`LHS`.*", y = "`y`")
+  )
+
+  out <- lf1 %>%
+    full_join(lf2, by = character()) %>%
+    select(a, x, y, b)
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "cross"),
+    sql(a = "`a`", "`RHS`.*", b = "`b`")
+  )
+})
+
+test_that("full_join() does not use *", {
+  con <- simulate_dbi()
+  lf1 <- lazy_frame(a = 1, b = 2)
+  lf2 <- lazy_frame(a = 1, b = 2)
+
+  out <- lf1 %>%
+    full_join(lf2, by = c("a", "b"))
+
+  expect_equal(
+    sql_join_vars(con, out$lazy_query$vars, type = "full"),
+    sql(
+      a = "COALESCE(`LHS`.`a`, `RHS`.`a`)",
+      b = "COALESCE(`LHS`.`b`, `RHS`.`b`)"
+    )
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {

@@ -56,7 +56,7 @@
       df_lazy %>% group_by(a) %>% tidyr::expand(b, c)
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `LHS`.*, `c`
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`

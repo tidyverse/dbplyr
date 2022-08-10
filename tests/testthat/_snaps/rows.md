@@ -318,7 +318,7 @@
       (
         SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
         FROM (
-          SELECT `df_x`.`x` AS `x`, `df_x`.`y` AS `y`, `df_y`.`y` AS `y...y`
+          SELECT `df_x`.*, `df_y`.`y` AS `y...y`
           FROM `df_x`
           INNER JOIN `df_y`
             ON (`df_x`.`x` = `df_y`.`x`)

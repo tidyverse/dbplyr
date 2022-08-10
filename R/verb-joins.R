@@ -406,6 +406,7 @@ check_join_as1 <- function(as, tbl_name, sql_on, default, arg, call) {
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
+  y_names_org <- y_names
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
@@ -434,7 +435,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
     x = c(x_x, y_x),
     y = c(x_y, y_y),
     all_x = x_names,
-    all_y = c(y_names, by$y)
+    all_y = y_names_org
   )
 }
 

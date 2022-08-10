@@ -45,7 +45,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 # SQL generation ----------------------------------------------------------
 
 
-sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
+sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS"), type) {
   join_vars_list <- mapply(
     FUN = sql_join_var,
     alias = vars$alias,
@@ -55,6 +55,24 @@ sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS")) {
     SIMPLIFY = FALSE,
     USE.NAMES = TRUE
   )
+
+  x_start <- min(c(Inf, which(!is.na(vars$x))))
+  y_start <- min(c(Inf, which(!is.na(vars$y))))
+
+  if (type == "left" || type == "inner") {
+    join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+  } else if (type == "right") {
+    join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+  } else if (type == "cross") {
+    # shrink `join_vars_list` from the back to not mess up the indices
+    if (x_start < y_start) {
+      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+    } else {
+      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+    }
+  }
 
   sql(unlist(join_vars_list))
 }
@@ -75,6 +93,52 @@ sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
   } else {
     cli_abort("No source for join column {alias}") # nocov
   }
+}
+
+join_use_star <- function(con,
+                          out_vars,
+                          used_vars,
+                          in_vars,
+                          join_vars_list,
+                          tbl_alias) {
+  if (length(in_vars) <= 1) {
+    return(join_vars_list)
+  }
+
+  if (!all(in_vars %in% used_vars)) {
+    return(join_vars_list)
+  }
+
+  loc_start <- vctrs::vec_match(in_vars[[1]], used_vars)
+  loc_end <- loc_start + length(in_vars) - 1
+
+  # shrink `out_vars` and `used_vars` to the actual part corresponding to the
+  # table
+  idx <- seq2(loc_start, loc_end)
+  alias <- vctrs::vec_slice(out_vars, idx)
+  used_vars <- vctrs::vec_slice(used_vars, idx)
+
+  renamed <- !identical(used_vars, alias)
+  if (renamed) {
+    return(join_vars_list)
+  }
+
+  moved <- !identical(used_vars, in_vars)
+  if (moved) {
+    return(join_vars_list)
+  }
+
+  # the part of `join_vars_list` corresponding to the vars of the input tbl can
+  # now be replaced by `tbl_alias.*`
+  idx_start <- seq2(1, loc_start - 1)
+  idx_end <- seq2(loc_end + 1, length(join_vars_list))
+
+  tbl_alias <- escape(tbl_alias, con = con)
+  vctrs::vec_c(
+    vctrs::vec_slice(join_vars_list, idx_start),
+    list(sql(paste0(tbl_alias, ".*"))),
+    vctrs::vec_slice(join_vars_list, idx_end)
+  )
 }
 
 sql_join_tbls <- function(con, by, na_matches = "never") {
