@@ -7,5 +7,5 @@
       Error in `collect()`:
       ! Failed to collect lazy table.
       Caused by error:
-      ! near "AS": syntax error
+      ! dummy DBI error
 

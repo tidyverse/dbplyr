@@ -10,7 +10,7 @@
       Caused by error in `dplyr::db_write_table()`:
       ! Can't write table "tmp".
       Caused by error:
-      ! table 'tmp' already exists
+      ! dummy DBI error
 
 ---
 
@@ -24,5 +24,5 @@
       Caused by error in `db_create_index.DBIConnection()`:
       ! Can't create index on "tmp2".
       Caused by error:
-      ! UNIQUE constraint failed: tmp2.x
+      ! dummy DBI error
 

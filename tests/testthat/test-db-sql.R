@@ -31,5 +31,7 @@ test_that("handles DBI error", {
     (expect_error(db_explain(con, "invalid sql")))
     (expect_error(db_query_fields(con, "does not exist")))
     (expect_error(db_save_query(con, "invalid sql", "tbl")))
-  })
+  },
+  transform = snap_transform_dbi
+  )
 })

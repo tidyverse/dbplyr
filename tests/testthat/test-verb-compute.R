@@ -99,7 +99,8 @@ test_that("compute can handle schema", {
 test_that("collect() handles DBI error", {
   mf <- memdb_frame(x = 1)
   expect_snapshot(
-    (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect()))
+    (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect())),
+    transform = snap_transform_dbi
   )
 })
 

@@ -179,7 +179,7 @@ test_that("rows_get_or_execute() gives error context", {
         returning = x
       )
     ))
-  })
+  }, transform = snap_transform_dbi)
 })
 
 test_that("`sql_query_insert()` works", {

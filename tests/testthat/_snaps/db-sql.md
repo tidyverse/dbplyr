@@ -17,7 +17,7 @@
       Error in `db_analyze()`:
       ! Can't analyze table "tbl".
       Caused by error:
-      ! no such table: tbl
+      ! dummy DBI error
     Code
       (expect_error(db_create_index(con, "tbl", "col")))
     Output
@@ -25,7 +25,7 @@
       Error in `db_create_index()`:
       ! Can't create index on "tbl".
       Caused by error:
-      ! no such table: main.tbl
+      ! dummy DBI error
     Code
       (expect_error(db_explain(con, "invalid sql")))
     Output
@@ -33,7 +33,7 @@
       Error in `db_explain()`:
       ! Can't explain query.
       Caused by error:
-      ! near "'invalid sql'": syntax error
+      ! dummy DBI error
     Code
       (expect_error(db_query_fields(con, "does not exist")))
     Output
@@ -41,7 +41,7 @@
       Error in `db_query_fields()`:
       ! Can't query fields.
       Caused by error:
-      ! no such table: does not exist
+      ! dummy DBI error
     Code
       (expect_error(db_save_query(con, "invalid sql", "tbl")))
     Output
@@ -49,5 +49,5 @@
       Error in `db_save_query()`:
       ! Can't save query to "tbl".
       Caused by error:
-      ! near "'invalid sql'": syntax error
+      ! dummy DBI error
 
