@@ -2,9 +2,6 @@
 
 * Joins now don't use the table alias "LHS" and "RHS" unless necessary (@mgirlich).
 
-* `fill()` now works for connections from RPostgreSQL (@mgirlich).
-
-* `explain()` now works for connections from ROracle (@mgirlich).
 * When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
   selecting every column (@mgirlich, #898).
   
