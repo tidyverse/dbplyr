@@ -105,7 +105,7 @@
       Error in `rows_insert()`:
       ! Can't modify database table "df_x".
       Caused by error:
-      ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
+      ! dummy DBI error
 
 # can upsert with returning
 
@@ -116,5 +116,5 @@
       Error in `rows_upsert()`:
       ! Can't modify database table "df_x".
       Caused by error:
-      ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
+      ! dummy DBI error
 
