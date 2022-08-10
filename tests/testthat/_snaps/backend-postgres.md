@@ -4,10 +4,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
+      SELECT `df_LHS`.`x` AS `x`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` IS NOT DISTINCT FROM `df_RHS`.`x`)
 
 ---
 

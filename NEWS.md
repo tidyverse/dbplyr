@@ -3,6 +3,8 @@
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
 
+* Joins now don't use the table alias "LHS" and "RHS" unless necessary (@mgirlich).
+
 * When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
   selecting every column (@mgirlich, #898).
   
