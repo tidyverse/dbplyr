@@ -90,6 +90,27 @@
       Error in `rows_check_in_place()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
+# rows_get_or_execute() gives error context
+
+    Code
+      (expect_error(rows_append(tbl(con, "mtcars"), tibble(x = 1), copy = TRUE,
+      in_place = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `rows_append()`:
+      ! Can't modify database table "mtcars".
+      Caused by error:
+      ! dummy DBI error
+    Code
+      (expect_error(rows_append(tbl(con, "mtcars"), tibble(x = 1), copy = TRUE,
+      in_place = TRUE, returning = x)))
+    Output
+      <error/rlang_error>
+      Error in `rows_append()`:
+      ! Can't modify database table "mtcars".
+      Caused by error:
+      ! dummy DBI error
+
 # `sql_query_insert()` works
 
     Code
