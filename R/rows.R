@@ -775,14 +775,23 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out
 }
 
-rows_get_or_execute <- function(x, sql, returning_cols) {
+rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
   con <- remote_con(x)
-  if (is_empty(returning_cols)) {
-    dbExecute(con, sql, immediate = TRUE)
-  } else {
-    returned_rows <- dbGetQuery(con, sql, immediate = TRUE)
-    x <- set_returned_rows(x, returned_rows)
-  }
+  msg <- "Can't modify database table {.val {remote_name(x)}}."
+  tryCatch(
+    {
+      if (is_empty(returning_cols)) {
+        DBI::dbExecute(con, sql, immediate = TRUE)
+      } else {
+        returned_rows <- DBI::dbGetQuery(con, sql, immediate = TRUE)
+        x <- set_returned_rows(x, returned_rows)
+      }
+    },
+    error = function(cnd) {
+      cli_abort(msg, parent = cnd, call = call)
+    }
+  )
+
 
   invisible(x)
 }
