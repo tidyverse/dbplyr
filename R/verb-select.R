@@ -21,7 +21,7 @@
 select.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
   sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
-  loc <- tidyselect::eval_select(expr(c(...)), sim_data)
+  loc <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
   loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
@@ -50,7 +50,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
-  loc <- tidyselect::eval_rename(expr(c(...)), sim_data)
+  loc <- fix_call(tidyselect::eval_rename(expr(c(...)), sim_data))
 
   new_vars <- set_names(names(sim_data), names(sim_data))
   names(new_vars)[loc] <- names(loc)
@@ -66,7 +66,7 @@ rename.tbl_lazy <- function(.data, ...) {
 #' @export
 rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   .fn <- as_function(.fn)
-  cols <- tidyselect::eval_select(enquo(.cols), simulate_vars(.data))
+  cols <- fix_call(tidyselect::eval_select(enquo(.cols), simulate_vars(.data)))
 
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
@@ -88,11 +88,13 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     attr(sim_data[[i]], "dbplyr_org_pos") <- i
   }
 
-  new_vars <- dplyr::relocate(
-    sim_data,
-    ...,
-    .before = {{.before}},
-    .after = {{.after}}
+  new_vars <- fix_call(
+    dplyr::relocate(
+      sim_data,
+      ...,
+      .before = {{.before}},
+      .after = {{.after}}
+    )
   )
 
   old_vars <- colnames(sim_data)
@@ -143,7 +145,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
 
   # drop NULLs
   vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
-  if (selects_same_variables(.data, vars)) {
+  if (is_identity(vars, names(vars), op_vars(.data))) {
     return(lazy_query)
   }
 
@@ -155,33 +157,43 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   renamed <- grps %in% names(old2new)
   grps[renamed] <- old2new[grps[renamed]]
 
-  if (length(lazy_query$last_op) == 1 && lazy_query$last_op %in% c("select", "mutate")) {
+  if (is_projection(vars)) {
+    sel_vars <- purrr::map_chr(vars, as_string)
+    names_prev <- op_vars(lazy_query)
+    idx <- vctrs::vec_match(sel_vars, names_prev)
+
+    out <- lazy_query
+    out$group_vars <- grps
+
+    if (inherits(lazy_query, "lazy_join_query")) {
+      out$vars$alias <- names(sel_vars)
+      out$vars$x <- lazy_query$vars$x[idx]
+      out$vars$y <- lazy_query$vars$y[idx]
+
+      return(out)
+    }
+
+    if (inherits(lazy_query, "lazy_semi_join_query")) {
+      out$vars <- set_names(lazy_query$vars[idx], names(sel_vars))
+
+      return(out)
+    }
+
+    if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
+      out$select <- vctrs::vec_slice(lazy_query$select, idx)
+      out$select$name <- names(vars)
+
+      return(out)
+    }
+  }
+
+  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
     select <- lazy_query$select
-
-    if (purrr::every(vars, is.symbol)) {
-      # if current operation is pure projection
-      # we can just subset the previous selection
-      # TODO test grps update
-      sel_vars <- purrr::map_chr(vars, as_string)
-      lazy_query$select <- update_lazy_select(select, sel_vars)
-      lazy_query$group_vars <- grps
-
-      return(lazy_query)
-    }
-
-    prev_vars <- select$expr
-    if (purrr::every(prev_vars, is.symbol)) {
-      # if previous operation is pure projection
-      sel_vars <- purrr::map_chr(prev_vars, as_string)
-      if (all(select$name == sel_vars)) {
-        # TODO update grps?
-
-        # and there's no renaming
-        # we can just ignore the previous step
-        if (op == "select") {
+    if (is_pure_projection(select$expr, select$name)) {
+      if (op == "select") {
           lazy_query$select <- update_lazy_select(select, vars)
         } else {
           lazy_query$select <- new_lazy_select(
@@ -192,7 +204,6 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
           )
         }
         return(lazy_query)
-      }
     }
   }
 
@@ -204,14 +215,30 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   )
 }
 
-selects_same_variables <- function(x, vars) {
-  if (!all(vapply(vars, is_symbol, logical(1)))) {
+is_projection <- function(exprs) {
+  purrr::every(exprs, is_symbol)
+}
+
+is_pure_projection <- function(exprs, names) {
+  if (!is_projection(exprs)) {
     return(FALSE)
   }
 
-  if (!identical(op_vars(x), names(vars))) {
+  expr_vars <- purrr::map_chr(unname(exprs), as_string)
+  identical(expr_vars, names)
+}
+
+is_identity <- function(exprs, names, names_prev) {
+  if (!is_pure_projection(exprs, names)) {
     return(FALSE)
   }
 
-  identical(syms(op_vars(x)), unname(vars))
+  identical(names, names_prev)
+}
+
+fix_call <- function(expr, call = caller_env()) {
+  withCallingHandlers(expr, error = function(cnd) {
+    cnd$call <- call
+    cnd_signal(cnd)
+  })
 }

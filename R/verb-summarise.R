@@ -34,9 +34,8 @@
 #'   summarise(n()) %>%
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
-  dots <- partial_eval_dots(.data, ..., .named = TRUE)
-  check_summarise_vars(dots)
   check_groups(.groups)
+  dots <- summarise_eval_dots(.data, ...)
 
   .data$lazy_query <- add_summarise(
     .data, dots,
@@ -46,21 +45,55 @@ summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
   .data
 }
 
-# For each expression, check if it uses any newly created variables
-check_summarise_vars <- function(dots) {
-  for (i in seq_along(dots)) {
-    used_vars <- all_names(get_expr(dots[[i]]))
-    cur_vars <- names(dots)[seq_len(i - 1)]
+summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
+  dots <- as.list(enquos(..., .named = TRUE))
+  was_named <- have_name(exprs(...))
+  cur_data <- .data
+  error_env <- new_environment()
 
-    if (any(used_vars %in% cur_vars)) {
-      first_used_var <- used_vars[used_vars %in% cur_vars][[1]]
-      cli_abort(c(
-        "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
-        x = "{.var {names(dots)[[i]]}} refers to {.var {first_used_var}} which was created earlier in this {.fun summarise}.",
-        i = "You need an extra {.fun mutate} step to use it."
-      ), call = caller_env())
-    }
+  for (i in seq_along(dots)) {
+    dot <- dots[[i]]
+    dot_name <- get_dot_name(dots, i, was_named)
+    parent.env(error_env) <- quo_get_env(dot)
+    dot <- quo_set_env(dot, error_env)
+
+    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
+    cur_data <- summarise_bind_error(cur_data, dots, i, error_env)
   }
+
+  # Remove names from any list elements
+  is_list <- purrr::map_lgl(dots, is.list)
+  names2(dots)[is_list] <- ""
+
+  # Auto-splice list results from partial_eval_quo()
+  dots[!is_list] <- lapply(dots[!is_list], list)
+  unlist(dots, recursive = FALSE)
+}
+
+summarise_bind_error <- function(cur_data, dots, i, error_env) {
+  quos <- dots[[i]]
+  if (!is.list(quos)) {
+    quos <- set_names(list(quos), names(dots)[[i]])
+  }
+
+  for (j in seq_along(quos)) {
+    dot_name <- names(quos)[[j]]
+    summarise_bind_error1(error_env, dot_name)
+    # remove variable from `cur_data` so that `partial_eval_sym()` evaluates
+    # variable in `error_env`
+    cur_data$lazy_query <- add_select(cur_data, set_names(list(NULL), dot_name), "select")
+  }
+
+  cur_data
+}
+
+summarise_bind_error1 <- function(error_env, dot_name) {
+  msg <- cli::format_message(c(
+    "In {.pkg dbplyr} you cannot use a variable created in the same {.fun summarise}.",
+    x = "{.var {dot_name}} was created earlier in this {.fun summarise}.",
+    i = "You need an extra {.fun mutate} step to use it."
+  ))
+  env_bind_lazy(error_env, !!dot_name := {abort(msg, call = NULL)})
 }
 
 check_groups <- function(.groups) {

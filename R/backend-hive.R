@@ -16,7 +16,7 @@
 #' lf <- lazy_frame(a = TRUE, b = 1, d = 2, c = "z", con = simulate_hive())
 #' lf %>% transmute(x = cot(b))
 #' lf %>% transmute(x = bitwShiftL(c, 1L))
-#' lf %>% transmute(x = str_replace_all(z, "a", "b"))
+#' lf %>% transmute(x = str_replace_all(c, "a", "b"))
 #'
 #' lf %>% summarise(x = median(d, na.rm = TRUE))
 #' lf %>% summarise(x = var(c, na.rm = TRUE))

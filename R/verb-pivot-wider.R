@@ -345,7 +345,7 @@ is_scalar <- function(x) {
 resolve_fun <- function(x, var, data, call = caller_env()) {
   if (is_formula(x)) {
     .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
-    exec(.fn_expr, var)
+    exec(.fn_expr, var, NULL)
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {

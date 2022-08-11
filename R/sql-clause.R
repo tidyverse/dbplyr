@@ -69,7 +69,13 @@ sql_clause_group_by <- function(group_by, lvl = 0) {
 }
 
 sql_clause_having <- function(having, lvl = 0) {
-  sql_clause("HAVING", having)
+  if (length(having) == 0L) {
+    return()
+  }
+
+  assert_that(is.character(having))
+  having_paren <- sql(paste0("(", having, ")"))
+  sql_clause("HAVING", having_paren, sep = " AND")
 }
 
 sql_clause_window <- function(window) {

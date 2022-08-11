@@ -35,9 +35,29 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
 add_distinct <- function(.data) {
   lazy_query <- .data$lazy_query
 
-  lazy_select_query(
+  out <- lazy_select_query(
     x = lazy_query,
     last_op = "distinct",
     distinct = TRUE
   )
+  # TODO this could also work for joins
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(out)
+  }
+
+  # Optimisation overview
+  # * `distinct()` adds the `DISTINCT` clause to `SELECT`
+  # * `WHERE`, `GROUP BY`, and `HAVING` are executed before `SELECT`
+  #   => they do not matter
+  # * `ORDER BY`
+  #   => but `arrange()` should not have an influence on `distinct()` so it
+  #      should not matter
+  # * `LIMIT` are executed after `SELECT`
+  #   => needs a subquery
+  if (!is_null(lazy_query$limit)) {
+    return(out)
+  }
+
+  lazy_query$distinct <- TRUE
+  lazy_query
 }

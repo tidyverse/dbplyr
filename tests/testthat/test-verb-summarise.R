@@ -17,8 +17,19 @@ test_that("summarise performs partial evaluation", {
 })
 
 test_that("can't refer to freshly created variables", {
-  mf1 <- lazy_frame(x = 1)
-  expect_snapshot(error = TRUE, summarise(mf1, y = sum(x), z = sum(y)))
+  lf1 <- lazy_frame(a = 1, b = 1)
+  expect_snapshot({
+    (expect_error(summarise(lf1, a_sum = sum(a), issue_col = sum(a_sum))))
+
+    # works for variables created in `across()`
+    # mentions `a_sum`
+    (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(a_sum))))
+    # mentions `b_sum`
+    (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(b_sum))))
+
+    # mentions `across()`
+    (expect_error(summarise(lf1, a_sum = sum(a), issue_col = across(a_sum, sum))))
+  })
 })
 
 test_that("summarise(.groups=)", {

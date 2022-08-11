@@ -120,6 +120,18 @@ test_that("constants do not need a new query", {
   )
 })
 
+test_that("mutate() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
+
+    # `...` cannot be evaluated
+    lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
+
+    # `.fns` cannot be evaluated
+    lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
+  })
+})
+
 
 # SQL generation -----------------------------------------------------------
 

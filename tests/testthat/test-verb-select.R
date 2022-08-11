@@ -105,6 +105,130 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% relocate(), lf)
 })
 
+test_that("select() after left_join() is inlined", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
+
+  expect_snapshot(
+    (out <- left_join(lf1, lf2, by = "x") %>%
+      select(b, x))
+  )
+  expect_equal(op_vars(out), c("b", "x"))
+
+  expect_snapshot(
+    (out <- left_join(lf1, lf2, by = "x") %>%
+      relocate(b))
+  )
+  expect_equal(op_vars(out), c("b", "x", "a"))
+  expect_equal(out$lazy_query$vars$x, c(NA, "x", "a"))
+  expect_equal(out$lazy_query$vars$y, c("b", NA, NA))
+
+  out <- left_join(lf1, lf2, by = "x") %>%
+      transmute(b, x = x + 1)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+})
+
+test_that("select() after semi_join() is inlined", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
+
+  expect_snapshot(
+    (out <- semi_join(lf1, lf2, by = "x") %>%
+      select(x, a2 = a))
+  )
+  expect_equal(op_vars(out), c("x", "a2"))
+
+  expect_snapshot(
+    (out <- anti_join(lf1, lf2, by = "x") %>%
+      relocate(a))
+  )
+  expect_equal(op_vars(out), c("a", "x"))
+
+  out <- semi_join(lf1, lf2, by = "x") %>%
+      transmute(a, x = x + 1)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+})
+
+test_that("select() after join handles previous select", {
+  lf <- lazy_frame(x = 1, y = 1, z = 1) %>%
+    group_by(x, y, z) %>%
+    select(x, y2 = y, z) %>%
+    semi_join(
+      lazy_frame(x = 1),
+      by = "x"
+    ) %>%
+    select(x2 = x, y3 = y2, z)
+
+  expect_equal(op_vars(lf), c("x2", "y3", "z"))
+  expect_equal(
+    lf$lazy_query$vars,
+    c(x2 = "x", y3 = "y", z = "z")
+  )
+  expect_equal(op_grps(lf), c("x2", "y3", "z"))
+  expect_snapshot(print(lf))
+
+  lf2 <- lazy_frame(x = 1, y = 1, z = 1) %>%
+    group_by(x, y, z) %>%
+    select(x, y2 = y, z) %>%
+    left_join(
+      lazy_frame(x = 1, y = 1),
+      by = "x"
+    ) %>%
+    select(x2 = x, y3 = y2, z)
+
+  expect_equal(op_vars(lf2), c("x2", "y3", "z"))
+  vars2 <- lf2$lazy_query$vars
+  expect_equal(vars2$alias, c("x2", "y3", "z"))
+  expect_equal(vars2$x, c("x", "y", "z"))
+  expect_equal(vars2$y, c(NA_character_, NA, NA))
+
+  expect_equal(op_grps(lf2), c("x2", "y3", "z"))
+  expect_snapshot(print(lf2))
+})
+
+test_that("select() afer join keeps grouping", {
+  lf1 <- lazy_frame(x = 1, y = 1) %>% group_by(y)
+  lf2 <- lazy_frame(x = 1, z = 1) %>% group_by(z)
+
+  # just to be sure check without select/renaming
+  expect_equal(left_join(lf1, lf2, by = "x") %>% op_grps(), "y")
+
+  # rename grouping variable
+  expect_equal(
+    left_join(lf1, lf2, by = "x") %>%
+      select(y2 = y) %>%
+      op_grps(),
+    "y2"
+  )
+})
+
+test_that("select() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% select(non_existent)
+    lf %>% select(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% relocate(non_existent)
+    lf %>% relocate(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    # no name
+    lf %>% rename(x)
+    # non-existing column
+    lf %>% rename(y = non_existent)
+    lf %>% rename(y = non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% rename_with(toupper, .cols = non_existent)
+    lf %>% rename_with(toupper, .cols = non_existent + 1)
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

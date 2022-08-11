@@ -28,6 +28,11 @@ test_that("rows_insert() checks arguments", {
       mutate(x = x + 1) %>%
       rows_insert(df, by = "x", conflict = "ignore", in_place = TRUE))
   )
+
+  expect_snapshot(error = TRUE,
+    (df %>%
+      rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+  )
 })
 
 
@@ -147,6 +152,34 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
   expect_equal(get_returned_rows(df_inserted), tibble(x = 4L, y = 24L))
 
   expect_equal(df_inserted %>% collect(), tibble(x = 1:4, y = c(11:13, 24L)))
+})
+
+test_that("rows_get_or_execute() gives error context", {
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con))
+  DBI::dbWriteTable(con, "mtcars", tibble(x = 1, y = 1), overwrite = TRUE, temporary = TRUE)
+  DBI::dbExecute(con, "CREATE UNIQUE INDEX `mtcars_x` ON `mtcars` (`x`)")
+
+  expect_snapshot({
+    (expect_error(
+      rows_append(
+        tbl(con, "mtcars"),
+        tibble(x = 1),
+        copy = TRUE,
+        in_place = TRUE
+      )
+    ))
+
+    (expect_error(
+      rows_append(
+        tbl(con, "mtcars"),
+        tibble(x = 1),
+        copy = TRUE,
+        in_place = TRUE,
+        returning = x
+      )
+    ))
+  }, transform = snap_transform_dbi)
 })
 
 test_that("`sql_query_insert()` works", {

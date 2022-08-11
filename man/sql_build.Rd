@@ -25,15 +25,22 @@ lazy_join_query(
   by,
   suffix = c(".x", ".y"),
   na_matches = c("never", "na"),
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL,
   call = caller_env()
 )
 
 lazy_semi_join_query(
   x,
   y,
+  vars,
   anti,
   by,
   na_matches = c("never", "na"),
+  group_vars = NULL,
+  order_vars = NULL,
+  frame = NULL,
   call = caller_env()
 )
 
@@ -52,6 +59,7 @@ lazy_select_query(
   select = NULL,
   where = NULL,
   group_by = NULL,
+  having = NULL,
   order_by = NULL,
   limit = NULL,
   distinct = FALSE,
@@ -86,7 +94,7 @@ select_query(
   distinct = FALSE
 )
 
-semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type, all = FALSE)
 

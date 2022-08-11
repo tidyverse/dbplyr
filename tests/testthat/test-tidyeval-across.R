@@ -245,6 +245,7 @@ test_that("untranslatable functions are preserved", {
 
 test_that("old _at functions continue to work", {
   withr::local_options(lifecycle_verbosity = "quiet")
+  reset_warning_verbosity("dbplyr_check_na_rm")
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum"))
@@ -362,6 +363,29 @@ test_that("across() searches for list in environment", {
       b_2 = sum(b)
     )
   )
+})
+
+test_that("across() handles cur_column()", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, ~ paste0(.x, cur_column()))),
+    exprs(a = paste0(a, "a"), b = paste0(b, "b"))
+  )
+
+  expect_equal(
+    capture_across(lf, across(a:b, function(x) paste0(x, cur_column()))),
+    exprs(a = paste0(a, "a"), b = paste0(b, "b"))
+  )
+})
+
+test_that("across() errors if named", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_snapshot({
+    (expect_error(mutate(lf, x = across())))
+    (expect_error(group_by(lf, x = across())))
+  })
 })
 
 
