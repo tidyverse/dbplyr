@@ -777,7 +777,7 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
 
 rows_auto_copy <- function(x, y, copy) {
   name <- remote_name(x)
-  x_types <- get_col_types(remote_con(x), name)
+  x_types <- get_col_types(remote_con(x), name)[colnames(y)]
   auto_copy(x, y, copy = copy, types = x_types)
 }
 
@@ -796,14 +796,23 @@ get_col_types <- function(con, name) {
   set_names(out[[".typname"]] %||% out[["type"]], out[["name"]])
 }
 
-rows_get_or_execute <- function(x, sql, returning_cols) {
+rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
   con <- remote_con(x)
-  if (is_empty(returning_cols)) {
-    dbExecute(con, sql, immediate = TRUE)
-  } else {
-    returned_rows <- dbGetQuery(con, sql, immediate = TRUE)
-    x <- set_returned_rows(x, returned_rows)
-  }
+  msg <- "Can't modify database table {.val {remote_name(x)}}."
+  tryCatch(
+    {
+      if (is_empty(returning_cols)) {
+        DBI::dbExecute(con, sql, immediate = TRUE)
+      } else {
+        returned_rows <- DBI::dbGetQuery(con, sql, immediate = TRUE)
+        x <- set_returned_rows(x, returned_rows)
+      }
+    },
+    error = function(cnd) {
+      cli_abort(msg, parent = cnd, call = call)
+    }
+  )
+
 
   invisible(x)
 }

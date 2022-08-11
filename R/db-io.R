@@ -48,17 +48,25 @@ db_copy_to.DBIConnection <- function(con, table, values,
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
+  call <- current_env()
 
   with_transaction(con, in_transaction, {
-    table <- dplyr::db_write_table(con, table,
-      types = types,
-      values = values,
-      temporary = temporary,
-      overwrite = overwrite
+    tryCatch(
+      {
+        table <- dplyr::db_write_table(con, table,
+          types = types,
+          values = values,
+          temporary = temporary,
+          overwrite = overwrite
+        )
+        create_indexes(con, table, unique_indexes, unique = TRUE)
+        create_indexes(con, table, indexes)
+        if (analyze) dbplyr_analyze(con, table)
+      },
+      error = function(cnd) {
+        cli_abort("Can't copy to table {.val {table}}", parent = cnd, call = call)
+      }
     )
-    create_indexes(con, table, unique_indexes, unique = TRUE)
-    create_indexes(con, table, indexes)
-    if (analyze) dbplyr_analyze(con, table)
   })
 
   table
@@ -120,16 +128,27 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
 
 #' @export
 #' @importFrom dplyr db_write_table
-db_write_table.DBIConnection <- function(con, table, types, values, temporary = TRUE, overwrite = FALSE, ...) {
-
-  dbWriteTable(
-    con,
-    name = dbi_quote(table, con),
-    value = values,
-    field.types = types,
-    temporary = temporary,
-    overwrite = overwrite,
-    row.names = FALSE
+db_write_table.DBIConnection <- function(con,
+                                         table,
+                                         types,
+                                         values,
+                                         temporary = TRUE,
+                                         overwrite = FALSE,
+                                         ...) {
+  tryCatch(
+    dbWriteTable(
+      con,
+      name = dbi_quote(table, con),
+      value = values,
+      field.types = types,
+      temporary = temporary,
+      overwrite = overwrite,
+      row.names = FALSE
+    ),
+    error = function(cnd) {
+      msg <- "Can't write table {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
   )
 
   table

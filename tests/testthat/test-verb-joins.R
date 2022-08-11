@@ -13,8 +13,8 @@ test_that("complete join pipeline works with SQLite and table alias", {
   out <- left_join(df1, df2, by = "x", x_as = "df1", y_as = "df2")
   expect_equal(out %>% collect(), tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
 
-  lf1 <- lazy_frame(x = 1:5)
-  lf2 <- lazy_frame(x = c(1, 3, 5), y = c("a", "b", "c"))
+  lf1 <- lazy_frame(x = 1:5, .name = "lf1")
+  lf2 <- lazy_frame(x = c(1, 3, 5), y = c("a", "b", "c"), .name = "lf2")
   expect_snapshot(left_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
 })
 
@@ -82,15 +82,15 @@ test_that("join with both same and different vars", {
 })
 
 test_that("joining over arbitrary predicates", {
-  j1 <- collect(left_join(df1, df2, sql_on = "LHS.x = RHS.b"))
+  j1 <- collect(left_join(df1, df2, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.b"))
   j2 <- collect(left_join(df1, df2, by = c("x" = "b"))) %>% mutate(b = x)
   expect_equal(j1, j2)
 
-  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.z"))
+  j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.z"))
   j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x.x)
   expect_equal(j1, j2)
 
-  j1 <- collect(left_join(df1, df3, sql_on = "LHS.x = RHS.x"))
+  j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.x"))
   j2 <- collect(left_join(df1, df3, by = "x")) %>%
     mutate(x.y = x) %>%
     select(x.x = x, y, x.y, z)
@@ -154,10 +154,63 @@ test_that("join functions error on column not found for SQL sources #1928", {
 })
 
 test_that("join check `x_as` and `y_as`", {
-  x <- lazy_frame(x = 1)
-  expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = NULL))
+  x <- lazy_frame(a = 1, x = 1, .name = "x")
+  y <- lazy_frame(a = 1, y = 1, .name = "y")
+
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
+
+  expect_snapshot(error = TRUE, left_join(x, y, by = "a", x_as = "y"))
+  expect_snapshot(error = TRUE, {
+    left_join(
+      x %>% filter(x == 1),
+      x,
+      by = "x",
+      y_as = "LHS"
+    )
+  })
+})
+
+test_that("join uses correct table alias", {
+  x <- lazy_frame(a = 1, x = 1, .name = "x")
+  y <- lazy_frame(a = 1, y = 1, .name = "y")
+
+  by <- left_join(x, x, by = "a")$lazy_query$by
+  expect_equal(by$x_as, ident("x_LHS"))
+  expect_equal(by$y_as, ident("x_RHS"))
+
+  by <- left_join(x, x, by = "a", x_as = "my_x")$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("x"))
+
+  by <- left_join(x, x, by = "a", y_as = "my_y")$lazy_query$by
+  expect_equal(by$x_as, ident("x"))
+  expect_equal(by$y_as, ident("my_y"))
+
+  by <- left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("my_y"))
+
+
+  by <- left_join(x, y, by = "a")$lazy_query$by
+  expect_equal(by$x_as, ident("x"))
+  expect_equal(by$y_as, ident("y"))
+
+  by <- left_join(x, y, by = "a", x_as = "my_x")$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("y"))
+
+  by <- left_join(x, y, by = "a", y_as = "my_y")$lazy_query$by
+  expect_equal(by$x_as, ident("x"))
+  expect_equal(by$y_as, ident("my_y"))
+
+  by <- left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("my_y"))
+
+  by <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$by
+  expect_equal(by$x_as, ident("my_x"))
+  expect_equal(by$y_as, ident("RHS"))
 })
 
 test_that("select() before join is inlined", {

@@ -187,7 +187,7 @@ test_that("can insert with returning", {
       returning = everything(),
       method = "on_conflict"
     )
-  })
+  }, transform = snap_transform_dbi)
 
   expect_error(
     rows_insert(
@@ -292,7 +292,7 @@ test_that("can upsert with returning", {
       returning = everything(),
       method = "on_conflict"
     )
-  })
+  }, transform = snap_transform_dbi)
 
   # DBI method does not need a unique index
   expect_error(

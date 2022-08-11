@@ -45,3 +45,11 @@ sqlite_con_with_aux <- function() {
 
   con
 }
+
+snap_transform_dbi <- function(x) {
+  # use the last line matching this in case of multiple chained errors
+  dbi_line_id <- max(which(x == "Caused by error:"))
+  n <- length(x)
+  x <- x[-seq2(dbi_line_id + 1, n)]
+  c(x, "! dummy DBI error")
+}

@@ -4,10 +4,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` IS NOT DISTINCT FROM `RHS`.`x`)
+      SELECT `df_LHS`.`x` AS `x`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` IS NOT DISTINCT FROM `df_RHS`.`x`)
 
 ---
 
@@ -102,8 +102,10 @@
       rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
       returning = everything(), method = "on_conflict")
     Condition
-      Error:
-      ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
+      Error in `rows_insert()`:
+      ! Can't modify database table "df_x".
+      Caused by error:
+      ! dummy DBI error
 
 # can upsert with returning
 
@@ -111,6 +113,8 @@
       rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
       method = "on_conflict")
     Condition
-      Error:
-      ! Failed to fetch row: ERROR:  there is no unique or exclusion constraint matching the ON CONFLICT specification
+      Error in `rows_upsert()`:
+      ! Can't modify database table "df_x".
+      Caused by error:
+      ! dummy DBI error
 
