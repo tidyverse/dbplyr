@@ -36,22 +36,6 @@
       Error in `left_join()`:
       ! `y_as` must be different from `x_as`.
 
----
-
-    Code
-      left_join(x, y, by = "a", x_as = "y")
-    Condition
-      Error in `left_join()`:
-      ! `y_as` must be different from `x_as`.
-
----
-
-    Code
-      left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS")
-    Condition
-      Error in `left_join()`:
-      ! `y_as` must be different from `x_as`.
-
 # select() before join is inlined
 
     Code
@@ -79,16 +63,31 @@
         WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
+# multiple joins create a single query
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `df3`.`x` AS `x`, `a`, `LHS`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+      FROM (
+        SELECT `df1`.*, `b`
+        FROM `df1`
+        LEFT JOIN `df2`
+          ON (`df1`.`x` = `df2`.`x`)
+      ) `LHS`
+      RIGHT JOIN `df3`
+        ON (`LHS`.`x` = `df3`.`x`)
+
 # can optionally match NA values
 
     Code
-      left_join(lf, lf, by = "x", na_matches = "na")
+      left_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (CASE WHEN (`df_LHS`.`x` = `df_RHS`.`x`) OR (`df_LHS`.`x` IS NULL AND `df_RHS`.`x` IS NULL) THEN 0 ELSE 1 END = 0)
+      SELECT `lf1`.`x` AS `x`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (CASE WHEN (`lf1`.`x` = `lf2`.`x`) OR (`lf1`.`x` IS NULL AND `lf2`.`x` IS NULL) THEN 0 ELSE 1 END = 0)
 
 # suffix arg is checked
 

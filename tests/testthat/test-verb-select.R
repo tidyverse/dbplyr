@@ -120,8 +120,8 @@ test_that("select() after left_join() is inlined", {
       relocate(b))
   )
   expect_equal(op_vars(out), c("b", "x", "a"))
-  expect_equal(out$lazy_query$vars$x, c(NA, "x", "a"))
-  expect_equal(out$lazy_query$vars$y, c("b", NA, NA))
+  expect_equal(out$lazy_query$vars$var, list("b", "x", "a"))
+  expect_equal(out$lazy_query$vars$table, list(2L, 1L, 1L))
 
   out <- left_join(lf1, lf2, by = "x") %>%
       transmute(b, x = x + 1)
@@ -178,9 +178,9 @@ test_that("select() after join handles previous select", {
 
   expect_equal(op_vars(lf2), c("x2", "y3", "z"))
   vars2 <- lf2$lazy_query$vars
-  expect_equal(vars2$alias, c("x2", "y3", "z"))
-  expect_equal(vars2$x, c("x", "y", "z"))
-  expect_equal(vars2$y, c(NA_character_, NA, NA))
+  expect_equal(vars2$name, c("x2", "y3", "z"))
+  expect_equal(vars2$var, list("x", "y", "z"))
+  expect_equal(vars2$table, list(1L, 1L, 1L))
 
   expect_equal(op_grps(lf2), c("x2", "y3", "z"))
   expect_snapshot(print(lf2))

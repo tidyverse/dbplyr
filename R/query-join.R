@@ -14,6 +14,20 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
   )
 }
 
+multi_join_query <- function(x, joins, table_names, vars, all_vars_list, duplicated_vars) {
+  structure(
+    list(
+      x = x,
+      joins = joins,
+      table_names = table_names,
+      vars = vars,
+      all_vars_list = all_vars_list,
+      duplicated_vars = duplicated_vars
+    ),
+    class = c("multi_join_query", "query")
+  )
+}
+
 #' @export
 print.join_query <- function(x, ...) {
   cat_line("<SQL JOIN (", toupper(x$type), ")>")
@@ -26,6 +40,24 @@ print.join_query <- function(x, ...) {
 
   cat_line("Y:")
   cat_line(indent_print(sql_build(x$y)))
+}
+
+#' @export
+print.multi_join_query <- function(x, ...) {
+  cat_line("<SQL JOINS>")
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  for (i in vctrs::vec_seq_along(x$joins)) {
+    cat_line("Type: ", paste0(x$joins$type[[i]]))
+
+    cat_line("By:")
+    cat_line(indent(paste0(x$joins$by_x[[i]], "-", x$joins$by_y[[i]])))
+
+    cat_line("Y:")
+    cat_line(indent_print(sql_build(x$joins$table[[i]])))
+  }
 }
 
 #' @export
@@ -42,8 +74,27 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
   )
 }
 
-# SQL generation ----------------------------------------------------------
+#' @export
+sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+  x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  query$joins$table <- purrr::map(
+    query$joins$table,
+    ~ sql_render(.x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  )
 
+  sql_query_multi_join(
+    con = con,
+    x = x,
+    joins = query$joins,
+    table_names = query$table_names,
+    vars = query$vars,
+    all_vars_list = query$all_vars_list,
+    duplicated_vars = query$duplicated_vars,
+    lvl = lvl
+  )
+}
+
+# SQL generation ----------------------------------------------------------
 
 sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS"), type) {
   join_vars_list <- mapply(

@@ -17,6 +17,7 @@
 \alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
+\alias{sql_query_multi_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
 \alias{sql_returning_cols}
@@ -72,6 +73,17 @@ sql_query_join(
   type = "inner",
   by = NULL,
   na_matches = FALSE,
+  ...,
+  lvl = 0
+)
+
+sql_query_multi_join(
+  con,
+  x,
+  joins,
+  table_names,
+  vars,
+  duplicated_vars,
   ...,
   lvl = 0
 )
