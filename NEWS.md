@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Querying Teradata databases works again. Unfortunately, the fix requires every
+  column to be explicitly selected again (@mgirlich, #966).
+
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
 
