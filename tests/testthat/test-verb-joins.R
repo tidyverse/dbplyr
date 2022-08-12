@@ -208,6 +208,10 @@ test_that("join uses correct table alias", {
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
 
+  by <- left_join(x, y, sql_on = sql("LHS.a = RHS.a"))$lazy_query$by
+  expect_equal(by$x_as, ident("LHS"))
+  expect_equal(by$y_as, ident("RHS"))
+
   by <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$by
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("RHS"))
