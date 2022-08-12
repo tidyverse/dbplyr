@@ -28,9 +28,9 @@ sql_translation.Snowflake <- function(con) {
       paste0 = snowflake_paste(""),
       str_c = function(..., sep = "", collapse = NULL) {
         if (!is.null(collapse)) {
-          abort(c(
-            "`collapse` not supported in DB translation of `str_c()`.",
-            i = "Please use `str_flatten()` instead."
+          cli_abort(c(
+            "{.arg collapse} not supported in DB translation of {.fn str_c}.",
+            i = "Please use {.fn str_flatten} instead."
           ))
         }
         sql_call2("CONCAT_WS", sep, ...)
@@ -180,8 +180,9 @@ sql_translation.Snowflake <- function(con) {
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
-        unit <- arg_match(
-          unit, c("second", "minute", "hour", "day", "week", "month", "quarter", "year")
+        unit <- arg_match(unit,
+          c("second", "minute", "hour", "day", "week", "month", "quarter", "year",
+            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years")
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       }
