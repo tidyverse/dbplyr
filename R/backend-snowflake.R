@@ -226,7 +226,7 @@ sql_table_analyze.Snowflake <- function(con, table, ...) {}
 snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
   if (perl || fixed || useBytes || ignore.case) {
-    abort("`perl`, `fixed`, `useBytes`, and `ignore.case` parameters are unsupported")
+    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
   }
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
