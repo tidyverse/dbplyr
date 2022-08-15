@@ -599,7 +599,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql("`df_LHS`.*", z = "`z`")
   )
 
@@ -610,7 +610,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql(z = "`z`", "`df_LHS`.*")
   )
 
@@ -621,7 +621,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql(a = "`df_LHS`.`a`", c = "`c`")
   )
 
@@ -633,7 +633,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
@@ -698,7 +698,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
   )
 
@@ -709,7 +709,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
   )
 
@@ -719,7 +719,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql(x = "`x`", "`df_LHS`.*", y = "`y`")
   )
 
@@ -729,7 +729,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$duplicated_vars, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
     sql(a = "`a`", "`df_RHS`.*", b = "`b`")
   )
 })

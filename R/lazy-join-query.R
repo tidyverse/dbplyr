@@ -254,10 +254,6 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
     op_vars
   )
 
-  all_vars <- tolower(unlist(all_vars_list))
-  duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
-  duplicated_vars <- unique(duplicated_vars)
-
   op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
 
   multi_join_query(
@@ -265,8 +261,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
     joins = op$joins,
     table_names = table_names_out,
     vars = op$vars,
-    all_vars_list = all_vars_list,
-    duplicated_vars = duplicated_vars
+    all_vars_list = all_vars_list
   )
 }
 

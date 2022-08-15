@@ -395,7 +395,6 @@ sql_query_multi_join <- function(con,
                                  table_names,
                                  vars,
                                  all_vars_list,
-                                 duplicated_vars,
                                  ...,
                                  lvl = 0) {
   UseMethod("sql_query_multi_join")
@@ -408,13 +407,12 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                table_names,
                                                vars,
                                                all_vars_list,
-                                               duplicated_vars,
                                                ...,
                                                lvl = 0) {
   # TODO check that names are unique?
   x_name <- ident(table_names[[1]])
 
-  select_sql <- sql_multi_join_vars(con, vars, table_names, duplicated_vars, all_vars_list)
+  select_sql <- sql_multi_join_vars(con, vars, table_names, all_vars_list)
 
   ons <- purrr::pmap(
     vctrs::vec_cbind(
@@ -450,37 +448,49 @@ sql_query_multi_join.DBIConnection <- function(con,
     sql_format_clauses(lvl = lvl, con = con)
 }
 
-sql_multi_join_vars <- function(con, vars, table_names, duplicated_vars, all_vars_list) {
+sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
+  all_vars <- tolower(unlist(all_vars_list))
+  duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
+  duplicated_vars <- unique(duplicated_vars)
+
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
-  can_use_star <- function(all_vars, used_vars, out_vars, idx) {
-    # using `tbl.*` for a single variable is silly
-    if (length(all_vars) <= 1) {
-      return(FALSE)
-    }
+  ns <- vctrs::list_sizes(vars$table)
+  if (any(ns > 1)) {
+    # special treatment for `full_join()`
+    out <- purrr::map2(
+      vars$table, vars$var,
+      function(table_ids, vars) {
+        if (length(table_ids) > 1) {
+          sql_expr(
+            COALESCE(
+              !!sql_table_prefix(con, vars[[1]], table = ident(table_names[[1]])),
+              !!sql_table_prefix(con, vars[[2]], table = ident(table_names[[2]]))
+            ),
+            con = con
+          )
+        } else {
+          table_id <- table_ids[[1]]
+          var <- vars[[1]]
+          sql_multi_join_var(con, var, table_id, table_names, duplicated_vars)
+        }
+      }
+    )
 
-    # all variables need to be used
-    if (!identical(used_vars, all_vars)) {
-      return(FALSE)
-    }
-
-    # they must not be renamed
-    if (!identical(used_vars, out_vars)) {
-      return(FALSE)
-    }
-
-    # the variables must form a sequence
-    all(diff(idx) == 1)
+    out <- set_names(out, vars$name)
+    return(sql(unlist(out)))
   }
 
   out <- rep_named(vars$name, list())
+  vars$var <- vctrs::vec_unchop(vars$var)
+  vars$table <- vctrs::vec_unchop(vars$table)
 
   for (i in seq_along(table_names)) {
     all_vars_current <- all_vars_list[[i]]
-    vars_idx <- which(unlist(vars$table) == i)
-    used_vars_current <- unlist(vars$var)[vars_idx]
+    vars_idx <- which(vars$table == i)
+    used_vars_current <- vars$var[vars_idx]
     out_vars_current <- vars$name[vars_idx]
 
-    if (can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
+    if (join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
       id <- vars_idx[[1]]
       tbl_alias <- escape(ident(table_names[i]), con = con)
       out[[id]] <- sql(paste0(tbl_alias, ".*"))
@@ -496,6 +506,26 @@ sql_multi_join_vars <- function(con, vars, table_names, duplicated_vars, all_var
 
   out <- purrr::compact(out)
   sql(unlist(out))
+}
+
+join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
+  # using `tbl.*` for a single variable is silly
+  if (length(all_vars) <= 1) {
+    return(FALSE)
+  }
+
+  # all variables need to be used
+  if (!identical(used_vars, all_vars)) {
+    return(FALSE)
+  }
+
+  # they must not be renamed
+  if (!identical(used_vars, out_vars)) {
+    return(FALSE)
+  }
+
+  # the variables must form a sequence
+  all(diff(idx) == 1)
 }
 
 sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {
