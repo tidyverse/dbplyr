@@ -32,7 +32,16 @@ lazy_join_query(
   call = caller_env()
 )
 
-lazy_multi_join_query(x, joins, table_names, vars, call = caller_env())
+lazy_multi_join_query(
+  x,
+  joins,
+  table_names,
+  vars,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
+  call = caller_env()
+)
 
 lazy_semi_join_query(
   x,
@@ -41,9 +50,9 @@ lazy_semi_join_query(
   anti,
   by,
   na_matches = c("never", "na"),
-  group_vars = NULL,
-  order_vars = NULL,
-  frame = NULL,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
   call = caller_env()
 )
 
