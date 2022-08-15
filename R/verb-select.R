@@ -165,15 +165,9 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     out <- lazy_query
     out$group_vars <- grps
 
-    if (inherits(lazy_query, "lazy_multi_join_query")) {
+    if (inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")) {
       out$vars <- vctrs::vec_slice(out$vars, idx)
       out$vars$name <- names(sel_vars)
-
-      return(out)
-    }
-
-    if (inherits(lazy_query, "lazy_semi_join_query")) {
-      out$vars <- set_names(lazy_query$vars[idx], names(sel_vars))
 
       return(out)
     }

@@ -461,7 +461,10 @@ add_semi_join <- function(x,
   inline_result <- join_inline_select(x$lazy_query, by$x, sql_on)
   x_lq <- inline_result$lq
   by$x <- inline_result$by
-  vars <- set_names(inline_result$vars, op_vars(x))
+  vars <- tibble(
+    name = op_vars(x),
+    var = inline_result$vars
+  )
 
   # the table alias can only be determined after `select()` was inlined
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
