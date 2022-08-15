@@ -242,23 +242,21 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
-  x_lq <- x$lazy_query
-  y_lq <- y$lazy_query
-  x_names <- op_vars(x_lq)
-  x_lq_org <- x_lq
+
+  x_names <- op_vars(x)
+  inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
+  x_lq <- inline_result$lq
+  x_vars <- inline_result$vars
   by_x_org <- by$x
+  by$x <- inline_result$by
 
-  if (is_empty(by$on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
-    x_vars <- purrr::map_chr(x_lq$select$expr, as_string)
+  y_names <- op_vars(y)
+  inline_result <- join_inline_select(y$lazy_query, by$y, by$on)
+  y_lq <- inline_result$lq
+  y_vars <- inline_result$vars
+  by$y <- inline_result$by
 
-    idx <- vctrs::vec_match(x_lq$select$name, by$x)
-    by$x <- vctrs::vec_assign(by$x, idx, x_vars)
-    x_lq <- x_lq$x
-  } else {
-    x_vars <- x_names
-  }
-
-  new_query <- join_needs_new_query(x_lq_org, join_alias, type)
+  new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
   if (new_query) {
     x_rows <- tibble(
       name = x_names,
@@ -269,18 +267,6 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     x_rows <- x_lq$vars
     table_id <- vctrs::vec_size(x_lq$table_names) + 1L
-  }
-
-  y_names <- op_vars(y_lq)
-  y_vars <- y_names
-  if (is_empty(by$on) && is_lazy_select_query_simple(y_lq, select = "projection")) {
-    y_vars <- purrr::map_chr(y_lq$select$expr, as_string)
-
-    idx <- vctrs::vec_match(y_lq$select$name, by$y)
-    by$y <- vctrs::vec_assign(by$y, idx, y_vars)
-    y_lq <- y_lq$x
-  } else {
-    y_vars <- y_names
   }
 
   vars <- multi_join_vars(
@@ -351,6 +337,24 @@ update_join_vars <- function(vars, select) {
   idx <- vctrs::vec_match(select$name, vars)
   prev_vars <- purrr::map_chr(select$expr, as_string)
   vctrs::vec_assign(vars, idx, prev_vars)
+}
+
+join_inline_select <- function(lq, by, on) {
+  if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
+    vars <- purrr::map_chr(lq$select$expr, as_string)
+
+    idx <- vctrs::vec_match(lq$select$name, by)
+    by <- vctrs::vec_assign(by, idx, vars)
+    lq <- lq$x
+  } else {
+    vars <- op_vars(lq)
+  }
+
+  list(
+    lq = lq,
+    vars = vars,
+    by = by
+  )
 }
 
 join_needs_new_query <- function(x_lq, join_alias, type) {
