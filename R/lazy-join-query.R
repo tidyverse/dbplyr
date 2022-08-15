@@ -41,35 +41,31 @@ lazy_multi_join_query <- function(x,
                                   joins,
                                   table_names,
                                   vars,
-                                  group_vars = NULL,
-                                  order_vars = NULL,
-                                  frame = NULL,
+                                  group_vars = op_grps(x),
+                                  order_vars = op_sort(x),
+                                  frame = op_frame(x),
                                   call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
 
   if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "on", "na_matches"))) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `on`, `na_matches`", .internal = TRUE)
-    vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
-    vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
-    vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
+    cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `on`, `na_matches`", .internal = TRUE)
   }
+  vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
+  vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
+  vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
+
   if (!identical(colnames(table_names), c("as", "name"))) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`table_names` must have fields `as`, `name`", .internal = TRUE)
-    vctrs::vec_assert(table_names$as, character(), arg = "table_names$as", call = caller_env())
-    vctrs::vec_assert(table_names$name, character(), arg = "table_names$as", call = caller_env())
+    cli_abort("`table_names` must have fields `as`, `name`", .internal = TRUE)
   }
+  vctrs::vec_assert(table_names$as, character(), arg = "table_names$as", call = caller_env())
+  vctrs::vec_assert(table_names$name, character(), arg = "table_names$as", call = caller_env())
+
   if (!identical(colnames(vars), c("name", "table", "var"))) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
-    vctrs::vec_assert(vars$name, character(), arg = "vars$name", call = caller_env())
-    vctrs::vec_assert(vars$table, integer(), arg = "vars$table", call = caller_env())
-    vctrs::vec_assert(vars$var, character(), arg = "vars$var", call = caller_env())
+    cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
   }
+  vctrs::vec_assert(vars$name, character(), arg = "vars$name", call = caller_env())
+  vctrs::vec_assert(vars$table, list(), arg = "vars$table", call = caller_env())
+  vctrs::vec_assert(vars$var, list(), arg = "vars$var", call = caller_env())
 
   lazy_query(
     query_type = "multi_join",
@@ -130,9 +126,9 @@ lazy_semi_join_query <- function(x,
                                  anti,
                                  by,
                                  na_matches = c("never", "na"),
-                                 group_vars = NULL,
-                                 order_vars = NULL,
-                                 frame = NULL,
+                                 group_vars = op_grps(x),
+                                 order_vars = op_sort(x),
+                                 frame = op_frame(x),
                                  call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -241,7 +237,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
         vars = vars_classic,
         type = type,
         by = list(
-          on = op$joins$on,
+          on = sql(op$joins$on),
           x = op$joins$by_x[[1]],
           y = op$joins$by_y[[1]],
           x_as = ident(table_names_out[[1]]),

@@ -223,7 +223,7 @@ add_join <- function(x,
                      y_as,
                      call = caller_env()) {
   if (!is.null(sql_on)) {
-    by <- list(x = character(0), y = character(0), on = sql(sql_on))
+    by <- list(x = character(0), y = character(0), on = unclass(sql_on))
   } else if (identical(type, "full") && identical(by, character())) {
     type <- "cross"
     by <- list(x = character(0), y = character(0))
@@ -307,12 +307,7 @@ add_join <- function(x,
       x = x_lq,
       joins = joins_field,
       table_names = vctrs::vec_rbind(table_names_x, table_names_y),
-      vars = vars,
-      # need to use attributes of `x` instead of `x_lq` b/c they might have
-      # changed due to inlining
-      group_vars = op_grps(x),
-      order_vars = op_sort(x),
-      frame = op_frame(x)
+      vars = vars
     )
     return(out)
   }
@@ -335,7 +330,12 @@ join_inline_select <- function(lq, by, on) {
 
     idx <- vctrs::vec_match(lq$select$name, by)
     by <- vctrs::vec_assign(by, idx, vars)
+
+    lq_org <- lq
     lq <- lq$x
+    lq$group_vars <- op_grps(lq_org)
+    lq$order_vars <- op_sort(lq_org)
+    lq$frame <- op_frame(lq_org)
   } else {
     vars <- op_vars(lq)
   }
@@ -458,21 +458,10 @@ add_semi_join <- function(x,
     indexes = if (auto_index) list(by$y)
   )
 
-  vars <- set_names(op_vars(x))
-  group_vars <- op_grps(x)
-  order_vars <- op_sort(x)
-  frame <- op_frame(x)
-
-  x_lq <- x$lazy_query
-  if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
-    if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
-      by$x <- update_join_vars(by$x, x_lq$select)
-      vars <- purrr::map_chr(x_lq$select$expr, as_name)
-      vars <- purrr::set_names(vars, x_lq$select$name)
-    }
-
-    x_lq <- x_lq$x
-  }
+  inline_result <- join_inline_select(x$lazy_query, by$x, sql_on)
+  x_lq <- inline_result$lq
+  by$x <- inline_result$by
+  vars <- set_names(inline_result$vars, op_vars(x))
 
   # the table alias can only be determined after `select()` was inlined
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
@@ -492,9 +481,6 @@ add_semi_join <- function(x,
     anti = anti,
     by = by,
     na_matches = na_matches,
-    group_vars = group_vars,
-    order_vars = order_vars,
-    frame = frame,
     call = call
   )
 }
