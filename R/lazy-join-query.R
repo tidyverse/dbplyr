@@ -278,42 +278,6 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
   )
 }
 
-join_vars_classic <- function(x_names, y_names, type, by, suffix = c(".x", ".y")) {
-  y_names_org <- y_names
-
-  # Remove join keys from y
-  y_names <- setdiff(y_names, by$y)
-
-
-  # Add suffix where needed
-  # suffix <- check_suffix(suffix, call)
-  x_new <- add_suffixes(x_names, y_names, suffix$x)
-  y_new <- add_suffixes(y_names, x_names, suffix$y)
-
-  # In left and inner joins, return key values only from x
-  # In right joins, return key values only from y
-  # In full joins, return key values by coalescing values from x and y
-  x_x <- x_names
-  x_y <- by$y[match(x_names, by$x)]
-  x_y[type == "left" | type == "inner"] <- NA
-  x_x[type == "right" & !is.na(x_y)] <- NA
-  y_x <- rep_len(NA, length(y_names))
-  y_y <- y_names
-
-  # Return a list with 3 parallel vectors
-  # At each position, values in the 3 vectors represent
-  #  alias - name of column in join result
-  #  x - name of column from left table or NA if only from right table
-  #  y - name of column from right table or NA if only from left table
-  list(
-    alias = c(x_new, y_new),
-    x = c(x_x, y_x),
-    y = c(x_y, y_y),
-    all_x = x_names,
-    all_y = y_names_org
-  )
-}
-
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
   vars <- op$vars
