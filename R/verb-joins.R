@@ -97,7 +97,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = NULL, y_as = NULL) {
-  lazy_query <- add_join(
+  x$lazy_query <- add_join(
     x, y,
     "left",
     by = by,
@@ -111,7 +111,6 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
@@ -123,7 +122,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
                                x_as = NULL, y_as = NULL) {
-  lazy_query <- add_join(
+  x$lazy_query <- add_join(
     x, y,
     "right",
     by = by,
@@ -137,7 +136,6 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
@@ -149,7 +147,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = NULL, y_as = NULL) {
-  lazy_query <- add_join(
+  x$lazy_query <- add_join(
     x, y,
     "full",
     by = by,
@@ -163,7 +161,6 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
@@ -174,7 +171,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = NULL, y_as = NULL) {
-  lazy_query <- add_semi_join(
+  x$lazy_query <- add_semi_join(
     x, y,
     anti = FALSE,
     by = by,
@@ -187,7 +184,6 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
@@ -198,7 +194,7 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
                                x_as = NULL, y_as = NULL) {
-  lazy_query <- add_semi_join(
+  x$lazy_query <- add_semi_join(
     x, y,
     anti = TRUE,
     by = by,
@@ -211,7 +207,6 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
     ...
   )
 
-  x$lazy_query <- lazy_query
   x
 }
 
