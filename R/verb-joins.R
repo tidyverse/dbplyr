@@ -240,21 +240,10 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
+  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+
   x_lq <- x$lazy_query
   y_lq <- y$lazy_query
-
-  table_alias <- check_join_as(
-    x_as,
-    x_lq,
-    y_as,
-    y_lq,
-    sql_on = sql_on,
-    type = type,
-    call = call
-  )
-  x_as <- unclass(table_alias$x_as)
-  y_as <- unclass(table_alias$y_as)
-
   x_names <- op_vars(x_lq)
   x_lq_org <- x_lq
   by_x_org <- by$x
@@ -269,7 +258,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     x_vars <- x_names
   }
 
-  new_query <- join_needs_new_query(x_lq_org, x_as, y_as, type)
+  new_query <- join_needs_new_query(x_lq_org, join_alias, type)
   if (new_query) {
     x_rows <- tibble(
       name = x_names,
@@ -325,7 +314,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
       x = x_lq,
       joins = joins_field,
       table_names = tibble(
-        as = c(x_as, y_as),
+        as = unlist(join_alias, use.names = FALSE),
         name = c(x_name, y_name)
       ),
       vars = vars,
@@ -336,15 +325,15 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     return(out)
   }
 
-  if (!is.na(x_as)) {
-    x_lq$table_names$as[[1]] <- x_as
+  if (!is.na(join_alias$x)) {
+    x_lq$table_names$as[[1]] <- join_alias$x
   }
 
   joins_field <- vctrs::vec_rbind(x_lq$joins, joins_field)
 
   table_names <- vctrs::vec_rbind(
     x_lq$table_names,
-    tibble(as = y_as, name = y_name)
+    tibble(as = join_alias$y, name = y_name)
   )
 
   lazy_multi_join_query(
@@ -364,7 +353,7 @@ update_join_vars <- function(vars, select) {
   vctrs::vec_assign(vars, idx, prev_vars)
 }
 
-join_needs_new_query <- function(x_lq, x_as, y_as, type) {
+join_needs_new_query <- function(x_lq, join_alias, type) {
   if (!inherits(x_lq, "lazy_multi_join_query")) {
     return(TRUE)
   }
@@ -372,6 +361,9 @@ join_needs_new_query <- function(x_lq, x_as, y_as, type) {
   if (!type %in% c("left", "inner")) {
     return(TRUE)
   }
+
+  x_as <- join_alias$x
+  y_as <- join_alias$y
 
   as_current <- x_lq$table_names$as
   if (!is.na(x_as)) {
@@ -434,12 +426,17 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   }
 
   # the table alias can only be determined after `select()` was inlined
-  by[c("x_as", "y_as")] <- check_join_as(x_as, x_lq, y_as, y, sql_on = sql_on, type = "semi", call = call)
+  # by$x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
+  # by$y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
+  # check_join_as2(by$x_as, by$y_as, call)
+
+  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+
   table_names <- c(
     unclass(query_name(x_lq)) %||% NA,
     unclass(query_name(y)) %||% NA
   )
-  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, c(by$x_as, by$y_as))
+  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, join_alias)
   by$x_as <- ident(by$x_as)
   by$y_as <- ident(by$y_as)
 
@@ -457,38 +454,35 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 }
 
-check_join_as <- function(x_as, x, y_as, y, sql_on, type, call) {
-  if (!is_null(x_as)) {
-    vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
-  }
-  if (!is_null(y_as)) {
-    vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
-  }
-
-  if (is_null(sql_on)) {
-    x_default_name <- NA_character_
-    y_default_name <- NA_character_
-  } else {
-    # for backwards compatibility use "LHS" and "RHS" if `sql_on` is used
-    # without a table alias
-    x_as <- x_as %||% "LHS"
-    y_as <- y_as %||% "RHS"
-  }
-
-
-  x_as <- x_as %||% NA_character_
-  y_as <- y_as %||% NA_character_
+check_join_alias <- function(x_as, y_as, sql_on, call) {
+  x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
+  y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
 
   if (identical(x_as, y_as) && !is.na(x_as)) {
     cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 
-  list(x_as = x_as, y_as = y_as)
+  list(x = x_as, y = y_as)
+}
+
+check_join_as1 <- function(as, arg, sql_on, default, call) {
+  if (!is_null(as)) {
+    vctrs::vec_assert(as, character(), size = 1, arg = arg, call = call)
+  }
+
+  if (!is_null(sql_on)) {
+    # for backwards compatibility use "LHS"/"RHS" if `sql_on` is used
+    # without a table alias
+    as <- as %||% default
+  }
+
+  as %||% NA_character_
 }
 
 join_simple_table_alias <- function(table_names, aliases) {
   stopifnot(length(table_names) == 2)
   stopifnot(length(aliases) == 2)
+  aliases <- unlist(aliases)
 
   out <- dplyr::coalesce(aliases, table_names)
 
