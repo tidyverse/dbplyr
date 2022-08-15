@@ -209,6 +209,19 @@ test_that("join uses correct table alias", {
 
   table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
   expect_equal(table_names, c("my_x", "RHS"))
+
+  # triple join
+  z <- lazy_frame(a = 1, z = 1, .name = "z")
+  out <- left_join(x, y, by = "a") %>%
+    left_join(z, by = "a") %>%
+    sql_build()
+  expect_equal(out$table_names, c("x", "y", "z"))
+
+  # triple join where names need to be repaired
+  out <- left_join(x, x, by = "a") %>%
+    left_join(z, by = "a") %>%
+    sql_build()
+  expect_equal(out$table_names, c("x...1", "x...2", "z"))
 })
 
 test_that("select() before join is inlined", {
