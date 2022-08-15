@@ -250,3 +250,5 @@ snowflake_paste <- function(default_sep) {
     )
   }
 }
+
+utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))

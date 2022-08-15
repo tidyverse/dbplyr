@@ -394,6 +394,7 @@ sql_query_multi_join <- function(con,
                                  joins,
                                  table_names,
                                  vars,
+                                 all_vars_list,
                                  duplicated_vars,
                                  ...,
                                  lvl = 0) {
