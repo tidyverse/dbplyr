@@ -328,12 +328,6 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   x_lq
 }
 
-update_join_vars <- function(vars, select) {
-  idx <- vctrs::vec_match(select$name, vars)
-  prev_vars <- purrr::map_chr(select$expr, as_string)
-  vctrs::vec_assign(vars, idx, prev_vars)
-}
-
 join_inline_select <- function(lq, by, on) {
   if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
     vars <- purrr::map_chr(lq$select$expr, as_string)
@@ -447,6 +441,12 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     frame = frame,
     call = call
   )
+}
+
+update_join_vars <- function(vars, select) {
+  idx <- vctrs::vec_match(select$name, vars)
+  prev_vars <- purrr::map_chr(select$expr, as_string)
+  vctrs::vec_assign(vars, idx, prev_vars)
 }
 
 check_join_alias <- function(x_as, y_as, sql_on, call) {
