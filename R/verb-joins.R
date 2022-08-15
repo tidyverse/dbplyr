@@ -215,13 +215,17 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
   x
 }
 
-
-add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
-                     suffix = NULL,
-                     auto_index = FALSE,
-                     na_matches = "never",
-                     x_as = NULL,
-                     y_as = NULL,
+add_join <- function(x,
+                     y,
+                     type,
+                     by,
+                     sql_on,
+                     copy,
+                     suffix,
+                     auto_index,
+                     na_matches,
+                     x_as,
+                     y_as,
                      call = caller_env()) {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
@@ -437,9 +441,16 @@ multi_join_vars <- function(x_join_vars,
   vctrs::vec_rbind(x_join_vars, y_join_vars)
 }
 
-add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                          auto_index = FALSE, na_matches = "never",
-                          x_as = NULL, y_as = NULL,
+add_semi_join <- function(x,
+                          y,
+                          anti,
+                          by,
+                          sql_on,
+                          copy,
+                          auto_index,
+                          na_matches,
+                          x_as,
+                          y_as,
                           call = caller_env()) {
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
