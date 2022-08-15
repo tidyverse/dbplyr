@@ -82,15 +82,11 @@ lazy_multi_join_query <- function(x,
 
 join_check_vars <- function(vars, call) {
   if (!vctrs::vec_is_list(vars)) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`vars` must be a list", .internal = TRUE)
+    cli_abort("`vars` must be a list", .internal = TRUE)
   }
 
   if (!identical(names(vars), c("alias", "x", "y", "all_x", "all_y"))) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`", .internal = TRUE)
+    cli_abort("`vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`", .internal = TRUE)
   }
 
   n <- vctrs::vec_size(vars$alias)

@@ -410,7 +410,6 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                duplicated_vars,
                                                ...,
                                                lvl = 0) {
-  # browser()
   # TODO check that names are unique?
   x_name <- ident(table_names[[1]])
 
@@ -474,7 +473,6 @@ sql_multi_join_vars <- function(con, vars, table_names, duplicated_vars, all_var
 
   out <- rep_named(vars$name, list())
 
-  # TODO this can and should not handle `full_join()`?
   for (i in seq_along(table_names)) {
     all_vars_current <- all_vars_list[[i]]
     vars_idx <- which(unlist(vars$table) == i)
