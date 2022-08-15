@@ -309,6 +309,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
       joins = joins_field,
       table_names = vctrs::vec_rbind(table_names_x, table_names_y),
       vars = vars,
+      # need to use attributes of `x` instead of `x_lq` b/c they might have
+      # changed due to inlining
       group_vars = op_grps(x),
       order_vars = op_sort(x),
       frame = op_frame(x)
