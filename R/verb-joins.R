@@ -282,13 +282,12 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     call = call
   )
 
-  by$on <- by$on %||% NA_character_
   joins_field <- tibble(
     table = list(y_lq),
     type = type,
     by_x = list(by$x),
     by_y = list(by$y),
-    on = by$on,
+    on = by$on %||% NA_character_,
     na_matches
   )
 
@@ -311,26 +310,19 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     return(out)
   }
 
+  # `x_lq` must be a `lazy_multi_join_query` so it can be modified directly
   if (!is.na(join_alias$x)) {
     x_lq$table_names$as[[1]] <- join_alias$x
   }
 
-  joins_field <- vctrs::vec_rbind(x_lq$joins, joins_field)
-
-  table_names <- vctrs::vec_rbind(
+  x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_field)
+  x_lq$table_names <- vctrs::vec_rbind(
     x_lq$table_names,
     tibble(as = join_alias$y, name = y_name)
   )
+  x_lq$vars <- vars
 
-  lazy_multi_join_query(
-    x = x_lq$x,
-    joins = joins_field,
-    table_names = table_names,
-    vars = vars,
-    group_vars = op_grps(x),
-    order_vars = op_sort(x),
-    frame = op_frame(x)
-  )
+  x_lq
 }
 
 update_join_vars <- function(vars, select) {
