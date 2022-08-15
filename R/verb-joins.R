@@ -291,17 +291,21 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     na_matches
   )
 
-  x_name <- as.character(query_name(x_lq) %||% NA)
-  y_name <- as.character(query_name(y_lq) %||% NA)
+  table_names_y <- tibble(
+    as = join_alias$y,
+    name = as.character(query_name(y_lq) %||% NA)
+  )
 
   if (new_query) {
+    table_names_x <- tibble(
+      as = join_alias$x,
+      name = as.character(query_name(x_lq) %||% NA)
+    )
+
     out <- lazy_multi_join_query(
       x = x_lq,
       joins = joins_field,
-      table_names = tibble(
-        as = unlist(join_alias, use.names = FALSE),
-        name = c(x_name, y_name)
-      ),
+      table_names = vctrs::vec_rbind(table_names_x, table_names_y),
       vars = vars,
       group_vars = op_grps(x),
       order_vars = op_sort(x),
@@ -316,10 +320,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   }
 
   x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_field)
-  x_lq$table_names <- vctrs::vec_rbind(
-    x_lq$table_names,
-    tibble(as = join_alias$y, name = y_name)
-  )
+  x_lq$table_names <- vctrs::vec_rbind(x_lq$table_names, table_names_y)
   x_lq$vars <- vars
 
   x_lq
