@@ -18,13 +18,13 @@
     Condition
       Error in `join_check_vars()`:
       ! `vars` must be a list
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error in the cli package, please report it to the package authors.
     Code
       (my_lazy_join_query(vars = c(vars0, list(z = 1))))
     Condition
       Error in `join_check_vars()`:
       ! `vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error in the cli package, please report it to the package authors.
     Code
       (my_lazy_join_query(vars = lmod(vars0, alias = 1)))
     Condition

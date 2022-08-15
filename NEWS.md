@@ -3,6 +3,9 @@
 * A sequence of `left_join()` or `inner_join()` now does not produce one subquery
   per join but a single join (@mgirlich, #865).
 
+* Querying Teradata databases works again. Unfortunately, the fix requires every
+  column to be explicitly selected again (@mgirlich, #966).
+
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
 
