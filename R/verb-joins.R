@@ -238,6 +238,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     indexes = if (auto_index) list(by$y)
   )
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  suffix <- check_suffix(suffix, call)
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
@@ -280,8 +281,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     by_y = by$y,
     type = type,
     table_id = table_id,
-    suffix = suffix,
-    call = call
+    suffix = suffix
   )
 
   joins_field <- tibble(
@@ -508,7 +508,6 @@ multi_join_vars <- function(x_join_vars,
   y_names <- y_join_vars$name
 
   # Add suffix where needed
-  suffix <- check_suffix(suffix, call)
   x_join_vars$name <- add_suffixes(x_names, y_names, suffix$x)
   y_join_vars$name <- add_suffixes(y_names, x_names, suffix$y)
 
