@@ -521,14 +521,34 @@ join_simple_table_alias <- function(table_names, aliases) {
   stopifnot(length(aliases) == 2)
   aliases <- unlist(aliases)
 
-  out <- dplyr::coalesce(aliases, table_names)
+  x_alias <- aliases[[1]]
+  y_alias <- aliases[[2]]
+  x_name <- table_names[[1]]
+  y_name <- table_names[[2]]
 
-  # if only joining two tables it is nicer to use `<tbl>_LHS`/`<tbl>_RHS`
-  if (identical(out[[1]], out[[2]]) && !is.na(out[[1]])) {
-    out <- paste0(out, c("_LHS", "_RHS"))
-  } else {
-    out <- dplyr::coalesce(out, c("LHS", "RHS"))
+  x_out <- dplyr::coalesce(x_alias, x_name, "LHS")
+  y_out <- dplyr::coalesce(y_alias, y_name, "RHS")
+  out <- c(x_out, y_out)
+
+  if (!identical(x_out, y_out)) {
+    return(out)
   }
+  # -> must rename
+
+  if (is.na(x_alias) && is.na(y_alias)) {
+    # self join of named table
+    if (!is.na(x_name) && !is.na(y_name) && identical(x_name, y_name)) {
+      out <- c(
+        paste0(x_name, "_LHS"),
+        paste0(y_name, "_RHS")
+      )
+      return(out)
+    }
+  }
+
+  out_repaired <- vctrs::vec_as_names(c(x_out, y_out), repair = "unique", quiet = TRUE)
+  may_repair <- is.na(c(x_alias, y_alias))
+  out[may_repair] <- out_repaired[may_repair]
 
   out
 }

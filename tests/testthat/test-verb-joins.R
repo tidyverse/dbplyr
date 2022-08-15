@@ -159,17 +159,6 @@ test_that("join check `x_as` and `y_as`", {
 
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
-
-  skip("TODO not yet decided")
-  expect_snapshot(error = TRUE, left_join(x, y, by = "a", x_as = "y"))
-  expect_snapshot(error = TRUE, {
-    left_join(
-      x %>% filter(x == 1),
-      x,
-      by = "x",
-      y_as = "LHS"
-    )
-  })
 })
 
 test_that("join uses correct table alias", {
@@ -179,7 +168,6 @@ test_that("join uses correct table alias", {
   # self joins
   table_names <- sql_build(left_join(x, x, by = "a"))$table_names
   expect_equal(table_names, c("x_LHS", "x_RHS"))
-
 
   table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
   expect_equal(table_names, c("my_x", "x"))
@@ -202,6 +190,13 @@ test_that("join uses correct table alias", {
 
   table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
   expect_equal(table_names, c("my_x", "my_y"))
+
+  # x_as same name as `y`
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
+  expect_equal(table_names, c("y", "y...2"))
+
+  table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
+  expect_equal(table_names, c("LHS...1", "LHS"))
 
   # sql_on -> use alias or LHS/RHS
   table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
