@@ -243,37 +243,39 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
 
-  x_names <- op_vars(x)
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
   x_vars <- inline_result$vars
   by_x_org <- by$x
   by$x <- inline_result$by
 
-  y_names <- op_vars(y)
+  new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
+  if (new_query) {
+    x_join_vars <- tibble(
+      name = op_vars(x),
+      table = list(1L),
+      var = as.list(x_vars)
+    )
+    table_id <- 2L
+  } else {
+    x_join_vars <- x_lq$vars
+    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
+  }
+
   inline_result <- join_inline_select(y$lazy_query, by$y, by$on)
   y_lq <- inline_result$lq
   y_vars <- inline_result$vars
   by$y <- inline_result$by
 
-  new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
-  if (new_query) {
-    x_rows <- tibble(
-      name = x_names,
-      table = rep_along(x_names, list(1L)),
-      var = as.list(x_vars)
-    )
-    table_id <- 2L
-  } else {
-    x_rows <- x_lq$vars
-    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
-  }
+  y_join_vars <- tibble(
+    name = op_vars(y),
+    table = list(table_id),
+    var = as.list(y_vars)
+  )
 
   vars <- multi_join_vars(
-    x_names = x_names,
-    y_names = y_names,
-    y_vars = y_vars,
-    x_rows = x_rows,
+    x_join_vars = x_join_vars,
+    y_join_vars = y_join_vars,
     by_x_org = by_x_org,
     by_y = by$y,
     type = type,
@@ -489,34 +491,26 @@ join_simple_table_alias <- function(table_names, aliases) {
   out
 }
 
-multi_join_vars <- function(x_names,
-                            y_names,
-                            y_vars,
-                            x_rows,
+multi_join_vars <- function(x_join_vars,
+                            y_join_vars,
                             by_x_org,
                             by_y,
                             type,
                             table_id,
-                            suffix = c(".x", ".y"),
-                            call = caller_env()) {
+                            suffix,
+                            call) {
   # Remove join keys from y
-  y_join_idx <- vctrs::vec_match(by_y, y_vars)
+  y_join_idx <- vctrs::vec_match(by_y, unlist(y_join_vars$var))
   if (!is_empty(y_join_idx)) {
-    y_names <- y_names[-y_join_idx]
-    y_vars <- y_vars[-y_join_idx]
+    y_join_vars <- vctrs::vec_slice(y_join_vars, -y_join_idx)
   }
+  x_names <- x_join_vars$name
+  y_names <- y_join_vars$name
 
   # Add suffix where needed
   suffix <- check_suffix(suffix, call)
-  x_new <- add_suffixes(x_names, y_names, suffix$x)
-  y_new <- add_suffixes(y_names, x_names, suffix$y)
-
-  x_rows$name <- x_new
-  y_rows <- tibble(
-    name = y_new,
-    table = list(table_id),
-    var = as.list(y_vars)
-  )
+  x_join_vars$name <- add_suffixes(x_names, y_names, suffix$x)
+  y_join_vars$name <- add_suffixes(y_names, x_names, suffix$y)
 
   if (type %in% c("left", "inner")) {
     # use all variables from `x` as is
@@ -525,25 +519,25 @@ multi_join_vars <- function(x_names,
     # Careful: this relies on the assumption that right_join()` starts a new query
     # `x`: non-join variables; `y`: all variables
     # -> must update table id of `x` join vars
-    x_rows$table[x_rows$name %in% by_x_org] <- list(table_id)
-    idx <- vctrs::vec_match(by_x_org, x_rows$name)
-    x_rows$var[idx] <- as.list(by_y)
+    x_join_vars$table[x_join_vars$name %in% by_x_org] <- list(table_id)
+    idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
+    x_join_vars$var[idx] <- as.list(by_y)
   } else if (type == "full") {
     # Careful: this relies on the assumption that `full_join()` starts a new query
-    idx <- vctrs::vec_match(by_x_org, x_rows$name)
-    x_rows$table[idx] <- purrr::map(
-      x_rows$table[idx],
+    idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
+    x_join_vars$table[idx] <- purrr::map(
+      x_join_vars$table[idx],
       ~ c(.x, table_id)
     )
-    x_rows$var[idx] <- purrr::map2(
-      x_rows$var[idx], by_y,
+    x_join_vars$var[idx] <- purrr::map2(
+      x_join_vars$var[idx], by_y,
       ~ c(.x, .y)
     )
   } else if (type == "cross") {
     # -> simply append `y_rows`
   }
 
-  vctrs::vec_rbind(x_rows, y_rows)
+  vctrs::vec_rbind(x_join_vars, y_join_vars)
 }
 
 check_suffix <- function(x, call) {
