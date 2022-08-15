@@ -422,10 +422,6 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   }
 
   # the table alias can only be determined after `select()` was inlined
-  # by$x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
-  # by$y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
-  # check_join_as2(by$x_as, by$y_as, call)
-
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
   table_names <- c(
