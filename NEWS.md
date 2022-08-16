@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* When using common table expressions the results of joins and set operations
+  are now reused (@mgirlich, #978).
+
 * Querying Teradata databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #966).
 
