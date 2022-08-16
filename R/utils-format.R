@@ -22,6 +22,10 @@ indent_print <- function(x) {
 }
 
 style_kw <- function(x) {
+  if (!dbplyr_use_colour()) {
+    return(x)
+  }
+
   highlight <- dbplyr_highlight()
   if (is_false(highlight)) {
     return(x)
@@ -35,6 +39,10 @@ style_kw <- function(x) {
 'big_mark' <- function(x, ...) {
   mark <- if (identical(getOption("OutDec"), ",")) "." else ","
   formatC(x, big.mark = mark, ...)
+}
+
+dbplyr_use_colour <- function() {
+  getOption("dbplyr_use_colour", FALSE)
 }
 
 dbplyr_highlight <- function() {
