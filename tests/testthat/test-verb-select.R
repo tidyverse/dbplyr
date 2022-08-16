@@ -248,6 +248,7 @@ test_that("mutate collapses over nested select", {
 
 test_that("output is styled", {
   local_reproducible_output(crayon = TRUE)
+  withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
 
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   out <- lf %>%

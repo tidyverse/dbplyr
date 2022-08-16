@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* The keyword highlighting can now be customised via the option `dbplyr_highlight`.
+  Turn it off via `options(dbplyr_highlight = FALSE)` or pass a custom ansi
+  style, e.g. `options(dbplyr_highlight = cli::combine_ansi_styles("bold", "cyan"))`
+  (@mgirlich, #974).
+
 * Querying Teradata databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #966).
 
