@@ -5,6 +5,78 @@
     Message
       Adding missing grouping variables: `b`
 
+# select() after left_join() is inlined
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% select(b, x))
+    Output
+      <SQL>
+      SELECT `b`, `lf1`.`x` AS `x`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+
+---
+
+    Code
+      (out <- left_join(lf1, lf2, by = "x") %>% relocate(b))
+    Output
+      <SQL>
+      SELECT `b`, `lf1`.*
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+
+# select() after semi_join() is inlined
+
+    Code
+      (out <- semi_join(lf1, lf2, by = "x") %>% select(x, a2 = a))
+    Output
+      <SQL>
+      SELECT `x`, `a` AS `a2`
+      FROM `lf1`
+      WHERE EXISTS (
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` = `lf2`.`x`)
+      )
+
+---
+
+    Code
+      (out <- anti_join(lf1, lf2, by = "x") %>% relocate(a))
+    Output
+      <SQL>
+      SELECT `a`, `x`
+      FROM `lf1`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` = `lf2`.`x`)
+      )
+
+# select() after join handles previous select
+
+    Code
+      print(lf)
+    Output
+      <SQL>
+      SELECT `x` AS `x2`, `y` AS `y3`, `z`
+      FROM `df` AS `df_LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `df_RHS`
+        WHERE (`df_LHS`.`x` = `df_RHS`.`x`)
+      )
+
+---
+
+    Code
+      print(lf2)
+    Output
+      <SQL>
+      SELECT `df_LHS`.`x` AS `x2`, `df_LHS`.`y` AS `y3`, `z`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+
 # select() produces nice error messages
 
     Code
@@ -130,9 +202,9 @@
         `LHS`.`x`[34m AS [39m`x`,
         `LHS`.`y`[34m AS [39m`y.x`,
         `LHS`.`z`[34m AS [39m`z.x`,
-        `RHS`.`y`[34m AS [39m`y.y`,
-        `RHS`.`z`[34m AS [39m`z.y`
+        `df`.`y`[34m AS [39m`y.y`,
+        `df`.`z`[34m AS [39m`z.y`
       [34mFROM[39m `q02`[34m AS [39m`LHS`
-      [34mLEFT JOIN[39m `df`[34m AS [39m`RHS`
-        [34mON[39m (`LHS`.`x` = `RHS`.`x`)
+      [34mLEFT JOIN[39m `df`
+        [34mON[39m (`LHS`.`x` = `df`.`x`)
 

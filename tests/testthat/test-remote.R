@@ -42,4 +42,3 @@ test_that("can retrieve query, src and con metadata", {
   expect_s3_class(remote_query(mf), "sql")
   expect_type(remote_query_plan(mf), "character")
 })
-

@@ -93,7 +93,7 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
     dot_name <- get_dot_name(dots, i, was_named)
-    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name)
+    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
   }
 
   # Remove names from any list elements
@@ -105,7 +105,7 @@ partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data, error_call, dot_name) {
+partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
   try_fetch(
     expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
@@ -117,6 +117,13 @@ partial_eval_quo <- function(x, data, error_call, dot_name) {
   )
 
   if (is.list(expr)) {
+    if (was_named) {
+      msg <- c(
+        "In dbplyr, the result of `across()` must be unnamed.",
+        i = "`{dot_name} = {as_label(x)}` is named."
+      )
+      cli_abort(msg, call = error_call)
+    }
     lapply(expr, new_quosure, env = get_env(x))
   } else {
     new_quosure(expr, get_env(x))

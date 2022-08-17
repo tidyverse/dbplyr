@@ -71,7 +71,7 @@ inner_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
-                                x_as = "LHS", y_as = "RHS") {
+                                x_as = NULL, y_as = NULL) {
   x$lazy_query <- add_join(
     x, y,
     "inner",
@@ -96,7 +96,7 @@ left_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               x_as = "LHS", y_as = "RHS") {
+                               x_as = NULL, y_as = NULL) {
   lazy_query <- add_join(
     x, y,
     "left",
@@ -122,7 +122,7 @@ right_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                 suffix = NULL,
                                 auto_index = FALSE, ...,
                                 sql_on = NULL, na_matches = c("never", "na"),
-                               x_as = "LHS", y_as = "RHS") {
+                               x_as = NULL, y_as = NULL) {
   lazy_query <- add_join(
     x, y,
     "right",
@@ -148,7 +148,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                suffix = NULL,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               x_as = "LHS", y_as = "RHS") {
+                               x_as = NULL, y_as = NULL) {
   lazy_query <- add_join(
     x, y,
     "full",
@@ -173,7 +173,7 @@ full_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               x_as = "LHS", y_as = "RHS") {
+                               x_as = NULL, y_as = NULL) {
   lazy_query <- add_semi_join(
     x, y,
     anti = FALSE,
@@ -197,7 +197,7 @@ semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
                                sql_on = NULL, na_matches = c("never", "na"),
-                               x_as = "LHS", y_as = "RHS") {
+                               x_as = NULL, y_as = NULL) {
   lazy_query <- add_semi_join(
     x, y,
     anti = TRUE,
@@ -220,11 +220,9 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
                      suffix = NULL,
                      auto_index = FALSE,
                      na_matches = "never",
-                     x_as = "LHS",
-                     y_as = "RHS",
+                     x_as = NULL,
+                     y_as = NULL,
                      call = caller_env()) {
-  check_join_as(x_as, y_as, call = call)
-
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else if (identical(type, "full") && identical(by, character())) {
@@ -233,8 +231,6 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- ident(x_as)
-  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y,
@@ -245,56 +241,168 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
+  inlined_select_list <- inline_select_in_join(x, y, vars, by)
+  vars <- inlined_select_list$vars
+  by <- inlined_select_list$by
+
+  # the table alias can only be determined after `select()` was inlined.
+  # This works even though `by` is used in `inline_select_in_join()` and updated
+  # because this does not touch `by$x_as` and `by$y_as`.
+  by[c("x_as", "y_as")] <- check_join_as(
+    x_as,
+    inlined_select_list$x,
+    y_as,
+    inlined_select_list$y,
+    sql_on = sql_on,
+    call = call
+  )
+
   lazy_join_query(
-    x$lazy_query,
-    y$lazy_query,
+    x = inlined_select_list$x,
+    y = inlined_select_list$y,
     vars = vars,
     type = type,
     by = by,
     suffix = suffix,
     na_matches = na_matches,
+    group_vars = op_grps(x),
+    order_vars = op_sort(x),
+    frame = op_frame(x),
     call = call
   )
 }
 
+inline_select_in_join <- function(x, y, vars, by) {
+  x_lq <- x$lazy_query
+  y_lq <- y$lazy_query
+  # Cannot inline select if `on` is used because the user might have
+  # used a renamed column.
+  if (!is_empty(by$on)) {
+    out <- list(
+      x = x_lq,
+      y = y_lq,
+      vars = vars,
+      by = by
+    )
+    return(out)
+  }
+
+  # In some cases it would also be possible to inline mutate but this would
+  # require careful analysis to not introduce bugs which does not really seem
+  # worth it currently.
+  if (is_lazy_select_query_simple(x_lq, select = "projection")) {
+    vars$x <- update_join_vars(vars$x, x_lq$select)
+    by$x <- update_join_vars(by$x, x_lq$select)
+    vars$all_x <- op_vars(x_lq$x)
+    x_lq <- x_lq$x
+  }
+
+  if (is_lazy_select_query_simple(y_lq, select = "projection")) {
+    vars$y <- update_join_vars(vars$y, y_lq$select)
+    by$y <- update_join_vars(by$y, y_lq$select)
+    vars$all_y <- op_vars(y_lq$x)
+    y_lq <- y_lq$x
+  }
+
+  list(
+    x = x_lq,
+    y = y_lq,
+    vars = vars,
+    by = by
+  )
+}
+
+update_join_vars <- function(vars, select) {
+  idx <- vctrs::vec_match(select$name, vars)
+  prev_vars <- purrr::map_chr(select$expr, as_string)
+  vctrs::vec_assign(vars, idx, prev_vars)
+}
+
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
                           auto_index = FALSE, na_matches = "never",
-                          x_as = "LHS", y_as = "RHS",
+                          x_as = NULL, y_as = NULL,
                           call = caller_env()) {
-  check_join_as(x_as, y_as, call = call)
-
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
   } else {
     by <- dplyr::common_by(by, x, y)
   }
-  by$x_as <- ident(x_as)
-  by$y_as <- ident(y_as)
 
   y <- auto_copy(
     x, y, copy,
     indexes = if (auto_index) list(by$y)
   )
 
+  vars <- set_names(op_vars(x))
+  group_vars <- op_grps(x)
+  order_vars <- op_sort(x)
+  frame <- op_frame(x)
+
+  x_lq <- x$lazy_query
+  if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
+    if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
+      by$x <- update_join_vars(by$x, x_lq$select)
+      vars <- purrr::map_chr(x_lq$select$expr, as_name)
+      vars <- purrr::set_names(vars, x_lq$select$name)
+    }
+
+    x_lq <- x_lq$x
+  }
+
+  # the table alias can only be determined after `select()` was inlined
+  by[c("x_as", "y_as")] <- check_join_as(x_as, x_lq, y_as, y, sql_on = sql_on, call = call)
+
   lazy_semi_join_query(
-    x$lazy_query,
+    x_lq,
     y$lazy_query,
+    vars = vars,
     anti = anti,
     by = by,
     na_matches = na_matches,
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame,
     call = call
   )
 }
 
-check_join_as <- function(x_as, y_as, call) {
-  vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
-  vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
-  if (x_as == y_as) {
+check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
+  if (!is_null(x_as)) {
+    vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
+  }
+  if (!is_null(y_as)) {
+    vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
+  }
+
+  if (is_null(sql_on)) {
+    x_name <- unclass(query_name(x))
+    y_name <- unclass(query_name(y))
+    if (is_null(x_as) && is_null(y_as) && identical(x_name, y_name)) {
+      # minor hack to deal with `*_name` = NULL
+      x_as <- paste0(c(x_name, "LHS"), collapse = "_")
+      y_as <- paste0(c(y_name, "RHS"), collapse = "_")
+      # we can safely omit the check that x_as and y_as are identical
+      return(list(x_as = ident(x_as), y_as = ident(y_as)))
+    }
+
+    x_as <- x_as %||% x_name %||% "LHS"
+    y_as <- y_as %||% y_name %||% "RHS"
+  } else {
+    # for backwards compatibility use "LHS" and "RHS" if `sql_on` is used
+    # without a table alias
+    x_as <- x_as %||% "LHS"
+    y_as <- y_as %||% "RHS"
+  }
+
+  if (identical(x_as, y_as)) {
     cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
+
+  list(x_as = ident(x_as), y_as = ident(y_as))
 }
 
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
+  y_names_org <- y_names
   # Remove join keys from y
   y_names <- setdiff(y_names, by$y)
 
@@ -323,7 +431,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
     x = c(x_x, y_x),
     y = c(x_y, y_y),
     all_x = x_names,
-    all_y = c(y_names, by$y)
+    all_y = y_names_org
   )
 }
 

@@ -359,7 +359,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as)
+  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as, type = type)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -389,18 +389,19 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, n
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
   on <- sql_join_tbls(con, by)
 
   lines <- list(
-    build_sql("SELECT * FROM ", x, con = con),
+    sql_clause_select(con, vars),
+    sql_clause_from(x),
     build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
@@ -740,7 +741,13 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  dbExecute(con, sql)
+  tryCatch(
+    DBI::dbExecute(con, sql),
+    error = function(cnd) {
+      msg <- "Can't analyze table {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_create_index <- function(con, ...) {
@@ -748,10 +755,20 @@ dbplyr_create_index <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_create_index
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
+db_create_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  dbExecute(con, sql)
+  tryCatch(
+    DBI::dbExecute(con, sql),
+    error = function(cnd) {
+      msg <- "Can't create index on {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -761,7 +778,15 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  expl <- dbGetQuery(con, sql)
+  call <- current_call()
+  tryCatch(
+    {
+      expl <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't explain query.", parent = cnd)
+    }
+  )
+
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
@@ -773,7 +798,14 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  names(dbGetQuery(con, sql))
+  tryCatch(
+    {
+      df <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't query fields.", parent = cnd)
+    }
+  )
+  names(df)
 }
 
 dbplyr_save_query <- function(con, ...) {
@@ -783,7 +815,12 @@ dbplyr_save_query <- function(con, ...) {
 #' @importFrom dplyr db_save_query
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  dbExecute(con, sql, immediate = TRUE)
+  tryCatch(
+    DBI::dbExecute(con, sql, immediate = TRUE),
+    error = function(cnd) {
+      cli_abort("Can't save query to {.val {name}}.", parent = cnd)
+    }
+  )
   name
 }
 

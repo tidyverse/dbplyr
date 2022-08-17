@@ -177,6 +177,12 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     }
   }
 
+  special_calls2$sql <- function(...) {
+    dots <- exprs(...)
+    dots <- purrr::map(dots, eval_tidy, env = top_env)
+    exec(sql, !!!dots)
+  }
+
   # Existing symbols in expression
   names <- all_names(expr)
   idents <- lapply(names, ident)

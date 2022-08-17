@@ -22,11 +22,16 @@ indent_print <- function(x) {
 }
 
 style_kw <- function(x) {
-  if (dbplyr_use_colour()) {
-    cli::col_blue(x)
-  } else {
-    x
+  if (!dbplyr_use_colour()) {
+    return(x)
   }
+
+  highlight <- dbplyr_highlight()
+  if (is_false(highlight)) {
+    return(x)
+  }
+
+  highlight(x)
 }
 
 # function for the thousand separator,
@@ -38,4 +43,23 @@ style_kw <- function(x) {
 
 dbplyr_use_colour <- function() {
   getOption("dbplyr_use_colour", FALSE)
+}
+
+dbplyr_highlight <- function() {
+  highlight <- getOption("dbplyr_highlight", cli::combine_ansi_styles("blue"))
+
+  if (is_true(highlight)) {
+    highlight <- cli::combine_ansi_styles("blue")
+  }
+
+  if (is_false(highlight)) {
+    return(FALSE)
+  }
+
+  if (!inherits(highlight, "cli_ansi_style")) {
+    msg <- "{.envvar dbplyr_highlight} must be `NULL`, `FALSE` or a {.cls cli_ansi_style}."
+    cli::cli_abort(msg)
+  }
+
+  highlight
 }

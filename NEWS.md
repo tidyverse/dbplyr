@@ -9,6 +9,48 @@
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 
+* When using common table expressions the results of joins and set operations
+  are now reused (@mgirlich, #978).
+
+* The keyword highlighting can now be customised via the option `dbplyr_highlight`.
+  Turn it off via `options(dbplyr_highlight = FALSE)` or pass a custom ansi
+  style, e.g. `options(dbplyr_highlight = cli::combine_ansi_styles("bold", "cyan"))`
+  (@mgirlich, #974).
+
+* Querying Teradata databases works again. Unfortunately, the fix requires every
+  column to be explicitly selected again (@mgirlich, #966).
+
+* Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
+  the verb where the error happened (@mgirlich).
+
+* Joins now don't use the table alias "LHS" and "RHS" unless necessary (@mgirlich).
+
+* When possible, dbplyr now uses `SELECT *` after a join instead of explicitly
+  selecting every column (@mgirlich, #898).
+  
+* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
+  `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
+  `cumsum()` (@overmar, #913).
+
+* Using a named `across()` now gives a clear error message (@mgirlich, #761).
+
+* `cur_column()` is now supported (@mgirlich, #951).
+
+* `*_join()` + `select()` now does not create an unnecessary subquery anymore
+  (@mgirlich, #876).
+
+* A call to `sql()` is now translated differently. The `...` are now evaluated
+  locally instead of being translated with `translate_sql()` (@mgirlich, #952).
+
+* Using `mutate()` + `filter()` and `filter()` + `filter()` do not generate a
+  subquery anymore unless it is necessary (@mgirlich, #792).
+
+* `distinct()` now avoids creating an unnecessary subquery and instead uses
+  the `DISTINCT` clause directly on the current query (@mgirlich, #880).
+
+* `window_order()` now produces a better error message when applied to a data
+  frame (@mgirlich, #947).
+
 * Fixed an installation issue due to missing namespace for `setOldClass()`
   (@mgirlich, #927).
 

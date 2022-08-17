@@ -22,6 +22,13 @@
 #'   mutate(z = sum(y)) %>%
 #'   show_query()
 window_order <- function(.data, ...) {
+  if (!is_tbl_lazy(.data)) {
+    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not a {.cls {class(.data)}}."
+    if (is.data.frame(.data)) {
+      msg <- c(msg, i = "Did you mean to use {.fn arrange} instead?")
+    }
+    cli_abort(msg)
+  }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
 
@@ -43,6 +50,12 @@ add_order <- function(.data, dots) {
 #' @rdname window_order
 #' @param from,to Bounds of the frame.
 window_frame <- function(.data, from = -Inf, to = Inf) {
+  if (!is_tbl_lazy(.data)) {
+    cli_abort(
+      "{.arg .data} must be a {.cls tbl_lazy}, not a {.cls {class(.data)}}."
+    )
+  }
+
   stopifnot(is.numeric(from), length(from) == 1)
   stopifnot(is.numeric(to), length(to) == 1)
 

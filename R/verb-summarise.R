@@ -57,7 +57,7 @@ summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
     parent.env(error_env) <- quo_get_env(dot)
     dot <- quo_set_env(dot, error_env)
 
-    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name)
+    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
     cur_data <- summarise_bind_error(cur_data, dots, i, error_env)
   }
 
