@@ -1,5 +1,14 @@
 # dbplyr (development version)
 
+* `summarise()` + `filter()` now uses the `HAVING` clause where possible
+  (@mgirlich, #877).
+  
+* Many errors have been improved and now show the function where the error
+  happened instead of a helper function (@mgirlich, #907).
+  
+* Variables that are neither found in the data nor in the environment now
+  produce an error (@mgirlich, #907).
+
 * When using common table expressions the results of joins and set operations
   are now reused (@mgirlich, #978).
 
