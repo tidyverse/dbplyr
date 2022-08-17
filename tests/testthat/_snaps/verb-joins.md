@@ -98,3 +98,21 @@
       Error in `inner_join()`:
       ! `suffix` must have size 2, not size 1.
 
+# joins reuse queries in cte mode
+
+    Code
+      left_join(lf, lf) %>% remote_query(cte = TRUE)
+    Message
+      Joining, by = "x"
+    Output
+      <SQL> WITH `q01` AS (
+        SELECT `lf1_LHS`.`x` AS `x`
+        FROM `lf1` AS `lf1_LHS`
+        INNER JOIN `lf1` AS `lf1_RHS`
+          ON (`lf1_LHS`.`x` = `lf1_RHS`.`x`)
+      )
+      SELECT `LHS`.`x` AS `x`
+      FROM `q01` AS `LHS`
+      LEFT JOIN `q01` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+

@@ -144,12 +144,7 @@ flatten_query.join_query <- function(qry, query_list) {
   query_list_y <- flatten_query(y, query_list_x)
   qry$y <- get_subquery_name(y, query_list_y)
 
-  name <- unique_subquery_name()
-  wrapped_query <- set_names(list(qry), name)
-
-  query_list$queries <- c(query_list_y$queries, wrapped_query)
-  query_list$name <- name
-  query_list
+  querylist_reuse_query(qry, query_list_y)
 }
 
 #' @export

@@ -625,6 +625,20 @@ test_that("full_join() does not use *", {
   )
 })
 
+test_that("joins reuse queries in cte mode", {
+  lf1 <- lazy_frame(x = 1, .name = "lf1")
+  lf <- lf1 %>%
+    inner_join(lf1, by = "x")
+
+  expect_snapshot(
+    left_join(
+      lf,
+      lf
+    ) %>%
+      remote_query(cte = TRUE)
+  )
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {
