@@ -353,7 +353,7 @@ test_that("select() before semi_join is inlined", {
   )
   lq <- out_semi$lazy_query
   expect_equal(op_vars(out_semi), c("a2", "x"))
-  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a", "x1")))
   expect_equal(lq$by$x, "x1")
   expect_snapshot(out_semi)
 
@@ -363,7 +363,7 @@ test_that("select() before semi_join is inlined", {
     by = "x"
   )
   lq <- out_anti$lazy_query
-  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a", "x1")))
   expect_equal(lq$by$x, "x1")
 
   # attributes like `group`, `sort`, `frame` is kept
@@ -395,7 +395,7 @@ test_that("select() before join is not inlined when using `sql_on`", {
 
   lq <- out$lazy_query
   expect_s3_class(lq$x, "lazy_select_query")
-  expect_equal(lq$vars, c(a2 = "a2", x = "x"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a2", "x")))
 })
 
 # sql_build ---------------------------------------------------------------
