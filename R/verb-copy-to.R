@@ -107,6 +107,10 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' @param con A database connection.
 #' @param df A local data frame. The data is written directly in the SQL query
 #'   so it should be small.
+#' @param types A named character vector of SQL data types to use for the columns.
+#'    The data types are backend specific. For example for Postgres this could
+#'    be `c(id = "bigint", created_at = "timestamp", values = "integer[]")`.
+#'    If `NULL`, the default, the types are determined from `df`.
 #' @return A `tbl_lazy`.
 #'
 #' @examples
@@ -116,7 +120,7 @@ auto_copy.tbl_sql <- function(x, y, copy = FALSE, ...) {
 #' copy_inline(con, df)
 #'
 #' copy_inline(con, df) %>% dplyr::show_query()
-copy_inline <- function(con, df) {
+copy_inline <- function(con, df, types = NULL) {
   if (!inherits(df, "data.frame")) {
     cli_abort("{.var df} needs to be a data.frame.")
   }
@@ -125,21 +129,30 @@ copy_inline <- function(con, df) {
     cli_abort("{.var df} needs at least one column.")
   }
 
+  if (!is_null(types)) {
+    vctrs::vec_assert(types, character())
+
+    if (!setequal(colnames(df), names(types))) {
+      cli_abort("Names of {.arg df} and {.arg types} must be the same.")
+    }
+  }
+
   # This workaround is needed because `tbl_sql()` applies `as.sql()` on `from`
   subclass <- class(con)[[1]] # prefix added by dplyr::make_tbl
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
     src = src_dbi(con),
     from = df,
-    lazy_query = lazy_values_query(df),
+    lazy_query = lazy_values_query(df, types),
     vars = colnames(df)
   )
 }
 
-lazy_values_query <- function(df) {
+lazy_values_query <- function(df, types) {
   lazy_query(
     query_type = "values",
     x = df,
+    col_types = types,
     group_vars = character(),
     order_vars = NULL,
     frame = NULL
@@ -153,7 +166,7 @@ sql_build.lazy_values_query <- function(op, con, ...) {
 
 #' @export
 sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  sql_values_subquery(con, query$x, lvl = lvl)
+  sql_values_subquery(con, query$x, types = query$col_types, lvl = lvl)
 }
 
 #' @export
@@ -166,20 +179,20 @@ op_vars.lazy_values_query <- function(op) {
   colnames(op$x)
 }
 
-sql_values_subquery <- function(con, df, lvl = 0, ...) {
+sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
   check_dots_empty()
   UseMethod("sql_values_subquery")
 }
 
 #' @export
-sql_values_subquery.DBIConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, lvl = lvl, row = FALSE)
+sql_values_subquery.DBIConnection <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, types = types, lvl = lvl, row = FALSE)
 }
 
-sql_values_subquery_default <- function(con, df, lvl, row) {
+sql_values_subquery_default <- function(con, df, types, lvl, row) {
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
-    return(sql_values_zero_rows(con, df, lvl))
+    return(sql_values_zero_rows(con, df, types, lvl))
   }
 
   # The query consists of two parts:
@@ -212,16 +225,16 @@ sql_values_subquery_default <- function(con, df, lvl, row) {
 
   sql_query_select(
     con,
-    select = sql_values_select(con, df),
+    select = sql_values_cast_clauses(con, df, types, na = FALSE),
     from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
     lvl = lvl
   )
 }
 
-sql_values_subquery_column_alias <- function(con, df, lvl) {
+sql_values_subquery_column_alias <- function(con, df, types, lvl) {
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
-    return(sql_values_zero_rows(con, df, lvl))
+    return(sql_values_zero_rows(con, df, types, lvl))
   }
 
   # The `SELECT` clause converts the values to the correct types. This needs
@@ -247,7 +260,7 @@ sql_values_subquery_column_alias <- function(con, df, lvl) {
 
   sql_query_select(
     con,
-    select = sql_values_select(con, df),
+    select = sql_values_cast_clauses(con, df, types, na = FALSE),
     from = rows_query,
     lvl = lvl
   )
@@ -261,38 +274,44 @@ sql_values_clause <- function(con, df, row = FALSE) {
   list(sql_clause("VALUES", rows_sql))
 }
 
-sql_values_zero_rows <- function(con, df, lvl) {
+sql_values_zero_rows <- function(con, df, types, lvl) {
   if (nrow(df) != 0L) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
     abort("`df` does not have 0 rows", .internal = TRUE)
   }
 
-  typed_cols <- purrr::map_chr(
-    vctrs::vec_init(df),
-    ~ {
-      cast_expr <- call2(sql_cast_dispatch(.x), NA)
-      translate_sql(!!cast_expr, con = con)
-    }
-  )
+  typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
 
   query <- select_query(
     from = ident(),
-    select = sql(typed_cols),
+    select = typed_cols,
     where = sql("0 = 1")
   )
 
   sql_render(query, con = con, lvl = lvl)
 }
 
-sql_values_select <- function(con, df) {
-  typed_cols <- purrr::map2_chr(
-    df, colnames(df),
-    ~ {
-      cast_expr <- call2(sql_cast_dispatch(.x), ident(.y))
-      translate_sql(!!cast_expr, con = con)
-    }
-  )
+sql_values_cast_clauses <- function(con, df, types, na) {
+  if (is_null(types)) {
+    typed_cols <- purrr::map2_chr(
+      df, colnames(df),
+      ~ {
+        val <- if (na) NA else ident(.y)
+        cast_expr <- call2(sql_cast_dispatch(.x), val)
+        translate_sql(!!cast_expr, con = con)
+      }
+    )
+  } else {
+    typed_cols <- purrr::imap_chr(
+      types,
+      ~ {
+        val <- if (na) NA else ident(.y)
+        sql_expr(cast(!!val %as% !!sql(.x)), con = con)
+      }
+    )
+  }
+
   sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
 }
 
