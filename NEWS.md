@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `copy_inline()` gains a `types` argument to specify the SQL column types
+  (@mgirlich, #963).
+
 * `summarise()` + `filter()` now uses the `HAVING` clause where possible
   (@mgirlich, #877).
   
