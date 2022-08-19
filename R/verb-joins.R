@@ -333,20 +333,23 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     indexes = if (auto_index) list(by$y)
   )
 
-  vars <- set_names(op_vars(x))
-  group_vars <- op_grps(x)
-  order_vars <- op_sort(x)
-  frame <- op_frame(x)
+  vars <- tibble(
+    name = op_vars(x),
+    var = op_vars(x)
+  )
 
   x_lq <- x$lazy_query
   if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
     if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
       by$x <- update_join_vars(by$x, x_lq$select)
-      vars <- purrr::map_chr(x_lq$select$expr, as_name)
-      vars <- purrr::set_names(vars, x_lq$select$name)
+      vars$var <- purrr::map_chr(x_lq$select$expr, as_name)
+      vars$name <- x_lq$select$name
     }
 
     x_lq <- x_lq$x
+    x_lq$group_vars <- op_grps(x)
+    x_lq$order_vars <- op_sort(x)
+    x_lq$frame <- op_frame(x)
   }
 
   # the table alias can only be determined after `select()` was inlined
@@ -359,9 +362,6 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     anti = anti,
     by = by,
     na_matches = na_matches,
-    group_vars = group_vars,
-    order_vars = order_vars,
-    frame = frame,
     call = call
   )
 }
