@@ -162,7 +162,10 @@ test_that("select() after join handles previous select", {
   expect_equal(op_vars(lf), c("x2", "y3", "z"))
   expect_equal(
     lf$lazy_query$vars,
-    c(x2 = "x", y3 = "y", z = "z")
+    tibble(
+      name = c("x2", "y3", "z"),
+      var = c("x", "y", "z")
+    )
   )
   expect_equal(op_grps(lf), c("x2", "y3", "z"))
   expect_snapshot(print(lf))
@@ -248,6 +251,7 @@ test_that("mutate collapses over nested select", {
 
 test_that("output is styled", {
   local_reproducible_output(crayon = TRUE)
+  withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
 
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   out <- lf %>%
