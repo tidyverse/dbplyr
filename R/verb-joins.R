@@ -245,11 +245,9 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   # because this does not touch `by$x_as` and `by$y_as`.
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
-  table_names <- c(
-    unclass(query_name(inlined_select_list$x)) %||% NA,
-    unclass(query_name(inlined_select_list$y)) %||% NA
-  )
-  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, join_alias)
+  x_name <- unclass(query_name(inlined_select_list$x))
+  y_name <- unclass(query_name(inlined_select_list$y))
+  by[c("x_as", "y_as")] <- join_two_table_alias(x_name, y_name, join_alias$x, join_alias$y)
   by$x_as <- ident(by$x_as)
   by$y_as <- ident(by$y_as)
 
@@ -348,11 +346,9 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   # the table alias can only be determined after `select()` was inlined
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
-  table_names <- c(
-    unclass(query_name(x_lq)) %||% NA,
-    unclass(query_name(y)) %||% NA
-  )
-  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, join_alias)
+  x_name <- unclass(query_name(x_lq))
+  y_name <- unclass(query_name(y))
+  by[c("x_as", "y_as")] <- join_two_table_alias(x_name, y_name, join_alias$x, join_alias$y)
   by$x_as <- ident(by$x_as)
   by$y_as <- ident(by$y_as)
 
@@ -374,7 +370,7 @@ check_join_alias <- function(x_as, y_as, sql_on, call) {
   x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
   y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
 
-  if (identical(x_as, y_as) && !is.na(x_as)) {
+  if (identical(x_as, y_as) && !is.null(x_as)) {
     cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 
@@ -392,7 +388,7 @@ check_join_as1 <- function(as, arg, sql_on, default, call) {
     as <- as %||% default
   }
 
-  as %||% NA_character_
+  as
 }
 
 check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
@@ -464,18 +460,14 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   )
 }
 
-join_simple_table_alias <- function(table_names, aliases) {
-  stopifnot(length(table_names) == 2)
-  stopifnot(length(aliases) == 2)
-  aliases <- unlist(aliases)
+join_two_table_alias <- function(x_name, y_name, x_alias, y_alias) {
+  stopifnot(is.null(x_name) || is.character(x_name))
+  stopifnot(is.null(y_name) || is.character(y_name))
+  stopifnot(is.null(x_alias) || is.character(x_alias))
+  stopifnot(is.null(y_alias) || is.character(y_alias))
 
-  x_alias <- aliases[[1]]
-  y_alias <- aliases[[2]]
-  x_name <- table_names[[1]]
-  y_name <- table_names[[2]]
-
-  x_out <- dplyr::coalesce(x_alias, x_name, "LHS")
-  y_out <- dplyr::coalesce(y_alias, y_name, "RHS")
+  x_out <- x_alias %||% x_name %||% "LHS"
+  y_out <- y_alias %||% y_name %||% "RHS"
   out <- c(x_out, y_out)
 
   if (!identical(x_out, y_out)) {
@@ -483,9 +475,9 @@ join_simple_table_alias <- function(table_names, aliases) {
   }
   # -> must rename
 
-  if (is.na(x_alias) && is.na(y_alias)) {
+  if (is_null(x_alias) && is_null(y_alias)) {
     # self join of named table
-    if (!is.na(x_name) && !is.na(y_name) && identical(x_name, y_name)) {
+    if (!is_null(x_name) && !is_null(y_name) && identical(x_name, y_name)) {
       out <- c(
         paste0(x_name, "_LHS"),
         paste0(y_name, "_RHS")
@@ -495,7 +487,7 @@ join_simple_table_alias <- function(table_names, aliases) {
   }
 
   out_repaired <- vctrs::vec_as_names(c(x_out, y_out), repair = "unique", quiet = TRUE)
-  may_repair <- is.na(c(x_alias, y_alias))
+  may_repair <- c(is_null(x_alias), is_null(y_alias))
   out[may_repair] <- out_repaired[may_repair]
 
   out
