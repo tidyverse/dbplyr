@@ -243,14 +243,15 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   # the table alias can only be determined after `select()` was inlined.
   # This works even though `by` is used in `inline_select_in_join()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
-  by[c("x_as", "y_as")] <- check_join_as(
-    x_as,
-    inlined_select_list$x,
-    y_as,
-    inlined_select_list$y,
-    sql_on = sql_on,
-    call = call
+  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+
+  table_names <- c(
+    unclass(query_name(inlined_select_list$x)) %||% NA,
+    unclass(query_name(inlined_select_list$y)) %||% NA
   )
+  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, join_alias)
+  by$x_as <- ident(by$x_as)
+  by$y_as <- ident(by$y_as)
 
   lazy_join_query(
     x = inlined_select_list$x,
@@ -345,7 +346,15 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   }
 
   # the table alias can only be determined after `select()` was inlined
-  by[c("x_as", "y_as")] <- check_join_as(x_as, x_lq, y_as, y, sql_on = sql_on, call = call)
+  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+
+  table_names <- c(
+    unclass(query_name(x_lq)) %||% NA,
+    unclass(query_name(y)) %||% NA
+  )
+  by[c("x_as", "y_as")] <- join_simple_table_alias(table_names, join_alias)
+  by$x_as <- ident(by$x_as)
+  by$y_as <- ident(by$y_as)
 
   lazy_semi_join_query(
     x_lq,
@@ -359,6 +368,31 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     frame = frame,
     call = call
   )
+}
+
+check_join_alias <- function(x_as, y_as, sql_on, call) {
+  x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
+  y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
+
+  if (identical(x_as, y_as) && !is.na(x_as)) {
+    cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
+  }
+
+  list(x = x_as, y = y_as)
+}
+
+check_join_as1 <- function(as, arg, sql_on, default, call) {
+  if (!is_null(as)) {
+    vctrs::vec_assert(as, character(), size = 1, arg = arg, call = call)
+  }
+
+  if (!is_null(sql_on)) {
+    # for backwards compatibility use "LHS"/"RHS" if `sql_on` is used
+    # without a table alias
+    as <- as %||% default
+  }
+
+  as %||% NA_character_
 }
 
 check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
@@ -428,6 +462,43 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
     all_x = x_names,
     all_y = y_names_org
   )
+}
+
+join_simple_table_alias <- function(table_names, aliases) {
+  stopifnot(length(table_names) == 2)
+  stopifnot(length(aliases) == 2)
+  aliases <- unlist(aliases)
+
+  x_alias <- aliases[[1]]
+  y_alias <- aliases[[2]]
+  x_name <- table_names[[1]]
+  y_name <- table_names[[2]]
+
+  x_out <- dplyr::coalesce(x_alias, x_name, "LHS")
+  y_out <- dplyr::coalesce(y_alias, y_name, "RHS")
+  out <- c(x_out, y_out)
+
+  if (!identical(x_out, y_out)) {
+    return(out)
+  }
+  # -> must rename
+
+  if (is.na(x_alias) && is.na(y_alias)) {
+    # self join of named table
+    if (!is.na(x_name) && !is.na(y_name) && identical(x_name, y_name)) {
+      out <- c(
+        paste0(x_name, "_LHS"),
+        paste0(y_name, "_RHS")
+      )
+      return(out)
+    }
+  }
+
+  out_repaired <- vctrs::vec_as_names(c(x_out, y_out), repair = "unique", quiet = TRUE)
+  may_repair <- is.na(c(x_alias, y_alias))
+  out[may_repair] <- out_repaired[may_repair]
+
+  out
 }
 
 check_suffix <- function(x, call) {

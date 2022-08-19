@@ -159,22 +159,13 @@ test_that("join check `x_as` and `y_as`", {
 
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
-
-  expect_snapshot(error = TRUE, left_join(x, y, by = "a", x_as = "y"))
-  expect_snapshot(error = TRUE, {
-    left_join(
-      x %>% filter(x == 1),
-      x,
-      by = "x",
-      y_as = "LHS"
-    )
-  })
 })
 
 test_that("join uses correct table alias", {
   x <- lazy_frame(a = 1, x = 1, .name = "x")
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
+  # self joins
   by <- left_join(x, x, by = "a")$lazy_query$by
   expect_equal(by$x_as, ident("x_LHS"))
   expect_equal(by$y_as, ident("x_RHS"))
@@ -191,7 +182,7 @@ test_that("join uses correct table alias", {
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
 
-
+  # x-y joins
   by <- left_join(x, y, by = "a")$lazy_query$by
   expect_equal(by$x_as, ident("x"))
   expect_equal(by$y_as, ident("y"))
@@ -208,6 +199,16 @@ test_that("join uses correct table alias", {
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
 
+  # x_as same name as `y`
+  by <- left_join(x, y, by = "a", x_as = "y")$lazy_query$by
+  expect_equal(by$x_as, ident("y"))
+  expect_equal(by$y_as, ident("y...2"))
+
+  by <- left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS")$lazy_query$by
+  expect_equal(by$x_as, ident("LHS...1"))
+  expect_equal(by$y_as, ident("LHS"))
+
+  # sql_on -> use alias or LHS/RHS
   by <- left_join(x, y, sql_on = sql("LHS.a = RHS.a"))$lazy_query$by
   expect_equal(by$x_as, ident("LHS"))
   expect_equal(by$y_as, ident("RHS"))

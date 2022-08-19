@@ -36,22 +36,6 @@
       Error in `left_join()`:
       ! `y_as` must be different from `x_as`.
 
----
-
-    Code
-      left_join(x, y, by = "a", x_as = "y")
-    Condition
-      Error in `left_join()`:
-      ! `y_as` must be different from `x_as`.
-
----
-
-    Code
-      left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS")
-    Condition
-      Error in `left_join()`:
-      ! `y_as` must be different from `x_as`.
-
 # select() before join is inlined
 
     Code
