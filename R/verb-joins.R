@@ -334,9 +334,6 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 
   vars <- set_names(op_vars(x))
-  group_vars <- op_grps(x)
-  order_vars <- op_sort(x)
-  frame <- op_frame(x)
 
   x_lq <- x$lazy_query
   if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
@@ -347,6 +344,9 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     }
 
     x_lq <- x_lq$x
+    x_lq$group_vars <- op_grps(x)
+    x_lq$order_vars <- op_sort(x)
+    x_lq$frame <- op_frame(x)
   }
 
   # the table alias can only be determined after `select()` was inlined
@@ -359,9 +359,6 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     anti = anti,
     by = by,
     na_matches = na_matches,
-    group_vars = group_vars,
-    order_vars = order_vars,
-    frame = frame,
     call = call
   )
 }
