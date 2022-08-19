@@ -315,26 +315,6 @@ sql_values_cast_clauses <- function(con, df, types, na) {
   sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
 }
 
-sql_values_select <- function(con, df, types) {
-  sql_select_cast(con, df, types, na = FALSE)
-  # if (is_null(types)) {
-  #   typed_cols <- purrr::map2_chr(
-  #     df, colnames(df),
-  #     ~ {
-  #       cast_expr <- call2(sql_cast_dispatch(.x), ident(.y))
-  #       translate_sql(!!cast_expr, con = con)
-  #     }
-  #   )
-  # } else {
-  #   typed_cols <- purrr::imap_chr(
-  #     types,
-  #     ~ sql_expr(cast(!!ident(.y) %as% !!sql(.x)), con = con)
-  #   )
-  # }
-
-  # sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
-}
-
 values_prepare <- function(con, df) {
   UseMethod("values_prepare")
 }
