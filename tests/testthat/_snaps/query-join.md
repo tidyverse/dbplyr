@@ -1,17 +1,21 @@
 # print method doesn't change unexpectedly
 
     Code
-      sql_build(left_join(lf1, lf2))
-    Message
-      Joining, by = "x"
+      left_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x") %>% sql_build()
     Output
-      <SQL JOIN (LEFT)>
+      <SQL JOINS>
+      X:
+        <IDENT> lf1
+      Type: left
       By:
         x-x
-      X:
-        <IDENT> df
       Y:
-        <IDENT> df
+        <IDENT> lf2
+      Type: left
+      By:
+        x-x
+      Y:
+        <IDENT> lf3
 
 # generated sql doesn't change unexpectedly
 

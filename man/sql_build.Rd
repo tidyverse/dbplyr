@@ -4,6 +4,7 @@
 %   R/query-select.R, R/query-semi-join.R, R/query-set-op.R, R/sql-build.R
 \name{lazy_join_query}
 \alias{lazy_join_query}
+\alias{lazy_multi_join_query}
 \alias{lazy_semi_join_query}
 \alias{lazy_query}
 \alias{lazy_select_query}
@@ -28,6 +29,17 @@ lazy_join_query(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
+  call = caller_env()
+)
+
+lazy_multi_join_query(
+  x,
+  joins,
+  table_names,
+  vars,
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
   call = caller_env()
 )
 

@@ -35,6 +35,51 @@ lazy_join_query <- function(x,
   )
 }
 
+#' @export
+#' @rdname sql_build
+lazy_multi_join_query <- function(x,
+                                  joins,
+                                  table_names,
+                                  vars,
+                                  group_vars = op_grps(x),
+                                  order_vars = op_sort(x),
+                                  frame = op_frame(x),
+                                  call = caller_env()) {
+  stopifnot(inherits(x, "lazy_query"))
+
+  if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "on", "na_matches"))) {
+    cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `on`, `na_matches`", .internal = TRUE)
+  }
+  vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
+  vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
+  vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
+
+  if (!identical(colnames(table_names), c("as", "name"))) {
+    cli_abort("`table_names` must have fields `as`, `name`", .internal = TRUE)
+  }
+  vctrs::vec_assert(table_names$as, character(), arg = "table_names$as", call = caller_env())
+  vctrs::vec_assert(table_names$name, character(), arg = "table_names$as", call = caller_env())
+
+  if (!identical(colnames(vars), c("name", "table", "var"))) {
+    cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
+  }
+  vctrs::vec_assert(vars$name, character(), arg = "vars$name", call = caller_env())
+  vctrs::vec_assert(vars$table, list(), arg = "vars$table", call = caller_env())
+  vctrs::vec_assert(vars$var, list(), arg = "vars$var", call = caller_env())
+
+  lazy_query(
+    query_type = "multi_join",
+    x = x,
+    joins = joins,
+    table_names = table_names,
+    vars = vars,
+    last_op = "join",
+    group_vars = group_vars,
+    order_vars = order_vars,
+    frame = frame
+  )
+}
+
 join_check_vars <- function(vars, call) {
   if (!vctrs::vec_is_list(vars)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
@@ -139,6 +184,10 @@ op_vars.lazy_join_query <- function(op) {
   op$vars$alias
 }
 #' @export
+op_vars.lazy_multi_join_query <- function(op) {
+  op$vars$name
+}
+#' @export
 op_vars.lazy_semi_join_query <- function(op) {
   op$vars$name
 }
@@ -153,6 +202,82 @@ sql_build.lazy_join_query <- function(op, con, ...) {
     by = op$by,
     suffix = op$suffix,
     na_matches = op$na_matches
+  )
+}
+
+#' @export
+sql_build.lazy_multi_join_query <- function(op, con, ...) {
+  auto_name <- is.na(op$table_names$as)
+  table_names_out <- dplyr::coalesce(op$table_names$as, op$table_names$name)
+  if (length(table_names_out) == 2) {
+    na_to_null <- function(x) {
+      if (is.na(x)) {
+        NULL
+      } else {
+        x
+      }
+    }
+
+    x_name <- na_to_null(op$table_names$name[[1]])
+    y_name <- na_to_null(op$table_names$name[[2]])
+    x_alias <- na_to_null(op$table_names$as[[1]])
+    y_alias <- na_to_null(op$table_names$as[[2]])
+    table_names_out <- join_two_table_alias(x_name, y_name, x_alias, y_alias)
+
+    if (op$joins$type %in% c("full", "right")) {
+      # construct a classical `join_query()` so that special handling of
+      # full and right join continue to work
+      type <- op$joins$type
+      x_idx <- purrr::map_lgl(op$vars$table, ~ 1L %in% .x)
+      vars_x <- purrr::map2_chr(op$vars$var, x_idx, ~ {if (.y) .x[[1]] else NA_character_})
+
+      y_idx <- purrr::map_lgl(op$vars$table, ~ 2L %in% .x)
+      vars_y <- purrr::map2_chr(op$vars$var, y_idx, ~ {if (.y) dplyr::last(.x) %||% .x[[1]] else NA_character_})
+
+
+      vars_classic <- list(
+        alias = op$vars$name,
+        x = vars_x,
+        y = vars_y,
+        all_x = op_vars(op$x),
+        all_y = op_vars(op$joins$table[[1]])
+      )
+
+      out <- join_query(
+        sql_optimise(sql_build(op$x, con), con),
+        sql_optimise(sql_build(op$joins$table[[1]], con), con),
+        vars = vars_classic,
+        type = type,
+        by = list(
+          on = sql(op$joins$on),
+          x = op$joins$by_x[[1]],
+          y = op$joins$by_y[[1]],
+          x_as = ident(table_names_out[[1]]),
+          y_as = ident(table_names_out[[2]])
+        ),
+        suffix = NULL, # it seems like the suffix is not used for rendering
+        na_matches = op$joins$na_matches
+      )
+      return(out)
+    }
+  } else {
+    table_names_repaired <- vctrs::vec_as_names(table_names_out, repair = "unique", quiet = TRUE)
+    table_names_out[auto_name] <- table_names_repaired[auto_name]
+  }
+
+  all_vars_list <- purrr::map(
+    c(list(op$x), op$joins$table),
+    op_vars
+  )
+
+  op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
+
+  multi_join_query(
+    x = sql_optimise(sql_build(op$x, con), con),
+    joins = op$joins,
+    table_names = table_names_out,
+    vars = op$vars,
+    all_vars_list = all_vars_list
   )
 }
 
