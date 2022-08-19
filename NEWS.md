@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `rows_*()` now uses the column types of `x` when copying a local data frame `y`
+  to a Postgres database (@mgirlich, #909).
+
 * `copy_inline()` gains a `types` argument to specify the SQL column types
   (@mgirlich, #963).
 
