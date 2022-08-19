@@ -99,9 +99,8 @@ rows_insert.tbl_lazy <- function(x,
 
   conflict <- rows_check_conflict(conflict)
 
-  y <- rows_auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -156,9 +155,8 @@ rows_append.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- rows_auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
@@ -204,9 +202,8 @@ rows_update.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- rows_auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -285,9 +282,8 @@ rows_patch.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- rows_auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -375,9 +371,8 @@ rows_upsert.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- rows_auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -451,8 +446,8 @@ rows_delete.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- rows_auto_copy(x, y, copy = copy)
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
