@@ -81,9 +81,9 @@ lazy_semi_join_query <- function(x,
                                  anti,
                                  by,
                                  na_matches = c("never", "na"),
-                                 group_vars = NULL,
-                                 order_vars = NULL,
-                                 frame = NULL,
+                                 group_vars = op_grps(x),
+                                 order_vars = op_sort(x),
+                                 frame = op_frame(x),
                                  call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
@@ -140,7 +140,7 @@ op_vars.lazy_join_query <- function(op) {
 }
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
-  names(op$vars)
+  op$vars$name
 }
 
 #' @export
@@ -158,13 +158,12 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
-  vars <- op$vars
   vars_prev <- op_vars(op$x)
-  if (identical(unname(vars), names(vars)) &&
-      identical(unname(vars), vars_prev)) {
+  if (identical(op$vars$var, op$vars$name) &&
+      identical(op$vars$var, vars_prev)) {
     vars <- sql("*")
   } else {
-    vars <- ident(vars)
+    vars <- ident(set_names(op$vars$var, op$vars$name))
   }
 
   semi_join_query(

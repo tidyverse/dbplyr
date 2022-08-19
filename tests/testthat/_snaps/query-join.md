@@ -108,9 +108,9 @@
       inner_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `df_LHS`
-      INNER JOIN `df` AS `df_RHS`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      FROM `df` AS `LHS`
+      INNER JOIN `df` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -119,9 +119,9 @@
       left_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -130,9 +130,9 @@
       right_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `df_LHS`
-      RIGHT JOIN `df` AS `df_RHS`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      FROM `df` AS `LHS`
+      RIGHT JOIN `df` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -141,9 +141,9 @@
       full_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`, `z`
-      FROM `df` AS `df_LHS`
-      FULL JOIN `df` AS `df_RHS`
+      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`, `z`
+      FROM `df` AS `LHS`
+      FULL JOIN `df` AS `RHS`
         ON (LHS.y < RHS.z)
 
 ---
@@ -153,9 +153,9 @@
     Output
       <SQL>
       SELECT *
-      FROM `df` AS `df_LHS`
+      FROM `df` AS `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
+        SELECT 1 FROM `df` AS `RHS`
         WHERE (LHS.y < RHS.z)
       )
 
@@ -166,9 +166,9 @@
     Output
       <SQL>
       SELECT *
-      FROM `df` AS `df_LHS`
+      FROM `df` AS `LHS`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
+        SELECT 1 FROM `df` AS `RHS`
         WHERE (LHS.y < RHS.z)
       )
 

@@ -174,7 +174,8 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     }
 
     if (inherits(lazy_query, "lazy_semi_join_query")) {
-      out$vars <- set_names(lazy_query$vars[idx], names(sel_vars))
+      out$vars <- vctrs::vec_slice(out$vars, idx)
+      out$vars$name <- names(sel_vars)
 
       return(out)
     }
