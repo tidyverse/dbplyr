@@ -770,25 +770,43 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out
 }
 
-rows_auto_copy <- function(x, y, copy) {
+rows_auto_copy <- function(x, y, copy, call = caller_env()) {
   name <- remote_name(x)
-  x_types <- get_col_types(remote_con(x), name)[colnames(y)]
+  x_types <- get_col_types(remote_con(x), name, call)
+
+  if (!is_null(x_types)) {
+    rows_check_containment(x, y, error_call = call)
+    x_types <- x_types[colnames(y)]
+  }
+
   auto_copy(x, y, copy = copy, types = x_types)
 }
 
-get_col_types <- function(con, name) {
-  if (inherits(con, "TestConnection")) {
-    return(NULL)
-  }
+get_col_types <- function(con, name, call) {
   if (is_null(name)) {
     return(NULL)
   }
+
+  UseMethod("get_col_types")
+}
+
+#' @export
+get_col_types.TestConnection <- function(con, name, call) {
+  NULL
+}
+
+#' @export
+get_col_types.DBIConnection <- function(con, name, call) {
+  NULL
+}
+
+#' @export
+get_col_types.PqConnection <- function(con, name, call) {
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
-  out <- DBI::dbColumnInfo(res)
-
-  set_names(out[[".typname"]] %||% out[["type"]], out[["name"]])
+  col_info_df <- DBI::dbColumnInfo(res)
+  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {

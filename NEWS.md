@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
 * `rows_*()` now uses the column types of `x` when copying a local data frame `y`
-  to the database (@mgirlich, #909).
+  to a Postgres database (@mgirlich, #909).
 
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
