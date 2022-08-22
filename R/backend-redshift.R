@@ -119,4 +119,9 @@ sql_query_explain.Redshift <- function(con, sql, ...) {
 #' @export
 sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
 
+#' @export
+sql_values_subquery.RedshiftConnection <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl)
+}
+
 utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))

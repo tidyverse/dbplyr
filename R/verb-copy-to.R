@@ -266,6 +266,53 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl) {
   )
 }
 
+sql_values_subquery_union <- function(con, df, types, lvl, row) {
+  df <- values_prepare(con, df)
+  if (nrow(df) == 0L) {
+    return(sql_values_zero_rows(con, df, types, lvl))
+  }
+
+  # The query consists of two parts:
+  # 1) An outer select which converts the values to the correct types. This needs
+  # to use the translation of `as.<column type>(<column name>)` (e.g. `as.numeric(mpg)`)
+  # because some backends need a special translation for some types e.g. casting
+  # to logical/bool in MySQL
+  #   `IF(<column name>, TRUE, FALSE)`
+  # This is done with the help of `sql_cast_dispatch()` via dispatch on the
+  # column type. The explicit cast is required so that joins work e.g. on date
+  # columns in Postgres.
+  # 2) A subquery which is the union of:
+  #   a) a zero row table which is just required to name the columns. This is
+  #      necessary as e.g. SQLite cannot name `VALUES`.
+  #   b) `UNION ALL` of one row `SELECT` statements
+  sim_data <- rep_named(colnames(df), list(NULL))
+  cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
+
+  null_row_query <- select_query(
+    from = ident(),
+    select = sql(cols_clause),
+    where = sql("0 = 1")
+  )
+
+  escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
+
+  select_kw <- style_kw("SELECT ")
+  union_kw <- style_kw("UNION ALL ")
+
+  rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
+  values_queries <- paste0(lvl_indent(lvl + 2), select_kw, rows, collapse = paste0(" ", union_kw, "\n"))
+
+  union_query <- set_op_query(null_row_query, sql(values_queries), type = "UNION", all = TRUE)
+  subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
+
+  sql_query_select(
+    con,
+    select = sql_values_cast_clauses(con, df, types, na = FALSE),
+    from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
+    lvl = lvl
+  )
+}
+
 sql_values_clause <- function(con, df, row = FALSE) {
   escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
