@@ -80,7 +80,7 @@
       copy_inline(con, y %>% slice(0)) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS INT) AS `id`, CAST(NULL AS VARCHAR2(255)) AS `arr`
-      FROM () 
+      FROM (`DUAL`) 
       WHERE (0 = 1)
     Code
       copy_inline(con, y) %>% remote_query()
@@ -93,13 +93,13 @@
           WHERE (0 = 1)
         )
         UNION ALL
-        (SELECT 1, '{1,2,3}')
+        (SELECT 1, '{1,2,3}' FROM DUAL)
       ) `values_table`
     Code
       copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
-      FROM () 
+      FROM (`DUAL`) 
       WHERE (0 = 1)
     Code
       copy_inline(con, y, types = types) %>% remote_query()
@@ -112,6 +112,6 @@
           WHERE (0 = 1)
         )
         UNION ALL
-        (SELECT 1, '{1,2,3}')
+        (SELECT 1, '{1,2,3}' FROM DUAL)
       ) `values_table`
 

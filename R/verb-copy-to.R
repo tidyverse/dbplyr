@@ -266,10 +266,10 @@ sql_values_subquery_column_alias <- function(con, df, types, lvl) {
   )
 }
 
-sql_values_subquery_union <- function(con, df, types, lvl, row) {
+sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
-    return(sql_values_zero_rows(con, df, types, lvl))
+    return(sql_values_zero_rows(con, df, types, lvl, from))
   }
 
   # The query consists of two parts:
@@ -300,7 +300,16 @@ sql_values_subquery_union <- function(con, df, types, lvl, row) {
   union_kw <- style_kw("UNION ALL ")
 
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
-  values_queries <- paste0(lvl_indent(lvl + 2), select_kw, rows, collapse = paste0(" ", union_kw, "\n"))
+  if (is_null(from)) {
+    values_queries <- paste0(lvl_indent(lvl + 2), select_kw, rows, collapse = paste0(" ", union_kw, "\n"))
+  } else {
+    from_kw <- style_kw("FROM ")
+    values_queries <- paste0(
+      lvl_indent(lvl + 2), select_kw, rows, " ", from_kw, from,
+      collapse = paste0(" ", union_kw, "\n")
+    )
+  }
+
 
   union_query <- set_op_query(null_row_query, sql(values_queries), type = "UNION", all = TRUE)
   subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
@@ -321,7 +330,7 @@ sql_values_clause <- function(con, df, row = FALSE) {
   list(sql_clause("VALUES", rows_sql))
 }
 
-sql_values_zero_rows <- function(con, df, types, lvl) {
+sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
   if (nrow(df) != 0L) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
@@ -331,7 +340,7 @@ sql_values_zero_rows <- function(con, df, types, lvl) {
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
 
   query <- select_query(
-    from = ident(),
+    from = ident(from),
     select = typed_cols,
     where = sql("0 = 1")
   )
