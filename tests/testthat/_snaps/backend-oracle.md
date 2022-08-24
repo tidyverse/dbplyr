@@ -89,7 +89,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
-          FROM () 
+          FROM (`DUAL`) 
           WHERE (0 = 1)
         )
         UNION ALL
@@ -108,7 +108,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
-          FROM () 
+          FROM (`DUAL`) 
           WHERE (0 = 1)
         )
         UNION ALL

@@ -48,6 +48,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
+          FROM `DUMMY`
           WHERE (0 = 1)
         )
         UNION ALL
@@ -66,6 +67,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
+          FROM `DUMMY`
           WHERE (0 = 1)
         )
         UNION ALL

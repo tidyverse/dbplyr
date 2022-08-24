@@ -289,7 +289,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
   null_row_query <- select_query(
-    from = ident(),
+    from = ident(from),
     select = sql(cols_clause),
     where = sql("0 = 1")
   )
