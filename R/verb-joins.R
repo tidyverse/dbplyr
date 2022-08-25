@@ -362,7 +362,7 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
   as_current <- x_lq$table_names$as
   if (!is_null(x_as)) {
     x_as_current <- as_current[[1]]
-    if (!is_null(x_as_current) && !identical(x_as, x_as_current)) {
+    if (!is.na(x_as_current) && !identical(x_as, x_as_current)) {
       return(TRUE)
     }
 
