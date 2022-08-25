@@ -74,3 +74,8 @@ db_table_temporary.HDB <- function(con, table, temporary) {
   # CREATE STATISTICS doesn't work for temporary tables, so
   # don't do anything at all
 }
+
+#' @export
+sql_values_subquery.HDB <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUMMY")
+}

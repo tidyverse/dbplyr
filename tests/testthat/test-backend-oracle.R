@@ -61,3 +61,18 @@ test_that("generates custom sql", {
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
 })
+
+test_that("copy_inline uses UNION ALL", {
+  con <- simulate_oracle()
+  y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
+
+  types <- c(id = "bigint", arr = "integer[]")
+  expect_snapshot({
+    copy_inline(con, y %>% slice(0)) %>% remote_query()
+    copy_inline(con, y) %>% remote_query()
+
+    # with `types`
+    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
+    copy_inline(con, y, types = types) %>% remote_query()
+  })
+})

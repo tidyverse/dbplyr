@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `copy_inline()` now works for Hana (#950), Oracle (#972), and Redshift
+  (#949, thanks to @ejneer for an initial implementation).
+
 * `rows_*()` now uses the column types of `x` when copying a local data frame `y`
   to a Postgres database (@mgirlich, #909).
 
