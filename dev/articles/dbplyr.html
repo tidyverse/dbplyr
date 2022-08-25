@@ -183,8 +183,7 @@
 <span><span class="co">#&gt; <span style="color: #949494;">#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, and</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   abbreviated variable names ¹​sched_dep_time, ²​dep_delay, ³​arr_time,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​sched_arr_time, ⁵​arr_delay</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​sched_arr_time, ⁵​arr_delay</span></span></span></code></pre></div>
 <p>The main difference is that you can see that it’s a remote source in a SQLite database.</p>
 </div>
 <div class="section level2">
@@ -205,7 +204,6 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">6</span>       -<span style="color: #BB0000;">25</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">4</span>        12</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span>
 <span></span>
 <span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 19]</span></span></span>
@@ -223,7 +221,6 @@
 <span><span class="co">#&gt; <span style="color: #949494;">#   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dbl&gt;, and</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   abbreviated variable names ¹​sched_dep_time, ²​dep_delay, ³​arr_time,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​sched_arr_time, ⁵​arr_delay</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names</span></span></span>
 <span></span>
 <span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -241,8 +238,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ANC   <span style="text-decoration: underline;">1</span>635.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ATL   <span style="text-decoration: underline;">1</span>293.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> AUS   <span style="text-decoration: underline;">1</span>521.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the basics of SQL. It’s a valuable skill for any data scientist, and it will help you debug problems if you run into problems with dplyr’s automatic translation. If you’re completely new to SQL you might start with this <a href="https://www.codecademy.com/learn/learn-sql" class="external-link">codeacademy tutorial</a>. If you have some familiarity with SQL and you’d like to learn more, I found <a href="https://www.sqlite.org/queryplanner.html" class="external-link">how indexes work in SQLite</a> and <a href="https://blog.jooq.org/2016/03/17/10-easy-steps-to-a-complete-understanding-of-sql/" class="external-link">10 easy steps to a complete understanding of SQL</a> to be particularly helpful.</p>
 <p>The most important difference between ordinary data frames and remote database queries is that your R code is translated into SQL and executed in the database on the remote server, not in R on your local machine. When working with databases, dplyr tries to be as lazy as possible:</p>
 <ul>
@@ -273,8 +269,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> N15910   27.6   280</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> N13123   26.0   121</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> N11192   25.9   154</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -298,8 +293,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> N15910   27.6   280</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> N13123   26.0   121</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> N11192   25.9   154</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,195 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ Use `print(n = ...)` to see more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 1,195 more rows</span></span></span></code></pre></div>
 <p><code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> requires that database does some work, so it may take a long time to complete. Otherwise, dplyr tries to prevent you from accidentally performing expensive query operations:</p>
 <ul>
 <li><p>Because there’s generally no way to determine how many rows a query will return unless you actually run it, <code><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow()</a></code> is always <code>NA</code>.</p></li>
