@@ -232,7 +232,7 @@ snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
   # behavior
-  sql_expr(((!!x)) %REGEXP% (".*" || (!!pattern) || ".*"))
+  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0('(', pattern, ')') || ".*"))
 }
 snowflake_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
