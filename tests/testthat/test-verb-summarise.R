@@ -76,6 +76,17 @@ test_that("across() does not select grouping variables", {
   expect_snapshot(df %>% group_by(g) %>% summarise(across(.fns = ~ 0)))
 })
 
+test_that("summarise() after select() works #985", {
+  df <- memdb_frame(g = 1, x = 1:3)
+  expect_equal(
+    df %>%
+      select(x) %>%
+      summarise(x = mean(x, na.rm = TRUE)) %>%
+      collect(),
+    tibble(x = 2)
+  )
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
