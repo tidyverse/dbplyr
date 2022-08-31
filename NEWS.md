@@ -67,6 +67,9 @@
 
 * `pivot_wider()` works again for MS SQL (@mgirlich, #929).
 
+* `str_flatten()` uses `collapse = ""` by default, consistent with `stringr`,
+  for Snowflake, Redshift, Postgres, and MySQL (@fh-afrachioni, #993).
+
 # dbplyr 2.2.1
 
 * Querying Oracle databases works again. Unfortunately, the fix requires every
