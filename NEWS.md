@@ -11,7 +11,7 @@
     `str_remove_all()`, `str_trim()`, `str_squish()` and `str_flatten()`
     (@fh-afrachioni, #860).
 
-`as.Date()`, `week()`, `quarter()`, `paste()`,
+* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
   `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
   `cumsum()` (@overmar, #913).
 
