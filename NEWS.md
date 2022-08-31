@@ -11,10 +11,6 @@
     `str_remove_all()`, `str_trim()`, `str_squish()` and `str_flatten()`
     (@fh-afrachioni, #860).
 
-* New translations for Teradata: `as.Date()`, `week()`, `quarter()`, `paste()`,
-  `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
-  `cumsum()` (@overmar, #913).
-
 * `copy_inline()` now works for Hana (#950), Oracle (#972), and Redshift
   (#949, thanks to @ejneer for an initial implementation).
 
