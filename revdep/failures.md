@@ -2,11 +2,11 @@
 
 <details>
 
-* Version: 1.9.11
+* Version: 1.10.8
 * GitHub: https://github.com/privefl/bigsnpr
 * Source code: https://github.com/cran/bigsnpr
-* Date/Publication: 2022-02-16 17:50:05 UTC
-* Number of recursive dependencies: 141
+* Date/Publication: 2022-07-09 09:20:02 UTC
+* Number of recursive dependencies: 146
 
 Run `revdep_details(, "bigsnpr")` for more info
 
@@ -103,38 +103,11 @@ Run `revdep_details(, "duckdb")` for more info
 * GitHub: https://github.com/computational-metabolomics/msPurity
 * Source code: https://github.com/cran/msPurity
 * Date/Publication: 2022-04-26
-* Number of recursive dependencies: 160
+* Number of recursive dependencies: 163
 
 Run `revdep_details(, "msPurity")` for more info
 
 </details>
-
-## Newly broken
-
-*   checking examples ... ERROR
-    ```
-    Running examples in ‘msPurity-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: purityX
-    > ### Title: Assessing anticipated purity of XCMS features from an LC-MS run
-    > ### Aliases: purityX
-    > 
-    > ### ** Examples
-    > 
-    > msPths <- list.files(system.file("extdata", "lcms", "mzML",
-    ...
-    > xset <- xcms::retcor(xset)
-    Performing retention time correction using 763 peak groups.
-    > xset <- xcms::group(xset)
-    Processing 3179 mz slices ... OK
-    > ppLCMS <- purityX(xset, cores = 1, xgroups = c(1, 2))
-    Sizes of mz and intensity arrays don't match.
-    Error in object@backend$getPeakList(scans) : 
-      dims [product 4516] do not match the length of object [2258]
-    Calls: purityX ... <Anonymous> -> .local -> .peaks -> <Anonymous> -> .External
-    Execution halted
-    ```
 
 ## In both
 
@@ -211,21 +184,6 @@ Run `revdep_details(, "msPurity")` for more info
 
 installing the source packages ‘org.Ce.eg.db’, ‘org.Dm.eg.db’, ‘org.Dr.eg.db’, ‘org.Rn.eg.db’, ‘org.Sc.sgd.db’, ‘reactome.db’, ‘TxDb.Celegans.UCSC.ce11.refGene’, ‘TxDb.Dmelanogaster.UCSC.dm6.ensGene’, ‘TxDb.Drerio.UCSC.danRer10.refGene’, ‘TxDb.Mmusculus.UCSC.mm10.knownGene’, ‘TxDb.Rnorvegicus.UCSC.rn6.refGene’
 
-Error in download.file(url, destfile, method, mode = "wb", ...) : 
-  download from 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz' failed
-In addition: Warning messages:
-1: In download.file(url, destfile, method, mode = "wb", ...) :
-  downloaded length 329046291 != reported length 455602515
-2: In download.file(url, destfile, method, mode = "wb", ...) :
-  downloaded length 329046291 != reported length 455602515
-3: In download.file(url, destfile, method, mode = "wb", ...) :
-  URL 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz': Timeout of 60 seconds was reached
-4: In download.file(url, destfile, method, mode = "wb", ...) :
-  URL 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz': Timeout of 60 seconds was reached
-Warning in download.packages(pkgs, destdir = tmpd, available = available,  :
-  download of package ‘reactome.db’ failed
-Warning in download.packages(pkgs, destdir = tmpd, available = available,  :
-  download of package ‘reactome.db’ failed
 
 
 ```
@@ -237,21 +195,6 @@ Warning in download.packages(pkgs, destdir = tmpd, available = available,  :
 
 installing the source packages ‘org.Ce.eg.db’, ‘org.Dm.eg.db’, ‘org.Dr.eg.db’, ‘org.Rn.eg.db’, ‘org.Sc.sgd.db’, ‘reactome.db’, ‘TxDb.Celegans.UCSC.ce11.refGene’, ‘TxDb.Dmelanogaster.UCSC.dm6.ensGene’, ‘TxDb.Drerio.UCSC.danRer10.refGene’, ‘TxDb.Mmusculus.UCSC.mm10.knownGene’, ‘TxDb.Rnorvegicus.UCSC.rn6.refGene’
 
-Error in download.file(url, destfile, method, mode = "wb", ...) : 
-  download from 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz' failed
-In addition: Warning messages:
-1: In download.file(url, destfile, method, mode = "wb", ...) :
-  downloaded length 329046291 != reported length 455602515
-2: In download.file(url, destfile, method, mode = "wb", ...) :
-  downloaded length 329046291 != reported length 455602515
-3: In download.file(url, destfile, method, mode = "wb", ...) :
-  URL 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz': Timeout of 60 seconds was reached
-4: In download.file(url, destfile, method, mode = "wb", ...) :
-  URL 'https://bioconductor.org/packages/3.15/data/annotation/src/contrib/reactome.db_1.79.0.tar.gz': Timeout of 60 seconds was reached
-Warning in download.packages(pkgs, destdir = tmpd, available = available,  :
-  download of package ‘reactome.db’ failed
-Warning in download.packages(pkgs, destdir = tmpd, available = available,  :
-  download of package ‘reactome.db’ failed
 
 
 ```
@@ -311,7 +254,7 @@ Run `revdep_details(, "SQLDataFrame")` for more info
 * Version: 0.99.8
 * GitHub: https://github.com/lptolik/synaptome.db
 * Source code: https://github.com/cran/synaptome.db
-* Number of recursive dependencies: 129
+* Number of recursive dependencies: 137
 
 Run `revdep_details(, "synaptome.db")` for more info
 
