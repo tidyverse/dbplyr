@@ -208,7 +208,9 @@ sql_translation.PqConnection <- function(con) {
       var = sql_aggregate("VAR_SAMP", "var"),
       all = sql_aggregate("BOOL_AND", "all"),
       any = sql_aggregate("BOOL_OR", "any"),
-      str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse = "") {
+        sql_expr(string_agg(!!x, !!collapse))
+      }
     ),
     sql_translator(.parent = base_win,
       cor = win_aggregate_2("CORR"),
@@ -217,7 +219,7 @@ sql_translation.PqConnection <- function(con) {
       var = win_aggregate("VAR_SAMP"),
       all = win_aggregate("BOOL_AND"),
       any = win_aggregate("BOOL_OR"),
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),

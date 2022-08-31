@@ -17,7 +17,7 @@ test_that("pasting translated correctly", {
 
   expect_error(translate_sql(paste0(x, collapse = "")), "`collapse` not supported")
 
-  expect_error(translate_sql(str_flatten(x)), 'argument "collapse" is missing, with no default')
+  expect_equal(translate_sql(str_flatten(x), window = TRUE), sql("LISTAGG(`x`, '') OVER ()"))
   expect_equal(translate_sql(str_flatten(x, collapse = "|"), window = TRUE), sql("LISTAGG(`x`, '|') OVER ()"))
   expect_equal(translate_sql(str_flatten(x, collapse = "|"), window = FALSE), sql("LISTAGG(`x`, '|')"))
 })

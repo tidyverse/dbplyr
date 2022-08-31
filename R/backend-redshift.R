@@ -58,7 +58,7 @@ sql_translation.RedshiftConnection <- function(con) {
     ),
     sql_translator(.parent = postgres$aggregate,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
-      str_flatten = function(x, collapse){
+      str_flatten = function(x, collapse = "") {
         sql_expr(LISTAGG(!!x, !!collapse))
       }
     ),
@@ -82,7 +82,7 @@ sql_translation.RedshiftConnection <- function(con) {
         )
       },
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         order <- win_current_order()
         if(length(order) > 0){
           sql <- build_sql(sql_expr(LISTAGG(!!x, !!collapse)),
