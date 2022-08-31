@@ -85,12 +85,14 @@ test_that("win_rank works", {
   local_con(simulate_dbi())
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_equal(
-    sql_row_number("x"),
-    sql("ROW_NUMBER() OVER (ORDER BY `x`)")
+    sql_row_number(ident("x")),
+    sql("CASE
+WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
+END")
   )
 })
 
-test_that("win_rank works", {
+test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")
 

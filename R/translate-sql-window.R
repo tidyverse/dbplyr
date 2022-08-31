@@ -143,12 +143,24 @@ rows <- function(from = -Inf, to = 0) {
 win_rank <- function(f) {
   force(f)
   function(order = NULL) {
-    win_over(
+    group <- win_current_group()
+    if (!is_null(order)) {
+      cond <- translate_sql((case_when(is.na(!!order) ~ 1L, TRUE ~ 0L)))
+      group <- sql(group, cond)
+    }
+
+    rank_sql <- win_over(
       build_sql(sql(f), list()),
-      partition = win_current_group(),
+      partition = group,
       order = order %||% win_current_order(),
       frame = win_current_frame()
     )
+
+    if (is_null(order)) {
+      rank_sql
+    } else {
+      translate_sql(case_when(!is.na(!!order) ~ !!rank_sql))
+    }
   }
 }
 
