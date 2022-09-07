@@ -664,7 +664,7 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
     cli_abort(
       c(
         '{.code conflict = "error"} is not supported for database tables.',
-        i = 'Please use {.code conflict = "ignore"} instead'
+        i = 'Please use {.code conflict = "ignore"} instead.'
       ),
       call = error_call
     )
@@ -682,7 +682,11 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   )
 
   if (unmatched == "error") {
-    cli_abort('{.code unmatched = "error"} is not supported for database tables.', call = error_call)
+    msg <- c(
+      '{.code unmatched = "error"} is not supported for database tables.',
+      i = 'Please use {.code unmatched = "ignore"} instead.'
+    )
+    cli_abort(msg, call = error_call)
   }
 
   unmatched
