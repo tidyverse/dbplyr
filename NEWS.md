@@ -23,6 +23,9 @@
 
 * Using a named `across()` now gives a clear error message (@mgirlich, #761).
 
+* Using `quantile()` for SQLite now gives a better error saying that it is not
+  supported (@mgirlich, #1000).
+
 ## Minor improvements and bug fixes
 
 * `pivot_wider()` works again for MS SQL (@mgirlich, #929).
