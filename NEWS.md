@@ -41,6 +41,8 @@
 * `str_flatten()` uses `collapse = ""` by default, consistent with `stringr`,
   for Snowflake, Redshift, Postgres, and MySQL (@fh-afrachioni, #993).
 
+* `slice_sample()` now works for Oracle (@mgirlich, #986).
+
 * `copy_inline()` now works for Hana (#950), Oracle (#972), and Redshift
   (#949, thanks to @ejneer for an initial implementation).
   
