@@ -1,13 +1,5 @@
 # dbplyr (development version)
 
-* `rows_*()` now uses the column types of `x` when copying a local data frame `y`
-  to a Postgres database (@mgirlich, #909).
-
-* `copy_inline()` gains a `types` argument to specify the SQL column types
-  (@mgirlich, #963).
-
-* `copy_inline()` now works for Hana (#950), Oracle (#972), and Redshift
-  (#949, thanks to @ejneer for an initial implementation).
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 
@@ -76,6 +68,8 @@
   
   * `summarise()` + `filter()` now translates to `HAVING` where possible
     (@mgirlich, #877).
+    
+  * `left/inner_join()` + `left/inner_join()` (@mgirlich, #865).
 
 * The generated SQL is now shorter and more readable:
 
