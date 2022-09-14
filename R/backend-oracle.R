@@ -189,6 +189,11 @@ supports_star_without_alias.Oracle <- function(con) {
   FALSE
 }
 
+#' @export
+sql_random.Oracle <- function(con) {
+  sql_expr(dbms_random.RANDOM())
+}
+
 
 # roacle package ----------------------------------------------------------
 
@@ -227,5 +232,8 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
 #' @export
 supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
+
+#' @export
+sql_random.OraConnection <- sql_random.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))

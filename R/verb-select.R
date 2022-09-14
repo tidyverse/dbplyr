@@ -144,7 +144,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
   lazy_query <- .data$lazy_query
 
   # drop NULLs
-  vars <- purrr::discard(vars, ~ is_quosure(.x) && quo_is_null(.x))
+  vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
   if (is_identity(vars, names(vars), op_vars(.data))) {
     return(lazy_query)
   }

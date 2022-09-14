@@ -2,7 +2,7 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_snowflake())
   expect_equal(translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
-  expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || 'exp' || '.*')"))
+  expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
   expect_error(translate_sql(grepl("exp", x, ignore.case = TRUE)),
                "`perl`, `fixed`, `useBytes`, and `ignore.case` parameters are unsupported.")
 })
@@ -17,7 +17,7 @@ test_that("pasting translated correctly", {
 
   expect_error(translate_sql(paste0(x, collapse = "")), "`collapse` not supported")
 
-  expect_error(translate_sql(str_flatten(x)), 'argument "collapse" is missing, with no default')
+  expect_equal(translate_sql(str_flatten(x), window = TRUE), sql("LISTAGG(`x`, '') OVER ()"))
   expect_equal(translate_sql(str_flatten(x, collapse = "|"), window = TRUE), sql("LISTAGG(`x`, '|') OVER ()"))
   expect_equal(translate_sql(str_flatten(x, collapse = "|"), window = FALSE), sql("LISTAGG(`x`, '|')"))
 })
