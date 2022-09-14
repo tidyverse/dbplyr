@@ -47,8 +47,8 @@ lazy_multi_join_query <- function(x,
                                   call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
 
-  if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "on", "na_matches"))) {
-    cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `on`, `na_matches`", .internal = TRUE)
+  if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "by_x_table_id", "on", "na_matches"))) {
+    cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `by_x_table_id`, `on`, `na_matches`", .internal = TRUE)
   }
   vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
   vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())

@@ -148,7 +148,7 @@ sql_table_prefix <- function(con, var, table = NULL) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
-    table <- escape(table, con = con)
+    table <- escape(table, collapse = NULL, con = con)
     sql(paste0(table, ".", var))
   } else {
     var

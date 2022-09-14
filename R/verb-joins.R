@@ -283,13 +283,13 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     suffix = suffix
   )
 
-  joins_field <- tibble(
-    table = list(y_lq),
+  joins_field <- join_get_metadata(
+    x_lq,
+    y_lq,
+    new_query = new_query,
     type = type,
-    by_x = list(by$x),
-    by_y = list(by$y),
-    on = by$on %||% NA_character_,
-    na_matches
+    by = by,
+    na_matches = na_matches
   )
 
   table_names_y <- tibble(
@@ -434,6 +434,29 @@ multi_join_vars <- function(x_join_vars,
   }
 
   vctrs::vec_rbind(x_join_vars, y_join_vars)
+}
+
+join_get_metadata <- function(x_lq, y_lq, new_query, type, by, na_matches) {
+  if (new_query) {
+    by_x_table_id <- rep_along(by$x, 1L)
+  } else {
+    idx <- vctrs::vec_match(by$x, x_lq$vars$name)
+    stopifnot(all(vctrs::list_sizes(x_lq$vars$var[idx]) == 1))
+
+    # need to fix `by$x` in case it was renamed in an inlined select
+    by$x <- unlist(x_lq$vars$var)[idx]
+    by_x_table_id <- unlist(x_lq$vars$table)[idx]
+  }
+
+  tibble(
+    table = list(y_lq),
+    type = type,
+    by_x = list(by$x),
+    by_y = list(by$y),
+    by_x_table_id = list(by_x_table_id),
+    on = by$on %||% NA_character_,
+    na_matches
+  )
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,

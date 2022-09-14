@@ -443,6 +443,35 @@ INNER JOIN `df3`
   expect_s3_class(out_build$x, "multi_join_query")
 })
 
+test_that("multiple joins can use by column from any table", {
+  lf <- lazy_frame(x = 1, a = 1, .name = "df1")
+  lf2 <- lazy_frame(x = 1, y = 2, .name = "df2")
+  lf3 <- lazy_frame(x = 1, y = 2, b = 2, .name = "df3")
+
+  out <- left_join(lf, lf2, by = "x") %>%
+    left_join(lf3, by = c("x", "y"))
+  joins_metadata <- out$lazy_query$joins
+  expect_equal(joins_metadata$by_x, list("x", c("x", "y")))
+  expect_equal(joins_metadata$by_y, list("x", c("x", "y")))
+  expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
+
+  lf <- lazy_frame(x = 1, a = 1, .name = "df1")
+  lf2 <- lazy_frame(x = 1, y2 = 2, .name = "df2")
+  lf3 <- lazy_frame(x = 1, y = 2, b = 2, .name = "df3")
+
+  out <- left_join(
+    lf,
+    lf2 %>% rename(y = y2),
+    by = "x"
+  ) %>%
+    left_join(lf3, by = c("x", "y"))
+
+  joins_metadata <- out$lazy_query$joins
+  expect_equal(joins_metadata$by_x, list("x", c("x", "y2")))
+  expect_equal(joins_metadata$by_y, list("x", c("x", "y")))
+  expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
+})
+
 test_that("multi joins work with x_as", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
