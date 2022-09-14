@@ -366,26 +366,18 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
       return(TRUE)
     }
 
-    if (join_as_already_used(x_as, as_current[-1])) {
+    if (x_as %in% as_current[-1]) {
       return(TRUE)
     }
   }
 
   if (!is_null(y_as)) {
-    if (join_as_already_used(y_as, as_current)) {
+    if (y_as %in% as_current) {
       return(TRUE)
     }
   }
 
   FALSE
-}
-
-join_as_already_used <- function(as, as_used) {
-  if (all(is.na(as_used))) {
-    return(FALSE)
-  }
-
-  any(as == as_used)
 }
 
 multi_join_vars <- function(x_join_vars,
