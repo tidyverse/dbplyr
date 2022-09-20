@@ -30,7 +30,7 @@
       db %>% slice_min()
     Condition
       Error in `slice_min()`:
-      ! Argument `order_by` is missing, with no default.
+      ! `order_by` is absent but must be supplied.
 
 ---
 
@@ -46,7 +46,7 @@
       db %>% slice_max()
     Condition
       Error in `slice_max()`:
-      ! Argument `order_by` is missing, with no default.
+      ! `order_by` is absent but must be supplied.
 
 # slice_sample errors when expected
 
