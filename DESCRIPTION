@@ -53,7 +53,7 @@ Suggests:
     tidyr (>= 1.2.0)
 Remotes: 
     r-lib/tidyselect,
-    r-lib/vctrs
+    r-lib/vctrs,
     tidyverse/dplyr
 VignetteBuilder: 
     knitr
