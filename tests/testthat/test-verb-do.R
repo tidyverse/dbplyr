@@ -20,7 +20,7 @@ test_that("unnamed results bound together by row", {
     x = c(3, 9, 4, 9)
   ) %>% group_by(g)
 
-  first <- mf %>% do(head(., 1))
+  first <- mf %>% do(head(., 1)) %>% ungroup()
   compare_tbl(first, tibble(g = c(1, 2), x = c(3, 4)))
 })
 

@@ -54,7 +54,7 @@ test_that("can rename multiple vars", {
   exp <- tibble(c = 1, d = 2)
 
   compare_tbl(mf %>% rename(c = a, d = b), exp)
-  compare_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp %>% group_by(c))
 })
 
 test_that("can rename with a function", {

@@ -1,8 +1,10 @@
 
-compare_tbl <- function(x, y, x_arg = "old", y_arg = "y_arg") {
-  waldo::compare(
-    arrange(x, dplyr::across()),
-    arrange(y, dplyr::across())
+compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
+  expect_equal(
+    arrange(collect(x), dplyr::across()),
+    arrange(collect(y), dplyr::across()),
+    label = label,
+    expected.label = expected.label
   )
 }
 
@@ -32,8 +34,8 @@ expect_equal_tbls <- function(results, ref = NULL, ...) {
   for (i in seq_along(rest)) {
     compare_tbl(
       rest[[i]], ref,
-      x_arg = names(rest)[[i]],
-      y_arg = ref_name
+      label = names(rest)[[i]],
+      expected.label = ref_name
     )
   }
 
