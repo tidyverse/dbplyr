@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (#1011, @krlmlr).
+
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 
