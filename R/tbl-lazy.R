@@ -42,6 +42,11 @@ dimnames.tbl_lazy <- function(x) {
 }
 
 #' @export
+names.tbl_lazy <- function(x) {
+  colnames(x)
+}
+
+#' @export
 dim.tbl_lazy <- function(x) {
   c(NA, length(op_vars(x$lazy_query)))
 }

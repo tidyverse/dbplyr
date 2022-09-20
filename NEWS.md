@@ -10,6 +10,9 @@
 
 * `cur_column()` is now supported (@mgirlich, #951).
 
+* `names()` method for `tbl_lazy` class matches `colnames()` to match the behavior
+  of in-memory tables (@michaelchirico, #997)
+
 ## Improved error messages
 
 * Many errors have been improved and now show the function where the error
