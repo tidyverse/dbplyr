@@ -32,7 +32,7 @@ test_that("generates custom sql", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
   expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
 
-  expect_snapshot(slice_sample(lf, 5))
+  expect_snapshot(slice_sample(lf, n = 1))
 
   expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
