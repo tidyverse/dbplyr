@@ -23,7 +23,7 @@ Imports:
     blob (>= 1.2.0),
     cli (>= 3.3.0),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.9),
+    dplyr (>= 1.0.99.9000),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.0),
     magrittr,
@@ -54,6 +54,7 @@ Suggests:
 Remotes: 
     r-lib/tidyselect,
     r-lib/vctrs
+    tidyverse/dplyr
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
