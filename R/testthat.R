@@ -1,6 +1,6 @@
 
 compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
-  expect_equal(
+  testthat::expect_equal(
     arrange(collect(x), dplyr::across()),
     arrange(collect(y), dplyr::across()),
     label = label,
