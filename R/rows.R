@@ -725,7 +725,7 @@ tick <- function(x) {
 
 eval_select2 <- function(expr, data, error_call) {
   sim_data <- simulate_vars(data)
-  locs <- fix_call(tidyselect::eval_select(expr, sim_data, error_call = error_call), error_call)
+  locs <- tidyselect::eval_select(expr, sim_data, error_call = error_call)
   names_out <- names(locs)
   set_names(colnames(sim_data)[locs], names_out)
 }
