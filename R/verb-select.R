@@ -219,10 +219,3 @@ is_identity <- function(exprs, names, names_prev) {
 
   identical(names, names_prev)
 }
-
-fix_call <- function(expr, call = caller_env()) {
-  withCallingHandlers(expr, error = function(cnd) {
-    cnd$call <- call
-    cnd_signal(cnd)
-  })
-}
