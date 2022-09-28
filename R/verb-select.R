@@ -80,31 +80,18 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
-  # Hack: We want to use `dplyr::relocate.data.frame()` instead of reimplementing it.
-  # Because `relocate()` can rename columns we use an attribute to store the
-  # original column position.
   sim_data <- simulate_vars(.data)
-  for (i in seq_along(sim_data)) {
-    attr(sim_data[[i]], "dbplyr_org_pos") <- i
-  }
 
-  new_vars <- fix_call(
-    dplyr::relocate(
-      sim_data,
-      ...,
-      .before = {{.before}},
-      .after = {{.after}}
-    )
+  loc <- tidyselect::eval_relocate(
+    expr(c(...)),
+    data = sim_data,
+    before = enquo(.before),
+    after = enquo(.after),
+    before_arg = ".before",
+    after_arg = ".after"
   )
 
-  old_vars <- colnames(sim_data)
-  vars_mapping <- purrr::map_chr(
-    new_vars,
-    ~ old_vars[[attr(.x, "dbplyr_org_pos")]]
-  )
-
-  .data$lazy_query <- add_select(.data, syms(vars_mapping))
-  .data
+  dplyr::select(.data, !!!loc)
 }
 
 #' Simulate variables to use in tidyselect
