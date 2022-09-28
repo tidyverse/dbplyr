@@ -88,13 +88,11 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     attr(sim_data[[i]], "dbplyr_org_pos") <- i
   }
 
-  new_vars <- fix_call(
-    dplyr::relocate(
-      sim_data,
-      ...,
-      .before = {{.before}},
-      .after = {{.after}}
-    )
+  new_vars <- dplyr::relocate(
+    sim_data,
+    ...,
+    .before = {{.before}},
+    .after = {{.after}}
   )
 
   old_vars <- colnames(sim_data)
