@@ -21,7 +21,7 @@
 select.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
   sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
-  loc <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
+  loc <- tidyselect::eval_select(expr(c(...)), sim_data)
   loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
   new_vars <- set_names(names(sim_data)[loc], names(loc))
 
@@ -50,7 +50,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
   sim_data <- simulate_vars(.data)
-  loc <- fix_call(tidyselect::eval_rename(expr(c(...)), sim_data))
+  loc <- tidyselect::eval_rename(expr(c(...)), sim_data)
 
   new_vars <- set_names(names(sim_data), names(sim_data))
   names(new_vars)[loc] <- names(loc)
@@ -66,7 +66,7 @@ rename.tbl_lazy <- function(.data, ...) {
 #' @export
 rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   .fn <- as_function(.fn)
-  cols <- fix_call(tidyselect::eval_select(enquo(.cols), simulate_vars(.data)))
+  cols <- tidyselect::eval_select(enquo(.cols), simulate_vars(.data))
 
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
@@ -88,13 +88,11 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
     attr(sim_data[[i]], "dbplyr_org_pos") <- i
   }
 
-  new_vars <- fix_call(
-    dplyr::relocate(
-      sim_data,
-      ...,
-      .before = {{.before}},
-      .after = {{.after}}
-    )
+  new_vars <- dplyr::relocate(
+    sim_data,
+    ...,
+    .before = {{.before}},
+    .after = {{.after}}
   )
 
   old_vars <- colnames(sim_data)
@@ -235,11 +233,4 @@ is_identity <- function(exprs, names, names_prev) {
   }
 
   identical(names, names_prev)
-}
-
-fix_call <- function(expr, call = caller_env()) {
-  withCallingHandlers(expr, error = function(cnd) {
-    cnd$call <- call
-    cnd_signal(cnd)
-  })
 }
