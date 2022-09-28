@@ -19,11 +19,9 @@
 #' db %>% relocate(z) %>% show_query()
 #' db %>% rename(first = x, last = z) %>% show_query()
 select.tbl_lazy <- function(.data, ...) {
-  sim_data <- simulate_vars(.data)
-  sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
-  loc <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
-  loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
-  new_vars <- set_names(names(sim_data)[loc], names(loc))
+  loc <- tidyselect::eval_select(expr(c(...)), .data)
+  loc <- ensure_group_vars(loc, .data, notify = TRUE)
+  new_vars <- set_names(colnames(.data)[loc], names(loc))
 
   .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
@@ -34,7 +32,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
   missing <- setdiff(group_loc, loc)
 
   if (length(missing) > 0) {
-    vars <- names(data)[missing]
+    vars <- colnames(data)[missing]
     if (notify) {
       cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
     }
