@@ -47,10 +47,9 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
 #' @importFrom dplyr rename
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
-  sim_data <- simulate_vars(.data)
-  loc <- fix_call(tidyselect::eval_rename(expr(c(...)), sim_data))
+  loc <- tidyselect::eval_rename(expr(c(...)), .data)
 
-  new_vars <- set_names(names(sim_data), names(sim_data))
+  new_vars <- set_names(colnames(.data), colnames(.data))
   names(new_vars)[loc] <- names(loc)
 
   .data$lazy_query <- add_select(.data, syms(new_vars))
@@ -64,7 +63,7 @@ rename.tbl_lazy <- function(.data, ...) {
 #' @export
 rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   .fn <- as_function(.fn)
-  cols <- fix_call(tidyselect::eval_select(enquo(.cols), simulate_vars(.data)))
+  cols <- tidyselect::eval_select(enquo(.cols), .data)
 
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
@@ -78,11 +77,9 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
-  sim_data <- simulate_vars(.data)
-
   loc <- tidyselect::eval_relocate(
     expr(c(...)),
-    data = sim_data,
+    data = .data,
     before = enquo(.before),
     after = enquo(.after),
     before_arg = ".before",
@@ -102,6 +99,7 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
 #' @export
 #' @keywords internal
 simulate_vars <- function (x, drop_groups = FALSE) {
+  # keep this for now as this might be used by other packages
   UseMethod("simulate_vars")
 }
 

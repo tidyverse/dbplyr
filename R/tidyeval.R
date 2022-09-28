@@ -165,7 +165,7 @@ partial_eval_call <- function(call, data, env) {
 
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
-    vars <- colnames(simulate_vars(data, drop_groups = FALSE))
+    vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
     # TODO what about environment in `dtplyr`?
