@@ -77,7 +77,7 @@
 ---
 
     Code
-      slice_sample(lf, 5)
+      slice_sample(lf, n = 1)
     Output
       <SQL>
       SELECT `x`

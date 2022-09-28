@@ -165,7 +165,7 @@ test_that("generates custom sql", {
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
 
   lf <- lazy_frame(x = 1:3, con = simulate_mssql())
-  expect_snapshot(lf %>% slice_sample(x))
+  expect_snapshot(lf %>% slice_sample(n = 1))
 
   expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
   expect_snapshot(copy_inline(con, trees) %>% remote_query())

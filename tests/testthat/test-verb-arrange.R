@@ -5,7 +5,7 @@ test_that("two arranges equivalent to one", {
   mf1 <- mf %>% arrange(x, y)
   mf2 <- mf %>% arrange(y) %>% arrange(x)
 
-  expect_warning(expect_equal_tbl(mf1, mf2))
+  expect_warning(compare_tbl(mf1, mf2))
 })
 
 # sql_render --------------------------------------------------------------

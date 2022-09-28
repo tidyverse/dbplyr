@@ -219,7 +219,7 @@
     Code
       (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
     Output
-      <error/rlang_error>
+      <error/tidyselect:::error_disallowed_rename>
       Error in `if_all()`:
       ! Can't rename variables in this context.
 

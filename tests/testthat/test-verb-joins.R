@@ -463,12 +463,13 @@ test_that("set ops captures both tables", {
 })
 
 test_that("extra args generates error", {
+  skip_if(getRversion() < "4.0.0")
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
   expect_error(
     inner_join(lf1, lf2, by = "x", never_used = "na"),
-    "unused argument"
+    "used"
   )
 })
 
