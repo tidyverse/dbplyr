@@ -468,7 +468,7 @@ test_that("extra args generates error", {
 
   expect_error(
     inner_join(lf1, lf2, by = "x", never_used = "na"),
-    "unused argument"
+    "used"
   )
 })
 
