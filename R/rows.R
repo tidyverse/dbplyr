@@ -693,7 +693,8 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
 }
 
 rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
-  returning_cols <- eval_select2(returning_expr, df, error_call)
+  locs <- tidyselect::eval_select(returning_expr, df, error_call = error_call)
+  returning_cols <- set_names(colnames(df)[locs], names(locs))
 
   if (is_empty(returning_cols)) return(returning_cols)
 
@@ -722,13 +723,6 @@ tick <- function(x) {
 }
 
 # other helpers -----------------------------------------------------------
-
-eval_select2 <- function(expr, data, error_call) {
-  sim_data <- simulate_vars(data)
-  locs <- tidyselect::eval_select(expr, sim_data, error_call = error_call)
-  names_out <- names(locs)
-  set_names(colnames(sim_data)[locs], names_out)
-}
 
 target_table_name <- function(x, in_place) {
   # Never touch target table with `in_place = FALSE`

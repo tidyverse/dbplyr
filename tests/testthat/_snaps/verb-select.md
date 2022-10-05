@@ -98,13 +98,13 @@
     Code
       lf %>% relocate(non_existent)
     Condition
-      Error in `dplyr::relocate()`:
+      Error in `relocate()`:
       ! Can't subset columns that don't exist.
       x Column `non_existent` doesn't exist.
     Code
       lf %>% relocate(non_existent + 1)
     Condition
-      Error in `dplyr::relocate()`:
+      Error in `relocate()`:
       ! Problem while evaluating `non_existent + 1`.
       Caused by error:
       ! object 'non_existent' not found

@@ -130,7 +130,10 @@ across_setup <- function(data,
                          allow_rename,
                          fn,
                          error_call) {
-  tbl <- simulate_vars(data, drop_groups = TRUE)
+  grps <- group_vars(data)
+  tbl <- ungroup(tidyselect_data_proxy(data))
+  tbl <- tbl[setdiff(colnames(tbl), grps)]
+
   .cols <- call$.cols %||% expr(everything())
   locs <- tidyselect::eval_select(
     .cols,
