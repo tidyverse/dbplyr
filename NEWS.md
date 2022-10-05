@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `case_when()` now supports the `.default` argument (@mgirlich, #1017).
+
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 
