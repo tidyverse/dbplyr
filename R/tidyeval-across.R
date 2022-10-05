@@ -5,6 +5,8 @@ capture_across <- function(data, x) {
 
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
+  deprecate_across_dots(call, error_call)
+
   across_setup(data, call, env, allow_rename = TRUE, fn = "across()", error_call = error_call)
 }
 
@@ -15,6 +17,8 @@ capture_if_all <- function(data, x) {
 
 partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_env()) {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
+  deprecate_across_dots(call, error_call)
+
   if (reduce == "&") {
     fn <- "if_all()"
   } else {
@@ -22,6 +26,28 @@ partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_e
   }
   out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
   Reduce(function(x, y) call2(reduce, x, y), out)
+}
+
+deprecate_across_dots <- function(call, error_call) {
+  if (!is_empty(call$...)) {
+    details <- paste(c(
+      "Supply arguments directly to `.fns` through a lambda instead.",
+      "",
+      "  # Previously",
+      "  across(a:b, mean, na.rm = TRUE)",
+      "",
+      "  # Now",
+      "  across(a:b, ~mean(.x, na.rm = TRUE))"),
+      collapse = "\n"
+    )
+    lifecycle::deprecate_warn(
+      when = "2.3.0",
+      what = "across(...)",
+      details = details,
+      env = env_parent(error_call),
+      user_env = env_parent(error_call, n = 4L),
+    )
+  }
 }
 
 across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE) {

@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Passing `...` to `across()` is now deprecated because the evaluation timing of
+  `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
+  you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
+
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 

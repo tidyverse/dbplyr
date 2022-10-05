@@ -22,17 +22,13 @@ test_that("across() drops groups", {
   )
 })
 
+
 test_that("across() translates functions", {
   lf <- lazy_frame(a = 1,  b = 2)
 
   expect_equal(
     capture_across(lf, across(a:b, log)),
     exprs(a = log(a), b = log(b))
-  )
-
-  expect_equal(
-    capture_across(lf, across(a:b, log, base = 2)),
-    exprs(a = log(a, base = 2), b = log(b, base = 2))
   )
 
   expect_equal(
@@ -58,16 +54,6 @@ test_that("across() captures anonymous functions", {
   )
 })
 
-test_that("dots are translated too", {
-  fun <- function() {
-    lf <- lazy_frame(a = 1, b = 2)
-    z <- TRUE
-    capture_across(lf, across(a, mean, na.rm = z))
-  }
-
-  expect_equal(fun(), exprs(a = mean(a, na.rm = TRUE)))
-})
-
 test_that("across() translates formulas", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -85,15 +71,6 @@ test_that("across() translates formulas", {
     capture_across(lf, across(a:b, list(~log(.x)))),
     exprs(a_1 = log(a), b_1 = log(b))
   )
-})
-
-test_that("across() does not support formulas with dots", {
-  lf <- lazy_frame(a = 1,  b = 2)
-
-  expect_snapshot({
-    (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
-    (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
-  })
 })
 
 test_that("across() translates evaluated functions", {
@@ -400,24 +377,9 @@ test_that("if_all() translates functions", {
   )
 
   expect_equal(
-    capture_if_all(lf, if_all(a:b, log, base = 2)),
-    expr(log(a, base = 2) & log(b, base = 2))
-  )
-
-  expect_equal(
     capture_if_all(lf, if_all(a, list(log, exp))),
     expr(log(a) & exp(a))
   )
-})
-
-test_that("if_all() translates dots", {
-  fun <- function() {
-    lf <- lazy_frame(a = 1, b = 2)
-    z <- TRUE
-    capture_if_all(lf, if_all(a, mean, na.rm = z))
-  }
-
-  expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
 })
 
 test_that("if_all() translates formulas", {
@@ -536,4 +498,75 @@ test_that("across() .cols is evaluated in across()'s calling environment", {
     fun("y"),
     expr(y)
   )
+})
+
+
+# dots --------------------------------------------------------------------
+
+test_that("across(...) is deprecated", {
+  lf <- lazy_frame(x = c(1, NA))
+  expect_snapshot(summarise(lf, across(everything(), mean, na.rm = TRUE)))
+
+})
+
+test_that("across() does not support formulas with dots", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_snapshot({
+    (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
+    (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
+  })
+})
+
+test_that("across() translates functions", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, log, base = 2)),
+    exprs(a = log(a, base = 2), b = log(b, base = 2))
+  )
+})
+
+test_that("dots are translated too", {
+  options(lifecycle_verbosity = "quiet")
+  fun <- function() {
+    lf <- lazy_frame(a = 1, b = 2)
+    z <- TRUE
+    capture_across(lf, across(a, mean, na.rm = z))
+  }
+
+  expect_equal(fun(), exprs(a = mean(a, na.rm = TRUE)))
+})
+
+test_that("if_all() translates functions", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_if_all(lf, if_all(a:b, log)),
+    expr(log(a) & log(b))
+  )
+
+  expect_equal(
+    capture_if_all(lf, if_all(a:b, log, base = 2)),
+    expr(log(a, base = 2) & log(b, base = 2))
+  )
+
+  expect_equal(
+    capture_if_all(lf, if_all(a, list(log, exp))),
+    expr(log(a) & exp(a))
+  )
+})
+
+test_that("if_all() translates dots", {
+  options(lifecycle_verbosity = "quiet")
+  fun <- function() {
+    lf <- lazy_frame(a = 1, b = 2)
+    z <- TRUE
+    capture_if_all(lf, if_all(a, mean, na.rm = z))
+  }
+
+  expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
 })
