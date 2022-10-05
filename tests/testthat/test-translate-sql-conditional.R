@@ -20,6 +20,37 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
   )
 })
 
+test_that("case_when uses the .default arg", {
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        .default = "undefined"
+      )
+    )
+  )
+
+  # TRUE ~ has precedence over .default
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        TRUE ~ "true",
+        .default = "undefined"
+      )
+    )
+  )
+})
+
+test_that("case_when does not support .ptype and .size", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_when(x == 1L ~ "yes", .ptype = character()))))
+    (expect_error(translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
+  })
+})
+
 test_that("long case_when is on multiple lines", {
   expect_snapshot(
     translate_sql(
