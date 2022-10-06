@@ -31,6 +31,16 @@ test_that("case_when uses the .default arg", {
     )
   )
 
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        .default = x + 1
+      )
+    )
+  )
+
   # TRUE ~ has precedence over .default
   expect_snapshot(
     translate_sql(

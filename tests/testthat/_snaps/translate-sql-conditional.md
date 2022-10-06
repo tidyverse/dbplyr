@@ -24,7 +24,14 @@
     Code
       translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = "undefined"))
     Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE undefined END
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+
+---
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = x + 1))
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE `x` + 1.0 END
 
 ---
 

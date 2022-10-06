@@ -64,6 +64,7 @@ sql_case_when <- function(...,
   if (is_true(formulas[[n]][[2]])) {
     clauses[[n]] <- paste0("ELSE ", value[[n]])
   } else if (!is_null(.default)) {
+    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = sql_current_con())
     clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
