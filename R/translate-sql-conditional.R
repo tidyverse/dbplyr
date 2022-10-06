@@ -31,14 +31,14 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   sql(paste0(out, " END"))
 }
 
-sql_case_when <- function(..., .default = NULL, .ptype = NULL, .size = NULL) {
+sql_case_when <- function(...,
+                          .default = NULL,
+                          .ptype = NULL,
+                          .size = NULL,
+                          error_call = caller_env()) {
   # TODO: switch to dplyr::case_when_prepare when available
-  if (!is_null(.ptype)) {
-    cli_abort("{.arg .ptype} is not supported in SQL translations.")
-  }
-  if (!is_null(.size)) {
-    cli_abort("{.arg .size} is not supported in SQL translations.")
-  }
+  check_not_supplied(.ptype, call = error_call)
+  check_not_supplied(.size, call = error_call)
 
   formulas <- list2(...)
   n <- length(formulas)
