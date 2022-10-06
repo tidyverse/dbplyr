@@ -162,7 +162,9 @@ base_scalar <- sql_translator(
   ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
   switch = function(x, ...) sql_switch(x, ...),
-  case_when = function(...) sql_case_when(...),
+  case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
+    sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
+  },
 
   `(` = function(x) {
     sql_expr(((!!x)))

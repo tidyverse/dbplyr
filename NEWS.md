@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `case_when()` now supports the `.default` argument (@mgirlich, #1017).
+
 * `distinct()` returns columns ordered the way you request, not the same
   as the input data (@mgirlich).
 

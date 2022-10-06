@@ -31,8 +31,14 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   sql(paste0(out, " END"))
 }
 
-sql_case_when <- function(...) {
+sql_case_when <- function(...,
+                          .default = NULL,
+                          .ptype = NULL,
+                          .size = NULL,
+                          error_call = caller_env()) {
   # TODO: switch to dplyr::case_when_prepare when available
+  check_not_supplied(.ptype, call = error_call)
+  check_not_supplied(.size, call = error_call)
 
   formulas <- list2(...)
   n <- length(formulas)
@@ -54,8 +60,12 @@ sql_case_when <- function(...) {
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
   # if a formula like TRUE ~ "other" is at the end of a sequence, use ELSE statement
+  # TRUE has precedence over `.default`
   if (is_true(formulas[[n]][[2]])) {
     clauses[[n]] <- paste0("ELSE ", value[[n]])
+  } else if (!is_null(.default)) {
+    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = sql_current_con())
+    clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
   same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
