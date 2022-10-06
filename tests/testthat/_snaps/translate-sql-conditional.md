@@ -114,5 +114,14 @@
     Output
       <error/rlang_error>
       Error in `case_match()`:
-      ! `.ptype` is not supported by dbplyr.
+      ! `.ptype` is not supported in SQL translations.
+
+# .x must be a symbol
+
+    Code
+      (expect_error(translate_sql(case_match(1, 1 ~ 1))))
+    Output
+      <error/rlang_error>
+      Error in `case_match()`:
+      ! `.x` must be a variable, not a a number.
 

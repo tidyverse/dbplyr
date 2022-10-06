@@ -193,3 +193,9 @@ test_that("`.ptype` not supported", {
     (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
   })
 })
+
+test_that(".x must be a symbol", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_match(1, 1 ~ 1))))
+  })
+})

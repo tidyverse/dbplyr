@@ -166,14 +166,9 @@ base_scalar <- sql_translator(
     sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
   },
   case_match = function(.x, ..., .default = NULL, .ptype = NULL) {
-    if (!is_null(.ptype)) {
-      cli_abort("{.arg .ptype} is not supported by dbplyr.")
-    }
-
     x_expr <- enexpr(.x)
     if (!is_symbol(x_expr)) {
-      # TODO better error message
-      cli_abort("{.arg .x} must be a variable, not an expression.")
+      cli_abort("{.arg .x} must be a variable, not a {.obj_type_friendly {.x}}.")
     }
 
     dots <- list2(...)
@@ -186,7 +181,7 @@ base_scalar <- sql_translator(
       }
     )
 
-    sql_case_when(!!!formulas)
+    sql_case_when(!!!formulas, .default = .default, .ptype = .ptype)
   },
 
   `(` = function(x) {
