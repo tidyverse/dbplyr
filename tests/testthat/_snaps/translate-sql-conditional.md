@@ -47,3 +47,35 @@
       Error in `sql_switch()`:
       ! Can only have one unnamed (ELSE) input
 
+# LHS can match multiple values
+
+    Code
+      translate_sql(case_match(z, 1:2 ~ "z"))
+    Output
+      <SQL> CASE WHEN (`z` IN (1, 2)) THEN 'z' END
+
+# requires at least one condition
+
+    Code
+      translate_sql(case_match(x))
+    Condition
+      Error in `sql_case_when()`:
+      ! No cases provided
+
+---
+
+    Code
+      translate_sql(case_match(x, NULL))
+    Condition
+      Error in `sql_case_when()`:
+      ! No cases provided
+
+# `.ptype` not supported
+
+    Code
+      (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
+    Output
+      <error/rlang_error>
+      Error in `case_match()`:
+      ! `.ptype` is not supported by dbplyr.
+

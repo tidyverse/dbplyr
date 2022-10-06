@@ -112,3 +112,43 @@ test_that("conditionals check arguments", {
 
   expect_snapshot(error = TRUE, translate_sql(switch(x, 1L, 2L)))
 })
+
+
+# case_match --------------------------------------------------------------
+
+test_that("LHS can match multiple values", {
+  expect_snapshot(
+    translate_sql(
+      case_match(z, 1:2 ~ "z")
+    )
+  )
+})
+
+test_that("`NULL` values in `...` are dropped", {
+  expect_identical(
+    translate_sql(case_match(x, 1L ~ "a", NULL, 2L ~ "b", NULL)),
+    sql("CASE WHEN (`x` IN (1)) THEN 'a' WHEN (`x` IN (2)) THEN 'b' END")
+  )
+})
+
+test_that("requires at least one condition", {
+  expect_snapshot(error = TRUE, {
+    translate_sql(case_match(x))
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(case_match(x, NULL))
+  })
+})
+
+test_that("passes through `.default` correctly", {
+  skip("need default arg in case_when")
+  expect_identical(case_match(1, 3 ~ 1, .default = 2), 2)
+  expect_identical(case_match(1:5, 6 ~ 1, .default = 2), rep(2, 5))
+  expect_identical(case_match(1:5, 6 ~ 1:5, .default = 2:6), 2:6)
+})
+
+test_that("`.ptype` not supported", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
+  })
+})

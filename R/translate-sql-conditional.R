@@ -34,6 +34,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
 sql_case_when <- function(...) {
   # TODO: switch to dplyr::case_when_prepare when available
 
+  # browser()
   formulas <- list2(...)
   n <- length(formulas)
 

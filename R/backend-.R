@@ -163,6 +163,29 @@ base_scalar <- sql_translator(
 
   switch = function(x, ...) sql_switch(x, ...),
   case_when = function(...) sql_case_when(...),
+  case_match = function(.x, ..., .default = NULL, .ptype = NULL) {
+    if (!is_null(.ptype)) {
+      cli_abort("{.arg .ptype} is not supported by dbplyr.")
+    }
+
+    x_expr <- enexpr(.x)
+    if (!is_symbol(x_expr)) {
+      # TODO better error message
+      cli_abort("{.arg .x} must be a variable, not an expression.")
+    }
+
+    dots <- list2(...)
+    dots <- purrr::compact(dots)
+
+    formulas <- purrr::map(
+      dots,
+      function(f) {
+        new_formula(expr(!!x_expr %in% !!f[[2]]), expr(!!f[[3]]), env = environment(f))
+      }
+    )
+
+    sql_case_when(!!!formulas)
+  },
 
   `(` = function(x) {
     sql_expr(((!!x)))
