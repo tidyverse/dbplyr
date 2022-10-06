@@ -19,6 +19,43 @@
     Output
       <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
 
+# case_when uses the .default arg
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = "undefined"))
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
+
+---
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", .default = x + 1))
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE `x` + 1.0 END
+
+---
+
+    Code
+      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "true",
+      .default = "undefined"))
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'true' END
+
+# case_when does not support .ptype and .size
+
+    Code
+      (expect_error(translate_sql(case_when(x == 1L ~ "yes", .ptype = character()))))
+    Output
+      <error/rlang_error>
+      Error in `case_when()`:
+      ! `.ptype` is not supported in SQL translations.
+    Code
+      (expect_error(translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
+    Output
+      <error/rlang_error>
+      Error in `case_when()`:
+      ! `.size` is not supported in SQL translations.
+
 # long case_when is on multiple lines
 
     Code
