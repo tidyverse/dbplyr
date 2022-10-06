@@ -2,6 +2,9 @@
 
 * `case_when()` now supports the `.default` argument (@mgirlich, #1017).
 
+* `distinct()` returns columns ordered the way you request, not the same
+  as the input data (@mgirlich).
+
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 

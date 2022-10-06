@@ -19,11 +19,24 @@ test_that("preserves group of input", {
   expect_equal(db %>% add_count(g) %>% group_vars(), character())
 })
 
-test_that("complains about bad names", {
-  expect_snapshot(error = TRUE, {
-    db <- lazy_frame(g = 1, x = 2)
-    db %>% count(g, name = "g")
-  })
+test_that("informs if n column already present, unless overridden", {
+  df1 <- lazy_frame(n = c(1, 1, 2, 2, 2))
+  expect_message(out <- count(df1, n), "already present")
+  expect_named(out, c("n", "nn"))
+
+  # not a good idea, but supported
+  expect_message(out <- count(df1, n, name = "n"), NA)
+  expect_named(out, "n")
+
+  expect_message(out <- count(df1, n, name = "nn"), NA)
+  expect_named(out, c("n", "nn"))
+
+  df2 <- lazy_frame(n = c(1, 1, 2, 2, 2), nn = 1:5)
+  expect_message(out <- count(df2, n), "already present")
+  expect_named(out, c("n", "nn"))
+
+  expect_message(out <- count(df2, n, nn), "already present")
+  expect_named(out, c("n", "nn", "nnn"))
 })
 
 test_that(".drop is not supported", {
