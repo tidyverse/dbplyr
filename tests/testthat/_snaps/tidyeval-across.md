@@ -10,26 +10,6 @@
       Error in `across()`:
       ! Cannot translate functions consisting of more than one statement.
 
-# across() does not support formulas with dots
-
-    Code
-      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
-    Output
-      <error/rlang_error>
-      Error in `across()`:
-      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
-    Code
-      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
-      )
-    Output
-      <error/rlang_error>
-      Error in `across()`:
-      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
-
 # across() gives informative errors
 
     Code
@@ -222,4 +202,41 @@
       <error/tidyselect:::error_disallowed_rename>
       Error in `if_all()`:
       ! Can't rename variables in this context.
+
+# across(...) is deprecated
+
+    Code
+      summarise(lf, across(everything(), mean, na.rm = TRUE))
+    Condition
+      Warning:
+      The `...` argument of `across()` is deprecated as of dbplyr 2.3.0.
+      i Supply arguments directly to `.fns` through a lambda instead.
+      
+      # Previously across(a:b, mean, na.rm = TRUE)
+      
+      # Now across(a:b, ~mean(.x, na.rm = TRUE))
+    Output
+      <SQL>
+      SELECT AVG(`x`) AS `x`
+      FROM `df`
+
+# across() does not support formulas with dots
+
+    Code
+      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+    Code
+      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
+      )
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
 

@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Passing `...` to `across()` is now deprecated because the evaluation timing of
+  `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
+  you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
+
 * `case_when()` now supports the `.default` argument (@mgirlich, #1017).
 
 * `distinct()` returns columns ordered the way you request, not the same

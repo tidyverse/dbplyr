@@ -121,6 +121,7 @@ test_that("constants do not need a new query", {
 })
 
 test_that("mutate() produces nice error messages", {
+  options(lifecycle_verbosity = "quiet")
   expect_snapshot(error = TRUE, {
     lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
 
