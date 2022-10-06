@@ -72,7 +72,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>Variables that are neither found in the data nor in the environment now produce an error (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/907" class="external-link">#907</a>).</p></li>
+<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> returns columns ordered the way you request, not the same as the input data (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p>Variables that are neither found in the data nor in the environment now produce an error (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/907" class="external-link">#907</a>).</p></li>
 <li><p>The keyword highlighting can now be customised via the option <code>dbplyr_highlight</code>. Turn it off via <code>options(dbplyr_highlight = FALSE)</code> or pass a custom ansi style, e.g. <code>options(dbplyr_highlight = cli::combine_ansi_styles("bold", "cyan"))</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/974" class="external-link">#974</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">cur_column()</a></code> is now supported (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/951" class="external-link">#951</a>).</p></li>
 </ul><div class="section level3">
