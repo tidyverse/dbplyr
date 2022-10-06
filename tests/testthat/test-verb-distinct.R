@@ -233,3 +233,14 @@ test_that("distinct produces correct vars when .keep_all is TRUE", {
   out <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(x) %>% distinct(y, .keep_all = TRUE)
   expect_equal(op_vars(out), c("x", "y", "z"))
 })
+
+test_that("distinct respects order of the specified variables (#3195, #6156)",{
+  d <- lazy_frame(x = 1:2, y = 3:4)
+  expect_named(distinct(d, y, x), c("y", "x"))
+})
+
+test_that("distinct adds grouping variables to front if missing",{
+  d <- lazy_frame(x = 1:2, y = 3:4)
+  expect_named(distinct(group_by(d, y), x), c("y", "x"))
+  expect_named(distinct(group_by(d, y), x, y), c("x", "y"))
+})
