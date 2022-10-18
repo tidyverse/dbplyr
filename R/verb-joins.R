@@ -238,7 +238,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   # the table alias can only be determined after `select()` was inlined.
-  # This works even though `by` is used in `inline_select_in_join()` and updated
+  # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
   # TODO can this be really be done before inlining?
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)

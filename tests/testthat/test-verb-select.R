@@ -36,25 +36,25 @@ test_that("select operates on mutated vars", {
     mutate(x, z = x + y) %>%
     select(z)
 
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 })
 
 test_that("select renames variables (#317)", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% select(A = x), tibble(A = 1))
+  compare_tbl(mf %>% select(A = x), tibble(A = 1))
 })
 
 test_that("rename renames variables", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
+  compare_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
 })
 
 test_that("can rename multiple vars", {
   mf <- memdb_frame(a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
 
-  expect_equal_tbl(mf %>% rename(c = a, d = b), exp)
-  expect_equal_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp %>% group_by(c))
 })
 
 test_that("can rename with a function", {

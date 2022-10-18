@@ -33,8 +33,7 @@
 #'     n_squirrels2,
 #'   )
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
-  sim_data <- simulate_vars(.data)
-  cols_to_fill <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
+  cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
   cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
   .direction <- arg_match0(.direction, c("down", "up"))
