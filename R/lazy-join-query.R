@@ -7,9 +7,9 @@ lazy_join_query <- function(x,
                             by,
                             suffix = c(".x", ".y"),
                             na_matches = c("never", "na"),
-                            group_vars = NULL,
-                            order_vars = NULL,
-                            frame = NULL,
+                            group_vars = op_grps(x),
+                            order_vars = op_sort(x),
+                            frame = op_frame(x),
                             call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
