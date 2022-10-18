@@ -157,12 +157,58 @@ test_that("conditionals check arguments", {
 
 # case_match --------------------------------------------------------------
 
-test_that("LHS can match multiple values", {
-  expect_snapshot(
-    translate_sql(
-      case_match(z, 1:2 ~ "z")
-    )
+test_that("LHS can handle different types", {
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' END")
   )
+
+  expect_equal(
+    translate_sql(case_match(z, y ~ "a")),
+    sql("CASE WHEN (`z` IN (`y`)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, f(y) ~ "a")),
+    sql("CASE WHEN (`z` IN (f(`y`))) THEN 'a' END")
+  )
+})
+
+test_that("LHS can match multiple values", {
+  expect_equal(
+    translate_sql(case_match(z, 1:2 ~ "a")),
+    sql("CASE WHEN (`z` IN ((1, 2))) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, 3L) ~ "a")),
+    sql("CASE WHEN (`z` IN (1, 3)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, y) ~ "a")),
+    sql("CASE WHEN (`z` IN (1, `y`)) THEN 'a' END")
+  )
+})
+
+test_that("LHS can match NA", {
+  expect_equal(
+    translate_sql(case_match(z, NA ~ "a")),
+    sql("CASE WHEN (`z` IS NULL) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, NA) ~ "a")),
+    sql("CASE WHEN (`z` IN (1) OR `z` IS NULL) THEN 'a' END")
+  )
+})
+
+test_that("LHS can handle bang bang", {
+  expect_snapshot({
+    translate_sql(case_match(x, !!1L ~ "x"))
+    translate_sql(case_match(x, !!c(1L, 2L) ~ "x"))
+    translate_sql(case_match(x, !!c(NA, 1L) ~ "x"))
+  })
 })
 
 test_that("`NULL` values in `...` are dropped", {
@@ -182,10 +228,10 @@ test_that("requires at least one condition", {
 })
 
 test_that("passes through `.default` correctly", {
-  skip("need default arg in case_when")
-  expect_identical(case_match(1, 3 ~ 1, .default = 2), 2)
-  expect_identical(case_match(1:5, 6 ~ 1, .default = 2), rep(2, 5))
-  expect_identical(case_match(1:5, 6 ~ 1:5, .default = 2:6), 2:6)
+  expect_equal(
+    translate_sql(case_match(z, 3L ~ 1L, .default = 2L)),
+    sql("CASE WHEN (`z` IN (3)) THEN 1 ELSE 2 END")
+  )
 })
 
 test_that("`.ptype` not supported", {

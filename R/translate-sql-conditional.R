@@ -1,3 +1,87 @@
+sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL, error_call = current_call()) {
+  check_not_supplied(.ptype, call = error_call)
+
+  x_expr <- enexpr(.x)
+  if (!is_symbol(x_expr)) {
+    msg <- "{.arg .x} must be a variable, not a {.obj_type_friendly {.x}}."
+    cli_abort(msg, call = error_call)
+  }
+
+  formulas <- list2(...)
+  formulas <- purrr::compact(formulas)
+
+  n <- length(formulas)
+
+  if (n == 0) {
+    cli_abort("No cases provided", call = error_call)
+  }
+
+  con <- sql_current_con()
+  query <- vector("list", n)
+  value <- vector("list", n)
+
+  for (i in seq_len(n)) {
+    f <- formulas[[i]]
+
+    env <- environment(f)
+    f_query <- f[[2]]
+    # must handle `c(...)` specially because `translate_sql()` doesn't do what
+    # we want
+    if (is_call(f_query, "c")) {
+      f_query <- f_query[-1]
+      escape_parts <- function(part) {
+        if (is.atomic(part) && is.na(part)) {
+          NA
+        } else {
+          translate_sql(!!part, con = con)
+        }
+      }
+
+      query_values_list <- purrr::map(f_query, escape_parts)
+      f_query <- sql(unlist(query_values_list))
+    }
+
+    # catch things like `f(y)`
+    if (!vctrs::vec_is(f_query)) {
+      f_query <- translate_sql(!!f_query, con = con)
+    }
+
+    # NA need to be translated to `IS NULL` instead of `IN (NULL)`
+    missing_loc <- vctrs::vec_detect_missing(f_query)
+    f_query <- vctrs::vec_slice(f_query, !missing_loc)
+    has_na <- any(missing_loc)
+
+    if (!is_empty(f_query)) {
+      f_query_esc <- escape(f_query, parens = TRUE, collapse = ", ", con = con)
+      query[[i]] <- translate_sql(!!.x %in% !!f_query_esc)
+    }
+
+    if (has_na) {
+      query[[i]] <- paste(c(query[[i]], build_sql(.x, " IS NULL")), collapse = " OR ")
+    }
+
+    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = sql_current_con())
+  }
+
+  clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN ", .y))
+  if (!is_null(.default)) {
+    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = sql_current_con())
+    clauses[[n + 1]] <- paste0("ELSE ", .default)
+  }
+
+  same_line_sql <- sql(paste0("CASE ", paste0(clauses, collapse = " "), " END"))
+  if (nchar(same_line_sql) <= 80) {
+    return(same_line_sql)
+  }
+
+  sql(paste0(
+    "CASE\n",
+    paste0(clauses, collapse = "\n"),
+    "\nEND"
+  ))
+}
+
+
 sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   out <- build_sql("CASE WHEN ", enpar(cond), " THEN ", enpar(if_true))
 
@@ -40,7 +124,6 @@ sql_case_when <- function(...,
   check_not_supplied(.ptype, call = error_call)
   check_not_supplied(.size, call = error_call)
 
-  # browser()
   formulas <- list2(...)
   n <- length(formulas)
 

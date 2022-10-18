@@ -165,24 +165,7 @@ base_scalar <- sql_translator(
   case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
     sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
   },
-  case_match = function(.x, ..., .default = NULL, .ptype = NULL) {
-    x_expr <- enexpr(.x)
-    if (!is_symbol(x_expr)) {
-      cli_abort("{.arg .x} must be a variable, not a {.obj_type_friendly {.x}}.")
-    }
-
-    dots <- list2(...)
-    dots <- purrr::compact(dots)
-
-    formulas <- purrr::map(
-      dots,
-      function(f) {
-        new_formula(expr(!!x_expr %in% !!f[[2]]), expr(!!f[[3]]), env = environment(f))
-      }
-    )
-
-    sql_case_when(!!!formulas, .default = .default, .ptype = .ptype)
-  },
+  case_match = sql_case_match,
 
   `(` = function(x) {
     sql_expr(((!!x)))
@@ -212,7 +195,9 @@ base_scalar <- sql_translator(
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64  = sql_cast("BIGINT"),
 
-  c = function(...) c(...),
+  c = function(...) {
+    c(...)
+  },
   `:` = function(from, to) from:to,
 
   between = function(x, left, right) {

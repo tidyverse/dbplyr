@@ -84,19 +84,27 @@
       Error in `sql_switch()`:
       ! Can only have one unnamed (ELSE) input
 
-# LHS can match multiple values
+# LHS can handle bang bang
 
     Code
-      translate_sql(case_match(z, 1:2 ~ "z"))
+      translate_sql(case_match(x, !!1L ~ "x"))
     Output
-      <SQL> CASE WHEN (`z` IN (1, 2)) THEN 'z' END
+      <SQL> CASE WHEN (`x` IN (1)) THEN 'x' END
+    Code
+      translate_sql(case_match(x, !!c(1L, 2L) ~ "x"))
+    Output
+      <SQL> CASE WHEN (`x` IN (1, 2)) THEN 'x' END
+    Code
+      translate_sql(case_match(x, !!c(NA, 1L) ~ "x"))
+    Output
+      <SQL> CASE WHEN (`x` IN (1) OR `x` IS NULL) THEN 'x' END
 
 # requires at least one condition
 
     Code
       translate_sql(case_match(x))
     Condition
-      Error in `sql_case_when()`:
+      Error in `case_match()`:
       ! No cases provided
 
 ---
@@ -104,7 +112,7 @@
     Code
       translate_sql(case_match(x, NULL))
     Condition
-      Error in `sql_case_when()`:
+      Error in `case_match()`:
       ! No cases provided
 
 # `.ptype` not supported
