@@ -21,21 +21,21 @@ Depends:
 Imports: 
     assertthat (>= 0.2.0),
     blob (>= 1.2.0),
-    cli (>= 3.3.0),
+    cli (>= 3.4.1),
     DBI (>= 1.0.0),
     dplyr (>= 1.0.99.9000),
     glue (>= 1.2.0),
-    lifecycle (>= 1.0.0),
+    lifecycle (>= 1.0.3),
     magrittr,
     methods,
     pillar (>= 1.5.0),
-    purrr (>= 0.2.5),
+    purrr (>= 0.3.5),
     R6 (>= 2.2.2),
-    rlang (>= 1.0.5),
+    rlang (>= 1.0.6),
     tibble (>= 1.4.2),
-    tidyselect (>= 1.1.2.9000),
+    tidyselect (>= 1.2.0),
     utils,
-    vctrs (>= 0.4.1.9000),
+    vctrs (>= 0.4.2.9000),
     withr
 Suggests:
     bit64,
@@ -52,7 +52,6 @@ Suggests:
     testthat (>= 3.0.2),
     tidyr (>= 1.2.0)
 Remotes: 
-    r-lib/tidyselect,
     r-lib/vctrs,
     tidyverse/dplyr
 VignetteBuilder: 
