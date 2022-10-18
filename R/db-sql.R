@@ -491,8 +491,8 @@ sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
   }
 
   out <- rep_named(vars$name, list())
-  vars$var <- vctrs::vec_unchop(vars$var)
-  vars$table <- vctrs::vec_unchop(vars$table)
+  vars$var <- vctrs::list_unchop(vars$var)
+  vars$table <- vctrs::list_unchop(vars$table)
 
   for (i in seq_along(table_names)) {
     all_vars_current <- all_vars_list[[i]]
