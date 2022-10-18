@@ -365,6 +365,14 @@ test_that("across() errors if named", {
   })
 })
 
+test_that("across() throws error if unpack = TRUE", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot(
+    (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+  )
+})
+
 
 # if_all ------------------------------------------------------------------
 
