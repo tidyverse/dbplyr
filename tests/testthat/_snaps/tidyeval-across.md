@@ -102,6 +102,17 @@
       ! In dbplyr, the result of `across()` must be unnamed.
       i `x = across()` is named.
 
+# across() throws error if unpack = TRUE
+
+    Code
+      (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+    Output
+      <error/rlang_error>
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, .unpack = TRUE)`
+      Caused by error in `mutate()`:
+      ! `.unpack = TRUE` is not supported in SQL translations.
+
 # if_all() gives informative errors
 
     Code
