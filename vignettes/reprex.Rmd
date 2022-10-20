@@ -32,7 +32,7 @@ library(dbplyr)
 
 ## Using `memdb_frame()`
 
-The first place to start is with SQLite. SQLite is particularly appealing because it's completely embedded instead an R package so doesn't have any external dependencies. SQLite is designed to be small and simple, so it can't demonstrate all problems, but it's easy to try out and a great place to start.
+The first place to start is with SQLite. SQLite is particularly appealing because it can be completely embedded inside an R package and doesn't have any external dependencies. SQLite is designed to be small and simple, so it can't demonstrate all problems, but it's easy to try out and a great place to start.
 
 You can easily create a SQLite in-memory database table using `memdb_frame()`:
 
@@ -45,7 +45,7 @@ mf %>%
   summarise_all(mean, na.rm = TRUE)
 ```
 
-Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame you can use `tbl_memdb()`:
+Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame, you can use `tbl_memdb()`:
 
 ```{r}
 mtcars_db <- tbl_memdb(mtcars)
@@ -57,7 +57,7 @@ mtcars_db %>%
 
 ## Translating verbs
 
-Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it's possible to generate SQL without a database using `lazy_frame()` and `tbl_lazy()`. Both take an `con` argument which takes a database "simulator" like `simulate_postgres()`, `simulate_sqlite()`, etc.
+Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it's possible to generate SQL without a database using `lazy_frame()` and `tbl_lazy()`. Both have a `con` argument and accept database "simulator" like `simulate_postgres()`, `simulate_sqlite()`, etc.
 
 ```{r}
 x <- c("abc", "def", "ghif")
