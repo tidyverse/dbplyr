@@ -7,10 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how entire verbs are translated; `vignette("translation-function")` describes how individual expressions within those verbs are translated.
 
-All dplyr verbs generate a `SELECT` statement. To demonstrate we'll make a temporary database with a couple of tables
+All dplyr verbs generate a `SELECT` statement. To demonstrate, we'll make a temporary database with a couple of tables:
 
 ```{r, message = FALSE}
 library(dplyr)
@@ -74,25 +77,25 @@ airports <- copy_to(con, nycflights13::airports)
 | `union(x, y)`    | `SELECT * FROM x UNION SELECT * FROM y`
 | `setdiff(x, y)`  | `SELECT * FROM x EXCEPT SELECT * FROM y`
 
-`x` and `y` don't have to be tables in the same database. If you specify `copy = TRUE`, dplyr will copy the `y` table into the same location as the `x` variable. This is useful if you've downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use `semi_join(x, y, copy = TRUE)` to upload the indices of interest to a temporary table in the same database as `x`, and then perform a efficient semi join in the database. 
+`x` and `y` don't have to be tables in the same database. If you specify `copy = TRUE`, dplyr will copy the `y` table into the same location as the `x` variable. This is useful if you've downloaded a summarised dataset and determined a subset of interest that you now want the full data for. You can use `semi_join(x, y, copy = TRUE)` to upload the indices of interest to a temporary table in the same database as `x`, and then perform an efficient semi join in the database. 
 
-If you're working with large data, it maybe also be helpful to set `auto_index = TRUE`. That will automatically add an index on the join variables to the temporary table.
+If you're working with large data, it may also be helpful to set `auto_index = TRUE`. That will automatically add an index on the join variables to the temporary table.
 
 ## Behind the scenes
 
-The verb level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in three steps:
+The verb-level SQL translation is implemented on top of `tbl_lazy`, which basically tracks the operations you perform in a pipeline (see `lazy-ops.R`). Turning that into a SQL query takes place in three steps:
 
 * `sql_build()` recurses over the lazy op data structure building up query 
-  objects (`select_query()`, `join_query()`, `set_op_query()` etc) 
+  objects (`select_query()`, `join_query()`, `set_op_query()`, etc.) 
   that represent the different subtypes of `SELECT` queries that we might
   generate.
 
 * `sql_optimise()` takes a pass over these SQL objects, looking for potential
-  optimisations. Currently this only involves removing subqueries where
+  optimisations. Currently, this only involves removing subqueries where
   possible.
 
 * `sql_render()` calls an SQL generation function (`sql_query_select()`,
-  `sql_query_join()`, `sql_query_semi_join()`, `sql_query_set_op()`, ...)
+  `sql_query_join()`, `sql_query_semi_join()`, `sql_query_set_op()`, etc.)
   to produce the actual SQL. Each of these functions is a generic, taking 
   the connection as an argument, so that the translation can be customised 
   for different databases.
