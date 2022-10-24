@@ -169,8 +169,8 @@ test_that("LHS can handle different types", {
   )
 
   expect_equal(
-    translate_sql(case_match(z, f(y) ~ "a")),
-    sql("CASE WHEN (`z` IN (f(`y`))) THEN 'a' END")
+    translate_sql(case_match(z, as.character(y) ~ "a")),
+    sql("CASE WHEN (`z` IN (CAST(`y` AS TEXT))) THEN 'a' END")
   )
 })
 
