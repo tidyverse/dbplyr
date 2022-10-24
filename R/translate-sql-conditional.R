@@ -2,8 +2,8 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL, error_call =
   check_not_supplied(.ptype, call = error_call)
 
   x_expr <- enexpr(.x)
-  if (!is_symbol(x_expr)) {
-    msg <- "{.arg .x} must be a variable, not a {.obj_type_friendly {.x}}."
+  if (!is_symbol(x_expr) && !is_call(x_expr)) {
+    msg <- "{.arg .x} must be a variable or function call, not {.obj_type_friendly {.x}}."
     cli_abort(msg, call = error_call)
   }
 
@@ -22,45 +22,10 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL, error_call =
 
   for (i in seq_len(n)) {
     f <- formulas[[i]]
-
     env <- environment(f)
-    f_query <- f[[2]]
-    # must handle `c(...)` specially because `translate_sql()` doesn't do what
-    # we want
-    if (is_call(f_query, "c")) {
-      f_query <- f_query[-1]
-      escape_parts <- function(part) {
-        if (is.atomic(part) && is.na(part)) {
-          NA
-        } else {
-          translate_sql(!!part, con = con)
-        }
-      }
 
-      query_values_list <- purrr::map(f_query, escape_parts)
-      f_query <- sql(unlist(query_values_list))
-    }
-
-    # catch things like `f(y)`
-    if (!vctrs::vec_is(f_query)) {
-      f_query <- translate_sql(!!f_query, con = con)
-    }
-
-    # NA need to be translated to `IS NULL` instead of `IN (NULL)`
-    missing_loc <- vctrs::vec_detect_missing(f_query)
-    f_query <- vctrs::vec_slice(f_query, !missing_loc)
-    has_na <- any(missing_loc)
-
-    if (!is_empty(f_query)) {
-      f_query_esc <- escape(f_query, parens = TRUE, collapse = ", ", con = con)
-      query[[i]] <- translate_sql(!!.x %in% !!f_query_esc)
-    }
-
-    if (has_na) {
-      query[[i]] <- paste(c(query[[i]], build_sql(.x, " IS NULL")), collapse = " OR ")
-    }
-
-    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = sql_current_con())
+    query[[i]] <- sql_case_match_clause(f, .x, con)
+    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = con)
   }
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN ", .y))
@@ -79,6 +44,36 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL, error_call =
     paste0(clauses, collapse = "\n"),
     "\nEND"
   ))
+}
+
+sql_case_match_clause <- function(f, x, con) {
+  env <- environment(f)
+  f_query <- f[[2]]
+  if (is_call(f_query, "c")) {
+    # need to handle `c(...)` specially because on `expr(c(1, y))` it returns
+    # `sql('1', '`y`')`
+    f_query <- translate_sql_(call_args(f_query), con)
+  } else if (is_call(f_query) || is_symbol(f_query)) {
+    f_query <- translate_sql(!!f_query, con = con)
+  }
+
+  # NA need to be translated to `IS NULL` instead of `IN (NULL)`
+  # due to the preceeding translation it might be NA or the string NULL
+  missing_loc <- is.na(f_query) | f_query == "NULL"
+  f_query <- vctrs::vec_slice(f_query, !missing_loc)
+  has_na <- any(missing_loc)
+
+  query <- NULL
+  if (!is_empty(f_query)) {
+    values <- sql_vector(f_query, parens = TRUE, collapse = ", ", con = con)
+    query <- translate_sql(!!x %in% !!values)
+  }
+
+  if (has_na) {
+    query <- paste(c(query, build_sql(x, " IS NULL")), collapse = " OR ")
+  }
+
+  query
 }
 
 
