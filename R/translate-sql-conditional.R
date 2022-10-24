@@ -1,4 +1,5 @@
-sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL, error_call = current_call()) {
+sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
+  error_call <- current_call()
   check_not_supplied(.ptype, call = error_call)
 
   x_expr <- enexpr(.x)
