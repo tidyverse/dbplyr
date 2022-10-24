@@ -234,6 +234,19 @@ test_that("passes through `.default` correctly", {
   )
 })
 
+test_that("can handle multiple cases", {
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a", 2L ~ "b")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' END")
+  )
+
+  # also with .default
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a", 2L ~ "b", .default = "default")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' ELSE 'default' END")
+  )
+})
+
 test_that("`.ptype` not supported", {
   expect_snapshot({
     (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
