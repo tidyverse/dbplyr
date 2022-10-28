@@ -133,4 +133,12 @@ sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
 #' @export
 sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
 
+#' @export
+supports_window_clause.Redshift <- function(con) {
+  FALSE
+}
+
+#' @export
+supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
+
 utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))
