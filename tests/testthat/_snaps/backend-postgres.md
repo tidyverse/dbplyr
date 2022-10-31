@@ -33,7 +33,7 @@
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead
+      i Please use `conflict = "ignore"` instead.
 
 ---
 

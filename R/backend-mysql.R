@@ -80,7 +80,7 @@ sql_translation.MariaDBConnection <- function(con) {
     sql_translator(.parent = base_agg,
       sd =  sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),
@@ -132,8 +132,8 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
-sql_values_subquery.MariaDBConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE)
+sql_values_subquery.MariaDBConnection <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
 }
 
 #' @export

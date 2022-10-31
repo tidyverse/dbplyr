@@ -164,6 +164,11 @@ sql_table_analyze.Teradata <- function(con, table, ...) {
   build_sql("COLLECT STATISTICS ", as.sql(table, con = con) , con = con)
 }
 
+#' @export
+supports_star_without_alias.Teradata <- function(con) {
+  FALSE
+}
+
 utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SUM"))
 
 #' @export

@@ -18,7 +18,10 @@
     Code
       mf %>% group_by(y) %>% mutate(val2 = lead(x, order_by = x)) %>% sql_render()
     Output
-      <SQL> SELECT *, LEAD(`x`, 1, NULL) OVER (PARTITION BY `y` ORDER BY `x`) AS `val2`
+      <SQL> SELECT
+        `x`,
+        `y`,
+        LEAD(`x`, 1, NULL) OVER (PARTITION BY `y` ORDER BY `x`) AS `val2`
       FROM `df`
 
 ---
@@ -26,7 +29,10 @@
     Code
       mf %>% group_by(y) %>% mutate(val2 = lag(x, order_by = x)) %>% sql_render()
     Output
-      <SQL> SELECT *, LAG(`x`, 1, NULL) OVER (PARTITION BY `y` ORDER BY `x`) AS `val2`
+      <SQL> SELECT
+        `x`,
+        `y`,
+        LAG(`x`, 1, NULL) OVER (PARTITION BY `y` ORDER BY `x`) AS `val2`
       FROM `df`
 
 # weighted.mean
@@ -44,7 +50,7 @@
       mf %>% mutate(rown = row_number())
     Output
       <SQL>
-      SELECT *, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
+      SELECT `x`, `y`, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
       FROM `df`
 
 ---
@@ -53,6 +59,6 @@
       mf %>% group_by(y) %>% mutate(rown = row_number())
     Output
       <SQL>
-      SELECT *, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
+      SELECT `x`, `y`, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
       FROM `df`
 

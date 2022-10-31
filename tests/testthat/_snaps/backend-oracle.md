@@ -74,3 +74,57 @@
       `schema`.`tbl` AS
       SELECT * FROM foo
 
+---
+
+    Code
+      slice_sample(lf, n = 1)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.RANDOM()) AS `q01`
+        FROM (`df`) 
+      ) `q01`
+      WHERE (`q01` <= 1)
+
+# copy_inline uses UNION ALL
+
+    Code
+      copy_inline(con, y %>% slice(0)) %>% remote_query()
+    Output
+      <SQL> SELECT CAST(NULL AS INT) AS `id`, CAST(NULL AS VARCHAR2(255)) AS `arr`
+      FROM (`DUAL`) 
+      WHERE (0 = 1)
+    Code
+      copy_inline(con, y) %>% remote_query()
+    Output
+      <SQL> SELECT CAST(`id` AS INT) AS `id`, CAST(`arr` AS VARCHAR2(255)) AS `arr`
+      FROM (
+        (
+          SELECT NULL AS `id`, NULL AS `arr`
+          FROM (`DUAL`) 
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (SELECT 1, '{1,2,3}' FROM DUAL)
+      ) `values_table`
+    Code
+      copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
+    Output
+      <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
+      FROM (`DUAL`) 
+      WHERE (0 = 1)
+    Code
+      copy_inline(con, y, types = types) %>% remote_query()
+    Output
+      <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
+      FROM (
+        (
+          SELECT NULL AS `id`, NULL AS `arr`
+          FROM (`DUAL`) 
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (SELECT 1, '{1,2,3}' FROM DUAL)
+      ) `values_table`
+

@@ -166,15 +166,14 @@ dbplyr_build_wider_spec <- function(data,
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
   # 1. create a tibble with unique values in the `names_from` column
   # row_ids <- vec_unique(data[names_from])
-  sim_data <- simulate_vars(data)
-  names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
+  names_from <- tidyselect::eval_select(enquo(names_from), data) %>% names()
   if (is_empty(names_from)) {
     cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
-  values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
+  values_from <- tidyselect::eval_select(enquo(values_from), data) %>% names()
   if (is_empty(values_from)) {
     cli_abort("{.arg values_from} must select at least one column.")
   }
@@ -275,9 +274,8 @@ build_wider_id_cols_expr <- function(data,
   # COPIED FROM tidyr
   # TODO: Use `allow_rename = FALSE`.
   # Requires https://github.com/r-lib/tidyselect/issues/225.
-  sim_data <- simulate_vars(data)
-  names_from <- names(tidyselect::eval_select(enquo(names_from), sim_data, error_call = call))
-  values_from <- names(tidyselect::eval_select(enquo(values_from), sim_data, error_call = call))
+  names_from <- names(tidyselect::eval_select(enquo(names_from), data, error_call = call))
+  values_from <- names(tidyselect::eval_select(enquo(values_from), data, error_call = call))
   non_id_cols <- c(names_from, values_from)
 
   out <- select_wider_id_cols(
@@ -315,7 +313,7 @@ select_wider_id_cols <- function(data,
                                  call = caller_env()) {
   # COPIED FROM tidyr
   id_cols <- enquo(id_cols)
-  sim_data <- simulate_vars(data)
+  sim_data <- tidyselect_data_proxy(data)
 
   # Remove known non-id-cols so they are never selected
   sim_data <- sim_data[setdiff(names(sim_data), non_id_cols)]

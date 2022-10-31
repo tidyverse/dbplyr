@@ -5,6 +5,11 @@ capture_across <- function(data, x) {
 
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
+  deprecate_across_dots(call, env = current_env(), user_env = env)
+  if (is_true(call$.unpack)) {
+    cli_abort("{.code .unpack = TRUE} is not supported in SQL translations.", call = error_call)
+  }
+
   across_setup(data, call, env, allow_rename = TRUE, fn = "across()", error_call = error_call)
 }
 
@@ -15,6 +20,8 @@ capture_if_all <- function(data, x) {
 
 partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_env()) {
   call <- match.call(dplyr::if_any, call, expand.dots = FALSE, envir = env)
+  deprecate_across_dots(call, env = current_env(), user_env = env)
+
   if (reduce == "&") {
     fn <- "if_all()"
   } else {
@@ -22,6 +29,28 @@ partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_e
   }
   out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
   Reduce(function(x, y) call2(reduce, x, y), out)
+}
+
+deprecate_across_dots <- function(call, env, user_env) {
+  if (!is_empty(call$...)) {
+    details <- paste(c(
+      "Supply arguments directly to `.fns` through a lambda instead.",
+      "",
+      "  # Previously",
+      "  across(a:b, mean, na.rm = TRUE)",
+      "",
+      "  # Now",
+      "  across(a:b, ~mean(.x, na.rm = TRUE))"),
+      collapse = "\n"
+    )
+    lifecycle::deprecate_warn(
+      when = "2.3.0",
+      what = "across(...)",
+      details = details,
+      env = env,
+      user_env = user_env
+    )
+  }
 }
 
 across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE) {
@@ -130,11 +159,17 @@ across_setup <- function(data,
                          allow_rename,
                          fn,
                          error_call) {
-  tbl <- simulate_vars(data, drop_groups = TRUE)
+  grps <- group_vars(data)
+  tbl <- ungroup(tidyselect_data_proxy(data))
+  tbl <- tbl[setdiff(colnames(tbl), grps)]
+
   .cols <- call$.cols %||% expr(everything())
-  locs <- fix_call(
-    tidyselect::eval_select(.cols, tbl, env = env, allow_rename = allow_rename),
-    call(fn)
+  locs <- tidyselect::eval_select(
+    .cols,
+    tbl,
+    env = env,
+    allow_rename = allow_rename,
+    error_call = call(fn)
   )
 
   vars <- syms(names(tbl))[locs]

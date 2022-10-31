@@ -4,36 +4,30 @@
 
 ## revdepcheck results
 
-We checked 73 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 85 reverse dependencies (76 from CRAN + 9 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 7 new problems
- * We failed to check 0 packages
+ * We saw 4 new problems
+ * We failed to check 2 packages
 
 Issues with CRAN packages are summarised below.
 
 ### New problems
 (This reports the first line of each new failure)
 
-Maintainers of the following packages were notified at least two weeks ago, and where possible we helped prepare patches.
+* bcdata
+  checking tests ...
 
 * dcmodifydb
-  checking tests ... ERROR
+  checking examples ... ERROR
+  checking tests ...
 
-* dittodb
-  checking re-building of vignette outputs ... WARNING
+* tidyhydat
+  checking tests ...
 
-* dlookr
-  checking re-building of vignette outputs ... WARNING
+* validatedb
+  checking tests ...
 
-* dplyr.teradata
-  checking tests ... ERROR
-  checking R code for possible problems ... NOTE
+### Failed to check
 
-* RClickhouse
-  checking dependencies in R code ... WARNING
-
-* sparklyr
-  checking dependencies in R code ... WARNING
-
-* VicmapR
-  checking tests ... ERROR
+* bigsnpr (NA)
+* duckdb  (NA)

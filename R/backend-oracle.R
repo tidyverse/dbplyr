@@ -165,6 +165,11 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   )
 }
 
+#' @export
+sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
+}
+
 # registered onLoad located in the zzz.R script
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
@@ -182,6 +187,11 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 #' @export
 supports_star_without_alias.Oracle <- function(con) {
   FALSE
+}
+
+#' @export
+sql_random.Oracle <- function(con) {
+  sql_expr(dbms_random.RANDOM())
 }
 
 
@@ -211,6 +221,9 @@ sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
 #' @export
 sql_query_save.OraConnection <- sql_query_save.Oracle
 
+#' @export
+sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
+
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle
 
@@ -220,4 +233,7 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 #' @export
 supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))
+#' @export
+sql_random.OraConnection <- sql_random.Oracle
+
+globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.RANDOM"))

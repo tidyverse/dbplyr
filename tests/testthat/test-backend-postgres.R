@@ -228,6 +228,49 @@ test_that("can insert with returning", {
   )
 })
 
+test_that("casts `y` column for local df", {
+  con <- src_test("postgres")
+
+  DBI::dbWriteTable(
+    con,
+    "df_x",
+    value = tibble(id = 1L, val = 10L, arr = "{1,2}"),
+    field.types = c(id = "bigint", val = "bigint", arr = "integer[]")
+  )
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+
+  y <- tibble(
+    id = "2",
+    val = 20,
+    arr = "{1, 2, 3}"
+  )
+
+  out <- tibble(
+    id = bit64::as.integer64(1:2),
+    val = bit64::as.integer64(10L, 20L),
+    arr = structure(c("{1,2}", "{1,2,3}"), class = "pq__int4")
+  )
+  expect_equal(
+    rows_append(
+      tbl(con, "df_x"),
+      y,
+      copy = TRUE,
+      in_place = FALSE
+    ) %>%
+      collect(),
+    out
+  )
+
+  rows_append(
+    tbl(con, "df_x"),
+    y,
+    copy = TRUE,
+    in_place = TRUE
+  )
+
+  expect_equal(tbl(con, "df_x") %>% collect(), out)
+})
+
 test_that("can upsert with returning", {
   con <- src_test("postgres")
 

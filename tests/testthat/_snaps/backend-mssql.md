@@ -200,7 +200,7 @@
 ---
 
     Code
-      lf %>% slice_sample(x)
+      lf %>% slice_sample(n = 1)
     Output
       <SQL>
       SELECT `x`

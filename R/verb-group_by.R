@@ -57,7 +57,7 @@ ungroup.tbl_lazy <- function(x, ...) {
     group_by(x)
   } else {
     old_groups <- group_vars(x)
-    to_remove <- fix_call(tidyselect::vars_select(op_vars(x), ...))
+    to_remove <- tidyselect::vars_select(op_vars(x), ...)
     new_groups <- setdiff(old_groups, to_remove)
     group_by(x, !!!syms(new_groups))
   }

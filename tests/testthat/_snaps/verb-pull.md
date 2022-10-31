@@ -4,6 +4,7 @@
       memdb_frame(x = 1) %>% pull(non_existent)
     Condition
       Error in `pull()`:
+      Caused by error:
       ! object 'non_existent' not found
     Code
       memdb_frame(x = 1) %>% pull(1000)

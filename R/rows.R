@@ -99,9 +99,8 @@ rows_insert.tbl_lazy <- function(x,
 
   conflict <- rows_check_conflict(conflict)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -156,9 +155,8 @@ rows_append.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
@@ -204,9 +202,8 @@ rows_update.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -285,9 +282,8 @@ rows_patch.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -307,6 +303,7 @@ rows_patch.tbl_lazy <- function(x,
     }
 
     con <- remote_con(x)
+
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
       sql_table_prefix(con, update_cols, name),
@@ -374,9 +371,8 @@ rows_upsert.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -450,9 +446,8 @@ rows_delete.tbl_lazy <- function(x,
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
 
-  y <- auto_copy(x, y, copy = copy)
-
   rows_check_containment(x, y)
+  y <- rows_auto_copy(x, y, copy = copy)
 
   by <- rows_check_by(by, y)
 
@@ -669,7 +664,7 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
     cli_abort(
       c(
         '{.code conflict = "error"} is not supported for database tables.',
-        i = 'Please use {.code conflict = "ignore"} instead'
+        i = 'Please use {.code conflict = "ignore"} instead.'
       ),
       call = error_call
     )
@@ -687,14 +682,19 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
   )
 
   if (unmatched == "error") {
-    cli_abort('{.code unmatched = "error"} is not supported for database tables.', call = error_call)
+    msg <- c(
+      '{.code unmatched = "error"} is not supported for database tables.',
+      i = 'Please use {.code unmatched = "ignore"} instead.'
+    )
+    cli_abort(msg, call = error_call)
   }
 
   unmatched
 }
 
 rows_check_returning <- function(df, returning, returning_expr, error_call = caller_env()) {
-  returning_cols <- eval_select2(returning_expr, df, error_call)
+  locs <- tidyselect::eval_select(returning_expr, df, error_call = error_call)
+  returning_cols <- set_names(colnames(df)[locs], names(locs))
 
   if (is_empty(returning_cols)) return(returning_cols)
 
@@ -723,13 +723,6 @@ tick <- function(x) {
 }
 
 # other helpers -----------------------------------------------------------
-
-eval_select2 <- function(expr, data, error_call) {
-  sim_data <- simulate_vars(data)
-  locs <- fix_call(tidyselect::eval_select(expr, sim_data, error_call = error_call), error_call)
-  names_out <- names(locs)
-  set_names(colnames(sim_data)[locs], names_out)
-}
 
 target_table_name <- function(x, in_place) {
   # Never touch target table with `in_place = FALSE`
@@ -773,6 +766,45 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out$insert_clause <- sql_clause_insert(con, insert_cols, x_name)
 
   out
+}
+
+rows_auto_copy <- function(x, y, copy, call = caller_env()) {
+  name <- remote_name(x)
+  x_types <- get_col_types(remote_con(x), name, call)
+
+  if (!is_null(x_types)) {
+    rows_check_containment(x, y, error_call = call)
+    x_types <- x_types[colnames(y)]
+  }
+
+  auto_copy(x, y, copy = copy, types = x_types)
+}
+
+get_col_types <- function(con, name, call) {
+  if (is_null(name)) {
+    return(NULL)
+  }
+
+  UseMethod("get_col_types")
+}
+
+#' @export
+get_col_types.TestConnection <- function(con, name, call) {
+  NULL
+}
+
+#' @export
+get_col_types.DBIConnection <- function(con, name, call) {
+  NULL
+}
+
+#' @export
+get_col_types.PqConnection <- function(con, name, call) {
+  res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
+  on.exit(DBI::dbClearResult(res))
+  DBI::dbFetch(res, n = 0)
+  col_info_df <- DBI::dbColumnInfo(res)
+  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {

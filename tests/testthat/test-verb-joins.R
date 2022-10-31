@@ -159,22 +159,13 @@ test_that("join check `x_as` and `y_as`", {
 
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", y_as = c("A", "B")))
   expect_snapshot(error = TRUE, left_join(x, x, by = "x", x_as = "LHS", y_as = "LHS"))
-
-  expect_snapshot(error = TRUE, left_join(x, y, by = "a", x_as = "y"))
-  expect_snapshot(error = TRUE, {
-    left_join(
-      x %>% filter(x == 1),
-      x,
-      by = "x",
-      y_as = "LHS"
-    )
-  })
 })
 
 test_that("join uses correct table alias", {
   x <- lazy_frame(a = 1, x = 1, .name = "x")
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
+  # self joins
   by <- left_join(x, x, by = "a")$lazy_query$by
   expect_equal(by$x_as, ident("x_LHS"))
   expect_equal(by$y_as, ident("x_RHS"))
@@ -191,7 +182,7 @@ test_that("join uses correct table alias", {
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
 
-
+  # x-y joins
   by <- left_join(x, y, by = "a")$lazy_query$by
   expect_equal(by$x_as, ident("x"))
   expect_equal(by$y_as, ident("y"))
@@ -207,6 +198,20 @@ test_that("join uses correct table alias", {
   by <- left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y")$lazy_query$by
   expect_equal(by$x_as, ident("my_x"))
   expect_equal(by$y_as, ident("my_y"))
+
+  # x_as same name as `y`
+  by <- left_join(x, y, by = "a", x_as = "y")$lazy_query$by
+  expect_equal(by$x_as, ident("y"))
+  expect_equal(by$y_as, ident("y...2"))
+
+  by <- left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS")$lazy_query$by
+  expect_equal(by$x_as, ident("LHS...1"))
+  expect_equal(by$y_as, ident("LHS"))
+
+  # sql_on -> use alias or LHS/RHS
+  by <- left_join(x, y, sql_on = sql("LHS.a = RHS.a"))$lazy_query$by
+  expect_equal(by$x_as, ident("LHS"))
+  expect_equal(by$y_as, ident("RHS"))
 
   by <- left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a"))$lazy_query$by
   expect_equal(by$x_as, ident("my_x"))
@@ -269,6 +274,22 @@ test_that("select() before join is inlined", {
   expect_equal(vars$y, c(NA, NA, "x2", "b"))
   expect_equal(vars$all_x, c("x1", "a", "y"))
   expect_equal(vars$all_y, c("x2", "b", "z"))
+
+  # attributes like `group`, `sort`, `frame` is kept
+  lf <- lazy_frame(x = 10, a = 1, b = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 10, .name = "lf2")
+  out_left <- left_join(
+    lf %>%
+      group_by(a) %>%
+      arrange(a) %>%
+      window_frame(0, 1) %>%
+      select(x, a),
+    lf2,
+    by = "x"
+  )
+  expect_equal(op_grps(out_left), "a")
+  expect_equal(op_sort(out_left), list(quo(a)), ignore_formula_env = TRUE)
+  expect_equal(op_frame(out_left), list(range = c(0, 1)))
 })
 
 test_that("select() before join works for tables with same column name", {
@@ -349,7 +370,7 @@ test_that("select() before semi_join is inlined", {
   )
   lq <- out_semi$lazy_query
   expect_equal(op_vars(out_semi), c("a2", "x"))
-  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a", "x1")))
   expect_equal(lq$by$x, "x1")
   expect_snapshot(out_semi)
 
@@ -359,8 +380,24 @@ test_that("select() before semi_join is inlined", {
     by = "x"
   )
   lq <- out_anti$lazy_query
-  expect_equal(lq$vars, c(a2 = "a", x = "x1"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a", "x1")))
   expect_equal(lq$by$x, "x1")
+
+  # attributes like `group`, `sort`, `frame` is kept
+  lf <- lazy_frame(x = 10, a = 1, b = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 10, .name = "lf2")
+  out_semi <- semi_join(
+    lf %>%
+      group_by(a) %>%
+      arrange(a) %>%
+      window_frame(0, 1) %>%
+      select(x, a),
+    lf2,
+    by = "x"
+  )
+  expect_equal(op_grps(out_semi), "a")
+  expect_equal(op_sort(out_semi), list(quo(a)), ignore_formula_env = TRUE)
+  expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 
 test_that("select() before join is not inlined when using `sql_on`", {
@@ -375,7 +412,7 @@ test_that("select() before join is not inlined when using `sql_on`", {
 
   lq <- out$lazy_query
   expect_s3_class(lq$x, "lazy_select_query")
-  expect_equal(lq$vars, c(a2 = "a2", x = "x"))
+  expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a2", "x")))
 })
 
 # sql_build ---------------------------------------------------------------
@@ -442,12 +479,13 @@ test_that("set ops captures both tables", {
 })
 
 test_that("extra args generates error", {
+  skip_if(getRversion() < "4.0.0")
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
   expect_error(
     inner_join(lf1, lf2, by = "x", never_used = "na"),
-    "unused argument"
+    "used"
   )
 })
 
@@ -618,6 +656,20 @@ test_that("full_join() does not use *", {
       a = "COALESCE(`LHS`.`a`, `RHS`.`a`)",
       b = "COALESCE(`LHS`.`b`, `RHS`.`b`)"
     )
+  )
+})
+
+test_that("joins reuse queries in cte mode", {
+  lf1 <- lazy_frame(x = 1, .name = "lf1")
+  lf <- lf1 %>%
+    inner_join(lf1, by = "x")
+
+  expect_snapshot(
+    left_join(
+      lf,
+      lf
+    ) %>%
+      remote_query(cte = TRUE)
   )
 })
 

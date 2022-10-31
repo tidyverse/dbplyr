@@ -36,25 +36,25 @@ test_that("select operates on mutated vars", {
     mutate(x, z = x + y) %>%
     select(z)
 
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 })
 
 test_that("select renames variables (#317)", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% select(A = x), tibble(A = 1))
+  compare_tbl(mf %>% select(A = x), tibble(A = 1))
 })
 
 test_that("rename renames variables", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
+  compare_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
 })
 
 test_that("can rename multiple vars", {
   mf <- memdb_frame(a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
 
-  expect_equal_tbl(mf %>% rename(c = a, d = b), exp)
-  expect_equal_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp %>% group_by(c))
 })
 
 test_that("can rename with a function", {
@@ -162,7 +162,10 @@ test_that("select() after join handles previous select", {
   expect_equal(op_vars(lf), c("x2", "y3", "z"))
   expect_equal(
     lf$lazy_query$vars,
-    c(x2 = "x", y3 = "y", z = "z")
+    tibble(
+      name = c("x2", "y3", "z"),
+      var = c("x", "y", "z")
+    )
   )
   expect_equal(op_grps(lf), c("x2", "y3", "z"))
   expect_snapshot(print(lf))
@@ -248,6 +251,7 @@ test_that("mutate collapses over nested select", {
 
 test_that("output is styled", {
   local_reproducible_output(crayon = TRUE)
+  withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
 
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   out <- lf %>%

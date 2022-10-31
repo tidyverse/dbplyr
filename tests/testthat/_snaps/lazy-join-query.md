@@ -18,13 +18,15 @@
     Condition
       Error in `join_check_vars()`:
       ! `vars` must be a list
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error that was detected in the dbplyr package.
+        Please report it at <https://github.com/tidyverse/dbplyr/issues> with a reprex (<https://https://tidyverse.org/help/>) and the full backtrace.
     Code
       (my_lazy_join_query(vars = c(vars0, list(z = 1))))
     Condition
       Error in `join_check_vars()`:
       ! `vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error that was detected in the dbplyr package.
+        Please report it at <https://github.com/tidyverse/dbplyr/issues> with a reprex (<https://https://tidyverse.org/help/>) and the full backtrace.
     Code
       (my_lazy_join_query(vars = lmod(vars0, alias = 1)))
     Condition
@@ -73,7 +75,8 @@
     Condition
       Error in `join_check_by()`:
       ! `by` must be a list
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error that was detected in the dbplyr package.
+        Please report it at <https://github.com/tidyverse/dbplyr/issues> with a reprex (<https://https://tidyverse.org/help/>) and the full backtrace.
     Code
       (my_lazy_join_query(by = lmod(by0, x = 1)))
     Condition
@@ -91,7 +94,8 @@
     Condition
       Error in `join_check_by()`:
       ! `by$x` and `by$y` must have the same size
-      i This is an internal error in the dbplyr package, please report it to the package authors.
+      i This is an internal error that was detected in the dbplyr package.
+        Please report it at <https://github.com/tidyverse/dbplyr/issues> with a reprex (<https://https://tidyverse.org/help/>) and the full backtrace.
     Code
       (my_lazy_join_query(by = lmod(by0, x_as = "a")))
     Condition
