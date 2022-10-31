@@ -97,7 +97,7 @@ db_compute.DBIConnection <- function(con,
   table <- new$table
   temporary <- new$temporary
 
-  table <- dbplyr_save_query(con, sql, table, temporary = temporary)
+  table <- dbplyr_save_query(con, sql, table, temporary = temporary, ...)
   create_indexes(con, table, unique_indexes, unique = TRUE)
   create_indexes(con, table, indexes)
   if (analyze) dbplyr_analyze(con, table)

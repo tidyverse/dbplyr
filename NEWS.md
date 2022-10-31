@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Allow additional arguments to be passed from `compute()` all the way to 
+  `sql_query_save()`-method (@rsund).
+
 * Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
   the verb where the error happened (@mgirlich).
 
