@@ -110,12 +110,22 @@
 
     
     
-<p>If you’re reporting a bug in dbplyr, it is much easier for me to help you if you can supply a <a href="https://reprex.tidyverse.org" class="external-link">reprex</a> that I can run on my computer. Creating reprexes for dbplyr is particularly challenging because you are probably using a database that you can’t share with me. Fortunately, in many cases you can still demonstrate the problem even if I don’t have the complete dataset, or even access to the database system that you’re using.</p>
-<p>This vignette outlines three approaches for creating reprexes that will work anywhere:</p>
+<p>If you’re reporting a bug in dbplyr, it is much easier for me to help
+you if you can supply a <a href="https://reprex.tidyverse.org" class="external-link">reprex</a> that I can run on my
+computer. Creating reprexes for dbplyr is particularly challenging
+because you are probably using a database that you can’t share with me.
+Fortunately, in many cases you can still demonstrate the problem even if
+I don’t have the complete dataset, or even access to the database system
+that you’re using.</p>
+<p>This vignette outlines three approaches for creating reprexes that
+will work anywhere:</p>
 <ul>
-<li><p>Use <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>/<code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code> to easily create datasets that live in an in-memory SQLite database.</p></li>
-<li><p>Use <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code>/<code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code> to simulate SQL generation of dplyr pipelines.</p></li>
-<li><p>Use <code><a href="../reference/translate_sql.html">translate_sql()</a></code> to simulate SQL generation of columnar expression.</p></li>
+<li><p>Use <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>/<code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code> to easily
+create datasets that live in an in-memory SQLite database.</p></li>
+<li><p>Use <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code>/<code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code> to simulate
+SQL generation of dplyr pipelines.</p></li>
+<li><p>Use <code><a href="../reference/translate_sql.html">translate_sql()</a></code> to simulate SQL generation of
+columnar expression.</p></li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -123,8 +133,13 @@
 <div class="section level2">
 <h2 id="using-memdb_frame">Using <code>memdb_frame()</code><a class="anchor" aria-label="anchor" href="#using-memdb_frame"></a>
 </h2>
-<p>The first place to start is with SQLite. SQLite is particularly appealing because it’s completely embedded instead an R package so doesn’t have any external dependencies. SQLite is designed to be small and simple, so it can’t demonstrate all problems, but it’s easy to try out and a great place to start.</p>
-<p>You can easily create a SQLite in-memory database table using <code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>:</p>
+<p>The first place to start is with SQLite. SQLite is particularly
+appealing because it’s completely embedded instead an R package so
+doesn’t have any external dependencies. SQLite is designed to be small
+and simple, so it can’t demonstrate all problems, but it’s easy to try
+out and a great place to start.</p>
+<p>You can easily create a SQLite in-memory database table using
+<code><a href="../reference/memdb_frame.html">memdb_frame()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>g <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, y <span class="op">=</span> <span class="fl">5</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">mf</span></span>
@@ -147,7 +162,9 @@
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1   1.5   4.5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2   4     2</span></span></code></pre></div>
-<p>Reprexes are easiest to understand if you create very small custom data, but if you do want to use an existing data frame you can use <code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code>:</p>
+<p>Reprexes are easiest to understand if you create very small custom
+data, but if you do want to use an existing data frame you can use
+<code><a href="../reference/memdb_frame.html">tbl_memdb()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mtcars_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="va">mtcars_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -162,7 +179,12 @@
 <div class="section level2">
 <h2 id="translating-verbs">Translating verbs<a class="anchor" aria-label="anchor" href="#translating-verbs"></a>
 </h2>
-<p>Many problems with dbplyr come down to incorrect SQL generation. Fortunately, it’s possible to generate SQL without a database using <code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an <code>con</code> argument which takes a database “simulator” like <code><a href="../reference/backend-postgres.html">simulate_postgres()</a></code>, <code><a href="../reference/backend-sqlite.html">simulate_sqlite()</a></code>, etc.</p>
+<p>Many problems with dbplyr come down to incorrect SQL generation.
+Fortunately, it’s possible to generate SQL without a database using
+<code><a href="../reference/tbl_lazy.html">lazy_frame()</a></code> and <code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code>. Both take an
+<code>con</code> argument which takes a database “simulator” like
+<code><a href="../reference/backend-postgres.html">simulate_postgres()</a></code>, <code><a href="../reference/backend-sqlite.html">simulate_sqlite()</a></code>,
+etc.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"abc"</span>, <span class="st">"def"</span>, <span class="st">"ghif"</span><span class="op">)</span></span>
 <span></span>
@@ -180,12 +202,15 @@
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT TOP 5</span> *</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `df`</span></span></code></pre></div>
-<p>If you isolate the problem to incorrect SQL generation, it would be very helpful if you could also suggest more appropriate SQL.</p>
+<p>If you isolate the problem to incorrect SQL generation, it would be
+very helpful if you could also suggest more appropriate SQL.</p>
 </div>
 <div class="section level2">
 <h2 id="translating-individual-expressions">Translating individual expressions<a class="anchor" aria-label="anchor" href="#translating-individual-expressions"></a>
 </h2>
-<p>In some cases, you might be able to track the problem down to incorrect translation for a single column expression. In that case, you can make your reprex even simpler with <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
+<p>In some cases, you might be able to track the problem down to
+incorrect translation for a single column expression. In that case, you
+can make your reprex even simpler with <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-postgres.html">simulate_postgres</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; SUBSTR(`x`, 1, 2)</span></span>

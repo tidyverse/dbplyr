@@ -110,64 +110,101 @@
 
     
     
-<p>This transition guide is aimed at backend authors. dbplyr 2.0.0 is an important release for backends because it starts the process of moving all backend generics into dbplyr (instead of some living in dplyr). This move has been designed to occur in phases to avoid sudden breakages and give backend authors plenty of time to make changes.</p>
+<p>This transition guide is aimed at backend authors. dbplyr 2.0.0 is an
+important release for backends because it starts the process of moving
+all backend generics into dbplyr (instead of some living in dplyr). This
+move has been designed to occur in phases to avoid sudden breakages and
+give backend authors plenty of time to make changes.</p>
 <p>The current timeline is something like this:</p>
 <ul>
-<li><p>dbplyr 2.0.0 adds a new interface for database backends. The old interface remains so all existing backends continue to work, but new packages should use the new interface, and existing backends should start the update process.</p></li>
-<li><p>dbplyr 2.2.0 (released &gt;= 18 months dbplyr 2.0.0) deprecates the old interface, so that users are encouraged to upgrade backends.</p></li>
-<li><p>dbplyr 2.3.0 (to be released &gt;= 12 months after dbplyr 2.2.0) removes the old interface so user must upgrade backends.</p></li>
-<li><p>A future version of dplyr will deprecate then remove the database generics.</p></li>
+<li><p>dbplyr 2.0.0 adds a new interface for database backends. The old
+interface remains so all existing backends continue to work, but new
+packages should use the new interface, and existing backends should
+start the update process.</p></li>
+<li><p>dbplyr 2.2.0 (released &gt;= 18 months dbplyr 2.0.0) deprecates
+the old interface, so that users are encouraged to upgrade
+backends.</p></li>
+<li><p>dbplyr 2.3.0 (to be released &gt;= 12 months after dbplyr 2.2.0)
+removes the old interface so user must upgrade backends.</p></li>
+<li><p>A future version of dplyr will deprecate then remove the database
+generics.</p></li>
 </ul>
 <div class="section level2">
 <h2 id="unused-generics">Unused generics<a class="anchor" aria-label="anchor" href="#unused-generics"></a>
 </h2>
-<p>A number of generics are no longer used so you can delete the corresponding methods:</p>
+<p>A number of generics are no longer used so you can delete the
+corresponding methods:</p>
 <ul>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> calls <code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">DBI::dbWriteTable()</a></code> instead of nine individual generics: <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_begin()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_commit()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_drop_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_table()</a></code>, and <code>db_data_types()</code>.</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_escape_ident()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_escape_string()</a></code> are no longer used in favour of calling <code>dbQuoteIdentifier()</code> and <code>dbQuoteString()</code> directly.</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> calls
+<code><a href="https://dbi.r-dbi.org/reference/dbWriteTable.html" class="external-link">DBI::dbWriteTable()</a></code> instead of nine individual generics:
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_indexes()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_begin()</a></code>,
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_rollback()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_commit()</a></code>,
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_list_tables()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_drop_table()</a></code>,
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_has_table()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_create_table()</a></code>, and
+<code>db_data_types()</code>.</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_escape_ident()</a></code> and
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">sql_escape_string()</a></code> are no longer used in favour of calling
+<code>dbQuoteIdentifier()</code> and <code>dbQuoteString()</code>
+directly.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_query_rows()</a></code> was never actually used.</p></li>
 </ul>
-<p>Making these changes are important because they ensure your backend works consistently whether you use it through DBI or dplyr.</p>
+<p>Making these changes are important because they ensure your backend
+works consistently whether you use it through DBI or dplyr.</p>
 </div>
 <div class="section level2">
 <h2 id="nd-edition">2nd edition<a class="anchor" aria-label="anchor" href="#nd-edition"></a>
 </h2>
-<p>dbplyr 2.0.0 draws inspiration from the idea of an <a href="https://testthat.r-lib.org/articles/third-edition.html" class="external-link">edition</a> so that to tell dbplyr to use the new generics, you need to do two things:</p>
+<p>dbplyr 2.0.0 draws inspiration from the idea of an <a href="https://testthat.r-lib.org/articles/third-edition.html" class="external-link">edition</a>
+so that to tell dbplyr to use the new generics, you need to do two
+things:</p>
 <ul>
-<li><p>Depend on dbplyr 2.0.0 in your <code>DESCRIPTION</code>, e.g. <code>Imports: dbplyr (&gt;= 2.0.0)</code>. This ensures that when someone installs your package they get the latest version of dbplyr.</p></li>
+<li><p>Depend on dbplyr 2.0.0 in your <code>DESCRIPTION</code>, e.g.
+<code>Imports: dbplyr (&gt;= 2.0.0)</code>. This ensures that when
+someone installs your package they get the latest version of
+dbplyr.</p></li>
 <li>
 <p>Provide a method for the <code>dbplyr_edition</code> generic:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' @importFrom dbplyr dbplyr_edition</span></span>
 <span><span class="co">#' @export</span></span>
 <span><span class="va">dbplyr_edition.myConnectionClass</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">con</span><span class="op">)</span> <span class="fl">2L</span></span></code></pre></div>
-<p>This tells dbplyr to use the new generics instead of the old generics.</p>
+<p>This tells dbplyr to use the new generics instead of the old
+generics.</p>
 </li>
 </ul>
-<p>Then you’ll need to update your methods, following the advice below.</p>
+<p>Then you’ll need to update your methods, following the advice
+below.</p>
 </div>
 <div class="section level2">
 <h2 id="sql-generation">SQL generation<a class="anchor" aria-label="anchor" href="#sql-generation"></a>
 </h2>
-<p>There are a number of dplyr generics that generate then execute SQL. These have been replaced by dbplyr generics that just generate the SQL (and dbplyr takes care of executing it):</p>
+<p>There are a number of dplyr generics that generate then execute SQL.
+These have been replaced by dbplyr generics that just generate the SQL
+(and dbplyr takes care of executing it):</p>
 <ul>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_analyze()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_analyze()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_analyze()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_table_analyze()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_create_index()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_table_index()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_create_index()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_table_index()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_explain()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_explain()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_explain()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_explain()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_query_fields()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_fields()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_query_fields()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_fields()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_save_query()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_save()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_save_query()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_save()</a></code>
 </li>
 </ul>
-<p>If you have methods for any of those generics, you’ll need to extract the SQL generation code into a new <code>sql_</code> method.</p>
+<p>If you have methods for any of those generics, you’ll need to extract
+the SQL generation code into a new <code>sql_</code> method.</p>
 </div>
 <div class="section level2">
 <h2 id="renamed-generics">Renamed generics<a class="anchor" aria-label="anchor" href="#renamed-generics"></a>
@@ -175,37 +212,50 @@
 <p>A number of other generics have been renamed:</p>
 <ul>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_select()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_select()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_select()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_select()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_join()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_join()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_join()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_semi_join()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_semi_join()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_semi_join()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_semi_join()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_set_op()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_set_op()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_set_op()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_set_op()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_subquery()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_query_wrap()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_subquery()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_query_wrap()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_translate_env()</a></code> -&gt; <code><a href="../reference/db-sql.html">dbplyr::sql_translation()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::sql_translate_env()</a></code> -&gt;
+<code><a href="../reference/db-sql.html">dbplyr::sql_translation()</a></code>
 </li>
 <li>
-<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_desc()</a></code> -&gt; <code><a href="../reference/db-misc.html">dbplyr::db_connection_describe()</a></code>
+<code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">dplyr::db_desc()</a></code> -&gt;
+<code><a href="../reference/db-misc.html">dbplyr::db_connection_describe()</a></code>
 </li>
 </ul>
-<p>If you have methods for any of these generics, you’ll need to rename.</p>
+<p>If you have methods for any of these generics, you’ll need to
+rename.</p>
 </div>
 <div class="section level2">
 <h2 id="new-generics">New generics<a class="anchor" aria-label="anchor" href="#new-generics"></a>
 </h2>
-<p>You may also want to consider methods for the new generics in dbplyr 2.0.0:</p>
+<p>You may also want to consider methods for the new generics in dbplyr
+2.0.0:</p>
 <ul>
-<li><p>Provide a method for <code>db_temporary_table()</code> if your backend requires that temporary tables have special names.</p></li>
-<li><p>Provide a method for <code><a href="../reference/db-sql.html">sql_expr_matches()</a></code> if your database has special syntax for matching two values (see <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link uri">https://modern-sql.com/feature/is-distinct-from</a>).</p></li>
-<li><p>Provide a method for <code><a href="../reference/db-misc.html">sql_join_suffix()</a></code> if your backend can’t use the usual <code>.x</code> and <code>.y</code> suffixes in joins.</p></li>
+<li><p>Provide a method for <code>db_temporary_table()</code> if your
+backend requires that temporary tables have special names.</p></li>
+<li><p>Provide a method for <code><a href="../reference/db-sql.html">sql_expr_matches()</a></code> if your
+database has special syntax for matching two values (see <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link uri">https://modern-sql.com/feature/is-distinct-from</a>).</p></li>
+<li><p>Provide a method for <code><a href="../reference/db-misc.html">sql_join_suffix()</a></code> if your
+backend can’t use the usual <code>.x</code> and <code>.y</code> suffixes
+in joins.</p></li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

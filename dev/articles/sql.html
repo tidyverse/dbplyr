@@ -110,7 +110,9 @@
 
     
     
-<p>This vignette discusses why you might use dbplyr instead of writing SQL yourself, and what to do when dbplyr’s built-in translations can’t create the SQL that you need.</p>
+<p>This vignette discusses why you might use dbplyr instead of writing
+SQL yourself, and what to do when dbplyr’s built-in translations can’t
+create the SQL that you need.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span></span>
@@ -119,7 +121,9 @@
 <div class="section level2">
 <h2 id="why-use-dbplyr">Why use dbplyr?<a class="anchor" aria-label="anchor" href="#why-use-dbplyr"></a>
 </h2>
-<p>One simple nicety of dplyr is that it will automatically generate subqueries if you want to use a freshly created variable in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>:</p>
+<p>One simple nicety of dplyr is that it will automatically generate
+subqueries if you want to use a freshly created variable in
+<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
@@ -133,12 +137,22 @@
 <span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span><span class="co">#&gt; )</span></span></code></pre></div>
-<p>In general, it’s much easier to work iteratively in dbplyr. You can easily give intermediate queries names, and reuse them in multiple places. Or if you have a common operation that you want to do to many queries, you can easily wrap it up in a function. It’s also easy to chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results are about what you expect.</p>
+<p>In general, it’s much easier to work iteratively in dbplyr. You can
+easily give intermediate queries names, and reuse them in multiple
+places. Or if you have a common operation that you want to do to many
+queries, you can easily wrap it up in a function. It’s also easy to
+chain <code><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count()</a></code> to the end of any query to check the results
+are about what you expect.</p>
 </div>
 <div class="section level2">
 <h2 id="what-happens-when-dbplyr-fails">What happens when dbplyr fails?<a class="anchor" aria-label="anchor" href="#what-happens-when-dbplyr-fails"></a>
 </h2>
-<p>dbplyr aims to translate the most common R functions to their SQL equivalents, allowing you to ignore the vagaries of the SQL dialect that you’re working with, so you can focus on the data analysis problem at hand. But different backends have different capabilities, and sometimes there are SQL functions that don’t have exact equivalents in R. In those cases, you’ll need to write SQL code directly.</p>
+<p>dbplyr aims to translate the most common R functions to their SQL
+equivalents, allowing you to ignore the vagaries of the SQL dialect that
+you’re working with, so you can focus on the data analysis problem at
+hand. But different backends have different capabilities, and sometimes
+there are SQL functions that don’t have exact equivalents in R. In those
+cases, you’ll need to write SQL code directly.</p>
 <p>Any function that dbplyr doesn’t know about will be left as is:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -155,7 +169,10 @@
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
-<p>SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can’t be translated directly from R code. To insert these in your own queries, you can use literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
+<p>SQL functions tend to have a greater variety of syntax than R. That
+means there are a number of expressions that can’t be translated
+directly from R code. To insert these in your own queries, you can use
+literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>

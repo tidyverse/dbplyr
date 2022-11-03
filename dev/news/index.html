@@ -440,14 +440,17 @@
 </ul></li>
 <li>
 <p>Oracle</p>
-<ul><li>New custom translation for <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code> (<a href="https://github.com/cderv" class="external-link">@cderv</a>, <a href="https://github.com/tidyverse/dbplyr/issues/221" class="external-link">#221</a>)</li></ul></li>
+<ul><li>New custom translation for <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code> (<a href="https://github.com/cderv" class="external-link">@cderv</a>, <a href="https://github.com/tidyverse/dbplyr/issues/221" class="external-link">#221</a>)</li>
+</ul></li>
 <li>
 <p>Postgres</p>
-<ul><li>Basic support for regular expressions via <code>str_detect()</code> and<br><code>str_replace_all()</code> (<a href="https://github.com/colearendt" class="external-link">@colearendt</a>, <a href="https://github.com/tidyverse/dbplyr/issues/168" class="external-link">#168</a>).</li></ul></li>
+<ul><li>Basic support for regular expressions via <code>str_detect()</code> and<br><code>str_replace_all()</code> (<a href="https://github.com/colearendt" class="external-link">@colearendt</a>, <a href="https://github.com/tidyverse/dbplyr/issues/168" class="external-link">#168</a>).</li>
+</ul></li>
 <li>
 <p>SQLite</p>
 <ul><li>
-<code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code> translation now generates <code>EXPLAIN QUERY PLAN</code> which generates a higher-level, more human friendly explanation.</li></ul></li>
+<code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code> translation now generates <code>EXPLAIN QUERY PLAN</code> which generates a higher-level, more human friendly explanation.</li>
+</ul></li>
 <li>
 <p>SQL server</p>
 <ul><li><p>Improved translation for <code>as.logical(x)</code> to <code>CAST(x as BIT)</code> (<a href="https://github.com/tidyverse/dbplyr/issues/250" class="external-link">#250</a>).</p></li>
@@ -478,7 +481,8 @@
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.3.0" id="dbplyr-130">dbplyr 1.3.0<a class="anchor" aria-label="anchor" href="#dbplyr-130"></a></h2><p class="text-muted">CRAN release: 2019-01-09</p>
-<ul><li>Now supports for dplyr 0.8.0 (<a href="https://github.com/tidyverse/dbplyr/issues/190" class="external-link">#190</a>) and R 3.1.0</li></ul><div class="section level3">
+<ul><li>Now supports for dplyr 0.8.0 (<a href="https://github.com/tidyverse/dbplyr/issues/190" class="external-link">#190</a>) and R 3.1.0</li>
+</ul><div class="section level3">
 <h3 id="api-changes-1-3-0">API changes<a class="anchor" aria-label="anchor" href="#api-changes-1-3-0"></a></h3>
 <ul><li><p>Calls of the form <code>dplyr::foo()</code> are now evaluated in the database, rather than locally (<a href="https://github.com/tidyverse/dbplyr/issues/197" class="external-link">#197</a>).</p></li>
 <li><p><code>vars</code> argument to <code><a href="../reference/tbl_sql.html">tbl_sql()</a></code> has been formally deprecated; it hasn’t actually done anything for a while (<a href="https://github.com/tidyverse/dbplyr/issues/3254" class="external-link">#3254</a>).</p></li>
@@ -505,11 +509,13 @@
 </ul></li>
 <li>
 <p>SQLite</p>
-<ul><li>Correct translation for <code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric()</a></code>/<code><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double()</a></code> (<a href="https://github.com/chris-park" class="external-link">@chris-park</a>, <a href="https://github.com/tidyverse/dbplyr/issues/171" class="external-link">#171</a>).</li></ul></li>
+<ul><li>Correct translation for <code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric()</a></code>/<code><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double()</a></code> (<a href="https://github.com/chris-park" class="external-link">@chris-park</a>, <a href="https://github.com/tidyverse/dbplyr/issues/171" class="external-link">#171</a>).</li>
+</ul></li>
 <li>
 <p>Redshift</p>
 <ul><li>
-<code><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr()</a></code> translation improved (<a href="https://github.com/tidyverse/dbplyr/issues/3339" class="external-link">#3339</a>)</li></ul></li>
+<code><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr()</a></code> translation improved (<a href="https://github.com/tidyverse/dbplyr/issues/3339" class="external-link">#3339</a>)</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-1-3-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-1-3-0"></a></h3>
@@ -521,10 +527,12 @@
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.2" id="dbplyr-122">dbplyr 1.2.2<a class="anchor" aria-label="anchor" href="#dbplyr-122"></a></h2><p class="text-muted">CRAN release: 2018-07-25</p>
-<ul><li>R CMD check fixes</li></ul></div>
+<ul><li>R CMD check fixes</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.1" id="dbplyr-121">dbplyr 1.2.1<a class="anchor" aria-label="anchor" href="#dbplyr-121"></a></h2><p class="text-muted">CRAN release: 2018-02-19</p>
-<ul><li>Forward compatibility fixes for rlang 0.2.0</li></ul></div>
+<ul><li>Forward compatibility fixes for rlang 0.2.0</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.0" id="dbplyr-120">dbplyr 1.2.0<a class="anchor" aria-label="anchor" href="#dbplyr-120"></a></h2><p class="text-muted">CRAN release: 2018-01-03</p>
 <div class="section level3">
@@ -629,7 +637,8 @@
 <div class="section level3">
 <h3 id="deprecated-and-defunct-1-0-0">Deprecated and defunct<a class="anchor" aria-label="anchor" href="#deprecated-and-defunct-1-0-0"></a></h3>
 <ul><li>
-<code>query()</code> is no longer exported. It hasn’t been useful for a while so this shouldn’t break any code.</li></ul></div>
+<code>query()</code> is no longer exported. It hasn’t been useful for a while so this shouldn’t break any code.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="verb-level-sql-generation-1-0-0">Verb-level SQL generation<a class="anchor" aria-label="anchor" href="#verb-level-sql-generation-1-0-0"></a></h3>
 <ul><li><p>Partial evaluation occurs immediately when you execute a verb (like <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code>) rather than happening when the query is executed (<a href="https://github.com/tidyverse/dbplyr/issues/2370" class="external-link">#2370</a>).</p></li>
