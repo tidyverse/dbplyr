@@ -3,6 +3,11 @@ capture_across <- function(data, x) {
   partial_eval_across(get_expr(x), data, get_env(x))
 }
 
+partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
+  call2 <- list(.cols = expr(c(!!!call_args(call))))
+  across_setup(data, call2, env, allow_rename = TRUE, fn = "pick()", error_call = error_call)
+}
+
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
   deprecate_across_dots(call, env = current_env(), user_env = env)
