@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (#1011, @krlmlr).
+* `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (@krlmlr, #1011).
 
 * Add translation for `case_match()` (@mgirlich, #1020).
 
