@@ -2,6 +2,17 @@
 
 * `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (#1011, @krlmlr).
 
+* Add translation for `case_match()` (@mgirlich, #1020).
+
+* Passing `...` to `across()` is now deprecated because the evaluation timing of
+  `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
+  you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
+
+* `case_when()` now supports the `.default` argument (@mgirlich, #1017).
+
+* `distinct()` returns columns ordered the way you request, not the same
+  as the input data (@mgirlich).
+
 * Variables that are neither found in the data nor in the environment now
   produce an error (@mgirlich, #907).
 

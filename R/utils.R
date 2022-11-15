@@ -105,3 +105,10 @@ assert_flag <- function(x, arg, call = caller_env()) {
     cli_abort("{.arg {arg}} must not be NA.", call = call)
   }
 }
+
+check_not_supplied <- function(arg, call = caller_env()) {
+  if (!is_null(arg)) {
+    arg <- caller_arg(arg)
+    cli_abort("{.arg {arg}} is not supported in SQL translations.", call = call)
+  }
+}

@@ -20,6 +20,47 @@ test_that("case_when translates correctly to ELSE when TRUE ~ is used 2", {
   )
 })
 
+test_that("case_when uses the .default arg", {
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        .default = "undefined"
+      )
+    )
+  )
+
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        .default = x + 1
+      )
+    )
+  )
+
+  # TRUE ~ has precedence over .default
+  expect_snapshot(
+    translate_sql(
+      case_when(
+        x == 1L ~ "yes",
+        x == 0L ~ "no",
+        TRUE ~ "true",
+        .default = "undefined"
+      )
+    )
+  )
+})
+
+test_that("case_when does not support .ptype and .size", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_when(x == 1L ~ "yes", .ptype = character()))))
+    (expect_error(translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
+  })
+})
+
 test_that("long case_when is on multiple lines", {
   expect_snapshot(
     translate_sql(
@@ -111,4 +152,109 @@ test_that("conditionals check arguments", {
   expect_snapshot(error = TRUE, translate_sql(case_when()))
 
   expect_snapshot(error = TRUE, translate_sql(switch(x, 1L, 2L)))
+})
+
+
+# case_match --------------------------------------------------------------
+
+test_that("LHS can handle different types", {
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, y ~ "a")),
+    sql("CASE WHEN (`z` IN (`y`)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, as.character(y) ~ "a")),
+    sql("CASE WHEN (`z` IN (CAST(`y` AS TEXT))) THEN 'a' END")
+  )
+})
+
+test_that("LHS can match multiple values", {
+  expect_equal(
+    translate_sql(case_match(z, 1:2 ~ "a")),
+    sql("CASE WHEN (`z` IN ((1, 2))) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, 3L) ~ "a")),
+    sql("CASE WHEN (`z` IN (1, 3)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, y) ~ "a")),
+    sql("CASE WHEN (`z` IN (1, `y`)) THEN 'a' END")
+  )
+})
+
+test_that("LHS can match NA", {
+  expect_equal(
+    translate_sql(case_match(z, NA ~ "a")),
+    sql("CASE WHEN (`z` IS NULL) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c(1L, NA) ~ "a")),
+    sql("CASE WHEN (`z` IN (1) OR `z` IS NULL) THEN 'a' END")
+  )
+})
+
+test_that("LHS can handle bang bang", {
+  expect_snapshot({
+    translate_sql(case_match(x, !!1L ~ "x"))
+    translate_sql(case_match(x, !!c(1L, 2L) ~ "x"))
+    translate_sql(case_match(x, !!c(NA, 1L) ~ "x"))
+  })
+})
+
+test_that("`NULL` values in `...` are dropped", {
+  expect_identical(
+    translate_sql(case_match(x, 1L ~ "a", NULL, 2L ~ "b", NULL)),
+    sql("CASE WHEN (`x` IN (1)) THEN 'a' WHEN (`x` IN (2)) THEN 'b' END")
+  )
+})
+
+test_that("requires at least one condition", {
+  expect_snapshot(error = TRUE, {
+    translate_sql(case_match(x))
+  })
+  expect_snapshot(error = TRUE, {
+    translate_sql(case_match(x, NULL))
+  })
+})
+
+test_that("passes through `.default` correctly", {
+  expect_equal(
+    translate_sql(case_match(z, 3L ~ 1L, .default = 2L)),
+    sql("CASE WHEN (`z` IN (3)) THEN 1 ELSE 2 END")
+  )
+})
+
+test_that("can handle multiple cases", {
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a", 2L ~ "b")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' END")
+  )
+
+  # also with .default
+  expect_equal(
+    translate_sql(case_match(z, 1L ~ "a", 2L ~ "b", .default = "default")),
+    sql("CASE WHEN (`z` IN (1)) THEN 'a' WHEN (`z` IN (2)) THEN 'b' ELSE 'default' END")
+  )
+})
+
+test_that("`.ptype` not supported", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
+  })
+})
+
+test_that(".x must be a symbol", {
+  expect_snapshot({
+    (expect_error(translate_sql(case_match(1, 1 ~ 1))))
+  })
 })

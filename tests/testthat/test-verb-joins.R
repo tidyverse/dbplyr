@@ -274,6 +274,22 @@ test_that("select() before join is inlined", {
   expect_equal(vars$y, c(NA, NA, "x2", "b"))
   expect_equal(vars$all_x, c("x1", "a", "y"))
   expect_equal(vars$all_y, c("x2", "b", "z"))
+
+  # attributes like `group`, `sort`, `frame` is kept
+  lf <- lazy_frame(x = 10, a = 1, b = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 10, .name = "lf2")
+  out_left <- left_join(
+    lf %>%
+      group_by(a) %>%
+      arrange(a) %>%
+      window_frame(0, 1) %>%
+      select(x, a),
+    lf2,
+    by = "x"
+  )
+  expect_equal(op_grps(out_left), "a")
+  expect_equal(op_sort(out_left), list(quo(a)), ignore_formula_env = TRUE)
+  expect_equal(op_frame(out_left), list(range = c(0, 1)))
 })
 
 test_that("select() before join works for tables with same column name", {
@@ -463,12 +479,13 @@ test_that("set ops captures both tables", {
 })
 
 test_that("extra args generates error", {
+  skip_if(getRversion() < "4.0.0")
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
   expect_error(
     inner_join(lf1, lf2, by = "x", never_used = "na"),
-    "unused argument"
+    "used"
   )
 })
 

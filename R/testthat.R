@@ -1,15 +1,11 @@
 
-expect_equal_tbl <- function(object, expected, ...,
-                             info = NULL, label = NULL, expected.label = NULL) {
-  lab_act <- label %||% expr_label(substitute(object))
-  lab_exp <- expected.label %||% expr_label(substitute(expected))
-
-  ok <- dplyr::all_equal(collect(object), collect(expected), ...)
-  msg <- glue("
-    {lab_act} not equal to {lab_exp}.
-    {paste(ok, collapse = '\n')}
-  ")
-  testthat::expect(isTRUE(ok), msg, info = info)
+compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
+  testthat::expect_equal(
+    arrange(collect(x), dplyr::across()),
+    arrange(collect(y), dplyr::across()),
+    label = label,
+    expected.label = expected.label
+  )
 }
 
 expect_equal_tbls <- function(results, ref = NULL, ...) {
@@ -36,8 +32,8 @@ expect_equal_tbls <- function(results, ref = NULL, ...) {
   }
 
   for (i in seq_along(rest)) {
-    expect_equal_tbl(
-      rest[[i]], ref, ...,
+    compare_tbl(
+      rest[[i]], ref,
       label = names(rest)[[i]],
       expected.label = ref_name
     )

@@ -162,7 +162,10 @@ base_scalar <- sql_translator(
   ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
   switch = function(x, ...) sql_switch(x, ...),
-  case_when = function(...) sql_case_when(...),
+  case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
+    sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
+  },
+  case_match = sql_case_match,
 
   `(` = function(x) {
     sql_expr(((!!x)))
@@ -192,7 +195,9 @@ base_scalar <- sql_translator(
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64  = sql_cast("BIGINT"),
 
-  c = function(...) c(...),
+  c = function(...) {
+    c(...)
+  },
   `:` = function(from, to) from:to,
 
   between = function(x, left, right) {

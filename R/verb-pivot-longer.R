@@ -79,7 +79,7 @@ pivot_longer.tbl_lazy <- function(data,
   rlang::check_dots_empty()
 
   cols <- enquo(cols)
-  spec <- tidyr::build_longer_spec(simulate_vars(data), !!cols,
+  spec <- tidyr::build_longer_spec(tidyselect_data_proxy(data), !!cols,
     names_to = names_to,
     values_to = values_to,
     names_prefix = names_prefix,
