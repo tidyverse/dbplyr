@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* The translation of `round()` for Redshift now respects the `digits` argument
+  (@owenjonesuob, #1033).
+
+* Redshift does not try to use named windows anymore (@owenjonesuob, #1035).
+
 * Passing `...` to `across()` is now deprecated because the evaluation timing of
   `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
   you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
