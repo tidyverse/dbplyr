@@ -328,7 +328,7 @@ simulate_mssql <- function(version = "15.0") {
       .parent = mssql_scalar,
       as.logical = sql_try_cast("BIT"),
       as.Date = sql_try_cast("DATE"),
-      as.POSIXct = sql_try_cast("TIMESTAMP"),
+      as.POSIXct = sql_try_cast("DATETIME2"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
 
