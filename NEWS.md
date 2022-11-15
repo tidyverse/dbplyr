@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* The translation of `round()` for Redshift now respects the `digits` argument
+  (@owenjonesuob, #1033).
+
+* Redshift does not try to use named windows anymore (@owenjonesuob, #1035).
+
 * `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (@krlmlr, #1011).
 
 * Add translation for `case_match()` (@mgirlich, #1020).
