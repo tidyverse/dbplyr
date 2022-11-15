@@ -234,82 +234,82 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
+
   vars <- join_vars(op_vars(x), op_vars(y), type = type, by = by, suffix = suffix, call = call)
 
-  inlined_select_list <- inline_select_in_join(x, y, vars, by)
-  vars <- inlined_select_list$vars
-  by <- inlined_select_list$by
+  inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
+  x_lq <- inline_result$lq
+  x_vars <- inline_result$vars
+  by_x_org <- by$x
+  by$x <- inline_result$by
+
+  inline_result <- join_inline_select(y$lazy_query, by$y, by$on)
+  y_lq <- inline_result$lq
+  y_vars <- inline_result$vars
+  by$y <- inline_result$by
+
+  vars <- update_join_vars(vars, x_lq, y_lq, x_vars, y_vars, type, by)
 
   # the table alias can only be determined after `select()` was inlined.
-  # This works even though `by` is used in `inline_select_in_join()` and updated
+  # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
 
-  x_name <- unclass(query_name(inlined_select_list$x))
-  y_name <- unclass(query_name(inlined_select_list$y))
+  x_name <- unclass(query_name(x_lq))
+  y_name <- unclass(query_name(y_lq))
   by[c("x_as", "y_as")] <- join_two_table_alias(x_name, y_name, join_alias$x, join_alias$y)
   by$x_as <- ident(by$x_as)
   by$y_as <- ident(by$y_as)
 
   lazy_join_query(
-    x = inlined_select_list$x,
-    y = inlined_select_list$y,
+    x = x_lq,
+    y = y_lq,
     vars = vars,
     type = type,
     by = by,
     suffix = suffix,
     na_matches = na_matches,
-    group_vars = op_grps(x),
-    order_vars = op_sort(x),
-    frame = op_frame(x),
     call = call
   )
 }
 
-inline_select_in_join <- function(x, y, vars, by) {
-  x_lq <- x$lazy_query
-  y_lq <- y$lazy_query
-  # Cannot inline select if `on` is used because the user might have
-  # used a renamed column.
-  if (!is_empty(by$on)) {
-    out <- list(
-      x = x_lq,
-      y = y_lq,
-      vars = vars,
-      by = by
-    )
-    return(out)
-  }
+join_inline_select <- function(lq, by, on) {
+  if (is_empty(on) && is_lazy_select_query_simple(lq, select = "projection")) {
+    vars <- purrr::map_chr(lq$select$expr, as_string)
 
-  # In some cases it would also be possible to inline mutate but this would
-  # require careful analysis to not introduce bugs which does not really seem
-  # worth it currently.
-  if (is_lazy_select_query_simple(x_lq, select = "projection")) {
-    vars$x <- update_join_vars(vars$x, x_lq$select)
-    by$x <- update_join_vars(by$x, x_lq$select)
-    vars$all_x <- op_vars(x_lq$x)
-    x_lq <- x_lq$x
-  }
+    idx <- vctrs::vec_match(lq$select$name, by)
+    by <- vctrs::vec_assign(by, idx, vars)
 
-  if (is_lazy_select_query_simple(y_lq, select = "projection")) {
-    vars$y <- update_join_vars(vars$y, y_lq$select)
-    by$y <- update_join_vars(by$y, y_lq$select)
-    vars$all_y <- op_vars(y_lq$x)
-    y_lq <- y_lq$x
+    lq_org <- lq
+    lq <- lq$x
+    lq$group_vars <- op_grps(lq_org)
+    lq$order_vars <- op_sort(lq_org)
+    lq$frame <- op_frame(lq_org)
+  } else {
+    vars <- op_vars(lq)
   }
 
   list(
-    x = x_lq,
-    y = y_lq,
+    lq = lq,
     vars = vars,
     by = by
   )
 }
 
-update_join_vars <- function(vars, select) {
-  idx <- vctrs::vec_match(select$name, vars)
-  prev_vars <- purrr::map_chr(select$expr, as_string)
-  vctrs::vec_assign(vars, idx, prev_vars)
+update_join_vars <- function(vars, x_lq, y_lq, x_vars, y_vars, type, by) {
+  vars$all_x <- op_vars(x_lq)
+  vars$all_y <- op_vars(y_lq)
+
+  if (type == "left" || type == "inner") {
+    y_vars <- setdiff(y_vars, by$y)
+  } else if (type == "right") {
+    x_vars <- setdiff(x_vars, by$x)
+  }
+
+  vars$x[!is.na(vars$x)] <- x_vars
+  vars$y[!is.na(vars$y)] <- y_vars
+  vars
 }
 
 add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
@@ -327,24 +327,13 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
     indexes = if (auto_index) list(by$y)
   )
 
+  inline_result <- join_inline_select(x$lazy_query, by$x, sql_on)
+  x_lq <- inline_result$lq
+  by$x <- inline_result$by
   vars <- tibble(
     name = op_vars(x),
-    var = op_vars(x)
+    var = inline_result$vars
   )
-
-  x_lq <- x$lazy_query
-  if (is_null(sql_on) && is_lazy_select_query_simple(x_lq, select = "projection")) {
-    if (!is_select_identity(x_lq$select, op_vars(x_lq))) {
-      by$x <- update_join_vars(by$x, x_lq$select)
-      vars$var <- purrr::map_chr(x_lq$select$expr, as_name)
-      vars$name <- x_lq$select$name
-    }
-
-    x_lq <- x_lq$x
-    x_lq$group_vars <- op_grps(x)
-    x_lq$order_vars <- op_sort(x)
-    x_lq$frame <- op_frame(x)
-  }
 
   # the table alias can only be determined after `select()` was inlined
   join_alias <- check_join_alias(x_as, y_as, sql_on, call)
