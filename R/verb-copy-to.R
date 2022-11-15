@@ -175,7 +175,7 @@ flatten_query.lazy_values_query <- function(qry, query_list) {
 }
 
 #' @export
-op_vars.lazy_values_query <- function(op) {
+op_vars.lazy_values_query <- function(op, ...) {
   colnames(op$x)
 }
 
@@ -371,62 +371,61 @@ sql_values_cast_clauses <- function(con, df, types, na) {
   sql_vector(typed_cols, parens = FALSE, collapse = NULL, con = con)
 }
 
-values_prepare <- function(con, df) {
+values_prepare <- function(con, df, ...) {
   UseMethod("values_prepare")
 }
 
 #' @export
-values_prepare.DBIConnection <- function(con, df) {
+values_prepare.DBIConnection <- function(con, df, ...) {
   df
 }
 
-# This
-sql_cast_dispatch <- function(x) {
+sql_cast_dispatch <- function(x, ...) {
   UseMethod("sql_cast_dispatch")
 }
 
 #' @export
-sql_cast_dispatch.sql <- function(x) {
+sql_cast_dispatch.sql <- function(x, ...) {
   expr(as.character)
 }
 
 #' @export
-sql_cast_dispatch.logical <- function(x) {
+sql_cast_dispatch.logical <- function(x, ...) {
   expr(as.logical)
 }
 
 #' @export
-sql_cast_dispatch.integer <- function(x) {
+sql_cast_dispatch.integer <- function(x, ...) {
   expr(as.integer)
 }
 
 #' @export
-sql_cast_dispatch.numeric <- function(x) {
+sql_cast_dispatch.numeric <- function(x, ...) {
   expr(as.numeric)
 }
 
 #' @export
-sql_cast_dispatch.character <- function(x) {
+sql_cast_dispatch.character <- function(x, ...) {
   expr(as.character)
 }
 
 #' @export
-sql_cast_dispatch.factor <- function(x) {
+sql_cast_dispatch.factor <- function(x, ...) {
   expr(as.character)
 }
 
 #' @export
-sql_cast_dispatch.Date <- function(x) {
+sql_cast_dispatch.Date <- function(x, ...) {
   expr(as.Date)
 }
 
 #' @export
-sql_cast_dispatch.POSIXct <- function(x) {
+sql_cast_dispatch.POSIXct <- function(x, ...) {
   expr(as.POSIXct)
 }
 
 #' @export
-sql_cast_dispatch.integer64 <- function(x) {
+sql_cast_dispatch.integer64 <- function(x, ...) {
   expr(as.integer64)
 }
 

@@ -31,7 +31,7 @@ print.lazy_set_op_query <- function(x, ..., con = NULL) {
 }
 
 #' @export
-op_vars.lazy_set_op_query <- function(op) {
+op_vars.lazy_set_op_query <- function(op, ...) {
   union(op_vars(op$x), op_vars(op$y))
 }
 

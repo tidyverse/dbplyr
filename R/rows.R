@@ -780,7 +780,7 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
   auto_copy(x, y, copy = copy, types = x_types)
 }
 
-get_col_types <- function(con, name, call) {
+get_col_types <- function(con, name, call, ...) {
   if (is_null(name)) {
     return(NULL)
   }
@@ -789,17 +789,17 @@ get_col_types <- function(con, name, call) {
 }
 
 #' @export
-get_col_types.TestConnection <- function(con, name, call) {
+get_col_types.TestConnection <- function(con, name, call, ...) {
   NULL
 }
 
 #' @export
-get_col_types.DBIConnection <- function(con, name, call) {
+get_col_types.DBIConnection <- function(con, name, call, ...) {
   NULL
 }
 
 #' @export
-get_col_types.PqConnection <- function(con, name, call) {
+get_col_types.PqConnection <- function(con, name, call, ...) {
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)

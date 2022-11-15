@@ -31,12 +31,12 @@ db_desc.DBIConnection <- function(x) {
 }
 #' @export
 #' @rdname db-misc
-db_connection_describe <- function(con) {
+db_connection_describe <- function(con, ...) {
   UseMethod("db_connection_describe")
 }
 # nocov start
 #' @export
-db_connection_describe.DBIConnection <- function(con) {
+db_connection_describe.DBIConnection <- function(con, ...) {
   class(con)[[1]]
 }
 # nocov end

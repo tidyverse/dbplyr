@@ -22,11 +22,11 @@
 \alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
-sql_expr_matches(con, x, y)
+sql_expr_matches(con, x, y, ...)
 
-sql_translation(con)
+sql_translation(con, ...)
 
-sql_random(con)
+sql_random(con, ...)
 
 sql_table_analyze(con, table, ...)
 
@@ -44,9 +44,9 @@ sql_indent_subquery(from, con, lvl = 0)
 
 sql_query_rows(con, sql, ...)
 
-supports_window_clause(con)
+supports_window_clause(con, ...)
 
-supports_star_without_alias(con)
+supports_star_without_alias(con, ...)
 
 sql_query_select(
   con,

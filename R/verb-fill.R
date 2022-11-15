@@ -64,7 +64,7 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
   )
 }
 
-dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
+dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction, ...) {
   UseMethod("dbplyr_fill0")
 }
 
@@ -76,10 +76,11 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
 # * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
 #' @export
 dbplyr_fill0.DBIConnection <- function(.con,
-                                          .data,
-                                          cols_to_fill,
-                                          order_by_cols,
-                                          .direction) {
+                                       .data,
+                                       cols_to_fill,
+                                       order_by_cols,
+                                       .direction,
+                                       ...) {
   # strategy:
   # 1. construct a window
   # * from the first row to the current row
@@ -190,17 +191,17 @@ dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
 
 
-last_value_sql <- function(con, x) {
+last_value_sql <- function(con, x, ...) {
   UseMethod("last_value_sql")
 }
 
 #' @export
-last_value_sql.DBIConnection <- function(con, x) {
+last_value_sql.DBIConnection <- function(con, x, ...) {
   build_sql("LAST_VALUE(", ident(as.character(x)), " IGNORE NULLS)", con = con)
 }
 
 #' @export
-`last_value_sql.Microsoft SQL Server` <- function(con, x) {
+`last_value_sql.Microsoft SQL Server` <- function(con, x, ...) {
   build_sql("LAST_VALUE(", ident(as.character(x)), ") IGNORE NULLS", con = con)
 }
 

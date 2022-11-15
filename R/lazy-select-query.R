@@ -167,12 +167,12 @@ named_commas2 <- function(x) {
 }
 
 #' @export
-op_vars.lazy_query <- function(op) {
+op_vars.lazy_query <- function(op, ...) {
   op$select$name
 }
 
 #' @export
-op_desc.lazy_query <- function(op) {
+op_desc.lazy_query <- function(op, ...) {
   "SQL"
 }
 

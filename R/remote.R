@@ -37,27 +37,27 @@ remote_name <- function(x) {
   lq$x$x
 }
 
-query_name <- function(x) {
+query_name <- function(x, ...) {
   UseMethod("query_name")
 }
 
 #' @export
-query_name.tbl_lazy <- function(x) {
+query_name.tbl_lazy <- function(x, ...) {
   query_name(x$lazy_query)
 }
 
 #' @export
-query_name.lazy_base_remote_query <- function(x) {
+query_name.lazy_base_remote_query <- function(x, ...) {
   x$x
 }
 
 #' @export
-query_name.lazy_base_local_query <- function(x) {
+query_name.lazy_base_local_query <- function(x, ...) {
   ident(x$name)
 }
 
 #' @export
-query_name.lazy_query <- function(x) {
+query_name.lazy_query <- function(x, ...) {
   NULL
 }
 

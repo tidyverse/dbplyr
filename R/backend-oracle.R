@@ -98,7 +98,7 @@ sql_query_upsert.Oracle <- function(con,
 }
 
 #' @export
-sql_translation.Oracle <- function(con) {
+sql_translation.Oracle <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       # Data type conversions are mostly based on this article
@@ -179,18 +179,18 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y) {
+sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
 }
 
 #' @export
-supports_star_without_alias.Oracle <- function(con) {
+supports_star_without_alias.Oracle <- function(con, ...) {
   FALSE
 }
 
 #' @export
-sql_random.Oracle <- function(con) {
+sql_random.Oracle <- function(con, ...) {
   sql_expr(dbms_random.RANDOM())
 }
 

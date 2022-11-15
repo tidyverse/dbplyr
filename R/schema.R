@@ -61,12 +61,12 @@ print.dbplyr_catalog <- function(x, ...) {
 }
 
 #' @export
-as.sql.dbplyr_schema <- function(x, con) {
+as.sql.dbplyr_schema <- function(x, con, ...) {
   ident_q(paste0(escape(x$schema, con = con), ".", escape(x$table, con = con)))
 }
 
 #' @export
-as.sql.dbplyr_catalog <- function(x, con) {
+as.sql.dbplyr_catalog <- function(x, con, ...) {
   ident_q(paste0(
     escape(x$catalog, con = con), ".", escape(x$schema, con = con), ".", escape(x$table, con = con)
   ))
@@ -79,7 +79,7 @@ is_catalog <- function(x) inherits(x, "dbplyr_catalog")
 # Support for DBI::Id() ---------------------------------------------------
 
 #' @export
-as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
+as.sql.Id <- function(x, con, ...) ident_q(dbQuoteIdentifier(con, x))
 
 # Old dbplyr approach -----------------------------------------------------
 

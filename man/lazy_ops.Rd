@@ -11,13 +11,13 @@
 \usage{
 lazy_base_query(x, vars, class = character(), ...)
 
-op_grps(op)
+op_grps(op, ...)
 
-op_vars(op)
+op_vars(op, ...)
 
-op_sort(op)
+op_sort(op, ...)
 
-op_frame(op)
+op_frame(op, ...)
 }
 \description{
 This set of S3 classes describe the action of dplyr verbs. These are

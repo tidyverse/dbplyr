@@ -32,7 +32,7 @@ dbplyr_edition.Hive <- function(con) {
 }
 
 #' @export
-sql_translation.Hive <- function(con) {
+sql_translation.Hive <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       bitwShiftL    = sql_prefix("SHIFTLEFT", 2),
@@ -88,7 +88,7 @@ sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) 
 }
 
 #' @export
-supports_window_clause.Hive <- function(con) {
+supports_window_clause.Hive <- function(con, ...) {
   TRUE
 }
 

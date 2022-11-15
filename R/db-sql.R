@@ -93,12 +93,12 @@ NULL
 
 #' @export
 #' @rdname db-sql
-sql_expr_matches <- function(con, x, y) {
+sql_expr_matches <- function(con, x, y, ...) {
   UseMethod("sql_expr_matches")
 }
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y) {
+sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
   build_sql(
     "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
     "THEN 0 ",
@@ -110,22 +110,22 @@ sql_expr_matches.DBIConnection <- function(con, x, y) {
 
 #' @export
 #' @rdname db-sql
-sql_translation <- function(con) {
+sql_translation <- function(con, ...) {
   UseMethod("sql_translation")
 }
 # sql_translation.DBIConnection lives in backend-.R
-dbplyr_sql_translation <- function(con) {
+dbplyr_sql_translation <- function(con, ...) {
   dbplyr_fallback(con, "sql_translate_env")
 }
 #' @importFrom dplyr sql_translate_env
 #' @export
-sql_translate_env.DBIConnection <- function(con) {
+sql_translate_env.DBIConnection <- function(con, ...) {
   sql_translation(con)
 }
 
 #' @export
 #' @rdname db-sql
-sql_random <- function(con) {
+sql_random <- function(con, ...) {
   UseMethod("sql_random")
 }
 
@@ -253,23 +253,23 @@ sql_query_rows.DBIConnection <- function(con, sql, ...) {
 
 #' @rdname db-sql
 #' @export
-supports_window_clause <- function(con) {
+supports_window_clause <- function(con, ...) {
   UseMethod("supports_window_clause")
 }
 
 #' @export
-supports_window_clause.DBIConnection <- function(con) {
+supports_window_clause.DBIConnection <- function(con, ...) {
   FALSE
 }
 
 #' @rdname db-sql
 #' @export
-supports_star_without_alias <- function(con) {
+supports_star_without_alias <- function(con, ...) {
   UseMethod("supports_star_without_alias")
 }
 
 #' @export
-supports_star_without_alias.DBIConnection <- function(con) {
+supports_star_without_alias.DBIConnection <- function(con, ...) {
   TRUE
 }
 

@@ -36,7 +36,7 @@ dbplyr_edition.MySQL <- dbplyr_edition.MariaDBConnection
 dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
-db_connection_describe.MariaDBConnection <- function(con) {
+db_connection_describe.MariaDBConnection <- function(con, ...) {
   info <- dbGetInfo(con)
 
   paste0(
@@ -51,7 +51,7 @@ db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
-sql_translation.MariaDBConnection <- function(con) {
+sql_translation.MariaDBConnection <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.logical = function(x) {
@@ -122,7 +122,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 
 
 #' @export
-sql_expr_matches.MariaDBConnection <- function(con, x, y) {
+sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
   build_sql(x, " <=> ", y, con = con)
 }
@@ -142,7 +142,7 @@ sql_values_subquery.MySQL <- sql_values_subquery.MariaDBConnection
 sql_values_subquery.MySQLConnection <- sql_values_subquery.MariaDBConnection
 
 #' @export
-sql_random.MariaDBConnection <- function(con) {
+sql_random.MariaDBConnection <- function(con, ...) {
   sql_expr(RAND())
 }
 #' @export
@@ -174,7 +174,7 @@ sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
 
 #' @export
-supports_window_clause.MariaDBConnection <- function(con) {
+supports_window_clause.MariaDBConnection <- function(con, ...) {
   TRUE
 }
 #' @export

@@ -106,12 +106,12 @@ get_subquery_name <- function(x, query_list) {
   ident(query_list$name)
 }
 
-flatten_query <- function(qry, query_list) {
+flatten_query <- function(qry, query_list, ...) {
   UseMethod("flatten_query")
 }
 
 #' @export
-flatten_query.select_query <- function(qry, query_list) {
+flatten_query.select_query <- function(qry, query_list, ...) {
   from <- qry$from
   query_list <- flatten_query(from, query_list)
 
@@ -135,7 +135,7 @@ querylist_reuse_query <- function(qry, query_list) {
 }
 
 #' @export
-flatten_query.join_query <- function(qry, query_list) {
+flatten_query.join_query <- function(qry, query_list, ...) {
   x <- qry$x
   query_list_x <- flatten_query(x, query_list)
   qry$x <- get_subquery_name(x, query_list_x)
@@ -153,12 +153,12 @@ flatten_query.semi_join_query <- flatten_query.join_query
 flatten_query.set_op_query <- flatten_query.join_query
 
 #' @export
-flatten_query.ident <- function(qry, query_list) {
+flatten_query.ident <- function(qry, query_list, ...) {
   query_list
 }
 
 #' @export
-flatten_query.sql <- function(qry, query_list) {
+flatten_query.sql <- function(qry, query_list, ...) {
   query_list
 }
 

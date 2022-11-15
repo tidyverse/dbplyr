@@ -7,13 +7,13 @@
 \alias{sql_escape_raw}
 \title{SQL escaping/quoting generics}
 \usage{
-sql_escape_logical(con, x)
+sql_escape_logical(con, x, ...)
 
-sql_escape_date(con, x)
+sql_escape_date(con, x, ...)
 
-sql_escape_datetime(con, x)
+sql_escape_datetime(con, x, ...)
 
-sql_escape_raw(con, x)
+sql_escape_raw(con, x, ...)
 }
 \description{
 These generics translate individual values into SQL. The core

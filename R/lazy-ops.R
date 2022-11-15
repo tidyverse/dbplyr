@@ -69,31 +69,31 @@ sql_build.lazy_base_local_query <- function(op, con, ...) {
 
 #' @export
 #' @rdname lazy_ops
-op_grps <- function(op) UseMethod("op_grps")
+op_grps <- function(op, ...) UseMethod("op_grps")
 #' @export
-op_grps.tbl_lazy <- function(op) op_grps(op$lazy_query)
+op_grps.tbl_lazy <- function(op, ...) op_grps(op$lazy_query)
 #' @export
-op_grps.lazy_query <- function(op) op$group_vars %||% character()
+op_grps.lazy_query <- function(op, ...) op$group_vars %||% character()
 
 # op_vars -----------------------------------------------------------------
 
 #' @export
 #' @rdname lazy_ops
-op_vars <- function(op) UseMethod("op_vars")
+op_vars <- function(op, ...) UseMethod("op_vars")
 #' @export
-op_vars.tbl_lazy <- function(op) op_vars(op$lazy_query)
+op_vars.tbl_lazy <- function(op, ...) op_vars(op$lazy_query)
 #' @export
-op_vars.lazy_base_query <- function(op) op$vars
+op_vars.lazy_base_query <- function(op, ...) op$vars
 
 # op_sort -----------------------------------------------------------------
 
 #' @export
 #' @rdname lazy_ops
-op_sort <- function(op) UseMethod("op_sort")
+op_sort <- function(op, ...) UseMethod("op_sort")
 #' @export
-op_sort.tbl_lazy <- function(op) op_sort(op$lazy_query)
+op_sort.tbl_lazy <- function(op, ...) op_sort(op$lazy_query)
 #' @export
-op_sort.lazy_query <- function(op) {
+op_sort.lazy_query <- function(op, ...) {
   # Renaming (like for groups) cannot be done because:
   # * `order_vars` is a list of quosures
   # * variables needed in sorting can be dropped
@@ -104,11 +104,11 @@ op_sort.lazy_query <- function(op) {
 
 #' @export
 #' @rdname lazy_ops
-op_frame <- function(op) UseMethod("op_frame")
+op_frame <- function(op, ...) UseMethod("op_frame")
 #' @export
-op_frame.tbl_lazy <- function(op) op_frame(op$lazy_query)
+op_frame.tbl_lazy <- function(op, ...) op_frame(op$lazy_query)
 #' @export
-op_frame.lazy_query <- function(op) op$frame
+op_frame.lazy_query <- function(op, ...) op$frame
 
 # Description -------------------------------------------------------------
 
@@ -123,10 +123,10 @@ op_cols <- function(op) {
   length(op_vars(op))
 }
 
-op_desc <- function(op) UseMethod("op_desc")
+op_desc <- function(op, ...) UseMethod("op_desc")
 
 #' @export
-op_desc.lazy_base_remote_query <- function(op) {
+op_desc.lazy_base_remote_query <- function(op, ...) {
   if (is.ident(op$x)) {
     paste0("table<", op$x, ">")
   } else {

@@ -35,7 +35,7 @@ redshift_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translation.RedshiftConnection <- function(con) {
+sql_translation.RedshiftConnection <- function(con, ...) {
   postgres <- sql_translation.PostgreSQL(con)
 
   sql_variant(
@@ -134,7 +134,7 @@ sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
 sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
 
 #' @export
-supports_window_clause.Redshift <- function(con) {
+supports_window_clause.Redshift <- function(con, ...) {
   FALSE
 }
 

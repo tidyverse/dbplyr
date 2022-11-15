@@ -201,7 +201,7 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_translation.Microsoft SQL Server` <- function(con) {
+`sql_translation.Microsoft SQL Server` <- function(con, ...) {
   mssql_scalar <-
     sql_translator(.parent = base_odbc_scalar,
 
@@ -384,7 +384,7 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
+`sql_escape_raw.Microsoft SQL Server` <- function(con, x, ...) {
   # SQL Server binary constants should be prefixed with 0x
   # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
   paste0(c("0x", format(x)), collapse = "")
@@ -400,7 +400,7 @@ mssql_version <- function(con) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary) {
+`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
   if (temporary && substr(table, 1, 1) != "#") {
     table <- hash_temp(table)
   }
@@ -427,7 +427,7 @@ mssql_version <- function(con) {
 `sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
 
 #' @export
-`sql_random.Microsoft SQL Server` <- function(con) {
+`sql_random.Microsoft SQL Server` <- function(con, ...) {
   sql_expr(RAND())
 }
 
@@ -506,7 +506,7 @@ mssql_case_when <- function(...) {
 }
 
 #' @export
-`sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
+`sql_escape_logical.Microsoft SQL Server` <- function(con, x, ...) {
   if (mssql_needs_bit()) {
     y <- ifelse(x, "1", "0")
   } else {

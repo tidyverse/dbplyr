@@ -37,7 +37,7 @@ dbplyr_edition.PostgreSQL <- function(con) {
 dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PqConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
@@ -65,7 +65,7 @@ postgres_round <- function(x, digits = 0L) {
 }
 
 #' @export
-sql_translation.PqConnection <- function(con) {
+sql_translation.PqConnection <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       bitwXor = sql_infix("#"),
@@ -233,7 +233,7 @@ sql_translation.PqConnection <- function(con) {
 sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
   build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
 }
@@ -342,12 +342,12 @@ sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
 sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
-supports_window_clause.PqConnection <- function(con) {
+supports_window_clause.PqConnection <- function(con, ...) {
   TRUE
 }
 
 #' @export
-supports_window_clause.PostgreSQL <- function(con) {
+supports_window_clause.PostgreSQL <- function(con, ...) {
   TRUE
 }
 

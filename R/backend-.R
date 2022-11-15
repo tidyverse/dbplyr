@@ -11,7 +11,7 @@
 NULL
 
 #' @export
-sql_translation.DBIConnection <- function(con) {
+sql_translation.DBIConnection <- function(con, ...) {
   sql_variant(
     base_scalar,
     base_agg,
@@ -492,7 +492,7 @@ base_no_win <- sql_translator(
 )
 
 #' @export
-sql_random.DBIConnection <- function(con) {
+sql_random.DBIConnection <- function(con, ...) {
   sql_expr(RANDOM())
 }
 

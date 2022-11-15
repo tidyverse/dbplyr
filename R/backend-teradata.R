@@ -53,7 +53,7 @@ sql_query_select.Teradata <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_translation.Teradata <- function(con) {
+sql_translation.Teradata <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_odbc_scalar,
       `!=`          = sql_infix("<>"),
@@ -165,7 +165,7 @@ sql_table_analyze.Teradata <- function(con, table, ...) {
 }
 
 #' @export
-supports_star_without_alias.Teradata <- function(con) {
+supports_star_without_alias.Teradata <- function(con, ...) {
   FALSE
 }
 

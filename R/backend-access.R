@@ -57,7 +57,7 @@ sql_query_select.ACCESS <- function(con, select, from,
 }
 
 #' @export
-sql_translation.ACCESS <- function(con) {
+sql_translation.ACCESS <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       # Much of this translation comes from: https://www.techonthenet.com/access/functions/
@@ -164,7 +164,7 @@ sql_table_analyze.ACCESS <- function(con, table, ...) {
 # Util -------------------------------------------
 
 #' @export
-sql_escape_logical.ACCESS <- function(con, x) {
+sql_escape_logical.ACCESS <- function(con, x, ...) {
   # Access uses a convention of -1 as True and 0 as False
   y <- ifelse(x, -1, 0)
   y[is.na(x)] <- "NULL"
@@ -172,7 +172,7 @@ sql_escape_logical.ACCESS <- function(con, x) {
 }
 
 #' @export
-sql_escape_date.ACCESS <-  function(con, x) {
+sql_escape_date.ACCESS <-  function(con, x, ...) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
   y[is.na(x)] <- "NULL"
@@ -180,7 +180,7 @@ sql_escape_date.ACCESS <-  function(con, x) {
 }
 
 #' @export
-sql_escape_datetime.ACCESS <-  function(con, x) {
+sql_escape_datetime.ACCESS <-  function(con, x, ...) {
   # Access delimits datetimes using octothorpes, and uses YYYY-MM-DD HH:MM:SS
   # Timezones are not supported in Access
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")
@@ -189,7 +189,7 @@ sql_escape_datetime.ACCESS <-  function(con, x) {
 }
 
 #' @export
-supports_window_clause.ACCESS <- function(con) {
+supports_window_clause.ACCESS <- function(con, ...) {
   TRUE
 }
 

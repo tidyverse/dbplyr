@@ -33,7 +33,7 @@ dbplyr_edition.SQLiteConnection <- function(con) {
 }
 
 #' @export
-db_connection_describe.SQLiteConnection <- function(con) {
+db_connection_describe.SQLiteConnection <- function(con, ...) {
   paste0("sqlite ", sqlite_version(), " [", con@dbname, "]")
 }
 
@@ -55,7 +55,7 @@ sqlite_version <- function() {
 # SQL methods -------------------------------------------------------------
 
 #' @export
-sql_translation.SQLiteConnection <- function(con) {
+sql_translation.SQLiteConnection <- function(con, ...) {
   sql_variant(
     sql_translator(.parent = base_scalar,
       as.numeric = sql_cast("REAL"),
@@ -108,7 +108,7 @@ sql_translation.SQLiteConnection <- function(con) {
 }
 
 #' @export
-sql_escape_logical.SQLiteConnection <- function(con, x){
+sql_escape_logical.SQLiteConnection <- function(con, x, ...){
   y <- as.character(as.integer(x))
   y[is.na(x)] <- "NULL"
   y
@@ -129,7 +129,7 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0
 }
 
 #' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y) {
+sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   build_sql(x, " IS ", y, con = con)
 }
@@ -188,7 +188,7 @@ values_prepare.SQLiteConnection <- function(con, df) {
 }
 
 #' @export
-supports_window_clause.SQLiteConnection <- function(con) {
+supports_window_clause.SQLiteConnection <- function(con, ...) {
   TRUE
 }
 

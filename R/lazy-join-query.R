@@ -135,11 +135,11 @@ print.lazy_semi_join_query <- function(x, ...) {
 }
 
 #' @export
-op_vars.lazy_join_query <- function(op) {
+op_vars.lazy_join_query <- function(op, ...) {
   op$vars$alias
 }
 #' @export
-op_vars.lazy_semi_join_query <- function(op) {
+op_vars.lazy_semi_join_query <- function(op, ...) {
   op$vars$name
 }
 

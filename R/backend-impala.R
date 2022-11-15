@@ -28,7 +28,7 @@ dbplyr_edition.Impala <- function(con) {
 }
 
 #' @export
-sql_translation.Impala <- function(con) {
+sql_translation.Impala <- function(con, ...) {
   sql_variant(
     scalar = sql_translator(.parent = base_odbc_scalar,
       bitwNot       = sql_prefix("BITNOT", 1),

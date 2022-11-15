@@ -7,7 +7,7 @@
 \alias{dbplyr_edition}
 \title{Miscellaneous database generics}
 \usage{
-db_connection_describe(con)
+db_connection_describe(con, ...)
 
 sql_join_suffix(con, ...)
 

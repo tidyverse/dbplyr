@@ -156,10 +156,10 @@ db_write_table.DBIConnection <- function(con,
 
 # Utility functions ------------------------------------------------------------
 
-dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
-dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x)) # nocov
+dbi_quote <- function(x, con, ...) UseMethod("dbi_quote")
+dbi_quote.ident <- function(x, con, ...) DBI::dbQuoteIdentifier(con, as.character(x))
+dbi_quote.character <- function(x, con, ...) DBI::dbQuoteString(con, x)
+dbi_quote.sql <- function(x, con, ...) DBI::SQL(as.character(x)) # nocov
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   if (is.null(indexes)) {
@@ -189,11 +189,11 @@ with_transaction <- function(con, in_transaction, code) {
 
 #' @export
 #' @rdname db-io
-db_table_temporary <- function(con, table, temporary) {
+db_table_temporary <- function(con, table, temporary, ...) {
   UseMethod("db_table_temporary")
 }
 #' @export
-db_table_temporary.DBIConnection <- function(con, table, temporary) {
+db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
   list(
     table = table,
     temporary = temporary

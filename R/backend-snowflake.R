@@ -17,7 +17,7 @@
 NULL
 
 #' @export
-sql_translation.Snowflake <- function(con) {
+sql_translation.Snowflake <- function(con, ...) {
   sql_variant(
     sql_translator(
       .parent = base_odbc_scalar,

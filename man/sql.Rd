@@ -10,7 +10,7 @@ sql(...)
 
 is.sql(x)
 
-as.sql(x, con)
+as.sql(x, con, ...)
 }
 \arguments{
 \item{...}{Character vectors that will be combined into a single SQL
