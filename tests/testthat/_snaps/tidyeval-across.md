@@ -272,6 +272,16 @@
       Caused by error in `pick()`:
       ! Can't rename variables in this context.
 
+# requires at least one input
+
+    Code
+      arrange(lazy_frame(x = 1), pick())
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick()`
+      Caused by error in `partial_eval_pick()`:
+      ! Must supply at least one input to `pick()`.
+
 # `filter()` with `pick()` that uses invalid tidy-selection errors
 
     Code

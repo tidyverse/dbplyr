@@ -612,6 +612,12 @@ test_that("doesn't allow renaming", {
   })
 })
 
+test_that("requires at least one input", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick())
+  })
+})
+
 # pick() + filter()
 
 test_that("`filter()` with `pick()` that uses invalid tidy-selection errors", {

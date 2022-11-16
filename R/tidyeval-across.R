@@ -4,9 +4,13 @@ capture_across <- function(data, x) {
 }
 
 partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
+  args <- call_args(call)
+  if (length(args) == 0) {
+    cli_abort("Must supply at least one input to {.fn pick}.", error_call = error_call)
+  }
 
   locs <- tidyselect::eval_select(
-    expr(c(!!!call_args(call))),
+    expr(c(!!!args)),
     data,
     env = env,
     allow_rename = FALSE,
