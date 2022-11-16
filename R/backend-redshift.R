@@ -141,4 +141,4 @@ supports_window_clause.Redshift <- function(con) {
 #' @export
 supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float"))
