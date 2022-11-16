@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* `pick()` is now translated (@mgirlich, #1044).
+* `pick()`, from dplyr 1.1.0, is now translated (@mgirlich, #1044).
 
 * The translation of `round()` for Redshift now respects the `digits` argument
   (@owenjonesuob, #1033).

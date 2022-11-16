@@ -4,9 +4,6 @@ capture_across <- function(data, x) {
 }
 
 partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
-  # grps <- group_vars(data)
-  # tbl <- ungroup(tidyselect_data_proxy(data))
-  # tbl <- tbl[setdiff(colnames(tbl), grps)]
 
   locs <- tidyselect::eval_select(
     expr(c(!!!call_args(call))),
@@ -16,7 +13,7 @@ partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
     error_call = call("pick()")
   )
 
-  return(syms(names(locs)))
+  syms(names(locs))
 }
 
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
