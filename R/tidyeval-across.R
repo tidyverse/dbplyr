@@ -3,6 +3,23 @@ capture_across <- function(data, x) {
   partial_eval_across(get_expr(x), data, get_env(x))
 }
 
+partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
+  args <- call_args(call)
+  if (length(args) == 0) {
+    cli_abort("Must supply at least one input to {.fn pick}.", error_call = error_call)
+  }
+
+  locs <- tidyselect::eval_select(
+    expr(c(!!!args)),
+    data,
+    env = env,
+    allow_rename = FALSE,
+    error_call = call("pick()")
+  )
+
+  syms(names(locs))
+}
+
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
   call <- match.call(dplyr::across, call, expand.dots = FALSE, envir = env)
   deprecate_across_dots(call, env = current_env(), user_env = env)

@@ -251,3 +251,45 @@
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
 
+# `pick()` errors in `arrange()` are useful
+
+    Code
+      arrange(df, pick(y))
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick(y)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
+# doesn't allow renaming
+
+    Code
+      arrange(lazy_frame(x = 1), pick(y = x))
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick(y = x)`
+      Caused by error in `pick()`:
+      ! Can't rename variables in this context.
+
+# requires at least one input
+
+    Code
+      arrange(lazy_frame(x = 1), pick())
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick()`
+      Caused by error in `partial_eval_pick()`:
+      ! Must supply at least one input to `pick()`.
+
+# `filter()` with `pick()` that uses invalid tidy-selection errors
+
+    Code
+      filter(df, pick(x, a))
+    Condition
+      Error in `filter()`:
+      ! Problem while computing `..1 = pick(x, a)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `a` doesn't exist.
+
