@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `pick()` is now translated (@mgirlich, #1044).
+
 * Passing `...` to `across()` is now deprecated because the evaluation timing of
   `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
   you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.

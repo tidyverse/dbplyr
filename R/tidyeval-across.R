@@ -4,8 +4,19 @@ capture_across <- function(data, x) {
 }
 
 partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
-  call2 <- list(.cols = expr(c(!!!call_args(call))))
-  across_setup(data, call2, env, allow_rename = TRUE, fn = "pick()", error_call = error_call)
+  # grps <- group_vars(data)
+  # tbl <- ungroup(tidyselect_data_proxy(data))
+  # tbl <- tbl[setdiff(colnames(tbl), grps)]
+
+  locs <- tidyselect::eval_select(
+    expr(c(!!!call_args(call))),
+    data,
+    env = env,
+    allow_rename = FALSE,
+    error_call = call("pick()")
+  )
+
+  return(syms(names(locs)))
 }
 
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {

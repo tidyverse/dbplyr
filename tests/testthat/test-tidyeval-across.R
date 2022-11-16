@@ -578,3 +578,61 @@ test_that("if_all() translates dots", {
 
   expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
 })
+
+
+# pick --------------------------------------------------------------------
+
+# pick() + arrange()
+
+test_that("can `arrange()` with `pick()` selection", {
+  df <- lazy_frame(x = c(2, 2, 1), y = c(3, 1, 3))
+
+  expect_identical(
+    arrange(df, pick(x, y)) %>% remote_query(),
+    sql("SELECT *\nFROM `df`\nORDER BY `x`, `y`")
+  )
+
+  expect_identical(
+    arrange(df, pick(x), y) %>% remote_query(),
+    sql("SELECT *\nFROM `df`\nORDER BY `x`, `y`")
+  )
+})
+
+test_that("`pick()` errors in `arrange()` are useful", {
+  df <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    arrange(df, pick(y))
+  })
+})
+
+test_that("doesn't allow renaming", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick(y = x))
+  })
+})
+
+# pick() + filter()
+
+test_that("`filter()` with `pick()` that uses invalid tidy-selection errors", {
+  df <- lazy_frame(x = c(1, 2, NA, 3), y = c(2, NA, 5, 3))
+
+  expect_snapshot(error = TRUE, {
+    filter(df, pick(x, a))
+  })
+})
+
+# pick() + group_by()
+
+test_that("`pick()` can be used inside `group_by()` wrappers", {
+  df <- lazy_frame(a = 1:3, b = 2:4, c = 3:5)
+
+  tidyselect_group_by <- function(data, groups) {
+    group_by(data, pick({{ groups }}))
+  }
+  expect_identical(
+    tidyselect_group_by(df, c(a, c)),
+    group_by(df, a, c)
+  )
+})
+
