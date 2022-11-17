@@ -4,23 +4,6 @@
 #' They are translated to computed expressions in the `SELECT` clause of
 #' the SQL query.
 #'
-#' @param .keep `r lifecycle::badge("experimental")`
-#'   Control which columns from `.data` are retained in the output. Grouping
-#'   columns and columns created by `...` are always kept.
-#'
-#'   * `"all"` retains all columns from `.data`. This is the default.
-#'   * `"used"` retains only the columns used in `...` to create new
-#'     columns. This is useful for checking your work, as it displays inputs
-#'     and outputs side-by-side.
-#'   * `"unused"` retains only the columns _not_ used in `...` to create new
-#'     columns. This is useful if you generate new columns, but no longer need
-#'     the columns used to generate them.
-#'   * `"none"` doesn't retain any extra columns from `.data`. Only the grouping
-#'     variables and columns created by `...` are kept.
-#' @param .before,.after `r lifecycle::badge("experimental")`
-#'   <[`tidy-select`][dplyr_tidy_select]> Optionally, control where new columns
-#'   should appear (the default is to add to the right hand side). See
-#'   [relocate()] for more details.
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::mutate
 #' @inherit arrange.tbl_lazy return

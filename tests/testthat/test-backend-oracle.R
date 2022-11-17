@@ -60,6 +60,8 @@ test_that("generates custom sql", {
 
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl")))
   expect_snapshot(sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"), temporary = FALSE))
+
+  expect_snapshot(slice_sample(lf, n = 1))
 })
 
 test_that("copy_inline uses UNION ALL", {

@@ -16,20 +16,27 @@
 #' db %>% distinct(x) %>% show_query()
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
-  can_use_distinct <- !.keep_all || (dots_n(...) == 0 && is_empty(grps))
-  if (can_use_distinct) {
-    if (dots_n(...) > 0) {
-      .data <- transmute(.data, !!!grps, ...)
-    }
+  empty_dots <- dots_n(...) == 0
+  can_use_distinct <- !.keep_all || (empty_dots && is_empty(grps))
+  if (!can_use_distinct) {
+    .data <- .data %>%
+      group_by(..., .add = TRUE) %>%
+      filter(row_number() == 1L) %>%
+      group_by(!!!grps)
 
-    .data$lazy_query <- add_distinct(.data)
     return(.data)
   }
 
-  .data %>%
-    group_by(..., .add = TRUE) %>%
-    filter(row_number() == 1L) %>%
-    group_by(!!!grps)
+  if (empty_dots) {
+    dots <- quos(!!!syms(colnames(.data)))
+  } else {
+    dots <- enquos(...)
+  }
+  prep <- dplyr::distinct_prepare(.data, dots, group_vars = group_vars(.data))
+  out <- dplyr::select(prep$data, prep$keep)
+
+  out$lazy_query <- add_distinct(out)
+  out
 }
 
 add_distinct <- function(.data) {

@@ -38,7 +38,7 @@
       <error/rlang_error>
       Error in `summarise()`:
       ! Problem while computing `issue_col = across(a_sum, sum)`
-      Caused by error in `across()`:
+      Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
       i You need an extra `mutate()` step to use it.

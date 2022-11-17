@@ -13,7 +13,7 @@ test_that("two mutates equivalent to one", {
 
   df1 <- mf %>% mutate(x2 = x * 2, y4 = y * 4) %>% collect()
   df2 <- mf %>% collect() %>% mutate(x2 = x * 2, y4 = y * 4)
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 })
 
 test_that("can refer to fresly created values", {
@@ -121,6 +121,7 @@ test_that("constants do not need a new query", {
 })
 
 test_that("mutate() produces nice error messages", {
+  options(lifecycle_verbosity = "quiet")
   expect_snapshot(error = TRUE, {
     lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
 

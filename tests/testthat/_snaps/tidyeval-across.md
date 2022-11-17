@@ -10,26 +10,6 @@
       Error in `across()`:
       ! Cannot translate functions consisting of more than one statement.
 
-# across() does not support formulas with dots
-
-    Code
-      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
-    Output
-      <error/rlang_error>
-      Error in `across()`:
-      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
-    Code
-      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
-      )
-    Output
-      <error/rlang_error>
-      Error in `across()`:
-      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
-
 # across() gives informative errors
 
     Code
@@ -121,6 +101,17 @@
       Error in `group_by()`:
       ! In dbplyr, the result of `across()` must be unnamed.
       i `x = across()` is named.
+
+# across() throws error if unpack = TRUE
+
+    Code
+      (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+    Output
+      <error/rlang_error>
+      Error in `mutate()`:
+      ! Problem while computing `..1 = across(x, .unpack = TRUE)`
+      Caused by error in `mutate()`:
+      ! `.unpack = TRUE` is not supported in SQL translations.
 
 # if_all() gives informative errors
 
@@ -219,7 +210,86 @@
     Code
       (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
     Output
-      <error/rlang_error>
+      <error/tidyselect:::error_disallowed_rename>
       Error in `if_all()`:
       ! Can't rename variables in this context.
+
+# across(...) is deprecated
+
+    Code
+      summarise(lf, across(everything(), mean, na.rm = TRUE))
+    Condition
+      Warning:
+      The `...` argument of `across()` is deprecated as of dbplyr 2.3.0.
+      i Supply arguments directly to `.fns` through a lambda instead.
+      
+      # Previously across(a:b, mean, na.rm = TRUE)
+      
+      # Now across(a:b, ~mean(.x, na.rm = TRUE))
+    Output
+      <SQL>
+      SELECT AVG(`x`) AS `x`
+      FROM `df`
+
+# across() does not support formulas with dots
+
+    Code
+      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+    Code
+      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
+      )
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+
+# `pick()` errors in `arrange()` are useful
+
+    Code
+      arrange(df, pick(y))
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick(y)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
+# doesn't allow renaming
+
+    Code
+      arrange(lazy_frame(x = 1), pick(y = x))
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick(y = x)`
+      Caused by error in `pick()`:
+      ! Can't rename variables in this context.
+
+# requires at least one input
+
+    Code
+      arrange(lazy_frame(x = 1), pick())
+    Condition
+      Error in `arrange()`:
+      ! Problem while computing `..1 = pick()`
+      Caused by error in `partial_eval_pick()`:
+      ! Must supply at least one input to `pick()`.
+
+# `filter()` with `pick()` that uses invalid tidy-selection errors
+
+    Code
+      filter(df, pick(x, a))
+    Condition
+      Error in `filter()`:
+      ! Problem while computing `..1 = pick(x, a)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `a` doesn't exist.
 

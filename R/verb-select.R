@@ -19,11 +19,9 @@
 #' db %>% relocate(z) %>% show_query()
 #' db %>% rename(first = x, last = z) %>% show_query()
 select.tbl_lazy <- function(.data, ...) {
-  sim_data <- simulate_vars(.data)
-  sim_data <- group_by(sim_data, !!!syms(group_vars(.data)))
-  loc <- fix_call(tidyselect::eval_select(expr(c(...)), sim_data))
-  loc <- ensure_group_vars(loc, sim_data, notify = TRUE)
-  new_vars <- set_names(names(sim_data)[loc], names(loc))
+  loc <- tidyselect::eval_select(expr(c(...)), .data)
+  loc <- ensure_group_vars(loc, .data, notify = TRUE)
+  new_vars <- set_names(colnames(.data)[loc], names(loc))
 
   .data$lazy_query <- add_select(.data, syms(new_vars))
   .data
@@ -34,7 +32,7 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
   missing <- setdiff(group_loc, loc)
 
   if (length(missing) > 0) {
-    vars <- names(data)[missing]
+    vars <- colnames(data)[missing]
     if (notify) {
       cli::cli_inform("Adding missing grouping variables: {.var {vars}}")
     }
@@ -49,10 +47,9 @@ ensure_group_vars <- function(loc, data, notify = TRUE) {
 #' @importFrom dplyr rename
 #' @export
 rename.tbl_lazy <- function(.data, ...) {
-  sim_data <- simulate_vars(.data)
-  loc <- fix_call(tidyselect::eval_rename(expr(c(...)), sim_data))
+  loc <- tidyselect::eval_rename(expr(c(...)), .data)
 
-  new_vars <- set_names(names(sim_data), names(sim_data))
+  new_vars <- set_names(colnames(.data), colnames(.data))
   names(new_vars)[loc] <- names(loc)
 
   .data$lazy_query <- add_select(.data, syms(new_vars))
@@ -66,7 +63,7 @@ rename.tbl_lazy <- function(.data, ...) {
 #' @export
 rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   .fn <- as_function(.fn)
-  cols <- fix_call(tidyselect::eval_select(enquo(.cols), simulate_vars(.data)))
+  cols <- tidyselect::eval_select(enquo(.cols), .data)
 
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
@@ -80,31 +77,16 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
 #' @inheritParams dplyr::relocate
 #' @export
 relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
-  # Hack: We want to use `dplyr::relocate.data.frame()` instead of reimplementing it.
-  # Because `relocate()` can rename columns we use an attribute to store the
-  # original column position.
-  sim_data <- simulate_vars(.data)
-  for (i in seq_along(sim_data)) {
-    attr(sim_data[[i]], "dbplyr_org_pos") <- i
-  }
-
-  new_vars <- fix_call(
-    dplyr::relocate(
-      sim_data,
-      ...,
-      .before = {{.before}},
-      .after = {{.after}}
-    )
+  loc <- tidyselect::eval_relocate(
+    expr(c(...)),
+    data = .data,
+    before = enquo(.before),
+    after = enquo(.after),
+    before_arg = ".before",
+    after_arg = ".after"
   )
 
-  old_vars <- colnames(sim_data)
-  vars_mapping <- purrr::map_chr(
-    new_vars,
-    ~ old_vars[[attr(.x, "dbplyr_org_pos")]]
-  )
-
-  .data$lazy_query <- add_select(.data, syms(vars_mapping))
-  .data
+  dplyr::select(.data, !!!loc)
 }
 
 #' Simulate variables to use in tidyselect
@@ -117,6 +99,7 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
 #' @export
 #' @keywords internal
 simulate_vars <- function (x, drop_groups = FALSE) {
+  # keep this for now as this might be used by other packages
   UseMethod("simulate_vars")
 }
 
@@ -235,11 +218,4 @@ is_identity <- function(exprs, names, names_prev) {
   }
 
   identical(names, names_prev)
-}
-
-fix_call <- function(expr, call = caller_env()) {
-  withCallingHandlers(expr, error = function(cnd) {
-    cnd$call <- call
-    cnd_signal(cnd)
-  })
 }

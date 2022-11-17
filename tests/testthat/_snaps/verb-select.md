@@ -89,6 +89,8 @@
       lf %>% select(non_existent + 1)
     Condition
       Error in `select()`:
+      ! Problem while evaluating `non_existent + 1`.
+      Caused by error:
       ! object 'non_existent' not found
 
 ---
@@ -103,6 +105,8 @@
       lf %>% relocate(non_existent + 1)
     Condition
       Error in `relocate()`:
+      ! Problem while evaluating `non_existent + 1`.
+      Caused by error:
       ! object 'non_existent' not found
 
 ---
@@ -122,6 +126,8 @@
       lf %>% rename(y = non_existent + 1)
     Condition
       Error in `rename()`:
+      ! Problem while evaluating `non_existent + 1`.
+      Caused by error:
       ! object 'non_existent' not found
 
 ---
@@ -136,6 +142,8 @@
       lf %>% rename_with(toupper, .cols = non_existent + 1)
     Condition
       Error in `rename_with()`:
+      ! Problem while evaluating `non_existent + 1`.
+      Caused by error:
       ! object 'non_existent' not found
 
 # multiple selects are collapsed

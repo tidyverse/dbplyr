@@ -5,7 +5,7 @@ test_that("filter captures local variables", {
   df1 <- mf %>% filter(x > z) %>% collect()
   df2 <- mf %>% collect() %>% filter(x > z)
 
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 })
 
 test_that("two filters equivalent to one", {
@@ -13,7 +13,7 @@ test_that("two filters equivalent to one", {
 
   df1 <- mf %>% filter(x > 3) %>% filter(y < 3)
   df2 <- mf %>% filter(x > 3, y < 3)
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 
   expect_equal(df1 %>% remote_query(), df2 %>% remote_query())
   expect_snapshot(df1 %>% remote_query(), transform = function(x) {
@@ -24,7 +24,7 @@ test_that("two filters equivalent to one", {
   df1 <- mf %>% filter(mean(x, na.rm = TRUE) > 3) %>% filter(y < 3)
   unique_subquery_name_reset()
   df2 <- mf %>% filter(mean(x, na.rm = TRUE) > 3, y < 3)
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 
   expect_equal(df1 %>% remote_query(), df2 %>% remote_query())
   expect_snapshot(df1 %>% remote_query(), transform = function(x) {
@@ -42,7 +42,7 @@ test_that("each argument gets implicit parens", {
 
   mf1 <- mf %>% filter((v1 == "a" | v2 == "a") & v3 == "a")
   mf2 <- mf %>% filter(v1 == "a" | v2 == "a", v3 == "a")
-  expect_equal_tbl(mf1, mf2)
+  compare_tbl(mf1, mf2)
 })
 
 test_that("only add step if necessary", {

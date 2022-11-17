@@ -176,7 +176,7 @@ test_that("names windows automatically", {
 
   lf1 <- lf %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
     )
 
@@ -240,7 +240,7 @@ test_that("only name windows if they appear multiple times", {
     group_by(part) %>%
     window_order(ord) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
     )
 
@@ -266,7 +266,7 @@ test_that("name windows only if supported", {
   ) %>%
     group_by(part) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE)
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE))
     )
 
   sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_hana())

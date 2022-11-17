@@ -1,3 +1,18 @@
+# custom aggregates translated
+
+    Code
+      (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! quantile() is not available in this SQL variant
+    Code
+      (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! quantile() is not available in this SQL variant
+
 # custom SQL translation
 
     Code

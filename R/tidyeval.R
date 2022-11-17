@@ -74,6 +74,8 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
     partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
   } else if (is_call(call, "across")) {
     partial_eval_across(call, data, env, error_call)
+  } else if (is_call(call, "pick")) {
+    partial_eval_pick(call, data, env, error_call)
   } else if (is_call(call)) {
     partial_eval_call(call, data, env)
   } else {
@@ -165,7 +167,7 @@ partial_eval_call <- function(call, data, env) {
 
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
-    vars <- colnames(simulate_vars(data, drop_groups = FALSE))
+    vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
     # TODO what about environment in `dtplyr`?

@@ -74,6 +74,19 @@
       `schema`.`tbl` AS
       SELECT * FROM foo
 
+---
+
+    Code
+      slice_sample(lf, n = 1)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.RANDOM()) AS `q01`
+        FROM (`df`) 
+      ) `q01`
+      WHERE (`q01` <= 1)
+
 # copy_inline uses UNION ALL
 
     Code
