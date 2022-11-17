@@ -456,7 +456,9 @@ again use <code><a href="../reference/translate_sql.html">translate_sql()</a></c
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER ()</span></span>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (ORDER BY `G`)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt; CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT((`G` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`G` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `G`)</span></span>
+<span><span class="co">#&gt; END</span></span>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">ntile</a></span><span class="op">(</span><span class="va">G</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></span>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span></span>
