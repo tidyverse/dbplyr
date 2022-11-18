@@ -84,3 +84,52 @@
       Error in `sql_switch()`:
       ! Can only have one unnamed (ELSE) input
 
+# LHS can handle bang bang
+
+    Code
+      translate_sql(case_match(x, !!1L ~ "x"))
+    Output
+      <SQL> CASE WHEN (`x` IN (1)) THEN 'x' END
+    Code
+      translate_sql(case_match(x, !!c(1L, 2L) ~ "x"))
+    Output
+      <SQL> CASE WHEN (`x` IN (1, 2)) THEN 'x' END
+    Code
+      translate_sql(case_match(x, !!c(NA, 1L) ~ "x"))
+    Output
+      <SQL> CASE WHEN (`x` IN (1) OR `x` IS NULL) THEN 'x' END
+
+# requires at least one condition
+
+    Code
+      translate_sql(case_match(x))
+    Condition
+      Error in `case_match()`:
+      ! No cases provided
+
+---
+
+    Code
+      translate_sql(case_match(x, NULL))
+    Condition
+      Error in `case_match()`:
+      ! No cases provided
+
+# `.ptype` not supported
+
+    Code
+      (expect_error(translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
+    Output
+      <error/rlang_error>
+      Error in `case_match()`:
+      ! `.ptype` is not supported in SQL translations.
+
+# .x must be a symbol
+
+    Code
+      (expect_error(translate_sql(case_match(1, 1 ~ 1))))
+    Output
+      <error/rlang_error>
+      Error in `case_match()`:
+      ! `.x` must be a variable or function call, not a number.
+

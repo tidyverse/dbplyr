@@ -29,6 +29,11 @@ dbplyr_edition.RedshiftConnection <- function(con) {
 #' @export
 dbplyr_edition.Redshift <- dbplyr_edition.RedshiftConnection
 
+redshift_round <- function(x, digits = 0L) {
+  digits <- as.integer(digits)
+  sql_expr(round(((!!x)) %::% float, !!digits))
+}
+
 #' @export
 sql_translation.RedshiftConnection <- function(con) {
   postgres <- sql_translation.PostgreSQL(con)
@@ -39,6 +44,7 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/r_Numeric_types201.html#r_Numeric_types201-floating-point-types
       as.numeric = sql_cast("FLOAT"),
       as.double = sql_cast("FLOAT"),
+      round = redshift_round,
 
       # https://stackoverflow.com/questions/56708136
       paste  = sql_paste_redshift(" "),
@@ -127,4 +133,12 @@ sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
 #' @export
 sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))
+#' @export
+supports_window_clause.Redshift <- function(con) {
+  FALSE
+}
+
+#' @export
+supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
+
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float"))
