@@ -15,11 +15,19 @@
 #' db %>% filter(is.na(x)) %>% show_query()
 # registered onLoad
 #' @importFrom dplyr filter
-filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
+filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   if (!identical(.preserve, FALSE)) {
     cli_abort("{.arg .preserve} is not supported on database backends")
   }
   check_filter(...)
+  by <- compute_by({{ .by }},
+                   .data,
+                   by_arg = ".by",
+                   data_arg = ".data",
+                   error_call = caller_env())
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
 
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
@@ -28,6 +36,9 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   }
 
   .data$lazy_query <- add_filter(.data, dots)
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
   .data
 }
 

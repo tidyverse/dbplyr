@@ -112,3 +112,29 @@
       Error in `slice_sample()`:
       ! `prop` must be a non-missing positive number.
 
+# catches `.by` with grouped-df
+
+    Code
+      slice(gdf, .by = x)
+    Condition
+      Error in `slice()`:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
+
+# slice_helper `by` errors use correct error context and correct `by_arg`
+
+    Code
+      slice_min(gdf, order_by = x, by = x)
+    Condition
+      Error in `slice_min()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
+    Code
+      slice_max(gdf, order_by = x, by = x)
+    Condition
+      Error in `slice_max()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
+    Code
+      slice_sample(gdf, n = 1, by = x)
+    Condition
+      Error in `slice_sample()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
+

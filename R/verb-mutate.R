@@ -23,10 +23,21 @@
 #'   show_query()
 mutate.tbl_lazy <- function(.data,
                             ...,
+                            .by = NULL,
                             .keep = c("all", "used", "unused", "none"),
                             .before = NULL,
                             .after = NULL) {
   keep <- arg_match(.keep)
+
+  by <- compute_by({{ .by }},
+                   .data,
+                   by_arg = ".by",
+                   data_arg = ".data",
+                   error_call = caller_env())
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+
   layer_info <- get_mutate_layers(.data, ...)
   used <- layer_info$used_vars
   layers <- layer_info$layers
@@ -68,6 +79,9 @@ mutate.tbl_lazy <- function(.data,
     cols_retain <- setdiff(cols_out, c(cols_used, cols_unused))
   }
 
+  if (by$from_by) {
+    out$lazy_query$group_vars <- character()
+  }
 
   select(out, all_of(cols_retain))
 }

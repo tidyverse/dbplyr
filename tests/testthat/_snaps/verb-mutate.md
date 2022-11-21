@@ -91,6 +91,14 @@
       Caused by error in `across()`:
       ! `.fns` must be a NULL, a function, formula, or list
 
+# catches `.by` with grouped-df
+
+    Code
+      mutate(gdf, .by = x)
+    Condition
+      Error:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
+
 # mutate generates subqueries as needed
 
     Code

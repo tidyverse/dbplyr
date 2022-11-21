@@ -49,6 +49,14 @@
       Error in `filter()`:
       ! `.preserve` is not supported on database backends
 
+# catches `.by` with grouped-df
+
+    Code
+      filter(gdf, .by = x)
+    Condition
+      Error:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
+
 # filter() after summarise() uses `HAVING`
 
     Code

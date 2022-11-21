@@ -4,13 +4,19 @@
 \alias{summarise.tbl_lazy}
 \title{Summarise each group to one row}
 \usage{
-\method{summarise}{tbl_lazy}(.data, ..., .groups = NULL)
+\method{summarise}{tbl_lazy}(.data, ..., .by = NULL, .groups = NULL)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
 \item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
 variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+
+\item{.by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
+<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
+temporarily group by using an inline alternative to \code{\link[dplyr:group_by]{group_by()}}. For
+details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 
 \item{.groups}{\Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.
 \itemize{
