@@ -38,7 +38,7 @@ test_that("sql_on query doesn't change unexpectedly", {
   expect_snapshot(anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
 })
 
-test_that("sql_multi_join_vars works", {
+test_that("sql_multi_join_vars generates expected SQL", {
   con <- simulate_dbi()
 
   # left_join(lf(x, a), lf(x, b), by = "x")
