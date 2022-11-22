@@ -144,7 +144,6 @@ sql_multi_join_vars <- function(con, vars, table_vars) {
     }
   }
 
-  out <- purrr::compact(out)
   sql(unlist(out))
 }
 
