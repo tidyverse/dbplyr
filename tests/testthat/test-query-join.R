@@ -37,3 +37,41 @@ test_that("sql_on query doesn't change unexpectedly", {
   expect_snapshot(semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
   expect_snapshot(anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z"))
 })
+
+test_that("sql_multi_join_vars works", {
+  con <- simulate_dbi()
+
+  # left_join(lf(x, a), lf(x, b), by = "x")
+  expect_equal(
+    sql_multi_join_vars(
+      con,
+      vars = tibble(
+        name = c("x", "a", "b"),
+        var = list("x", "a", "b"),
+        table = list(1L, 1L, 2L)
+      ),
+      table_names = c("left", "right"),
+      all_vars_list = list(c("x", "a"), c("x", "b"))
+    ),
+    sql("`left`.*", b = "`b`")
+  )
+
+  expect_equal(
+    sql_multi_join_vars(
+      con,
+      vars = tibble(
+        name = c("x", "a.x", "a.y", "b"),
+        table = list(c(1, 2), 1, 2, 2),
+        var = list(c("x", "x"), "a", "a", "b")
+      ),
+      table_names = c("left", "right"),
+      all_vars_list = list(c("x", "a"), c("x", "a", "b"))
+    ),
+    sql(
+      x = "COALESCE(`left`.`x`, `right`.`x`)",
+      a.x = "`left`.`a`",
+      a.y = "`right`.`a`",
+      b = "`b`"
+    )
+  )
+})
