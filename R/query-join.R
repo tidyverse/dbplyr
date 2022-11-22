@@ -98,9 +98,9 @@ sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
 
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
   ns <- vctrs::list_sizes(vars$table)
+
+  # Handle `full_join()` which must COALESCE join cols and can never use *
   if (any(ns > 1)) {
-    # This means that two variables need to be coalesced together. This is the
-    # case for the join variables in a `full_join()`.
     out <- purrr::map2(
       vars$table, vars$var,
       function(table_ids, vars) {
