@@ -55,6 +55,7 @@ test_that("sql_multi_join_vars generates expected SQL", {
     sql("`left`.*", b = "`b`")
   )
 
+  # full_join(lf(x, a), lf(x, b), by = "x")
   expect_equal(
     sql_multi_join_vars(
       con,
