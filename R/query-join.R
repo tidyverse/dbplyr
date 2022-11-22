@@ -44,6 +44,43 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 
 # SQL generation ----------------------------------------------------------
 
+# Examples for the input structure
+#
+# # --- left join ---
+# out <- left_join(
+#   lazy_frame(x = 1, a = 1),
+#   lazy_frame(x = 1, a = 1, b = 1),
+#   by = "x"
+# ) %>%
+#   select(y = x, a.y, a.x)
+#
+# tibble(
+#   name = c("y", "a.y", "a.x"),
+#   table = list(1, 2, 1),
+#   var = list("x", "a", "a")
+# )
+# table_names <- c("LHS", "RHS")
+# all_vars_list <- list(c("x", "a"), c("x", "a", "b"))
+#
+# # --- full join ---
+# out <- full_join(
+#   lazy_frame(x = 1, a = 1),
+#   lazy_frame(y = 1, a = 1, b = 1),
+#   by = c("x" = "y")
+# )
+#
+# vars <- tibble(
+#   name = c("x", "a.x", "a.y", "b"),
+#   table = list(c(1, 2), 1, 2, 2),
+#   var = list(c("x", "y"), "a", "a", "b")
+# )
+#
+# * each element of `var` indicates which variable are coalesced together
+# * each element of `table` indicates from which table the corresponding
+#   variables from `var` come from
+# * for `left_join()`, `right_join()` and `inner_join()` all elements of `table`
+#   and `var` are scalars. Then there is no need to use coalesce.
+# * for `full_join()` there will be more than one variable to coalesce.
 sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
   all_vars <- tolower(unlist(all_vars_list))
   duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
