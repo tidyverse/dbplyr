@@ -44,100 +44,182 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 
 # SQL generation ----------------------------------------------------------
 
+#' @param vars tibble with three columns:
+#'   * `name` `<character>`: variable name in output.
+#'   * `table` `<list_of<integer>>`: tables index in database.
+#'   * `var` `<list_of<character>>`: variable names in database.
+#'     If more than one, need to coalesce in output.
+#' @param table_names `<character>`: table names indexed by `table`.
+#' @param all_vars_list `<list_of<character>>` All variables in each table.
+#' @noRd
+#' @examples
+#' # Left join with *
+#' vars <- tibble(
+#'   name = c("y", "a", "b", "c"),
+#'   table = list(1, 1, 1, 2),
+#'   var = list("y", "a", "b", "c")
+#' )
+#' sql_multi_join_vars(
+#'    simulate_dbi(),
+#'    vars,
+#'    c("one", "two"),
+#'    list(c("y", "a", "b"), c("y", "c"))
+#' )
+#'
+#' # Left join with duplicated names
+#' vars <- tibble(
+#'   name = c("y", "a.y", "a.x"),
+#'   table = list(1, 2, 1),
+#'   var = list("x", "a", "a")
+#' )
+#' sql_multi_join_vars(
+#'    simulate_dbi(),
+#'    vars,
+#'    c("one", "two"),
+#'    list(c("x", "a"), c("x", "a"))
+#' )
+#'
+#' # Full join
+#' vars <- tibble(
+#'   name = c("y", "a", "b", "c"),
+#'   table = list(c(1, 2), 1, 1, 2),
+#'   var = list(c("y", "y"), "a", "b", "c")
+#' )
+#' sql_multi_join_vars(
+#'    simulate_dbi(),
+#'    vars,
+#'    c("one", "two"),
+#'    list(c("x", "a"), c("x", "a"))
+#' )
+sql_multi_join_vars <- function(con, vars, table_vars) {
+  all_vars <- tolower(unlist(table_vars))
+  duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
+  duplicated_vars <- unique(duplicated_vars)
+  table_names <- names(table_vars)
 
-sql_join_vars <- function(con, vars, x_as = ident("LHS"), y_as = ident("RHS"), type) {
-  join_vars_list <- mapply(
-    FUN = sql_join_var,
-    alias = vars$alias,
-    x = vars$x,
-    y = vars$y,
-    MoreArgs = list(con = con, all_x = vars$all_x, all_y = vars$all_y, x_as = x_as, y_as = y_as),
-    SIMPLIFY = FALSE,
-    USE.NAMES = TRUE
-  )
+  # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
+  ns_table <- vctrs::list_sizes(vars$table)
+  ns_var <- vctrs::list_sizes(vars$var)
 
-  x_start <- min(c(Inf, which(!is.na(vars$x))))
-  y_start <- min(c(Inf, which(!is.na(vars$y))))
+  if (any(ns_table != ns_var) || any(ns_table == 0) || any(ns_var == 0)) {
+    cli_abort("vars$var or vars$table has incorrect size", .internal = TRUE)
+  }
 
-  if (type == "left" || type == "inner") {
-    join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
-  } else if (type == "right") {
-    join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
-  } else if (type == "cross") {
-    # shrink `join_vars_list` from the back to not mess up the indices
-    if (x_start < y_start) {
-      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
-      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
+  # Handle `full_join()` which must COALESCE join cols and can never use *
+  if (any(ns_table > 1)) {
+    out <- purrr::map2(
+      vars$table, vars$var,
+      function(table_ids, vars) {
+        sql_multi_join_var(con, vars, table_ids, table_names, duplicated_vars)
+      }
+    )
+
+    out <- set_names(out, vars$name)
+    return(sql(unlist(out)))
+  }
+
+  # At this point `vars$var` and `vars$table` must be list of scalars so they
+  # can be safely unchopped
+  out <- rep_named(vars$name, list())
+  vars$var <- vctrs::list_unchop(vars$var, ptype = character())
+  vars$table <- vctrs::list_unchop(vars$table, ptype = integer())
+
+  for (i in seq_along(table_names)) {
+    all_vars_current <- table_vars[[i]]
+    vars_idx <- which(vars$table == i)
+    used_vars_current <- vars$var[vars_idx]
+    out_vars_current <- vars$name[vars_idx]
+
+    if (join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
+      id <- vars_idx[[1]]
+      tbl_alias <- escape(ident(table_names[i]), con = con)
+      out[[id]] <- sql(paste0(tbl_alias, ".*"))
+      names(out)[id] <- ""
     } else {
-      join_vars_list <- join_use_star(con, vars$alias, vars$x, vars$all_x, join_vars_list, x_as)
-      join_vars_list <- join_use_star(con, vars$alias, vars$y, vars$all_y, join_vars_list, y_as)
+      out[vars_idx] <- purrr::map2(
+        used_vars_current, i,
+        ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
+      )
+
     }
   }
 
-  sql(unlist(join_vars_list))
+  sql(unlist(out))
 }
 
-sql_join_var <- function(con, alias, x, y, all_x, all_y, x_as, y_as) {
-  if (!is.na(x) && !is.na(y)) {
-    sql_expr(
+join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
+  # using `tbl.*` for a single variable is silly
+  if (length(all_vars) <= 1) {
+    return(FALSE)
+  }
+
+  # all variables need to be used in same order
+  if (!identical(used_vars, all_vars)) {
+    return(FALSE)
+  }
+
+  # they must not be renamed
+  if (!identical(used_vars, out_vars)) {
+    return(FALSE)
+  }
+
+  # the variables must form a sequence
+  all(diff(idx) == 1)
+}
+
+sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {
+  if (length(table_id) > 1) {
+    if (length(table_id) != 2 || length(var) != 2) {
+      cli_abort("{.arg table_id} or {.arg var} does not have length 2", .internal = TRUE)
+    }
+
+    table_1 <- table_names[[table_id[[1]]]]
+    table_2 <- table_names[[table_id[[2]]]]
+
+    out <- sql_expr(
       COALESCE(
-        !!sql_table_prefix(con, x, table = x_as),
-        !!sql_table_prefix(con, y, table = y_as)
+        !!sql_table_prefix(con, var[[1]], table = ident(table_1)),
+        !!sql_table_prefix(con, var[[2]], table = ident(table_2))
       ),
       con = con
     )
-  } else if (!is.na(x)) {
-    sql_table_prefix(con, x, table = if (tolower(x) %in% tolower(all_y)) x_as)
-  } else if (!is.na(y)) {
-    sql_table_prefix(con, y, table = if (tolower(y) %in% tolower(all_x)) y_as)
+
+    return(out)
+  }
+
+  if (tolower(var) %in% duplicated_vars) {
+    sql_table_prefix(con, var, ident(table_names[[table_id]]))
   } else {
-    cli_abort("No source for join column {alias}") # nocov
+    sql_escape_ident(con, var)
   }
 }
 
-join_use_star <- function(con,
-                          out_vars,
-                          used_vars,
-                          in_vars,
-                          join_vars_list,
-                          tbl_alias) {
-  if (length(in_vars) <= 1) {
-    return(join_vars_list)
-  }
+sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS", type) {
+  multi_join_vars <- purrr::map2_dfr(
+    vars$x, vars$y,
+    ~ {
+      table <- integer()
+      var <- character()
+      if (!is.na(.x)) {
+        table <- 1L
+        var <- .x
+      }
 
-  if (!all(in_vars %in% used_vars)) {
-    return(join_vars_list)
-  }
+      if (!is.na(.y)) {
+        table <- c(table, 2L)
+        var <- c(var, .y)
+      }
 
-  loc_start <- vctrs::vec_match(in_vars[[1]], used_vars)
-  loc_end <- loc_start + length(in_vars) - 1
+      vctrs::new_data_frame(list(table = list(table), var = list(var)), n = 1L)
+    }
+  )
+  multi_join_vars <- vctrs::vec_cbind(name = vars$alias, multi_join_vars)
+  table_vars <- set_names(vars[c("all_x", "all_y")], c(unclass(x_as), unclass(y_as)))
 
-  # shrink `out_vars` and `used_vars` to the actual part corresponding to the
-  # table
-  idx <- seq2(loc_start, loc_end)
-  alias <- vctrs::vec_slice(out_vars, idx)
-  used_vars <- vctrs::vec_slice(used_vars, idx)
-
-  renamed <- !identical(used_vars, alias)
-  if (renamed) {
-    return(join_vars_list)
-  }
-
-  moved <- !identical(used_vars, in_vars)
-  if (moved) {
-    return(join_vars_list)
-  }
-
-  # the part of `join_vars_list` corresponding to the vars of the input tbl can
-  # now be replaced by `tbl_alias.*`
-  idx_start <- seq2(1, loc_start - 1)
-  idx_end <- seq2(loc_end + 1, length(join_vars_list))
-
-  tbl_alias <- escape(tbl_alias, con = con)
-  vctrs::vec_c(
-    vctrs::vec_slice(join_vars_list, idx_start),
-    list(sql(paste0(tbl_alias, ".*"))),
-    vctrs::vec_slice(join_vars_list, idx_end)
+  sql_multi_join_vars(
+    con,
+    multi_join_vars,
+    table_vars = table_vars
   )
 }
 
