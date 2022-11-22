@@ -50,8 +50,7 @@ test_that("sql_multi_join_vars works", {
         var = list("x", "a", "b"),
         table = list(1L, 1L, 2L)
       ),
-      table_names = c("left", "right"),
-      all_vars_list = list(c("x", "a"), c("x", "b"))
+      table_vars = list(left = c("x", "a"), right = c("x", "b"))
     ),
     sql("`left`.*", b = "`b`")
   )
@@ -64,8 +63,7 @@ test_that("sql_multi_join_vars works", {
         table = list(c(1, 2), 1, 2, 2),
         var = list(c("x", "x"), "a", "a", "b")
       ),
-      table_names = c("left", "right"),
-      all_vars_list = list(c("x", "a"), c("x", "a", "b"))
+      table_vars = list(left = c("x", "a"), right = c("x", "a", "b"))
     ),
     sql(
       x = "COALESCE(`left`.`x`, `right`.`x`)",

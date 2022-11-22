@@ -91,10 +91,11 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 #'    c("one", "two"),
 #'    list(c("x", "a"), c("x", "a"))
 #' )
-sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
-  all_vars <- tolower(unlist(all_vars_list))
+sql_multi_join_vars <- function(con, vars, table_vars) {
+  all_vars <- tolower(unlist(table_vars))
   duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
   duplicated_vars <- unique(duplicated_vars)
+  table_names <- names(table_vars)
 
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
   ns <- vctrs::list_sizes(vars$table)
@@ -129,7 +130,7 @@ sql_multi_join_vars <- function(con, vars, table_names, all_vars_list) {
   vars$table <- vctrs::list_unchop(vars$table)
 
   for (i in seq_along(table_names)) {
-    all_vars_current <- all_vars_list[[i]]
+    all_vars_current <- table_vars[[i]]
     vars_idx <- which(vars$table == i)
     used_vars_current <- vars$var[vars_idx]
     out_vars_current <- vars$name[vars_idx]
@@ -200,12 +201,12 @@ sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS", type) {
     }
   )
   multi_join_vars <- vctrs::vec_cbind(name = vars$alias, multi_join_vars)
+  table_vars <- set_names(vars[c("all_x", "all_y")], c(unclass(x_as), unclass(y_as)))
 
   sql_multi_join_vars(
     con,
     multi_join_vars,
-    table_names = c(unclass(x_as), unclass(y_as)),
-    all_vars_list = vars[c("all_x", "all_y")]
+    table_vars = table_vars
   )
 }
 
