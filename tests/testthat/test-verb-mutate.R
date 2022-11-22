@@ -168,15 +168,6 @@ test_that("can `NULL` out the `.by` column", {
   expect_identical(remote_query(out), sql("SELECT `y`\nFROM `df`"))
 })
 
-test_that("catches `.by` with grouped-df", {
-  df <- lazy_frame(x = 1)
-  gdf <- group_by(df, x)
-
-  expect_snapshot(error = TRUE, {
-    mutate(gdf, .by = x)
-  })
-})
-
 # SQL generation -----------------------------------------------------------
 
 test_that("mutate generates new variables and replaces existing", {

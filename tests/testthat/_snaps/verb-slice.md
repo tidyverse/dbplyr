@@ -112,14 +112,6 @@
       Error in `slice_sample()`:
       ! `prop` must be a non-missing positive number.
 
-# catches `.by` with grouped-df
-
-    Code
-      slice(gdf, .by = x)
-    Condition
-      Error in `slice()`:
-      ! Can't supply `.by` when `.data` is a grouped data frame.
-
 # slice_helper `by` errors use correct error context and correct `by_arg`
 
     Code

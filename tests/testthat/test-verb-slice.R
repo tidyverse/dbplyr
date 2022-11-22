@@ -55,15 +55,6 @@ test_that("check_slice_size checks for common issues", {
   expect_snapshot(error = TRUE, lf %>% slice_sample(prop = -1))
 })
 
-test_that("catches `.by` with grouped-df", {
-  df <- tibble(x = 1)
-  gdf <- group_by(df, x)
-
-  expect_snapshot(error = TRUE, {
-    slice(gdf, .by = x)
-  })
-})
-
 test_that("slice_helper `by` errors use correct error context and correct `by_arg`", {
   df <- lazy_frame(x = 1)
   gdf <- group_by(df, x)
