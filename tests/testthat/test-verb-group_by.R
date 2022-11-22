@@ -105,9 +105,9 @@ test_that("ungroup drops PARTITION BY", {
   out <- lazy_frame(x = 1) %>%
     group_by(x) %>%
     ungroup() %>%
-    mutate(x = rank(x)) %>%
+    mutate(x = sum(x)) %>%
     sql_build()
-  expect_equal(out$select, sql(x = 'RANK() OVER (ORDER BY `x`)'))
+  expect_equal(out$select, sql(x = 'SUM(`x`) OVER ()'))
 })
 
 # ops ---------------------------------------------------------------------

@@ -22,6 +22,7 @@ test_that("numeric translations", {
 
   expect_equal(translate_sql(as.numeric(x)), sql("CAST(`x` AS FLOAT)"))
   expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(round(1.234, 1)), sql("ROUND((1.234) :: float, 1)"))
 })
 
 test_that("aggregate functions", {

@@ -85,18 +85,27 @@ test_that("win_rank works", {
   local_con(simulate_dbi())
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_equal(
-    sql_row_number("x"),
-    sql("ROW_NUMBER() OVER (ORDER BY `x`)")
+    sql_row_number(ident("x")),
+    sql("CASE
+WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
+END")
   )
 })
 
-test_that("win_rank works", {
+test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")
 
   expect_equal(
     sql_cumsum(ident("x"), "y"),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+  )
+
+  # NA values results in NA rank
+  db <- memdb_frame(x = c(1, 2, NA, 3))
+  expect_equal(
+    db %>% mutate(rank = dense_rank(x)) %>% collect() %>% arrange(x),
+    tibble(x = c(1:3, NA), rank = c(1:3, NA))
   )
 })
 

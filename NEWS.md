@@ -1,5 +1,20 @@
 # dbplyr (development version)
 
+* The rank functions `row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+  `percent_rank()`, and `cume_dist()` now give missing values the rank NA to
+  match the behaviour of local data (@mgirlich, #991).
+
+* `pick()`, from dplyr 1.1.0, is now translated (@mgirlich, #1044).
+
+* The translation of `round()` for Redshift now respects the `digits` argument
+  (@owenjonesuob, #1033).
+
+* Redshift does not try to use named windows anymore (@owenjonesuob, #1035).
+
+* `as.POSIXct()` is now translated correctly for SQL Server, this fixes `copy_inline()` with such columns (@krlmlr, #1011).
+
+* Add translation for `case_match()` (@mgirlich, #1020).
+
 * Passing `...` to `across()` is now deprecated because the evaluation timing of
   `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
   you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
