@@ -120,6 +120,29 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
+# .by -------------------------------------------------------------------------
+
+test_that("can group transiently using `.by`", {
+  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
+
+  out <- filter(df, x > mean(x), .by = g) %>%
+    arrange(g, x) %>%
+    collect()
+
+  expect_identical(out$g, c(1, 2))
+  expect_identical(out$x, c(10, 3))
+  expect_equal(group_vars(out), character())
+})
+
+test_that("catches `.by` with grouped-df", {
+  df <- lazy_frame(x = 1)
+  gdf <- group_by(df, x)
+
+  expect_snapshot(error = TRUE, {
+    filter(gdf, .by = x)
+  })
+})
+
 # SQL generation --------------------------------------------------------
 
 test_that("filter calls windowed versions of sql functions", {

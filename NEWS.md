@@ -4,6 +4,8 @@
   `percent_rank()`, and `cume_dist()` now give missing values the rank NA to
   match the behaviour of local data (@mgirlich, #991).
 
+* The `.by` argument, from dplyr 1.1.0, is now supported (@mgirlich, #1051).
+
 * `pick()`, from dplyr 1.1.0, is now translated (@mgirlich, #1044).
 
 * The translation of `round()` for Redshift now respects the `digits` argument

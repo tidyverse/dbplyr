@@ -94,6 +94,22 @@
       FROM `df`
       GROUP BY `g`
 
+# can't use `.by` with `.groups`
+
+    Code
+      summarise(df, .by = x, .groups = "drop")
+    Condition
+      Error in `summarise()`:
+      ! Can't supply both `.by` and `.groups`.
+
+# catches `.by` with grouped-df
+
+    Code
+      summarise(gdf, .by = x)
+    Condition
+      Error:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
+
 # quoting for rendering summarized grouped table
 
     Code

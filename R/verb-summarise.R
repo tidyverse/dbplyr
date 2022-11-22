@@ -33,15 +33,31 @@
 #'   group_by(g) %>%
 #'   summarise(n()) %>%
 #'   show_query()
-summarise.tbl_lazy <- function(.data, ..., .groups = NULL) {
+summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   check_groups(.groups)
   dots <- summarise_eval_dots(.data, ...)
 
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = ".by",
+    data_arg = ".data",
+    error_call = caller_env()
+  )
+
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+    .groups <- "drop"
+  }
   .data$lazy_query <- add_summarise(
     .data, dots,
     .groups = .groups,
     env_caller = caller_env()
   )
+
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
   .data
 }
 
@@ -153,4 +169,70 @@ summarise_verbose <- function(.groups, .env) {
   is.null(.groups) &&
     is_reference(topenv(.env), global_env()) &&
     !identical(getOption("dplyr.summarise.inform"), FALSE)
+}
+
+compute_by <- function(by,
+                       data,
+                       ...,
+                       by_arg = "by",
+                       data_arg = "data",
+                       error_call = caller_env()) {
+  check_dots_empty0(...)
+
+  by <- enquo(by)
+  check_by(by, data, by_arg = by_arg, data_arg = data_arg, error_call = error_call)
+
+  if (is_grouped_lf(data)) {
+    names <- group_vars(data)
+    from_by <- FALSE
+  } else {
+    by <- eval_select_by(by, data, error_call = error_call)
+    names <- by
+    from_by <- TRUE
+  }
+
+  new_by(from_by = from_by, names = names)
+}
+
+is_grouped_lf <- function(data) {
+  !is_empty(group_vars(data))
+}
+
+check_by <- function(by,
+                     data,
+                     ...,
+                     by_arg = "by",
+                     data_arg = "data",
+                     error_call = caller_env()) {
+  check_dots_empty0(...)
+
+  if (quo_is_null(by)) {
+    return(invisible(NULL))
+  }
+
+  if (is_grouped_lf(data)) {
+    message <- paste0(
+      "Can't supply {.arg {by_arg}} when ",
+      "{.arg {data_arg}} is a grouped data frame."
+    )
+    cli::cli_abort(message, call = error_call)
+  }
+
+  invisible(NULL)
+}
+
+eval_select_by <- function(by,
+                           data,
+                           error_call = caller_env()) {
+  out <- tidyselect::eval_select(
+    expr = by,
+    data = data,
+    allow_rename = FALSE,
+    error_call = error_call
+  )
+  names(out)
+}
+
+new_by <- function(from_by, names) {
+  structure(list(from_by = from_by, names = names), class = "dbplyr_by")
 }
