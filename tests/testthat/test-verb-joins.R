@@ -166,57 +166,57 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   # self joins
-  table_names <- sql_build(left_join(x, x, by = "a"))$table_names
-  expect_equal(table_names, c("x_LHS", "x_RHS"))
+  table_vars <- sql_build(left_join(x, x, by = "a"))$table_vars
+  expect_named(table_vars, c("x_LHS", "x_RHS"))
 
-  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "x"))
+  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_vars
+  expect_named(table_vars, c("my_x", "x"))
 
-  table_names <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  table_vars <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_vars
+  expect_named(table_vars, c("x", "my_y"))
 
-  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
+  expect_named(table_vars, c("my_x", "my_y"))
 
   # x-y joins
-  table_names <- sql_build(left_join(x, y, by = "a"))$table_names
-  expect_equal(table_names, c("x", "y"))
+  table_vars <- sql_build(left_join(x, y, by = "a"))$table_vars
+  expect_named(table_vars, c("x", "y"))
 
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "y"))
+  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_vars
+  expect_named(table_vars, c("my_x", "y"))
 
-  table_names <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  table_vars <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_vars
+  expect_named(table_vars, c("x", "my_y"))
 
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
+  expect_named(table_vars, c("my_x", "my_y"))
 
   # x_as same name as `y`
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
-  expect_equal(table_names, c("y", "y...2"))
+  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_vars
+  expect_named(table_vars, c("y", "y...2"))
 
-  table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
-  expect_equal(table_names, c("LHS...1", "LHS"))
+  table_vars <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_vars
+  expect_named(table_vars, c("LHS...1", "LHS"))
 
   # sql_on -> use alias or LHS/RHS
-  table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
-  expect_equal(table_names, c("LHS", "RHS"))
+  table_vars <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_vars
+  expect_named(table_vars, c("LHS", "RHS"))
 
-  table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
-  expect_equal(table_names, c("my_x", "RHS"))
+  table_vars <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_vars
+  expect_named(table_vars, c("my_x", "RHS"))
 
   # triple join
   z <- lazy_frame(a = 1, z = 1, .name = "z")
   out <- left_join(x, y, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x", "y", "z"))
+  expect_named(out$table_vars, c("x", "y", "z"))
 
   # triple join where names need to be repaired
   out <- left_join(x, x, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x...1", "x...2", "z"))
+  expect_named(out$table_vars, c("x...1", "x...2", "z"))
 })
 
 test_that("select() before join is inlined", {
@@ -637,7 +637,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql("`df_LHS`.*", z = "`z`")
   )
 
@@ -648,7 +648,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql(z = "`z`", "`df_LHS`.*")
   )
 
@@ -659,7 +659,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql(a = "`df_LHS`.`a`", c = "`c`")
   )
 
@@ -671,7 +671,7 @@ test_that("left_join/inner_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
@@ -736,7 +736,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
   )
 
@@ -747,7 +747,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
   )
 
@@ -757,7 +757,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql(x = "`x`", "`df_LHS`.*", y = "`y`")
   )
 
@@ -767,7 +767,7 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_names, out$all_vars_list),
+    sql_multi_join_vars(con, out$vars, out$table_vars),
     sql(a = "`a`", "`df_RHS`.*", b = "`b`")
   )
 })

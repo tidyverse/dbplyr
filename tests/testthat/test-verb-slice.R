@@ -54,3 +54,32 @@ test_that("check_slice_size checks for common issues", {
   expect_snapshot(error = TRUE, lf %>% slice_sample(n = -1))
   expect_snapshot(error = TRUE, lf %>% slice_sample(prop = -1))
 })
+
+test_that("slice_helper `by` errors use correct error context and correct `by_arg`", {
+  df <- lazy_frame(x = 1)
+  gdf <- group_by(df, x)
+
+  expect_snapshot(error = TRUE, {
+    slice_min(gdf, order_by = x, by = x)
+    slice_max(gdf, order_by = x, by = x)
+    slice_sample(gdf, n = 1, by = x)
+  })
+})
+
+test_that("slice_min/max() work with `by`", {
+  df <- memdb_frame(g = c(2, 2, 1, 1), x = c(1, 2, 3, 1))
+
+  out <- slice_min(df, x, by = g) %>% arrange(g) %>% collect()
+  expect_identical(out, tibble(g = c(1, 2), x = 1))
+  expect_equal(group_vars(out), character())
+  expect_identical(slice_max(df, x, by = g) %>% arrange(g) %>% collect(), tibble(g = c(1, 2), x = c(3, 2)))
+})
+
+test_that("slice_sample() works with `by`", {
+  df <- tibble(g = c(2, 2, 2, 1), x = c(1, 2, 3, 1))
+  df <- memdb_frame(g = c(2, 2, 2, 1), x = c(1, 2, 3, 1))
+  expect_identical(
+    slice_sample(df, n = 2, by = g) %>% pull(g) %>% sort(),
+    c(1, 2, 2)
+  )
+})

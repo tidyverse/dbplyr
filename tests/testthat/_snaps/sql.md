@@ -11,5 +11,5 @@
       sql(a = "x", "y")
     Output
       <SQL> x AS a
-      <SQL> y AS 
+      <SQL> y
 

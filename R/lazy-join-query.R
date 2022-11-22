@@ -275,9 +275,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con), con),
     joins = op$joins,
-    table_names = table_names_out,
-    vars = op$vars,
-    all_vars_list = all_vars_list
+    table_vars = set_names(all_vars_list, table_names_out),
+    vars = op$vars
   )
 }
 
