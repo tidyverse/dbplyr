@@ -115,12 +115,13 @@ slice_sample.tbl_lazy <- function(.data, ..., n, prop, by = NULL, weight_by = NU
 }
 
 slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
-  # browser()
-  by <- compute_by({{ .by }},
-                   .data,
-                   by_arg = "by",
-                   data_arg = "data",
-                   error_call = caller_env())
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = "by",
+    data_arg = "data",
+    error_call = caller_env()
+  )
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }

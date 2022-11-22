@@ -29,11 +29,13 @@ mutate.tbl_lazy <- function(.data,
                             .after = NULL) {
   keep <- arg_match(.keep)
 
-  by <- compute_by({{ .by }},
-                   .data,
-                   by_arg = ".by",
-                   data_arg = ".data",
-                   error_call = caller_env())
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = ".by",
+    data_arg = ".data",
+    error_call = caller_env()
+  )
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }
