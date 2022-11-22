@@ -49,7 +49,7 @@ NULL
 
 #' @importFrom dplyr slice
 #' @export
-  slice.tbl_lazy <- function(.data, ...) {
+slice.tbl_lazy <- function(.data, ...) {
   cli_abort("{.fun slice} is not supported on database backends")
 }
 
