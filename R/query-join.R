@@ -158,7 +158,7 @@ join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
     return(FALSE)
   }
 
-  # all variables need to be used
+  # all variables need to be used in same order
   if (!identical(used_vars, all_vars)) {
     return(FALSE)
   }
