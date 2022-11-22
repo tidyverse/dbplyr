@@ -179,8 +179,6 @@ compute_by <- function(by,
                        error_call = caller_env()) {
   check_dots_empty0(...)
 
-  # error_call <- dplyr_error_call(error_call)
-
   by <- enquo(by)
   check_by(by, data, by_arg = by_arg, data_arg = data_arg, error_call = error_call)
 
