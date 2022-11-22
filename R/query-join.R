@@ -98,26 +98,19 @@ sql_multi_join_vars <- function(con, vars, table_vars) {
   table_names <- names(table_vars)
 
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
-  ns <- vctrs::list_sizes(vars$table)
+  ns_table <- vctrs::list_sizes(vars$table)
+  ns_var <- vctrs::list_sizes(vars$var)
+
+  if (any(ns_table != ns_var) || any(ns_table == 0) || any(ns_var == 0)) {
+    cli_abort("vars$var or vars$table has incorrect size", .internal = TRUE)
+  }
 
   # Handle `full_join()` which must COALESCE join cols and can never use *
-  if (any(ns > 1)) {
+  if (any(ns_table > 1)) {
     out <- purrr::map2(
       vars$table, vars$var,
       function(table_ids, vars) {
-        if (length(table_ids) > 1) {
-          sql_expr(
-            COALESCE(
-              !!sql_table_prefix(con, vars[[1]], table = ident(table_names[[1]])),
-              !!sql_table_prefix(con, vars[[2]], table = ident(table_names[[2]]))
-            ),
-            con = con
-          )
-        } else {
-          table_id <- table_ids[[1]]
-          var <- vars[[1]]
-          sql_multi_join_var(con, var, table_id, table_names, duplicated_vars)
-        }
+        sql_multi_join_var(con, vars, table_ids, table_names, duplicated_vars)
       }
     )
 
@@ -125,9 +118,11 @@ sql_multi_join_vars <- function(con, vars, table_vars) {
     return(sql(unlist(out)))
   }
 
+  # At this point `vars$var` and `vars$table` must be list of scalars so they
+  # can be safely unchopped
   out <- rep_named(vars$name, list())
-  vars$var <- vctrs::list_unchop(vars$var)
-  vars$table <- vctrs::list_unchop(vars$table)
+  vars$var <- vctrs::list_unchop(vars$var, ptype = character())
+  vars$table <- vctrs::list_unchop(vars$table, ptype = integer())
 
   for (i in seq_along(table_names)) {
     all_vars_current <- table_vars[[i]]
@@ -174,6 +169,25 @@ join_can_use_star <- function(all_vars, used_vars, out_vars, idx) {
 }
 
 sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {
+  if (length(table_id) > 1) {
+    if (length(table_id) != 2 || length(var) != 2) {
+      cli_abort("{.arg table_id} or {.arg var} does not have length 2", .internal = TRUE)
+    }
+
+    table_1 <- table_names[[table_id[[1]]]]
+    table_2 <- table_names[[table_id[[2]]]]
+
+    out <- sql_expr(
+      COALESCE(
+        !!sql_table_prefix(con, var[[1]], table = ident(table_1)),
+        !!sql_table_prefix(con, var[[2]], table = ident(table_2))
+      ),
+      con = con
+    )
+
+    return(out)
+  }
+
   if (tolower(var) %in% duplicated_vars) {
     sql_table_prefix(con, var, ident(table_names[[table_id]]))
   } else {
