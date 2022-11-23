@@ -400,6 +400,35 @@ sql_query_multi_join <- function(con,
 }
 
 #' @export
+#' @param vars tibble with three columns:
+#'   * `table` `<tbl_lazy>`: the tables to join with.
+#'   * `type` `<character>`: the join type (left, right, inner, full).
+#'   * `by_x`, `by_y` `<list_of<character>>`: The columns to join by
+#'   * `by_x_table_id` `<list_of<integer>>`: The table index where the join column
+#'     comes from. This needs to be a list because a the join columns might come
+#'     from different tables
+#'   * `on` `<character>`
+#'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
+#' @param vars See [sql_multi_join_vars()].
+#' @param table_vars `named <list_of<character>>`: All variables in each table.
+#' @noRd
+#' @examples
+#' # Left join with *
+#' df1 <- lazy_frame(x = 1, y = 1)
+#' df2 <- lazy_frame(x = 1, z = 1)
+#' df3 <- lazy_frame(x = 1, z2 = 1)
+#'
+#' tmp <- left_join(df1, df2, by = "x") %>%
+#'   left_join(df3, by = c("x", z = "z2"))
+#' tibble(
+#'   table = list(df1, df2),
+#'   type = c("left", "left"),
+#'   by_x = list("x", c("x", "z")),
+#'   by_y = list("x", c("x", "z2")),
+#'   by_x_table_id = list(1L, c(1L, 2L)),
+#'   on = c(NA, NA),
+#'   na_matches = c("never", "never")
+#' )
 sql_query_multi_join.DBIConnection <- function(con,
                                                x,
                                                joins,
