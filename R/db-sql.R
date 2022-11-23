@@ -441,48 +441,48 @@ sql_query_multi_join.DBIConnection <- function(con,
     cli_abort("{.arg table_names} must be unique.")
   }
 
-  x_name <- ident(table_names[[1]])
-
-  # FIXME pass `table_vars` to sql_query_multi_join
   select_sql <- sql_multi_join_vars(con, vars, table_vars)
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
 
-  ons <- purrr::pmap(
+  join_table_queries <- purrr::map2(
+    joins$table,
+    table_names[-1],
+    function(table, name) dbplyr_sql_subquery(con, table, name = name, lvl = lvl)
+  )
+  types <- toupper(paste0(joins$type, " JOIN"))
+  join_clauses <- purrr::map2(
+    types,
+    join_table_queries,
+    function(join_kw, from) sql_clause(join_kw, from)
+  )
+
+  on_clauses <- purrr::pmap(
     vctrs::vec_cbind(
       rhs = table_names[-1],
       joins[c("by_x", "by_x_table_id", "by_y", "on", "na_matches")]
     ),
     function(rhs, by_x, by_x_table_id, by_y, on, na_matches) {
       if (!is.na(on)) {
-        return(sql(on))
+        on <- sql(on)
+      } else {
+        by <- list(
+          x = ident(by_x),
+          y = ident(by_y),
+          x_as = ident(table_names[by_x_table_id]),
+          y_as = ident(rhs)
+        )
+        on <- sql_join_tbls(con, by = by, na_matches = na_matches)
       }
 
-      by <- list(
-        x = ident(by_x),
-        y = ident(by_y),
-        x_as = ident(table_names[by_x_table_id]),
-        y_as = ident(rhs)
-      )
-
-      sql_join_tbls(con, by = by, na_matches = na_matches)
+      sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
     }
   )
-
-  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
-  join_table_queries <- purrr::map2(
-    joins$table,
-    table_names[-1],
-    ~ dbplyr_sql_subquery(con, .x, name = .y, lvl = lvl)
-  )
-  types <- toupper(paste0(joins$type, " JOIN"))
-  join_clauses <- vctrs::vec_interleave(
-    purrr::map2(join_table_queries, types, ~ sql_clause(.y, .x)),
-    purrr::map(ons, ~ sql_clause("ON", .x, sep = " AND", parens = TRUE, lvl = 1))
-  )
+  join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
 
   list2(
     sql_clause_select(con, select_sql),
     sql_clause_from(from),
-    !!!join_clauses
+    !!!join_on_clauses
   ) %>%
     sql_format_clauses(lvl = lvl, con = con)
 }

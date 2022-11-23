@@ -283,7 +283,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     suffix = suffix
   )
 
-  joins_field <- join_get_metadata(
+  joins_data <- new_joins_data(
     x_lq,
     y_lq,
     new_query = new_query,
@@ -305,7 +305,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 
     out <- lazy_multi_join_query(
       x = x_lq,
-      joins = joins_field,
+      joins = joins_data,
       table_names = vctrs::vec_rbind(table_names_x, table_names_y),
       vars = vars
     )
@@ -317,7 +317,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     x_lq$table_names$as[[1]] <- join_alias$x
   }
 
-  x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_field)
+  x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_data)
   x_lq$table_names <- vctrs::vec_rbind(x_lq$table_names, table_names_y)
   x_lq$vars <- vars
 
@@ -428,7 +428,7 @@ multi_join_vars <- function(x_join_vars,
   vctrs::vec_rbind(x_join_vars, y_join_vars)
 }
 
-join_get_metadata <- function(x_lq, y_lq, new_query, type, by, na_matches) {
+new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
   if (new_query) {
     by_x_table_id <- rep_along(by$x, 1L)
   } else {
