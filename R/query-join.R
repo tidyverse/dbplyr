@@ -242,33 +242,6 @@ sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars)
   }
 }
 
-sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars) {
-  if (length(table_id) > 1) {
-    if (length(table_id) != 2 || length(var) != 2) {
-      cli_abort("{.arg table_id} or {.arg var} does not have length 2", .internal = TRUE)
-    }
-
-    table_1 <- table_names[[table_id[[1]]]]
-    table_2 <- table_names[[table_id[[2]]]]
-
-    out <- sql_expr(
-      COALESCE(
-        !!sql_table_prefix(con, var[[1]], table = ident(table_1)),
-        !!sql_table_prefix(con, var[[2]], table = ident(table_2))
-      ),
-      con = con
-    )
-
-    return(out)
-  }
-
-  if (tolower(var) %in% duplicated_vars) {
-    sql_table_prefix(con, var, ident(table_names[[table_id]]))
-  } else {
-    sql_escape_ident(con, var)
-  }
-}
-
 sql_join_vars <- function(con, vars, x_as = "LHS", y_as = "RHS", type) {
   multi_join_vars <- purrr::map2_dfr(
     vars$x, vars$y,
