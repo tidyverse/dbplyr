@@ -209,61 +209,61 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 sql_build.lazy_multi_join_query <- function(op, con, ...) {
   table_names_out <- generate_join_table_names(op$table_names)
 
-  if (length(table_names_out) == 2) {
-    if (op$joins$type %in% c("full", "right")) {
-      # construct a classical `join_query()` so that special handling of
-      # full and right join continue to work
-      type <- op$joins$type
-      x_idx <- purrr::map_lgl(op$vars$table, ~ 1L %in% .x)
-      vars_x <- purrr::map2_chr(op$vars$var, x_idx, ~ {if (.y) .x[[1]] else NA_character_})
+  if (length(table_names_out) > 2 || !op$joins$type %in% c("full", "right")) {
+    table_vars <- purrr::map(
+      set_names(c(list(op$x), op$joins$table), table_names_out),
+      op_vars
+    )
 
-      y_idx <- purrr::map_lgl(op$vars$table, ~ 2L %in% .x)
-      vars_y <- purrr::map2_chr(op$vars$var, y_idx, ~ {if (.y) dplyr::last(.x) %||% .x[[1]] else NA_character_})
+    op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
+    op$joins$by <- purrr::map2(
+      op$joins$by, seq_along(op$joins$by),
+      function(by, i) {
+        by$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
+        by$y_as <- ident(table_names_out[i + 1L])
+        by
+      }
+    )
 
-      vars_classic <- list(
-        alias = op$vars$name,
-        x = vars_x,
-        y = vars_y,
-        all_x = op_vars(op$x),
-        all_y = op_vars(op$joins$table[[1]])
-      )
+    out <- multi_join_query(
+      x = sql_optimise(sql_build(op$x, con), con),
+      joins = op$joins,
+      table_vars = table_vars,
+      vars = op$vars
+    )
 
-      by <- op$joins$by[[1]]
-      by$x_as <- ident(table_names_out[[1]])
-      by$y_as <- ident(table_names_out[[2]])
-
-      out <- join_query(
-        sql_optimise(sql_build(op$x, con), con),
-        sql_optimise(sql_build(op$joins$table[[1]], con), con),
-        vars = vars_classic,
-        type = type,
-        by = by,
-        suffix = NULL, # it seems like the suffix is not used for rendering
-        na_matches = by$na_matches
-      )
-      return(out)
-    }
+    return(out)
   }
 
-  table_vars <- purrr::map(
-    set_names(c(list(op$x), op$joins$table), table_names_out),
-    op_vars
+  # construct a classical `join_query()` so that special handling of
+  # full and right join continue to work
+  type <- op$joins$type
+  x_idx <- purrr::map_lgl(op$vars$table, ~ 1L %in% .x)
+  vars_x <- purrr::map2_chr(op$vars$var, x_idx, ~ {if (.y) .x[[1]] else NA_character_})
+
+  y_idx <- purrr::map_lgl(op$vars$table, ~ 2L %in% .x)
+  vars_y <- purrr::map2_chr(op$vars$var, y_idx, ~ {if (.y) dplyr::last(.x) %||% .x[[1]] else NA_character_})
+
+  vars_classic <- list(
+    alias = op$vars$name,
+    x = vars_x,
+    y = vars_y,
+    all_x = op_vars(op$x),
+    all_y = op_vars(op$joins$table[[1]])
   )
 
-  op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
+  by <- op$joins$by[[1]]
+  by$x_as <- ident(table_names_out[[1]])
+  by$y_as <- ident(table_names_out[[2]])
 
-  for (i in seq_along(op$joins$by)) {
-    by_i <- op$joins$by[[i]]
-    by_i$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
-    by_i$y_as <- ident(table_names_out[i + 1L])
-    op$joins$by[[i]] <- by_i
-  }
-
-  multi_join_query(
-    x = sql_optimise(sql_build(op$x, con), con),
-    joins = op$joins,
-    table_vars = table_vars,
-    vars = op$vars
+  join_query(
+    sql_optimise(sql_build(op$x, con), con),
+    sql_optimise(sql_build(op$joins$table[[1]], con), con),
+    vars = vars_classic,
+    type = type,
+    by = by,
+    suffix = NULL, # it seems like the suffix is not used for rendering
+    na_matches = by$na_matches
   )
 }
 
