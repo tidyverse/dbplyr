@@ -241,7 +241,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
   # TODO can this be really be done before inlining?
-  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
 
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
@@ -477,7 +477,7 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 
   # the table alias can only be determined after `select()` was inlined
-  join_alias <- check_join_alias(x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
 
   x_name <- unclass(query_name(x_lq))
   y_name <- unclass(query_name(y))
@@ -496,7 +496,7 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   )
 }
 
-check_join_alias <- function(x_as, y_as, sql_on, call) {
+make_join_aliases <- function(x_as, y_as, sql_on, call) {
   x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
   y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
 
