@@ -429,17 +429,7 @@ test_that("multiple joins create a single query", {
   expect_equal(lq$vars$table, list(1L, 1L, 2L, 3L))
   expect_equal(lq$vars$var, list("x", "a", "b", "b"))
 
-  expect_equal(
-    remote_query(out),
-    sql(
-"SELECT `df1`.*, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
-FROM `df1`
-LEFT JOIN `df2`
-  ON (`df1`.`x` = `df2`.`x`)
-INNER JOIN `df3`
-  ON (`df1`.`x` = `df3`.`x`)"
-    )
-  )
+  expect_snapshot(out)
 })
 
 test_that("multiple joins produce separate queries if using right/full join", {

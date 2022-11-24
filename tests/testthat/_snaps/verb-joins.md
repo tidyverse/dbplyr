@@ -63,6 +63,19 @@
         WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
+# multiple joins create a single query
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df1`.*, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+      FROM `df1`
+      LEFT JOIN `df2`
+        ON (`df1`.`x` = `df2`.`x`)
+      INNER JOIN `df3`
+        ON (`df1`.`x` = `df3`.`x`)
+
 # multiple joins produce separate queries if using right/full join
 
     Code
