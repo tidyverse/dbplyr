@@ -207,23 +207,9 @@ sql_build.lazy_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ...) {
-  auto_name <- is.na(op$table_names$as)
-  table_names_out <- dplyr::coalesce(op$table_names$as, op$table_names$name)
+  table_names_out <- generate_join_table_names(op$table_names)
+
   if (length(table_names_out) == 2) {
-    na_to_null <- function(x) {
-      if (is.na(x)) {
-        NULL
-      } else {
-        x
-      }
-    }
-
-    x_name <- na_to_null(op$table_names$name[[1]])
-    y_name <- na_to_null(op$table_names$name[[2]])
-    x_alias <- na_to_null(op$table_names$as[[1]])
-    y_alias <- na_to_null(op$table_names$as[[2]])
-    table_names_out <- join_two_table_alias(x_name, y_name, x_alias, y_alias)
-
     if (op$joins$type %in% c("full", "right")) {
       # construct a classical `join_query()` so that special handling of
       # full and right join continue to work
@@ -234,7 +220,6 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
       y_idx <- purrr::map_lgl(op$vars$table, ~ 2L %in% .x)
       vars_y <- purrr::map2_chr(op$vars$var, y_idx, ~ {if (.y) dplyr::last(.x) %||% .x[[1]] else NA_character_})
 
-
       vars_classic <- list(
         alias = op$vars$name,
         x = vars_x,
@@ -244,11 +229,6 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
       )
 
       by <- op$joins$by[[1]]
-      if (is.na(by$on)) {
-        by$on <- NULL
-      } else {
-        by$on <- sql(by$on)
-      }
       by$x_as <- ident(table_names_out[[1]])
       by$y_as <- ident(table_names_out[[2]])
 
@@ -263,9 +243,6 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
       )
       return(out)
     }
-  } else {
-    table_names_repaired <- vctrs::vec_as_names(table_names_out, repair = "unique", quiet = TRUE)
-    table_names_out[auto_name] <- table_names_repaired[auto_name]
   }
 
   table_vars <- purrr::map(
@@ -279,21 +256,41 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
     by_i <- op$joins$by[[i]]
     by_i$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
     by_i$y_as <- ident(table_names_out[i + 1L])
-    if (is.na(by_i$on)) {
-      by_i$on <- NULL
-    } else {
-      by_i$on <- sql(by_i$on)
-    }
     op$joins$by[[i]] <- by_i
   }
 
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con), con),
     joins = op$joins,
-    by_list = op$joins$by,
     table_vars = table_vars,
     vars = op$vars
   )
+}
+
+generate_join_table_names <- function(table_names) {
+  table_names_out <- dplyr::coalesce(table_names$as, table_names$name)
+
+  if (length(table_names_out) != 2) {
+    table_names_repaired <- vctrs::vec_as_names(table_names_out, repair = "unique", quiet = TRUE)
+    auto_name <- is.na(table_names$as)
+    table_names_out[auto_name] <- table_names_repaired[auto_name]
+
+    return(table_names_out)
+  }
+
+  na_to_null <- function(x) {
+    if (is.na(x)) {
+      NULL
+    } else {
+      x
+    }
+  }
+
+  x_name <- na_to_null(table_names$name[[1]])
+  y_name <- na_to_null(table_names$name[[2]])
+  x_alias <- na_to_null(table_names$as[[1]])
+  y_alias <- na_to_null(table_names$as[[2]])
+  join_two_table_alias(x_name, y_name, x_alias, y_alias)
 }
 
 #' @export
