@@ -479,12 +479,13 @@ sql_query_multi_join.DBIConnection <- function(con,
   )
   join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
 
-  list2(
+  clauses <- list2(
     sql_clause_select(con, select_sql),
     sql_clause_from(from),
     !!!join_on_clauses
-  ) %>%
-    sql_format_clauses(lvl = lvl, con = con)
+  )
+
+  sql_format_clauses(clauses, lvl = lvl, con = con)
 }
 
 #' @rdname db-sql
