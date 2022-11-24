@@ -400,7 +400,7 @@ sql_query_multi_join <- function(con,
 }
 
 #' @export
-#' @param vars tibble with three columns:
+#' @param vars tibble with six columns:
 #'   * `table` `<tbl_lazy>`: the tables to join with.
 #'   * `type` `<character>`: the join type (left, right, inner, full).
 #'   * `by_x`, `by_y` `<list_of<character>>`: The columns to join by
