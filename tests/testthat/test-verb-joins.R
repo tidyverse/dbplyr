@@ -228,8 +228,8 @@ test_that("select() before join is inlined", {
     expect_equal(lq$vars$var, var)
     expect_equal(lq$vars$table, table)
 
-    expect_equal(lq$joins$by_x, list("x1"))
-    expect_equal(lq$joins$by_y, list("x2"))
+    expect_equal(lq$joins$by[[1]]$x, ident("x1"))
+    expect_equal(lq$joins$by[[1]]$y, ident("x2"))
   }
 
   out_left <- left_join(
@@ -322,8 +322,8 @@ test_that("named by works in combination with inlined select", {
   expect_equal(op_vars(lq), c("id_x", "x.x"))
   expect_equal(lq$vars$var, list("id_x", "x"))
   expect_equal(lq$vars$table, list(1, 1))
-  expect_equal(lq$joins$by_x, list(c("id_x", "x")))
-  expect_equal(lq$joins$by_y, list(c("id_y", "x")))
+  expect_equal(lq$joins$by[[1]]$x, ident(c("id_x", "x")))
+  expect_equal(lq$joins$by[[1]]$y, ident(c("id_y", "x")))
 })
 
 test_that("suffix works in combination with inlined select", {
@@ -467,8 +467,10 @@ test_that("multiple joins can use by column from any table", {
   out <- left_join(lf, lf2, by = "x") %>%
     left_join(lf3, by = c("x", "y"))
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by_x, list("x", c("x", "y")))
-  expect_equal(joins_metadata$by_y, list("x", c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
+  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
+  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
@@ -483,8 +485,10 @@ test_that("multiple joins can use by column from any table", {
     left_join(lf3, by = c("x", "y"))
 
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by_x, list("x", c("x", "y2")))
-  expect_equal(joins_metadata$by_y, list("x", c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
+  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y2")))
+  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
+  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 })
 
@@ -833,4 +837,3 @@ test_that("add_suffixes works if no suffix requested", {
   expect_equal(add_suffixes(c("x", "x"), "y", ""), c("x", "x"))
   expect_equal(add_suffixes(c("x", "y"), "y", ""), c("x", "y"))
 })
-

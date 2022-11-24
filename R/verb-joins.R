@@ -443,11 +443,13 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
   tibble(
     table = list(y_lq),
     type = type,
-    by_x = list(by$x),
-    by_y = list(by$y),
     by_x_table_id = list(by_x_table_id),
-    on = by$on %||% NA_character_,
-    na_matches
+    by = list(list(
+      x = ident(by$x),
+      y = ident(by$y),
+      on = sql(by$on),
+      na_matches = na_matches
+    ))
   )
 }
 

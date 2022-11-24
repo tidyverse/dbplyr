@@ -456,24 +456,10 @@ sql_query_multi_join.DBIConnection <- function(con,
     function(join_kw, from) sql_clause(join_kw, from)
   )
 
-  on_clauses <- purrr::pmap(
-    vctrs::vec_cbind(
-      rhs = table_names[-1],
-      joins[c("by_x", "by_x_table_id", "by_y", "on", "na_matches")]
-    ),
-    function(rhs, by_x, by_x_table_id, by_y, on, na_matches) {
-      if (!is.na(on)) {
-        on <- sql(on)
-      } else {
-        by <- list(
-          x = ident(by_x),
-          y = ident(by_y),
-          x_as = ident(table_names[by_x_table_id]),
-          y_as = ident(rhs)
-        )
-        on <- sql_join_tbls(con, by = by, na_matches = na_matches)
-      }
-
+  on_clauses <- purrr::map(
+    joins$by,
+    function(by) {
+      on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
       sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
     }
   )

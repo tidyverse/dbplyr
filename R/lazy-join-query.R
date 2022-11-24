@@ -47,12 +47,12 @@ lazy_multi_join_query <- function(x,
                                   call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
 
-  if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "by_x_table_id", "on", "na_matches"))) {
-    cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `by_x_table_id`, `on`, `na_matches`", .internal = TRUE)
-  }
+  # if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "by_x_table_id", "on", "na_matches"))) {
+  #   cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `by_x_table_id`, `on`, `na_matches`", .internal = TRUE)
+  # }
   vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
-  vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
-  vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
+  # vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
+  # vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
 
   if (!identical(colnames(table_names), c("as", "name"))) {
     cli_abort("`table_names` must have fields `as`, `name`", .internal = TRUE)
@@ -243,20 +243,23 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
         all_y = op_vars(op$joins$table[[1]])
       )
 
+      by <- op$joins$by[[1]]
+      if (is.na(by$on)) {
+        by$on <- NULL
+      } else {
+        by$on <- sql(by$on)
+      }
+      by$x_as <- ident(table_names_out[[1]])
+      by$y_as <- ident(table_names_out[[2]])
+
       out <- join_query(
         sql_optimise(sql_build(op$x, con), con),
         sql_optimise(sql_build(op$joins$table[[1]], con), con),
         vars = vars_classic,
         type = type,
-        by = list(
-          on = sql(op$joins$on),
-          x = op$joins$by_x[[1]],
-          y = op$joins$by_y[[1]],
-          x_as = ident(table_names_out[[1]]),
-          y_as = ident(table_names_out[[2]])
-        ),
+        by = by,
         suffix = NULL, # it seems like the suffix is not used for rendering
-        na_matches = op$joins$na_matches
+        na_matches = by$na_matches
       )
       return(out)
     }
@@ -265,17 +268,30 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
     table_names_out[auto_name] <- table_names_repaired[auto_name]
   }
 
-  all_vars_list <- purrr::map(
-    c(list(op$x), op$joins$table),
+  table_vars <- purrr::map(
+    set_names(c(list(op$x), op$joins$table), table_names_out),
     op_vars
   )
 
   op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
 
+  for (i in seq_along(op$joins$by)) {
+    by_i <- op$joins$by[[i]]
+    by_i$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
+    by_i$y_as <- ident(table_names_out[i + 1L])
+    if (is.na(by_i$on)) {
+      by_i$on <- NULL
+    } else {
+      by_i$on <- sql(by_i$on)
+    }
+    op$joins$by[[i]] <- by_i
+  }
+
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con), con),
     joins = op$joins,
-    table_vars = set_names(all_vars_list, table_names_out),
+    by_list = op$joins$by,
+    table_vars = table_vars,
     vars = op$vars
   )
 }

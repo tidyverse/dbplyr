@@ -51,7 +51,7 @@ print.multi_join_query <- function(x, ...) {
     cat_line("Type: ", paste0(x$joins$type[[i]]))
 
     cat_line("By:")
-    cat_line(indent(paste0(x$joins$by_x[[i]], "-", x$joins$by_y[[i]])))
+    cat_line(indent(paste0(x$joins$by[[i]]$x, "-", x$joins$by[[i]]$y)))
 
     cat_line("Y:")
     cat_line(indent_print(sql_build(x$joins$table[[i]])))
@@ -85,6 +85,7 @@ sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE
     x = x,
     joins = query$joins,
     table_vars = query$table_vars,
+    by_list = query$by_list,
     vars = query$vars,
     lvl = lvl
   )
