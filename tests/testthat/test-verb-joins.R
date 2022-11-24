@@ -440,8 +440,13 @@ INNER JOIN `df3`
   ON (`df1`.`x` = `df3`.`x`)"
     )
   )
+})
 
-  # `right_join()` and `full_join()` are not inlined
+test_that("multiple joins produce separate queries if using right/full join", {
+  lf <- lazy_frame(x = 1, a = 1, .name = "df1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
+  lf3 <- lazy_frame(x = 1, b = 2, .name = "df3")
+
   out <- left_join(lf, lf2, by = "x") %>%
     right_join(lf3, by = "x")
 

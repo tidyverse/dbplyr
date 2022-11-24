@@ -63,7 +63,7 @@
         WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
-# multiple joins create a single query
+# multiple joins produce separate queries if using right/full join
 
     Code
       remote_query(out)
