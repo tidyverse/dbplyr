@@ -87,7 +87,7 @@
       SELECT `lf1`.`x` AS `x`
       FROM `lf1`
       LEFT JOIN `lf2`
-        ON (CASE WHEN (`lf1`.`x` = `lf2`.`x`) OR (`lf1`.`x` IS NULL AND `lf2`.`x` IS NULL) THEN 0 ELSE 1 END = 0)
+        ON (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
 
 # suffix arg is checked
 

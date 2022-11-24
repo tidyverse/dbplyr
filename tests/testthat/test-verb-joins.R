@@ -568,8 +568,9 @@ test_that("join verbs generate expected ops", {
 })
 
 test_that("can optionally match NA values", {
-  lf1 <- lazy_frame(x = 1, .name = "lf1")
-  lf2 <- lazy_frame(x = 1, .name = "lf2")
+  con <- simulate_postgres()
+  lf1 <- lazy_frame(x = 1, .name = "lf1", con = con)
+  lf2 <- lazy_frame(x = 1, .name = "lf2", con = con)
   expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
 })
 
