@@ -352,7 +352,7 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
     return(TRUE)
   }
 
-  if (!type %in% c("left", "inner")) {
+  if (type %in% c("full", "right")) {
     return(TRUE)
   }
 
