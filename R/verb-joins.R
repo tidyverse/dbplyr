@@ -292,17 +292,10 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     na_matches = na_matches
   )
 
-  table_names_y <- tibble(
-    as = join_alias$y %||% NA_character_,
-    name = as.character(query_name(y_lq) %||% NA)
-  )
+  table_names_y <- make_table_names(join_alias$y, y_lq)
 
   if (new_query) {
-    table_names_x <- tibble(
-      as = join_alias$x %||% NA_character_,
-      name = as.character(query_name(x_lq) %||% NA)
-    )
-
+    table_names_x <- make_table_names(join_alias$x, x_lq)
     out <- lazy_multi_join_query(
       x = x_lq,
       joins = joins_data,
@@ -314,7 +307,8 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
 
   # `x_lq` must be a `lazy_multi_join_query` so it can be modified directly
   if (!is_null(join_alias$x)) {
-    x_lq$table_names$as[[1]] <- join_alias$x
+    x_lq$table_names$name[[1]] <- join_alias$x
+    x_lq$table_names$from[[1]] <- "as"
   }
 
   x_lq$joins <- vctrs::vec_rbind(x_lq$joins, joins_data)
@@ -359,20 +353,20 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
   x_as <- join_alias$x
   y_as <- join_alias$y
 
-  as_current <- x_lq$table_names$as
+  names <- x_lq$table_names$name
+  from <- x_lq$table_names$from
   if (!is_null(x_as)) {
-    x_as_current <- as_current[[1]]
-    if (!is.na(x_as_current) && !identical(x_as, x_as_current)) {
+    if (from[[1]] == "as" && !identical(x_as, names[[1]])) {
       return(TRUE)
     }
 
-    if (x_as %in% as_current[-1]) {
+    if (x_as %in% names[-1][from[-1] == "as"]) {
       return(TRUE)
     }
   }
 
   if (!is_null(y_as)) {
-    if (y_as %in% as_current) {
+    if (y_as %in% names[from == "as"]) {
       return(TRUE)
     }
   }
@@ -479,9 +473,12 @@ add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = F
   # the table alias can only be determined after `select()` was inlined
   join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
 
-  x_name <- unclass(query_name(x_lq))
-  y_name <- unclass(query_name(y))
-  by[c("x_as", "y_as")] <- join_two_table_alias(x_name, y_name, join_alias$x, join_alias$y)
+  x_alias <- make_table_names(join_alias$x, x_lq)
+  y_alias <- make_table_names(join_alias$y, y)
+  by[c("x_as", "y_as")] <- join_two_table_alias(
+    c(x_alias$name, y_alias$name),
+    c(x_alias$from, y_alias$from)
+  )
   by$x_as <- ident(by$x_as)
   by$y_as <- ident(by$y_as)
 
@@ -505,6 +502,18 @@ make_join_aliases <- function(x_as, y_as, sql_on, call) {
   }
 
   list(x = x_as, y = y_as)
+}
+
+make_table_names <- function(as, lq) {
+  name <- unclass(query_name(lq))
+
+  if (!is.null(as)) {
+    tibble(name = as, from = "as")
+  } else if (!is.null(name)) {
+    tibble(name = name, from = "name")
+  } else {
+    tibble(name = NA_character_, from = "")
+  }
 }
 
 check_join_as1 <- function(as, arg, sql_on, default, call) {
@@ -590,34 +599,31 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   )
 }
 
-join_two_table_alias <- function(x_name, y_name, x_alias, y_alias) {
-  stopifnot(is.null(x_name) || is.character(x_name))
-  stopifnot(is.null(y_name) || is.character(y_name))
-  stopifnot(is.null(x_alias) || is.character(x_alias))
-  stopifnot(is.null(y_alias) || is.character(y_alias))
+join_two_table_alias <- function(names, from) {
+  stopifnot(is.character(names))
+  stopifnot(is.character(from))
+  stopifnot(length(names) == 2L)
 
-  x_out <- x_alias %||% x_name %||% "LHS"
-  y_out <- y_alias %||% y_name %||% "RHS"
-  out <- c(x_out, y_out)
+  out <- dplyr::coalesce(names, c("LHS", "RHS"))
 
-  if (!identical(x_out, y_out)) {
+  if (!identical(out[1], out[2])) {
     return(out)
   }
   # -> must rename
 
-  if (is_null(x_alias) && is_null(y_alias)) {
+  if (from[1] != "as" && from[2] != "as") {
     # self join of named table
-    if (!is_null(x_name) && !is_null(y_name) && identical(x_name, y_name)) {
+    if (!is.na(names[1]) && !is.na(names[2]) && identical(names[1], names[2])) {
       out <- c(
-        paste0(x_name, "_LHS"),
-        paste0(y_name, "_RHS")
+        paste0(names[1], "_LHS"),
+        paste0(names[2], "_RHS")
       )
       return(out)
     }
   }
 
-  out_repaired <- vctrs::vec_as_names(c(x_out, y_out), repair = "unique", quiet = TRUE)
-  may_repair <- c(is_null(x_alias), is_null(y_alias))
+  out_repaired <- vctrs::vec_as_names(out, repair = "unique", quiet = TRUE)
+  may_repair <- c(from[1] != "as", from[2] != "as")
   out[may_repair] <- out_repaired[may_repair]
 
   out

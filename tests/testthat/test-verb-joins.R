@@ -424,7 +424,7 @@ test_that("multiple joins create a single query", {
     inner_join(lf3, by = "x")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(as = NA_character_, name = c("df1", "df2", "df3")))
+  expect_equal(lq$table_names, tibble(name = c("df1", "df2", "df3"), from = "name"))
   expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
   expect_equal(lq$vars$table, list(1L, 1L, 2L, 3L))
   expect_equal(lq$vars$var, list("x", "a", "b", "b"))
@@ -496,7 +496,7 @@ test_that("multi joins work with x_as", {
     inner_join(lf3, by = "x", y_as = "lf3")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(as = c("lf1", "lf2", "lf3"), name = c("df1", "df2", "df3")))
+  expect_equal(lq$table_names, tibble(name = c("lf1", "lf2", "lf3"), from = "as"))
 
   # `x_as` provided twice with the same name -> one query
   out2 <- left_join(lf, lf2, by = "x", x_as = "lf1", y_as = "lf2") %>%

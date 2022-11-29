@@ -47,18 +47,16 @@ lazy_multi_join_query <- function(x,
                                   call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
 
-  # if (!identical(colnames(joins), c("table", "type", "by_x", "by_y", "by_x_table_id", "on", "na_matches"))) {
-  #   cli_abort("`joins` must have fields `table`, `type`, `by_x`, `by_y`, `by_x_table_id`, `on`, `na_matches`", .internal = TRUE)
-  # }
-  vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
-  # vctrs::vec_assert(joins$on, character(), arg = "joins$on", call = caller_env())
-  # vctrs::vec_assert(joins$na_matches, character(), arg = "joins$na_matches", call = caller_env())
-
-  if (!identical(colnames(table_names), c("as", "name"))) {
-    cli_abort("`table_names` must have fields `as`, `name`", .internal = TRUE)
+  if (!identical(colnames(joins), c("table", "type", "by_x_table_id", "by"))) {
+    cli_abort("`joins` must have fields `table`, `type`, `by_x_table_id`, `by`", .internal = TRUE)
   }
-  vctrs::vec_assert(table_names$as, character(), arg = "table_names$as", call = caller_env())
+  vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
+
+  if (!identical(colnames(table_names), c("name", "from"))) {
+    cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
+  }
   vctrs::vec_assert(table_names$name, character(), arg = "table_names$as", call = caller_env())
+  vctrs::vec_assert(table_names$from, character(), arg = "table_names$from", call = caller_env())
 
   if (!identical(colnames(vars), c("name", "table", "var"))) {
     cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
@@ -268,29 +266,15 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
 }
 
 generate_join_table_names <- function(table_names) {
-  table_names_out <- dplyr::coalesce(table_names$as, table_names$name)
+  if (length(table_names$name) != 2) {
+    table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
+    auto_name <- table_names$from != "as"
+    table_names$name[auto_name] <- table_names_repaired[auto_name]
 
-  if (length(table_names_out) != 2) {
-    table_names_repaired <- vctrs::vec_as_names(table_names_out, repair = "unique", quiet = TRUE)
-    auto_name <- is.na(table_names$as)
-    table_names_out[auto_name] <- table_names_repaired[auto_name]
-
-    return(table_names_out)
+    return(table_names$name)
   }
 
-  na_to_null <- function(x) {
-    if (is.na(x)) {
-      NULL
-    } else {
-      x
-    }
-  }
-
-  x_name <- na_to_null(table_names$name[[1]])
-  y_name <- na_to_null(table_names$name[[2]])
-  x_alias <- na_to_null(table_names$as[[1]])
-  y_alias <- na_to_null(table_names$as[[2]])
-  join_two_table_alias(x_name, y_name, x_alias, y_alias)
+  join_two_table_alias(table_names$name, table_names$from)
 }
 
 #' @export
