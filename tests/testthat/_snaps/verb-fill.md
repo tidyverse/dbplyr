@@ -82,7 +82,12 @@
 # fill errors on unsorted data
 
     Code
-      expect_error(df_db %>% tidyr::fill(n1))
+      (expect_error(df_db %>% tidyr::fill(n1)))
+    Output
+      <error/rlang_error>
+      Error in `tidyr::fill()`:
+      x `.data` does not have explicit order.
+      i Please use `dbplyr::window_order()` to make order explicit.
 
 # fill() produces nice error messages
 

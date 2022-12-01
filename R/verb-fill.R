@@ -42,7 +42,7 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     cli_abort(
       c(
         x = "{.arg .data} does not have explicit order.",
-        i = "Please use {.fun arrange} or {.fun window_order} to make determinstic."
+        i = "Please use {.fun dbplyr::window_order} to make order explicit."
       )
     )
   }
