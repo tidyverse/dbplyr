@@ -24,6 +24,39 @@
         LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC) AS `n1`
       FROM `df`
 
+---
+
+    Code
+      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "updown")
+    Output
+      <SQL>
+      SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id`) AS `n1`
+      FROM (
+        SELECT
+          `id`,
+          `group`,
+          LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC) AS `n1`
+        FROM `df`
+      ) `q01`
+
+---
+
+    Code
+      df_lazy_std %>% window_order(id) %>% tidyr::fill(n1, .direction = "downup")
+    Output
+      <SQL>
+      SELECT
+        `id`,
+        `group`,
+        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC) AS `n1`
+      FROM (
+        SELECT
+          `id`,
+          `group`,
+          LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id`) AS `n1`
+        FROM `df`
+      ) `q01`
+
 # up-direction works with descending
 
     Code

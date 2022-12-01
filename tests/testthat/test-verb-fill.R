@@ -54,6 +54,19 @@ test_that("up-direction works", {
   )
 })
 
+test_that("up-direction works", {
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "updown")
+  )
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "downup")
+  )
+})
+
 test_that("up-direction works with descending", {
   expect_snapshot(
     df_lazy_ns %>%

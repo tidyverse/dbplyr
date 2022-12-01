@@ -32,11 +32,11 @@
 #'     n_squirrels,
 #'     n_squirrels2,
 #'   )
-fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
+fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "downup")) {
   cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
   cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
-  .direction <- arg_match0(.direction, c("down", "up"))
+  .direction <- arg_match0(.direction, c("down", "up", "updown", "downup"))
 
   if (is_empty(order_by_cols)) {
     cli_abort(
@@ -47,11 +47,15 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     )
   }
 
+  if (.direction == "updown") {
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "up")
+    return(tidyr::fill(.data, !!!cols_to_fill, .direction = "down"))
+  } else if (.direction == "downup") {
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "down")
+    return(tidyr::fill(.data, !!!cols_to_fill, .direction = "up"))
+  }
+
   if (.direction == "up") {
-    # `desc()` cannot be used here because one gets invalid SQL if a variable
-    # is already wrapped in `desc()`
-    # i.e. `desc(desc(x))` produces `x DESC DESC`
-    # but this implies that "up" does not work for sorting non-numeric columns!
     order_by_cols <- purrr::map(order_by_cols, swap_order_direction)
   }
 
