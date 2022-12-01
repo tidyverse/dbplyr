@@ -8,7 +8,7 @@
       FROM (
         SELECT
           *,
-          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY -`id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
+          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       )
 
@@ -21,7 +21,7 @@
       SELECT
         `id`,
         `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id`) AS `n1`
+        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC) AS `n1`
       FROM `df`
 
 # up-direction works with descending
@@ -34,7 +34,7 @@
       FROM (
         SELECT
           *,
-          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY -`id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
+          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       )
 
@@ -44,10 +44,7 @@
       df_lazy_std %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
-      SELECT
-        `id`,
-        `group`,
-        LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY -`id` DESC) AS `n1`
+      SELECT `id`, `group`, LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id`) AS `n1`
       FROM `df`
 
 # groups are respected

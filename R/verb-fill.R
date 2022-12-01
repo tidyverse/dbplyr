@@ -52,7 +52,7 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     # is already wrapped in `desc()`
     # i.e. `desc(desc(x))` produces `x DESC DESC`
     # but this implies that "up" does not work for sorting non-numeric columns!
-    order_by_cols <- purrr::map(order_by_cols, ~ quo(-!!.x))
+    order_by_cols <- purrr::map(order_by_cols, swap_order_direction)
   }
 
   dbplyr_fill0(
@@ -62,6 +62,18 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     order_by_cols = order_by_cols,
     .direction = .direction
   )
+}
+
+swap_order_direction <- function(x) {
+  if (is_quosure(x)) {
+    x <- quo_get_expr(x)
+  }
+
+  if (is_call(x, "desc")) {
+    call_args(x)[[1]]
+  } else {
+    expr(desc(!!x))
+  }
 }
 
 dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
