@@ -26,7 +26,6 @@ jobs:
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_POSTGRES: true
-      RSPM: "https://demo.rstudiopm.com/all/__linux__/focal/latest"
 
     steps:
       - uses: actions/checkout@v3
@@ -43,7 +42,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          cache-version: 2
 
       - uses: r-lib/actions/check-r-package@v2
         with:

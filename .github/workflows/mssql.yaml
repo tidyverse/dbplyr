@@ -24,7 +24,6 @@ jobs:
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_MSSQL: true
-      RSPM: "https://demo.rstudiopm.com/all/__linux__/focal/latest"
       ODBCSYSINI: ${{ github.workspace }}/.github/odbc
 
     steps:
@@ -42,7 +41,6 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          cache-version: 2
 
       - name: Install SQL Server driver
         run: |
