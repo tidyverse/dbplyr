@@ -73,7 +73,7 @@ swap_order_direction <- function(x) {
     x <- quo_get_expr(x)
   }
 
-  if (is_call(x, "desc")) {
+  if (is_call(x, "desc", n = 1)) {
     call_args(x)[[1]]
   } else {
     expr(desc(!!x))
