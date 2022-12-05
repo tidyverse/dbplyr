@@ -49,10 +49,12 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "do
 
   if (.direction == "updown") {
     .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "up")
-    return(tidyr::fill(.data, !!!cols_to_fill, .direction = "down"))
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "down")
+    return(.data)
   } else if (.direction == "downup") {
     .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "down")
-    return(tidyr::fill(.data, !!!cols_to_fill, .direction = "up"))
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "up")
+    return(.data)
   }
 
   if (.direction == "up") {
