@@ -24,7 +24,7 @@
 #'   ensuring that the database has up-to-date statistics for use in the query
 #'   planner. It called from [copy_to()] when `analyze = TRUE`.
 #'
-#' * `sql_table_index()` generates SQL for adding an index to table. The
+#' * `sql_table_index()` generates SQL for adding an index to table.
 #'
 #' Query manipulation:
 #'
