@@ -333,6 +333,10 @@ base_agg <- sql_translator(
   quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
   median = sql_median("PERCENTILE_CONT", "ordered"),
 
+  # `first()`, `last()` and `nth()` don't work as aggregate functions in SQL
+  # b/c grouping takes places before sorting => it is undefined which value comes
+  # first/last. See
+  # https://stackoverflow.com/a/46805009/7529482
   # first = sql_prefix("FIRST_VALUE", 1),
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
