@@ -152,6 +152,14 @@ test_that("filter calls windowed versions of sql functions", {
   expect_equal(out$x, c(1L, 2L, 6L, 7L))
 })
 
+test_that("filter() can use window function and external vector - #1048", {
+  to_filter <- 1:2
+  expect_snapshot(
+    lazy_frame(x = 1L) %>%
+      filter(x == max(x, na.rm = T), x %in% to_filter)
+  )
+})
+
 test_that("recycled aggregates generate window function", {
   df1 <- memdb_frame(x = 1:10, g = rep(c(1, 2), each = 5))
 

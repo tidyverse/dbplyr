@@ -57,6 +57,19 @@
       Error:
       ! Can't supply `.by` when `.data` is a grouped data frame.
 
+# filter() can use window function and external vector - #1048
+
+    Code
+      lazy_frame(x = 1L) %>% filter(x == max(x, na.rm = T), x %in% to_filter)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT *, MAX(`x`) OVER () AS `q01`
+        FROM `df`
+      ) `q01`
+      WHERE (`x` = `q01`) AND (`x` IN (1, 2))
+
 # filter() after summarise() uses `HAVING`
 
     Code

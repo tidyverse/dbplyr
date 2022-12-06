@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `filter()` now works when using a window function and an external vector
+  (#1048).
+
 * `fill()` can now fill downup and updown (@mgirlich, #1057).
 
 * `fill()` can now order by non-numeric columns also in the up direction
