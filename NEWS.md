@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `last()` is now correctly translated when no window frame is specified
+  (@mgirlich, #1063).
+
 * `filter()` now works when using a window function and an external vector
   (#1048).
 

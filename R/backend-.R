@@ -375,7 +375,7 @@ base_win <- sql_translator(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order(),
-      win_current_frame()
+      win_current_frame() %||% c(-Inf, Inf)
     )
   },
   nth = function(x, n, order_by = NULL) {
