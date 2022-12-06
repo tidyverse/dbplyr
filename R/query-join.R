@@ -14,6 +14,18 @@ join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", "
   )
 }
 
+multi_join_query <- function(x, joins, table_vars, vars) {
+  structure(
+    list(
+      x = x,
+      joins = joins,
+      table_vars = table_vars,
+      vars = vars
+    ),
+    class = c("multi_join_query", "query")
+  )
+}
+
 #' @export
 print.join_query <- function(x, ...) {
   cat_line("<SQL JOIN (", toupper(x$type), ")>")
@@ -29,6 +41,24 @@ print.join_query <- function(x, ...) {
 }
 
 #' @export
+print.multi_join_query <- function(x, ...) {
+  cat_line("<SQL JOINS>")
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x)))
+
+  for (i in vctrs::vec_seq_along(x$joins)) {
+    cat_line("Type: ", paste0(x$joins$type[[i]]))
+
+    cat_line("By:")
+    cat_line(indent(paste0(x$joins$by[[i]]$x, "-", x$joins$by[[i]]$y)))
+
+    cat_line("Y:")
+    cat_line(indent_print(sql_build(x$joins$table[[i]])))
+  }
+}
+
+#' @export
 sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
@@ -38,6 +68,25 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
+    lvl = lvl
+  )
+}
+
+#' @export
+sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+  x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  query$joins$table <- purrr::map(
+    query$joins$table,
+    ~ sql_render(.x, con, ..., subquery = TRUE, lvl = lvl + 1)
+  )
+
+  sql_query_multi_join(
+    con = con,
+    x = x,
+    joins = query$joins,
+    table_vars = query$table_vars,
+    by_list = query$by_list,
+    vars = query$vars,
     lvl = lvl
   )
 }
@@ -248,7 +297,7 @@ sql_table_prefix <- function(con, var, table = NULL) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
-    table <- escape(table, con = con)
+    table <- escape(table, collapse = NULL, con = con)
     sql(paste0(table, ".", var))
   } else {
     var

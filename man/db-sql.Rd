@@ -17,6 +17,7 @@
 \alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
+\alias{sql_query_multi_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
 \alias{sql_returning_cols}
@@ -75,6 +76,8 @@ sql_query_join(
   ...,
   lvl = 0
 )
+
+sql_query_multi_join(con, x, joins, table_vars, vars, ..., lvl = 0)
 
 sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
 

@@ -102,6 +102,8 @@
   
   * `summarise()` + `filter()` now translates to `HAVING` where possible
     (@mgirlich, #877).
+    
+  * `left/inner_join()` + `left/inner_join()` (@mgirlich, #865).
 
 * The generated SQL is now shorter and more readable:
 

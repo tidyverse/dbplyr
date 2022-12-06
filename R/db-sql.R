@@ -389,6 +389,93 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, n
 
 #' @rdname db-sql
 #' @export
+sql_query_multi_join <- function(con,
+                                 x,
+                                 joins,
+                                 table_vars,
+                                 vars,
+                                 ...,
+                                 lvl = 0) {
+  UseMethod("sql_query_multi_join")
+}
+
+#' @export
+#' @param vars tibble with six columns:
+#'   * `table` `<tbl_lazy>`: the tables to join with.
+#'   * `type` `<character>`: the join type (left, right, inner, full).
+#'   * `by_x`, `by_y` `<list_of<character>>`: The columns to join by
+#'   * `by_x_table_id` `<list_of<integer>>`: The table index where the join column
+#'     comes from. This needs to be a list because a the join columns might come
+#'     from different tables
+#'   * `on` `<character>`
+#'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
+#' @param vars See [sql_multi_join_vars()].
+#' @param table_vars `named <list_of<character>>`: All variables in each table.
+#' @noRd
+#' @examples
+#' # Left join with *
+#' df1 <- lazy_frame(x = 1, y = 1)
+#' df2 <- lazy_frame(x = 1, z = 1)
+#' df3 <- lazy_frame(x = 1, z2 = 1)
+#'
+#' tmp <- left_join(df1, df2, by = "x") %>%
+#'   left_join(df3, by = c("x", z = "z2"))
+#' tibble(
+#'   table = list(df1, df2),
+#'   type = c("left", "left"),
+#'   by_x = list("x", c("x", "z")),
+#'   by_y = list("x", c("x", "z2")),
+#'   by_x_table_id = list(1L, c(1L, 2L)),
+#'   on = c(NA, NA),
+#'   na_matches = c("never", "never")
+#' )
+sql_query_multi_join.DBIConnection <- function(con,
+                                               x,
+                                               joins,
+                                               table_vars,
+                                               vars,
+                                               ...,
+                                               lvl = 0) {
+  table_names <- names(table_vars)
+  if (vctrs::vec_duplicate_any(table_names)) {
+    cli_abort("{.arg table_names} must be unique.")
+  }
+
+  select_sql <- sql_multi_join_vars(con, vars, table_vars)
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+
+  join_table_queries <- purrr::map2(
+    joins$table,
+    table_names[-1],
+    function(table, name) dbplyr_sql_subquery(con, table, name = name, lvl = lvl)
+  )
+  types <- toupper(paste0(joins$type, " JOIN"))
+  join_clauses <- purrr::map2(
+    types,
+    join_table_queries,
+    function(join_kw, from) sql_clause(join_kw, from)
+  )
+
+  on_clauses <- purrr::map(
+    joins$by,
+    function(by) {
+      on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+      sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+    }
+  )
+  join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
+
+  clauses <- list2(
+    sql_clause_select(con, select_sql),
+    sql_clause_from(from),
+    !!!join_on_clauses
+  )
+
+  sql_format_clauses(clauses, lvl = lvl, con = con)
+}
+
+#' @rdname db-sql
+#' @export
 sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
