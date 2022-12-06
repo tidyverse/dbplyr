@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `fill()` now works with Presto (@copernican, #1065).
+
 * `last()` is now correctly translated when no window frame is specified
   (@mgirlich, #1063).
 
