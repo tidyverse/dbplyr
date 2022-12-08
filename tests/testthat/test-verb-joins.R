@@ -531,6 +531,95 @@ test_that("multi joins work with x_as", {
   expect_s3_class(lq$x, "lazy_multi_join_query")
 })
 
+test_that("when keep = TRUE, left_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- left_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(2, 3))
+  expect_equal(out$x, c(NA, 3))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- left_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(2, 3))
+  expect_equal(out$a.y, c(NA, 3))
+})
+
+test_that("when keep = TRUE, right_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- right_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(3, NA))
+  expect_equal(out$x, c(3, 4))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- right_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(3, NA))
+  expect_equal(out$a.y, c(3, 4))
+})
+
+test_that("when keep = TRUE, full_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- full_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>%
+    collect() %>%
+    arrange(a)
+  expect_equal(out$a, c(2, 3, NA))
+  expect_equal(out$x, c(NA, 3, 4))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- full_join(df1, df2, by = c("a"), keep = TRUE) %>%
+    collect() %>%
+    arrange(a.x)
+  expect_equal(out$a.x, c(2, 3, NA))
+  expect_equal(out$a.y, c(NA, 3, 4))
+})
+
+test_that("when keep = TRUE, inner_join() preserves both sets of keys (#5581)", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- inner_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(3))
+  expect_equal(out$x, c(3))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- inner_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(3))
+  expect_equal(out$a.y, c(3))
+})
+
+test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
+  skip_if(packageVersion("dplyr") < "1.1.0")
+  join_by <- dplyr::join_by
+  df1 <- memdb_frame(xl = c(1, 3), xu = c(4, 7))
+  df2 <- memdb_frame(yl = c(2, 5, 8), yu = c(6, 8, 9))
+
+  expect_snapshot(error = TRUE, {
+    left_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+  })
+
+  # Would never make sense here.
+  # Based on how the binary conditions are generated we'd merge:
+  # - `yu` into `xl`
+  # - `yl` into `xu`
+  # Which results in `xl` and `xu` columns that don't maintain `xl <= xu`.
+  expect_snapshot(error = TRUE, {
+    full_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+  })
+})
+
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {
