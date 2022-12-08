@@ -290,7 +290,7 @@ with:</p>
 <span></span>
 <span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_time</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Missing values are always removed in SQL aggregation functions.</span></span>
 <span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
@@ -298,12 +298,12 @@ with:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.39.4 [:memory:]</span></span></span>
 <span><span class="co">#&gt;   dest  delay</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ABQ   <span style="text-decoration: underline;">2</span>006.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ACK   <span style="text-decoration: underline;">1</span>033.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ALB   <span style="text-decoration: underline;">1</span>627.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ANC   <span style="text-decoration: underline;">1</span>635.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ATL   <span style="text-decoration: underline;">1</span>293.</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> AUS   <span style="text-decoration: underline;">1</span>521.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ABQ   13.7 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ACK    6.46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ALB   23.6 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ANC   12.9 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ATL   12.5 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> AUS   13.0 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># … with more rows</span></span></span></code></pre></div>
 <p>However, in the long-run, I highly recommend you at least learn the
 basics of SQL. It’s a valuable skill for any data scientist, and it will
