@@ -131,7 +131,7 @@ lazy_semi_join_query <- function(x,
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
   assert_flag(anti, "anti", call = call)
-  join_check_by(by, call)
+  # join_check_by(by, call)
   na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
 
   lazy_query(

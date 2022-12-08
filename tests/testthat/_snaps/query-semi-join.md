@@ -3,7 +3,7 @@
     Code
       sql_build(semi_join(lf1, lf2))
     Message
-      Joining, by = "x"
+      Joining with `by = join_by(x)`
     Output
       <SQL SEMI JOIN>
       By:
@@ -18,7 +18,7 @@
     Code
       semi_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT *
@@ -33,7 +33,7 @@
     Code
       anti_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT *

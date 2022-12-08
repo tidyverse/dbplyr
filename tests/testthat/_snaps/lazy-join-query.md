@@ -159,15 +159,6 @@
 ---
 
     Code
-      (my_lazy_semi_join_query(by = lmod(by0, x = 1)))
-    Condition
-      Error in `my_lazy_semi_join_query()`:
-      ! `by$x` must be a vector with type <character>.
-      Instead, it has type <double>.
-
----
-
-    Code
       (my_lazy_semi_join_query(anti = NA))
     Condition
       Error in `my_lazy_semi_join_query()`:

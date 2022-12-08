@@ -108,14 +108,14 @@
       inner_join(lf1, lf2, by = "x", suffix = "a")
     Condition
       Error in `inner_join()`:
-      ! `suffix` must have size 2, not size 1.
+      ! `suffix` must be a character vector of length 2, not a string of length 1.
 
 # joins reuse queries in cte mode
 
     Code
       left_join(lf, lf) %>% remote_query(cte = TRUE)
     Message
-      Joining, by = "x"
+      Joining with `by = join_by(x)`
     Output
       <SQL> WITH `q01` AS (
         SELECT `lf1_LHS`.`x` AS `x`

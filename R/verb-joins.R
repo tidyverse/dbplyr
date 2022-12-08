@@ -211,20 +211,36 @@ anti_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
 }
 
 
-add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
+add_join <- function(x,
+                     y,
+                     type,
+                     by = NULL,
+                     sql_on = NULL,
+                     copy = FALSE,
                      suffix = NULL,
                      auto_index = FALSE,
                      na_matches = "never",
                      x_as = NULL,
                      y_as = NULL,
                      call = caller_env()) {
+  x_names <- tbl_vars(x)
+  y_names <- tbl_vars(y)
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = unclass(sql_on))
   } else if (identical(type, "full") && identical(by, character())) {
     type <- "cross"
     by <- list(x = character(0), y = character(0))
+  } else if (is_null(by)) {
+    by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- as_join_by(by, error_call = call)
+  }
+
+  if (is.null(sql_on)) {
+    # TODO better error
+    tidyselect::eval_select(by$x, x)
+    tidyselect::eval_select(by$y, y)
   }
 
   y <- auto_copy(
@@ -234,7 +250,18 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
+  vars <- join_cols(
+    x_names = x_names,
+    y_names = y_names,
+    by = by,
+    suffix = suffix,
+    # TODO
+    # keep = keep,
+    keep = NULL,
+    error_call = call
+  )
   suffix <- check_suffix(suffix, call)
+
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   # the table alias can only be determined after `select()` was inlined.
@@ -278,6 +305,7 @@ add_join <- function(x, y, type, by = NULL, sql_on = NULL, copy = FALSE,
     y_join_vars = y_join_vars,
     by_x_org = by_x_org,
     by_y = by$y,
+    by_condition = by$condition,
     type = type,
     table_id = table_id,
     suffix = suffix
@@ -378,12 +406,13 @@ multi_join_vars <- function(x_join_vars,
                             y_join_vars,
                             by_x_org,
                             by_y,
+                            by_condition,
                             type,
                             table_id,
                             suffix,
                             call) {
   # Remove join keys from y
-  y_join_idx <- vctrs::vec_match(by_y, unlist(y_join_vars$var))
+  y_join_idx <- vctrs::vec_match(by_y, unlist(y_join_vars$var))[by_condition == "=="]
   if (!is_empty(y_join_idx)) {
     y_join_vars <- vctrs::vec_slice(y_join_vars, -y_join_idx)
   }
@@ -441,20 +470,33 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
     by = list(list(
       x = ident(by$x),
       y = ident(by$y),
+      condition = by$condition,
       on = sql(by$on),
       na_matches = na_matches
     ))
   )
 }
 
-add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                          auto_index = FALSE, na_matches = "never",
-                          x_as = NULL, y_as = NULL,
+add_semi_join <- function(x,
+                          y,
+                          anti = FALSE,
+                          by = NULL,
+                          sql_on = NULL,
+                          copy = FALSE,
+                          auto_index = FALSE,
+                          na_matches = "never",
+                          x_as = NULL,
+                          y_as = NULL,
                           call = caller_env()) {
+  x_names <- tbl_vars(x)
+  y_names <- tbl_vars(y)
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else if (is_null(by)) {
+    by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- as_join_by(by, error_call = call)
   }
 
   y <- auto_copy(
@@ -629,24 +671,8 @@ join_two_table_alias <- function(names, from) {
   out
 }
 
+# TODO this can probably be removed
 check_suffix <- function(x, call) {
   vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
   list(x = x[1], y = x[2])
-}
-
-add_suffixes <- function(x, y, suffix) {
-  if (identical(suffix, "")) {
-    return(x)
-  }
-
-  out <- character(length(x))
-  for (i in seq_along(x)) {
-    nm <- x[[i]]
-    while (nm %in% y || nm %in% out) {
-      nm <- paste0(nm, suffix)
-    }
-
-    out[[i]] <- nm
-  }
-  out
 }

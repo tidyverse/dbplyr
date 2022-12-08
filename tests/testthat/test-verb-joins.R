@@ -141,11 +141,11 @@ test_that("join functions error on column not found for SQL sources #1928", {
   # Rely on dplyr to test precise code
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "x"),
-    "missing|(not found)"
+    "missing|(not found)|exist"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "y"),
-    "missing|(not found)"
+    "missing|(not found)|exist"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5)),

@@ -155,7 +155,8 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
     x = by$y,
     y = by$x,
     x_as = by$y_as,
-    y_as = by$x_as
+    y_as = by$x_as,
+    condition = "="
   )
 
   if (type == "full") {

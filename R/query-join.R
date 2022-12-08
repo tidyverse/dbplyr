@@ -284,7 +284,8 @@ sql_join_tbls <- function(con, by, na_matches = "never") {
         sql_expr_matches(sql(lhs[[i]]), sql(rhs[[i]]), con = con)
       })
     } else {
-      compare <- paste0(lhs, " = ", rhs)
+      by$condition[by$condition == "=="] <- "="
+      compare <- paste0(lhs, " ", by$condition, " ", rhs)
     }
 
     sql(compare)
