@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `NA`s in `blob()`s are correctly translated to `NULL` (#983).
+
 * `last()` is now correctly translated when no window frame is specified
   (@mgirlich, #1063).
 
