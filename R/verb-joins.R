@@ -303,12 +303,11 @@ add_join <- function(x,
   vars <- multi_join_vars(
     x_join_vars = x_join_vars,
     y_join_vars = y_join_vars,
+    vars_info = vars,
     by_x_org = by_x_org,
     by_y = by$y,
-    by_condition = by$condition,
     type = type,
     table_id = table_id,
-    suffix = suffix
   )
 
   joins_data <- new_joins_data(
@@ -404,24 +403,16 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
 
 multi_join_vars <- function(x_join_vars,
                             y_join_vars,
+                            vars_info,
                             by_x_org,
                             by_y,
-                            by_condition,
                             type,
                             table_id,
-                            suffix,
                             call) {
-  # Remove join keys from y
-  y_join_idx <- vctrs::vec_match(by_y, unlist(y_join_vars$var))[by_condition == "=="]
-  if (!is_empty(y_join_idx)) {
-    y_join_vars <- vctrs::vec_slice(y_join_vars, -y_join_idx)
-  }
-  x_names <- x_join_vars$name
-  y_names <- y_join_vars$name
-
-  # Add suffix where needed
-  x_join_vars$name <- add_suffixes(x_names, y_names, suffix$x)
-  y_join_vars$name <- add_suffixes(y_names, x_names, suffix$y)
+  x_join_vars <- vctrs::vec_slice(x_join_vars, vars_info$x$out)
+  x_join_vars$name <- names(vars_info$x$out)
+  y_join_vars <- vctrs::vec_slice(y_join_vars, vars_info$y$out)
+  y_join_vars$name <- names(vars_info$y$out)
 
   if (type %in% c("left", "inner")) {
     # use all variables from `x` as is

@@ -87,7 +87,7 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.z"))
-  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x.x)
+  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x) %>% rename(x.x = x)
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.x"))
@@ -107,8 +107,8 @@ test_that("self-joins allowed with named by", {
   j1 <- fam %>% left_join(fam, by = c("parent" = "id"))
   j2 <- fam %>% inner_join(fam, by = c("parent" = "id"))
 
-  expect_equal(op_vars(j1), c("id", "parent.x", "parent.y"))
-  expect_equal(op_vars(j2), c("id", "parent.x", "parent.y"))
+  expect_equal(op_vars(j1), c("id", "parent", "parent.y"))
+  expect_equal(op_vars(j2), c("id", "parent", "parent.y"))
   expect_equal(nrow(collect(j1)), 5)
   expect_equal(nrow(collect(j2)), 4)
 
@@ -124,8 +124,8 @@ test_that("suffix modifies duplicated variable names", {
   j1 <- collect(inner_join(fam, fam, by = c("parent" = "id"), suffix = c("1", "2")))
   j2 <- collect(left_join(fam, fam, by = c("parent" = "id"), suffix = c("1", "2")))
 
-  expect_named(j1, c("id", "parent1", "parent2"))
-  expect_named(j2, c("id", "parent1", "parent2"))
+  expect_named(j1, c("id", "parent", "parent2"))
+  expect_named(j2, c("id", "parent", "parent2"))
 })
 
 test_that("join variables always disambiguated (#2823)", {
