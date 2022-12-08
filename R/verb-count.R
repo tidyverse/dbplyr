@@ -6,6 +6,7 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::count
+#' @inheritParams args_by
 #' @param .drop Not supported for lazy tables.
 #' @importFrom dplyr count
 #' @export

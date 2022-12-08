@@ -13,6 +13,7 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::slice
+#' @inheritParams args_by
 #' @param ... Not used.
 #' @param n,prop Provide either `n`, the number of rows, or `prop`, the
 #'   proportion of rows to select. If neither are supplied, `n = 1` will be

@@ -6,6 +6,7 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::summarise
+#' @inheritParams args_by
 #' @param .groups \Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.
 #'
 #'   * "drop_last": dropping the last level of grouping. This was the
@@ -176,6 +177,19 @@ summarise_verbose <- function(.groups, .env) {
     is_reference(topenv(.env), global_env()) &&
     !identical(getOption("dplyr.summarise.inform"), FALSE)
 }
+
+#' Helper for consistent documentation of `.by`
+#'
+#' Use `@inheritParams args_by` to consistently document `.by`.
+#'
+#' @param .by `r lifecycle::badge("experimental")`
+#'
+#'   <[`tidy-select`][dplyr_tidy_select]> Optionally, a selection of columns to
+#'   temporarily group by using an inline alternative to [group_by()].
+#'
+#' @name args_by
+#' @keywords internal
+NULL
 
 compute_by <- function(by,
                        data,
