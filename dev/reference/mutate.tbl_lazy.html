@@ -76,7 +76,7 @@ the SQL query."><meta property="og:image" content="https://dbplyr.tidyverse.org/
     </div>
 
     <div class="ref-description section level2">
-    <p>These are methods for the dplyr <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute()</a></code> generics.
+    <p>These are methods for the dplyr <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute()</a></code> generics.
 They are translated to computed expressions in the <code>SELECT</code> clause of
 the SQL query.</p>
     </div>
@@ -108,12 +108,12 @@ variables. Use <code><a href="https://dplyr.tidyverse.org/reference/desc.html" c
 <dt>.by</dt>
 <dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a></p>
 <p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">tidy-select</a></code>&gt; Optionally, a selection of columns to
-temporarily group by using an inline alternative to <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>. For
-details and examples, see <a href="https://dplyr.tidyverse.org/reference/dplyr_by.html" class="external-link">?dplyr_by</a>.</p></dd>
+temporarily group by using an inline alternative to <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by()</a></code>.</p></dd>
 
 
 <dt>.keep</dt>
-<dd><p>Control which columns from <code>.data</code> are retained in the output. Grouping
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+Control which columns from <code>.data</code> are retained in the output. Grouping
 columns and columns created by <code>...</code> are always kept.</p><ul><li><p><code>"all"</code> retains all columns from <code>.data</code>. This is the default.</p></li>
 <li><p><code>"used"</code> retains only the columns used in <code>...</code> to create new
 columns. This is useful for checking your work, as it displays inputs
@@ -127,7 +127,8 @@ variables and columns created by <code>...</code> are kept.</p></li>
 
 
 <dt>.before, .after</dt>
-<dd><p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">tidy-select</a></code>&gt; Optionally, control where new columns
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_tidy_select.html" class="external-link">tidy-select</a></code>&gt; Optionally, control where new columns
 should appear (the default is to add to the right hand side). See
 <code><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate()</a></code> for more details.</p></dd>
 

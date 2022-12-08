@@ -119,8 +119,7 @@ Can be <code>NULL</code> or a variable:</p><ul><li><p>If <code>NULL</code> (the 
 <dt>name</dt>
 <dd><p>The name of the new column in the output.</p>
 <p>If omitted, it will default to <code>n</code>. If there's already a column called <code>n</code>,
-it will use <code>nn</code>. If there's a column called <code>n</code> and <code>nn</code>, it'll use
-<code>nnn</code>, and so on, adding <code>n</code>s until it gets a new name.</p></dd>
+it will error, and require you to specify the name.</p></dd>
 
 
 <dt>.drop</dt>

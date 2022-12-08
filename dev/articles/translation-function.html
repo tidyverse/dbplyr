@@ -371,14 +371,14 @@ literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <code class="sourceCode R"><span><span class="va">mf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"x!"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
@@ -459,9 +459,9 @@ again use <code><a href="../reference/translate_sql.html">translate_sql()</a></c
 <span><span class="co">#&gt; &lt;SQL&gt; CASE</span></span>
 <span><span class="co">#&gt; WHEN (NOT((`G` IS NULL))) THEN RANK() OVER (PARTITION BY (CASE WHEN ((`G` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `G`)</span></span>
 <span><span class="co">#&gt; END</span></span>
-<span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">ntile</a></span><span class="op">(</span><span class="va">G</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">ntile</a></span><span class="op">(</span><span class="va">G</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; NTILE(2) OVER (ORDER BY `G`)</span></span>
-<span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">lag</span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; LAG(`G`, 1, NULL) OVER ()</span></span></code></pre></div>
 <p>If the tbl has been grouped or arranged previously in the pipeline,
 then dplyr will use that information to set the “partition by” and
@@ -494,7 +494,7 @@ it to override the default ordering.</p></li>
 <p>The three options are illustrated in the snippet below:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">players</span>,</span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">min_rank</a></span><span class="op">(</span><span class="va">yearID</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">min_rank</a></span><span class="op">(</span><span class="va">yearID</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/order_by.html" class="external-link">order_by</a></span><span class="op">(</span><span class="va">yearID</span>, <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lead</a></span><span class="op">(</span><span class="va">G</span>, order_by <span class="op">=</span> <span class="va">yearID</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
