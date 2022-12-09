@@ -619,6 +619,36 @@ test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
   })
 })
 
+test_that("by default, `by` columns omitted from `y` with equi-conditions, but not non-equi conditions" , {
+  # equi keys always keep the LHS name, regardless of whether of not a duplicate exists in the RHS
+  # non-equi keys will get a suffix if a duplicate exists
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  lf2 <- lazy_frame(x = 2, y = 1, z = 2)
+  out <- right_join(
+    lf,
+    lf2,
+    by = join_by(x == y, y > z),
+    keep = NULL
+  )
+  vars <- out$lazy_query$vars
+  expect_equal(vars$name, c("x", "y", "z.x", "x.y", "z.y"))
+  expect_equal(vars$table, list(2L, 1L, 1L, 2L, 2L))
+  expect_equal(vars$var, list("y", "y", "z", "x", "z"))
+
+  # unless specifically requested with `keep = TRUE`
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  lf2 <- lazy_frame(x = 2, y = 1, z = 2)
+  out <- right_join(
+    lf,
+    lf2,
+    by = join_by(x == y, y > z),
+    keep = TRUE
+  )
+  vars <- out$lazy_query$vars
+  expect_equal(vars$name, c("x.x", "y.x", "z.x", "x.y", "y.y", "z.y"))
+  expect_equal(vars$table, list(1L, 1L, 1L, 2L, 2L, 2L))
+  expect_equal(vars$var, list("x", "y", "z", "x", "y", "z"))
+})
 
 # sql_build ---------------------------------------------------------------
 
