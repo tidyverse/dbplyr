@@ -65,6 +65,10 @@ test_that("custom aggregators translated correctly", {
     translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
     sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
   )
+  expect_equal(
+    translate_sql(median(x, na.rm = TRUE), window = FALSE),
+    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
 })
 
 test_that("custom window functions translated correctly", {
@@ -146,6 +150,11 @@ test_that("custom escapes translated correctly", {
   # expect_snapshot() also uses !!
   qry <- mf %>% filter(x %in% !!L)
   expect_snapshot(qry)
+})
+
+test_that("sql_escape_raw handles NULLs", {
+  con <- simulate_mssql()
+  expect_equal(sql_escape_raw(con, NULL), "NULL")
 })
 
 test_that("logical escaping depends on context", {

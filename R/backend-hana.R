@@ -36,7 +36,7 @@ dbplyr_edition.HDB <- function(con) {
 sql_translation.HDB <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      as.character = sql_cast("SHORTTEXT"),
+      as.character = sql_cast("VARCHAR"),
       as.numeric = sql_cast("DOUBLE"),
       as.double = sql_cast("DOUBLE"),
 
