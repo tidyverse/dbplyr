@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `NA`s in `blob()`s are correctly translated to `NULL` (#983).
+
 * HANA backend correctly translates `as.character()` (#1027).
 
 * Correct translation for `median()` for SQL server (#1008).
