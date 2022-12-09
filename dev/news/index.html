@@ -72,7 +72,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">last()</a></code> is now correctly translated when no window frame is specified (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1063" class="external-link">#1063</a>).</p></li>
+<ul><li><p>Correct translation for <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median()</a></code> for SQL server (<a href="https://github.com/tidyverse/dbplyr/issues/1008" class="external-link">#1008</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">last()</a></code> is now correctly translated when no window frame is specified (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1063" class="external-link">#1063</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> now works when using a window function and an external vector (<a href="https://github.com/tidyverse/dbplyr/issues/1048" class="external-link">#1048</a>).</p></li>
 <li><p><code>fill()</code> can now fill downup and updown (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1057" class="external-link">#1057</a>).</p></li>
 <li><p><code>fill()</code> can now order by non-numeric columns also in the up direction (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1057" class="external-link">#1057</a>).</p></li>
