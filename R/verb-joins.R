@@ -304,7 +304,6 @@ add_join <- function(x,
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
   x_vars <- inline_result$vars
-  by_x_org <- by$x
   by$x <- inline_result$by
 
   new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
@@ -336,7 +335,7 @@ add_join <- function(x,
     y_join_vars = y_join_vars,
     vars_info = vars,
     keep = keep,
-    by_x_org = by_x_org,
+    condition = by$condition,
     by_y = by$y,
     type = type,
     table_id = table_id,
@@ -437,7 +436,7 @@ multi_join_vars <- function(x_join_vars,
                             y_join_vars,
                             vars_info,
                             keep,
-                            by_x_org,
+                            condition,
                             by_y,
                             type,
                             table_id,
@@ -447,6 +446,8 @@ multi_join_vars <- function(x_join_vars,
   y_join_vars <- vctrs::vec_slice(y_join_vars, vars_info$y$out)
   y_join_vars$name <- names(vars_info$y$out)
 
+  keep <- keep %||% (condition != "==")
+  idx <- vars_info$x$key[!keep]
   if (type %in% c("left", "inner")) {
     # use all variables from `x` as is
     # use non-join variables from `y`
@@ -454,24 +455,18 @@ multi_join_vars <- function(x_join_vars,
     # Careful: this relies on the assumption that right_join()` starts a new query
     # `x`: non-join variables; `y`: all variables
     # -> must update table id of `x` join vars
-    if (!keep) {
-      x_join_vars$table[x_join_vars$name %in% by_x_org] <- list(table_id)
-      idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
-      x_join_vars$var[idx] <- as.list(by_y)
-    }
+    x_join_vars$table[idx] <- list(table_id)
+    x_join_vars$var[idx] <- as.list(by_y[!keep])
   } else if (type == "full") {
     # Careful: this relies on the assumption that `full_join()` starts a new query
-    if (!keep) {
-      idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
-      x_join_vars$table[idx] <- purrr::map(
-        x_join_vars$table[idx],
-        ~ c(.x, table_id)
-      )
-      x_join_vars$var[idx] <- purrr::map2(
-        x_join_vars$var[idx], by_y,
-        ~ c(.x, .y)
-      )
-    }
+    x_join_vars$table[idx] <- purrr::map(
+      x_join_vars$table[idx],
+      ~ c(.x, table_id)
+    )
+    x_join_vars$var[idx] <- purrr::map2(
+      x_join_vars$var[idx], by_y[!keep],
+      ~ c(.x, .y)
+    )
   } else if (type == "cross") {
     # -> simply append `y_rows`
   }
