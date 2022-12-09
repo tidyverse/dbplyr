@@ -2,6 +2,8 @@
 
 * HANA backend correctly translates `as.character()` (#1027).
 
+* Correct translation for `median()` for SQL server (#1008).
+
 * `last()` is now correctly translated when no window frame is specified
   (@mgirlich, #1063).
 
