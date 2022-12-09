@@ -160,7 +160,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (`x` = TRUE)
+      WHERE (`x` = 1)
 
 ---
 

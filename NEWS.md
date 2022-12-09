@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Always use 1 and 0 as literals for logicals in SQL Server
+  (@krlmlr, #934).
+
 * `last()` is now correctly translated when no window frame is specified
   (@mgirlich, #1063).
 
