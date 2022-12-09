@@ -151,6 +151,7 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
     all_x = vars$all_y,
     all_y = vars$all_x
   )
+  # TODO this does not work correctly...
   by_right <- list(
     x = by$y,
     y = by$x,

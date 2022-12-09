@@ -97,6 +97,8 @@ Collate:
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'join-by-compat.R'
+    'join-cols-compat.R'
     'lazy-join-query.R'
     'lazy-ops.R'
     'lazy-query.R'
