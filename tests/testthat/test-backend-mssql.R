@@ -65,6 +65,10 @@ test_that("custom aggregators translated correctly", {
     translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
     sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
   )
+  expect_equal(
+    translate_sql(median(x, na.rm = TRUE), window = FALSE),
+    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
 })
 
 test_that("custom window functions translated correctly", {

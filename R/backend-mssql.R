@@ -358,6 +358,7 @@ simulate_mssql <- function(version = "15.0") {
 
       # percentile_cont needs `OVER()` in mssql
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
       quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
