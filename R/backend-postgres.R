@@ -342,6 +342,14 @@ sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
 sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
+sql_escape_date.PostgreSQL <- function(con, x) {
+  DBI::dbQuoteLiteral(con, x)
+}
+#' @export
+sql_escape_date.PqConnection <- sql_escape_date.PostgreSQL
+
+
+#' @export
 supports_window_clause.PqConnection <- function(con) {
   TRUE
 }
