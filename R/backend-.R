@@ -507,4 +507,4 @@ sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
 
-utils::globalVariables("RANDOM")
+utils::globalVariables(c("RANDOM", "%LIKE%"))
