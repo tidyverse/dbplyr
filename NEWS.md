@@ -4,6 +4,7 @@
   equivalent (@rjpat, #509)
 
 * `NA`s in `blob()`s are correctly translated to `NULL` (#983).
+
 * Postgres backend generates correct literals for Dates (#727).
 
 * HANA backend correctly translates `as.character()` (#1027).
