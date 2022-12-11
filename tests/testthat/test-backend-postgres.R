@@ -334,3 +334,10 @@ test_that("can upsert with returning", {
     tibble(a = 1:3, b = 11:13, c = c(1L, -1L, -2L), d = c("a", "y", "z"))
   )
 })
+
+test_that("correctly escapes dates", {
+  con <- src_test("postgres")
+
+  dd <- as.Date("2022-03-04")
+  expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))
+})
