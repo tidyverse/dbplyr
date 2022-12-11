@@ -93,6 +93,14 @@ sql_translation.PqConnection <- function(con) {
           sql_expr(!!string ~ !!pattern)
         }
       },
+      # https://www.postgresql.org/docs/current/functions-matching.html
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
+        }
+      },
       str_replace = function(string, pattern, replacement){
         sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
       },

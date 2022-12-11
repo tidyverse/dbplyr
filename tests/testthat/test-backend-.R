@@ -63,6 +63,18 @@ test_that("can translate subsetting", {
 })
 
 
+# strings -----------------------------------------------------------------
+
+test_that("can translate case insensitive like", {
+  translate_sql(stringr::str_like(x, "abc"))
+  expect_snapshot(
+    translate_sql(stringr::str_like(x, "abc", ignore_case = FALSE)),
+    error = TRUE
+  )
+})
+
+
+
 # aggregates --------------------------------------------------------------
 
 test_that("all and any translated correctly", {

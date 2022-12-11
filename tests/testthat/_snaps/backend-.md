@@ -1,3 +1,11 @@
+# can translate case insensitive like
+
+    Code
+      translate_sql(stringr::str_like(x, "abc", ignore_case = FALSE))
+    Condition
+      Error in `stringr::str_like()`:
+      ! Backend only supports case insensitve `str_like()`.
+
 # default raw escapes translated correctly
 
     Code
