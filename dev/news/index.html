@@ -72,7 +72,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>Postgres backend generates correct literals for Dates (<a href="https://github.com/tidyverse/dbplyr/issues/727" class="external-link">#727</a>).</p></li>
+<ul><li><p><code><a href="https://stringr.tidyverse.org/reference/str_like.html" class="external-link">stringr::str_like()</a></code> (new in 1.5.0) is translated to the closest <code>LIKE</code> equivalent (<a href="https://github.com/rjpat" class="external-link">@rjpat</a>, <a href="https://github.com/tidyverse/dbplyr/issues/509" class="external-link">#509</a>)</p></li>
+<li><p>Postgres backend generates correct literals for Dates (<a href="https://github.com/tidyverse/dbplyr/issues/727" class="external-link">#727</a>).</p></li>
 <li><p><code>NA</code>s in <code>blob()</code>s are correctly translated to <code>NULL</code> (<a href="https://github.com/tidyverse/dbplyr/issues/983" class="external-link">#983</a>).</p></li>
 <li><p>HANA backend correctly translates <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1027" class="external-link">#1027</a>).</p></li>
 <li><p>Correct translation for <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median()</a></code> for SQL server (<a href="https://github.com/tidyverse/dbplyr/issues/1008" class="external-link">#1008</a>).</p></li>
