@@ -26,7 +26,7 @@
 #'
 #' * The `BIT` type is a special type of numeric column used to store
 #'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
-#'   <https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
+#'   <https://learn.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
 #'
 #' dbplyr does its best to automatically create the correct type when needed,
 #' but can't do it 100% correctly because it does not have a full type
