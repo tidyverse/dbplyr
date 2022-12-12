@@ -358,6 +358,7 @@ simulate_mssql <- function(version = "15.0") {
 
       # percentile_cont needs `OVER()` in mssql
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
       quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
@@ -385,9 +386,14 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
-  # SQL Server binary constants should be prefixed with 0x
-  # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
-  paste0(c("0x", format(x)), collapse = "")
+
+  if (is.null(x)) {
+    "NULL"
+  } else {
+    # SQL Server binary constants should be prefixed with 0x
+    # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
+    paste0(c("0x", format(x)), collapse = "")
+  }
 }
 
 #' @export

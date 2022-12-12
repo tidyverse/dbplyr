@@ -3,6 +3,17 @@
 * Always use 1 and 0 as literals for logicals in SQL Server
   (@krlmlr, #934).
 
+* `stringr::str_like()` (new in 1.5.0) is translated to the closest `LIKE` 
+  equivalent (@rjpat, #509)
+
+* Postgres backend generates correct literals for Dates (#727).
+
+* `NA`s in `blob()`s are correctly translated to `NULL` (#983).
+ 
+* HANA backend correctly translates `as.character()` (#1027).
+
+* Correct translation for `median()` for SQL server (#1008).
+
 * `last()` is now correctly translated when no window frame is specified
   (@mgirlich, #1063).
 
