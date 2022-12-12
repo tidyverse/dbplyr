@@ -148,7 +148,7 @@ test_that("custom escapes translated correctly", {
   expect_snapshot(qry)
 })
 
-test_that("logical escaping depends on context", {
+test_that("logical escaping to 0/1 for both filter() and mutate()", {
   mf <- lazy_frame(x = "abc", con = simulate_mssql())
   expect_snapshot(mf %>% filter(x == TRUE))
   expect_snapshot(mf %>% mutate(x = TRUE))
