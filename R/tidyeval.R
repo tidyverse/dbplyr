@@ -53,12 +53,16 @@
 #' partial_eval(quote(year > local(f(1980))), lf)
 partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call) {
   if (!is_null(vars)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
+    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)", always = TRUE)
     data <- lazy_frame(!!!rep_named(vars, list(logical())))
   }
 
   if (is.character(data)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(data = 'must be a lazy frame')")
+    lifecycle::deprecate_warn(
+      "2.1.2",
+      "partial_eval(data = 'must be a lazy frame')",
+      always = TRUE
+    )
     data <- lazy_frame(!!!rep_named(data, list(logical())))
   }
 
