@@ -258,6 +258,13 @@ base_scalar <- sql_translator(
   str_trim = sql_str_trim,
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
+  str_like = function(string, pattern, ignore_case = TRUE) {
+    if (isTRUE(ignore_case)) {
+      sql_expr(!!string %LIKE% !!pattern)
+    } else {
+      cli::cli_abort("Backend only supports case insensitve {.fn str_like}.")
+    }
+  },
 
   str_conv = sql_not_supported("str_conv()"),
   str_count = sql_not_supported("str_count()"),
@@ -500,4 +507,4 @@ sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
 
-utils::globalVariables("RANDOM")
+utils::globalVariables(c("RANDOM", "%LIKE%"))
