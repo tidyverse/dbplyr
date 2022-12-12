@@ -513,13 +513,7 @@ mssql_case_when <- function(...) {
 
 #' @export
 `sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
-  if (mssql_needs_bit()) {
-    y <- ifelse(x, "1", "0")
-  } else {
-    y <- as.character(x)
-  }
-  y[is.na(x)] <- "NULL"
-  y
+  dplyr::if_else(x, "1", "0", "NULL")
 }
 
 globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))

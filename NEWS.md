@@ -99,6 +99,8 @@
   * `as.POSIXct()` now translated correctly (@krlmlr, #1011).
   * `median()` now translated correctly (#1008).
   * `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+  * Always use 1 and 0 as literals for logicals (@krlmlr, #934).
+
 
 * Terdata: * Querying Teradata databases works again. Unfortunately, the fix requires every
   column to be explicitly selected again (@mgirlich, #966).
