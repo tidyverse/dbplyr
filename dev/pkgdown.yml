@@ -1,5 +1,5 @@
 pandoc: 2.19.2
-pkgdown: 2.0.6
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   backend-2: backend-2.html
@@ -9,7 +9,7 @@ articles:
   sql: sql.html
   translation-function: translation-function.html
   translation-verb: translation-verb.html
-last_built: 2022-12-12T22:40Z
+last_built: 2022-12-20T17:14Z
 urls:
   reference: https://dbplyr.tidyverse.org/reference
   article: https://dbplyr.tidyverse.org/articles
