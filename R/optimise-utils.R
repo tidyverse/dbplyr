@@ -21,5 +21,5 @@ expr_uses_var <- function(x, vars) {
     return(is_symbol(x, vars))
   }
 
-  any(purrr::map_lgl(x[-1], expr_uses_var, vars))
+  any(purrr::map_lgl(as.list(x[-1]), expr_uses_var, vars))
 }
