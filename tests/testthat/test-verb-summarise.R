@@ -188,7 +188,6 @@ test_that("can handle rename", {
     out,
     lazy_select_query(
       x = out$x,
-      last_op = "summarise",
       select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
       group_by = syms("ax"),
       select_operation = "summarise",

@@ -1,7 +1,6 @@
 #' @export
 #' @rdname sql_build
 lazy_select_query <- function(x,
-                              last_op,
                               select = NULL,
                               where = NULL,
                               group_by = NULL,
@@ -15,7 +14,6 @@ lazy_select_query <- function(x,
                               select_operation = c("select", "mutate", "summarise"),
                               message_summarise = NULL) {
   stopifnot(inherits(x, "lazy_query"))
-  stopifnot(is_string(last_op))
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
@@ -54,7 +52,6 @@ lazy_select_query <- function(x,
     distinct = distinct,
     limit = limit,
     select_operation = select_operation,
-    last_op = last_op,
     message_summarise = message_summarise,
     group_vars = group_vars,
     order_vars = order_vars,

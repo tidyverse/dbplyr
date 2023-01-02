@@ -302,7 +302,6 @@ test_that("generates correct lazy_select_query", {
       .$lazy_query,
     lazy_select_query(
       x = lf$lazy_query,
-      last_op = "filter",
       select = syms(set_names(colnames(lf))),
       where = list(quo(x > 1))
     ),
@@ -317,7 +316,6 @@ test_that("generates correct lazy_select_query", {
     out,
     lazy_select_query(
       x = out$x,
-      last_op = "filter",
       select = syms(set_names(colnames(lf))),
       where = list(expr(q01 > 1))
     ),
@@ -328,7 +326,6 @@ test_that("generates correct lazy_select_query", {
     out$x,
     lazy_select_query(
       x = lf$lazy_query,
-      last_op = "mutate",
       select_operation = "mutate",
       select = list(x = sym("x"), y = sym("y"), q01 = quo(mean(x, na.rm = TRUE)))
     ),
