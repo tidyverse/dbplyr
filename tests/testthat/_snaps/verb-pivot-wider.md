@@ -60,7 +60,9 @@
 
 ---
 
-    Can't convert to a function.
+    i In index: 2.
+    Caused by error in `dbplyr_pivot_wider_spec()`:
+    ! Can't convert to a function.
 
 # values_fn cannot be NULL
 
@@ -76,7 +78,9 @@
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
       <error/rlang_error>
-      Error in `dbplyr_pivot_wider_spec()`:
+      Error in `map2()`:
+      i In index: 1.
+      Caused by error in `dbplyr_pivot_wider_spec()`:
       ! Can't convert to a function.
 
 # can fill in missing cells

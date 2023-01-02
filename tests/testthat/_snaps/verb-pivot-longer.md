@@ -111,7 +111,11 @@
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
       <error/rlang_error>
-      Error in `dbplyr_pivot_longer_spec()`:
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `map2()`:
+      i In index: 1.
+      Caused by error in `dbplyr_pivot_longer_spec()`:
       ! Can't convert to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))

@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Compatibility with purrr 1.0.0 (@mgirlich, #1085).
+
 ## New features
 
 * `stringr::str_like()` (new in 1.5.0) is translated to the closest `LIKE` 
