@@ -47,16 +47,7 @@ add_head <- function(x, n) {
     return(lazy_query)
   }
 
-  if (identical(lazy_query$last_op, "head")) {
-    lazy_query$limit <- min(lazy_query$limit, n)
-  } else {
-    lazy_query <- lazy_select_query(
-      x = lazy_query,
-      last_op = "head",
-      limit = n
-    )
-  }
-
+  lazy_query$limit <- min(lazy_query$limit, n)
   lazy_query
 }
 
