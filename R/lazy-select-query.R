@@ -12,7 +12,7 @@ lazy_select_query <- function(x,
                               group_vars = NULL,
                               order_vars = NULL,
                               frame = NULL,
-                              select_operation = c("mutate", "summarise"),
+                              select_operation = c("select", "mutate", "summarise"),
                               message_summarise = NULL) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(is_string(last_op))
@@ -24,7 +24,7 @@ lazy_select_query <- function(x,
   stopifnot(is.logical(distinct), length(distinct) == 1L)
 
   select <- select %||% syms(set_names(op_vars(x)))
-  select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
+  select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
 
   stopifnot(is.null(message_summarise) || is_string(message_summarise))
 
@@ -33,7 +33,7 @@ lazy_select_query <- function(x,
   order_vars <- order_vars %||% op_sort(x)
   frame <- frame %||% op_frame(x)
 
-  if (last_op == "mutate") {
+  if (select_operation == "mutate") {
     select <- new_lazy_select(
       select,
       group_vars = group_vars,
@@ -70,7 +70,7 @@ is_lazy_sql_part <- function(x) {
   purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_call(.x))
 }
 
-new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = NULL) {
+new_lazy_select <- function(vars, group_vars = character(), order_vars = NULL, frame = NULL) {
   vctrs::vec_as_names(names2(vars), repair = "check_unique")
 
   var_names <- names(vars)
