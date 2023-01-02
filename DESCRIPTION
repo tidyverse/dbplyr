@@ -29,7 +29,7 @@ Imports:
     magrittr,
     methods,
     pillar (>= 1.5.0),
-    purrr (>= 0.3.5),
+    purrr (>= 1.0.0),
     R6 (>= 2.2.2),
     rlang (>= 1.0.6),
     tibble (>= 1.4.2),
