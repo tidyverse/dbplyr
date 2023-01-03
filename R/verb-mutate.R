@@ -30,13 +30,7 @@ mutate.tbl_lazy <- function(.data,
                             .after = NULL) {
   keep <- arg_match(.keep)
 
-  by <- compute_by(
-    {{ .by }},
-    .data,
-    by_arg = ".by",
-    data_arg = ".data",
-    error_call = caller_env()
-  )
+  by <- compute_by({{ .by }}, .data, by_arg = ".by", data_arg = ".data")
   if (by$from_by) {
     .data$lazy_query$group_vars <- by$names
   }
@@ -52,41 +46,31 @@ mutate.tbl_lazy <- function(.data,
     out$lazy_query <- add_select(out, layer, "mutate")
   }
 
-  cols_data <- op_vars(.data)
-  cols_group <- group_vars(.data)
-
-  cols_expr <- layer_info$modified_vars
-  cols_expr_modified <- intersect(cols_expr, cols_data)
-  cols_expr_new <- setdiff(cols_expr, cols_expr_modified)
-
-  cols_used <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[!used]))
-  cols_unused <- setdiff(cols_data, c(cols_group, cols_expr_modified, names(used)[used]))
-
-  .before <- enquo(.before)
-  .after <- enquo(.after)
-
-  if (!quo_is_null(.before) || !quo_is_null(.after)) {
-    # Only change the order of new columns
-    out <- relocate(out, all_of(cols_expr_new), .before = !!.before, .after = !!.after)
-  }
-
-  cols_out <- op_vars(out)
-
-  if (keep == "all") {
-    cols_retain <- cols_out
-  } else if (keep == "used") {
-    cols_retain <- setdiff(cols_out, cols_unused)
-  } else if (keep == "unused") {
-    cols_retain <- setdiff(cols_out, cols_used)
-  } else if (keep == "none") {
-    cols_retain <- setdiff(cols_out, c(cols_used, cols_unused))
-  }
-
   if (by$from_by) {
     out$lazy_query$group_vars <- character()
   }
 
-  select(out, all_of(cols_retain))
+  names_original <- names(.data)
+
+  out <- mutate_relocate(
+    out = out,
+    before = {{ .before }},
+    after = {{ .after }},
+    names_original = names_original
+  )
+
+  names_new <- layer_info$modified_vars
+  names_groups <- by$names
+
+  out <- mutate_keep(
+    out = out,
+    keep = keep,
+    used = used,
+    names_new = names_new,
+    names_groups = names_groups
+  )
+
+  out
 }
 
 #' @export
@@ -166,8 +150,6 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
         next
       }
 
-      all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
-
       used_vars <- all_names(cur_quo)
       all_used_vars <- c(all_used_vars, used_vars)
       if (any(used_vars %in% layer_modified_vars)) {
@@ -186,7 +168,9 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
       }
       cur_layer[[cur_var]] <- cur_quo
       dot_layer[[cur_var]] <- cur_quo
+
       layer_modified_vars <- c(layer_modified_vars, cur_var)
+      all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
     }
 
     all_vars <- names(cur_layer)[!var_is_null]
@@ -208,4 +192,44 @@ get_dot_name <- function(dots, i, was_named) {
   }
 
   dot_name
+}
+
+mutate_relocate <- function(out, before, after, names_original) {
+  before <- enquo(before)
+  after <- enquo(after)
+
+  if (quo_is_null(before) && quo_is_null(after)) {
+    return(out)
+  }
+
+  # Only change the order of completely new columns that
+  # didn't exist in the original data
+  names <- names(out)
+  names <- setdiff(names, names_original)
+
+  relocate(
+    out,
+    all_of(names),
+    .before = !!before,
+    .after = !!after
+  )
+}
+
+mutate_keep <- function(out, keep, used, names_new, names_groups) {
+  names <- names(out)
+
+  if (keep == "all") {
+    names_out <- names
+  } else {
+    names_keep <- switch(
+      keep,
+      used = names(used)[used],
+      unused = names(used)[!used],
+      none = character(),
+      abort("Unknown `keep`.", .internal = TRUE)
+    )
+    names_out <- intersect(names, c(names_new, names_groups, names_keep))
+  }
+
+  select(out, all_of(names_out))
 }
