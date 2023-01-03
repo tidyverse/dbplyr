@@ -44,7 +44,6 @@ add_distinct <- function(.data) {
 
   out <- lazy_select_query(
     x = lazy_query,
-    last_op = "distinct",
     distinct = TRUE
   )
   # TODO this could also work for joins

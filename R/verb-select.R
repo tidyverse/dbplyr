@@ -155,7 +155,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
       return(out)
     }
 
-    if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
+    if (inherits(lazy_query, "lazy_select_query")) {
       out$select <- vctrs::vec_slice(lazy_query$select, idx)
       out$select$name <- names(vars)
 
@@ -163,7 +163,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
     }
   }
 
-  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
+  if (inherits(lazy_query, "lazy_select_query")) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
@@ -185,7 +185,7 @@ add_select <- function(.data, vars, op = c("select", "mutate")) {
 
   lazy_select_query(
     x = lazy_query,
-    last_op = op,
+    select_operation = op,
     select = vars,
     group_vars = grps
   )

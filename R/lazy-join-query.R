@@ -31,7 +31,6 @@ lazy_join_query <- function(x,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame,
-    last_op = "join"
   )
 }
 
@@ -71,7 +70,6 @@ lazy_multi_join_query <- function(x,
     joins = joins,
     table_names = table_names,
     vars = vars,
-    last_op = "join",
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -144,8 +142,7 @@ lazy_semi_join_query <- function(x,
     vars = vars,
     group_vars = group_vars,
     order_vars = order_vars,
-    frame = frame,
-    last_op = "semi_join"
+    frame = frame
   )
 }
 

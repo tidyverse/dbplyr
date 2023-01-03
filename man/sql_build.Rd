@@ -67,7 +67,6 @@ lazy_query(
 
 lazy_select_query(
   x,
-  last_op,
   select = NULL,
   where = NULL,
   group_by = NULL,
@@ -78,7 +77,7 @@ lazy_select_query(
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("mutate", "summarise"),
+  select_operation = c("select", "mutate", "summarise"),
   message_summarise = NULL
 )
 
