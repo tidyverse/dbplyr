@@ -71,14 +71,14 @@
       lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
     Condition
       Error in `mutate()`:
-      ! Problem while computing `z = non_existent + 1`
+      i In argument: `z = non_existent + 1`
       Caused by error:
       ! Object `non_existent` not found.
     Code
       lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
     Condition
       Error in `mutate()`:
-      ! Problem while computing `..1 = across(x, mean, na.rm = z)`
+      i In argument: `across(x, mean, na.rm = z)`
       Caused by error in `across()`:
       ! Problem while evaluating `na.rm = z`.
       Caused by error:
@@ -87,9 +87,9 @@
       lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
     Condition
       Error in `mutate()`:
-      ! Problem while computing `..1 = across(x, .fns = "a")`
+      i In argument: `across(x, .fns = "a")`
       Caused by error in `across()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
 
 # mutate generates subqueries as needed
 

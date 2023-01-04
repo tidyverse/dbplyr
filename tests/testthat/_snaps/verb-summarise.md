@@ -5,7 +5,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(a_sum)`
+      i In argument: `issue_col = sum(a_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
@@ -16,7 +16,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(a_sum)`
+      i In argument: `issue_col = sum(a_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
@@ -27,7 +27,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(b_sum)`
+      i In argument: `issue_col = sum(b_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `b_sum` was created earlier in this `summarise()`.
@@ -37,7 +37,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = across(a_sum, sum)`
+      i In argument: `issue_col = across(a_sum, sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.

@@ -144,6 +144,7 @@ add_mutate <- function(.data, vars) {
 #    because `d` depends on `b` it must be on a new layer
 get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   dots <- as.list(enquos(..., .named = TRUE))
+  dot_names <- names2(exprs(...))
   was_named <- have_name(exprs(...))
 
   layer_modified_vars <- character()
@@ -165,7 +166,7 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
-    dot_name <- get_dot_name(dots, i, was_named)
+    dot_name <- dot_names[[i]]
     quosures <- partial_eval_quo(dot, cur_data, error_call, dot_name, was_named[[i]])
 
     if (!is.list(quosures)) {
@@ -219,15 +220,6 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
     modified_vars = all_modified_vars,
     used_vars = set_names(all_vars %in% all_used_vars, all_vars)
   )
-}
-
-get_dot_name <- function(dots, i, was_named) {
-  dot_name <- names2(dots)[[i]]
-  if (!was_named[[i]]) {
-    dot_name <- paste0("..", i)
-  }
-
-  dot_name
 }
 
 mutate_relocate <- function(out, before, after, names_original) {

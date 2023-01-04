@@ -16,7 +16,7 @@
       capture_across(lf, across(a, 1))
     Condition
       Error in `across()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(a, list(1)))
     Condition
@@ -27,7 +27,7 @@
       capture_across(lf, across(a:b, "log"))
     Condition
       Error in `across()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(c, mean))
     Condition
@@ -109,7 +109,7 @@
     Output
       <error/rlang_error>
       Error in `mutate()`:
-      ! Problem while computing `..1 = across(x, .unpack = TRUE)`
+      i In argument: `across(x, .unpack = TRUE)`
       Caused by error in `mutate()`:
       ! `.unpack = TRUE` is not supported in SQL translations.
 
@@ -119,7 +119,7 @@
       capture_if_all(lf, if_all(a, 1))
     Condition
       Error in `if_all()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
@@ -257,7 +257,7 @@
       arrange(df, pick(y))
     Condition
       Error in `arrange()`:
-      ! Problem while computing `..1 = pick(y)`
+      i In argument: `pick(y)`
       Caused by error in `pick()`:
       ! Can't subset columns that don't exist.
       x Column `y` doesn't exist.
@@ -268,7 +268,7 @@
       arrange(lazy_frame(x = 1), pick(y = x))
     Condition
       Error in `arrange()`:
-      ! Problem while computing `..1 = pick(y = x)`
+      i In argument: `pick(y = x)`
       Caused by error in `pick()`:
       ! Can't rename variables in this context.
 
@@ -278,7 +278,7 @@
       arrange(lazy_frame(x = 1), pick())
     Condition
       Error in `arrange()`:
-      ! Problem while computing `..1 = pick()`
+      i In argument: `pick()`
       Caused by error in `partial_eval_pick()`:
       ! Must supply at least one input to `pick()`.
 
@@ -288,7 +288,7 @@
       filter(df, pick(x, a))
     Condition
       Error in `filter()`:
-      ! Problem while computing `..1 = pick(x, a)`
+      i In argument: `pick(x, a)`
       Caused by error in `pick()`:
       ! Can't subset columns that don't exist.
       x Column `a` doesn't exist.
