@@ -82,16 +82,6 @@ new_lazy_select <- function(vars, group_vars = character(), order_vars = NULL, f
   )
 }
 
-update_lazy_select <- function(select, vars) {
-  vctrs::vec_as_names(names(vars), repair = "check_unique")
-
-  sel_vars <- purrr::map_chr(vars, as_string)
-  idx <- vctrs::vec_match(sel_vars, select$name)
-  select <- vctrs::vec_slice(select, idx)
-  select$name <- names(vars)
-  select
-}
-
 # projection = only select (including rename) from parent query
 # identity = selects exactly the same variable as the parent query
 is_lazy_select_query_simple <- function(x,
