@@ -130,25 +130,21 @@ add_select <- function(.data, vars) {
     return(lazy_query)
   }
 
-  old2new <- set_names(names(vars), vars)
-  grps <- op_grps(.data)
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-  lazy_query$group_vars <- grps
+  lazy_query <- rename_groups(lazy_query, vars)
 
-  names_prev <- op_vars(lazy_query)
-  idx <- vctrs::vec_match(vars, names_prev)
+  is_join <- inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")
+  is_select <- inherits(lazy_query, "lazy_select_query")
+  if (is_join || is_select) {
+    names_prev <- op_vars(lazy_query)
+    idx <- vctrs::vec_match(vars, names_prev)
 
-  if (inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")) {
-    lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
-    lazy_query$vars$name <- names(vars)
-
-    return(lazy_query)
-  }
-
-  if (inherits(lazy_query, "lazy_select_query")) {
-    lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
-    lazy_query$select$name <- names(vars)
+    if (is_join) {
+      lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
+      lazy_query$vars$name <- names(vars)
+    } else {
+      lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
+      lazy_query$select$name <- names(vars)
+    }
 
     return(lazy_query)
   }
@@ -158,6 +154,16 @@ add_select <- function(.data, vars) {
     select_operation = "select",
     select = syms(vars)
   )
+}
+
+rename_groups <- function(lazy_query, vars) {
+  old2new <- set_names(names(vars), vars)
+  grps <- op_grps(lazy_query)
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
+
+  lazy_query$group_vars <- grps
+  lazy_query
 }
 
 is_projection <- function(exprs) {

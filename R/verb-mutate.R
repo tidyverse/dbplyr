@@ -101,9 +101,6 @@ add_mutate <- function(.data, vars) {
 
   # drop NULLs
   vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
-  if (is_identity(vars, names(vars), op_vars(.data))) {
-    return(lazy_query)
-  }
 
   if (is_projection(vars)) {
     sel_vars <- purrr::map_chr(vars, as_string)
