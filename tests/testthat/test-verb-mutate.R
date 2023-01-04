@@ -454,4 +454,3 @@ test_that("mutated vars are always named", {
   out2 <- mf %>% mutate(1) %>% op_vars()
   expect_equal(out2, c("a", "1"))
 })
-

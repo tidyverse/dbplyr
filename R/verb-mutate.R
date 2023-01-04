@@ -149,18 +149,14 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
 
   layer_modified_vars <- character()
   all_modified_vars <- character()
-  all_used_vars <- character()
+  used_vars <- character()
   all_vars <- op_vars(.data)
   var_is_null <- rep_named(all_vars, FALSE)
 
   # Each dot may contain an `across()` expression which can refer to freshly
   # created variables. So, it is necessary to keep track of the current data
   # to partially evaluate the dot.
-  # `dot_layer` contains the expressions of the current dot and is only needed
-  # to correctly update `cur_data`
   cur_data <- .data
-  dot_layer <- syms(set_names(all_vars))
-
   cur_layer <- syms(set_names(all_vars))
   layers <- list()
 
@@ -173,52 +169,74 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
     }
     quosures <- unclass(quosures)
+    cols_result <- get_mutate_dot_cols(quosures, var_is_null, all_vars)
 
-    for (k in seq_along(quosures)) {
-      cur_quo <- quosures[[k]]
-      cur_var <- names(quosures)[[k]]
+    if (any(cols_result$used_vars %in% layer_modified_vars)) {
+      layers <- append(layers, list(cur_layer))
 
-      if (quo_is_null(cur_quo)) {
-        var_is_null[[cur_var]] <- TRUE
-        cur_layer[[cur_var]] <- cur_quo
-        dot_layer[[cur_var]] <- cur_quo
-        layer_modified_vars <- setdiff(layer_modified_vars, cur_var)
-        all_modified_vars <- setdiff(all_modified_vars, cur_var)
-        next
-      }
-
-      used_vars <- all_names(cur_quo)
-      all_used_vars <- c(all_used_vars, used_vars)
-      if (any(used_vars %in% layer_modified_vars)) {
-        layers <- append(layers, list(cur_layer))
-
-        cur_layer[!var_is_null] <- syms(names(cur_layer)[!var_is_null])
-        layer_modified_vars <- character()
-      }
-
-      var_is_null[[cur_var]] <- FALSE
-      if (quo_is_symbol(cur_quo)) {
-        cur_sym <- quo_get_expr(cur_quo)
-        if (as_name(cur_sym) %in% all_vars) {
-          cur_quo <- cur_sym
-        }
-      }
-      cur_layer[[cur_var]] <- cur_quo
-      dot_layer[[cur_var]] <- cur_quo
-
-      layer_modified_vars <- c(layer_modified_vars, cur_var)
-      all_modified_vars <- c(all_modified_vars, setdiff(cur_var, all_modified_vars))
+      cur_layer <- syms(set_names(names(cur_layer)))
+      layer_modified_vars <- character()
     }
 
-    all_vars <- names(cur_layer)[!var_is_null]
-    cur_data$lazy_query <- add_mutate(cur_data, dot_layer)
-    dot_layer <- syms(set_names(all_vars))
+    used_vars <- c(used_vars, cols_result$used_vars)
+    layer_modified_vars <- c(layer_modified_vars, cols_result$modified_vars)
+    all_modified_vars <- c(all_modified_vars, cols_result$modified_vars)
+
+    cur_layer <- purrr::list_assign(cur_layer, !!!cols_result$cols)
+    all_vars <- c(all_vars, setdiff(cols_result$modified_vars, all_vars))
+
+    cols <- set_names(syms(names(cur_layer)))
+    cols <- purrr::list_assign(cur_layer, !!!cols_result$cols)
+
+    cur_data$lazy_query <- add_mutate(cur_data, cols)
+    var_is_null <- cols_result$var_is_null
+    null_vars <- names(var_is_null)[var_is_null]
+    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(all_vars, null_vars)))
   }
 
+  null_vars <- names(var_is_null)[var_is_null]
+  all_vars <- setdiff(all_vars, null_vars)
   list(
     layers = append(layers, list(cur_layer)),
     modified_vars = all_modified_vars,
-    used_vars = set_names(all_vars %in% all_used_vars, all_vars)
+    used_vars = set_names(all_vars %in% used_vars, all_vars)
+  )
+}
+
+get_mutate_dot_cols <- function(quosures, var_is_null, all_vars) {
+  cols <- list()
+  modified_vars <- character()
+  used_vars <- character()
+
+  for (k in seq_along(quosures)) {
+    cur_quo <- quosures[[k]]
+    cur_var <- names(quosures)[[k]]
+
+    if (quo_is_null(cur_quo)) {
+      var_is_null[[cur_var]] <- TRUE
+      cols[[cur_var]] <- cur_quo
+      modified_vars <- setdiff(modified_vars, cur_var)
+      next
+    }
+
+    var_is_null[[cur_var]] <- FALSE
+    if (quo_is_symbol(cur_quo)) {
+      cur_sym <- quo_get_expr(cur_quo)
+      if (as_name(cur_sym) %in% all_vars) {
+        cur_quo <- cur_sym
+      }
+    }
+    cols[[cur_var]] <- cur_quo
+
+    used_vars <- c(used_vars, all_names(cur_quo))
+    modified_vars <- c(modified_vars, cur_var)
+  }
+
+  list(
+    cols = cols,
+    used_vars = used_vars,
+    modified_vars = modified_vars,
+    var_is_null = var_is_null
   )
 }
 
