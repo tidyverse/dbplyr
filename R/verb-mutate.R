@@ -151,7 +151,6 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   all_modified_vars <- character()
   used_vars <- character()
   all_vars <- op_vars(.data)
-  var_is_null <- rep_named(all_vars, FALSE)
 
   # Each dot may contain an `across()` expression which can refer to freshly
   # created variables. So, it is necessary to keep track of the current data
@@ -169,7 +168,7 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
       quosures <- set_names(list(quosures), names(dots)[[i]])
     }
     quosures <- unclass(quosures)
-    cols_result <- get_mutate_dot_cols(quosures, var_is_null, all_vars)
+    cols_result <- get_mutate_dot_cols(quosures, all_vars)
 
     if (any(cols_result$used_vars %in% layer_modified_vars)) {
       layers <- append(layers, list(cur_layer))
@@ -187,15 +186,12 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
 
     cols <- set_names(syms(names(cur_layer)))
     cols <- purrr::list_assign(cur_layer, !!!cols_result$cols)
-
     cur_data$lazy_query <- add_mutate(cur_data, cols)
-    var_is_null <- cols_result$var_is_null
-    null_vars <- names(var_is_null)[var_is_null]
-    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(all_vars, null_vars)))
+
+    removed_cols <- cols_result$removed_cols
+    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(all_vars, removed_cols)))
   }
 
-  null_vars <- names(var_is_null)[var_is_null]
-  all_vars <- setdiff(all_vars, null_vars)
   list(
     layers = append(layers, list(cur_layer)),
     modified_vars = all_modified_vars,
@@ -203,10 +199,11 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
   )
 }
 
-get_mutate_dot_cols <- function(quosures, var_is_null, all_vars) {
+get_mutate_dot_cols <- function(quosures, all_vars) {
   cols <- list()
   modified_vars <- character()
   used_vars <- character()
+  var_is_null <- logical()
 
   for (k in seq_along(quosures)) {
     cur_quo <- quosures[[k]]
@@ -236,7 +233,7 @@ get_mutate_dot_cols <- function(quosures, var_is_null, all_vars) {
     cols = cols,
     used_vars = used_vars,
     modified_vars = modified_vars,
-    var_is_null = var_is_null
+    removed_cols = names2(var_is_null)[var_is_null]
   )
 }
 
