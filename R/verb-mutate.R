@@ -40,10 +40,10 @@ mutate.tbl_lazy <- function(.data,
   layers <- layer_info$layers
 
   # The layers may contain `var = quo(NULL)` at this point.
-  # They are removed in `add_select()`.
+  # They are removed in `add_mutate()`.
   out <- .data
   for (layer in layers) {
-    out$lazy_query <- add_select(out, layer, "mutate")
+    out$lazy_query <- add_mutate(out, layer, "mutate")
   }
 
   if (by$from_by) {
@@ -79,7 +79,7 @@ transmute.tbl_lazy <- function(.data, ...) {
   layer_info <- get_mutate_layers(.data, ...)
 
   for (layer in layer_info$layers) {
-    .data$lazy_query <- add_select(.data, layer, "mutate")
+    .data$lazy_query <- add_mutate(.data, layer, "mutate")
   }
 
   # Retain expression columns in order of their appearance
@@ -95,6 +95,75 @@ transmute.tbl_lazy <- function(.data, ...) {
 }
 
 # helpers -----------------------------------------------------------------
+
+add_mutate <- function(.data, vars, op = c("select", "mutate")) {
+  op <- match.arg(op, c("select", "mutate"))
+  lazy_query <- .data$lazy_query
+
+  # drop NULLs
+  vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
+  if (is_identity(vars, names(vars), op_vars(.data))) {
+    return(lazy_query)
+  }
+
+  symbols <- purrr::keep(vars, is_symbol)
+  new2old <- purrr::map_chr(symbols, as_string)
+  old2new <- set_names(names(new2old), new2old)
+
+  grps <- op_grps(.data)
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
+
+  if (is_projection(vars)) {
+    sel_vars <- purrr::map_chr(vars, as_string)
+    names_prev <- op_vars(lazy_query)
+    idx <- vctrs::vec_match(sel_vars, names_prev)
+
+    out <- lazy_query
+    out$group_vars <- grps
+
+    if (inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")) {
+      out$vars <- vctrs::vec_slice(out$vars, idx)
+      out$vars$name <- names(sel_vars)
+
+      return(out)
+    }
+
+    if (inherits(lazy_query, "lazy_select_query")) {
+      out$select <- vctrs::vec_slice(lazy_query$select, idx)
+      out$select$name <- names(vars)
+
+      return(out)
+    }
+  }
+
+  if (inherits(lazy_query, "lazy_select_query")) {
+    # Special optimisation when applied to pure projection() - this is
+    # conservative and we could expand to any op_select() if combined with
+    # the logic in get_mutate_layers()
+    select <- lazy_query$select
+    if (is_pure_projection(select$expr, select$name)) {
+      if (op == "select") {
+          lazy_query$select <- update_lazy_select(select, vars)
+        } else {
+          lazy_query$select <- new_lazy_select(
+            vars,
+            group_vars = op_grps(lazy_query),
+            order_vars = op_sort(lazy_query),
+            frame = op_frame(lazy_query)
+          )
+        }
+        return(lazy_query)
+    }
+  }
+
+  lazy_select_query(
+    x = lazy_query,
+    select_operation = op,
+    select = vars,
+    group_vars = grps
+  )
+}
 
 # Split mutate expressions in independent layers, e.g.
 #
@@ -174,7 +243,7 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
     }
 
     all_vars <- names(cur_layer)[!var_is_null]
-    cur_data$lazy_query <- add_select(cur_data, dot_layer, "mutate")
+    cur_data$lazy_query <- add_mutate(cur_data, dot_layer, "mutate")
     dot_layer <- syms(set_names(all_vars))
   }
 
