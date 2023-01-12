@@ -18,10 +18,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
-        ON (`df_LHS`.`x` <=> `df_RHS`.`x`)
+      SELECT `LHS`.`x` AS `x`
+      FROM `df` AS `LHS`
+      LEFT JOIN `df` AS `RHS`
+        ON (`LHS`.`x` <=> `RHS`.`x`)
 
 ---
 
@@ -74,17 +74,4 @@
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
-
-# can explain
-
-    Code
-      db %>% mutate(y = x + 1) %>% explain()
-    Output
-      <SQL>
-      SELECT *, `x` + 1.0 AS `y`
-      FROM `test`
-      
-      <PLAN>
-        id select_type table type possible_keys  key key_len  ref rows Extra
-      1  1      SIMPLE  test  ALL          <NA> <NA>    <NA> <NA>    3      
 

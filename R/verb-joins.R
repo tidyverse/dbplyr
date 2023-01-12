@@ -614,10 +614,7 @@ join_two_table_alias <- function(names, from) {
   if (from[1] != "as" && from[2] != "as") {
     # self join of named table
     if (!is.na(names[1]) && !is.na(names[2]) && identical(names[1], names[2])) {
-      out <- c(
-        paste0(names[1], "_LHS"),
-        paste0(names[2], "_RHS")
-      )
+      out <- c("LHS", "RHS")
       return(out)
     }
   }

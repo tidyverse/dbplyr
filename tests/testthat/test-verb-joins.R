@@ -167,7 +167,7 @@ test_that("join uses correct table alias", {
 
   # self joins
   table_vars <- sql_build(left_join(x, x, by = "a"))$table_vars
-  expect_named(table_vars, c("x_LHS", "x_RHS"))
+  expect_named(table_vars, c("LHS", "RHS"))
 
   table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_vars
   expect_named(table_vars, c("my_x", "x"))
@@ -638,7 +638,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql("`df_LHS`.*", z = "`z`")
+    sql("`LHS`.*", z = "`z`")
   )
 
   # also works after relocate
@@ -649,7 +649,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(z = "`z`", "`df_LHS`.*")
+    sql(z = "`z`", "`LHS`.*")
   )
 
   # does not use * if variable are missing
@@ -660,7 +660,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", c = "`c`")
+    sql(a = "`LHS`.`a`", c = "`c`")
   )
 
   # does not use * if variable names changed
@@ -672,7 +672,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
+    sql(a = "`LHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
   )
 })
 
@@ -688,7 +688,7 @@ test_that("right_join uses *", {
   # cannot use * without relocate or select
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`df_RHS`.`a`", b = "`df_RHS`.`b`", c = "`c`", z = "`z`")
+    sql(a = "`RHS`.`a`", b = "`RHS`.`b`", c = "`c`", z = "`z`")
   )
 
   # also works after relocate
@@ -699,7 +699,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql("`df_RHS`.*", c = "`c`")
+    sql("`RHS`.*", c = "`c`")
   )
 
   # does not use * if variable are missing
@@ -710,7 +710,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`df_RHS`.`a`", z = "`z`")
+    sql(a = "`RHS`.`a`", z = "`z`")
   )
 
   # does not use * if variable names changed
@@ -722,7 +722,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`df_RHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
+    sql(a = "`RHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
   )
 })
 
@@ -737,7 +737,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
+    set_names(sql("`LHS`.*", "`RHS`.*"), c("", ""))
   )
 
   # also works after relocate
@@ -748,7 +748,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
+    set_names(sql("`RHS`.*", "`LHS`.*"), c("", ""))
   )
 
   out <- lf1 %>%
@@ -758,7 +758,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(x = "`x`", "`df_LHS`.*", y = "`y`")
+    sql(x = "`x`", "`LHS`.*", y = "`y`")
   )
 
   out <- lf1 %>%
@@ -768,7 +768,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`a`", "`df_RHS`.*", b = "`b`")
+    sql(a = "`a`", "`RHS`.*", b = "`b`")
   )
 })
 
@@ -784,8 +784,8 @@ test_that("full_join() does not use *", {
   expect_equal(
     sql_join_vars(con, out$vars, type = "full", x_as = out$by$x_as, y_as = out$by$y_as),
     sql(
-      a = "COALESCE(`df_LHS`.`a`, `df_RHS`.`a`)",
-      b = "COALESCE(`df_LHS`.`b`, `df_RHS`.`b`)"
+      a = "COALESCE(`LHS`.`a`, `RHS`.`a`)",
+      b = "COALESCE(`LHS`.`b`, `RHS`.`b`)"
     )
   )
 })

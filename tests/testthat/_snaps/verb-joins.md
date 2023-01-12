@@ -118,10 +118,10 @@
       Joining, by = "x"
     Output
       <SQL> WITH `q01` AS (
-        SELECT `lf1_LHS`.`x` AS `x`
-        FROM `lf1` AS `lf1_LHS`
-        INNER JOIN `lf1` AS `lf1_RHS`
-          ON (`lf1_LHS`.`x` = `lf1_RHS`.`x`)
+        SELECT `LHS`.`x` AS `x`
+        FROM `lf1` AS `LHS`
+        INNER JOIN `lf1` AS `RHS`
+          ON (`LHS`.`x` = `RHS`.`x`)
       )
       SELECT `lf1...1`.`x` AS `x`
       FROM `lf1` AS `lf1...1`

@@ -22,10 +22,10 @@
     Output
       <SQL>
       SELECT *
-      FROM `df` AS `df_LHS`
+      FROM `df` AS `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+        SELECT 1 FROM `df` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       )
 
 ---
@@ -37,9 +37,9 @@
     Output
       <SQL>
       SELECT *
-      FROM `df` AS `df_LHS`
+      FROM `df` AS `LHS`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+        SELECT 1 FROM `df` AS `RHS`
+        WHERE (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
       )
 
