@@ -61,6 +61,7 @@
 ---
 
     i In index: 2.
+    i With name: b_x.
     Caused by error in `dbplyr_pivot_wider_spec()`:
     ! Can't convert to a function.
 
@@ -77,9 +78,10 @@
     Code
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
-      <error/rlang_error>
+      <error/purrr_error_indexed>
       Error in `map2()`:
       i In index: 1.
+      i With name: unused.
       Caused by error in `dbplyr_pivot_wider_spec()`:
       ! Can't convert to a function.
 
