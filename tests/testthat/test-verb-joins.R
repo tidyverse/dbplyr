@@ -41,6 +41,37 @@ test_that("complete semi join works with SQLite and table alias", {
   expect_snapshot(inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
 })
 
+test_that("join works with in_schema", {
+  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+
+  DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df2"), tibble(x = 2:3, z = "b"))
+
+  # same schema, different name
+  df1 <- tbl(con, in_schema("foo", "df"))
+  df2 <- tbl(con, in_schema("foo", "df2"))
+  expect_equal(
+    left_join(df1, df2, by = "x") %>% collect(),
+    tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
+  )
+  expect_snapshot(
+    left_join(df1, df2, by = "x") %>% remote_query()
+  )
+
+  # different schema, same name
+  DBI::dbExecute(con, "ATTACH ':memory:' AS foo2")
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo2", table = "df"), tibble(x = 2:3, z = "c"))
+  df3 <- tbl(con, in_schema("foo2", "df"))
+  expect_equal(
+    left_join(df1, df3, by = "x") %>% collect(),
+    tibble(x = 1:3, y = "a", z = c(NA, "c", "c"))
+  )
+  expect_snapshot(
+    left_join(df1, df3, by = "x") %>% remote_query()
+  )
+})
+
 test_that("joins with non by variables gives cross join", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
