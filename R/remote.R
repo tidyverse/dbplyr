@@ -48,7 +48,20 @@ query_name.tbl_lazy <- function(x) {
 
 #' @export
 query_name.lazy_base_remote_query <- function(x) {
-  x$x
+  name <- x$x
+  if (is.sql(name)) {
+    return(NULL)
+  }
+
+  if (is.ident(name)) {
+    return(name)
+  }
+
+  if (is_schema(name) || is_catalog(name)) {
+    return(name$table)
+  }
+
+  abort("Unexpected type", .internal = TRUE)
 }
 
 #' @export
