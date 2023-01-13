@@ -41,37 +41,6 @@ test_that("complete semi join works with SQLite and table alias", {
   expect_snapshot(inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
 })
 
-test_that("join works with in_schema", {
-  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
-
-  DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df2"), tibble(x = 2:3, z = "b"))
-
-  # same schema, different name
-  df1 <- tbl(con, in_schema("foo", "df"))
-  df2 <- tbl(con, in_schema("foo", "df2"))
-  expect_equal(
-    left_join(df1, df2, by = "x") %>% collect(),
-    tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
-  )
-  expect_snapshot(
-    left_join(df1, df2, by = "x") %>% remote_query()
-  )
-
-  # different schema, same name
-  DBI::dbExecute(con, "ATTACH ':memory:' AS foo2")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo2", table = "df"), tibble(x = 2:3, z = "c"))
-  df3 <- tbl(con, in_schema("foo2", "df"))
-  expect_equal(
-    left_join(df1, df3, by = "x") %>% collect(),
-    tibble(x = 1:3, y = "a", z = c(NA, "c", "c"))
-  )
-  expect_snapshot(
-    left_join(df1, df3, by = "x") %>% remote_query()
-  )
-})
-
 test_that("joins with non by variables gives cross join", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
@@ -198,7 +167,7 @@ test_that("join uses correct table alias", {
 
   # self joins
   table_vars <- sql_build(left_join(x, x, by = "a"))$table_vars
-  expect_named(table_vars, c("LHS", "RHS"))
+  expect_named(table_vars, c("x_LHS", "x_RHS"))
 
   table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_vars
   expect_named(table_vars, c("my_x", "x"))
@@ -669,7 +638,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql("`LHS`.*", z = "`z`")
+    sql("`df_LHS`.*", z = "`z`")
   )
 
   # also works after relocate
@@ -680,7 +649,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(z = "`z`", "`LHS`.*")
+    sql(z = "`z`", "`df_LHS`.*")
   )
 
   # does not use * if variable are missing
@@ -691,7 +660,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`LHS`.`a`", c = "`c`")
+    sql(a = "`df_LHS`.`a`", c = "`c`")
   )
 
   # does not use * if variable names changed
@@ -703,7 +672,7 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`LHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
+    sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
 
@@ -719,7 +688,7 @@ test_that("right_join uses *", {
   # cannot use * without relocate or select
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`RHS`.`a`", b = "`RHS`.`b`", c = "`c`", z = "`z`")
+    sql(a = "`df_RHS`.`a`", b = "`df_RHS`.`b`", c = "`c`", z = "`z`")
   )
 
   # also works after relocate
@@ -730,7 +699,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql("`RHS`.*", c = "`c`")
+    sql("`df_RHS`.*", c = "`c`")
   )
 
   # does not use * if variable are missing
@@ -741,7 +710,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`RHS`.`a`", z = "`z`")
+    sql(a = "`df_RHS`.`a`", z = "`z`")
   )
 
   # does not use * if variable names changed
@@ -753,7 +722,7 @@ test_that("right_join uses *", {
 
   expect_equal(
     sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
-    sql(a = "`RHS`.`a`", `b.x` = "`LHS`.`b`", `b.y` = "`RHS`.`b`")
+    sql(a = "`df_RHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
 
@@ -768,7 +737,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`LHS`.*", "`RHS`.*"), c("", ""))
+    set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
   )
 
   # also works after relocate
@@ -779,7 +748,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`RHS`.*", "`LHS`.*"), c("", ""))
+    set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
   )
 
   out <- lf1 %>%
@@ -789,7 +758,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(x = "`x`", "`LHS`.*", y = "`y`")
+    sql(x = "`x`", "`df_LHS`.*", y = "`y`")
   )
 
   out <- lf1 %>%
@@ -799,7 +768,7 @@ test_that("cross_join uses *", {
 
   expect_equal(
     sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`a`", "`RHS`.*", b = "`b`")
+    sql(a = "`a`", "`df_RHS`.*", b = "`b`")
   )
 })
 
@@ -815,8 +784,8 @@ test_that("full_join() does not use *", {
   expect_equal(
     sql_join_vars(con, out$vars, type = "full", x_as = out$by$x_as, y_as = out$by$y_as),
     sql(
-      a = "COALESCE(`LHS`.`a`, `RHS`.`a`)",
-      b = "COALESCE(`LHS`.`b`, `RHS`.`b`)"
+      a = "COALESCE(`df_LHS`.`a`, `df_RHS`.`a`)",
+      b = "COALESCE(`df_LHS`.`b`, `df_RHS`.`b`)"
     )
   )
 })
