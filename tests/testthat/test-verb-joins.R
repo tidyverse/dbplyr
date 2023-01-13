@@ -74,7 +74,9 @@ test_that("join works with in_schema", {
 
 test_that("alias truncates long table names at database limit", {
   # Postgres has max table name length of 63; ensure it's not exceeded when generating table alias
-  con <- DBI::dbConnect(RPostgres::Postgres())
+  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+
+  DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
 
   nm1 <- strrep("a", 63)
   DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
@@ -97,14 +99,14 @@ test_that("alias truncates long table names at database limit", {
 
   # 2. self join: >2 identical tables
   # 2a: 1 -> 1-> 2
-  lazy_table_2a<- left_join(df1, df1, by = c("x", "y")) %>%
+  lazy_table_2a <-
+    left_join(df1, df1, by = c("x", "y")) %>%
     left_join(df2, by = "x")
 
   expect_equal(
     lazy_table_2a %>% collect(),
     tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
   )
-
   expect_snapshot(
     left_join(df1, df1, by = c("x", "y")) %>%
       left_join(df2, by = "x") %>%
@@ -120,15 +122,13 @@ test_that("alias truncates long table names at database limit", {
     lazy_table_2b %>% collect(),
     tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
   )
-
   expect_snapshot(
     left_join(df1, df2, by = "x") %>%
       left_join(df1, by = c("x", "y")) %>%
       remote_query()
   )
 
-  #
-  # 2b: 2 -> 1-> 1
+  # 2c: 2 -> 1-> 1
   lazy_table_2c <-
     left_join(df2, df1, by = "x") %>%
     left_join(df1, by = c("x", "y"))
@@ -137,7 +137,6 @@ test_that("alias truncates long table names at database limit", {
     lazy_table_2c %>% collect(),
     tibble(x = 2:3, z = "b", y = "a")
   )
-
   expect_snapshot(
     left_join(df2, df1, by = "x") %>%
       left_join(df1, by = c("x", "y")) %>%
