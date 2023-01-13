@@ -197,6 +197,15 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, 
   }
 }
 
+#' @export
+sql_render.dbplyr_schema <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  query <- as.sql(query, con)
+  sql_render(query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
+}
+
+#' @export
+sql_render.dbplyr_catalog <- sql_render.dbplyr_schema
+
 # Optimise ----------------------------------------------------------------
 
 #' @export
