@@ -86,7 +86,8 @@ pivot_longer.tbl_lazy <- function(data,
     names_sep = names_sep,
     names_pattern = names_pattern,
     names_ptypes = names_ptypes,
-    names_transform = names_transform
+    names_transform = names_transform,
+    error_call = current_env()
   )
 
   dbplyr_pivot_longer_spec(data, spec,

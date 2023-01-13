@@ -126,7 +126,8 @@ pivot_wider.tbl_lazy <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = current_env()
   )
 
   id_cols <- build_wider_id_cols_expr(
@@ -155,7 +156,8 @@ dbplyr_build_wider_spec <- function(data,
                                     names_glue = NULL,
                                     names_sort = FALSE,
                                     names_vary = "fastest",
-                                    names_expand = FALSE) {
+                                    names_expand = FALSE,
+                                    error_call = current_env()) {
   if (!inherits(data, "tbl_sql")) {
     cli_abort(c(
       "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
@@ -191,7 +193,8 @@ dbplyr_build_wider_spec <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = error_call
   )
 }
 
