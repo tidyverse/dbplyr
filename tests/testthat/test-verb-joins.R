@@ -94,7 +94,7 @@ test_that("alias truncates long table names at database limit", {
     tibble(x = 1:3, y = "a")
   )
   expect_snapshot(
-    left_join(df1, df1, by = "x") %>% remote_query()
+    left_join(df1, df1, by = c("x", "y")) %>% remote_query()
   )
 
   # 2. self join: >2 identical tables
