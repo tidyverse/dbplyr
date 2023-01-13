@@ -196,7 +196,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
 }
 
 generate_join_table_names <- function(table_names) {
-  source_length_max <- max(stringr::str_length(table_names$name))
+  table_name_length_max <- max(stringr::str_length(table_names$name))
 
   if (length(table_names$name) != 2) {
     table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
@@ -207,12 +207,13 @@ generate_join_table_names <- function(table_names) {
     table_names_prepared <- join_two_table_alias(table_names$name, table_names$from)
   }
 
-  # avoid database aliases exceeding the length of input table names to
-  # prevent database truncation issues (e.g., 63 for Postgres)
+  # avoid database aliases exceeding the database-specific maximum length
   table_names_prepared %>%
     abbreviate(
-      minlength = source_length_max,
-      strict = FALSE, # (explicit, default) err on the side of unique table names instead of exact length
+      # arbitrarily floor at 63 (Postgres limit) to avoid unnecessarily truncating reasonable lengths
+      minlength = max(table_name_length_max, 63),
+      # (explicit, default) err on the side of unique table names instead of exact length
+      strict = FALSE,
       named = FALSE
     )
 }
