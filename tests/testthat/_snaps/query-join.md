@@ -25,10 +25,10 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.*
-      FROM `df` AS `LHS`
-      INNER JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `df_LHS`.*
+      FROM `df` AS `df_LHS`
+      INNER JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
 
 ---
 
@@ -38,10 +38,10 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `LHS`.*
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `df_LHS`.*
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
 
 ---
 
@@ -51,10 +51,10 @@
       Joining, by = c("x", "y")
     Output
       <SQL>
-      SELECT `RHS`.*
-      FROM `df` AS `LHS`
-      RIGHT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+      SELECT `df_RHS`.*
+      FROM `df` AS `df_LHS`
+      RIGHT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
 
 ---
 
@@ -65,11 +65,11 @@
     Output
       <SQL>
       SELECT
-        COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
-        COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`
-      FROM `df` AS `LHS`
-      FULL JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`,
+        COALESCE(`df_LHS`.`y`, `df_RHS`.`y`) AS `y`
+      FROM `df` AS `df_LHS`
+      FULL JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
 
 # only disambiguates shared variables
 
@@ -79,10 +79,10 @@
       Joining, by = "x"
     Output
       <SQL>
-      SELECT `LHS`.*, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      SELECT `df_LHS`.*, `z`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
 ---
 
@@ -90,10 +90,10 @@
       left_join(lf1, lf2, by = c(y = "z"))
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x.x`, `y`, `RHS`.`x` AS `x.y`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`y` = `RHS`.`z`)
+      SELECT `df_LHS`.`x` AS `x.x`, `y`, `df_RHS`.`x` AS `x.y`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`y` = `df_RHS`.`z`)
 
 # disambiguate variables that only differ in case
 
@@ -101,10 +101,10 @@
       left_join(lf1, lf2, by = "y")
     Output
       <SQL>
-      SELECT `LHS`.*, `RHS`.`X` AS `X`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`y` = `RHS`.`y`)
+      SELECT `df_LHS`.*, `df_RHS`.`X` AS `X`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`y` = `df_RHS`.`y`)
 
 # sql_on query doesn't change unexpectedly
 

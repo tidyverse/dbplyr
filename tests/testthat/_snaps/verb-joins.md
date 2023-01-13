@@ -20,26 +20,6 @@
       INNER JOIN `df` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
 
-# join works with in_schema
-
-    Code
-      left_join(df1, df2, by = "x") %>% remote_query()
-    Output
-      <SQL> SELECT `df`.*, `z`
-      FROM `foo`.`df` AS `df`
-      LEFT JOIN `foo`.`df2` AS `df2`
-        ON (`df`.`x` = `df2`.`x`)
-
----
-
-    Code
-      left_join(df1, df3, by = "x") %>% remote_query()
-    Output
-      <SQL> SELECT `df_LHS`.*, `z`
-      FROM `foo`.`df` AS `df_LHS`
-      LEFT JOIN `foo2`.`df` AS `df_RHS`
-        ON (`df_LHS`.`x` = `df_RHS`.`x`)
-
 # join check `x_as` and `y_as`
 
     Code
@@ -138,10 +118,10 @@
       Joining, by = "x"
     Output
       <SQL> WITH `q01` AS (
-        SELECT `LHS`.`x` AS `x`
-        FROM `lf1` AS `LHS`
-        INNER JOIN `lf1` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+        SELECT `lf1_LHS`.`x` AS `x`
+        FROM `lf1` AS `lf1_LHS`
+        INNER JOIN `lf1` AS `lf1_RHS`
+          ON (`lf1_LHS`.`x` = `lf1_RHS`.`x`)
       )
       SELECT `lf1...1`.`x` AS `x`
       FROM `lf1` AS `lf1...1`

@@ -200,10 +200,10 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT `LHS`.*, `c`
-        FROM `df` AS `LHS`
-        LEFT JOIN `df` AS `RHS`
-          ON (`LHS`.`a` = `RHS`.`a`)
+        SELECT `df_LHS`.*, `c`
+        FROM `df` AS `df_LHS`
+        LEFT JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`a` = `df_RHS`.`a`)
       ) `q01`
       ORDER BY `a`
     Code
@@ -215,10 +215,10 @@
       SELECT *
       FROM (
         SELECT *
-        FROM `df` AS `LHS`
+        FROM `df` AS `df_LHS`
         WHERE EXISTS (
-          SELECT 1 FROM `df` AS `RHS`
-          WHERE (`LHS`.`a` = `RHS`.`a`)
+          SELECT 1 FROM `df` AS `df_RHS`
+          WHERE (`df_LHS`.`a` = `df_RHS`.`a`)
         )
       ) `q01`
       ORDER BY `a`

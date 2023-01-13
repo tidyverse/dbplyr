@@ -19,10 +19,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` IS `RHS`.`x`)
+      SELECT `df_LHS`.`x` AS `x`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` IS `df_RHS`.`x`)
 
 # case_when translates correctly to ELSE when TRUE ~ is used
 
@@ -41,22 +41,22 @@
       SELECT `x`, `y.x`, `y.y`, `z`
       FROM (
         SELECT
-          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
-          `LHS`.`y` AS `y.x`,
-          `RHS`.`y` AS `y.y`,
+          COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`,
+          `df_LHS`.`y` AS `y.x`,
+          `df_RHS`.`y` AS `y.y`,
           `z`
-        FROM `df` AS `LHS`
-        LEFT JOIN `df` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+        FROM `df` AS `df_LHS`
+        LEFT JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
         UNION
         SELECT
-          COALESCE(`RHS`.`x`, `LHS`.`x`) AS `x`,
-          `LHS`.`y` AS `y.x`,
-          `RHS`.`y` AS `y.y`,
+          COALESCE(`df_RHS`.`x`, `df_LHS`.`x`) AS `x`,
+          `df_LHS`.`y` AS `y.x`,
+          `df_RHS`.`y` AS `y.y`,
           `z`
-        FROM `df` AS `RHS`
-        LEFT JOIN `df` AS `LHS`
-          ON (`RHS`.`x` = `LHS`.`x`)
+        FROM `df` AS `df_RHS`
+        LEFT JOIN `df` AS `df_LHS`
+          ON (`df_RHS`.`x` = `df_LHS`.`x`)
       ) AS `q01`
 
 ---
@@ -65,10 +65,10 @@
       right_join(df2, df1, by = "x")
     Output
       <SQL>
-      SELECT `RHS`.`x` AS `x`, `LHS`.`y` AS `y.x`, `z`, `RHS`.`y` AS `y.y`
-      FROM `df` AS `RHS`
-      LEFT JOIN `df` AS `LHS`
-        ON (`RHS`.`x` = `LHS`.`x`)
+      SELECT `df_RHS`.`x` AS `x`, `df_LHS`.`y` AS `y.x`, `z`, `df_RHS`.`y` AS `y.y`
+      FROM `df` AS `df_RHS`
+      LEFT JOIN `df` AS `df_LHS`
+        ON (`df_RHS`.`x` = `df_LHS`.`x`)
 
 # can explain a query
 

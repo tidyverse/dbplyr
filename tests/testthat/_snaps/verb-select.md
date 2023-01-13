@@ -60,10 +60,10 @@
     Output
       <SQL>
       SELECT `x` AS `x2`, `y` AS `y3`, `z`
-      FROM `df` AS `LHS`
+      FROM `df` AS `df_LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `df` AS `df_RHS`
+        WHERE (`df_LHS`.`x` = `df_RHS`.`x`)
       )
 
 ---
@@ -72,10 +72,10 @@
       print(lf2)
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x2`, `LHS`.`y` AS `y3`, `z`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` = `RHS`.`x`)
+      SELECT `df_LHS`.`x` AS `x2`, `df_LHS`.`y` AS `y3`, `z`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
 # select() produces nice error messages
 
