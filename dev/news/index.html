@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.2.1.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,9 +72,12 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.3.0" id="dbplyr-230">dbplyr 2.3.0<a class="anchor" aria-label="anchor" href="#dbplyr-230"></a></h2>
 <ul><li>Compatibility with purrr 1.0.0 (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1085" class="external-link">#1085</a>).</li>
 </ul><div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-2-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-3-0"></a></h3>
 <ul><li><p><code><a href="https://stringr.tidyverse.org/reference/str_like.html" class="external-link">stringr::str_like()</a></code> (new in 1.5.0) is translated to the closest <code>LIKE</code> equivalent (<a href="https://github.com/rjpat" class="external-link">@rjpat</a>, <a href="https://github.com/tidyverse/dbplyr/issues/509" class="external-link">#509</a>)</p></li>
 <li>
 <p>In preparation for dplyr 1.1.0:</p>
@@ -90,7 +93,7 @@
 <li><p>Variables that aren’t found in either the data or in the environment now produce an error (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/907" class="external-link">#907</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="sql-optimisation-development-version">SQL optimisation<a class="anchor" aria-label="anchor" href="#sql-optimisation-development-version"></a></h3>
+<h3 id="sql-optimisation-2-3-0">SQL optimisation<a class="anchor" aria-label="anchor" href="#sql-optimisation-2-3-0"></a></h3>
 <ul><li>
 <p>dbplyr now produces fewer subqueries resulting in shorter, more readable, and, in some cases, faster SQL. The following combination of verbs now avoids a subquery if possible:</p>
 <ul><li>
@@ -111,14 +114,14 @@
 <li><p>When using common table expressions, the results of joins and set operations are now reused (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/978" class="external-link">#978</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="improved-error-messages-development-version">Improved error messages<a class="anchor" aria-label="anchor" href="#improved-error-messages-development-version"></a></h3>
+<h3 id="improved-error-messages-2-3-0">Improved error messages<a class="anchor" aria-label="anchor" href="#improved-error-messages-2-3-0"></a></h3>
 <ul><li><p>Many errors have been improved and now show the function where the error happened instead of a helper function (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/907" class="external-link">#907</a>).</p></li>
 <li><p>Errors produced by the database, e.g. in <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> or <code>rows_*()</code>, now show the verb where the error happened (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p><code><a href="../reference/window_order.html">window_order()</a></code> now produces a better error message when applied to a data frame (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/947" class="external-link">#947</a>).</p></li>
 <li><p>Using a named <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now gives a clear error message (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/761" class="external-link">#761</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-2-3-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-3-0"></a></h3>
 <ul><li><p>Keyword highlighting can now be customised via the option <code>dbplyr_highlight</code>. Turn it off via <code>options(dbplyr_highlight = FALSE)</code> or pass a custom ansi style, e.g. <code>options(dbplyr_highlight = cli::combine_ansi_styles("bold", "cyan"))</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/974" class="external-link">#974</a>).</p></li>
 <li><p>The rank functions (<code><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">row_number()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">min_rank()</a></code>, <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">dense_rank()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">percent_rank()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/ranking.html" class="external-link">cume_dist()</a></code>) now give missing values the rank NA to match the behaviour of dplyr (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/991" class="external-link">#991</a>).</p></li>
 <li><p><code>NA</code>s in <code>blob()</code>s are correctly translated to <code>NULL</code> (<a href="https://github.com/tidyverse/dbplyr/issues/983" class="external-link">#983</a>).</p></li>
@@ -133,7 +136,7 @@
 <li><p><code><a href="../reference/sql.html">sql()</a></code> is now translated differently. The <code>...</code> are now evaluated locally instead of being translated with <code><a href="../reference/translate_sql.html">translate_sql()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/952" class="external-link">#952</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="backend-specific-improvements-development-version">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-development-version"></a></h3>
+<h3 id="backend-specific-improvements-2-3-0">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-2-3-0"></a></h3>
 <ul><li>
 <p>HANA:</p>
 <ul><li>Correctly translates <code><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1027" class="external-link">#1027</a>).</li>
