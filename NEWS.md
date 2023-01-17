@@ -14,7 +14,7 @@
   * The `.by` argument is supported (@mgirlich, #1051).
   * Passing `...` to `across()` is deprecated because the evaluation timing 
     of `...` is ambiguous. Now instead of (e.g.) 
-    `across(a:b, mean, na.rm = TRUE)` use 
+    `across(a:b, mean, na.rm = TRUE)` use  `across(a:b, \(x) mean(x, na.rm = TRUE)`
   * `pick()` is translated (@mgirlich, #1044).
   * `case_match()` is translated (@mgirlich, #1020).
   * `case_when()` now supports the `.default` argument (@mgirlich, #1017).
