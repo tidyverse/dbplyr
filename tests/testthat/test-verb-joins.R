@@ -463,6 +463,33 @@ test_that("multiple joins create a single query", {
   expect_snapshot(out)
 })
 
+test_that("can join 4 tables with same column #1101", {
+  # when there are
+  # * at least 3 joins
+  # * a variable appears in two table
+  # * it is not joined by
+  # * and it is renamed
+  #
+  # this produced a wrong query
+  lf1 <- lazy_frame(x = 1, a = 2, .name = "lf1")
+  lf2 <- lazy_frame(x = 2, b = 3, .name = "lf2")
+  lf3 <- lazy_frame(x = 3, c = 4, .name = "lf3")
+  lf4 <- lazy_frame(x = 4, a = 5, .name = "lf4") %>%
+    rename(a4 = a)
+
+  out <- lf1 %>%
+    inner_join(lf2, by = "x") %>%
+    inner_join(lf3, by = "x") %>%
+    inner_join(lf4, by = "x")
+
+  join_vars <- out$lazy_query$vars
+  expect_equal(join_vars$name, c("x", "a", "b", "c", "a4"))
+  expect_equal(join_vars$table, list(1L, 1L, 2L, 3L, 4L))
+  expect_equal(join_vars$var, list("x", "a", "b", "c", "a"))
+  # `lf4`.`a` AS `a4`
+  expect_snapshot(remote_query(out))
+})
+
 test_that("multiple joins produce separate queries if using right/full join", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
