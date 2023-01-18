@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.2.1.9000
+Version: 2.3.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -29,7 +29,7 @@ Imports:
     magrittr,
     methods,
     pillar (>= 1.5.0),
-    purrr (>= 1.0.0),
+    purrr (>= 1.0.1),
     R6 (>= 2.2.2),
     rlang (>= 1.0.6),
     tibble (>= 1.4.2),

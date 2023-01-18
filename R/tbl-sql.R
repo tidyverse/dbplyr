@@ -14,9 +14,12 @@
 #'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   # If not literal sql, must be a table identifier
-  from <- as.sql(from, con = src$con)
+  from_sql <- as.sql(from, con = src$con)
+  if (!(is.ident(from) || is.sql(from) || is_schema(from))) {
+    from <- as.sql(from, con = src$con)
+  }
 
-  vars <- vars %||% dbplyr_query_fields(src$con, from)
+  vars <- vars %||% dbplyr_query_fields(src$con, from_sql)
 
   tbl_sql_impl(subclass, src, from, vars)
 }
