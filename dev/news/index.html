@@ -95,7 +95,8 @@ FROM (
 <li>
 <p>In preparation for dplyr 1.1.0:</p>
 <ul><li>The <code>.by</code> argument is supported (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1051" class="external-link">#1051</a>).</li>
-<li>Passing <code>...</code> to <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> is deprecated because the evaluation timing of <code>...</code> is ambiguous. Now instead of (e.g.) <code>across(a:b, mean, na.rm = TRUE)</code> use</li>
+<li>Passing <code>...</code> to <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> is deprecated because the evaluation timing of <code>...</code> is ambiguous. Now instead of (e.g.) <code>across(a:b, mean, na.rm = TRUE)</code> use <code>across(a:b, \(x) mean(x, na.rm = TRUE)</code>
+</li>
 <li>
 <code>pick()</code> is translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1044" class="external-link">#1044</a>).</li>
 <li>
