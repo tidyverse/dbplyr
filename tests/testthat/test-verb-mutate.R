@@ -100,6 +100,40 @@ test_that("across() can access previously created variables", {
   expect_snapshot(remote_query(lf))
 })
 
+test_that("across() uses original column rather than overriden one", {
+  db <- memdb_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    db %>% mutate(across(everything(), ~ .x / x)) %>% collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
+  expect_equal(
+    db %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      ) %>%
+      collect(),
+    tibble(x = 1, y = -1, z = -3)
+  )
+
+  lf <- lazy_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    lf %>%
+      mutate(across(everything(), ~ .x / x)) %>%
+      remote_query(),
+    sql("SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`")
+  )
+  expect_snapshot(
+    lf %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      )
+  )
+})
+
 test_that("new columns take precedence over global variables", {
   y <- "global var"
   db <- memdb_frame(data.frame(x = 1)) %>% mutate(y = 2, z = y + 1)
@@ -454,4 +488,3 @@ test_that("mutated vars are always named", {
   out2 <- mf %>% mutate(1) %>% op_vars()
   expect_equal(out2, c("a", "1"))
 })
-

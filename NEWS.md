@@ -1,5 +1,26 @@
 # dbplyr (development version)
 
+* `across()` now uses the original value when a column is overriden to match
+  the behaviour of dplyr. For example `mutate(df, across(c(x, y), ~ .x / x))`
+  now produces
+  
+  ```
+  SELECT `x` / `x` AS `x`, `y` / `x` AS `y`
+  FROM `df`
+  ```
+  
+  instead of
+  
+  ```
+  SELECT `x`, `y` / `x` AS `y`
+  FROM (
+    SELECT `x` / `x` AS `x`, `y`
+    FROM `df`
+  ) 
+  ```
+  
+  (@mgirlich, #1015).
+
 # dbplyr 2.3.0
 
 * Compatibility with purrr 1.0.0 (@mgirlich, #1085).

@@ -54,6 +54,21 @@
         FROM `df`
       ) `q01`
 
+# across() uses original column rather than overriden one
+
+    Code
+      lf %>% mutate(x = -x, across(everything(), ~ .x / x), y = y + x)
+    Output
+      <SQL>
+      SELECT `x`, `y` + `x` AS `y`, `z`
+      FROM (
+        SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`
+        FROM (
+          SELECT -`x` AS `x`, `y`, `z`
+          FROM `df`
+        ) `q01`
+      ) `q02`
+
 # new columns take precedence over global variables
 
     Code
