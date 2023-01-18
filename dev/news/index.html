@@ -73,9 +73,21 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-</div>
+<ul><li>
+<p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now uses the original value when a column is overriden to match the behaviour of dplyr. For example <code>mutate(df, across(c(x, y), ~ .x / x))</code> now produces</p>
+<pre><code>SELECT `x` / `x` AS `x`, `y` / `x` AS `y`
+FROM `df`</code></pre>
+<p>instead of</p>
+<pre><code>SELECT `x`, `y` / `x` AS `y`
+FROM (
+  SELECT `x` / `x` AS `x`, `y`
+  FROM `df`
+) </code></pre>
+<p>(<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1015" class="external-link">#1015</a>).</p>
+</li>
+</ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.3.0" id="dbplyr-230">dbplyr 2.3.0<a class="anchor" aria-label="anchor" href="#dbplyr-230"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.3.0" id="dbplyr-230">dbplyr 2.3.0<a class="anchor" aria-label="anchor" href="#dbplyr-230"></a></h2><p class="text-muted">CRAN release: 2023-01-16</p>
 <ul><li>Compatibility with purrr 1.0.0 (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1085" class="external-link">#1085</a>).</li>
 </ul><div class="section level3">
 <h3 id="new-features-2-3-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-3-0"></a></h3>
@@ -695,7 +707,7 @@
 <h3 id="new-features-1-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-1-0-0"></a></h3>
 <ul><li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> now work directly with DBI connections (<a href="https://github.com/tidyverse/dbplyr/issues/2423" class="external-link">#2423</a>, <a href="https://github.com/tidyverse/dbplyr/issues/2576" class="external-link">#2576</a>), so there is no longer a need to generate a dplyr src.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
