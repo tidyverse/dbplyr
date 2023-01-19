@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* Fixed an issu when there where at least 3 joins and renamed variables
+* Fixed an issue when there where at least 3 joins and renamed variables
   (@mgirlich, #1101).
 
 * `across()` now uses the original value when a column is overriden to match
