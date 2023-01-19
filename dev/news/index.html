@@ -73,7 +73,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li><p>Fixed an issue when there where at least 3 joins and renamed variables (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1101" class="external-link">#1101</a>).</p></li>
+<li>
 <p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now uses the original value when a column is overriden to match the behaviour of dplyr. For example <code>mutate(df, across(c(x, y), ~ .x / x))</code> now produces</p>
 <pre><code>SELECT `x` / `x` AS `x`, `y` / `x` AS `y`
 FROM `df`</code></pre>
