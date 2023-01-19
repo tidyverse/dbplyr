@@ -19,7 +19,7 @@ test_that("two mutates equivalent to one", {
 test_that("can use window function after summarise and pure projection #1104", {
   lf <- lazy_frame(g = 1, x = 1) %>%
     group_by(g) %>%
-    summarize(x = 1) %>%
+    summarise(x = 1) %>%
     select(g)
 
   expect_snapshot({
