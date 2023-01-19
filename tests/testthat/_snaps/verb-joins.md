@@ -96,6 +96,20 @@
       INNER JOIN `df3`
         ON (`df1`.`x` = `df3`.`x`)
 
+# can join 4 tables with same column #1101
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `lf1`.*, `b`, `c`, `lf4`.`a` AS `a4`
+      FROM `lf1`
+      INNER JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+      INNER JOIN `lf3`
+        ON (`lf1`.`x` = `lf3`.`x`)
+      INNER JOIN `lf4`
+        ON (`lf1`.`x` = `lf4`.`x`)
+
 # multiple joins produce separate queries if using right/full join
 
     Code
