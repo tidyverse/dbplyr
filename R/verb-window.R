@@ -31,6 +31,7 @@ window_order <- function(.data, ...) {
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
+  dots <- check_window_order_dots(dots)
 
   .data$lazy_query <- add_order(.data, dots)
   .data
@@ -41,6 +42,33 @@ window_order <- function(.data, ...) {
 add_order <- function(.data, dots) {
   .data$lazy_query$order_vars <- dots
   .data$lazy_query
+}
+
+check_window_order_dots <- function(dots, call = caller_env()) {
+  for (i in seq_along(dots)) {
+    x <- dots[[i]]
+    if (is_quosure(x)) {
+      x <- quo_get_expr(x)
+    }
+
+    if (is_call(x, "desc", n = 1)) {
+      x <- call_args(x)[[1]]
+    }
+
+    dot <- dots[[i]]
+    if (!is_symbol(x)) {
+      dot <- as_label(dot)
+      msg <- c(
+        `!` = "Each element of {.code ...} must be a single column name or a column wrapped in {.fn desc}.",
+        x = "Element {i} is {.code {dot}}."
+      )
+      cli_abort(msg, call = caller_env())
+    }
+
+    dots[[i]] <- quo_get_expr(dot)
+  }
+
+  dots
 }
 
 

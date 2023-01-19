@@ -70,7 +70,7 @@ test_that("compute keeps window and groups", {
     summarise(n = n(), .groups = "drop_last") %>%
     compute()
 
-  expect_equal(op_sort(out), list(quo(x)), ignore_formula_env = TRUE)
+  expect_equal(op_sort(out), list(expr(x)))
   expect_equal(op_grps(out), "x")
 })
 

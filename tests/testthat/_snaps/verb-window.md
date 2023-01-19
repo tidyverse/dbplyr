@@ -14,6 +14,16 @@
       Error in `window_order()`:
       ! `.data` must be a <tbl_lazy>, not a <character>.
 
+# window_order only accepts variables
+
+    Code
+      (expect_error(window_order(lf, x + y)))
+    Output
+      <error/rlang_error>
+      Error in `window_order()`:
+      ! Each element of `...` must be a single column name or a column wrapped in `desc()`.
+      x Element 1 is `x + y`.
+
 # window_frame errors for data frame
 
     Code

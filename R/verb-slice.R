@@ -137,9 +137,10 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
     )
   }
 
-  out <- .data %>%
-    window_order({{order_by}}) %>%
-    filter(!!window_fun) %>%
+  # must use `add_order()` as `window_order()` only allows variables
+  .data$lazy_query <- add_order(.data, quos({{order_by}}))
+
+  out <- filter(.data, !!window_fun) %>%
     window_order(!!!old_frame)
 
   if (by$from_by) {
