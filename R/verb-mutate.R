@@ -114,7 +114,8 @@ add_mutate <- function(.data, vars) {
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
     select <- lazy_query$select
-    if (is_pure_projection(select$expr, select$name)) {
+    is_select_op <- lazy_query$select_operation %in% c("select", "mutate")
+    if (is_pure_projection(select$expr, select$name) && is_select_op) {
       lazy_query$select <- new_lazy_select(
         vars,
         group_vars = op_grps(lazy_query),
