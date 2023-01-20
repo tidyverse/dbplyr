@@ -171,14 +171,14 @@ rename_order <- function(lazy_query, vars) {
   old2new <- set_names(names(vars), vars)
   order <- op_sort(lazy_query)
 
-  desc <- purrr::map_lgl(order, \(x) is_call(x, "desc", n = 1L))
-  order <- purrr::map_if(order, desc, \(x) call_args(x)[[1L]])
+  desc <- purrr::map_lgl(order, ~ is_call(.x, "desc", n = 1L))
+  order <- purrr::map_if(order, desc, ~ call_args(.x)[[1L]])
   order <- purrr::map_chr(order, as_name)
 
   keep <- order %in% names(old2new)
   order[keep] <- syms(old2new[order[keep]])
 
-  order <- purrr::map_if(order, desc, \(x) call2("desc", x))
+  order <- purrr::map_if(order, desc, ~ call2("desc", .x))
   lazy_query$order_vars <- order[keep]
   lazy_query
 }
