@@ -24,6 +24,29 @@
       ! Each element of `...` must be a single column name or a column wrapped in `desc()`.
       x Element 1 is `x + y`.
 
+# window order works afer renaming variable
+
+    Code
+      lazy_frame(x = 1, y = 1) %>% window_order(y) %>% rename(y2 = y) %>% mutate(
+        x_cum = cumsum(x))
+    Output
+      <SQL>
+      SELECT *, SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
+      FROM (
+        SELECT `x`, `y` AS `y2`
+        FROM `df`
+      ) `q01`
+    Code
+      lazy_frame(x = 1, y = 1) %>% rename(y2 = y) %>% window_order(y2) %>% mutate(
+        x_cum = cumsum(x))
+    Output
+      <SQL>
+      SELECT *, SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
+      FROM (
+        SELECT `x`, `y` AS `y2`
+        FROM `df`
+      ) `q01`
+
 # window_frame errors for data frame
 
     Code

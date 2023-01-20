@@ -15,6 +15,20 @@ test_that("window_order only accepts variables", {
   })
 })
 
+test_that("window order works afer renaming variable", {
+  expect_snapshot({
+    lazy_frame(x = 1, y = 1) %>%
+      window_order(y) %>%
+      rename(y2 = y) %>%
+      mutate(x_cum = cumsum(x))
+
+    lazy_frame(x = 1, y = 1) %>%
+      rename(y2 = y) %>%
+      window_order(y2) %>%
+      mutate(x_cum = cumsum(x))
+  })
+})
+
 test_that("window_frame errors for data frame", {
   expect_snapshot({
     (expect_error(window_frame(data.frame(x = 1))))
