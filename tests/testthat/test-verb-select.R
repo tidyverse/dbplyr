@@ -71,6 +71,24 @@ test_that("select preserves grouping vars", {
   expect_named(out, c("b", "a"))
 })
 
+test_that("select handles order vars", {
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  # can drop order vars
+  expect_equal(lf %>% window_order(y) %>% select(-y) %>% op_sort(), list())
+  expect_equal(lf %>% window_order(desc(y)) %>% select(-y) %>% op_sort(), list())
+  # can rename order vars
+  expect_equal(lf %>% window_order(y) %>% select(y2 = y) %>% op_sort(), list(expr(y2)))
+  expect_equal(
+    lf %>% window_order(desc(y)) %>% select(y2 = y) %>% op_sort(),
+    list(expr(desc(y2)))
+  )
+  # keeps sort order
+  expect_equal(
+    lf %>% window_order(x, y) %>% select(y2 = y, x) %>% op_sort(),
+    list(expr(x), expr(y2))
+  )
+})
+
 test_that("select doesn't relocate grouping vars to the front", {
   mf <- memdb_frame(a = 1, b = 2) %>% group_by(b)
   expect_equal(mf %>% select(a, b) %>% op_vars(), c("a", "b"))

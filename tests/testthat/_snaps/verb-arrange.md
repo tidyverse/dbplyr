@@ -60,7 +60,7 @@
       lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
     Output
       <SQL>
-      SELECT `b`, LAG(`b`, 1, NULL) OVER (ORDER BY `a`) AS `c`
+      SELECT `b`, LAG(`b`, 1, NULL) OVER () AS `c`
       FROM `df`
       ORDER BY `a`
 
