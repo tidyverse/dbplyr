@@ -16,6 +16,17 @@ test_that("two mutates equivalent to one", {
   compare_tbl(df1, df2)
 })
 
+test_that("can use window function after summarise and pure projection #1104", {
+  lf <- lazy_frame(g = 1, x = 1) %>%
+    group_by(g) %>%
+    summarise(x = 1) %>%
+    select(g)
+
+  expect_snapshot({
+    (expect_no_error(lf %>% mutate(r = row_number())))
+  })
+})
+
 test_that("can refer to fresly created values", {
   out1 <- memdb_frame(x1 = 1) %>%
     mutate(x2 = x1 + 1, x3 = x2 + 1, x4 = x3 + 1) %>%

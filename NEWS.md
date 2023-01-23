@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Fixed an issue when using a window function after a `summarise()` and
+  `select()` (@mgirlich, #1104).
+
 * Fixed an issue when there where at least 3 joins and renamed variables
   (@mgirlich, #1101).
 
