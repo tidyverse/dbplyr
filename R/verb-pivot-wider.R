@@ -99,6 +99,7 @@
 #'     values_from = value
 #'   )
 pivot_wider.tbl_lazy <- function(data,
+                                 ...,
                                  id_cols = NULL,
                                  names_from = name,
                                  names_prefix = "",
@@ -111,9 +112,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_from = value,
                                  values_fill = NULL,
                                  values_fn = ~ max(.x, na.rm = TRUE),
-                                 unused_fn = NULL,
-                                 ...
-                                 ) {
+                                 unused_fn = NULL) {
   rlang::check_dots_empty()
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)

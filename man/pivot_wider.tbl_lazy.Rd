@@ -6,6 +6,7 @@
 \usage{
 \method{pivot_wider}{tbl_lazy}(
   data,
+  ...,
   id_cols = NULL,
   names_from = name,
   names_prefix = "",
@@ -18,12 +19,13 @@
   values_from = value,
   values_fill = NULL,
   values_fn = ~max(.x, na.rm = TRUE),
-  unused_fn = NULL,
-  ...
+  unused_fn = NULL
 )
 }
 \arguments{
 \item{data}{A lazy data frame backed by a database query.}
+
+\item{...}{Unused; included for compatibility with generic.}
 
 \item{id_cols}{A set of columns that uniquely identifies each observation.}
 
@@ -87,8 +89,6 @@ all unspecified columns will be considered \code{id_cols}.
 
 This is similar to grouping by the \code{id_cols} then summarizing the
 unused columns using \code{unused_fn}.}
-
-\item{...}{Unused; included for compatibility with generic.}
 }
 \description{
 \code{pivot_wider()} "widens" data, increasing the number of columns and

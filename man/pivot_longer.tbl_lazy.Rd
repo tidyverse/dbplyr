@@ -7,6 +7,7 @@
 \method{pivot_longer}{tbl_lazy}(
   data,
   cols,
+  ...,
   names_to = "name",
   names_prefix = NULL,
   names_sep = NULL,
@@ -17,14 +18,15 @@
   values_to = "value",
   values_drop_na = FALSE,
   values_ptypes,
-  values_transform = NULL,
-  ...
+  values_transform = NULL
 )
 }
 \arguments{
 \item{data}{A data frame to pivot.}
 
 \item{cols}{Columns to pivot into longer format.}
+
+\item{...}{Additional arguments passed on to methods.}
 
 \item{names_to}{A string specifying the name of the column to create
 from the data stored in the column names of \code{data}.}
@@ -51,8 +53,6 @@ existing column names.}
 in the \code{value_to} column.}
 
 \item{values_ptypes}{Not supported.}
-
-\item{...}{Additional arguments passed on to methods.}
 }
 \description{
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and

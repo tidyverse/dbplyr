@@ -60,6 +60,7 @@
 #'   tidyr::pivot_longer(-id)
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
+                                  ...,
                                   names_to = "name",
                                   names_prefix = NULL,
                                   names_sep = NULL,
@@ -70,8 +71,7 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = NULL,
-                                  ...) {
+                                  values_transform = NULL) {
   if (!is_missing(values_ptypes)) {
     cli_abort("The {.arg values_ptypes} argument is not supported for remote back-ends")
   }
