@@ -168,3 +168,12 @@
       Error in `dbplyr_build_wider_spec()`:
       ! `values_from` must select at least one column.
 
+# `id_expand` must be FALSE
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, id_expand = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `tidyr::pivot_wider()`:
+      ! `id_expand = TRUE` isn't supported by dbplyr.
+

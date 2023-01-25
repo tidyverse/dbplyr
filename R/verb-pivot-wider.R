@@ -33,6 +33,7 @@
 #'
 #' @param data A lazy data frame backed by a database query.
 #' @param id_cols A set of columns that uniquely identifies each observation.
+#' @param id_expand Unused; included for compatibility with the generic.
 #' @param names_from,values_from A pair of
 #'   arguments describing which column (or columns) to get the name of the
 #'   output column (`names_from`), and which column (or columns) to get the
@@ -101,6 +102,7 @@
 pivot_wider.tbl_lazy <- function(data,
                                  ...,
                                  id_cols = NULL,
+                                 id_expand = FALSE,
                                  names_from = name,
                                  names_prefix = "",
                                  names_sep = "_",
@@ -114,6 +116,10 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_fn = ~ max(.x, na.rm = TRUE),
                                  unused_fn = NULL) {
   rlang::check_dots_empty()
+  if (!is_false(id_expand)) {
+    cli_abort("{.code id_expand = TRUE} isn't supported by dbplyr.")
+  }
+
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 

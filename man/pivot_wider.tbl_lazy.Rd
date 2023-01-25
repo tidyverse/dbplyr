@@ -8,6 +8,7 @@
   data,
   ...,
   id_cols = NULL,
+  id_expand = FALSE,
   names_from = name,
   names_prefix = "",
   names_sep = "_",
@@ -28,6 +29,8 @@
 \item{...}{Unused; included for compatibility with generic.}
 
 \item{id_cols}{A set of columns that uniquely identifies each observation.}
+
+\item{id_expand}{Unused; included for compatibility with the generic.}
 
 \item{names_from, values_from}{A pair of
 arguments describing which column (or columns) to get the name of the
