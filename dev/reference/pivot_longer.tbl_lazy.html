@@ -115,6 +115,8 @@ remote tables.</p>
 <span><span class="fu">pivot_longer</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">cols</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  <span class="va">cols_vary</span>,</span>
 <span>  names_to <span class="op">=</span> <span class="st">"name"</span>,</span>
 <span>  names_prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  names_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -125,8 +127,7 @@ remote tables.</p>
 <span>  values_to <span class="op">=</span> <span class="st">"value"</span>,</span>
 <span>  values_drop_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">values_ptypes</span>,</span>
-<span>  values_transform <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  values_transform <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -138,6 +139,14 @@ remote tables.</p>
 
 <dt>cols</dt>
 <dd><p>Columns to pivot into longer format.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional arguments passed on to methods.</p></dd>
+
+
+<dt>cols_vary</dt>
+<dd><p>Unsupported; included for compatibility with the generic.</p></dd>
 
 
 <dt>names_to</dt>
@@ -182,10 +191,6 @@ in the <code>value_to</code> column.</p></dd>
 
 <dt>values_ptypes</dt>
 <dd><p>Not supported.</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Additional arguments passed on to methods.</p></dd>
 
 </dl></div>
     <div class="section level2">
