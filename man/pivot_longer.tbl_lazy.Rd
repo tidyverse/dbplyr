@@ -8,6 +8,7 @@
   data,
   cols,
   ...,
+  cols_vary,
   names_to = "name",
   names_prefix = NULL,
   names_sep = NULL,
@@ -27,6 +28,8 @@
 \item{cols}{Columns to pivot into longer format.}
 
 \item{...}{Additional arguments passed on to methods.}
+
+\item{cols_vary}{Unsupported; included for compatibility with the generic.}
 
 \item{names_to}{A string specifying the name of the column to create
 from the data stored in the column names of \code{data}.}
