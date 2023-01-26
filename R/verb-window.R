@@ -62,7 +62,7 @@ check_window_order_dots <- function(dots, call = caller_env()) {
         `!` = "Each element of {.code ...} must be a single column name or a column wrapped in {.fn desc}.",
         x = "Element {i} is {.code {dot}}."
       )
-      cli_abort(msg, call = caller_env())
+      cli_abort(msg, call = call)
     }
 
     dots[[i]] <- quo_get_expr(dot)
