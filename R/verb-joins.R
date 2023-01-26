@@ -427,7 +427,7 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
     by_x_table_id <- rep_along(by$x, 1L)
   } else {
     idx <- vctrs::vec_match(by$x, x_lq$vars$name)
-    stopifnot(all(vctrs::list_sizes(x_lq$vars$var[idx]) == 1))
+    vctrs::list_check_all_size(x_lq$vars$var[idx], size = 1)
 
     # need to fix `by$x` in case it was renamed in an inlined select
     by$x <- unlist(x_lq$vars$var)[idx]
