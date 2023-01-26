@@ -103,7 +103,7 @@ translate_sql_ <- function(dots,
     return(sql())
   }
 
-  stopifnot(is.list(dots))
+  check_list(dots)
 
   if (!any(have_name(dots))) {
     names(dots) <- NULL

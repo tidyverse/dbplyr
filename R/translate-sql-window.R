@@ -316,7 +316,7 @@ local_context <- function(x, env = parent.frame()) {
 # Where translation -------------------------------------------------------
 
 uses_window_fun <- function(x, con, lq) {
-  stopifnot(is.list(x))
+  check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
@@ -403,7 +403,7 @@ translate_window_where_all <- function(x, window_funs = common_window_funs()) {
 
 window_where <- function(expr, comp) {
   stopifnot(is.call(expr) || is.name(expr) || is.atomic(expr))
-  stopifnot(is.list(comp))
+  check_list(comp)
 
   list(
     expr = expr,

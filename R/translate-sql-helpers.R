@@ -59,9 +59,9 @@
 sql_variant <- function(scalar = sql_translator(),
                         aggregate = sql_translator(),
                         window = sql_translator()) {
-  stopifnot(is.environment(scalar))
-  stopifnot(is.environment(aggregate))
-  stopifnot(is.environment(window))
+  check_environment(scalar)
+  check_environment(aggregate)
+  check_environment(window)
 
   # Need to check that every function in aggregate also occurs in window
   missing <- setdiff(ls(aggregate), ls(window))
