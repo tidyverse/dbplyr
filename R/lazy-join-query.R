@@ -8,7 +8,7 @@ lazy_multi_join_query <- function(x,
                                   order_vars = op_sort(x),
                                   frame = op_frame(x),
                                   call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
+  check_lazy_query(x, call = call)
 
   if (!identical(colnames(joins), c("table", "type", "by_x_table_id", "by"))) {
     cli_abort("`joins` must have fields `table`, `type`, `by_x_table_id`, `by`", .internal = TRUE)
@@ -93,8 +93,8 @@ lazy_semi_join_query <- function(x,
                                  order_vars = op_sort(x),
                                  frame = op_frame(x),
                                  call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
-  stopifnot(inherits(y, "lazy_query"))
+  check_lazy_query(x, call = call)
+  check_lazy_query(y, call = call)
   check_bool(anti, call = call)
   join_check_by(by, call)
   na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)

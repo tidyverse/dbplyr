@@ -13,7 +13,7 @@ lazy_select_query <- function(x,
                               frame = NULL,
                               select_operation = c("select", "mutate", "summarise"),
                               message_summarise = NULL) {
-  stopifnot(inherits(x, "lazy_query"))
+  check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))

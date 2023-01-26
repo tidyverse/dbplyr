@@ -120,3 +120,15 @@ check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = c
     call = call
   )
 }
+
+check_lazy_query <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
+  if (!inherits(x, "lazy_query")) {
+    stop_input_type(
+      x,
+      what = "a lazy query",
+      ...,
+      arg = arg,
+      call = call
+    )
+  }
+}
