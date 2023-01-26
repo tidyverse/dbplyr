@@ -130,7 +130,7 @@ copy_inline <- function(con, df, types = NULL) {
   }
 
   if (!is_null(types)) {
-    vctrs::vec_assert(types, character())
+    check_character(types)
 
     if (!setequal(colnames(df), names(types))) {
       cli_abort("Names of {.arg df} and {.arg types} must be the same.")

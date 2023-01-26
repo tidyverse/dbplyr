@@ -99,16 +99,24 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
-assert_flag <- function(x, arg, call = caller_env()) {
-  vctrs::vec_assert(x, logical(), size = 1L)
-  if (is.na(x)) {
-    cli_abort("{.arg {arg}} must not be NA.", call = call)
-  }
-}
-
 check_not_supplied <- function(arg, call = caller_env()) {
   if (!is_null(arg)) {
     arg <- caller_arg(arg)
     cli_abort("{.arg {arg}} is not supported in SQL translations.", call = call)
   }
+}
+
+check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = caller_env()) {
+  if (vctrs::vec_is_list(x)) {
+    return()
+  }
+  stop_input_type(
+    x,
+    c("a list"),
+    ...,
+    allow_na = FALSE,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
 }

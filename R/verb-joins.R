@@ -517,9 +517,7 @@ make_table_names <- function(as, lq) {
 }
 
 check_join_as1 <- function(as, arg, sql_on, default, call) {
-  if (!is_null(as)) {
-    vctrs::vec_assert(as, character(), size = 1, arg = arg, call = call)
-  }
+  check_string(as, allow_null = TRUE, arg = arg, call = call)
 
   if (!is_null(sql_on)) {
     # for backwards compatibility use "LHS"/"RHS" if `sql_on` is used
@@ -595,6 +593,7 @@ join_two_table_alias <- function(names, from) {
 }
 
 check_suffix <- function(x, call) {
+  check_character(x, arg = "suffix", call = call)
   vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
   list(x = x[1], y = x[2])
 }

@@ -7,8 +7,8 @@ lazy_set_op_query <- function(x,
                               call = caller_env()) {
   stopifnot(inherits(x, "lazy_query"))
   stopifnot(inherits(y, "lazy_query"))
-  vctrs::vec_assert(type, character(), size = 1L, arg = "type", call = call)
-  assert_flag(all)
+  check_string(type, call = call)
+  check_bool(all, call = call)
 
   lazy_query(
     query_type = "set_op",
