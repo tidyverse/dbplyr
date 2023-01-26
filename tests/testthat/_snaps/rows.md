@@ -4,14 +4,14 @@
       (rows_insert(lf, lf, by = "x", conflict = "error"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -57,8 +57,8 @@
     Output
       <error/rlang_error>
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -118,8 +118,8 @@
         "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -227,14 +227,14 @@
       (rows_update(lf, lf, by = "x", unmatched = "error"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
-      i Please use `unmatched = "ignore"` instead.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_update(lf, lf, by = "x"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
-      i Please use `unmatched = "ignore"` instead.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 

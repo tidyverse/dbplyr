@@ -52,5 +52,5 @@ add_head <- function(x, n) {
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
-  cli_abort("{.fun tail} is not supported by sql sources")
+  stop_unsupported_function("tail")
 }

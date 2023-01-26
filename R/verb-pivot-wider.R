@@ -116,9 +116,7 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_fn = ~ max(.x, na.rm = TRUE),
                                  unused_fn = NULL) {
   rlang::check_dots_empty()
-  if (!is_false(id_expand)) {
-    cli_abort("{.code id_expand = TRUE} isn't supported by dbplyr.")
-  }
+  check_unsupported_arg(id_expand, FALSE)
 
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)

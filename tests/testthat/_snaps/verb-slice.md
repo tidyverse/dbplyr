@@ -4,7 +4,7 @@
       lf %>% slice()
     Condition
       Error in `slice()`:
-      ! `slice()` is not supported on database backends
+      ! `slice()` is not supported on database backends.
 
 ---
 
@@ -12,8 +12,8 @@
       lf %>% slice_head()
     Condition
       Error in `slice_head()`:
-      ! `slice_head()` is not supported on database backends
-      i Please use `slice_min()` instead
+      ! `slice_head()` is not supported on database backends.
+      i Please use `slice_min()` instead.
 
 ---
 
@@ -21,8 +21,8 @@
       lf %>% slice_tail()
     Condition
       Error in `slice_tail()`:
-      ! `slice_tail()` is not supported on database backends
-      i Please use `slice_max()` instead
+      ! `slice_tail()` is not supported on database backends.
+      i Please use `slice_max()` instead.
 
 # slice_min handles arguments
 

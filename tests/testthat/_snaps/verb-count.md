@@ -54,5 +54,5 @@
       lazy_frame(g = 1) %>% add_count(.drop = TRUE)
     Condition
       Error in `add_count()`:
-      ! `.drop` argument not supported for lazy tables.
+      ! Argument `.drop` isn't supported on database backends.
 

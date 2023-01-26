@@ -32,9 +32,7 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @importFrom dplyr add_count
 #' @export
 add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
-  if (!missing(.drop)) {
-    cli_abort("{.arg .drop} argument not supported for lazy tables.")
-  }
+  check_unsupported_arg(.drop)
 
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)

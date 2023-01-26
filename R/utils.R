@@ -99,13 +99,6 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
-check_not_supplied <- function(arg, call = caller_env()) {
-  if (!is_null(arg)) {
-    arg <- caller_arg(arg)
-    cli_abort("{.arg {arg}} is not supported in SQL translations.", call = call)
-  }
-}
-
 check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = caller_env()) {
   if (vctrs::vec_is_list(x)) {
     return()
@@ -137,4 +130,46 @@ check_con <- function(con, ..., arg = caller_arg(con), call = caller_env()) {
   if (is.null(con)) {
     cli_abort("{.arg {arg}} must not be NULL.", call = call)
   }
+}
+
+check_unsupported_arg <- function(x,
+                                  allowed = NULL,
+                                  ...,
+                                  backend = NULL,
+                                  arg = caller_arg(x),
+                                  call = caller_env()) {
+  if (is_missing(x)) {
+    return()
+  }
+
+  if (identical(x, allowed)) {
+    return()
+  }
+
+  if (is_null(allowed)) {
+    msg <- "Argument {.arg {arg}} isn't supported"
+  } else {
+    msg <- "{.code {arg} = {.val {x}}} isn't supported"
+  }
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " in {backend} translation.")
+  }
+
+  if (!is_null(allowed)) {
+    msg <- c(
+      msg,
+      i = "It must be {.val {allowed}} instead."
+    )
+  }
+  cli_abort(msg, call = call)
+}
+
+stop_unsupported_function <- function(f, ..., with = NULL, call = caller_env()) {
+  cli_abort(c(
+    "{.fun {f}} is not supported on database backends.",
+    i = if (!is_null(with)) "Please use {.fun {with}} instead."
+  ), call = call)
 }
