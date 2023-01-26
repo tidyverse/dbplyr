@@ -640,15 +640,13 @@ rows_check_key <- function(x,
   }
 }
 
-rows_check_in_place <- function(df, in_place) {
-  if (!rlang::is_bool(in_place)) {
-    cli_abort("{.arg in_place} must be `TRUE` or `FALSE`.")
-  }
+rows_check_in_place <- function(df, in_place, call = caller_env()) {
+  check_bool(in_place, call = call)
 
   if (!in_place) return()
 
   if (inherits(df, "tbl_TestConnection")) {
-    cli_abort("{.code in_place = TRUE} does not work for simulated connections.")
+    cli_abort("{.code in_place = TRUE} does not work for simulated connections.", call = call)
   }
 }
 
