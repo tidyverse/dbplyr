@@ -33,6 +33,7 @@
 #'
 #' @param data A lazy data frame backed by a database query.
 #' @param id_cols A set of columns that uniquely identifies each observation.
+#' @param id_expand Unused; included for compatibility with the generic.
 #' @param names_from,values_from A pair of
 #'   arguments describing which column (or columns) to get the name of the
 #'   output column (`names_from`), and which column (or columns) to get the
@@ -99,7 +100,9 @@
 #'     values_from = value
 #'   )
 pivot_wider.tbl_lazy <- function(data,
+                                 ...,
                                  id_cols = NULL,
+                                 id_expand = FALSE,
                                  names_from = name,
                                  names_prefix = "",
                                  names_sep = "_",
@@ -111,10 +114,12 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_from = value,
                                  values_fill = NULL,
                                  values_fn = ~ max(.x, na.rm = TRUE),
-                                 unused_fn = NULL,
-                                 ...
-                                 ) {
+                                 unused_fn = NULL) {
   rlang::check_dots_empty()
+  if (!is_false(id_expand)) {
+    cli_abort("{.code id_expand = TRUE} isn't supported by dbplyr.")
+  }
+
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 
@@ -126,7 +131,8 @@ pivot_wider.tbl_lazy <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = current_env()
   )
 
   id_cols <- build_wider_id_cols_expr(
@@ -155,7 +161,8 @@ dbplyr_build_wider_spec <- function(data,
                                     names_glue = NULL,
                                     names_sort = FALSE,
                                     names_vary = "fastest",
-                                    names_expand = FALSE) {
+                                    names_expand = FALSE,
+                                    error_call = current_env()) {
   if (!inherits(data, "tbl_sql")) {
     cli_abort(c(
       "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
@@ -191,7 +198,8 @@ dbplyr_build_wider_spec <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = error_call
   )
 }
 

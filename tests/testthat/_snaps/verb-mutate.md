@@ -1,3 +1,16 @@
+# can use window function after summarise and pure projection #1104
+
+    Code
+      (expect_no_error(lf %>% mutate(r = row_number())))
+    Output
+      <SQL>
+      SELECT *, ROW_NUMBER() OVER () AS `r`
+      FROM (
+        SELECT `g`
+        FROM `df`
+        GROUP BY `g`
+      ) `q01`
+
 # can refer to fresly created values
 
     Code

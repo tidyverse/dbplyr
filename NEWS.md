@@ -4,6 +4,12 @@
   This breaking change is necessary to allow `select()` to drop and rename
   variables used in `window_order()` (@mgirlich, #1103).
 
+* Catch unsupported argument `pivot_wider(id_expand = TRUE)` and
+  `pivot_longer(cols_vary)` (@mgirlich, #1109).
+
+* Fixed an issue when using a window function after a `summarise()` and
+  `select()` (@mgirlich, #1104).
+
 * Fixed an issue when there where at least 3 joins and renamed variables
   (@mgirlich, #1101).
 
