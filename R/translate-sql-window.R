@@ -259,7 +259,7 @@ local_con <- function(con, env = parent.frame()) {
 }
 
 set_win_current_group <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$group_by
   sql_context$group_by <- vars
@@ -267,7 +267,7 @@ set_win_current_group <- function(vars) {
 }
 
 set_win_current_order <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$order_by
   sql_context$order_by <- vars
@@ -275,7 +275,7 @@ set_win_current_order <- function(vars) {
 }
 
 set_win_current_frame <- function(frame) {
-  stopifnot(is.null(frame) || is.numeric(frame))
+  check_frame_range(frame)
 
   old <- sql_context$frame
   sql_context$frame <- frame

@@ -124,7 +124,7 @@ simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
 
 add_select <- function(.data, vars) {
   lazy_query <- .data$lazy_query
-  stopifnot(is.character(vars))
+  check_character(vars)
 
   if (is_identity(syms(vars), names(vars), op_vars(.data))) {
     return(lazy_query)

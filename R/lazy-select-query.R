@@ -24,7 +24,7 @@ lazy_select_query <- function(x,
   select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
 
-  stopifnot(is.null(message_summarise) || is_string(message_summarise))
+  check_string(message_summarise, allow_null = TRUE)
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
   group_vars <- group_vars %||% op_grps(x)
