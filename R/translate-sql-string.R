@@ -5,19 +5,17 @@
 #' @rdname sql_variant
 sql_substr <- function(f = "SUBSTR") {
   function(x, start, stop) {
-    start <- max(check_integer(start, "start"), 1L)
-    stop <- max(check_integer(stop, "stop"), 1L)
+    start <- max(check_integer(start), 1L)
+    stop <- max(check_integer(stop), 1L)
     length <- max(stop - start + 1L, 0L)
 
     sql_call2(f, x, start, length)
   }
 }
 
-check_integer <- function(x, arg) {
-  if (length(x) != 1 || !is.numeric(x)) {
-    cli_abort("{.arg {arg}} must be a single number")
-  }
-  as.integer(x)
+check_integer <- function(x, arg = caller_arg(x), call = caller_env()) {
+  check_number_whole(x, arg = arg, call = call)
+  vctrs::vec_cast(x, integer(), x_arg = arg)
 }
 
 # str_sub(x, start, end) - start and end can be negative
@@ -31,9 +29,8 @@ sql_str_sub <- function(
                         optional_length = TRUE
   ) {
   function(string, start = 1L, end = -1L) {
-    stopifnot(length(start) == 1L, length(end) == 1L)
-    start <- check_integer(start, "start")
-    end <- check_integer(end, "stop")
+    start <- check_integer(start)
+    end <- check_integer(end)
 
     start_sql <- start_pos(string, start, length_f)
 
