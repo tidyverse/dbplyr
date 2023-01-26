@@ -132,3 +132,9 @@ check_lazy_query <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
     )
   }
 }
+
+check_con <- function(con, ..., arg = caller_arg(con), call = caller_env()) {
+  if (is.null(con)) {
+    cli_abort("{.arg {arg}} must not be NULL.", call = call)
+  }
+}
