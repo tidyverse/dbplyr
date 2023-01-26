@@ -10,14 +10,14 @@ select_query <- function(from,
                          limit = NULL,
                          distinct = FALSE) {
 
-  stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
-  stopifnot(is.logical(distinct), length(distinct) == 1L)
   check_character(select)
   check_character(where)
   check_character(group_by)
   check_character(having)
   check_character(window)
   check_character(order_by)
+  check_number_whole_inf(limit, allow_null = TRUE)
+  check_bool(distinct)
 
   structure(
     list(

@@ -18,8 +18,8 @@ lazy_select_query <- function(x,
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
-  stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
-  stopifnot(is.logical(distinct), length(distinct) == 1L)
+  check_number_whole_inf(limit, allow_null = TRUE)
+  check_bool(distinct)
 
   select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
