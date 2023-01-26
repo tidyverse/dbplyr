@@ -530,41 +530,6 @@ check_join_as1 <- function(as, arg, sql_on, default, call) {
   as
 }
 
-check_join_as <- function(x_as, x, y_as, y, sql_on, call) {
-  if (!is_null(x_as)) {
-    vctrs::vec_assert(x_as, character(), size = 1, arg = "x_as", call = call)
-  }
-  if (!is_null(y_as)) {
-    vctrs::vec_assert(y_as, character(), size = 1, arg = "y_as", call = call)
-  }
-
-  if (is_null(sql_on)) {
-    x_name <- unclass(query_name(x))
-    y_name <- unclass(query_name(y))
-    if (is_null(x_as) && is_null(y_as) && identical(x_name, y_name)) {
-      # minor hack to deal with `*_name` = NULL
-      x_as <- paste0(c(x_name, "LHS"), collapse = "_")
-      y_as <- paste0(c(y_name, "RHS"), collapse = "_")
-      # we can safely omit the check that x_as and y_as are identical
-      return(list(x_as = ident(x_as), y_as = ident(y_as)))
-    }
-
-    x_as <- x_as %||% x_name %||% "LHS"
-    y_as <- y_as %||% y_name %||% "RHS"
-  } else {
-    # for backwards compatibility use "LHS" and "RHS" if `sql_on` is used
-    # without a table alias
-    x_as <- x_as %||% "LHS"
-    y_as <- y_as %||% "RHS"
-  }
-
-  if (identical(x_as, y_as)) {
-    cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
-  }
-
-  list(x_as = ident(x_as), y_as = ident(y_as))
-}
-
 join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call = caller_env()) {
   y_names_org <- y_names
   # Remove join keys from y
