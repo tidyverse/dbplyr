@@ -173,3 +173,13 @@ stop_unsupported_function <- function(f, ..., with = NULL, call = caller_env()) 
     i = if (!is_null(with)) "Please use {.fun {with}} instead."
   ), call = call)
 }
+
+check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
+  if (!is_named2(x)) {
+    cli_abort("All elements of {.arg {arg}} must be named.", call = call)
+  }
+
+  if (vctrs::vec_duplicate_any(names2(x))) {
+    cli_abort("The names of {.arg {arg}} must be unique.", call = call)
+  }
+}

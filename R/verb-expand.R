@@ -125,7 +125,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' df %>% tidyr::replace_na(list(x = 0, y = "unknown"))
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   check_list(replace)
-  stopifnot(is_empty(replace) || is_named(replace))
+  check_named(replace)
   replace <- replace[names(replace) %in% colnames(data)]
 
   if (is_empty(replace)) {
