@@ -152,7 +152,7 @@
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
-# logical escaping depends on context
+# logical escaping to 0/1 for both filter() and mutate()
 
     Code
       mf %>% filter(x == TRUE)
@@ -160,7 +160,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (`x` = TRUE)
+      WHERE (`x` = 1)
 
 ---
 

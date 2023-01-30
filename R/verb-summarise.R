@@ -70,13 +70,14 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
 
 summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
   dots <- as.list(enquos(..., .named = TRUE))
+  dot_names <- names2(exprs(...))
   was_named <- have_name(exprs(...))
   cur_data <- .data
   error_env <- new_environment()
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
-    dot_name <- get_dot_name(dots, i, was_named)
+    dot_name <- dot_names[[i]]
     parent.env(error_env) <- quo_get_env(dot)
     dot <- quo_set_env(dot, error_env)
 
@@ -104,7 +105,7 @@ summarise_bind_error <- function(cur_data, dots, i, error_env) {
     summarise_bind_error1(error_env, dot_name)
     # remove variable from `cur_data` so that `partial_eval_sym()` evaluates
     # variable in `error_env`
-    cur_data$lazy_query <- add_select(cur_data, set_names(list(NULL), dot_name), "select")
+    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(colnames(cur_data), dot_name)))
   }
 
   cur_data
@@ -153,7 +154,6 @@ add_summarise <- function(.data, dots, .groups, env_caller) {
 
   lazy_select_query(
     x = lazy_query,
-    last_op = "summarise",
     select = select,
     group_by = syms(grps),
     group_vars = groups_out,

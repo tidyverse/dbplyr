@@ -20,6 +20,26 @@
       INNER JOIN `df` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
 
+# join works with in_schema
+
+    Code
+      left_join(df1, df2, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `df`.*, `z`
+      FROM `foo`.`df` AS `df`
+      LEFT JOIN `foo`.`df2` AS `df2`
+        ON (`df`.`x` = `df2`.`x`)
+
+---
+
+    Code
+      left_join(df1, df3, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `df_LHS`.*, `z`
+      FROM `foo`.`df` AS `df_LHS`
+      LEFT JOIN `foo2`.`df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+
 # join check `x_as` and `y_as`
 
     Code
@@ -75,6 +95,20 @@
         ON (`df1`.`x` = `df2`.`x`)
       INNER JOIN `df3`
         ON (`df1`.`x` = `df3`.`x`)
+
+# can join 4 tables with same column #1101
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `lf1`.*, `b`, `c`, `lf4`.`a` AS `a4`
+      FROM `lf1`
+      INNER JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+      INNER JOIN `lf3`
+        ON (`lf1`.`x` = `lf3`.`x`)
+      INNER JOIN `lf4`
+        ON (`lf1`.`x` = `lf4`.`x`)
 
 # multiple joins produce separate queries if using right/full join
 

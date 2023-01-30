@@ -16,6 +16,17 @@ test_that("two mutates equivalent to one", {
   compare_tbl(df1, df2)
 })
 
+test_that("can use window function after summarise and pure projection #1104", {
+  lf <- lazy_frame(g = 1, x = 1) %>%
+    group_by(g) %>%
+    summarise(x = 1) %>%
+    select(g)
+
+  expect_snapshot({
+    (expect_no_error(lf %>% mutate(r = row_number())))
+  })
+})
+
 test_that("can refer to fresly created values", {
   out1 <- memdb_frame(x1 = 1) %>%
     mutate(x2 = x1 + 1, x3 = x2 + 1, x4 = x3 + 1) %>%
@@ -98,6 +109,40 @@ test_that("across() can access previously created variables", {
   )
 
   expect_snapshot(remote_query(lf))
+})
+
+test_that("across() uses original column rather than overriden one", {
+  db <- memdb_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    db %>% mutate(across(everything(), ~ .x / x)) %>% collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
+  expect_equal(
+    db %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      ) %>%
+      collect(),
+    tibble(x = 1, y = -1, z = -3)
+  )
+
+  lf <- lazy_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    lf %>%
+      mutate(across(everything(), ~ .x / x)) %>%
+      remote_query(),
+    sql("SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`")
+  )
+  expect_snapshot(
+    lf %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      )
+  )
 })
 
 test_that("new columns take precedence over global variables", {
@@ -454,4 +499,3 @@ test_that("mutated vars are always named", {
   out2 <- mf %>% mutate(1) %>% op_vars()
   expect_equal(out2, c("a", "1"))
 })
-

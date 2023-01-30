@@ -37,10 +37,6 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
-    Condition
-      Warning:
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `b`
@@ -59,7 +55,6 @@
       <SQL>
       SELECT `b`
       FROM `df`
-      ORDER BY `a`
     Code
       # use order
       lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
@@ -122,10 +117,6 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-    Condition
-      Warning:
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT 1.0 AS `a`, `b`

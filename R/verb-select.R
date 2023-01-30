@@ -23,7 +23,7 @@ select.tbl_lazy <- function(.data, ...) {
   loc <- ensure_group_vars(loc, .data, notify = TRUE)
   new_vars <- set_names(colnames(.data)[loc], names(loc))
 
-  .data$lazy_query <- add_select(.data, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -52,7 +52,7 @@ rename.tbl_lazy <- function(.data, ...) {
   new_vars <- set_names(colnames(.data), colnames(.data))
   names(new_vars)[loc] <- names(loc)
 
-  .data$lazy_query <- add_select(.data, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -68,7 +68,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
 
-  .data$lazy_query <- add_select(.data, syms(new_vars))
+  .data$lazy_query <- add_select(.data, new_vars)
   .data
 }
 
@@ -122,73 +122,48 @@ simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
 
 # op_select ---------------------------------------------------------------
 
-add_select <- function(.data, vars, op = c("select", "mutate")) {
-  op <- match.arg(op, c("select", "mutate"))
+add_select <- function(.data, vars) {
   lazy_query <- .data$lazy_query
+  stopifnot(is.character(vars))
 
-  # drop NULLs
-  vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
-  if (is_identity(vars, names(vars), op_vars(.data))) {
+  if (is_identity(syms(vars), names(vars), op_vars(.data))) {
     return(lazy_query)
   }
 
-  symbols <- purrr::keep(vars, is_symbol)
-  new2old <- purrr::map_chr(symbols, as_string)
-  old2new <- set_names(names(new2old), new2old)
+  lazy_query <- rename_groups(lazy_query, vars)
 
-  grps <- op_grps(.data)
-  renamed <- grps %in% names(old2new)
-  grps[renamed] <- old2new[grps[renamed]]
-
-  if (is_projection(vars)) {
-    sel_vars <- purrr::map_chr(vars, as_string)
+  is_join <- inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")
+  is_select <- inherits(lazy_query, "lazy_select_query")
+  if (is_join || is_select) {
     names_prev <- op_vars(lazy_query)
-    idx <- vctrs::vec_match(sel_vars, names_prev)
+    idx <- vctrs::vec_match(vars, names_prev)
 
-    out <- lazy_query
-    out$group_vars <- grps
-
-    if (inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")) {
-      out$vars <- vctrs::vec_slice(out$vars, idx)
-      out$vars$name <- names(sel_vars)
-
-      return(out)
+    if (is_join) {
+      lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
+      lazy_query$vars$name <- names(vars)
+    } else {
+      lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
+      lazy_query$select$name <- names(vars)
     }
 
-    if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
-      out$select <- vctrs::vec_slice(lazy_query$select, idx)
-      out$select$name <- names(vars)
-
-      return(out)
-    }
-  }
-
-  if (identical(lazy_query$last_op, "select") || identical(lazy_query$last_op, "mutate")) {
-    # Special optimisation when applied to pure projection() - this is
-    # conservative and we could expand to any op_select() if combined with
-    # the logic in get_mutate_layers()
-    select <- lazy_query$select
-    if (is_pure_projection(select$expr, select$name)) {
-      if (op == "select") {
-          lazy_query$select <- update_lazy_select(select, vars)
-        } else {
-          lazy_query$select <- new_lazy_select(
-            vars,
-            group_vars = op_grps(lazy_query),
-            order_vars = op_sort(lazy_query),
-            frame = op_frame(lazy_query)
-          )
-        }
-        return(lazy_query)
-    }
+    return(lazy_query)
   }
 
   lazy_select_query(
     x = lazy_query,
-    last_op = op,
-    select = vars,
-    group_vars = grps
+    select_operation = "select",
+    select = syms(vars)
   )
+}
+
+rename_groups <- function(lazy_query, vars) {
+  old2new <- set_names(names(vars), vars)
+  grps <- op_grps(lazy_query)
+  renamed <- grps %in% names(old2new)
+  grps[renamed] <- old2new[grps[renamed]]
+
+  lazy_query$group_vars <- grps
+  lazy_query
 }
 
 is_projection <- function(exprs) {

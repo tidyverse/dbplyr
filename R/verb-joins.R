@@ -316,7 +316,7 @@ add_join <- function(x,
     table_id <- 2L
   } else {
     x_join_vars <- x_lq$vars
-    table_id <- length(x_lq$table_names) + 1L
+    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
   }
 
   inline_result <- join_inline_select(y$lazy_query, by$y, by$on)

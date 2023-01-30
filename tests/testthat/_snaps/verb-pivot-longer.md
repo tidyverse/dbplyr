@@ -110,8 +110,13 @@
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
-      <error/rlang_error>
-      Error in `dbplyr_pivot_longer_spec()`:
+      <error/purrr_error_indexed>
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `map2()`:
+      i In index: 1.
+      i With name: value.
+      Caused by error in `dbplyr_pivot_longer_spec()`:
       ! Can't convert to a function.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
@@ -179,4 +184,12 @@
     Condition
       Error in `tidyr::pivot_longer()`:
       ! The `values_ptypes` argument is not supported for remote back-ends
+
+# cols_vary is not supported
+
+    Code
+      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, cols_vary = "fastest")
+    Condition
+      Error in `tidyr::pivot_longer()`:
+      ! The `cols_vary` argument is not supported for remote back-ends.
 

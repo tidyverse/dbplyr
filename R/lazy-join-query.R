@@ -1,42 +1,5 @@
 #' @export
 #' @rdname sql_build
-lazy_join_query <- function(x,
-                            y,
-                            vars,
-                            type,
-                            by,
-                            suffix = c(".x", ".y"),
-                            na_matches = c("never", "na"),
-                            group_vars = op_grps(x),
-                            order_vars = op_sort(x),
-                            frame = op_frame(x),
-                            call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
-  stopifnot(inherits(y, "lazy_query"))
-  join_check_vars(vars, call = call)
-  type <- arg_match(type, c("left", "right", "inner", "full", "cross"), error_call = call)
-  join_check_by(by, call = call)
-  vctrs::vec_assert(suffix, ptype = character(), size = 2L, arg = "suffix", call = call)
-  na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
-
-  lazy_query(
-    query_type = "join",
-    x = x,
-    y = y,
-    vars = vars,
-    type = type,
-    by = by,
-    suffix = suffix,
-    na_matches = na_matches,
-    group_vars = group_vars,
-    order_vars = order_vars,
-    frame = frame,
-    last_op = "join"
-  )
-}
-
-#' @export
-#' @rdname sql_build
 lazy_multi_join_query <- function(x,
                                   joins,
                                   table_names,
@@ -71,7 +34,6 @@ lazy_multi_join_query <- function(x,
     joins = joins,
     table_names = table_names,
     vars = vars,
-    last_op = "join",
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -144,23 +106,8 @@ lazy_semi_join_query <- function(x,
     vars = vars,
     group_vars = group_vars,
     order_vars = order_vars,
-    frame = frame,
-    last_op = "semi_join"
+    frame = frame
   )
-}
-
-#' @export
-print.lazy_join_query <- function(x, ...) {
-  cat_line("<SQL JOIN (", toupper(x$type), ")>")
-
-  cat_line("By:")
-  cat_line(indent(paste0(x$by$x, "-", x$by$y)))
-
-  cat_line("X:")
-  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
-
-  cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
 }
 
 #' @export
@@ -178,29 +125,12 @@ print.lazy_semi_join_query <- function(x, ...) {
 }
 
 #' @export
-op_vars.lazy_join_query <- function(op) {
-  op$vars$alias
-}
-#' @export
 op_vars.lazy_multi_join_query <- function(op) {
   op$vars$name
 }
 #' @export
 op_vars.lazy_semi_join_query <- function(op) {
   op$vars$name
-}
-
-#' @export
-sql_build.lazy_join_query <- function(op, con, ...) {
-  join_query(
-    sql_optimise(sql_build(op$x, con), con),
-    sql_optimise(sql_build(op$y, con), con),
-    op$vars,
-    type = op$type,
-    by = op$by,
-    suffix = op$suffix,
-    na_matches = op$na_matches
-  )
 }
 
 #' @export

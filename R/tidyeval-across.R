@@ -118,7 +118,7 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     return(across_funs(funs, env, data = data, dots = dots, names_spec = NULL, fn = fn, evaluated = TRUE))
   } else {
     cli_abort(
-      "{.arg .fns} must be a NULL, a function, formula, or list",
+      "{.arg .fns} must be a function, a formula, or list of functions/formulas.",
       call = call2(fn, .ns = "dbplyr")
     )
   }
@@ -213,9 +213,8 @@ across_setup <- function(data,
     try_fetch({
       dots[[i]] <- partial_eval(dot, data = data, env = env, error_call = error_call)
     }, error = function(cnd) {
-      dot_name <- get_dot_name(call$..., i, have_name(call$...))
-      expr <- glue::glue("{dot_name} = {as_label(dot)}")
-      msg <- "Problem while evaluating {.code {expr}}."
+      label <- expr_as_label(dot, names2(call$...)[[i]])
+      msg <- "Problem while evaluating {.code {label}}."
       cli_abort(msg, call = call(fn), parent = cnd)
     })
   }
@@ -248,6 +247,15 @@ across_setup <- function(data,
   names_out <- vctrs::vec_as_names(glue(names_spec, .envir = glue_mask), repair = "check_unique")
 
   across_apply_fns(vars, fns, names_out, env)
+}
+
+expr_as_label <- function(expr, name) {
+  label <- as_label(expr)
+  if (name != "") {
+    label <- paste0(name, " = ", label)
+  }
+
+  label
 }
 
 across_apply_fns <- function(vars, fns, names, env) {

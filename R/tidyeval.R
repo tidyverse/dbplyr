@@ -53,12 +53,16 @@
 #' partial_eval(quote(year > local(f(1980))), lf)
 partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call) {
   if (!is_null(vars)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
+    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)", always = TRUE)
     data <- lazy_frame(!!!rep_named(vars, list(logical())))
   }
 
   if (is.character(data)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(data = 'must be a lazy frame')")
+    lifecycle::deprecate_warn(
+      "2.1.2",
+      "partial_eval(data = 'must be a lazy frame')",
+      always = TRUE
+    )
     data <- lazy_frame(!!!rep_named(data, list(logical())))
   }
 
@@ -90,11 +94,12 @@ capture_dot <- function(.data, x) {
 partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env()) {
   # corresponds to `capture_dots()`
   dots <- as.list(enquos(..., .named = .named))
+  dot_names <- names2(exprs(...))
   was_named <- have_name(exprs(...))
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
-    dot_name <- get_dot_name(dots, i, was_named)
+    dot_name <- dot_names[[i]]
     dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
   }
 
@@ -112,8 +117,8 @@ partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   try_fetch(
     expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
     error = function(cnd) {
-      expr <- glue::glue("{dot_name} = {as_label(x)}")
-      msg <- "Problem while computing {.code {expr}}"
+      label <- expr_as_label(x, dot_name)
+      msg <- c(i = "In argument: {.code {label}}")
       cli_abort(msg, call = error_call, parent = cnd)
     }
   )

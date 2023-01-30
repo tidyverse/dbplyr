@@ -41,6 +41,37 @@ test_that("complete semi join works with SQLite and table alias", {
   expect_snapshot(inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2"))
 })
 
+test_that("join works with in_schema", {
+  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+
+  DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df2"), tibble(x = 2:3, z = "b"))
+
+  # same schema, different name
+  df1 <- tbl(con, in_schema("foo", "df"))
+  df2 <- tbl(con, in_schema("foo", "df2"))
+  expect_equal(
+    left_join(df1, df2, by = "x") %>% collect(),
+    tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
+  )
+  expect_snapshot(
+    left_join(df1, df2, by = "x") %>% remote_query()
+  )
+
+  # different schema, same name
+  DBI::dbExecute(con, "ATTACH ':memory:' AS foo2")
+  DBI::dbWriteTable(con, DBI::Id(schema = "foo2", table = "df"), tibble(x = 2:3, z = "c"))
+  df3 <- tbl(con, in_schema("foo2", "df"))
+  expect_equal(
+    left_join(df1, df3, by = "x") %>% collect(),
+    tibble(x = 1:3, y = "a", z = c(NA, "c", "c"))
+  )
+  expect_snapshot(
+    left_join(df1, df3, by = "x") %>% remote_query()
+  )
+})
+
 test_that("joins with non by variables gives cross join", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
@@ -430,6 +461,33 @@ test_that("multiple joins create a single query", {
   expect_equal(lq$vars$var, list("x", "a", "b", "b"))
 
   expect_snapshot(out)
+})
+
+test_that("can join 4 tables with same column #1101", {
+  # when there are
+  # * at least 3 joins
+  # * a variable appears in two table
+  # * it is not joined by
+  # * and it is renamed
+  #
+  # this produced a wrong query
+  lf1 <- lazy_frame(x = 1, a = 2, .name = "lf1")
+  lf2 <- lazy_frame(x = 2, b = 3, .name = "lf2")
+  lf3 <- lazy_frame(x = 3, c = 4, .name = "lf3")
+  lf4 <- lazy_frame(x = 4, a = 5, .name = "lf4") %>%
+    rename(a4 = a)
+
+  out <- lf1 %>%
+    inner_join(lf2, by = "x") %>%
+    inner_join(lf3, by = "x") %>%
+    inner_join(lf4, by = "x")
+
+  join_vars <- out$lazy_query$vars
+  expect_equal(join_vars$name, c("x", "a", "b", "c", "a4"))
+  expect_equal(join_vars$table, list(1L, 1L, 2L, 3L, 4L))
+  expect_equal(join_vars$var, list("x", "a", "b", "c", "a"))
+  # `lf4`.`a` AS `a4`
+  expect_snapshot(remote_query(out))
 })
 
 test_that("multiple joins produce separate queries if using right/full join", {

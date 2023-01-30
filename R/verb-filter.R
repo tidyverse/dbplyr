@@ -60,7 +60,6 @@ add_filter <- function(.data, dots) {
     if (uses_mutated_vars(dots, lazy_query$select)) {
       lazy_select_query(
         x = lazy_query,
-        last_op = "filter",
         where = dots
       )
     } else {
@@ -86,7 +85,6 @@ add_filter <- function(.data, dots) {
     original_vars <- op_vars(.data)
     lazy_select_query(
       x = mutated$lazy_query,
-      last_op = "filter",
       select = syms(set_names(original_vars)),
       where = where$expr
     )
