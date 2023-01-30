@@ -203,7 +203,7 @@ is_infix_user <- function(x) {
 }
 
 default_op <- function(x, env) {
-  assert_that(is_string(x))
+  check_string(x)
 
   # Check for shiny reactives; these are zero-arg functions
   # so need special handling to give a useful error

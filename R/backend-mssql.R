@@ -465,7 +465,7 @@ mssql_is_null <- function(x) {
 }
 
 mssql_infix_comparison <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
   f <- toupper(f)
   function(x, y) {
     mssql_as_bit(build_sql(x, " ", sql(f), " ", y))

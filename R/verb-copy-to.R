@@ -45,13 +45,18 @@
 #' # in the join functions
 #' db %>% left_join(df2, copy = TRUE)
 #' @importFrom dplyr copy_to
-copy_to.src_sql <- function(dest, df, name = deparse(substitute(df)),
-                            overwrite = FALSE, types = NULL, temporary = TRUE,
-                            unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...,
-                            in_transaction = TRUE
-                            ) {
-  assert_that(is.flag(temporary))
+copy_to.src_sql <- function(dest,
+                            df,
+                            name = deparse(substitute(df)),
+                            overwrite = FALSE,
+                            types = NULL,
+                            temporary = TRUE,
+                            unique_indexes = NULL,
+                            indexes = NULL,
+                            analyze = TRUE,
+                            ...,
+                            in_transaction = TRUE) {
+  check_bool(temporary)
 
   if (!is.data.frame(df) && !inherits(df, "tbl_sql")) {
     cli_abort("{.var df} must be a local dataframe or a remote tbl_sql")
