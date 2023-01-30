@@ -565,7 +565,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
 join_two_table_alias <- function(names, from) {
   check_character(names)
   check_character(from)
-  stopifnot(length(names) == 2L)
+  vctrs::vec_assert(names, size = 2L)
 
   out <- dplyr::coalesce(names, c("LHS", "RHS"))
 

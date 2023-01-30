@@ -9,7 +9,7 @@ compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
 }
 
 expect_equal_tbls <- function(results, ref = NULL, ...) {
-  stopifnot(is.list(results))
+  check_list(results)
 
   if (!is_named(results)) {
     result_name <- expr_name(substitute(results)) # nocov
