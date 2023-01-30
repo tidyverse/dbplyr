@@ -23,7 +23,7 @@
 #'   show_query()
 window_order <- function(.data, ...) {
   if (!is_tbl_lazy(.data)) {
-    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not a {.cls {class(.data)}}."
+    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not {.obj_type_friendly {(.data)}}."
     if (is.data.frame(.data)) {
       msg <- c(msg, i = "Did you mean to use {.fn arrange} instead?")
     }
