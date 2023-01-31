@@ -5,15 +5,15 @@
 #' @rdname sql_variant
 sql_substr <- function(f = "SUBSTR") {
   function(x, start, stop) {
-    start <- max(check_integer(start), 1L)
-    stop <- max(check_integer(stop), 1L)
+    start <- max(cast_number_whole(start), 1L)
+    stop <- max(cast_number_whole(stop), 1L)
     length <- max(stop - start + 1L, 0L)
 
     sql_call2(f, x, start, length)
   }
 }
 
-check_integer <- function(x, arg = caller_arg(x), call = caller_env()) {
+cast_number_whole <- function(x, arg = caller_arg(x), call = caller_env()) {
   check_number_whole(x, arg = arg, call = call)
   vctrs::vec_cast(x, integer(), x_arg = arg)
 }
@@ -29,8 +29,8 @@ sql_str_sub <- function(
                         optional_length = TRUE
   ) {
   function(string, start = 1L, end = -1L) {
-    start <- check_integer(start)
-    end <- check_integer(end)
+    start <- cast_number_whole(start)
+    end <- cast_number_whole(end)
 
     start_sql <- start_pos(string, start, length_f)
 
