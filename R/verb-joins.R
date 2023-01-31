@@ -309,12 +309,6 @@ add_join <- function(x,
     by <- as_join_by(by, error_call = call)
   }
 
-  if (is.null(sql_on)) {
-    # TODO better error
-    tidyselect::eval_select(by$x, x)
-    tidyselect::eval_select(by$y, y)
-  }
-
   y <- auto_copy(
     x, y,
     copy = copy,
