@@ -40,6 +40,23 @@
       LEFT JOIN `foo2`.`df` AS `df_RHS`
         ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
+# joins with non by variables gives cross join
+
+    Code
+      (expect_warning(out_inner <- collect(inner_join(df1, df2, by = character()))))
+    Output
+      <warning/lifecycle_warning_deprecated>
+      Warning:
+      Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
+      i Please use `cross_join()` instead.
+    Code
+      (expect_warning(out_full <- collect(full_join(df1, df2, by = character()))))
+    Output
+      <warning/lifecycle_warning_deprecated>
+      Warning:
+      Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
+      i Please use `cross_join()` instead.
+
 # join check `x_as` and `y_as`
 
     Code
@@ -124,6 +141,43 @@
       ) `LHS`
       RIGHT JOIN `df3`
         ON (`LHS`.`x` = `df3`.`x`)
+
+# can't use `keep = FALSE` with non-equi conditions (#6499)
+
+    Code
+      left_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+    Condition
+      Error in `left_join()`:
+      ! Can't set `keep = FALSE` when using an inequality, rolling, or overlap join.
+
+---
+
+    Code
+      full_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+    Condition
+      Error in `full_join()`:
+      ! Can't set `keep = FALSE` when using an inequality, rolling, or overlap join.
+
+# can translate join conditions
+
+    Code
+      left_join(lf1, lf1, by = join_by(a == a, b >= b, c < c), keep = TRUE)
+    Output
+      <SQL>
+      SELECT
+        `df_LHS`.`a` AS `a.x`,
+        `df_LHS`.`b` AS `b.x`,
+        `df_LHS`.`c` AS `c.x`,
+        `df_RHS`.`a` AS `a.y`,
+        `df_RHS`.`b` AS `b.y`,
+        `df_RHS`.`c` AS `c.y`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (
+          `df_LHS`.`a` = `df_RHS`.`a` AND
+          `df_LHS`.`b` >= `df_RHS`.`b` AND
+          `df_LHS`.`c` < `df_RHS`.`c`
+        )
 
 # can optionally match NA values
 

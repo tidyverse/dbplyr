@@ -198,6 +198,34 @@ full_join.tbl_lazy <- function(x,
 
 #' @rdname join.tbl_sql
 #' @export
+#' @importFrom dplyr cross_join
+cross_join.tbl_lazy <- function(x,
+                                y,
+                                ...,
+                                copy = FALSE,
+                                suffix = c(".x", ".y"),
+                                x_as = NULL,
+                                y_as = NULL) {
+  x$lazy_query <- add_join(
+    x, y,
+    "cross",
+    by = character(),
+    sql_on = NULL,
+    copy = copy,
+    suffix = suffix,
+    auto_index = FALSE,
+    keep = NULL,
+    na_matches = "never",
+    x_as = x_as,
+    y_as = y_as,
+    ...
+  )
+
+  x
+}
+
+#' @rdname join.tbl_sql
+#' @export
 #' @importFrom dplyr semi_join
 semi_join.tbl_lazy <- function(x, y, by = NULL, copy = FALSE,
                                auto_index = FALSE, ...,
@@ -248,7 +276,7 @@ add_join <- function(x,
                      type,
                      by = NULL,
                      sql_on = NULL,
-                     keep = NUL,
+                     keep = NULL,
                      copy = FALSE,
                      suffix = NULL,
                      auto_index = FALSE,
@@ -258,11 +286,22 @@ add_join <- function(x,
                      call = caller_env()) {
   x_names <- tbl_vars(x)
   y_names <- tbl_vars(y)
+  if (identical(by, character()) && is.null(sql_on)) {
+    if (type != "cross") {
+      lifecycle::deprecate_soft(
+        when = "1.1.0",
+        what = I("Using `by = character()` to perform a cross join"),
+        with = "cross_join()",
+        env = caller_env(),
+        user_env = caller_env(2)
+      )
+    }
+    type <- "cross"
+  }
 
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = unclass(sql_on))
-  } else if (identical(type, "full") && identical(by, character())) {
-    type <- "cross"
+  } else if (type == "cross") {
     by <- list(x = character(0), y = character(0))
   } else if (is_null(by)) {
     by <- join_by_common(x_names, y_names, error_call = call)

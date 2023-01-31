@@ -76,13 +76,13 @@ test_that("joins with non by variables gives cross join", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
 
-  out <- collect(inner_join(df1, df2, by = character()))
-  expect_equal(nrow(out), 25)
+  expect_snapshot({
+    (expect_warning(out_inner <- collect(inner_join(df1, df2, by = character()))))
+    (expect_warning(out_full <- collect(full_join(df1, df2, by = character()))))
+  })
 
-  # full_join() goes through a slightly different path and
-  # generates CROSS JOIN for reasons I don't fully understand
-  out <- collect(full_join(df1, df2, by = character()))
-  expect_equal(nrow(out), 25)
+  expect_equal(nrow(out_inner), 25)
+  expect_equal(nrow(out_full), 25)
 })
 
 df1 <- memdb_frame(x = 1:5, y = 1:5)
@@ -296,10 +296,9 @@ test_that("select() before join is inlined", {
   expect_equal(vars$var, list("a", c("x1", "x2"), "b"))
   expect_equal(vars$table, list(1, c(1, 2), 2))
 
-  out_cross <- full_join(
+  out_cross <- cross_join(
     lf %>% select(a2 = a, x = x1),
-    lf2 %>% select(x = x2, b),
-    by = character()
+    lf2 %>% select(x = x2, b)
   )
   vars <- out_cross$lazy_query$vars
   expect_equal(vars$name, c("a2", "x.x", "x.y", "b"))
@@ -983,7 +982,7 @@ test_that("cross_join uses *", {
 
   con <- simulate_dbi()
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     sql_build()
 
   expect_equal(
@@ -993,7 +992,7 @@ test_that("cross_join uses *", {
 
   # also works after relocate
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(x, y, a, b) %>%
     sql_build()
 
@@ -1003,7 +1002,7 @@ test_that("cross_join uses *", {
   )
 
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(x, a, b, y) %>%
     sql_build()
 
@@ -1013,7 +1012,7 @@ test_that("cross_join uses *", {
   )
 
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(a, x, y, b) %>%
     sql_build()
 

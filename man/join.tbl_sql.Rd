@@ -6,6 +6,7 @@
 \alias{left_join.tbl_lazy}
 \alias{right_join.tbl_lazy}
 \alias{full_join.tbl_lazy}
+\alias{cross_join.tbl_lazy}
 \alias{semi_join.tbl_lazy}
 \alias{anti_join.tbl_lazy}
 \title{Join SQL tables}
@@ -66,6 +67,16 @@
   sql_on = NULL,
   keep = NULL,
   na_matches = c("never", "na"),
+  x_as = NULL,
+  y_as = NULL
+)
+
+\method{cross_join}{tbl_lazy}(
+  x,
+  y,
+  ...,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
   x_as = NULL,
   y_as = NULL
 )
