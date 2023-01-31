@@ -23,7 +23,7 @@
 #'   show_query()
 window_order <- function(.data, ...) {
   if (!is_tbl_lazy(.data)) {
-    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not a {.cls {class(.data)}}."
+    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not {.obj_type_friendly {(.data)}}."
     if (is.data.frame(.data)) {
       msg <- c(msg, i = "Did you mean to use {.fn arrange} instead?")
     }
@@ -56,9 +56,41 @@ window_frame <- function(.data, from = -Inf, to = Inf) {
     )
   }
 
-  stopifnot(is.numeric(from), length(from) == 1)
-  stopifnot(is.numeric(to), length(to) == 1)
+  check_number_whole_inf(from)
+  check_number_whole_inf(to)
 
   .data$lazy_query$frame <- list(range = c(from, to))
   .data
+}
+
+check_frame <- function(frame, call = caller_env()) {
+  if (is.null(frame)) {
+    return()
+  }
+
+  check_frame_range(frame$range)
+}
+
+check_number_whole_inf <- function(x,
+                                   allow_null = FALSE,
+                                   arg = caller_arg(x),
+                                   call = caller_env()) {
+  .rlang_types_check_number(
+    x,
+    allow_decimal = FALSE,
+    allow_infinite = TRUE,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
+check_frame_range <- function(range, call = caller_env()) {
+  if (is.null(range)) {
+    return()
+  }
+
+  vctrs::vec_assert(range, size = 2L, arg = "frame", call = call)
+  check_number_whole_inf(range[1], arg = "frame", call = call)
+  check_number_whole_inf(range[2], arg = "frame", call = call)
 }

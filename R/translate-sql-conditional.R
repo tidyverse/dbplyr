@@ -1,6 +1,6 @@
 sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
   error_call <- current_call()
-  check_not_supplied(.ptype, call = error_call)
+  check_unsupported_arg(.ptype)
 
   x_expr <- enexpr(.x)
   if (!is_symbol(x_expr) && !is_call(x_expr)) {
@@ -117,8 +117,8 @@ sql_case_when <- function(...,
                           .size = NULL,
                           error_call = caller_env()) {
   # TODO: switch to dplyr::case_when_prepare when available
-  check_not_supplied(.ptype, call = error_call)
-  check_not_supplied(.size, call = error_call)
+  check_unsupported_arg(.ptype, call = error_call)
+  check_unsupported_arg(.size, call = error_call)
 
   formulas <- list2(...)
   n <- length(formulas)

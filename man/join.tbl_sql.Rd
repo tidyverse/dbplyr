@@ -17,11 +17,11 @@
   by = NULL,
   copy = FALSE,
   suffix = NULL,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   keep = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -32,11 +32,11 @@
   by = NULL,
   copy = FALSE,
   suffix = NULL,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   keep = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -47,11 +47,11 @@
   by = NULL,
   copy = FALSE,
   suffix = NULL,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   keep = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -62,11 +62,11 @@
   by = NULL,
   copy = FALSE,
   suffix = NULL,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   keep = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -86,10 +86,10 @@
   y,
   by = NULL,
   copy = FALSE,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -99,10 +99,10 @@
   y,
   by = NULL,
   copy = FALSE,
-  auto_index = FALSE,
   ...,
-  sql_on = NULL,
   na_matches = c("never", "na"),
+  sql_on = NULL,
+  auto_index = FALSE,
   x_as = NULL,
   y_as = NULL
 )
@@ -153,17 +153,7 @@ operation so you must opt into it.}
 \code{y}, these suffixes will be added to the output to disambiguate them.
 Should be a character vector of length 2.}
 
-\item{auto_index}{if \code{copy} is \code{TRUE}, automatically create
-indices for the variables in \code{by}. This may speed up the join if
-there are matching indexes in \code{x}.}
-
 \item{...}{Other parameters passed onto methods.}
-
-\item{sql_on}{A custom join predicate as an SQL expression.
-Usually joins use column equality, but you can perform more complex
-queries by supply \code{sql_on} which should be a SQL expression that
-uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
-right-hand side of the join respectively.}
 
 \item{keep}{Should the join keys from both \code{x} and \code{y} be preserved in the
 output?
@@ -181,6 +171,16 @@ inequality conditions.
 The default, "never", is how databases usually work. \code{"na"} makes
 the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[=match]{match()}},
 and \code{\%in\%}.}
+
+\item{sql_on}{A custom join predicate as an SQL expression.
+Usually joins use column equality, but you can perform more complex
+queries by supply \code{sql_on} which should be a SQL expression that
+uses \code{LHS} and \code{RHS} aliases to refer to the left-hand side or
+right-hand side of the join respectively.}
+
+\item{auto_index}{if \code{copy} is \code{TRUE}, automatically create
+indices for the variables in \code{by}. This may speed up the join if
+there are matching indexes in \code{x}.}
 
 \item{x_as, y_as}{Alias to use for \code{x} resp. \code{y}. Defaults to \code{"LHS"} resp.
 \code{"RHS"}}

@@ -6,6 +6,6 @@ test_that("quantile and median don't change without warning", {
 })
 
 test_that("checks for invalid probs", {
-  expect_error(check_probs("a"), "numeric")
-  expect_error(check_probs(1:3), "single value")
+  expect_error(check_probs("a"), "number")
+  expect_error(check_probs(1:3), "vector")
 })

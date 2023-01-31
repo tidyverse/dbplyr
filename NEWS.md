@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* Moved argument `auto_index` after `...` in `*_join()` (@mgirlich, #1115).
+
+* Removed dependency on assertthat (@mgirlich, #1112).
+
 * Catch unsupported argument `pivot_wider(id_expand = TRUE)` and
   `pivot_longer(cols_vary)` (@mgirlich, #1109).
 

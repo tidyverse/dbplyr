@@ -8,25 +8,25 @@ lazy_multi_join_query <- function(x,
                                   order_vars = op_sort(x),
                                   frame = op_frame(x),
                                   call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
+  check_lazy_query(x, call = call)
 
   if (!identical(colnames(joins), c("table", "type", "by_x_table_id", "by"))) {
     cli_abort("`joins` must have fields `table`, `type`, `by_x_table_id`, `by`", .internal = TRUE)
   }
-  vctrs::vec_assert(joins$type, character(), arg = "joins$type", call = caller_env())
+  check_character(joins$type, call = call)
 
   if (!identical(colnames(table_names), c("name", "from"))) {
     cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
   }
-  vctrs::vec_assert(table_names$name, character(), arg = "table_names$as", call = caller_env())
-  vctrs::vec_assert(table_names$from, character(), arg = "table_names$from", call = caller_env())
+  check_character(table_names$name, call = call)
+  check_character(table_names$from, call = call)
 
   if (!identical(colnames(vars), c("name", "table", "var"))) {
     cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
   }
-  vctrs::vec_assert(vars$name, character(), arg = "vars$name", call = caller_env())
-  vctrs::vec_assert(vars$table, list(), arg = "vars$table", call = caller_env())
-  vctrs::vec_assert(vars$var, list(), arg = "vars$var", call = caller_env())
+  check_character(vars$name, call = call)
+  check_list(vars$table, call = call)
+  check_list(vars$var, call = call)
 
   lazy_query(
     query_type = "multi_join",
@@ -53,22 +53,25 @@ join_check_vars <- function(vars, call) {
     abort("`vars` must have fields `alias`, `x`, `y`, `all_x`, and `all_y`", .internal = TRUE)
   }
 
+  check_character(vars$alias, call = call)
+  check_character(vars$x, call = call)
+  check_character(vars$y, call = call)
+  check_character(vars$all_x, call = call)
+  check_character(vars$all_y, call = call)
+
   n <- vctrs::vec_size(vars$alias)
-  vctrs::vec_assert(vars$alias, character(), arg = "vars$alias", call = call)
-  vctrs::vec_assert(vars$x, character(), size = n, arg = "vars$x", call = call)
-  vctrs::vec_assert(vars$y, character(), size = n, arg = "vars$y", call = call)
-  vctrs::vec_assert(vars$all_x, character(), arg = "vars$all_x", call = call)
-  vctrs::vec_assert(vars$all_y, character(), arg = "vars$all_y", call = call)
+  vctrs::vec_assert(vars$x, size = n, arg = "vars$x", call = call)
+  vctrs::vec_assert(vars$y, size = n, arg = "vars$y", call = call)
 }
 
 join_check_by <- function(by, call) {
-  if (!vctrs::vec_is_list(by)) {
+  if (!vctrs::vec_is_list(by) && !inherits(by, "dplyr_join_by")) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
     abort("`by` must be a list", .internal = TRUE)
   }
-  vctrs::vec_assert(by$x, character(), arg = "by$x", call = call)
-  vctrs::vec_assert(by$y, character(), arg = "by$y", call = call)
+  check_character(by$x, call = call)
+  check_character(by$y, call = call)
   if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
     # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
     # is fixed
@@ -90,10 +93,10 @@ lazy_semi_join_query <- function(x,
                                  order_vars = op_sort(x),
                                  frame = op_frame(x),
                                  call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
-  stopifnot(inherits(y, "lazy_query"))
-  assert_flag(anti, "anti", call = call)
-  # join_check_by(by, call)
+  check_lazy_query(x, call = call)
+  check_lazy_query(y, call = call)
+  check_bool(anti, call = call)
+  join_check_by(by, call)
   na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
 
   lazy_query(

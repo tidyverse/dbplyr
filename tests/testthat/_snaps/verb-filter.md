@@ -47,7 +47,8 @@
       lf %>% filter(x == 1, .preserve = TRUE)
     Condition
       Error in `filter()`:
-      ! `.preserve` is not supported on database backends
+      ! `.preserve = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
 
 # catches `.by` with grouped-df
 

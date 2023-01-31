@@ -148,9 +148,22 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
   UseMethod("sql_table_index")
 }
 #' @export
-sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                           unique = FALSE, ...) {
-  assert_that(is_string(table) || is_schema(table), is.character(columns))
+sql_table_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...,
+                                          call = caller_env()) {
+  if (!(is_string(table) || is_schema(table))) {
+    stop_input_type(
+      table,
+      c("a string", "a schema"),
+      ...,
+      call = call
+    )
+  }
+  check_character(columns)
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)

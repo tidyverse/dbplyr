@@ -3,13 +3,13 @@
     Code
       (my_lazy_semi_join_query(x = lazy_frame(x = 1)))
     Condition
-      Error in `lazy_semi_join_query()`:
-      ! inherits(x, "lazy_query") is not TRUE
+      Error in `my_lazy_semi_join_query()`:
+      ! `x` must be a lazy query, not a <tbl_TestConnection/tbl_lazy/tbl> object.
     Code
       (my_lazy_semi_join_query(y = lazy_frame(x = 1)))
     Condition
-      Error in `lazy_semi_join_query()`:
-      ! inherits(y, "lazy_query") is not TRUE
+      Error in `my_lazy_semi_join_query()`:
+      ! `y` must be a lazy query, not a <tbl_TestConnection/tbl_lazy/tbl> object.
 
 ---
 
@@ -17,7 +17,7 @@
       (my_lazy_semi_join_query(anti = NA))
     Condition
       Error in `my_lazy_semi_join_query()`:
-      ! `anti` must not be NA.
+      ! `anti` must be `TRUE` or `FALSE`, not `NA`.
     Code
       (my_lazy_semi_join_query(na_matches = "sometimes"))
     Condition
