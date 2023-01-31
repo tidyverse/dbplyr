@@ -657,7 +657,6 @@ test_that("when keep = TRUE, inner_join() preserves both sets of keys (#5581)", 
 })
 
 test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
-  skip_if(packageVersion("dplyr") < "1.1.0")
   join_by <- dplyr::join_by
   df1 <- memdb_frame(xl = c(1, 3), xu = c(4, 7))
   df2 <- memdb_frame(yl = c(2, 5, 8), yu = c(6, 8, 9))
@@ -677,7 +676,6 @@ test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
 })
 
 test_that("by default, `by` columns omitted from `y` with equi-conditions, but not non-equi conditions" , {
-  skip_if(packageVersion("dplyr") < "1.1.0")
   # equi keys always keep the LHS name, regardless of whether of not a duplicate exists in the RHS
   # non-equi keys will get a suffix if a duplicate exists
   lf <- lazy_frame(x = 1, y = 1, z = 1)
@@ -709,7 +707,6 @@ test_that("by default, `by` columns omitted from `y` with equi-conditions, but n
 })
 
 test_that("can translate join conditions", {
-  skip_if(packageVersion("dplyr") < "1.1.0")
   lf1 <- lazy_frame(a = 1, b = 1, c = 1)
   expect_snapshot({
     left_join(
@@ -726,7 +723,6 @@ test_that("can translate join conditions", {
 })
 
 test_that("joins using `between(bounds =)` work as expected", {
-  skip_if(packageVersion("dplyr") < "1.1.0")
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(lower = 2, upper = 4)
 
@@ -753,7 +749,6 @@ test_that("joins using `between(bounds =)` work as expected", {
 })
 
 test_that("joins using `overlaps(bounds =)` work as expected", {
-  skip_if(packageVersion("dplyr") < "1.1.0")
   df1 <- tibble(x_lower = c(1, 1, 3, 4), x_upper = c(2, 3, 4, 5))
   df2 <- tibble(y_lower = 2, y_upper = 4)
 
