@@ -194,6 +194,38 @@
       Error in `semi_join()`:
       ! Rolling joins aren't supported on database backends.
 
+# `na_matches` is validated
+
+    Code
+      left_join(df, df, by = "x", na_matches = 1)
+    Condition
+      Error in `left_join()`:
+      ! `na_matches` must be a character vector, not a number.
+
+---
+
+    Code
+      left_join(df, df, by = "x", na_matches = "foo")
+    Condition
+      Error in `left_join()`:
+      ! `na_matches` must be one of "na" or "never", not "foo".
+
+---
+
+    Code
+      semi_join(df, df, by = "x", na_matches = 1)
+    Condition
+      Error in `semi_join()`:
+      ! `na_matches` must be a character vector, not a number.
+
+---
+
+    Code
+      semi_join(df, df, by = "x", na_matches = "foo")
+    Condition
+      Error in `semi_join()`:
+      ! `na_matches` must be one of "never" or "na", not "foo".
+
 # can optionally match NA values
 
     Code

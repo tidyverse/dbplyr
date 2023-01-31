@@ -784,6 +784,25 @@ test_that("rolling joins aren't supported", {
   })
 })
 
+test_that("`na_matches` is validated", {
+  df <- lazy_frame(x = 1)
+
+  # Mutating joins
+  expect_snapshot(error = TRUE, {
+    left_join(df, df, by = "x", na_matches = 1)
+  })
+  expect_snapshot(error = TRUE, {
+    left_join(df, df, by = "x", na_matches = "foo")
+  })
+
+  # Filtering joins
+  expect_snapshot(error = TRUE, {
+    semi_join(df, df, by = "x", na_matches = 1)
+  })
+  expect_snapshot(error = TRUE, {
+    semi_join(df, df, by = "x", na_matches = "foo")
+  })
+})
 
 # sql_build ---------------------------------------------------------------
 
