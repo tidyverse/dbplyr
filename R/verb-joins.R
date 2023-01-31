@@ -306,7 +306,7 @@ add_join <- function(x,
   } else if (is_null(by)) {
     by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- as_join_by(by, error_call = call)
+    by <- dbplyr_as_join_by(by, error_call = call)
   }
 
   check_join_by_supported(by, call = call)
@@ -554,7 +554,7 @@ add_semi_join <- function(x,
   } else if (is_null(by)) {
     by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- as_join_by(by, error_call = call)
+    by <- dbplyr_as_join_by(by, error_call = call)
   }
 
   check_join_by_supported(by, call = call)

@@ -16,13 +16,12 @@ new_join_by <- function(exprs = list(),
 # ------------------------------------------------------------------------------
 
 # Internal generic
-as_join_by <- function(x, error_call = caller_env()) {
-  UseMethod("as_join_by")
+dbplyr_as_join_by <- function(x, error_call = caller_env()) {
+  UseMethod("dbplyr_as_join_by")
 }
 
-# TODO they might not be needed?
 #' @export
-as_join_by.default <- function(x, error_call = caller_env()) {
+dbplyr_as_join_by.default <- function(x, error_call = caller_env()) {
   message <- glue(paste0(
     "`by` must be a (named) character vector, list, `join_by()` result, ",
     "or NULL, not {obj_type_friendly(x)}."
@@ -31,12 +30,12 @@ as_join_by.default <- function(x, error_call = caller_env()) {
 }
 
 #' @export
-as_join_by.dplyr_join_by <- function(x, error_call = caller_env()) {
+dbplyr_as_join_by.dplyr_join_by <- function(x, error_call = caller_env()) {
   x
 }
 
 #' @export
-as_join_by.character <- function(x, error_call = caller_env()) {
+dbplyr_as_join_by.character <- function(x, error_call = caller_env()) {
   x_names <- names(x) %||% x
   y_names <- unname(x)
 
@@ -47,7 +46,7 @@ as_join_by.character <- function(x, error_call = caller_env()) {
 }
 
 #' @export
-as_join_by.list <- function(x, error_call = caller_env()) {
+dbplyr_as_join_by.list <- function(x, error_call = caller_env()) {
   # TODO: check lengths
   x_names <- x[["x"]]
   y_names <- x[["y"]]
