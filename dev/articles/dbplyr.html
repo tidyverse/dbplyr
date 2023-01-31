@@ -403,7 +403,7 @@ whole query, you can’t use <code><a href="https://rdrr.io/r/utils/head.html" c
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tail()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `tail()` is not supported by sql sources</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `tail()` is not supported on database backends.</span></span></code></pre></div>
 <p>You can also ask the database how it plans to execute the query with
 <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code>. The output is database dependent, and can be
 esoteric, but learning a bit about it can be very useful because it
