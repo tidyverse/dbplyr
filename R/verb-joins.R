@@ -309,6 +309,8 @@ add_join <- function(x,
     by <- as_join_by(by, error_call = call)
   }
 
+  check_join_by_supported(by, call = call)
+
   y <- auto_copy(
     x, y,
     copy = copy,
@@ -555,6 +557,8 @@ add_semi_join <- function(x,
     by <- as_join_by(by, error_call = call)
   }
 
+  check_join_by_supported(by, call = call)
+
   y <- auto_copy(
     x, y, copy,
     indexes = if (auto_index) list(by$y)
@@ -731,4 +735,10 @@ join_two_table_alias <- function(names, from) {
 check_suffix <- function(x, call) {
   vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
   list(x = x[1], y = x[2])
+}
+
+check_join_by_supported <- function(by, call = caller_env()) {
+  if (any(by$filter != "none")) {
+    cli_abort("Rolling joins aren't supported on database backends.", call = call)
+  }
 }

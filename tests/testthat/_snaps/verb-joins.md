@@ -179,6 +179,21 @@
           `df_LHS`.`c` < `df_RHS`.`c`
         )
 
+# rolling joins aren't supported
+
+    Code
+      (expect_error(left_join(lf, lf, join_by(closest(x >= y)))))
+    Output
+      <error/rlang_error>
+      Error in `left_join()`:
+      ! Rolling joins aren't supported on database backends.
+    Code
+      (expect_error(semi_join(lf, lf, join_by(closest(x >= y)))))
+    Output
+      <error/rlang_error>
+      Error in `semi_join()`:
+      ! Rolling joins aren't supported on database backends.
+
 # can optionally match NA values
 
     Code

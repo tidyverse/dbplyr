@@ -780,6 +780,15 @@ test_that("joins using `overlaps(bounds =)` work as expected", {
   expect_identical(out, expect_open)
 })
 
+test_that("rolling joins aren't supported", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot({
+    (expect_error(left_join(lf, lf, join_by(closest(x >= y)))))
+    (expect_error(semi_join(lf, lf, join_by(closest(x >= y)))))
+  })
+})
+
 
 # sql_build ---------------------------------------------------------------
 
