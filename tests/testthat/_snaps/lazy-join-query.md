@@ -14,6 +14,14 @@
 ---
 
     Code
+      (my_lazy_semi_join_query(by = lmod(by0, x = 1)))
+    Condition
+      Error in `my_lazy_semi_join_query()`:
+      ! `by$x` must be a character vector, not the number 1.
+
+---
+
+    Code
       (my_lazy_semi_join_query(anti = NA))
     Condition
       Error in `my_lazy_semi_join_query()`:
