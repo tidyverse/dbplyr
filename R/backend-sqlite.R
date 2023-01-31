@@ -161,6 +161,10 @@ sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by 
   )
 
   if (type == "full") {
+    if (any(by$condition != "==")) {
+      cli_abort("Full joins with non-equi conditions are not supported for SQLite.")
+    }
+
     x_join <- sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1)
     y_join <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl + 1)
     join_sql <- sql_query_set_op(
