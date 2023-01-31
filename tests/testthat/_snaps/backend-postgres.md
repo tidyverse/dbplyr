@@ -32,8 +32,8 @@
       by = c("a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 

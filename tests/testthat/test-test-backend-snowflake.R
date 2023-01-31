@@ -3,8 +3,7 @@ test_that("custom scalar translated correctly", {
   expect_equal(translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
   expect_equal(translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
-  expect_error(translate_sql(grepl("exp", x, ignore.case = TRUE)),
-               "`perl`, `fixed`, `useBytes`, and `ignore.case` parameters are unsupported.")
+  expect_snapshot((expect_error(translate_sql(grepl("exp", x, ignore.case = TRUE)))))
 })
 
 test_that("pasting translated correctly", {

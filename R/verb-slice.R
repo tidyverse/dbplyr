@@ -51,25 +51,19 @@ NULL
 #' @importFrom dplyr slice
 #' @export
 slice.tbl_lazy <- function(.data, ...) {
-  cli_abort("{.fun slice} is not supported on database backends")
+  stop_unsupported_function("slice")
 }
 
 #' @importFrom dplyr slice_head
 #' @export
 slice_head.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
-  cli_abort(c(
-    "{.fun slice_head} is not supported on database backends",
-    i = "Please use {.fun slice_min} instead"
-  ))
+  stop_unsupported_function("slice_head", with = "slice_min")
 }
 
 #' @importFrom dplyr slice_tail
 #' @export
 slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
-  cli_abort(c(
-    "{.fun slice_tail} is not supported on database backends",
-    i = "Please use {.fun slice_max} instead"
-  ))
+  stop_unsupported_function("slice_tail", with = "slice_max")
 }
 
 #' @rdname dbplyr-slice

@@ -183,7 +183,7 @@
       lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, values_ptypes = character())
     Condition
       Error in `tidyr::pivot_longer()`:
-      ! The `values_ptypes` argument is not supported for remote back-ends
+      ! Argument `values_ptypes` isn't supported on database backends.
 
 # cols_vary is not supported
 
@@ -191,5 +191,5 @@
       lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, cols_vary = "fastest")
     Condition
       Error in `tidyr::pivot_longer()`:
-      ! The `cols_vary` argument is not supported for remote back-ends.
+      ! Argument `cols_vary` isn't supported on database backends.
 

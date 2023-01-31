@@ -46,7 +46,7 @@
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
       Error in `left_join()`:
-      ! `y_as` must have size 1, not size 2.
+      ! `y_as` must be a single string or `NULL`, not a character vector.
 
 ---
 
@@ -139,10 +139,17 @@
 # suffix arg is checked
 
     Code
-      inner_join(lf1, lf2, by = "x", suffix = "a")
-    Condition
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = "a")))
+    Output
+      <error/vctrs_error_assert_size>
       Error in `inner_join()`:
       ! `suffix` must have size 2, not size 1.
+    Code
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = 1L)))
+    Output
+      <error/rlang_error>
+      Error in `inner_join()`:
+      ! `suffix` must be a character vector, not the number 1.
 
 # joins reuse queries in cte mode
 
