@@ -8,6 +8,8 @@
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
+#' @include compat-obj-type.R
+#' @include compat-types-check.R
 NULL
 
 #' @export
@@ -162,9 +164,11 @@ base_scalar <- sql_translator(
   ifelse = function(test, yes, no) sql_if(enquo(test), enquo(yes), enquo(no)),
 
   switch = function(x, ...) sql_switch(x, ...),
-  case_when = function(...) sql_case_when(...),
+  case_when = function(..., .default = NULL, .ptype = NULL, .size = NULL) {
+    sql_case_when(..., .default = .default, .ptype = .ptype, .size = .size)
+  },
+  case_match = sql_case_match,
 
-  sql = function(...) sql(...),
   `(` = function(x) {
     sql_expr(((!!x)))
   },
@@ -193,7 +197,9 @@ base_scalar <- sql_translator(
   # Impala - https://impala.apache.org/docs/build/html/topics/impala_bigint.html
   as.integer64  = sql_cast("BIGINT"),
 
-  c = function(...) c(...),
+  c = function(...) {
+    c(...)
+  },
   `:` = function(from, to) from:to,
 
   between = function(x, left, right) {
@@ -254,6 +260,13 @@ base_scalar <- sql_translator(
   str_trim = sql_str_trim,
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
+  str_like = function(string, pattern, ignore_case = TRUE) {
+    if (isTRUE(ignore_case)) {
+      sql_expr(!!string %LIKE% !!pattern)
+    } else {
+      cli::cli_abort("Backend only supports case insensitve {.fn str_like}.")
+    }
+  },
 
   str_conv = sql_not_supported("str_conv()"),
   str_count = sql_not_supported("str_count()"),
@@ -329,6 +342,10 @@ base_agg <- sql_translator(
   quantile = sql_quantile("PERCENTILE_CONT", "ordered"),
   median = sql_median("PERCENTILE_CONT", "ordered"),
 
+  # `first()`, `last()` and `nth()` don't work as aggregate functions in SQL
+  # b/c grouping takes places before sorting => it is undefined which value comes
+  # first/last. See
+  # https://stackoverflow.com/a/46805009/7529482
   # first = sql_prefix("FIRST_VALUE", 1),
   # last = sql_prefix("LAST_VALUE", 1),
   # nth = sql_prefix("NTH_VALUE", 2),
@@ -371,7 +388,7 @@ base_win <- sql_translator(
       sql_expr(LAST_VALUE(!!x)),
       win_current_group(),
       order_by %||% win_current_order(),
-      win_current_frame()
+      win_current_frame() %||% c(-Inf, Inf)
     )
   },
   nth = function(x, n, order_by = NULL) {
@@ -492,4 +509,4 @@ sql_random.DBIConnection <- function(con) {
   sql_expr(RANDOM())
 }
 
-utils::globalVariables("RANDOM")
+utils::globalVariables(c("RANDOM", "%LIKE%"))

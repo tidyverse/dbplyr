@@ -4,14 +4,14 @@
       (rows_insert(lf, lf, by = "x", conflict = "error"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -40,6 +40,15 @@
       Error in `target_table_name()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
+---
+
+    Code
+      (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
+    Condition
+      Error in `rows_insert()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
 
     Code
@@ -48,8 +57,8 @@
     Output
       <error/rlang_error>
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -64,10 +73,11 @@
       )
       UNION ALL
       (
-        SELECT * FROM `df_y` AS `LHS`
+        SELECT *
+        FROM `df_y`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_x` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_x`
+          WHERE (`df_y`.`x` = `df_x`.`x`)
         )
       )
 
@@ -77,8 +87,29 @@
       (rows_insert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_insert()`:
       ! `in_place = TRUE` does not work for simulated connections.
+
+# rows_get_or_execute() gives error context
+
+    Code
+      (expect_error(rows_append(tbl(con, "mtcars"), tibble(x = 1), copy = TRUE,
+      in_place = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `rows_append()`:
+      ! Can't modify database table "mtcars".
+      Caused by error:
+      ! dummy DBI error
+    Code
+      (expect_error(rows_append(tbl(con, "mtcars"), tibble(x = 1), copy = TRUE,
+      in_place = TRUE, returning = x)))
+    Output
+      <error/rlang_error>
+      Error in `rows_append()`:
+      ! Can't modify database table "mtcars".
+      Caused by error:
+      ! dummy DBI error
 
 # `sql_query_insert()` works
 
@@ -87,8 +118,8 @@
         "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -148,7 +179,7 @@
       (rows_append(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_append()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_append()` works
@@ -196,12 +227,14 @@
       (rows_update(lf, lf, by = "x", unmatched = "error"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_update(lf, lf, by = "x"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -238,21 +271,19 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
       (
-        SELECT `LHS`.`x` AS `x`, `y`
-        FROM (
-          SELECT `x`
-          FROM `df_x`
-        ) `LHS`
-        INNER JOIN `df_y` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
+        SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
+        FROM `df_x`
+        INNER JOIN `df_y`
+          ON (`df_x`.`x` = `df_y`.`x`)
       )
 
 # `rows_update()` works with `in_place = TRUE`
@@ -261,7 +292,7 @@
       (rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_update()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_update_from()` works
@@ -299,20 +330,21 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
       (
         SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
         FROM (
-          SELECT `LHS`.`x` AS `x`, `LHS`.`y` AS `y`, `RHS`.`y` AS `y...y`
-          FROM `df_x` AS `LHS`
-          INNER JOIN `df_y` AS `RHS`
-            ON (`LHS`.`x` = `RHS`.`x`)
+          SELECT `df_x`.*, `df_y`.`y` AS `y...y`
+          FROM `df_x`
+          INNER JOIN `df_y`
+            ON (`df_x`.`x` = `df_y`.`x`)
         ) `q01`
       )
 
@@ -322,7 +354,7 @@
       (rows_patch(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_patch()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `rows_upsert()` returns early if no column to update
@@ -340,10 +372,11 @@
       (
         SELECT *, NULL AS `y`
         FROM (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y`
           WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x` AS `RHS`
-            WHERE (`LHS`.`x` = `RHS`.`x`)
+            SELECT 1 FROM `df_x`
+            WHERE (`df_y`.`x` = `df_x`.`x`)
           )
         ) `q01`
       )
@@ -356,29 +389,28 @@
     Output
       <SQL>
       (
-        SELECT * FROM `df_x` AS `LHS`
+        SELECT *
+        FROM `df_x`
         WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y` AS `RHS`
-          WHERE (`LHS`.`x` = `RHS`.`x`)
+          SELECT 1 FROM `df_y`
+          WHERE (`df_x`.`x` = `df_y`.`x`)
         )
       )
       UNION ALL
       (
         (
-          SELECT `LHS`.`x` AS `x`, `y`
-          FROM (
-            SELECT `x`
-            FROM `df_x`
-          ) `LHS`
-          INNER JOIN `df_y` AS `RHS`
-            ON (`LHS`.`x` = `RHS`.`x`)
+          SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
+          FROM `df_x`
+          INNER JOIN `df_y`
+            ON (`df_x`.`x` = `df_y`.`x`)
         )
         UNION ALL
         (
-          SELECT * FROM `df_y` AS `LHS`
+          SELECT *
+          FROM `df_y`
           WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x` AS `RHS`
-            WHERE (`LHS`.`x` = `RHS`.`x`)
+            SELECT 1 FROM `df_x`
+            WHERE (`df_y`.`x` = `df_x`.`x`)
           )
         )
       )
@@ -389,7 +421,7 @@
       (rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_upsert()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_upsert()` is correct
@@ -427,10 +459,11 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT * FROM `df_x` AS `LHS`
+      SELECT *
+      FROM `df_x`
       WHERE NOT EXISTS (
-        SELECT 1 FROM `df_y` AS `RHS`
-        WHERE (`LHS`.`x` = `RHS`.`x`)
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
       )
 
 # `rows_delete()` works with `in_place = TRUE`
@@ -439,7 +472,7 @@
       (rows_delete(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_delete()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_delete()` is correct

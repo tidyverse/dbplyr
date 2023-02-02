@@ -4,7 +4,7 @@
       lf %>% slice()
     Condition
       Error in `slice()`:
-      ! `slice()` is not supported on database backends
+      ! `slice()` is not supported on database backends.
 
 ---
 
@@ -12,8 +12,8 @@
       lf %>% slice_head()
     Condition
       Error in `slice_head()`:
-      ! `slice_head()` is not supported on database backends
-      i Please use `slice_min()` instead
+      ! `slice_head()` is not supported on database backends.
+      i Please use `slice_min()` instead.
 
 ---
 
@@ -21,8 +21,8 @@
       lf %>% slice_tail()
     Condition
       Error in `slice_tail()`:
-      ! `slice_tail()` is not supported on database backends
-      i Please use `slice_max()` instead
+      ! `slice_tail()` is not supported on database backends.
+      i Please use `slice_max()` instead.
 
 # slice_min handles arguments
 
@@ -30,7 +30,7 @@
       db %>% slice_min()
     Condition
       Error in `slice_min()`:
-      ! Argument `order_by` is missing, with no default.
+      ! `order_by` is absent but must be supplied.
 
 ---
 
@@ -46,7 +46,7 @@
       db %>% slice_max()
     Condition
       Error in `slice_max()`:
-      ! Argument `order_by` is missing, with no default.
+      ! `order_by` is absent but must be supplied.
 
 # slice_sample errors when expected
 
@@ -111,4 +111,22 @@
     Condition
       Error in `slice_sample()`:
       ! `prop` must be a non-missing positive number.
+
+# slice_helper `by` errors use correct error context and correct `by_arg`
+
+    Code
+      slice_min(gdf, order_by = x, by = x)
+    Condition
+      Error in `slice_min()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
+    Code
+      slice_max(gdf, order_by = x, by = x)
+    Condition
+      Error in `slice_max()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
+    Code
+      slice_sample(gdf, n = 1, by = x)
+    Condition
+      Error in `slice_sample()`:
+      ! Can't supply `by` when `data` is a grouped data frame.
 

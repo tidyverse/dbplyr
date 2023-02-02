@@ -103,7 +103,7 @@ translate_sql_ <- function(dots,
     return(sql())
   }
 
-  stopifnot(is.list(dots))
+  check_list(dots)
 
   if (!any(have_name(dots))) {
     names(dots) <- NULL
@@ -177,6 +177,12 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     }
   }
 
+  special_calls2$sql <- function(...) {
+    dots <- exprs(...)
+    dots <- purrr::map(dots, eval_tidy, env = top_env)
+    exec(sql, !!!dots)
+  }
+
   # Existing symbols in expression
   names <- all_names(expr)
   idents <- lapply(names, ident)
@@ -197,7 +203,7 @@ is_infix_user <- function(x) {
 }
 
 default_op <- function(x, env) {
-  assert_that(is_string(x))
+  check_string(x)
 
   # Check for shiny reactives; these are zero-arg functions
   # so need special handling to give a useful error

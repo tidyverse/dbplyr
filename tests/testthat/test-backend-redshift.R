@@ -22,6 +22,7 @@ test_that("numeric translations", {
 
   expect_equal(translate_sql(as.numeric(x)), sql("CAST(`x` AS FLOAT)"))
   expect_equal(translate_sql(as.double(x)), sql("CAST(`x` AS FLOAT)"))
+  expect_equal(translate_sql(round(1.234, 1)), sql("ROUND((1.234) :: float, 1)"))
 })
 
 test_that("aggregate functions", {
@@ -40,4 +41,19 @@ test_that("lag and lead translation", {
 
   expect_error(translate_sql(lead(x, default = y)), "unused argument")
   expect_error(translate_sql(lag(x, default = y)), "unused argument")
+})
+
+test_that("copy_inline uses UNION ALL", {
+  con <- simulate_redshift()
+  y <- tibble::tibble(id = 1L, arr = "{1,2,3}")
+
+  types <- c(id = "bigint", arr = "integer[]")
+  expect_snapshot({
+    copy_inline(con, y %>% slice(0)) %>% remote_query()
+    copy_inline(con, y) %>% remote_query()
+
+    # with `types`
+    copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
+    copy_inline(con, y, types = types) %>% remote_query()
+  })
 })

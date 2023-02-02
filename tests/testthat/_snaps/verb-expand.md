@@ -56,7 +56,7 @@
       df_lazy %>% group_by(a) %>% tidyr::expand(b, c)
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `LHS`.*, `c`
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`
@@ -97,7 +97,9 @@
     Code
       tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
     Condition
-      Error in `tidyr::expand()`:
+      Error in `purrr::map()`:
+      i In index: 1.
+      Caused by error in `tidyr::expand()`:
       ! Names must be unique.
       x These names are duplicated:
         * "x" at locations 1 and 2.
@@ -129,8 +131,8 @@
       SELECT `x`, `y`, COALESCE(`z`, 'c') AS `z`
       FROM (
         SELECT
-          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
-          COALESCE(`LHS`.`y`, `RHS`.`y`) AS `y`,
+          COALESCE(`LHS`.`x`, `df`.`x`) AS `x`,
+          COALESCE(`LHS`.`y`, `df`.`y`) AS `y`,
           `z`
         FROM (
           SELECT `x`, `y`
@@ -143,7 +145,7 @@
             FROM `df`
           ) `RHS`
         ) `LHS`
-        FULL JOIN `df` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x` AND `LHS`.`y` = `RHS`.`y`)
+        FULL JOIN `df`
+          ON (`LHS`.`x` = `df`.`x` AND `LHS`.`y` = `df`.`y`)
       ) `q01`
 

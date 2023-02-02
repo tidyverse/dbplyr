@@ -4,7 +4,8 @@
       translate_sql(month(x, label = TRUE, abbr = TRUE))
     Condition
       Error in `month()`:
-      ! `abbr` is not supported in SQL Server translation
+      ! `abbr = TRUE` isn't supported in SQL Server translation.
+      i It must be FALSE instead.
 
 # convert between bit and boolean as needed
 
@@ -152,7 +153,7 @@
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
-# logical escaping depends on context
+# logical escaping to 0/1 for both filter() and mutate()
 
     Code
       mf %>% filter(x == TRUE)
@@ -160,7 +161,7 @@
       <SQL>
       SELECT *
       FROM `df`
-      WHERE (`x` = TRUE)
+      WHERE (`x` = 1)
 
 ---
 
@@ -200,7 +201,7 @@
 ---
 
     Code
-      lf %>% slice_sample(x)
+      lf %>% slice_sample(n = 1)
     Output
       <SQL>
       SELECT `x`

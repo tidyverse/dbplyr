@@ -1,11 +1,187 @@
 # dbplyr (development version)
 
-* Fixed an installation issue due to missing namespace for `setOldClass()`
-  (@mgirlich, #927).
+* Moved argument `auto_index` after `...` in `*_join()` (@mgirlich, #1115).
 
-* Grouping by renamed columns works again (@mgirlich, #928).
+* Removed dependency on assertthat (@mgirlich, #1112).
 
-* `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+* Catch unsupported argument `pivot_wider(id_expand = TRUE)` and
+  `pivot_longer(cols_vary)` (@mgirlich, #1109).
+
+* Fixed an issue when using a window function after a `summarise()` and
+  `select()` (@mgirlich, #1104).
+
+* Fixed an issue when there where at least 3 joins and renamed variables
+  (@mgirlich, #1101).
+
+* `across()` now uses the original value when a column is overriden to match
+  the behaviour of dplyr. For example `mutate(df, across(c(x, y), ~ .x / x))`
+  now produces
+  
+  ```
+  SELECT `x` / `x` AS `x`, `y` / `x` AS `y`
+  FROM `df`
+  ```
+  
+  instead of
+  
+  ```
+  SELECT `x`, `y` / `x` AS `y`
+  FROM (
+    SELECT `x` / `x` AS `x`, `y`
+    FROM `df`
+  ) 
+  ```
+  
+  (@mgirlich, #1015).
+
+# dbplyr 2.3.0
+
+* Compatibility with purrr 1.0.0 (@mgirlich, #1085).
+
+## New features
+
+* `stringr::str_like()` (new in 1.5.0) is translated to the closest `LIKE` 
+  equivalent (@rjpat, #509)
+
+* In preparation for dplyr 1.1.0:
+
+  * The `.by` argument is supported (@mgirlich, #1051).
+  * Passing `...` to `across()` is deprecated because the evaluation timing 
+    of `...` is ambiguous. Now instead of (e.g.) 
+    `across(a:b, mean, na.rm = TRUE)` use  `across(a:b, \(x) mean(x, na.rm = TRUE)`
+  * `pick()` is translated (@mgirlich, #1044).
+  * `case_match()` is translated (@mgirlich, #1020).
+  * `case_when()` now supports the `.default` argument (@mgirlich, #1017).
+
+* Variables that aren't found in either the data or in the environment now
+  produce an error (@mgirlich, #907).
+
+## SQL optimisation
+
+* dbplyr now produces fewer subqueries resulting in shorter, more readable, and,
+  in some cases, faster SQL. The following combination of verbs now avoids a
+  subquery if possible:
+
+  * `*_join()` + `select()` (@mgirlich, #876).
+  * `select()` + `*_join()` (@mgirlich, #875).
+  * `mutate()` + `filter()` and `filter()` + `filter()` (@mgirlich, #792).
+  * `distinct()` (@mgirlich, #880).
+  * `summarise()` + `filter()` now translates to `HAVING` (@mgirlich, #877).
+  * `left/inner_join()` + `left/inner_join()` (@mgirlich, #865).
+
+* dbplyr now uses `SELECT *` after a join instead of explicitly selecting every 
+  column, where possible (@mgirlich, #898).
+
+* Joins only use the table aliases ("LHS" and "RHS") if necessary (@mgirlich).
+
+* When using common table expressions, the results of joins and set operations
+  are now reused (@mgirlich, #978).
+
+## Improved error messages
+
+* Many errors have been improved and now show the function where the error
+  happened instead of a helper function (@mgirlich, #907).
+
+* Errors produced by the database, e.g. in `collect()` or `rows_*()`, now show
+  the verb where the error happened (@mgirlich).
+  
+* `window_order()` now produces a better error message when applied to a data
+  frame (@mgirlich, #947).
+
+* Using a named `across()` now gives a clear error message (@mgirlich, #761).
+
+## Minor improvements and bug fixes
+
+* Keyword highlighting can now be customised via the option `dbplyr_highlight`.
+  Turn it off via `options(dbplyr_highlight = FALSE)` or pass a custom ansi
+  style, e.g. `options(dbplyr_highlight = cli::combine_ansi_styles("bold", "cyan"))`
+  (@mgirlich, #974).
+
+* The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+  `percent_rank()`, and `cume_dist()`) now give missing values the rank NA to
+  match the behaviour of dplyr (@mgirlich, #991).
+
+* `NA`s in `blob()`s are correctly translated to `NULL` (#983).
+
+* `copy_inline()` gains a `types` argument to specify the SQL column types
+  (@mgirlich, #963).
+
+* `cur_column()` is now supported (@mgirlich, #951).
+
+* `distinct()` returns columns ordered the way you request, not the same
+  as the input data (@mgirlich).
+
+* `fill()` can now fill "downup" and "updown" (@mgirlich, #1057), and
+  now order by non-numeric columns also in the up direction (@mgirlich, #1057).
+
+* `filter()` now works when using a window function and an external vector
+  (#1048).
+
+* `group_by()` + renamed columns works once again (@mgirlich, #928).
+
+* `last()` is correctly translated when no window frame is specified
+  (@mgirlich, #1063).
+
+* `setOldClass()` uses a namespace, fixing an installation issue (@mgirlich, #927).
+  
+* `sql()` is now translated differently. The `...` are now evaluated locally 
+  instead of being translated with `translate_sql()` (@mgirlich, #952).
+
+
+## Backend specific improvements
+
+* HANA:
+  * Correctly translates `as.character()` (#1027).
+  * `copy_inline()` now works for Hana (#950)
+
+* MySQL:
+  * `str_flatten()` uses `collapse = ""` by default (@fh-afrachioni, #993)
+
+* Oracle:
+  * `slice_sample()` now works for Oracle (@mgirlich, #986).
+  * `copy_inline()` now works for Oracle (#972)
+
+* PostgreSQL:
+  * Generates correct literals for Dates (#727).
+  * `str_flatten()` uses `collapse = ""` by default (@fh-afrachioni, #993)
+  * `rows_*()` use the column types of `x` when auto copying (@mgirlich, #909).
+
+* Redshift:
+  * `round()` now respects the `digits` argument (@owenjonesuob, #1033).
+  * No longer tries to use named windows anymore (@owenjonesuob, #1035).
+  * `copy_inline()` now works for Redshift (#949, thanks to @ejneer for an 
+    initial implementation).
+  * `str_flatten()` uses `collapse = ""` by default (@fh-afrachioni, #993)
+
+*  Snowflake:
+  * numeric functions: `all()`, `any()`, `log10()`, `round()`, `cor()`, `cov()`
+    and `sd()`.
+  * date functions: `day()`, `mday()`, `wday()`, `yday()`, `week()`,
+    `isoweek()`, `month()`, `quarter()`, `isoyear()`, `seconds()`, `minutes()`,
+    `hours()`, `days()`, `weeks()`, `months()`, `years()` and `floor_date()`.
+  * string functions: `grepl()`, `paste()`, `paste0()`, `str_c()`, `str_locate()`,
+    `str_detect()`, `str_replace()`, `str_replace_all()`, `str_remove()`,
+    `str_remove_all()`, `str_trim()`, `str_squish()` and `str_flatten()`
+    (@fh-afrachioni, #860).
+  * `str_flatten()` uses `collapse = ""` by default (@fh-afrachioni, #993)
+
+* SQLite:
+  * `quantile()` gives a better error saying that it is not supported 
+    (@mgirlich, #1000).
+
+* SQL server:
+  * `as.POSIXct()` now translated correctly (@krlmlr, #1011).
+  * `median()` now translated correctly (#1008).
+  * `pivot_wider()` works again for MS SQL (@mgirlich, #929).
+  * Always use 1 and 0 as literals for logicals (@krlmlr, #934).
+
+* Teradata: 
+  * Querying works again. Unfortunately, the fix requires every column to 
+    once again by explicitly selected (@mgirlich, #966).
+  * New translations for `as.Date()`, `week()`, `quarter()`, `paste()`,
+    `startsWith()`, `row_number()`, `weighted.mean()`, `lead()`, `lag()`, and
+    `cumsum()` (@overmar, #913).
+
 
 # dbplyr 2.2.1
 

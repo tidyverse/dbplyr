@@ -26,7 +26,7 @@
 #'
 #' * The `BIT` type is a special type of numeric column used to store
 #'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
-#'   <https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
+#'   <https://learn.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15>
 #'
 #' dbplyr does its best to automatically create the correct type when needed,
 #' but can't do it 100% correctly because it does not have a full type
@@ -302,18 +302,13 @@ simulate_mssql <- function(version = "15.0") {
         if (!label) {
           sql_expr(DATEPART(MONTH, !!x))
         } else {
-          if (!abbr) {
-            sql_expr(DATENAME(MONTH, !!x))
-          } else {
-            cli_abort("{.arg abbr} is not supported in SQL Server translation")
-          }
+          check_unsupported_arg(abbr, FALSE, backend = "SQL Server")
+          sql_expr(DATENAME(MONTH, !!x))
         }
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
-        if (fiscal_start != 1) {
-          cli_abort("{.arg fiscal_start} is not supported in SQL Server translation. Must be 1.")
-        }
+        check_unsupported_arg(fiscal_start, 1, backend = "SQL Server")
 
         if (with_year) {
           sql_expr((DATENAME(YEAR, !!x) + '.' + DATENAME(QUARTER, !!x)))
@@ -328,7 +323,7 @@ simulate_mssql <- function(version = "15.0") {
       .parent = mssql_scalar,
       as.logical = sql_try_cast("BIT"),
       as.Date = sql_try_cast("DATE"),
-      as.POSIXct = sql_try_cast("TIMESTAMP"),
+      as.POSIXct = sql_try_cast("DATETIME2"),
       as.numeric = sql_try_cast("FLOAT"),
       as.double = sql_try_cast("FLOAT"),
 
@@ -358,6 +353,7 @@ simulate_mssql <- function(version = "15.0") {
 
       # percentile_cont needs `OVER()` in mssql
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
       quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
 
     ),
@@ -385,9 +381,14 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
-  # SQL Server binary constants should be prefixed with 0x
-  # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
-  paste0(c("0x", format(x)), collapse = "")
+
+  if (is.null(x)) {
+    "NULL"
+  } else {
+    # SQL Server binary constants should be prefixed with 0x
+    # https://docs.microsoft.com/en-us/sql/t-sql/data-types/constants-transact-sql?view=sql-server-ver15#binary-constants
+    paste0(c("0x", format(x)), collapse = "")
+  }
 }
 
 #' @export
@@ -464,7 +465,7 @@ mssql_is_null <- function(x) {
 }
 
 mssql_infix_comparison <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
   f <- toupper(f)
   function(x, y) {
     mssql_as_bit(build_sql(x, " ", sql(f), " ", y))
@@ -507,13 +508,7 @@ mssql_case_when <- function(...) {
 
 #' @export
 `sql_escape_logical.Microsoft SQL Server` <- function(con, x) {
-  if (mssql_needs_bit()) {
-    y <- ifelse(x, "1", "0")
-  } else {
-    y <- as.character(x)
-  }
-  y[is.na(x)] <- "NULL"
-  y
+  dplyr::if_else(x, "1", "0", "NULL")
 }
 
 globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))

@@ -6,6 +6,7 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::count
+#' @inheritParams args_by
 #' @param .drop Not supported for lazy tables.
 #' @importFrom dplyr count
 #' @export
@@ -31,9 +32,7 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @importFrom dplyr add_count
 #' @export
 add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
-  if (!missing(.drop)) {
-    cli_abort("{.arg .drop} argument not supported for lazy tables.")
-  }
+  check_unsupported_arg(.drop)
 
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)
@@ -55,7 +54,7 @@ tally.tbl_lazy <- function(x, wt = NULL, sort = FALSE, name = NULL) {
     n <- expr(sum(!!wt, na.rm = TRUE))
   }
 
-  name <- check_name(name, group_vars(x))
+  name <- check_count_name(name, group_vars(x))
 
   out <- summarise(x, !!name := !!n, .groups = "drop")
 
@@ -66,18 +65,24 @@ tally.tbl_lazy <- function(x, wt = NULL, sort = FALSE, name = NULL) {
   }
 }
 
-check_name <- function(name, vars) {
-  name <- name %||% "n"
-
-  if (!name %in% vars) {
-    return(name)
+n_name <- function (x) {
+  name <- "n"
+  while (name %in% x) {
+    name <- paste0("n", name)
   }
+  name
+}
 
-  cli_abort(
-    c(
-      "'{name}' already present in output",
-      i = "Use {.code name = \"new_name\"} to pick a new name."
-    ),
-    call = caller_env()
-  )
+check_count_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) {
+  if (is.null(name)) {
+    name <- n_name(vars)
+    if (name != "n") {
+      cli::cli_inform(c(
+        "Storing counts in {.field {name}}, as {.field n} already present in input",
+        i = "Use {.code name = \"new_name\"} to pick a new name."
+      ))
+    }
+  }
+  check_name(name, arg = arg, call = call)
+  name
 }

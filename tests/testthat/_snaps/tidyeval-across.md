@@ -7,51 +7,31 @@
       }))))
     Output
       <error/rlang_error>
-      Error in `partial_eval_fun()`:
+      Error in `across()`:
       ! Cannot translate functions consisting of more than one statement.
-
-# across() does not support formulas with dots
-
-    Code
-      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
-    Output
-      <error/rlang_error>
-      Error in `across_fun()`:
-      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
-    Code
-      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
-      )
-    Output
-      <error/rlang_error>
-      Error in `FUN()`:
-      ! `dbplyr::across()` does not support `...` when a purrr-style lambda is used in `.fns`.
-      i Use a lambda instead.
-      i Or inline them via a purrr-style lambda.
 
 # across() gives informative errors
 
     Code
       capture_across(lf, across(a, 1))
     Condition
-      Error in `across_funs()`:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Error in `across()`:
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(a, list(1)))
     Condition
-      Error in `FUN()`:
-      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
+      Error in `across()`:
+      ! `.fns` must contain a function or a formula.
       x Problem with 1
     Code
       capture_across(lf, across(a:b, "log"))
     Condition
-      Error in `across_funs()`:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Error in `across()`:
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(c, mean))
     Condition
-      Error in `chr_as_locations()`:
+      Error in `across()`:
       ! Can't subset columns that don't exist.
       x Column `c` doesn't exist.
 
@@ -105,18 +85,47 @@
       SELECT SUM(`a`) AS `a`, SUM(`b`) AS `b`
       FROM `df`
 
+# across() errors if named
+
+    Code
+      (expect_error(mutate(lf, x = across())))
+    Output
+      <error/rlang_error>
+      Error in `mutate()`:
+      ! In dbplyr, the result of `across()` must be unnamed.
+      i `x = across()` is named.
+    Code
+      (expect_error(group_by(lf, x = across())))
+    Output
+      <error/rlang_error>
+      Error in `group_by()`:
+      ! In dbplyr, the result of `across()` must be unnamed.
+      i `x = across()` is named.
+
+# across() throws error if unpack = TRUE
+
+    Code
+      (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+    Output
+      <error/rlang_error>
+      Error in `mutate()`:
+      i In argument: `across(x, .unpack = TRUE)`
+      Caused by error in `mutate()`:
+      ! `.unpack = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
+
 # if_all() gives informative errors
 
     Code
       capture_if_all(lf, if_all(a, 1))
     Condition
-      Error in `across_funs()`:
-      ! `.fns` argument to `dbplyr::across()` must be a NULL, a function, formula, or list
+      Error in `if_all()`:
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
-      Error in `FUN()`:
-      ! `.fns` argument to `dbplyr::across()` must contain a function or a formula
+      Error in `if_all()`:
+      ! `.fns` must contain a function or a formula.
       x Problem with 1
 
 # if_all/any works in filter()
@@ -202,7 +211,86 @@
     Code
       (expect_error(capture_if_all(lf, if_all(c(a = x, b = y)))))
     Output
-      <error/rlang_error>
-      Error in `across_setup()`:
+      <error/tidyselect:::error_disallowed_rename>
+      Error in `if_all()`:
       ! Can't rename variables in this context.
+
+# across(...) is deprecated
+
+    Code
+      summarise(lf, across(everything(), mean, na.rm = TRUE))
+    Condition
+      Warning:
+      The `...` argument of `across()` is deprecated as of dbplyr 2.3.0.
+      i Supply arguments directly to `.fns` through a lambda instead.
+      
+      # Previously across(a:b, mean, na.rm = TRUE)
+      
+      # Now across(a:b, ~mean(.x, na.rm = TRUE))
+    Output
+      <SQL>
+      SELECT AVG(`x`) AS `x`
+      FROM `df`
+
+# across() does not support formulas with dots
+
+    Code
+      (expect_error(capture_across(lf, across(a:b, ~ log(.x, base = .y), base = 2))))
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+    Code
+      (expect_error(capture_across(lf, across(a:b, list(~ log(.x, base = .y)), base = 2)))
+      )
+    Output
+      <error/rlang_error>
+      Error in `across()`:
+      ! Can't use `...` when a purrr-style lambda is used in `.fns`.
+      i Use a lambda instead.
+      i Or inline them via a purrr-style lambda.
+
+# `pick()` errors in `arrange()` are useful
+
+    Code
+      arrange(df, pick(y))
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick(y)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
+# doesn't allow renaming
+
+    Code
+      arrange(lazy_frame(x = 1), pick(y = x))
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick(y = x)`
+      Caused by error in `pick()`:
+      ! Can't rename variables in this context.
+
+# requires at least one input
+
+    Code
+      arrange(lazy_frame(x = 1), pick())
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick()`
+      Caused by error in `partial_eval_pick()`:
+      ! Must supply at least one input to `pick()`.
+
+# `filter()` with `pick()` that uses invalid tidy-selection errors
+
+    Code
+      filter(df, pick(x, a))
+    Condition
+      Error in `filter()`:
+      i In argument: `pick(x, a)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `a` doesn't exist.
 

@@ -37,10 +37,6 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange(b)
-    Condition
-      Warning:
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT `b`
@@ -59,7 +55,6 @@
       <SQL>
       SELECT `b`
       FROM `df`
-      ORDER BY `a`
     Code
       # use order
       lf %>% arrange(a) %>% select(-a) %>% mutate(c = lag(b))
@@ -122,10 +117,6 @@
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% mutate(a = 1) %>% arrange(b)
-    Condition
-      Warning:
-      ORDER BY is ignored in subqueries without LIMIT
-      i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
       SELECT 1.0 AS `a`, `b`
@@ -160,13 +151,13 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT `LHS`.`a` AS `a`, `b`, `c`
+      SELECT `LHS`.*, `c`
       FROM (
         SELECT *
         FROM `df`
       ) `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`a` = `RHS`.`a`)
+      LEFT JOIN `df`
+        ON (`LHS`.`a` = `df`.`a`)
     Code
       lf %>% arrange(a) %>% semi_join(rf)
     Message
@@ -177,13 +168,14 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT * FROM (
+      SELECT *
+      FROM (
         SELECT *
         FROM `df`
       ) `LHS`
       WHERE EXISTS (
-        SELECT 1 FROM `df` AS `RHS`
-        WHERE (`LHS`.`a` = `RHS`.`a`)
+        SELECT 1 FROM `df`
+        WHERE (`LHS`.`a` = `df`.`a`)
       )
     Code
       lf %>% arrange(a) %>% union(rf)
@@ -208,10 +200,10 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT `LHS`.`a` AS `a`, `b`, `c`
-        FROM `df` AS `LHS`
-        LEFT JOIN `df` AS `RHS`
-          ON (`LHS`.`a` = `RHS`.`a`)
+        SELECT `df_LHS`.*, `c`
+        FROM `df` AS `df_LHS`
+        LEFT JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`a` = `df_RHS`.`a`)
       ) `q01`
       ORDER BY `a`
     Code
@@ -222,10 +214,11 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT * FROM `df` AS `LHS`
+        SELECT *
+        FROM `df` AS `df_LHS`
         WHERE EXISTS (
-          SELECT 1 FROM `df` AS `RHS`
-          WHERE (`LHS`.`a` = `RHS`.`a`)
+          SELECT 1 FROM `df` AS `df_RHS`
+          WHERE (`df_LHS`.`a` = `df_RHS`.`a`)
         )
       ) `q01`
       ORDER BY `a`

@@ -17,6 +17,8 @@ test_that("custom stringr functions translated correctly", {
 
   expect_equal(translate_sql(str_detect(x, y)), sql("`x` ~ `y`"))
   expect_equal(translate_sql(str_detect(x, y, negate = TRUE)), sql("!(`x` ~ `y`)"))
+  expect_equal(translate_sql(str_like(x, y)), sql("`x` ILIKE `y`"))
+  expect_equal(translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE `y`"))
   expect_equal(translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
   expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 'g')"))
   expect_equal(translate_sql(str_squish(x)), sql("LTRIM(RTRIM(REGEXP_REPLACE(`x`, '\\s+', ' ', 'g')))"))
@@ -187,7 +189,7 @@ test_that("can insert with returning", {
       returning = everything(),
       method = "on_conflict"
     )
-  })
+  }, transform = snap_transform_dbi)
 
   expect_error(
     rows_insert(
@@ -228,6 +230,49 @@ test_that("can insert with returning", {
   )
 })
 
+test_that("casts `y` column for local df", {
+  con <- src_test("postgres")
+
+  DBI::dbWriteTable(
+    con,
+    "df_x",
+    value = tibble(id = 1L, val = 10L, arr = "{1,2}"),
+    field.types = c(id = "bigint", val = "bigint", arr = "integer[]")
+  )
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+
+  y <- tibble(
+    id = "2",
+    val = 20,
+    arr = "{1, 2, 3}"
+  )
+
+  out <- tibble(
+    id = bit64::as.integer64(1:2),
+    val = bit64::as.integer64(10L, 20L),
+    arr = structure(c("{1,2}", "{1,2,3}"), class = "pq__int4")
+  )
+  expect_equal(
+    rows_append(
+      tbl(con, "df_x"),
+      y,
+      copy = TRUE,
+      in_place = FALSE
+    ) %>%
+      collect(),
+    out
+  )
+
+  rows_append(
+    tbl(con, "df_x"),
+    y,
+    copy = TRUE,
+    in_place = TRUE
+  )
+
+  expect_equal(tbl(con, "df_x") %>% collect(), out)
+})
+
 test_that("can upsert with returning", {
   con <- src_test("postgres")
 
@@ -249,7 +294,7 @@ test_that("can upsert with returning", {
       returning = everything(),
       method = "on_conflict"
     )
-  })
+  }, transform = snap_transform_dbi)
 
   # DBI method does not need a unique index
   expect_error(
@@ -288,4 +333,11 @@ test_that("can upsert with returning", {
     collect(x),
     tibble(a = 1:3, b = 11:13, c = c(1L, -1L, -2L), d = c("a", "y", "z"))
   )
+})
+
+test_that("correctly escapes dates", {
+  con <- src_test("postgres")
+
+  dd <- as.Date("2022-03-04")
+  expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))
 })

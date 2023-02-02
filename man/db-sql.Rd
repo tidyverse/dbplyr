@@ -17,6 +17,7 @@
 \alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
+\alias{sql_query_multi_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
 \alias{sql_returning_cols}
@@ -76,7 +77,9 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
+sql_query_multi_join(con, x, joins, table_vars, vars, ..., lvl = 0)
+
+sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 
@@ -101,7 +104,7 @@ Tables:
 \item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
-\item \code{sql_table_index()} generates SQL for adding an index to table. The
+\item \code{sql_table_index()} generates SQL for adding an index to table.
 }
 
 Query manipulation:

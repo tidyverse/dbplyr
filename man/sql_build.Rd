@@ -2,8 +2,8 @@
 % Please edit documentation in R/lazy-join-query.R, R/lazy-query.R,
 %   R/lazy-select-query.R, R/lazy-set-op-query.R, R/query-join.R,
 %   R/query-select.R, R/query-semi-join.R, R/query-set-op.R, R/sql-build.R
-\name{lazy_join_query}
-\alias{lazy_join_query}
+\name{lazy_multi_join_query}
+\alias{lazy_multi_join_query}
 \alias{lazy_semi_join_query}
 \alias{lazy_query}
 \alias{lazy_select_query}
@@ -17,23 +17,27 @@
 \alias{sql_optimise}
 \title{Build and render SQL from a sequence of lazy operations}
 \usage{
-lazy_join_query(
+lazy_multi_join_query(
   x,
-  y,
+  joins,
+  table_names,
   vars,
-  type,
-  by,
-  suffix = c(".x", ".y"),
-  na_matches = c("never", "na"),
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
   call = caller_env()
 )
 
 lazy_semi_join_query(
   x,
   y,
+  vars,
   anti,
   by,
   na_matches = c("never", "na"),
+  group_vars = op_grps(x),
+  order_vars = op_sort(x),
+  frame = op_frame(x),
   call = caller_env()
 )
 
@@ -48,17 +52,17 @@ lazy_query(
 
 lazy_select_query(
   x,
-  last_op,
   select = NULL,
   where = NULL,
   group_by = NULL,
+  having = NULL,
   order_by = NULL,
   limit = NULL,
   distinct = FALSE,
   group_vars = NULL,
   order_vars = NULL,
   frame = NULL,
-  select_operation = c("mutate", "summarise"),
+  select_operation = c("select", "mutate", "summarise"),
   message_summarise = NULL
 )
 
@@ -86,7 +90,7 @@ select_query(
   distinct = FALSE
 )
 
-semi_join_query(x, y, anti = FALSE, by = NULL, na_matches = FALSE)
+semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type, all = FALSE)
 

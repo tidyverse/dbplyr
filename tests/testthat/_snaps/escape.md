@@ -3,7 +3,9 @@
     Code
       lf %>% filter(a == input$x) %>% show_query()
     Condition
-      Error:
+      Error in `purrr::map_chr()`:
+      i In index: 1.
+      Caused by error:
       ! Cannot translate shiny inputs to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!input$x` or `local(input$x)`?
 
@@ -22,7 +24,7 @@
       escape("a")
     Condition
       Error in `escape()`:
-      ! `con` must not be NULL
+      ! `con` must not be NULL.
 
 ---
 
@@ -30,7 +32,7 @@
       sql_vector("a")
     Condition
       Error in `sql_vector()`:
-      ! `con` must not be NULL
+      ! `con` must not be NULL.
 
 # data frames give useful errors
 

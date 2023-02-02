@@ -33,7 +33,7 @@ and can be used \code{WHERE} but not to create new columns in \code{SELECT}.
 \url{https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql}
 \item The \code{BIT} type is a special type of numeric column used to store
 \code{TRUE} and \code{FALSE} values, but can't be used in \code{WHERE} clauses.
-\url{https://docs.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15}
+\url{https://learn.microsoft.com/en-us/sql/t-sql/data-types/bit-transact-sql?view=sql-server-ver15}
 }
 
 dbplyr does its best to automatically create the correct type when needed,

@@ -49,6 +49,107 @@ test_that("distinct respects groups when .keep_all is TRUE", {
   expect_equal(group_vars(result), "x")
 })
 
+test_that("distinct() produces optimized SQL", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  # can use renamed variable
+  out <- lf %>%
+    select(a = x, y) %>%
+    distinct(a)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `x` AS `a`\nFROM `df`")
+  )
+
+  expect_true(out$lazy_query$distinct)
+  expect_equal(out$lazy_query$select$name, "a")
+  expect_equal(out$lazy_query$select$expr, syms("x"))
+
+  # unnecessary extra variables do not matter
+  out <- lf %>%
+    mutate(z = 1) %>%
+    group_by(x) %>%
+    distinct(y)
+  expect_s3_class(out$lazy_query$x, "lazy_base_local_query")
+  expect_equal(out$lazy_query$select$name, c("x", "y"))
+  expect_equal(out$lazy_query$select$expr, syms(c("x", "y")))
+
+  # inlined after `summarise()`
+  out <- lf %>%
+    group_by(x) %>%
+    summarise(y = mean(y, na.rm = TRUE)) %>%
+    distinct(x, y)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`")
+  )
+
+  expect_true(out$lazy_query$distinct)
+  expect_equal(out$lazy_query$select$name, c("x", "y"))
+  expect_equal(
+    out$lazy_query$select$expr, list(sym("x"), quo(mean(y, na.rm = TRUE))),
+    ignore_formula_env = TRUE
+  )
+  expect_equal(out$lazy_query$group_by, syms("x"))
+
+  # inlined after `filter()`
+  out <- lf %>%
+    filter(x == 1L) %>%
+    distinct(y)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `y`\nFROM `df`\nWHERE (`x` = 1)")
+  )
+
+  expect_true(out$lazy_query$distinct)
+  expect_equal(out$lazy_query$select$name, "y")
+  expect_equal(out$lazy_query$select$expr, syms("y"))
+  # TODO probably `where` should be in the same query but this requires an
+  # optimized `mutate()` resp. `add_select`
+  # expect_equal(out$lazy_query$where, syms("y"))
+
+  # Note: currently this needs `distinct()` or `distinct(x, y)` because
+  # `summarise()` + `select()` is not inlined.
+  out <- lf %>%
+    group_by(x) %>%
+    summarise(y = mean(y, na.rm = TRUE)) %>%
+    filter(x == 1) %>%
+    distinct(x, y)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `x`, AVG(`y`) AS `y`\nFROM `df`\nGROUP BY `x`\nHAVING (`x` = 1.0)")
+  )
+  expect_true(out$lazy_query$distinct)
+  expect_equal(out$lazy_query$select$name, c("x", "y"))
+  expect_equal(
+    out$lazy_query$select$expr,
+    list(sym("x"), quo(mean(y, na.rm = TRUE))),
+    ignore_formula_env = TRUE
+  )
+
+  out <- lf %>%
+    arrange(y) %>%
+    distinct(x)
+
+  expect_equal(
+    remote_query(out),
+    sql("SELECT DISTINCT `x`\nFROM `df`\nORDER BY `y`")
+  )
+
+  expect_snapshot(
+    (out <- lf %>%
+       head(2) %>%
+       distinct(x, y))
+  )
+
+  expect_s3_class(out$lazy_query$x, "lazy_select_query")
+  expect_equal(out$lazy_query$x$limit, 2)
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("distinct adds DISTINCT suffix", {
@@ -131,4 +232,17 @@ test_that("distinct produces correct vars when .keep_all is TRUE", {
 
   out <- lazy_frame(x = 1, y = 2, z = 3) %>% group_by(x) %>% distinct(y, .keep_all = TRUE)
   expect_equal(op_vars(out), c("x", "y", "z"))
+})
+
+test_that("distinct respects order of the specified variables (#3195, #6156)",{
+  skip_if(packageVersion("dplyr") < "1.1.0")
+  d <- lazy_frame(x = 1:2, y = 3:4)
+  expect_equal(colnames(distinct(d, y, x)), c("y", "x"))
+})
+
+test_that("distinct adds grouping variables to front if missing",{
+  skip_if(packageVersion("dplyr") < "1.1.0")
+  d <- lazy_frame(x = 1:2, y = 3:4)
+  expect_equal(colnames(distinct(group_by(d, y), x)), c("y", "x"))
+  expect_equal(colnames(distinct(group_by(d, y), x, y)), c("x", "y"))
 })

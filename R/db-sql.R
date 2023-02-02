@@ -24,7 +24,7 @@
 #'   ensuring that the database has up-to-date statistics for use in the query
 #'   planner. It called from [copy_to()] when `analyze = TRUE`.
 #'
-#' * `sql_table_index()` generates SQL for adding an index to table. The
+#' * `sql_table_index()` generates SQL for adding an index to table.
 #'
 #' Query manipulation:
 #'
@@ -148,9 +148,22 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
   UseMethod("sql_table_index")
 }
 #' @export
-sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                           unique = FALSE, ...) {
-  assert_that(is_string(table) || is_schema(table), is.character(columns))
+sql_table_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...,
+                                          call = caller_env()) {
+  if (!(is_string(table) || is_schema(table))) {
+    stop_input_type(
+      table,
+      c("a string", "a schema"),
+      ...,
+      call = call
+    )
+  }
+  check_character(columns)
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
@@ -359,7 +372,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as)
+  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as, type = type)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -389,18 +402,106 @@ sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, n
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_multi_join <- function(con,
+                                 x,
+                                 joins,
+                                 table_vars,
+                                 vars,
+                                 ...,
+                                 lvl = 0) {
+  UseMethod("sql_query_multi_join")
+}
+
+#' @export
+#' @param vars tibble with six columns:
+#'   * `table` `<tbl_lazy>`: the tables to join with.
+#'   * `type` `<character>`: the join type (left, right, inner, full).
+#'   * `by_x`, `by_y` `<list_of<character>>`: The columns to join by
+#'   * `by_x_table_id` `<list_of<integer>>`: The table index where the join column
+#'     comes from. This needs to be a list because a the join columns might come
+#'     from different tables
+#'   * `on` `<character>`
+#'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
+#' @param vars See [sql_multi_join_vars()].
+#' @param table_vars `named <list_of<character>>`: All variables in each table.
+#' @noRd
+#' @examples
+#' # Left join with *
+#' df1 <- lazy_frame(x = 1, y = 1)
+#' df2 <- lazy_frame(x = 1, z = 1)
+#' df3 <- lazy_frame(x = 1, z2 = 1)
+#'
+#' tmp <- left_join(df1, df2, by = "x") %>%
+#'   left_join(df3, by = c("x", z = "z2"))
+#' tibble(
+#'   table = list(df1, df2),
+#'   type = c("left", "left"),
+#'   by_x = list("x", c("x", "z")),
+#'   by_y = list("x", c("x", "z2")),
+#'   by_x_table_id = list(1L, c(1L, 2L)),
+#'   on = c(NA, NA),
+#'   na_matches = c("never", "never")
+#' )
+sql_query_multi_join.DBIConnection <- function(con,
+                                               x,
+                                               joins,
+                                               table_vars,
+                                               vars,
+                                               ...,
+                                               lvl = 0) {
+  table_names <- names(table_vars)
+  if (vctrs::vec_duplicate_any(table_names)) {
+    cli_abort("{.arg table_names} must be unique.")
+  }
+
+  select_sql <- sql_multi_join_vars(con, vars, table_vars)
+  from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
+
+  join_table_queries <- purrr::map2(
+    joins$table,
+    table_names[-1],
+    function(table, name) dbplyr_sql_subquery(con, table, name = name, lvl = lvl)
+  )
+  types <- toupper(paste0(joins$type, " JOIN"))
+  join_clauses <- purrr::map2(
+    types,
+    join_table_queries,
+    function(join_kw, from) sql_clause(join_kw, from)
+  )
+
+  on_clauses <- purrr::map(
+    joins$by,
+    function(by) {
+      on <- sql_join_tbls(con, by = by, na_matches = by$na_matches)
+      sql_clause("ON", on, sep = " AND", parens = TRUE, lvl = 1)
+    }
+  )
+  join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
+
+  clauses <- list2(
+    sql_clause_select(con, select_sql),
+    sql_clause_from(from),
+    !!!join_on_clauses
+  )
+
+  sql_format_clauses(clauses, lvl = lvl, con = con)
+}
+
+#' @rdname db-sql
+#' @export
+sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
   on <- sql_join_tbls(con, by)
 
   lines <- list(
-    build_sql("SELECT * FROM ", x, con = con),
+    sql_clause_select(con, vars),
+    sql_clause_from(x),
     build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
@@ -740,7 +841,13 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  dbExecute(con, sql)
+  tryCatch(
+    DBI::dbExecute(con, sql),
+    error = function(cnd) {
+      msg <- "Can't analyze table {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_create_index <- function(con, ...) {
@@ -748,10 +855,20 @@ dbplyr_create_index <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_create_index
-db_create_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                          unique = FALSE, ...) {
+db_create_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  dbExecute(con, sql)
+  tryCatch(
+    DBI::dbExecute(con, sql),
+    error = function(cnd) {
+      msg <- "Can't create index on {.val {table}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -761,7 +878,15 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  expl <- dbGetQuery(con, sql)
+  call <- current_call()
+  tryCatch(
+    {
+      expl <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't explain query.", parent = cnd)
+    }
+  )
+
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
@@ -773,7 +898,14 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  names(dbGetQuery(con, sql))
+  tryCatch(
+    {
+      df <- DBI::dbGetQuery(con, sql)
+    }, error = function(cnd) {
+      cli_abort("Can't query fields.", parent = cnd)
+    }
+  )
+  names(df)
 }
 
 dbplyr_save_query <- function(con, ...) {
@@ -783,7 +915,12 @@ dbplyr_save_query <- function(con, ...) {
 #' @importFrom dplyr db_save_query
 db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  dbExecute(con, sql, immediate = TRUE)
+  tryCatch(
+    DBI::dbExecute(con, sql, immediate = TRUE),
+    error = function(cnd) {
+      cli_abort("Can't save query to {.val {name}}.", parent = cnd)
+    }
+  )
   name
 }
 

@@ -4,9 +4,11 @@
 \alias{pivot_wider.tbl_lazy}
 \title{Pivot data from long to wide}
 \usage{
-pivot_wider.tbl_lazy(
+\method{pivot_wider}{tbl_lazy}(
   data,
+  ...,
   id_cols = NULL,
+  id_expand = FALSE,
   names_from = name,
   names_prefix = "",
   names_sep = "_",
@@ -18,14 +20,17 @@ pivot_wider.tbl_lazy(
   values_from = value,
   values_fill = NULL,
   values_fn = ~max(.x, na.rm = TRUE),
-  unused_fn = NULL,
-  ...
+  unused_fn = NULL
 )
 }
 \arguments{
 \item{data}{A lazy data frame backed by a database query.}
 
+\item{...}{Unused; included for compatibility with generic.}
+
 \item{id_cols}{A set of columns that uniquely identifies each observation.}
+
+\item{id_expand}{Unused; included for compatibility with the generic.}
 
 \item{names_from, values_from}{A pair of
 arguments describing which column (or columns) to get the name of the
@@ -87,8 +92,6 @@ all unspecified columns will be considered \code{id_cols}.
 
 This is similar to grouping by the \code{id_cols} then summarizing the
 unused columns using \code{unused_fn}.}
-
-\item{...}{Unused; included for compatibility with generic.}
 }
 \description{
 \code{pivot_wider()} "widens" data, increasing the number of columns and

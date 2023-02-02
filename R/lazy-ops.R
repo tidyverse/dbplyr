@@ -18,7 +18,7 @@ NULL
 #' @export
 #' @rdname lazy_ops
 lazy_base_query <- function(x, vars, class = character(), ...) {
-  stopifnot(is.character(vars))
+  check_character(vars)
 
   lazy_query(
     query_type = c(paste0("base_", class), "base"),
@@ -57,7 +57,7 @@ print.lazy_base_local_query <- function(x, ...) {
 
 #' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
-  op$x
+  as.sql(op$x, con = con)
 }
 
 #' @export

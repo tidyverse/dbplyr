@@ -57,6 +57,11 @@ test_that("first, last, and nth translated to _value", {
     translate_sql(first(x)),
     sql("FIRST_VALUE(`x`) OVER ()")
   )
+  # `last()` must default to unbounded preceding and following
+  expect_equal(
+    translate_sql(last(x), vars_order = "a"),
+    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+  )
   expect_equal(
     translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
     sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)")
@@ -85,18 +90,27 @@ test_that("win_rank works", {
   local_con(simulate_dbi())
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_equal(
-    sql_row_number("x"),
-    sql("ROW_NUMBER() OVER (ORDER BY `x`)")
+    sql_row_number(ident("x")),
+    sql("CASE
+WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
+END")
   )
 })
 
-test_that("win_rank works", {
+test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")
 
   expect_equal(
     sql_cumsum(ident("x"), "y"),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+  )
+
+  # NA values results in NA rank
+  db <- memdb_frame(x = c(1, 2, NA, 3))
+  expect_equal(
+    db %>% mutate(rank = dense_rank(x)) %>% collect() %>% arrange(x),
+    tibble(x = c(1:3, NA), rank = c(1:3, NA))
   )
 })
 
@@ -174,7 +188,7 @@ test_that("names windows automatically", {
 
   lf1 <- lf %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
     )
 
@@ -238,7 +252,7 @@ test_that("only name windows if they appear multiple times", {
     group_by(part) %>%
     window_order(ord) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
     )
 
@@ -264,7 +278,7 @@ test_that("name windows only if supported", {
   ) %>%
     group_by(part) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE)
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE))
     )
 
   sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_hana())

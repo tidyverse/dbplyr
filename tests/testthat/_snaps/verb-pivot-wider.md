@@ -60,7 +60,10 @@
 
 ---
 
-    Can't convert to a function.
+    i In index: 2.
+    i With name: b_x.
+    Caused by error in `dbplyr_pivot_wider_spec()`:
+    ! Can't convert to a function.
 
 # values_fn cannot be NULL
 
@@ -75,8 +78,11 @@
     Code
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
-      <error/rlang_error>
-      Error in `dbplyr_pivot_wider_spec()`:
+      <error/purrr_error_indexed>
+      Error in `map2()`:
+      i In index: 1.
+      i With name: unused.
+      Caused by error in `dbplyr_pivot_wider_spec()`:
       ! Can't convert to a function.
 
 # can fill in missing cells
@@ -128,7 +134,7 @@
       (expect_error(tidyr::pivot_wider(df, values_from = val)))
     Output
       <error/vctrs_error_subscript_oob>
-      Error in `chr_as_locations()`:
+      Error in `dbplyr_build_wider_spec()`:
       ! Can't subset columns that don't exist.
       x Column `name` doesn't exist.
 
@@ -138,7 +144,7 @@
       (expect_error(tidyr::pivot_wider(df, names_from = key)))
     Output
       <error/vctrs_error_subscript_oob>
-      Error in `chr_as_locations()`:
+      Error in `dbplyr_build_wider_spec()`:
       ! Can't subset columns that don't exist.
       x Column `value` doesn't exist.
 
@@ -161,4 +167,14 @@
       <error/rlang_error>
       Error in `dbplyr_build_wider_spec()`:
       ! `values_from` must select at least one column.
+
+# `id_expand` must be FALSE
+
+    Code
+      (expect_error(tidyr::pivot_wider(df, id_expand = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `tidyr::pivot_wider()`:
+      ! `id_expand = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
 

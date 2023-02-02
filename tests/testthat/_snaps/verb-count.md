@@ -48,21 +48,11 @@
       SELECT *, COUNT(*) OVER (PARTITION BY `g`) AS `n`
       FROM `df`
 
-# complains about bad names
-
-    Code
-      db <- lazy_frame(g = 1, x = 2)
-      db %>% count(g, name = "g")
-    Condition
-      Error in `tally()`:
-      ! 'g' already present in output
-      i Use `name = "new_name"` to pick a new name.
-
 # .drop is not supported
 
     Code
       lazy_frame(g = 1) %>% add_count(.drop = TRUE)
     Condition
       Error in `add_count()`:
-      ! `.drop` argument not supported for lazy tables.
+      ! Argument `.drop` isn't supported on database backends.
 

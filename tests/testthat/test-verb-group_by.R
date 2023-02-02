@@ -29,6 +29,15 @@ test_that("informative errors for missing variables", {
   })
 })
 
+test_that("group_by() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% group_by(z = non_existent + 1)
+    lf %>% group_by(across(non_existent))
+  })
+})
+
 test_that("collect, collapse and compute preserve grouping", {
   g <- memdb_frame(x = 1:3, y = 1:3) %>% group_by(x, y)
 
@@ -96,9 +105,9 @@ test_that("ungroup drops PARTITION BY", {
   out <- lazy_frame(x = 1) %>%
     group_by(x) %>%
     ungroup() %>%
-    mutate(x = rank(x)) %>%
+    mutate(x = sum(x)) %>%
     sql_build()
-  expect_equal(out$select, sql(x = 'RANK() OVER (ORDER BY `x`)'))
+  expect_equal(out$select, sql(x = 'SUM(`x`) OVER ()'))
 })
 
 # ops ---------------------------------------------------------------------
@@ -133,4 +142,10 @@ test_that("ungroup drops all groups", {
 
   expect_equal(op_grps(out1), character())
   expect_equal(op_grps(out2), character())
+})
+
+test_that("ungroup() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% ungroup(non_existent)
+  })
 })

@@ -25,41 +25,53 @@
 #' remote_con(mf2)
 #' remote_query(mf2)
 remote_name <- function(x) {
-  if (inherits(x$lazy_query, "lazy_base_remote_query")) {
-    return(x$lazy_query$x)
-  }
-
-  if (!inherits(x$lazy_query, "lazy_select_query")) {
-    return()
-  }
-
   lq <- x$lazy_query
-  if (!inherits(lq$x, "lazy_base_remote_query")) {
-    return()
+  if (inherits(lq, "lazy_base_remote_query")) {
+    return(lq$x)
   }
 
-  vars_base <- op_vars(lq$x)
-  if (!is_select_trivial(lq$select, vars_base)) {
-    return()
-  }
-
-  if (!is_empty(lq$where)) {
-    return()
-  }
-
-  if (!is_empty(lq$order_by)) {
-    return()
-  }
-
-  if (!is_false(lq$distinct)) {
-    return()
-  }
-
-  if (!is_empty(lq$limit)) {
+  if (!is_lazy_select_query_simple(lq, ignore_group_by = TRUE, select = "identity")) {
     return()
   }
 
   lq$x$x
+}
+
+query_name <- function(x) {
+  UseMethod("query_name")
+}
+
+#' @export
+query_name.tbl_lazy <- function(x) {
+  query_name(x$lazy_query)
+}
+
+#' @export
+query_name.lazy_base_remote_query <- function(x) {
+  name <- x$x
+  if (is.sql(name)) {
+    return(NULL)
+  }
+
+  if (is.ident(name)) {
+    return(name)
+  }
+
+  if (is_schema(name) || is_catalog(name)) {
+    return(name$table)
+  }
+
+  abort("Unexpected type", .internal = TRUE)
+}
+
+#' @export
+query_name.lazy_base_local_query <- function(x) {
+  ident(x$name)
+}
+
+#' @export
+query_name.lazy_query <- function(x) {
+  NULL
 }
 
 #' @export

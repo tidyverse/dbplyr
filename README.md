@@ -62,7 +62,7 @@ details). Printing it just retrieves the first few rows:
 mtcars2 <- tbl(con, "mtcars")
 mtcars2
 #> # Source:   table<mtcars> [?? x 11]
-#> # Database: sqlite 3.38.5 [:memory:]
+#> # Database: sqlite 3.39.4 [:memory:]
 #>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
 #>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
 #>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4

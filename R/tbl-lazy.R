@@ -86,3 +86,25 @@ group_by_drop_default.tbl_lazy <- function(x) {
 group_vars.tbl_lazy <- function(x) {
   op_grps(x$lazy_query)
 }
+
+is_tbl_lazy <- function(x) {
+  inherits(x, "tbl_lazy")
+}
+
+#' @importFrom tidyselect tidyselect_data_proxy tidyselect_data_has_predicates
+#' @export
+tidyselect_data_proxy.tbl_lazy <- function(x) {
+  vars <- op_vars(x)
+  out <- as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
+  group_by(out, !!!syms(group_vars(x)))
+}
+
+#' @export
+tidyselect_data_has_predicates.tbl_lazy <- function(x) {
+  FALSE
+}
+
+#' @export
+names.tbl_lazy <- function(x) {
+  colnames(x)
+}

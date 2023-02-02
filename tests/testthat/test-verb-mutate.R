@@ -13,7 +13,18 @@ test_that("two mutates equivalent to one", {
 
   df1 <- mf %>% mutate(x2 = x * 2, y4 = y * 4) %>% collect()
   df2 <- mf %>% collect() %>% mutate(x2 = x * 2, y4 = y * 4)
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
+})
+
+test_that("can use window function after summarise and pure projection #1104", {
+  lf <- lazy_frame(g = 1, x = 1) %>%
+    group_by(g) %>%
+    summarise(x = 1) %>%
+    select(g)
+
+  expect_snapshot({
+    (expect_no_error(lf %>% mutate(r = row_number())))
+  })
 })
 
 test_that("can refer to fresly created values", {
@@ -100,6 +111,40 @@ test_that("across() can access previously created variables", {
   expect_snapshot(remote_query(lf))
 })
 
+test_that("across() uses original column rather than overriden one", {
+  db <- memdb_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    db %>% mutate(across(everything(), ~ .x / x)) %>% collect(),
+    tibble(x = 1, y = 2, z = 3)
+  )
+  expect_equal(
+    db %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      ) %>%
+      collect(),
+    tibble(x = 1, y = -1, z = -3)
+  )
+
+  lf <- lazy_frame(x = 2, y = 4, z = 6)
+  expect_equal(
+    lf %>%
+      mutate(across(everything(), ~ .x / x)) %>%
+      remote_query(),
+    sql("SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`")
+  )
+  expect_snapshot(
+    lf %>%
+      mutate(
+        x = -x,
+        across(everything(), ~ .x / x),
+        y = y + x
+      )
+  )
+})
+
 test_that("new columns take precedence over global variables", {
   y <- "global var"
   db <- memdb_frame(data.frame(x = 1)) %>% mutate(y = 2, z = y + 1)
@@ -120,6 +165,53 @@ test_that("constants do not need a new query", {
   )
 })
 
+test_that("mutate() produces nice error messages", {
+  options(lifecycle_verbosity = "quiet")
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% mutate(z = non_existent + 1)
+
+    # `...` cannot be evaluated
+    lazy_frame(x = 1) %>% mutate(across(x, mean, na.rm = z))
+
+    # `.fns` cannot be evaluated
+    lazy_frame(x = 1) %>% mutate(across(x, .fns = "a"))
+  })
+})
+
+test_that("empty mutate returns input", {
+  df <- lazy_frame(x = 1)
+  gf <- group_by(df, x)
+
+  expect_equal(mutate(df), df)
+  expect_equal(mutate(df, .by = x), df)
+  expect_equal(mutate(gf), gf)
+
+  expect_equal(mutate(df, !!!list()), df)
+  expect_equal(mutate(df, !!!list(), .by = x), df)
+  expect_equal(mutate(gf, !!!list()), gf)
+})
+
+# .by -------------------------------------------------------------------------
+
+test_that("can group transiently using `.by`", {
+  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
+
+  out <- mutate(df, x = mean(x), .by = g) %>%
+    arrange(g) %>%
+    collect()
+
+  expect_identical(out$g, c(1, 1, 1, 2, 2))
+  expect_identical(out$x, c(3, 3, 3, 2, 2))
+  expect_equal(group_vars(out), character())
+})
+
+test_that("can `NULL` out the `.by` column", {
+  df <- lazy_frame(x = 1:3, y = 1:3)
+  out <- mutate(df, x = NULL, .by = x)
+
+  expect_identical(op_vars(out), "y")
+  expect_identical(remote_query(out), sql("SELECT `y`\nFROM `df`"))
+})
 
 # SQL generation -----------------------------------------------------------
 
@@ -407,4 +499,3 @@ test_that("mutated vars are always named", {
   out2 <- mf %>% mutate(1) %>% op_vars()
   expect_equal(out2, c("a", "1"))
 })
-

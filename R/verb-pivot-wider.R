@@ -33,6 +33,7 @@
 #'
 #' @param data A lazy data frame backed by a database query.
 #' @param id_cols A set of columns that uniquely identifies each observation.
+#' @param id_expand Unused; included for compatibility with the generic.
 #' @param names_from,values_from A pair of
 #'   arguments describing which column (or columns) to get the name of the
 #'   output column (`names_from`), and which column (or columns) to get the
@@ -99,7 +100,9 @@
 #'     values_from = value
 #'   )
 pivot_wider.tbl_lazy <- function(data,
+                                 ...,
                                  id_cols = NULL,
+                                 id_expand = FALSE,
                                  names_from = name,
                                  names_prefix = "",
                                  names_sep = "_",
@@ -111,10 +114,10 @@ pivot_wider.tbl_lazy <- function(data,
                                  values_from = value,
                                  values_fill = NULL,
                                  values_fn = ~ max(.x, na.rm = TRUE),
-                                 unused_fn = NULL,
-                                 ...
-                                 ) {
+                                 unused_fn = NULL) {
   rlang::check_dots_empty()
+  check_unsupported_arg(id_expand, FALSE)
+
   names_from <- enquo(names_from)
   values_from <- enquo(values_from)
 
@@ -126,7 +129,8 @@ pivot_wider.tbl_lazy <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = current_env()
   )
 
   id_cols <- build_wider_id_cols_expr(
@@ -155,7 +159,8 @@ dbplyr_build_wider_spec <- function(data,
                                     names_glue = NULL,
                                     names_sort = FALSE,
                                     names_vary = "fastest",
-                                    names_expand = FALSE) {
+                                    names_expand = FALSE,
+                                    error_call = current_env()) {
   if (!inherits(data, "tbl_sql")) {
     cli_abort(c(
       "{.fun dbplyr_build_wider_spec} doesn't work with local lazy tibbles.",
@@ -166,15 +171,14 @@ dbplyr_build_wider_spec <- function(data,
   # prepare a minimal local tibble we can pass to `tidyr::build_wider_spec`
   # 1. create a tibble with unique values in the `names_from` column
   # row_ids <- vec_unique(data[names_from])
-  sim_data <- simulate_vars(data)
-  names_from <- tidyselect::eval_select(enquo(names_from), sim_data) %>% names()
+  names_from <- tidyselect::eval_select(enquo(names_from), data) %>% names()
   if (is_empty(names_from)) {
     cli_abort("{.arg names_from} must select at least one column.")
   }
   distinct_data <- collect(distinct(data, !!!syms(names_from)))
 
   # 2. add `values_from` column
-  values_from <- tidyselect::eval_select(enquo(values_from), sim_data) %>% names()
+  values_from <- tidyselect::eval_select(enquo(values_from), data) %>% names()
   if (is_empty(values_from)) {
     cli_abort("{.arg values_from} must select at least one column.")
   }
@@ -192,7 +196,8 @@ dbplyr_build_wider_spec <- function(data,
     names_glue = names_glue,
     names_sort = names_sort,
     names_vary = names_vary,
-    names_expand = names_expand
+    names_expand = names_expand,
+    error_call = error_call
   )
 }
 
@@ -275,9 +280,8 @@ build_wider_id_cols_expr <- function(data,
   # COPIED FROM tidyr
   # TODO: Use `allow_rename = FALSE`.
   # Requires https://github.com/r-lib/tidyselect/issues/225.
-  sim_data <- simulate_vars(data)
-  names_from <- names(tidyselect::eval_select(enquo(names_from), sim_data, error_call = call))
-  values_from <- names(tidyselect::eval_select(enquo(values_from), sim_data, error_call = call))
+  names_from <- names(tidyselect::eval_select(enquo(names_from), data, error_call = call))
+  values_from <- names(tidyselect::eval_select(enquo(values_from), data, error_call = call))
   non_id_cols <- c(names_from, values_from)
 
   out <- select_wider_id_cols(
@@ -315,7 +319,7 @@ select_wider_id_cols <- function(data,
                                  call = caller_env()) {
   # COPIED FROM tidyr
   id_cols <- enquo(id_cols)
-  sim_data <- simulate_vars(data)
+  sim_data <- tidyselect_data_proxy(data)
 
   # Remove known non-id-cols so they are never selected
   sim_data <- sim_data[setdiff(names(sim_data), non_id_cols)]
@@ -345,7 +349,7 @@ is_scalar <- function(x) {
 resolve_fun <- function(x, var, data, call = caller_env()) {
   if (is_formula(x)) {
     .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
-    exec(.fn_expr, var)
+    exec(.fn_expr, var, NULL)
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {

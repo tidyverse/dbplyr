@@ -1,10 +1,14 @@
 #' @export
 #' @rdname sql_build
-lazy_set_op_query <- function(x, y, type, all, call = caller_env()) {
-  stopifnot(inherits(x, "lazy_query"))
-  stopifnot(inherits(y, "lazy_query"))
-  vctrs::vec_assert(type, character(), size = 1L, arg = "type", call = call)
-  assert_flag(all)
+lazy_set_op_query <- function(x,
+                              y,
+                              type,
+                              all,
+                              call = caller_env()) {
+  check_lazy_query(x, call = call)
+  check_lazy_query(y, call = call)
+  check_string(type, call = call)
+  check_bool(all, call = call)
 
   lazy_query(
     query_type = "set_op",

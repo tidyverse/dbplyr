@@ -1,38 +1,37 @@
 #' @export
 #' @rdname sql_build
 lazy_select_query <- function(x,
-                              last_op,
                               select = NULL,
                               where = NULL,
                               group_by = NULL,
+                              having = NULL,
                               order_by = NULL,
                               limit = NULL,
                               distinct = FALSE,
                               group_vars = NULL,
                               order_vars = NULL,
                               frame = NULL,
-                              select_operation = c("mutate", "summarise"),
+                              select_operation = c("select", "mutate", "summarise"),
                               message_summarise = NULL) {
-  stopifnot(inherits(x, "lazy_query"))
-  stopifnot(is_string(last_op))
+  check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
-  stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
-  stopifnot(is.logical(distinct), length(distinct) == 1L)
+  check_number_whole_inf(limit, allow_null = TRUE)
+  check_bool(distinct)
 
   select <- select %||% syms(set_names(op_vars(x)))
-  select_operation <- arg_match0(select_operation, c("mutate", "summarise"))
+  select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
 
-  stopifnot(is.null(message_summarise) || is_string(message_summarise))
+  check_string(message_summarise, allow_null = TRUE)
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
   group_vars <- group_vars %||% op_grps(x)
   order_vars <- order_vars %||% op_sort(x)
   frame <- frame %||% op_frame(x)
 
-  if (last_op == "mutate") {
+  if (select_operation == "mutate") {
     select <- new_lazy_select(
       select,
       group_vars = group_vars,
@@ -53,7 +52,6 @@ lazy_select_query <- function(x,
     distinct = distinct,
     limit = limit,
     select_operation = select_operation,
-    last_op = last_op,
     message_summarise = message_summarise,
     group_vars = group_vars,
     order_vars = order_vars,
@@ -66,10 +64,10 @@ is_lazy_sql_part <- function(x) {
   if (is_quosures(x)) return(TRUE)
 
   if (!is.list(x)) return(FALSE)
-  purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_expression(.x))
+  purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_call(.x))
 }
 
-new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = NULL) {
+new_lazy_select <- function(vars, group_vars = character(), order_vars = NULL, frame = NULL) {
   vctrs::vec_as_names(names2(vars), repair = "check_unique")
 
   var_names <- names(vars)
@@ -84,15 +82,47 @@ new_lazy_select <- function(vars, group_vars = NULL, order_vars = NULL, frame = 
   )
 }
 
-update_lazy_select <- function(select, vars) {
-  vctrs::vec_as_names(names(vars), repair = "check_unique")
+# projection = only select (including rename) from parent query
+# identity = selects exactly the same variable as the parent query
+is_lazy_select_query_simple <- function(x,
+                                        ignore_group_by = FALSE,
+                                        select = c("projection", "identity")) {
+  select <- arg_match(select, c("projection", "identity"))
+  if (!inherits(x, "lazy_select_query")) {
+    return(FALSE)
+  }
 
-  sel_vars <- purrr::map_chr(vars, as_string)
-  idx <- vctrs::vec_match(sel_vars, select$name)
-  select <- vctrs::vec_slice(select, idx)
-  select$name <- names(vars)
-  select
+  if (select == "projection" && !is_projection(x$select$expr)) {
+    return(FALSE)
+  }
+
+  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
+    return(FALSE)
+  }
+
+  if (!is_empty(x$where)) {
+    return(FALSE)
+  }
+  if (!ignore_group_by && !is_empty(x$group_by)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$order_by)) {
+    return(FALSE)
+  }
+  if (is_true(x$distinct)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$limit)) {
+    return(FALSE)
+  }
+
+  TRUE
 }
+
+is_select_identity <- function(select, vars_prev) {
+  is_identity(select$expr, select$name, vars_prev)
+}
+
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
@@ -147,6 +177,7 @@ sql_build.lazy_select_query <- function(op, con, ...) {
     select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
+    having = translate_sql_(op$having, con = con, window = FALSE),
     window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
     distinct = op$distinct,
@@ -162,7 +193,7 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (is_select_trivial(select, in_vars)) {
+  if (is_select_identity(select, in_vars)) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
@@ -213,7 +244,7 @@ select_use_star <- function(select, vars_prev, con) {
 
   test_cols <- vctrs::vec_slice(select, seq2(first_match, last))
 
-  if (is_select_trivial(test_cols, vars_prev)) {
+  if (is_select_identity(test_cols, vars_prev)) {
     idx_start <- seq2(1, first_match - 1)
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
@@ -224,12 +255,6 @@ select_use_star <- function(select, vars_prev, con) {
   } else {
     select
   }
-}
-
-is_select_trivial <- function(select, vars_prev) {
-  identical(select$name, vars_prev) &&
-    purrr::every(select$expr, is_symbol) &&
-    identical(syms(select$name), select$expr)
 }
 
 translate_select_sql <- function(con, select_df) {

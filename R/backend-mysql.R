@@ -19,7 +19,7 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_mysql())
-#' lf %>% transmute(x = paste0(z, " times"))
+#' lf %>% transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
@@ -70,6 +70,13 @@ sql_translation.MariaDBConnection <- function(con) {
       # but available in MariaDB. A few more details at:
       # https://www.oreilly.com/library/view/mysql-cookbook/0596001452/ch04s11.html
       str_detect = sql_infix("REGEXP"),
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %LIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE BINARY% !!pattern)
+        }
+      },
       str_locate = function(string, pattern) {
         sql_expr(REGEXP_INSTR(!!string, !!pattern))
       },
@@ -80,7 +87,7 @@ sql_translation.MariaDBConnection <- function(con) {
     sql_translator(.parent = base_agg,
       sd =  sql_aggregate("STDDEV_SAMP", "sd"),
       var = sql_aggregate("VAR_SAMP", "var"),
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         sql_expr(group_concat(!!x %separator% !!collapse))
       }
     ),
@@ -132,8 +139,8 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
 #' @export
-sql_values_subquery.MariaDBConnection <- function(con, df, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, lvl = lvl, row = TRUE)
+sql_values_subquery.MariaDBConnection <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
 }
 
 #' @export
@@ -182,4 +189,4 @@ supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnecti
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
 
-globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND"))
+globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%"))

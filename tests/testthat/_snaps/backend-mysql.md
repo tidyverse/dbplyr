@@ -18,10 +18,10 @@
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` <=> `RHS`.`x`)
+      SELECT `df_LHS`.`x` AS `x`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` <=> `df_RHS`.`x`)
 
 ---
 
@@ -34,7 +34,7 @@
 ---
 
     Code
-      slice_sample(lf, 5)
+      slice_sample(lf, n = 1)
     Output
       <SQL>
       SELECT `x`

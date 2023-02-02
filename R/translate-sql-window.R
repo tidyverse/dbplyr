@@ -143,12 +143,24 @@ rows <- function(from = -Inf, to = 0) {
 win_rank <- function(f) {
   force(f)
   function(order = NULL) {
-    win_over(
+    group <- win_current_group()
+    if (!is_null(order)) {
+      cond <- translate_sql((case_when(is.na(!!order) ~ 1L, TRUE ~ 0L)))
+      group <- sql(group, cond)
+    }
+
+    rank_sql <- win_over(
       build_sql(sql(f), list()),
-      partition = win_current_group(),
+      partition = group,
       order = order %||% win_current_order(),
       frame = win_current_frame()
     )
+
+    if (is_null(order)) {
+      rank_sql
+    } else {
+      translate_sql(case_when(!is.na(!!order) ~ !!rank_sql))
+    }
   }
 }
 
@@ -247,7 +259,7 @@ local_con <- function(con, env = parent.frame()) {
 }
 
 set_win_current_group <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$group_by
   sql_context$group_by <- vars
@@ -255,7 +267,7 @@ set_win_current_group <- function(vars) {
 }
 
 set_win_current_order <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$order_by
   sql_context$order_by <- vars
@@ -263,7 +275,7 @@ set_win_current_order <- function(vars) {
 }
 
 set_win_current_frame <- function(frame) {
-  stopifnot(is.null(frame) || is.numeric(frame))
+  check_frame_range(frame)
 
   old <- sql_context$frame
   sql_context$frame <- frame
@@ -303,12 +315,34 @@ local_context <- function(x, env = parent.frame()) {
 
 # Where translation -------------------------------------------------------
 
-uses_window_fun <- function(x, con) {
-  stopifnot(is.list(x))
+uses_window_fun <- function(x, con, lq) {
+  check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
   any(calls %in% win_f)
+}
+
+is_aggregating <- function(x, non_group_cols, agg_f) {
+  if (is_quosure(x)) {
+    x <- quo_get_expr(x)
+  }
+
+  if (is_symbol(x)) {
+    xc <- as_name(x)
+    return(!(xc %in% non_group_cols))
+  }
+
+  if (is_call(x)) {
+    fname <- as.character(x[[1]])
+    if (fname %in% agg_f) {
+      return(TRUE)
+    }
+
+    return(all(purrr::map_lgl(x[-1], is_aggregating, non_group_cols, agg_f)))
+  }
+
+  return(TRUE)
 }
 
 common_window_funs <- function() {
@@ -369,7 +403,7 @@ translate_window_where_all <- function(x, window_funs = common_window_funs()) {
 
 window_where <- function(expr, comp) {
   stopifnot(is.call(expr) || is.name(expr) || is.atomic(expr))
-  stopifnot(is.list(comp))
+  check_list(comp)
 
   list(
     expr = expr,

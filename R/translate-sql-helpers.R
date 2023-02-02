@@ -59,9 +59,9 @@
 sql_variant <- function(scalar = sql_translator(),
                         aggregate = sql_translator(),
                         window = sql_translator()) {
-  stopifnot(is.environment(scalar))
-  stopifnot(is.environment(aggregate))
-  stopifnot(is.environment(window))
+  check_environment(scalar)
+  check_environment(aggregate)
+  check_environment(window)
 
   # Need to check that every function in aggregate also occurs in window
   missing <- setdiff(ls(aggregate), ls(window))
@@ -72,13 +72,15 @@ sql_variant <- function(scalar = sql_translator(),
     ))
   }
 
+  aggregate_fns <- ls(envir = aggregate)
+
   # An ensure that every window function is flagged in aggregate context
   missing <- setdiff(ls(window), ls(aggregate))
   missing_funs <- lapply(missing, sql_aggregate_win)
   env_bind(aggregate, !!!set_names(missing_funs, missing))
 
   structure(
-    list(scalar = scalar, aggregate = aggregate, window = window),
+    list(scalar = scalar, aggregate = aggregate, window = window, aggregate_fns = aggregate_fns),
     class = "sql_variant"
   )
 }
@@ -141,7 +143,7 @@ sql_infix <- function(f, pad = TRUE) {
   #
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
-  assert_that(is_string(f))
+  check_string(f)
 
   if (pad) {
     function(x, y) {
@@ -176,7 +178,7 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 #' @rdname sql_variant
 #' @export
 sql_prefix <- function(f, n = NULL) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
     args <- list(...)
@@ -196,7 +198,7 @@ sql_prefix <- function(f, n = NULL) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
@@ -207,7 +209,7 @@ sql_aggregate <- function(f, f_r = f) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate_2 <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, y) {
     build_sql(sql(f), list(x, y))
@@ -217,7 +219,7 @@ sql_aggregate_2 <- function(f) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate_n <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
@@ -252,7 +254,7 @@ check_na_rm <- function(na.rm) {
 #' @rdname sql_variant
 #' @export
 sql_not_supported <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
     # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed

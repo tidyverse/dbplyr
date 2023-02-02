@@ -20,7 +20,7 @@
 #' library(dplyr, warn.conflicts = FALSE)
 #'
 #' lf <- lazy_frame(a = TRUE, b = 1, c = 2, d = "z", con = simulate_hana())
-#' lf %>% transmute(x = paste0(z, " times"))
+#' lf %>% transmute(x = paste0(d, " times"))
 NULL
 
 #' @export
@@ -36,7 +36,7 @@ dbplyr_edition.HDB <- function(con) {
 sql_translation.HDB <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      as.character = sql_cast("SHORTTEXT"),
+      as.character = sql_cast("VARCHAR"),
       as.numeric = sql_cast("DOUBLE"),
       as.double = sql_cast("DOUBLE"),
 
@@ -73,4 +73,9 @@ db_table_temporary.HDB <- function(con, table, temporary) {
 `sql_table_analyze.HDB` <- function(con, table, ...) {
   # CREATE STATISTICS doesn't work for temporary tables, so
   # don't do anything at all
+}
+
+#' @export
+sql_values_subquery.HDB <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUMMY")
 }

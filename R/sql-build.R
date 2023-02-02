@@ -144,10 +144,26 @@ flatten_query.join_query <- function(qry, query_list) {
   query_list_y <- flatten_query(y, query_list_x)
   qry$y <- get_subquery_name(y, query_list_y)
 
+  querylist_reuse_query(qry, query_list_y)
+}
+
+#' @export
+flatten_query.multi_join_query <- function(qry, query_list) {
+  x <- qry$x
+  query_list_new <- flatten_query(x, query_list)
+  qry$x <- get_subquery_name(x, query_list_new)
+
+  for (i in vctrs::vec_seq_along(qry$joins)) {
+    y <- qry$joins$table[[i]]
+    query_list_new <- flatten_query(y, query_list_new)
+    qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
+  }
+
+  # TODO reuse query
   name <- unique_subquery_name()
   wrapped_query <- set_names(list(qry), name)
 
-  query_list$queries <- c(query_list_y$queries, wrapped_query)
+  query_list$queries <- c(query_list_new$queries, wrapped_query)
   query_list$name <- name
   query_list
 }
@@ -180,6 +196,15 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, 
     dbplyr_query_select(con, sql("*"), query, lvl = lvl)
   }
 }
+
+#' @export
+sql_render.dbplyr_schema <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  query <- as.sql(query, con)
+  sql_render(query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
+}
+
+#' @export
+sql_render.dbplyr_catalog <- sql_render.dbplyr_schema
 
 # Optimise ----------------------------------------------------------------
 

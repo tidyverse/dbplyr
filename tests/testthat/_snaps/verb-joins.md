@@ -5,8 +5,8 @@
     Output
       <SQL>
       SELECT `df1`.`x` AS `x`, `y`
-      FROM `df` AS `df1`
-      LEFT JOIN `df` AS `df2`
+      FROM `lf1` AS `df1`
+      LEFT JOIN `lf2` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
 
 # complete semi join works with SQLite and table alias
@@ -15,26 +15,38 @@
       inner_join(lf1, lf2, by = "x", x_as = "df1", y_as = "df2")
     Output
       <SQL>
-      SELECT `df1`.`x` AS `x`, `y`
+      SELECT `df1`.*
       FROM `df` AS `df1`
       INNER JOIN `df` AS `df2`
         ON (`df1`.`x` = `df2`.`x`)
 
-# join check `x_as` and `y_as`
+# join works with in_schema
 
     Code
-      left_join(x, x, by = "x", x_as = NULL)
-    Condition
-      Error in `left_join()`:
-      ! `x_as` must be a vector, not NULL.
+      left_join(df1, df2, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `df`.*, `z`
+      FROM `foo`.`df` AS `df`
+      LEFT JOIN `foo`.`df2` AS `df2`
+        ON (`df`.`x` = `df2`.`x`)
 
 ---
+
+    Code
+      left_join(df1, df3, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `df_LHS`.*, `z`
+      FROM `foo`.`df` AS `df_LHS`
+      LEFT JOIN `foo2`.`df` AS `df_RHS`
+        ON (`df_LHS`.`x` = `df_RHS`.`x`)
+
+# join check `x_as` and `y_as`
 
     Code
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
       Error in `left_join()`:
-      ! `y_as` must have size 1, not size 2.
+      ! `y_as` must be a single string or `NULL`, not a character vector.
 
 ---
 
@@ -44,22 +56,118 @@
       Error in `left_join()`:
       ! `y_as` must be different from `x_as`.
 
+# select() before join is inlined
+
+    Code
+      out_left
+    Output
+      <SQL>
+      SELECT `a` AS `a2`, `x1` AS `x`, `b`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x1` = `lf2`.`x2`)
+
+# select() before semi_join is inlined
+
+    Code
+      out_semi
+    Output
+      <SQL>
+      SELECT `a` AS `a2`, `x1` AS `x`
+      FROM `lf1`
+      WHERE EXISTS (
+        SELECT 1 FROM (
+        SELECT `x2` AS `x`, `b`
+        FROM `lf2`
+      ) `RHS`
+        WHERE (`lf1`.`x1` = `RHS`.`x`)
+      )
+
+# multiple joins create a single query
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df1`.*, `df2`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+      FROM `df1`
+      LEFT JOIN `df2`
+        ON (`df1`.`x` = `df2`.`x`)
+      INNER JOIN `df3`
+        ON (`df1`.`x` = `df3`.`x`)
+
+# can join 4 tables with same column #1101
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `lf1`.*, `b`, `c`, `lf4`.`a` AS `a4`
+      FROM `lf1`
+      INNER JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+      INNER JOIN `lf3`
+        ON (`lf1`.`x` = `lf3`.`x`)
+      INNER JOIN `lf4`
+        ON (`lf1`.`x` = `lf4`.`x`)
+
+# multiple joins produce separate queries if using right/full join
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `df3`.`x` AS `x`, `a`, `LHS`.`b` AS `b.x`, `df3`.`b` AS `b.y`
+      FROM (
+        SELECT `df1`.*, `b`
+        FROM `df1`
+        LEFT JOIN `df2`
+          ON (`df1`.`x` = `df2`.`x`)
+      ) `LHS`
+      RIGHT JOIN `df3`
+        ON (`LHS`.`x` = `df3`.`x`)
+
 # can optionally match NA values
 
     Code
-      left_join(lf, lf, by = "x", na_matches = "na")
+      left_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (CASE WHEN (`LHS`.`x` = `RHS`.`x`) OR (`LHS`.`x` IS NULL AND `RHS`.`x` IS NULL) THEN 0 ELSE 1 END = 0)
+      SELECT `lf1`.`x` AS `x`
+      FROM `lf1`
+      LEFT JOIN `lf2`
+        ON (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
 
 # suffix arg is checked
 
     Code
-      inner_join(lf1, lf2, by = "x", suffix = "a")
-    Condition
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = "a")))
+    Output
+      <error/vctrs_error_assert_size>
       Error in `inner_join()`:
       ! `suffix` must have size 2, not size 1.
+    Code
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = 1L)))
+    Output
+      <error/rlang_error>
+      Error in `inner_join()`:
+      ! `suffix` must be a character vector, not the number 1.
+
+# joins reuse queries in cte mode
+
+    Code
+      left_join(lf, lf) %>% remote_query(cte = TRUE)
+    Message
+      Joining, by = "x"
+    Output
+      <SQL> WITH `q01` AS (
+        SELECT `lf1_LHS`.`x` AS `x`
+        FROM `lf1` AS `lf1_LHS`
+        INNER JOIN `lf1` AS `lf1_RHS`
+          ON (`lf1_LHS`.`x` = `lf1_RHS`.`x`)
+      )
+      SELECT `lf1...1`.`x` AS `x`
+      FROM `lf1` AS `lf1...1`
+      INNER JOIN `lf1` AS `lf1...2`
+        ON (`lf1...1`.`x` = `lf1...2`.`x`)
+      LEFT JOIN `q01` AS `...3`
+        ON (`lf1...1`.`x` = `...3`.`x`)
 

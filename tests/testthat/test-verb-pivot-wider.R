@@ -480,3 +480,10 @@ test_that("`values_from` must identify at least 1 column (#1240)", {
     (expect_error(tidyr::pivot_wider(df, names_from = key, values_from = starts_with("foo"))))
   )
 })
+
+test_that("`id_expand` must be FALSE", {
+  df <- lazy_frame(name = "x", value = 1)
+  expect_snapshot(
+    (expect_error(tidyr::pivot_wider(df, id_expand = TRUE)))
+  )
+})

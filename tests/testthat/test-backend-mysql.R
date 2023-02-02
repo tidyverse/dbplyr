@@ -20,6 +20,17 @@ test_that("use CHAR type for as.character", {
 })
 
 
+test_that("custom stringr functions translated correctly", {
+  local_con(simulate_mysql())
+
+  expect_equal(translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
+  expect_equal(translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
+  expect_equal(translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
+  expect_equal(translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
+  expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+})
+
 # verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
@@ -32,7 +43,7 @@ test_that("generates custom sql", {
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
   expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
 
-  expect_snapshot(slice_sample(lf, 5))
+  expect_snapshot(slice_sample(lf, n = 1))
 
   expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
