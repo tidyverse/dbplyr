@@ -6,7 +6,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::mutate
-#' @inheritParams args_by
 #' @inherit arrange.tbl_lazy return
 #' @export
 #' @importFrom dplyr mutate

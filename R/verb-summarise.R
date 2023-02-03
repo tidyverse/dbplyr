@@ -6,7 +6,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::summarise
-#' @inheritParams args_by
 #' @param .groups \Sexpr[results=rd]{lifecycle::badge("experimental")} Grouping structure of the result.
 #'
 #'   * "drop_last": dropping the last level of grouping. This was the

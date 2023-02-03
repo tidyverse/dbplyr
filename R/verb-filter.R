@@ -5,7 +5,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter
-#' @inheritParams args_by
 #' @param .preserve Not supported by this method.
 #' @inherit arrange.tbl_lazy return
 #' @examples
