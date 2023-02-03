@@ -35,12 +35,6 @@
 #'   summarise(n()) %>%
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
-  # TODO remove this check after depending on dplyr 1.1.0
-  by <- enquo(.by)
-  if (!quo_is_null(by) && !is.null(.groups)) {
-    abort("Can't supply both `.by` and `.groups`.")
-  }
-
   check_groups(.groups)
   dots <- summarise_eval_dots(.data, ...)
 
