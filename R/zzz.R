@@ -14,13 +14,11 @@
   register_s3_method("tidyr", "expand", "tbl_lazy")
   register_s3_method("tidyr", "replace_na", "tbl_lazy")
 
-  if (utils::packageVersion("dplyr") >= "0.8.99") {
-    register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
+  register_s3_method("dplyr", "group_by_drop_default", "tbl_lazy")
 
-    methods::setOldClass(c("ident_q", "ident", "character"), ident_q())
-    methods::setOldClass(c("ident", "character"), ident())
-    methods::setOldClass(c("sql", "character"), sql())
-  }
+  methods::setOldClass(c("ident_q", "ident", "character"), ident_q())
+  methods::setOldClass(c("ident", "character"), ident())
+  methods::setOldClass(c("sql", "character"), sql())
 
   base_scalar$`%>%` <- magrittr::`%>%`
 }
