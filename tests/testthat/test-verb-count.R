@@ -40,14 +40,6 @@ test_that("count() does not create groups", {
   expect_identical(df, expect)
 })
 
-test_that("complains about bad names", {
-  skip("Undecided whether error makes sense")
-  expect_snapshot(error = TRUE, {
-    db <- lazy_frame(g = 1, x = 2)
-    db %>% count(g, name = "g")
-  })
-})
-
 test_that("informs if n column already present, unless overridden", {
   df1 <- lazy_frame(n = c(1, 1, 2, 2, 2))
   expect_message(out <- count(df1, n), "already present")
