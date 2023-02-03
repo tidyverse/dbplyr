@@ -144,9 +144,7 @@ sql_translation.Snowflake <- function(con) {
         }
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
-        if (fiscal_start != 1) {
-          abort("`fiscal_start` is not supported in Snowflake translation. Must be 1.")
-        }
+        check_unsupported_arg(fiscal_start, 1)
 
         if (with_year) {
           sql_expr((EXTRACT("year", !!x) || "." || EXTRACT("quarter", !!x)))
@@ -228,9 +226,10 @@ sql_table_analyze.Snowflake <- function(con, table, ...) {}
 
 snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
-  if (perl || fixed || useBytes || ignore.case) {
-    cli_abort("{.arg {c('perl', 'fixed', 'useBytes', 'ignore.case')}} parameters are unsupported.")
-  }
+  check_unsupported_arg(ignore.case, FALSE, backend = "Snowflake")
+  check_unsupported_arg(perl, FALSE, backend = "Snowflake")
+  check_unsupported_arg(fixed, FALSE, backend = "Snowflake")
+  check_unsupported_arg(useBytes, FALSE, backend = "Snowflake")
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
   # behavior

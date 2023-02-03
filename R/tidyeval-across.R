@@ -21,22 +21,21 @@ partial_eval_pick <- function(call, data, env, error_call = caller_env()) {
 }
 
 partial_eval_across <- function(call, data, env, error_call = caller_env()) {
-  across_dummy <- function(.cols,
-                           .fns,
+  across_dummy <- function(.cols = everything(),
+                           .fns = NULL,
                            ...,
                            .names = NULL,
                            .unpack = FALSE) {}
 
-  call <- match.call(
-    across_dummy,
+  call <- call_match(
     call,
-    expand.dots = FALSE,
-    envir = env
+    fn = across_dummy,
+    defaults = TRUE,
+    dots_expand = FALSE,
+    dots_env = env
   )
   deprecate_across_dots(call, env = current_env(), user_env = env)
-  if (is_true(call$.unpack)) {
-    cli_abort("{.code .unpack = TRUE} is not supported in SQL translations.", call = error_call)
-  }
+  check_unsupported_arg(call$.unpack, FALSE, arg = ".unpack", call = error_call)
 
   across_setup(data, call, env, allow_rename = TRUE, fn = "across()", error_call = error_call)
 }

@@ -669,10 +669,10 @@ test_that("suffix arg is checked", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(x = 1, z = 2)
 
-  expect_snapshot(
-    error = TRUE,
-    inner_join(lf1, lf2, by = "x", suffix = "a")
-  )
+  expect_snapshot({
+    (expect_error(inner_join(lf1, lf2, by = "x", suffix = "a")))
+    (expect_error(inner_join(lf1, lf2, by = "x", suffix = 1L)))
+  })
 })
 
 test_that("copy = TRUE works", {

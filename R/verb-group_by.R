@@ -37,10 +37,7 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
     .add <- add
   }
 
-  if (!identical(.drop, TRUE)) {
-    cli_abort("{.arg .drop} is not supported with database backends")
-  }
-
+  check_unsupported_arg(.drop, TRUE)
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())
   names <- purrr::map_chr(groups$groups, as_string)
 

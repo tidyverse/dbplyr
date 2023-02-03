@@ -35,10 +35,9 @@ sql_median <- function(f,
   }
 }
 
-check_probs <- function(probs) {
-  if (!is.numeric(probs)) {
-    cli_abort("{.arg probs} must be numeric")
-  }
+check_probs <- function(probs, call = caller_env()) {
+  # TODO min, max? Inf? NA?
+  check_number_decimal(probs, call = call)
 
   if (length(probs) > 1) {
     cli_abort("SQL translation only supports single value for {.arg probs}.")

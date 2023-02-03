@@ -13,18 +13,18 @@ lazy_select_query <- function(x,
                               frame = NULL,
                               select_operation = c("select", "mutate", "summarise"),
                               message_summarise = NULL) {
-  stopifnot(inherits(x, "lazy_query"))
+  check_lazy_query(x, call = call)
   stopifnot(is.null(select) || is_lazy_sql_part(select))
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
-  stopifnot(is.null(limit) || (is.numeric(limit) && length(limit) == 1L))
-  stopifnot(is.logical(distinct), length(distinct) == 1L)
+  check_number_whole_inf(limit, allow_null = TRUE)
+  check_bool(distinct)
 
   select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
 
-  stopifnot(is.null(message_summarise) || is_string(message_summarise))
+  check_string(message_summarise, allow_null = TRUE)
 
   # inherit `group_vars`, `order_vars`, and `frame` from `from`
   group_vars <- group_vars %||% op_grps(x)

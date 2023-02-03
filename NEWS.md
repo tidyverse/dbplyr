@@ -4,6 +4,17 @@
   This breaking change is necessary to allow `select()` to drop and rename
   variables used in `window_order()` (@mgirlich, #1103).
 
+* The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+  `percent_rank()`, and `cume_dist()`) now work again for variables wrapped in
+  `desc()`, e.g. `row_number(desc(x))` (@mgirlich, #1118).
+
+* `mutate()` after `distinct()` now again produces a subquery to produce the
+  correct result (@mgirlich, #1119).
+
+* Moved argument `auto_index` after `...` in `*_join()` (@mgirlich, #1115).
+
+* Removed dependency on assertthat (@mgirlich, #1112).
+
 * Catch unsupported argument `pivot_wider(id_expand = TRUE)` and
   `pivot_longer(cols_vary)` (@mgirlich, #1109).
 

@@ -5,14 +5,14 @@
     Output
       <error/rlang_error>
       Error in `window_order()`:
-      ! `.data` must be a <tbl_lazy>, not a <data.frame>.
+      ! `.data` must be a <tbl_lazy>, not a data frame.
       i Did you mean to use `arrange()` instead?
     Code
       (expect_error(window_order("a")))
     Output
       <error/rlang_error>
       Error in `window_order()`:
-      ! `.data` must be a <tbl_lazy>, not a <character>.
+      ! `.data` must be a <tbl_lazy>, not a string.
 
 # window_order only accepts variables
 

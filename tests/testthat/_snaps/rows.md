@@ -4,14 +4,14 @@
       (rows_insert(lf, lf, by = "x", conflict = "error"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_insert(lf, lf, by = "x"))
     Condition
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -57,8 +57,8 @@
     Output
       <error/rlang_error>
       Error in `rows_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 # `rows_insert()` works with `in_place = FALSE`
 
@@ -87,7 +87,7 @@
       (rows_insert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_insert()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # rows_get_or_execute() gives error context
@@ -118,8 +118,8 @@
         "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -179,7 +179,7 @@
       (rows_append(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_append()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_append()` works
@@ -227,14 +227,14 @@
       (rows_update(lf, lf, by = "x", unmatched = "error"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
-      i Please use `unmatched = "ignore"` instead.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
     Code
       (rows_update(lf, lf, by = "x"))
     Condition
       Error in `rows_update()`:
-      ! `unmatched = "error"` is not supported for database tables.
-      i Please use `unmatched = "ignore"` instead.
+      ! `unmatched = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
@@ -292,7 +292,7 @@
       (rows_update(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_update()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_update_from()` works
@@ -354,7 +354,7 @@
       (rows_patch(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_patch()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `rows_upsert()` returns early if no column to update
@@ -421,7 +421,7 @@
       (rows_upsert(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       y = 22:23, .name = "df_y"), by = "x", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_upsert()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_upsert()` is correct
@@ -472,7 +472,7 @@
       (rows_delete(lazy_frame(x = 1:3, y = 11:13, .name = "df_x"), lazy_frame(x = 2:3,
       .name = "df_y"), by = "x", unmatched = "ignore", in_place = TRUE))
     Condition
-      Error in `rows_check_in_place()`:
+      Error in `rows_delete()`:
       ! `in_place = TRUE` does not work for simulated connections.
 
 # `sql_query_delete()` is correct

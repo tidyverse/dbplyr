@@ -17,9 +17,7 @@
 # registered onLoad
 #' @importFrom dplyr filter
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
-  if (!identical(.preserve, FALSE)) {
-    cli_abort("{.arg .preserve} is not supported on database backends")
-  }
+  check_unsupported_arg(.preserve, FALSE)
   check_filter(...)
   by <- compute_by(
     {{ .by }},

@@ -74,12 +74,8 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_drop_na = FALSE,
                                   values_ptypes,
                                   values_transform = NULL) {
-  if (!is_missing(values_ptypes)) {
-    cli_abort("The {.arg values_ptypes} argument is not supported for remote back-ends")
-  }
-  if (!is_missing(cols_vary)) {
-    cli_abort("The {.arg cols_vary} argument is not supported for remote back-ends.")
-  }
+  check_unsupported_arg(cols_vary)
+  check_unsupported_arg(values_ptypes)
 
   rlang::check_dots_empty()
 

@@ -37,7 +37,7 @@
       window_frame(lf, "a")
     Condition
       Error in `window_frame()`:
-      ! is.numeric(from) is not TRUE
+      ! `from` must be a whole number, not the string "a".
 
 ---
 
@@ -45,7 +45,7 @@
       window_frame(lf, 1:2)
     Condition
       Error in `window_frame()`:
-      ! length(from) == 1 is not TRUE
+      ! `from` must be a whole number, not an integer vector.
 
 ---
 
@@ -53,7 +53,7 @@
       window_frame(lf, 1, "a")
     Condition
       Error in `window_frame()`:
-      ! is.numeric(to) is not TRUE
+      ! `to` must be a whole number, not the string "a".
 
 ---
 
@@ -61,5 +61,5 @@
       window_frame(lf, 1, 1:2)
     Condition
       Error in `window_frame()`:
-      ! length(to) == 1 is not TRUE
+      ! `to` must be a whole number, not an integer vector.
 

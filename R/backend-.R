@@ -8,6 +8,8 @@
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
+#' @include compat-obj-type.R
+#' @include compat-types-check.R
 NULL
 
 #' @export

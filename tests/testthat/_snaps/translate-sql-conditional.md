@@ -48,13 +48,13 @@
     Output
       <error/rlang_error>
       Error in `case_when()`:
-      ! `.ptype` is not supported in SQL translations.
+      ! Argument `.ptype` isn't supported on database backends.
     Code
       (expect_error(translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
     Output
       <error/rlang_error>
       Error in `case_when()`:
-      ! `.size` is not supported in SQL translations.
+      ! Argument `.size` isn't supported on database backends.
 
 # long case_when is on multiple lines
 
@@ -122,7 +122,7 @@
     Output
       <error/rlang_error>
       Error in `case_match()`:
-      ! `.ptype` is not supported in SQL translations.
+      ! Argument `.ptype` isn't supported on database backends.
 
 # .x must be a symbol
 

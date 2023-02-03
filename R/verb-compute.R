@@ -43,8 +43,9 @@ compute.tbl_sql <- function(x,
     name <- unname(name)
   }
   vars <- op_vars(x)
-  assert_that(all(unlist(indexes) %in% vars))
-  assert_that(all(unlist(unique_indexes) %in% vars))
+
+  compute_check_indexes(x, indexes)
+  compute_check_indexes(x, unique_indexes)
 
   x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
   sql <- db_sql_render(x$src$con, x_aliased$lazy_query, cte = cte)
@@ -60,6 +61,42 @@ compute.tbl_sql <- function(x,
   tbl_src_dbi(x$src, as.sql(name, x$src$con), colnames(x)) %>%
     group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
+}
+
+compute_check_indexes <- function(x,
+                                  indexes,
+                                  ...,
+                                  arg = caller_arg(indexes),
+                                  error_call = caller_env()) {
+  if (is.null(indexes)) {
+    return()
+  }
+
+  check_dots_empty()
+  force(arg)
+  if (!is.list(indexes) && !is.character(indexes)) {
+    stop_input_type(
+      indexes,
+      c("a character vector", "a list of characters"),
+      arg = arg,
+      call = error_call
+    )
+  }
+  if (is.list(indexes)) {
+    indexes <- unique(unlist(indexes))
+  }
+
+  x_nms <- colnames(x)
+
+  missing <- setdiff(indexes, x_nms)
+  if (!is_empty(missing)) {
+    message <- c(
+      "All columns specified through {.arg {arg}} must exist in {.arg x}.",
+      i = "The following columns are missing from {.arg {arg}}: {.field {missing}}."
+    )
+
+    cli_abort(message, call = error_call)
+  }
 }
 
 # collect -----------------------------------------------------------------

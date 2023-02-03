@@ -32,9 +32,7 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @importFrom dplyr add_count
 #' @export
 add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
-  if (!missing(.drop)) {
-    cli_abort("{.arg .drop} argument not supported for lazy tables.")
-  }
+  check_unsupported_arg(.drop)
 
   if (!missing(...)) {
     out <- group_by(x, ..., .add = TRUE)
@@ -56,7 +54,7 @@ tally.tbl_lazy <- function(x, wt = NULL, sort = FALSE, name = NULL) {
     n <- expr(sum(!!wt, na.rm = TRUE))
   }
 
-  name <- check_name(name, group_vars(x))
+  name <- check_count_name(name, group_vars(x))
 
   out <- summarise(x, !!name := !!n, .groups = "drop")
 
@@ -75,7 +73,7 @@ n_name <- function (x) {
   name
 }
 
-check_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) {
+check_count_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) {
   if (is.null(name)) {
     name <- n_name(vars)
     if (name != "n") {
@@ -84,9 +82,7 @@ check_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) 
         i = "Use {.code name = \"new_name\"} to pick a new name."
       ))
     }
-  } else {
-    # TODO use rlang checker functions
-    # check_string(name, arg = arg, call = call)
   }
+  check_name(name, arg = arg, call = call)
   name
 }

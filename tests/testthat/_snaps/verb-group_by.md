@@ -4,7 +4,8 @@
       lazy_frame(x = 1:3, y = 1:3) %>% group_by(y, .drop = FALSE)
     Condition
       Error in `group_by()`:
-      ! `.drop` is not supported with database backends
+      ! `.drop = FALSE` isn't supported on database backends.
+      i It must be TRUE instead.
 
 # informative errors for missing variables
 

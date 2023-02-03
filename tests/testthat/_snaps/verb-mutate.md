@@ -1,3 +1,15 @@
+# mutate() isn't inlined after distinct() #1119
+
+    Code
+      lf %>% distinct(x) %>% mutate(x = 0)
+    Output
+      <SQL>
+      SELECT 0.0 AS `x`
+      FROM (
+        SELECT DISTINCT *
+        FROM `df`
+      ) `q01`
+
 # can use window function after summarise and pure projection #1104
 
     Code

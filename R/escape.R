@@ -32,9 +32,7 @@
 #' escape_ansi(escape_ansi("X"))
 #' escape_ansi(escape_ansi(escape_ansi("X")))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
-  if (is.null(con)) {
-    cli_abort("{.arg con} must not be NULL")
-  }
+  check_con(con)
 
   UseMethod("escape")
 }
@@ -147,9 +145,7 @@ error_embed <- function(type, expr) {
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
-  if (is.null(con)) {
-    cli_abort("{.arg con} must not be NULL")
-  }
+  check_con(con)
 
   if (length(x) == 0) {
     if (!is.null(collapse)) {

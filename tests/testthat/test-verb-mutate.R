@@ -16,6 +16,24 @@ test_that("two mutates equivalent to one", {
   compare_tbl(df1, df2)
 })
 
+test_that("mutate() isn't inlined after distinct() #1119", {
+  mf <- memdb_frame(x = 1:2)
+  expect_equal(
+    mf %>%
+      distinct(x) %>%
+      mutate(x = 0) %>%
+      collect(),
+    tibble(x = c(0, 0))
+  )
+
+  lf <- lazy_frame(x = 1:2)
+  expect_snapshot(
+    lf %>%
+      distinct(x) %>%
+      mutate(x = 0)
+  )
+})
+
 test_that("can use window function after summarise and pure projection #1104", {
   lf <- lazy_frame(g = 1, x = 1) %>%
     group_by(g) %>%

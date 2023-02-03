@@ -124,8 +124,8 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
 #' df %>% tidyr::replace_na(list(x = 0, y = "unknown"))
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
-  stopifnot(is_list(replace))
-  stopifnot(is_empty(replace) || is_named(replace))
+  check_list(replace)
+  check_named(replace)
   replace <- replace[names(replace) %in% colnames(data)]
 
   if (is_empty(replace)) {

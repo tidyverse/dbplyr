@@ -4,7 +4,8 @@
       translate_sql(month(x, label = TRUE, abbr = TRUE))
     Condition
       Error in `month()`:
-      ! `abbr` is not supported in SQL Server translation
+      ! `abbr = TRUE` isn't supported in SQL Server translation.
+      i It must be FALSE instead.
 
 # convert between bit and boolean as needed
 
