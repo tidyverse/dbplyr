@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `across()` and `pick()` can be used (again) in `distinct()` (@mgirlich, #1125).
+
 * The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
   `percent_rank()`, and `cume_dist()`) now work again for variables wrapped in
   `desc()`, e.g. `row_number(desc(x))` (@mgirlich, #1118).

@@ -30,7 +30,8 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   if (empty_dots) {
     dots <- quos(!!!syms(colnames(.data)))
   } else {
-    dots <- enquos(...)
+    dots <- partial_eval_dots(.data, ..., .named = FALSE)
+    dots <- quos(!!!dots)
   }
   prep <- dplyr::distinct_prepare(.data, dots, group_vars = group_vars(.data))
   out <- dplyr::select(prep$data, prep$keep)

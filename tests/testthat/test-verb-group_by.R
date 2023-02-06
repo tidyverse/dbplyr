@@ -73,6 +73,14 @@ test_that("group_by handles empty dots", {
   expect_equal(lf %>% group_by(.add = TRUE) %>% group_vars(), c("x"))
 })
 
+test_that("can select variables via pick()", {
+  lf <- lazy_frame(x_1 = 1, x_2 = 1, y = 1)
+  expect_equal(
+    lf %>% group_by(pick(starts_with("x_"))) %>% op_grps(),
+    c("x_1", "x_2")
+  )
+})
+
 test_that("only adds step if necessary", {
   lf <- lazy_frame(x = 1, y = 1)
   expect_equal(lf %>% group_by(), lf)
