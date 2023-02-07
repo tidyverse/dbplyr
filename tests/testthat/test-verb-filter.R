@@ -210,7 +210,7 @@ test_that("filter() after summarise() uses `HAVING`", {
   # Can use freshly aggregated column
   expect_snapshot((out <- lf %>% filter(x_mean > 1)))
   expect_equal(
-    out$lazy_query$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    out$lazy_query$having, list(quo(mean(x, na.rm = TRUE) > 1)),
     ignore_formula_env = TRUE
   )
 
@@ -252,12 +252,46 @@ test_that("filter() after summarise() uses `HAVING`", {
 
   lq <- out$lazy_query
   expect_equal(
-    lq$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    lq$having, list(quo(mean(x, na.rm = TRUE) > 1)),
     ignore_formula_env = TRUE
   )
   # TODO should the `order_vars` and the `frame` really survive `summarise()`?
   expect_equal(lq$order_vars, list(quo(h)), ignore_formula_env = TRUE)
   expect_equal(lq$frame, list(range = c(-3, Inf)))
+})
+
+test_that("`HAVING` supports expressions #1128", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot({
+    lf %>%
+      summarise(x_sum = sum(x, na.rm = TRUE)) %>%
+      filter(!is.na(x_sum))
+  })
+
+  out <- lf %>%
+    summarise(x_sum = sum(x, na.rm = TRUE)) %>%
+    filter(!is.na(x_sum))
+  expect_equal(
+    out$lazy_query$having,
+    list(quo(!is.na(sum(x, na.rm = TRUE)))),
+    ignore_formula_env = TRUE
+  )
+
+  # correctly handles environments
+  y <- 1L
+  f <- function(lf, y = 2L) {
+    lf %>% summarise(x_sum = sum(x, na.rm = TRUE) - y)
+  }
+
+  out <- f(lf) %>%
+    filter(!is.na(x_sum + y))
+
+  expect_equal(
+    out$lazy_query$having,
+    list(quo(!is.na(sum(x, na.rm = TRUE) - 2L + 1L))),
+    ignore_formula_env = TRUE
+  )
 })
 
 test_that("filter() after mutate() does not use `HAVING`", {
