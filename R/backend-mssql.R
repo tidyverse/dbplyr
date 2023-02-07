@@ -351,8 +351,6 @@ simulate_mssql <- function(version = "15.0") {
       var           = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
-      # percentile_cont needs `OVER()` in mssql
-      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
       median = sql_agg_not_supported("median", "SQL Server"),
       quantile = sql_agg_not_supported("quantile", "SQL Server")
 
