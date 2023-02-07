@@ -75,6 +75,15 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(translate_sql(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
 })
 
+test_that("custom window functions translated correctly", {
+  local_con(simulate_postgres())
+
+  expect_snapshot({
+    (expect_error(translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)))
+    (expect_error(translate_sql(median(x, na.rm = TRUE), window = TRUE)))
+  })
+})
+
 test_that("custom SQL translation", {
   lf <- lazy_frame(x = 1, con = simulate_postgres())
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))

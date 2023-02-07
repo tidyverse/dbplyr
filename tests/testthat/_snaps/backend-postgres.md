@@ -1,3 +1,20 @@
+# custom window functions translated correctly
+
+    Code
+      (expect_error(translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
+      i Use `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))` instead.
+    Code
+      (expect_error(translate_sql(median(x, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `median()`:
+      ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
+      i Use `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))` instead.
+
 # custom SQL translation
 
     Code

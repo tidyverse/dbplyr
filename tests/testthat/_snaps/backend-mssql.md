@@ -1,3 +1,20 @@
+# custom aggregators translated correctly
+
+    Code
+      (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
+      i Use `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct()` instead.
+    Code
+      (expect_error(translate_sql(median(x, na.rm = TRUE), window = FALSE)))
+    Output
+      <error/rlang_error>
+      Error in `median()`:
+      ! Translation of `median()` in `summarise()` is not supported for SQL Server.
+      i Use `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct()` instead.
+
 # custom lubridate functions translated correctly
 
     Code

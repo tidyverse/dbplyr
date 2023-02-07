@@ -253,12 +253,53 @@ check_na_rm <- function(na.rm) {
 
 #' @rdname sql_variant
 #' @export
-sql_not_supported <- function(f) {
+sql_not_supported <- function(f, alternative = NULL) {
   check_string(f)
 
   function(...) {
     # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("{f} is not available in this SQL variant")
+    cli_abort(c(
+      "{f} is not available in this SQL variant.",
+      i = alternative
+    ))
+  }
+}
+
+sql_agg_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun summarise} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(msg, i = "Use {.code mutate(<col> = {f_call_str}) %>% distinct()} instead.")
+    cli_abort(msg)
+  }
+}
+
+sql_win_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun mutate} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(msg, i = "Use {.code df %>% left_join(summarise(<col> = {f_call_str}))} instead.")
+    cli_abort(msg)
   }
 }
 
