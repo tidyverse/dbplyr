@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `quantile()` and `median()` now error for SQL Server when used in `summarise()`
+  and for PostgreSQL when used in `mutate()` as they can't be properly
+  translated (@mgirlich, #1110).
+
 * Fixed an issue when using `filter()` on a summarised variable (@mgirlich, #1128).
 
 * `across()` and `pick()` can be used (again) in `distinct()` (@mgirlich, #1125).
