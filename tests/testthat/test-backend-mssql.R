@@ -61,9 +61,9 @@ test_that("custom aggregators translated correctly", {
   expect_error(translate_sql(cov(x), window = FALSE), "not available")
 
   expect_equal(translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
-  expect_snapshot({
-    (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
-    (expect_error(translate_sql(median(x, na.rm = TRUE), window = FALSE)))
+  expect_snapshot(error = TRUE, {
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+    translate_sql(median(x, na.rm = TRUE), window = FALSE)
   })
 })
 

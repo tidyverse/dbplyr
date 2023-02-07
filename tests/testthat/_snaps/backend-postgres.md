@@ -6,14 +6,16 @@
       <error/rlang_error>
       Error in `quantile()`:
       ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
-      i Use `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))` instead.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
     Code
       (expect_error(translate_sql(median(x, na.rm = TRUE), window = TRUE)))
     Output
       <error/rlang_error>
       Error in `median()`:
       ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
-      i Use `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))` instead.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
 
 # custom SQL translation
 
@@ -86,52 +88,4 @@
       DO UPDATE
       SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
-
-# can explain
-
-    Code
-      db %>% mutate(y = x + 1) %>% explain()
-    Output
-      <SQL>
-      SELECT *, "x" + 1.0 AS "y"
-      FROM "test"
-      
-      <PLAN>
-                                                 QUERY PLAN
-      1 Seq Scan on test  (cost=0.00..1.04 rows=3 width=36)
-
----
-
-    Code
-      db %>% mutate(y = x + 1) %>% explain(format = "json")
-    Output
-      <SQL>
-      SELECT *, "x" + 1.0 AS "y"
-      FROM "test"
-      
-      <PLAN>
-                                                                                                                                                                                                                                                                 QUERY PLAN
-      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
-
-# can insert with returning
-
-    Code
-      rows_insert(x, y, by = c("a", "b"), in_place = TRUE, conflict = "ignore",
-      returning = everything(), method = "on_conflict")
-    Condition
-      Error in `rows_insert()`:
-      ! Can't modify database table "df_x".
-      Caused by error:
-      ! dummy DBI error
-
-# can upsert with returning
-
-    Code
-      rows_upsert(x, y, by = c("a", "b"), in_place = TRUE, returning = everything(),
-      method = "on_conflict")
-    Condition
-      Error in `rows_upsert()`:
-      ! Can't modify database table "df_x".
-      Caused by error:
-      ! dummy DBI error
 
