@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fixed an issue when using `filter()` on a summarised variable (@mgirlich, #1128).
+
 * `across()` and `pick()` can be used (again) in `distinct()` (@mgirlich, #1125).
 
 * The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,

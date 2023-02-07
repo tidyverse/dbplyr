@@ -115,7 +115,7 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
 
 filter_via_having <- function(lazy_query, dots) {
   names <- lazy_query$select$name
-  exprs <- lazy_query$select$expr
+  exprs <- purrr::map_if(lazy_query$select$expr, is_quosure, quo_get_expr)
   dots <- purrr::map(dots, replace_sym, names, exprs)
 
   lazy_query$having <- c(lazy_query$having, dots)
