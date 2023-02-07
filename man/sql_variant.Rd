@@ -55,7 +55,7 @@ sql_aggregate_2(f)
 
 sql_aggregate_n(f, f_r = f)
 
-sql_not_supported(f, alternative = NULL)
+sql_not_supported(f)
 
 sql_cast(type)
 

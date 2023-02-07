@@ -253,15 +253,12 @@ check_na_rm <- function(na.rm) {
 
 #' @rdname sql_variant
 #' @export
-sql_not_supported <- function(f, alternative = NULL) {
+sql_not_supported <- function(f) {
   check_string(f)
 
   function(...) {
     # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort(c(
-      "{f} is not available in this SQL variant.",
-      i = alternative
-    ))
+    cli_abort("{f} is not available in this SQL variant.")
   }
 }
 
