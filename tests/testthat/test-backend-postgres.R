@@ -242,13 +242,18 @@ test_that("can insert with returning", {
 test_that("casts `y` column for local df", {
   con <- src_test("postgres")
 
-  DBI::dbWriteTable(
-    con,
-    "df_x",
-    value = tibble(id = 1L, val = 10L, arr = "{1,2}"),
-    field.types = c(id = "bigint", val = "bigint", arr = "integer[]")
-  )
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+  DBI::dbExecute(con, "CREATE SCHEMA dbplyr_test_schema")
+  df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
+  types <- c(id = "bigint", val = "bigint", arr = "integer[]")
+  DBI::dbWriteTable(con, "df_x", value = df, field.types = types)
+  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x")
+  DBI::dbWriteTable(con, table2, value = df, field.types = types)
+
+  withr::defer({
+    DBI::dbRemoveTable(con, DBI::SQL("df_x"))
+    DBI::dbRemoveTable(con, DBI::Id(schema = "dbplyr_test_schema", table = "df_x"))
+    DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema")
+  })
 
   y <- tibble(
     id = "2",
@@ -280,6 +285,10 @@ test_that("casts `y` column for local df", {
   )
 
   expect_equal(tbl(con, "df_x") %>% collect(), out)
+
+  types_expected <- c(id = "int8", val = "int8", arr = "_int4")
+  expect_equal(get_col_types(con, table2), types_expected)
+  expect_equal(get_col_types(con, in_schema("public", "df_x")), types_expected)
 })
 
 test_that("can upsert with returning", {

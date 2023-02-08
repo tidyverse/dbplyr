@@ -783,6 +783,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
+  name <- as.sql(name, con)
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
