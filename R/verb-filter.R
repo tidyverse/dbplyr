@@ -53,7 +53,7 @@ add_filter <- function(.data, dots) {
     return(filter_via_having(lazy_query, dots))
   }
 
-  if (!uses_window_fun(dots, con)) {
+  if (!dots_use_window_fun) {
     if (uses_mutated_vars(dots, lazy_query$select)) {
       lazy_select_query(
         x = lazy_query,
