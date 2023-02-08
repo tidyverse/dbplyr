@@ -54,7 +54,7 @@ add_filter <- function(.data, dots) {
   }
 
   if (!dots_use_window_fun) {
-    if (uses_mutated_vars(dots, lazy_query$select)) {
+    if (filter_needs_new_query(dots, lazy_query, con)) {
       lazy_select_query(
         x = lazy_query,
         where = dots
@@ -86,6 +86,26 @@ add_filter <- function(.data, dots) {
       where = where$expr
     )
   }
+}
+
+filter_needs_new_query <- function(dots, lazy_query, con) {
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(TRUE)
+  }
+
+  if (uses_mutated_vars(dots, lazy_query$select)) {
+    return(TRUE)
+  }
+
+  if (uses_window_fun(lazy_query$select$expr, con)) {
+    return(TRUE)
+  }
+
+  if (any_expr_uses_sql(lazy_query$select$expr)) {
+    return(TRUE)
+  }
+
+  FALSE
 }
 
 filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
