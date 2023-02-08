@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `mutate()` + `filter()` now again produces a new query if the `mutate()`
+  uses a window function or SQL (@mgirlich, #1135).
+
 * `quantile()` and `median()` now error for SQL Server when used in `summarise()`
   and for PostgreSQL when used in `mutate()` as they can't be properly
   translated (@mgirlich, #1110).

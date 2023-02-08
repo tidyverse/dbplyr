@@ -120,6 +120,33 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
+test_that("filter isn't inlined after mutate with window function #1135", {
+  lf <- lazy_frame(x = 1L, y = 1:2)
+  out <- lf %>%
+    dplyr::mutate(z = sum(y, na.rm = TRUE)) %>%
+    dplyr::filter(y <= 1)
+
+  lq <- out$lazy_query
+  expect_equal(lq$select$expr, syms(c("x", "y", "z")))
+  expect_equal(lq$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
+  expect_equal(
+    quo_get_expr(lq$x$select$expr[[3]]),
+    expr(sum(y, na.rm = TRUE))
+  )
+
+  out2 <- lf %>%
+    dplyr::mutate(z = sql("SUM(y) OVER ()")) %>%
+    dplyr::filter(y <= 1)
+
+  lq2 <- out2$lazy_query
+  expect_equal(lq2$select$expr, syms(c("x", "y", "z")))
+  expect_equal(lq2$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
+  expect_equal(
+    quo_get_expr(lq2$x$select$expr[[3]]),
+    expr(sql("SUM(y) OVER ()"))
+  )
+})
+
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
