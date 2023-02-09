@@ -1,3 +1,30 @@
+# select after distinct produces subquery
+
+    Code
+      lf %>% distinct() %>% select(x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT DISTINCT *
+        FROM `df`
+      ) `q01`
+
+# rename/relocate after distinct is inlined #1141
+
+    Code
+      lf %>% distinct() %>% rename(z = y)
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y` AS `z`
+      FROM `df`
+    Code
+      lf %>% distinct() %>% relocate(y)
+    Output
+      <SQL>
+      SELECT DISTINCT `y`, `x`
+      FROM `df`
+
 # select preserves grouping vars
 
     Code
