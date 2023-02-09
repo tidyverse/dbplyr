@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `case_match()` now works with strings on the left hand side (@mgirlich, #1143).
+
 * The `rows_*()` function work again for tables in a schema in PostgreSQL
   (@mgirlich, #1133).
 
