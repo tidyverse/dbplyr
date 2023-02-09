@@ -1,7 +1,7 @@
 # select after distinct produces subquery
 
     Code
-      select(distinct(lf), x)
+      lf %>% distinct() %>% select(x)
     Output
       <SQL>
       SELECT `x`
@@ -13,13 +13,13 @@
 # rename/relocate after distinct is inlined #1141
 
     Code
-      rename(distinct(lf), z = y)
+      lf %>% distinct() %>% rename(z = y)
     Output
       <SQL>
       SELECT DISTINCT `x`, `y` AS `z`
       FROM `df`
     Code
-      relocate(distinct(lf), y)
+      lf %>% distinct() %>% relocate(y)
     Output
       <SQL>
       SELECT DISTINCT `y`, `x`
