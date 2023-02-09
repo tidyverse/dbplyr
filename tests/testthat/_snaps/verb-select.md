@@ -1,3 +1,30 @@
+# select after distinct produces subquery
+
+    Code
+      select(distinct(lf), x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT DISTINCT *
+        FROM `df`
+      ) `q01`
+
+# rename/relocate after distinct is inlined #1141
+
+    Code
+      rename(distinct(lf), z = y)
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y` AS `z`
+      FROM `df`
+    Code
+      relocate(distinct(lf), y)
+    Output
+      <SQL>
+      SELECT DISTINCT `y`, `x`
+      FROM `df`
+
 # select preserves grouping vars
 
     Code

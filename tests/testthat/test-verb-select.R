@@ -23,6 +23,34 @@ test_that("two selects equivalent to one", {
   expect_named(out, c("b", "c"))
 })
 
+test_that("select after distinct produces subquery", {
+  lf <- lazy_frame(x = 1, y = 1:2)
+  expect_snapshot(
+    lf |> distinct() |> select(x)
+  )
+
+  out <- lf |> distinct() |> select(x)
+  lq <- out$lazy_query
+  expect_false(lq$distinct)
+  expect_true(lq$x$distinct)
+})
+
+test_that("rename/relocate after distinct is inlined #1141", {
+  lf <- lazy_frame(x = 1, y = 1:2)
+  expect_snapshot({
+    lf |> distinct() |> rename(z = y)
+    lf |> distinct() |> relocate(y)
+  })
+
+  out <- lf |> distinct() |> rename(z = y)
+  lq <- out$lazy_query
+  expect_true(lq$distinct)
+
+  out <- lf |> distinct() |> relocate(y)
+  lq <- out$lazy_query
+  expect_true(lq$distinct)
+})
+
 test_that("select operates on mutated vars", {
   mf <- memdb_frame(x = c(1, 2, 3), y = c(3, 2, 1))
 

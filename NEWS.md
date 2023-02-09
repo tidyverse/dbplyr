@@ -2,7 +2,7 @@
 
 * The `rows_*()` function work again for tables in a schema in PostgreSQL
   (@mgirlich, #1133).
-
+ 
 * `mutate()` + `filter()` now again produces a new query if the `mutate()`
   uses a window function or SQL (@mgirlich, #1135).
 
@@ -18,8 +18,8 @@
   `percent_rank()`, and `cume_dist()`) now work again for variables wrapped in
   `desc()`, e.g. `row_number(desc(x))` (@mgirlich, #1118).
 
-* `mutate()` after `distinct()` now again produces a subquery to produce the
-  correct result (@mgirlich, #1119).
+* `mutate()` and `select()` after `distinct()` now again produce a subquery to
+  generate the correct translation (@mgirlich, #1119, #1141).
 
 * Moved argument `auto_index` after `...` in `*_join()` (@mgirlich, #1115).
 
