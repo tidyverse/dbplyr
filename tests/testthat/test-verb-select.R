@@ -26,10 +26,10 @@ test_that("two selects equivalent to one", {
 test_that("select after distinct produces subquery", {
   lf <- lazy_frame(x = 1, y = 1:2)
   expect_snapshot(
-    lf |> distinct() |> select(x)
+    lf %>% distinct() %>% select(x)
   )
 
-  out <- lf |> distinct() |> select(x)
+  out <- lf %>% distinct() %>% select(x)
   lq <- out$lazy_query
   expect_false(lq$distinct)
   expect_true(lq$x$distinct)
@@ -38,15 +38,15 @@ test_that("select after distinct produces subquery", {
 test_that("rename/relocate after distinct is inlined #1141", {
   lf <- lazy_frame(x = 1, y = 1:2)
   expect_snapshot({
-    lf |> distinct() |> rename(z = y)
-    lf |> distinct() |> relocate(y)
+    lf %>% distinct() %>% rename(z = y)
+    lf %>% distinct() %>% relocate(y)
   })
 
-  out <- lf |> distinct() |> rename(z = y)
+  out <- lf %>% distinct() %>% rename(z = y)
   lq <- out$lazy_query
   expect_true(lq$distinct)
 
-  out <- lf |> distinct() |> relocate(y)
+  out <- lf %>% distinct() %>% relocate(y)
   lq <- out$lazy_query
   expect_true(lq$distinct)
 })
