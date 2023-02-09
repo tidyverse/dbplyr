@@ -164,6 +164,11 @@ test_that("LHS can handle different types", {
   )
 
   expect_equal(
+    translate_sql(case_match(z, "x" ~ "a")),
+    sql("CASE WHEN (`z` IN ('x')) THEN 'a' END")
+  )
+
+  expect_equal(
     translate_sql(case_match(z, y ~ "a")),
     sql("CASE WHEN (`z` IN (`y`)) THEN 'a' END")
   )
@@ -183,6 +188,11 @@ test_that("LHS can match multiple values", {
   expect_equal(
     translate_sql(case_match(z, c(1L, 3L) ~ "a")),
     sql("CASE WHEN (`z` IN (1, 3)) THEN 'a' END")
+  )
+
+  expect_equal(
+    translate_sql(case_match(z, c("x", "y") ~ "a")),
+    sql("CASE WHEN (`z` IN ('x', 'y')) THEN 'a' END")
   )
 
   expect_equal(
