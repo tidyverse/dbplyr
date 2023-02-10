@@ -211,14 +211,14 @@ generate_join_table_names <- function(table_names) {
   }
 
   # avoid database aliases exceeding the database-specific maximum length
-  table_names_prepared %>%
-    abbreviate(
-      # arbitrarily floor at 63 (Postgres limit) to avoid unnecessarily truncating reasonable lengths
-      minlength = max(table_name_length_max, 63),
-      # (explicit, default) err on the side of unique table names instead of exact length
-      strict = FALSE,
-      named = FALSE
-    )
+  abbreviate(
+    table_names_prepared,
+    # arbitrarily floor at 63 (Postgres limit) to avoid unnecessarily truncating reasonable lengths
+    minlength = max(table_name_length_max, 63),
+    # (explicit, default) err on the side of unique table names instead of exact length
+    strict = FALSE,
+    named = FALSE
+  )
 }
 
 #' @export
