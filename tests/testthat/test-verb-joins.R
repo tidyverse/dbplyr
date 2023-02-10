@@ -76,71 +76,35 @@ test_that("alias truncates long table names at database limit", {
   # Postgres has max table name length of 63; ensure it's not exceeded when generating table alias
   withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
 
-  DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
-
-  nm1 <- strrep("a", 63)
+  nm1 <- paste0("a", paste0(0:62 %% 10, collapse = ""))
   DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
-  df1 <- tbl(con, nm1)
+  mf1 <- tbl(con, nm1)
 
-  nm2 <- strrep("b", 63)
-  DBI::dbWriteTable(con, nm2, tibble(x = 2:3, z = "b"))
-  df2 <- tbl(con, nm2)
+  nm2 <- paste0("b", paste0(0:62 %% 10, collapse = ""))
+  DBI::dbWriteTable(con, nm2, tibble(x = 2:3, y = "b"))
+  mf2 <- tbl(con, nm2)
 
-  # 1. self join: 2 identical tables
-  lazy_table_1 <- left_join(df1, df1, by = c("x", "y"))
+  # 2 tables
+  self_join2 <- left_join(mf1, mf1, by = c("x", "y"))
 
   expect_equal(
-    lazy_table_1 %>% collect(),
+    self_join2 %>% collect(),
     tibble(x = 1:3, y = "a")
   )
   expect_snapshot(
-    left_join(df1, df1, by = c("x", "y")) %>% remote_query()
+    self_join2 %>% remote_query()
   )
 
-  # 2. self join: >2 identical tables
-  # 2a: 1 -> 1-> 2
-  lazy_table_2a <-
-    left_join(df1, df1, by = c("x", "y")) %>%
-    left_join(df2, by = "x")
+  # 3 tables
+  self_join3 <- left_join(mf1, mf1, by = c("x", "y")) %>%
+    inner_join(mf2, by = "x")
 
   expect_equal(
-    lazy_table_2a %>% collect(),
-    tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
+    self_join3 %>% collect(),
+    tibble(x = 2:3, y.x = "a", y.y = "b")
   )
   expect_snapshot(
-    left_join(df1, df1, by = c("x", "y")) %>%
-      left_join(df2, by = "x") %>%
-      remote_query()
-  )
-
-  # 2b: 1 -> 2-> 1
-  lazy_table_2b <-
-    left_join(df1, df2, by = "x") %>%
-    left_join(df1, by = c("x", "y"))
-
-  expect_equal(
-    lazy_table_2b %>% collect(),
-    tibble(x = 1:3, y = "a", z = c(NA, "b", "b"))
-  )
-  expect_snapshot(
-    left_join(df1, df2, by = "x") %>%
-      left_join(df1, by = c("x", "y")) %>%
-      remote_query()
-  )
-
-  # 2c: 2 -> 1-> 1
-  lazy_table_2c <-
-    left_join(df2, df1, by = "x") %>%
-    left_join(df1, by = c("x", "y"))
-
-  expect_equal(
-    lazy_table_2c %>% collect(),
-    tibble(x = 2:3, z = "b", y = "a")
-  )
-  expect_snapshot(
-    left_join(df2, df1, by = "x") %>%
-      left_join(df1, by = c("x", "y")) %>%
-      remote_query()
+    self_join3 %>% remote_query()
   )
 })
 

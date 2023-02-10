@@ -43,65 +43,33 @@
 # alias truncates long table names at database limit
 
     Code
-      left_join(df1, df1, by = c("x", "y")) %>% remote_query()
+      self_join2 %>% remote_query()
     Output
-      <SQL> SELECT `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_LHS`.*
-      FROM `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_LHS`
-      LEFT JOIN `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_RHS`
+      <SQL> SELECT `a012345678901234567890123456789012345678901234567890123456789012_L`.*
+      FROM `a012345678901234567890123456789012345678901234567890123456789012` AS `a012345678901234567890123456789012345678901234567890123456789012_L`
+      LEFT JOIN `a012345678901234567890123456789012345678901234567890123456789012` AS `a012345678901234567890123456789012345678901234567890123456789012_R`
         ON (
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_LHS`.`x` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_RHS`.`x` AND
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_LHS`.`y` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_RHS`.`y`
+          `a012345678901234567890123456789012345678901234567890123456789012_L`.`x` = `a012345678901234567890123456789012345678901234567890123456789012_R`.`x` AND
+          `a012345678901234567890123456789012345678901234567890123456789012_L`.`y` = `a012345678901234567890123456789012345678901234567890123456789012_R`.`y`
         )
 
 ---
 
     Code
-      left_join(df1, df1, by = c("x", "y")) %>% left_join(df2, by = "x") %>%
-        remote_query()
-    Output
-      <SQL> SELECT `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.*, `z`
-      FROM `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`
-      LEFT JOIN `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`
-        ON (
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`x` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`.`x` AND
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`y` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`.`y`
-        )
-      LEFT JOIN `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`
-        ON (`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`x` = `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`.`x`)
-
----
-
-    Code
-      left_join(df1, df2, by = "x") %>% left_join(df1, by = c("x", "y")) %>%
-        remote_query()
-    Output
-      <SQL> SELECT `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.*, `z`
-      FROM `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`
-      LEFT JOIN `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`
-        ON (`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`x` = `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`.`x`)
-      LEFT JOIN `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`
-        ON (
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`x` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`.`x` AND
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...1`.`y` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`.`y`
-        )
-
----
-
-    Code
-      left_join(df2, df1, by = "x") %>% left_join(df1, by = c("x", "y")) %>%
-        remote_query()
+      self_join3 %>% remote_query()
     Output
       <SQL> SELECT
-        `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`.*,
-        `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`.`y` AS `y`
-      FROM `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`
-      LEFT JOIN `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`
-        ON (`bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`.`x` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`.`x`)
-      LEFT JOIN `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa` AS `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`
+        `a012345678901234567890123456789012345678901234567890123456789012...1`.`x` AS `x`,
+        `a012345678901234567890123456789012345678901234567890123456789012...1`.`y` AS `y.x`,
+        `b012345678901234567890123456789012345678901234567890123456789012`.`y` AS `y.y`
+      FROM `a012345678901234567890123456789012345678901234567890123456789012` AS `a012345678901234567890123456789012345678901234567890123456789012...1`
+      LEFT JOIN `a012345678901234567890123456789012345678901234567890123456789012` AS `a012345678901234567890123456789012345678901234567890123456789012...2`
         ON (
-          `bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb`.`x` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`.`x` AND
-          `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...2`.`y` = `aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...3`.`y`
+          `a012345678901234567890123456789012345678901234567890123456789012...1`.`x` = `a012345678901234567890123456789012345678901234567890123456789012...2`.`x` AND
+          `a012345678901234567890123456789012345678901234567890123456789012...1`.`y` = `a012345678901234567890123456789012345678901234567890123456789012...2`.`y`
         )
+      INNER JOIN `b012345678901234567890123456789012345678901234567890123456789012`
+        ON (`a012345678901234567890123456789012345678901234567890123456789012...1`.`x` = `b012345678901234567890123456789012345678901234567890123456789012`.`x`)
 
 # join check `x_as` and `y_as`
 
