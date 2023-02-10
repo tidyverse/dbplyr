@@ -49,9 +49,9 @@ db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 
 postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
-  if (any(c(perl, fixed, useBytes))) {
-    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
-  }
+  check_unsupported_arg(perl, FALSE, backend = "PostgreSQL")
+  check_unsupported_arg(fixed, FALSE, backend = "PostgreSQL")
+  check_unsupported_arg(useBytes, FALSE, backend = "PostgreSQL")
 
   if (ignore.case) {
     sql_expr(((!!x)) %~*% ((!!pattern)))
@@ -157,9 +157,7 @@ sql_translation.PqConnection <- function(con) {
         }
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
-        if (fiscal_start != 1) {
-          cli_abort("{.arg fiscal_start} is not supported in PostgreSQL translation. Must be 1.")
-        }
+        check_unsupported_arg(fiscal_start, 1, backend = "PostgreSQL")
 
         if (with_year) {
           sql_expr((EXTRACT(YEAR %FROM% !!x) || '.' || EXTRACT(QUARTER %FROM% !!x)))
@@ -233,7 +231,9 @@ sql_translation.PqConnection <- function(con) {
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+      median = sql_win_not_supported("median", "PostgreSQL"),
+      quantile = sql_win_not_supported("quantile", "PostgreSQL")
     )
   )
 }

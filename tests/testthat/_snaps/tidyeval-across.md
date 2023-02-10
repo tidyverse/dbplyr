@@ -111,7 +111,8 @@
       Error in `mutate()`:
       i In argument: `across(x, .unpack = TRUE)`
       Caused by error in `mutate()`:
-      ! `.unpack = TRUE` is not supported in SQL translations.
+      ! `.unpack = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
 
 # if_all() gives informative errors
 

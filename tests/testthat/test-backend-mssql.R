@@ -61,14 +61,10 @@ test_that("custom aggregators translated correctly", {
   expect_error(translate_sql(cov(x), window = FALSE), "not available")
 
   expect_equal(translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
-  expect_equal(
-    translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE),
-    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
-  )
-  expect_equal(
-    translate_sql(median(x, na.rm = TRUE), window = FALSE),
-    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
-  )
+  expect_snapshot(error = TRUE, {
+    translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+    translate_sql(median(x, na.rm = TRUE), window = FALSE)
+  })
 })
 
 test_that("custom window functions translated correctly", {
@@ -78,6 +74,15 @@ test_that("custom window functions translated correctly", {
   expect_equal(translate_sql(var(x, na.rm = TRUE)), sql("VAR(`x`) OVER ()"))
 
   expect_equal(translate_sql(str_flatten(x)), sql("STRING_AGG(`x`, '') OVER ()"))
+
+  expect_equal(
+    translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE),
+    sql("PERCENTILE_CONT(0.3) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
+  expect_equal(
+    translate_sql(median(x, na.rm = TRUE), window = TRUE),
+    sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
 })
 
 test_that("custom lubridate functions translated correctly", {

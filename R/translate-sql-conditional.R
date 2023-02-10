@@ -1,6 +1,6 @@
 sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
   error_call <- current_call()
-  check_not_supplied(.ptype, call = error_call)
+  check_unsupported_arg(.ptype)
 
   x_expr <- enexpr(.x)
   if (!is_symbol(x_expr) && !is_call(x_expr)) {
@@ -53,21 +53,23 @@ sql_case_match_clause <- function(f, x, con) {
   if (is_call(f_query, "c")) {
     # need to handle `c(...)` specially because on `expr(c(1, y))` it returns
     # `sql('1', '`y`')`
-    f_query <- translate_sql_(call_args(f_query), con)
-  } else if (is_call(f_query) || is_symbol(f_query)) {
-    f_query <- translate_sql(!!f_query, con = con)
+    f_query <- call_args(f_query)
+  } else {
+    if (!is_vector(f_query) || length(f_query) == 1) {
+      f_query <- list(f_query)
+    }
   }
 
-  # NA need to be translated to `IS NULL` instead of `IN (NULL)`
-  # due to the preceeding translation it might be NA or the string NULL
-  missing_loc <- is.na(f_query) | f_query == "NULL"
+  f_query <- purrr::map_if(f_query, ~ !is_vector(.x), ~ translate_sql(!!.x, con = con))
+  missing_loc <- purrr::map_lgl(f_query, ~ is.null(.x) || is.na(.x))
+
   f_query <- vctrs::vec_slice(f_query, !missing_loc)
   has_na <- any(missing_loc)
 
   query <- NULL
   if (!is_empty(f_query)) {
-    values <- sql_vector(f_query, parens = TRUE, collapse = ", ", con = con)
-    query <- translate_sql(!!x %in% !!values)
+    f_query <- escape(f_query, con = con, parens = TRUE, collapse = ", ")
+    query <- translate_sql(!!x %in% !!f_query)
   }
 
   if (has_na) {
@@ -117,8 +119,8 @@ sql_case_when <- function(...,
                           .size = NULL,
                           error_call = caller_env()) {
   # TODO: switch to dplyr::case_when_prepare when available
-  check_not_supplied(.ptype, call = error_call)
-  check_not_supplied(.size, call = error_call)
+  check_unsupported_arg(.ptype, call = error_call)
+  check_unsupported_arg(.size, call = error_call)
 
   formulas <- list2(...)
   n <- length(formulas)

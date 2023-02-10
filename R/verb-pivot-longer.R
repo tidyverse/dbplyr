@@ -30,6 +30,8 @@
 #'
 #' @param data A data frame to pivot.
 #' @param cols Columns to pivot into longer format.
+#' @param ... Additional arguments passed on to methods.
+#' @param cols_vary Unsupported; included for compatibility with the generic.
 #' @param names_to A string specifying the name of the column to create
 #'   from the data stored in the column names of `data`.
 #' @param names_prefix A regular expression used to remove matching text
@@ -47,7 +49,6 @@
 #' @param names_transform,values_transform A list of column name-function pairs.
 #' @param names_ptypes A list of column name-prototype pairs.
 #' @param values_ptypes Not supported.
-#' @param ... Additional arguments passed on to methods.
 #' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' # See vignette("pivot") for examples and explanation
 #'
@@ -60,6 +61,8 @@
 #'   tidyr::pivot_longer(-id)
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
+                                  ...,
+                                  cols_vary,
                                   names_to = "name",
                                   names_prefix = NULL,
                                   names_sep = NULL,
@@ -70,11 +73,9 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = NULL,
-                                  ...) {
-  if (!is_missing(values_ptypes)) {
-    cli_abort("The {.arg values_ptypes} argument is not supported for remote back-ends")
-  }
+                                  values_transform = NULL) {
+  check_unsupported_arg(cols_vary)
+  check_unsupported_arg(values_ptypes)
 
   rlang::check_dots_empty()
 
@@ -86,7 +87,8 @@ pivot_longer.tbl_lazy <- function(data,
     names_sep = names_sep,
     names_pattern = names_pattern,
     names_ptypes = names_ptypes,
-    names_transform = names_transform
+    names_transform = names_transform,
+    error_call = current_env()
   )
 
   dbplyr_pivot_longer_spec(data, spec,

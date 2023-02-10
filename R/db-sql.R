@@ -148,9 +148,22 @@ sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ..
   UseMethod("sql_table_index")
 }
 #' @export
-sql_table_index.DBIConnection <- function(con, table, columns, name = NULL,
-                                           unique = FALSE, ...) {
-  assert_that(is_string(table) || is_schema(table), is.character(columns))
+sql_table_index.DBIConnection <- function(con,
+                                          table,
+                                          columns,
+                                          name = NULL,
+                                          unique = FALSE,
+                                          ...,
+                                          call = caller_env()) {
+  if (!(is_string(table) || is_schema(table))) {
+    stop_input_type(
+      table,
+      c("a string", "a schema"),
+      ...,
+      call = call
+    )
+  }
+  check_character(columns)
 
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
@@ -831,6 +844,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
+      table <- as.sql(table, con = con)
       msg <- "Can't analyze table {.val {table}}."
       cli_abort(msg, parent = cnd)
     }
@@ -852,6 +866,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
+      table <- as.sql(table, con = con)
       msg <- "Can't create index on {.val {table}}."
       cli_abort(msg, parent = cnd)
     }
@@ -905,6 +920,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
+      name <- as.sql(name, con = con)
       cli_abort("Can't save query to {.val {name}}.", parent = cnd)
     }
   )

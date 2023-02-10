@@ -144,8 +144,14 @@ win_rank <- function(f) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
+    order_expr <- enexpr(order)
+
     if (!is_null(order)) {
-      cond <- translate_sql((case_when(is.na(!!order) ~ 1L, TRUE ~ 0L)))
+      if (is_call(order_expr, "desc", n = 1L)) {
+        order_expr <- call_args(order_expr)[[1L]]
+      }
+
+      cond <- translate_sql((case_when(is.na(!!order_expr) ~ 1L, TRUE ~ 0L)))
       group <- sql(group, cond)
     }
 
@@ -159,7 +165,7 @@ win_rank <- function(f) {
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!is.na(!!order) ~ !!rank_sql))
+      translate_sql(case_when(!is.na(!!order_expr) ~ !!rank_sql))
     }
   }
 }
@@ -259,7 +265,7 @@ local_con <- function(con, env = parent.frame()) {
 }
 
 set_win_current_group <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$group_by
   sql_context$group_by <- vars
@@ -267,7 +273,7 @@ set_win_current_group <- function(vars) {
 }
 
 set_win_current_order <- function(vars) {
-  stopifnot(is.null(vars) || is.character(vars))
+  check_character(vars, allow_null = TRUE)
 
   old <- sql_context$order_by
   sql_context$order_by <- vars
@@ -275,7 +281,7 @@ set_win_current_order <- function(vars) {
 }
 
 set_win_current_frame <- function(frame) {
-  stopifnot(is.null(frame) || is.numeric(frame))
+  check_frame_range(frame)
 
   old <- sql_context$frame
   sql_context$frame <- frame
@@ -316,7 +322,7 @@ local_context <- function(x, env = parent.frame()) {
 # Where translation -------------------------------------------------------
 
 uses_window_fun <- function(x, con, lq) {
-  stopifnot(is.list(x))
+  check_list(x)
 
   calls <- unlist(lapply(x, all_calls))
   win_f <- ls(envir = dbplyr_sql_translation(con)$window)
@@ -403,7 +409,7 @@ translate_window_where_all <- function(x, window_funs = common_window_funs()) {
 
 window_where <- function(expr, comp) {
   stopifnot(is.call(expr) || is.name(expr) || is.atomic(expr))
-  stopifnot(is.list(comp))
+  check_list(comp)
 
   list(
     expr = expr,

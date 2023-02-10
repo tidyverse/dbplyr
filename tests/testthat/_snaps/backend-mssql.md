@@ -1,10 +1,28 @@
+# custom aggregators translated correctly
+
+    Code
+      translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+    Condition
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct(<col>)`
+    Code
+      translate_sql(median(x, na.rm = TRUE), window = FALSE)
+    Condition
+      Error in `median()`:
+      ! Translation of `median()` in `summarise()` is not supported for SQL Server.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct(<col>)`
+
 # custom lubridate functions translated correctly
 
     Code
       translate_sql(month(x, label = TRUE, abbr = TRUE))
     Condition
       Error in `month()`:
-      ! `abbr` is not supported in SQL Server translation
+      ! `abbr = TRUE` isn't supported in SQL Server translation.
+      i It must be FALSE instead.
 
 # convert between bit and boolean as needed
 

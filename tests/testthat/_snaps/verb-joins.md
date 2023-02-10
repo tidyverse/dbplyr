@@ -109,7 +109,7 @@
       left_join(x, x, by = "x", y_as = c("A", "B"))
     Condition
       Error in `left_join()`:
-      ! `y_as` must have size 1, not size 2.
+      ! `y_as` must be a single string or `NULL`, not a character vector.
 
 ---
 
@@ -159,6 +159,20 @@
       INNER JOIN `df3`
         ON (`df1`.`x` = `df3`.`x`)
 
+# can join 4 tables with same column #1101
+
+    Code
+      remote_query(out)
+    Output
+      <SQL> SELECT `lf1`.*, `b`, `c`, `lf4`.`a` AS `a4`
+      FROM `lf1`
+      INNER JOIN `lf2`
+        ON (`lf1`.`x` = `lf2`.`x`)
+      INNER JOIN `lf3`
+        ON (`lf1`.`x` = `lf3`.`x`)
+      INNER JOIN `lf4`
+        ON (`lf1`.`x` = `lf4`.`x`)
+
 # multiple joins produce separate queries if using right/full join
 
     Code
@@ -188,10 +202,17 @@
 # suffix arg is checked
 
     Code
-      inner_join(lf1, lf2, by = "x", suffix = "a")
-    Condition
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = "a")))
+    Output
+      <error/vctrs_error_assert_size>
       Error in `inner_join()`:
       ! `suffix` must have size 2, not size 1.
+    Code
+      (expect_error(inner_join(lf1, lf2, by = "x", suffix = 1L)))
+    Output
+      <error/rlang_error>
+      Error in `inner_join()`:
+      ! `suffix` must be a character vector, not the number 1.
 
 # joins reuse queries in cte mode
 

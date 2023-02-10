@@ -640,15 +640,13 @@ rows_check_key <- function(x,
   }
 }
 
-rows_check_in_place <- function(df, in_place) {
-  if (!rlang::is_bool(in_place)) {
-    cli_abort("{.arg in_place} must be `TRUE` or `FALSE`.")
-  }
+rows_check_in_place <- function(df, in_place, call = caller_env()) {
+  check_bool(in_place, call = call)
 
   if (!in_place) return()
 
   if (inherits(df, "tbl_TestConnection")) {
-    cli_abort("{.code in_place = TRUE} does not work for simulated connections.")
+    cli_abort("{.code in_place = TRUE} does not work for simulated connections.", call = call)
   }
 }
 
@@ -660,16 +658,7 @@ rows_check_conflict <- function(conflict, error_call = caller_env()) {
     error_call = error_call
   )
 
-  if (conflict == "error") {
-    cli_abort(
-      c(
-        '{.code conflict = "error"} is not supported for database tables.',
-        i = 'Please use {.code conflict = "ignore"} instead.'
-      ),
-      call = error_call
-    )
-  }
-
+  check_unsupported_arg(conflict, "ignore", call = error_call)
   conflict
 }
 
@@ -681,13 +670,7 @@ rows_check_ummatched <- function(unmatched, error_call = caller_env()) {
     error_call = error_call
   )
 
-  if (unmatched == "error") {
-    msg <- c(
-      '{.code unmatched = "error"} is not supported for database tables.',
-      i = 'Please use {.code unmatched = "ignore"} instead.'
-    )
-    cli_abort(msg, call = error_call)
-  }
+  check_unsupported_arg(unmatched, "ignore", call = error_call)
 
   unmatched
 }
@@ -800,6 +783,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
+  name <- as.sql(name, con)
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)

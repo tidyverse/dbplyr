@@ -1,3 +1,28 @@
+# mutate() isn't inlined after distinct() #1119
+
+    Code
+      lf %>% distinct(x) %>% mutate(x = 0)
+    Output
+      <SQL>
+      SELECT 0.0 AS `x`
+      FROM (
+        SELECT DISTINCT *
+        FROM `df`
+      ) `q01`
+
+# can use window function after summarise and pure projection #1104
+
+    Code
+      (expect_no_error(lf %>% mutate(r = row_number())))
+    Output
+      <SQL>
+      SELECT *, ROW_NUMBER() OVER () AS `r`
+      FROM (
+        SELECT `g`
+        FROM `df`
+        GROUP BY `g`
+      ) `q01`
+
 # can refer to fresly created values
 
     Code
@@ -53,6 +78,21 @@
         SELECT *, 2.0 AS `y`
         FROM `df`
       ) `q01`
+
+# across() uses original column rather than overriden one
+
+    Code
+      lf %>% mutate(x = -x, across(everything(), ~ .x / x), y = y + x)
+    Output
+      <SQL>
+      SELECT `x`, `y` + `x` AS `y`, `z`
+      FROM (
+        SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`
+        FROM (
+          SELECT -`x` AS `x`, `y`, `z`
+          FROM `df`
+        ) `q01`
+      ) `q02`
 
 # new columns take precedence over global variables
 

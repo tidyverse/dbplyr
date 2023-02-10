@@ -59,9 +59,9 @@
 sql_variant <- function(scalar = sql_translator(),
                         aggregate = sql_translator(),
                         window = sql_translator()) {
-  stopifnot(is.environment(scalar))
-  stopifnot(is.environment(aggregate))
-  stopifnot(is.environment(window))
+  check_environment(scalar)
+  check_environment(aggregate)
+  check_environment(window)
 
   # Need to check that every function in aggregate also occurs in window
   missing <- setdiff(ls(aggregate), ls(window))
@@ -143,7 +143,7 @@ sql_infix <- function(f, pad = TRUE) {
   #
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
-  assert_that(is_string(f))
+  check_string(f)
 
   if (pad) {
     function(x, y) {
@@ -178,7 +178,7 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 #' @rdname sql_variant
 #' @export
 sql_prefix <- function(f, n = NULL) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
     args <- list(...)
@@ -198,7 +198,7 @@ sql_prefix <- function(f, n = NULL) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
@@ -209,7 +209,7 @@ sql_aggregate <- function(f, f_r = f) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate_2 <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, y) {
     build_sql(sql(f), list(x, y))
@@ -219,7 +219,7 @@ sql_aggregate_2 <- function(f) {
 #' @rdname sql_variant
 #' @export
 sql_aggregate_n <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
@@ -254,11 +254,57 @@ check_na_rm <- function(na.rm) {
 #' @rdname sql_variant
 #' @export
 sql_not_supported <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
     # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("{f} is not available in this SQL variant")
+    cli_abort("{f} is not available in this SQL variant.")
+  }
+}
+
+sql_agg_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun summarise} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
+      " " = "{.code mutate(<col> = {f_call_str}) %>% distinct(<col>)}"
+    )
+    cli_abort(msg)
+  }
+}
+
+sql_win_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun mutate} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
+      " " = "{.code df %>% left_join(summarise(<col> = {f_call_str}))}."
+    )
+    cli_abort(msg)
   }
 }
 

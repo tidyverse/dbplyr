@@ -1,3 +1,30 @@
+# index fails if columns are missing
+
+    Code
+      (expect_error(compute(mf, indexes = list(c("y", "x", "z"), "a"))))
+    Output
+      <error/rlang_error>
+      Error in `compute()`:
+      ! All columns specified through `indexes` must exist in `x`.
+      i The following columns are missing from `indexes`: y, z, and a.
+    Code
+      (expect_error(compute(mf, unique_indexes = list(c("y", "x", "z"), "a"))))
+    Output
+      <error/rlang_error>
+      Error in `compute()`:
+      ! All columns specified through `unique_indexes` must exist in `x`.
+      i The following columns are missing from `unique_indexes`: y, z, and a.
+
+# compute can handle schema
+
+    Code
+      df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
+    Condition
+      Error in `db_save_query.DBIConnection()`:
+      ! Can't save query to "`main`.`db1`".
+      Caused by error:
+      ! table `db1` already exists
+
 # collect() handles DBI error
 
     Code

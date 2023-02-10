@@ -124,27 +124,31 @@ simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
 
 add_select <- function(.data, vars) {
   lazy_query <- .data$lazy_query
-  stopifnot(is.character(vars))
+  check_character(vars)
+  vars_data <- op_vars(.data)
 
-  if (is_identity(syms(vars), names(vars), op_vars(.data))) {
+  if (is_identity(syms(vars), names(vars), vars_data)) {
     return(lazy_query)
   }
 
   lazy_query <- rename_groups(lazy_query, vars)
 
   is_join <- inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")
-  is_select <- inherits(lazy_query, "lazy_select_query")
-  if (is_join || is_select) {
-    names_prev <- op_vars(lazy_query)
-    idx <- vctrs::vec_match(vars, names_prev)
+  if (is_join) {
+    idx <- vctrs::vec_match(vars, vars_data)
 
-    if (is_join) {
-      lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
-      lazy_query$vars$name <- names(vars)
-    } else {
-      lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
-      lazy_query$select$name <- names(vars)
-    }
+    lazy_query$vars <- vctrs::vec_slice(lazy_query$vars, idx)
+    lazy_query$vars$name <- names(vars)
+    return(lazy_query)
+  }
+
+  is_select <- inherits(lazy_query, "lazy_select_query")
+  select_can_be_inlined <- is_bijective_projection(vars, vars_data) || !is_true(lazy_query$distinct)
+  if (is_select && select_can_be_inlined) {
+    idx <- vctrs::vec_match(vars, vars_data)
+
+    lazy_query$select <- vctrs::vec_slice(lazy_query$select, idx)
+    lazy_query$select$name <- names(vars)
 
     return(lazy_query)
   }
@@ -154,6 +158,11 @@ add_select <- function(.data, vars) {
     select_operation = "select",
     select = syms(vars)
   )
+}
+
+is_bijective_projection <- function(vars, names_prev) {
+  vars <- unname(vars)
+  identical(sort(vars), names_prev)
 }
 
 rename_groups <- function(lazy_query, vars) {
