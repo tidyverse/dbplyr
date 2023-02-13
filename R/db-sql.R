@@ -765,7 +765,7 @@ sql_query_upsert.DBIConnection <- function(con,
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
 
-  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"))
+  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
@@ -844,6 +844,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
+      table <- as.sql(table, con = con)
       msg <- "Can't analyze table {.val {table}}."
       cli_abort(msg, parent = cnd)
     }
@@ -865,6 +866,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
+      table <- as.sql(table, con = con)
       msg <- "Can't create index on {.val {table}}."
       cli_abort(msg, parent = cnd)
     }
@@ -918,6 +920,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
+      name <- as.sql(name, con = con)
       cli_abort("Can't save query to {.val {name}}.", parent = cnd)
     }
   )

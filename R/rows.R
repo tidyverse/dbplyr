@@ -729,7 +729,7 @@ rows_prep <- function(con, x_name, y, by, lvl = 0) {
     lvl = lvl
   )
 
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name)
+  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name, condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   list(
@@ -741,7 +741,7 @@ rows_prep <- function(con, x_name, y, by, lvl = 0) {
 rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
   out <- rows_prep(con, x_name, y, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"))
+  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
   out$conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
 
@@ -783,6 +783,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
+  name <- as.sql(name, con)
   res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)

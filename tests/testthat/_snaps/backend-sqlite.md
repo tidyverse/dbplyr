@@ -5,13 +5,13 @@
     Output
       <error/rlang_error>
       Error in `quantile()`:
-      ! quantile() is not available in this SQL variant
+      ! quantile() is not available in this SQL variant.
     Code
       (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
     Output
       <error/rlang_error>
       Error in `quantile()`:
-      ! quantile() is not available in this SQL variant
+      ! quantile() is not available in this SQL variant.
 
 # custom SQL translation
 
@@ -31,44 +31,6 @@
       con = simulate_sqlite())
     Output
       <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
-
-# full and right join
-
-    Code
-      full_join(df1, df2, by = "x")
-    Output
-      <SQL>
-      SELECT `x`, `y.x`, `y.y`, `z`
-      FROM (
-        SELECT
-          COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`,
-          `df_LHS`.`y` AS `y.x`,
-          `df_RHS`.`y` AS `y.y`,
-          `z`
-        FROM `df` AS `df_LHS`
-        LEFT JOIN `df` AS `df_RHS`
-          ON (`df_LHS`.`x` = `df_RHS`.`x`)
-        UNION
-        SELECT
-          COALESCE(`df_RHS`.`x`, `df_LHS`.`x`) AS `x`,
-          `df_LHS`.`y` AS `y.x`,
-          `df_RHS`.`y` AS `y.y`,
-          `z`
-        FROM `df` AS `df_RHS`
-        LEFT JOIN `df` AS `df_LHS`
-          ON (`df_RHS`.`x` = `df_LHS`.`x`)
-      ) AS `q01`
-
----
-
-    Code
-      right_join(df2, df1, by = "x")
-    Output
-      <SQL>
-      SELECT `df_RHS`.`x` AS `x`, `df_LHS`.`y` AS `y.x`, `z`, `df_RHS`.`y` AS `y.y`
-      FROM `df` AS `df_RHS`
-      LEFT JOIN `df` AS `df_LHS`
-        ON (`df_RHS`.`x` = `df_LHS`.`x`)
 
 # can explain a query
 

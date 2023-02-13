@@ -144,7 +144,7 @@
       # warn if arrange before join
       lf %>% arrange(a) %>% left_join(rf)
     Message
-      Joining, by = "a"
+      Joining with `by = join_by(a)`
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
@@ -161,7 +161,7 @@
     Code
       lf %>% arrange(a) %>% semi_join(rf)
     Message
-      Joining, by = "a"
+      Joining with `by = join_by(a)`
     Condition
       Warning:
       ORDER BY is ignored in subqueries without LIMIT
@@ -195,7 +195,7 @@
       # can arrange after join
       lf %>% left_join(rf) %>% arrange(a)
     Message
-      Joining, by = "a"
+      Joining with `by = join_by(a)`
     Output
       <SQL>
       SELECT *
@@ -209,7 +209,7 @@
     Code
       lf %>% semi_join(rf) %>% arrange(a)
     Message
-      Joining, by = "a"
+      Joining with `by = join_by(a)`
     Output
       <SQL>
       SELECT *

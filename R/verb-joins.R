@@ -73,6 +73,7 @@ inner_join.tbl_lazy <- function(x,
                                 copy = FALSE,
                                 suffix = NULL,
                                 ...,
+                                keep = NULL,
                                 na_matches = c("never", "na"),
                                 sql_on = NULL,
                                 auto_index = FALSE,
@@ -86,6 +87,7 @@ inner_join.tbl_lazy <- function(x,
     by = by,
     copy = copy,
     suffix = suffix,
+    keep = keep,
     na_matches = na_matches,
     sql_on = sql_on,
     auto_index = auto_index,
@@ -100,16 +102,17 @@ inner_join.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr left_join
 left_join.tbl_lazy <- function(x,
-                                y,
-                                by = NULL,
-                                copy = FALSE,
-                                suffix = NULL,
-                                ...,
-                                na_matches = c("never", "na"),
-                                sql_on = NULL,
-                                auto_index = FALSE,
-                                x_as = NULL,
-                                y_as = NULL) {
+                               y,
+                               by = NULL,
+                               copy = FALSE,
+                               suffix = NULL,
+                               ...,
+                               keep = NULL,
+                               na_matches = c("never", "na"),
+                               sql_on = NULL,
+                               auto_index = FALSE,
+                               x_as = NULL,
+                               y_as = NULL) {
   check_dots_empty()
   x$lazy_query <- add_join(
     x,
@@ -118,6 +121,7 @@ left_join.tbl_lazy <- function(x,
     by = by,
     copy = copy,
     suffix = suffix,
+    keep = keep,
     na_matches = na_matches,
     sql_on = sql_on,
     auto_index = auto_index,
@@ -137,6 +141,7 @@ right_join.tbl_lazy <- function(x,
                                 copy = FALSE,
                                 suffix = NULL,
                                 ...,
+                                keep = NULL,
                                 na_matches = c("never", "na"),
                                 sql_on = NULL,
                                 auto_index = FALSE,
@@ -150,6 +155,7 @@ right_join.tbl_lazy <- function(x,
     by = by,
     copy = copy,
     suffix = suffix,
+    keep = keep,
     na_matches = na_matches,
     sql_on = sql_on,
     auto_index = auto_index,
@@ -164,16 +170,17 @@ right_join.tbl_lazy <- function(x,
 #' @export
 #' @importFrom dplyr full_join
 full_join.tbl_lazy <- function(x,
-                                y,
-                                by = NULL,
-                                copy = FALSE,
-                                suffix = NULL,
-                                ...,
-                                na_matches = c("never", "na"),
-                                sql_on = NULL,
-                                auto_index = FALSE,
-                                x_as = NULL,
-                                y_as = NULL) {
+                               y,
+                               by = NULL,
+                               copy = FALSE,
+                               suffix = NULL,
+                               ...,
+                               keep = NULL,
+                               na_matches = c("never", "na"),
+                               sql_on = NULL,
+                               auto_index = FALSE,
+                               x_as = NULL,
+                               y_as = NULL) {
   check_dots_empty()
   x$lazy_query <- add_join(
     x,
@@ -182,11 +189,40 @@ full_join.tbl_lazy <- function(x,
     by = by,
     copy = copy,
     suffix = suffix,
+    keep = keep,
     na_matches = na_matches,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
     y_as = y_as
+  )
+
+  x
+}
+
+#' @rdname join.tbl_sql
+#' @export
+#' @importFrom dplyr cross_join
+cross_join.tbl_lazy <- function(x,
+                                y,
+                                ...,
+                                copy = FALSE,
+                                suffix = c(".x", ".y"),
+                                x_as = NULL,
+                                y_as = NULL) {
+  x$lazy_query <- add_join(
+    x, y,
+    "cross",
+    by = character(),
+    sql_on = NULL,
+    copy = copy,
+    suffix = suffix,
+    auto_index = FALSE,
+    keep = NULL,
+    na_matches = "never",
+    x_as = x_as,
+    y_as = y_as,
+    ...
   )
 
   x
@@ -252,27 +288,45 @@ anti_join.tbl_lazy <- function(x,
   x
 }
 
-
 add_join <- function(x,
                      y,
                      type,
                      by = NULL,
                      copy = FALSE,
                      suffix = NULL,
+                     keep = NULL,
                      na_matches = "never",
                      sql_on = NULL,
                      auto_index = FALSE,
                      x_as = NULL,
                      y_as = NULL,
                      call = caller_env()) {
+  x_names <- tbl_vars(x)
+  y_names <- tbl_vars(y)
+  if (identical(by, character()) && is.null(sql_on)) {
+    if (type != "cross") {
+      lifecycle::deprecate_soft(
+        when = "1.1.0",
+        what = I("Using `by = character()` to perform a cross join"),
+        with = "cross_join()",
+        env = caller_env(),
+        user_env = caller_env(2)
+      )
+    }
+    type <- "cross"
+  }
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = unclass(sql_on))
-  } else if (identical(type, "full") && identical(by, character())) {
-    type <- "cross"
+  } else if (type == "cross") {
     by <- list(x = character(0), y = character(0))
+  } else if (is_null(by)) {
+    by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- dbplyr_as_join_by(by, error_call = call)
   }
+
+  check_join_by_supported(by, call = call)
 
   y <- auto_copy(
     x, y,
@@ -281,7 +335,15 @@ add_join <- function(x,
   )
 
   suffix <- suffix %||% sql_join_suffix(x$src$con, suffix)
-  suffix <- check_suffix(suffix, call)
+  vars <- join_cols(
+    x_names = x_names,
+    y_names = y_names,
+    by = by,
+    suffix = suffix,
+    keep = keep,
+    error_call = call
+  )
+
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   # the table alias can only be determined after `select()` was inlined.
@@ -293,7 +355,6 @@ add_join <- function(x,
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
   x_vars <- inline_result$vars
-  by_x_org <- by$x
   by$x <- inline_result$by
 
   new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
@@ -323,11 +384,12 @@ add_join <- function(x,
   vars <- multi_join_vars(
     x_join_vars = x_join_vars,
     y_join_vars = y_join_vars,
-    by_x_org = by_x_org,
+    vars_info = vars,
+    keep = keep,
+    condition = by$condition,
     by_y = by$y,
     type = type,
     table_id = table_id,
-    suffix = suffix
   )
 
   joins_data <- new_joins_data(
@@ -423,24 +485,20 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
 
 multi_join_vars <- function(x_join_vars,
                             y_join_vars,
-                            by_x_org,
+                            vars_info,
+                            keep,
+                            condition,
                             by_y,
                             type,
                             table_id,
-                            suffix,
                             call) {
-  # Remove join keys from y
-  y_join_idx <- vctrs::vec_match(by_y, unlist(y_join_vars$var))
-  if (!is_empty(y_join_idx)) {
-    y_join_vars <- vctrs::vec_slice(y_join_vars, -y_join_idx)
-  }
-  x_names <- x_join_vars$name
-  y_names <- y_join_vars$name
+  x_join_vars <- vctrs::vec_slice(x_join_vars, vars_info$x$out)
+  x_join_vars$name <- names(vars_info$x$out)
+  y_join_vars <- vctrs::vec_slice(y_join_vars, vars_info$y$out)
+  y_join_vars$name <- names(vars_info$y$out)
 
-  # Add suffix where needed
-  x_join_vars$name <- add_suffixes(x_names, y_names, suffix$x)
-  y_join_vars$name <- add_suffixes(y_names, x_names, suffix$y)
-
+  keep <- keep %||% (condition != "==")
+  idx <- vars_info$x$key[!keep]
   if (type %in% c("left", "inner")) {
     # use all variables from `x` as is
     # use non-join variables from `y`
@@ -448,18 +506,16 @@ multi_join_vars <- function(x_join_vars,
     # Careful: this relies on the assumption that right_join()` starts a new query
     # `x`: non-join variables; `y`: all variables
     # -> must update table id of `x` join vars
-    x_join_vars$table[x_join_vars$name %in% by_x_org] <- list(table_id)
-    idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
-    x_join_vars$var[idx] <- as.list(by_y)
+    x_join_vars$table[idx] <- list(table_id)
+    x_join_vars$var[idx] <- as.list(by_y[!keep])
   } else if (type == "full") {
     # Careful: this relies on the assumption that `full_join()` starts a new query
-    idx <- vctrs::vec_match(by_x_org, x_join_vars$name)
     x_join_vars$table[idx] <- purrr::map(
       x_join_vars$table[idx],
       ~ c(.x, table_id)
     )
     x_join_vars$var[idx] <- purrr::map2(
-      x_join_vars$var[idx], by_y,
+      x_join_vars$var[idx], by_y[!keep],
       ~ c(.x, .y)
     )
   } else if (type == "cross") {
@@ -488,21 +544,36 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
     by = list(list(
       x = ident(by$x),
       y = ident(by$y),
+      condition = by$condition,
       on = sql(by$on),
       na_matches = na_matches
     ))
   )
 }
 
-add_semi_join <- function(x, y, anti = FALSE, by = NULL, sql_on = NULL, copy = FALSE,
-                          auto_index = FALSE, na_matches = "never",
-                          x_as = NULL, y_as = NULL,
+add_semi_join <- function(x,
+                          y,
+                          anti = FALSE,
+                          by = NULL,
+                          sql_on = NULL,
+                          copy = FALSE,
+                          auto_index = FALSE,
+                          na_matches = "never",
+                          x_as = NULL,
+                          y_as = NULL,
                           call = caller_env()) {
+  x_names <- tbl_vars(x)
+  y_names <- tbl_vars(y)
+
   if (!is.null(sql_on)) {
     by <- list(x = character(0), y = character(0), on = sql(sql_on))
+  } else if (is_null(by)) {
+    by <- join_by_common(x_names, y_names, error_call = call)
   } else {
-    by <- dplyr::common_by(by, x, y)
+    by <- dbplyr_as_join_by(by, error_call = call)
   }
+
+  check_join_by_supported(by, call = call)
 
   y <- auto_copy(
     x, y, copy,
@@ -581,7 +652,6 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   y_names <- setdiff(y_names, by$y)
 
   # Add suffix where needed
-  suffix <- check_suffix(suffix, call)
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
 
@@ -639,25 +709,8 @@ join_two_table_alias <- function(names, from) {
   out
 }
 
-check_suffix <- function(x, call) {
-  check_character(x, arg = "suffix", call = call)
-  vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
-  list(x = x[1], y = x[2])
-}
-
-add_suffixes <- function(x, y, suffix) {
-  if (identical(suffix, "")) {
-    return(x)
+check_join_by_supported <- function(by, call = caller_env()) {
+  if (any(by$filter != "none")) {
+    cli_abort("Rolling joins aren't supported on database backends.", call = call)
   }
-
-  out <- character(length(x))
-  for (i in seq_along(x)) {
-    nm <- x[[i]]
-    while (nm %in% y || nm %in% out) {
-      nm <- paste0(nm, suffix)
-    }
-
-    out[[i]] <- nm
-  }
-  out
 }

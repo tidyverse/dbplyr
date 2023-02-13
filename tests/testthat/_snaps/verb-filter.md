@@ -115,6 +115,16 @@
       GROUP BY `g`, `h`
       HAVING (`g` = 1.0) AND (`h` = 2.0)
 
+# `HAVING` supports expressions #1128
+
+    Code
+      lf %>% summarise(x_sum = sum(x, na.rm = TRUE)) %>% filter(!is.na(x_sum))
+    Output
+      <SQL>
+      SELECT SUM(`x`) AS `x_sum`
+      FROM `df`
+      HAVING (NOT(((SUM(`x`)) IS NULL)))
+
 # filter() after mutate() does not use `HAVING`
 
     Code

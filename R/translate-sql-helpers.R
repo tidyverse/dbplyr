@@ -258,7 +258,53 @@ sql_not_supported <- function(f) {
 
   function(...) {
     # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("{f} is not available in this SQL variant")
+    cli_abort("{f} is not available in this SQL variant.")
+  }
+}
+
+sql_agg_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun summarise} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
+      " " = "{.code mutate(<col> = {f_call_str}) %>% distinct(<col>)}"
+    )
+    cli_abort(msg)
+  }
+}
+
+sql_win_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun mutate} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
+      " " = "{.code df %>% left_join(summarise(<col> = {f_call_str}))}."
+    )
+    cli_abort(msg)
   }
 }
 

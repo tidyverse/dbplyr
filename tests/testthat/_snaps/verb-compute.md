@@ -15,6 +15,16 @@
       ! All columns specified through `unique_indexes` must exist in `x`.
       i The following columns are missing from `unique_indexes`: y, z, and a.
 
+# compute can handle schema
+
+    Code
+      df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
+    Condition
+      Error in `db_save_query.DBIConnection()`:
+      ! Can't save query to "`main`.`db1`".
+      Caused by error:
+      ! table `db1` already exists
+
 # collect() handles DBI error
 
     Code

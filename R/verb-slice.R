@@ -13,7 +13,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::slice
-#' @inheritParams args_by
 #' @param ... Not used.
 #' @param n,prop Provide either `n`, the number of rows, or `prop`, the
 #'   proportion of rows to select. If neither are supplied, `n = 1` will be
@@ -70,7 +69,6 @@ slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
 #' @importFrom dplyr slice_min
 #' @export
 slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, by = NULL, with_ties = TRUE) {
-  check_required(order_by)
   size <- check_slice_size(n, prop)
   slice_by(.data, {{order_by}}, size, {{ by }}, with_ties = with_ties)
 }
@@ -79,7 +77,6 @@ slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, by = NULL, with_ti
 #' @importFrom dplyr slice_max
 #' @export
 slice_max.tbl_lazy <- function(.data, order_by, ..., n, by = NULL, prop, with_ties = TRUE) {
-  check_required(order_by)
   size <- check_slice_size(n, prop)
 
   slice_by(.data, desc({{order_by}}), size, {{ by }}, with_ties = with_ties)

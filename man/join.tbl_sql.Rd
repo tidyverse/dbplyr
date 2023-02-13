@@ -6,6 +6,7 @@
 \alias{left_join.tbl_lazy}
 \alias{right_join.tbl_lazy}
 \alias{full_join.tbl_lazy}
+\alias{cross_join.tbl_lazy}
 \alias{semi_join.tbl_lazy}
 \alias{anti_join.tbl_lazy}
 \title{Join SQL tables}
@@ -17,6 +18,7 @@
   copy = FALSE,
   suffix = NULL,
   ...,
+  keep = NULL,
   na_matches = c("never", "na"),
   sql_on = NULL,
   auto_index = FALSE,
@@ -31,6 +33,7 @@
   copy = FALSE,
   suffix = NULL,
   ...,
+  keep = NULL,
   na_matches = c("never", "na"),
   sql_on = NULL,
   auto_index = FALSE,
@@ -45,6 +48,7 @@
   copy = FALSE,
   suffix = NULL,
   ...,
+  keep = NULL,
   na_matches = c("never", "na"),
   sql_on = NULL,
   auto_index = FALSE,
@@ -59,9 +63,20 @@
   copy = FALSE,
   suffix = NULL,
   ...,
+  keep = NULL,
   na_matches = c("never", "na"),
   sql_on = NULL,
   auto_index = FALSE,
+  x_as = NULL,
+  y_as = NULL
+)
+
+\method{cross_join}{tbl_lazy}(
+  x,
+  y,
+  ...,
+  copy = FALSE,
+  suffix = c(".x", ".y"),
   x_as = NULL,
   y_as = NULL
 )
@@ -139,6 +154,18 @@ operation so you must opt into it.}
 Should be a character vector of length 2.}
 
 \item{...}{Other parameters passed onto methods.}
+
+\item{keep}{Should the join keys from both \code{x} and \code{y} be preserved in the
+output?
+\itemize{
+\item If \code{NULL}, the default, joins on equality retain only the keys from \code{x},
+while joins on inequality retain the keys from both inputs.
+\item If \code{TRUE}, all keys from both inputs are retained.
+\item If \code{FALSE}, only keys from \code{x} are retained. For right and full joins,
+the data in key columns corresponding to rows that only exist in \code{y} are
+merged into the key columns from \code{x}. Can't be used when joining on
+inequality conditions.
+}}
 
 \item{na_matches}{Should NA (NULL) values match one another?
 The default, "never", is how databases usually work. \code{"na"} makes

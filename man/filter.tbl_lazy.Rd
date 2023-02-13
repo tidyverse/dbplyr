@@ -14,8 +14,9 @@ variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending
 
 \item{.by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
-<\code{\link[=dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
-temporarily group by using an inline alternative to \code{\link[=group_by]{group_by()}}.}
+<\code{\link[dplyr:dplyr_tidy_select]{tidy-select}}> Optionally, a selection of columns to
+group by for just this operation, functioning as an alternative to \code{\link[dplyr:group_by]{group_by()}}. For
+details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 
 \item{.preserve}{Not supported by this method.}
 }
