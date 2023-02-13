@@ -22,7 +22,7 @@ Imports:
     blob (>= 1.2.0),
     cli (>= 3.4.1),
     DBI (>= 1.0.0),
-    dplyr (>= 1.0.10),
+    dplyr (>= 1.1.0),
     glue (>= 1.2.0),
     lifecycle (>= 1.0.3),
     magrittr,
@@ -98,6 +98,8 @@ Collate:
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'join-by-compat.R'
+    'join-cols-compat.R'
     'lazy-join-query.R'
     'lazy-ops.R'
     'lazy-query.R'

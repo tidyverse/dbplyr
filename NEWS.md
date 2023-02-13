@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* Added support for `join_by()` added in dplyr 1.1.0 (@mgirlich, #1074).
+
+* Using `by = character()` to perform a cross join is now soft-deprecated in
+  favor of `cross_join()`.
+
 * `full_join()` and `right_join()` are now translated directly to `FULL JOIN`
   and `RIGHT JOIN` for SQLite as native support was finally added (@mgirlich, #1150).
 

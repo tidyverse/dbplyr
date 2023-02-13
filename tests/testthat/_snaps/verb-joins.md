@@ -40,6 +40,21 @@
       LEFT JOIN `foo2`.`df` AS `df_RHS`
         ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
+# cross join via by = character() is deprecated
+
+    Code
+      out_inner <- collect(inner_join(df1, df2, by = character()))
+    Condition
+      Warning:
+      Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
+      i Please use `cross_join()` instead.
+    Code
+      out_full <- collect(full_join(df1, df2, by = character()))
+    Condition
+      Warning:
+      Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
+      i Please use `cross_join()` instead.
+
 # join check `x_as` and `y_as`
 
     Code
@@ -125,6 +140,90 @@
       RIGHT JOIN `df3`
         ON (`LHS`.`x` = `df3`.`x`)
 
+# can't use `keep = FALSE` with non-equi conditions (#6499)
+
+    Code
+      left_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+    Condition
+      Error in `left_join()`:
+      ! Can't set `keep = FALSE` when using an inequality, rolling, or overlap join.
+
+---
+
+    Code
+      full_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+    Condition
+      Error in `full_join()`:
+      ! Can't set `keep = FALSE` when using an inequality, rolling, or overlap join.
+
+# can translate join conditions
+
+    Code
+      left_join(lf1, lf1, by = join_by(a == a, b >= b, c < c), keep = TRUE)
+    Output
+      <SQL>
+      SELECT
+        `df_LHS`.`a` AS `a.x`,
+        `df_LHS`.`b` AS `b.x`,
+        `df_LHS`.`c` AS `c.x`,
+        `df_RHS`.`a` AS `a.y`,
+        `df_RHS`.`b` AS `b.y`,
+        `df_RHS`.`c` AS `c.y`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (
+          `df_LHS`.`a` = `df_RHS`.`a` AND
+          `df_LHS`.`b` >= `df_RHS`.`b` AND
+          `df_LHS`.`c` < `df_RHS`.`c`
+        )
+
+# rolling joins aren't supported
+
+    Code
+      (expect_error(left_join(lf, lf, join_by(closest(x >= y)))))
+    Output
+      <error/rlang_error>
+      Error in `left_join()`:
+      ! Rolling joins aren't supported on database backends.
+    Code
+      (expect_error(semi_join(lf, lf, join_by(closest(x >= y)))))
+    Output
+      <error/rlang_error>
+      Error in `semi_join()`:
+      ! Rolling joins aren't supported on database backends.
+
+# `na_matches` is validated
+
+    Code
+      left_join(df, df, by = "x", na_matches = 1)
+    Condition
+      Error in `left_join()`:
+      ! `na_matches` must be a character vector, not a number.
+
+---
+
+    Code
+      left_join(df, df, by = "x", na_matches = "foo")
+    Condition
+      Error in `left_join()`:
+      ! `na_matches` must be one of "na" or "never", not "foo".
+
+---
+
+    Code
+      semi_join(df, df, by = "x", na_matches = 1)
+    Condition
+      Error in `semi_join()`:
+      ! `na_matches` must be a character vector, not a number.
+
+---
+
+    Code
+      semi_join(df, df, by = "x", na_matches = "foo")
+    Condition
+      Error in `semi_join()`:
+      ! `na_matches` must be one of "never" or "na", not "foo".
+
 # can optionally match NA values
 
     Code
@@ -141,22 +240,22 @@
     Code
       (expect_error(inner_join(lf1, lf2, by = "x", suffix = "a")))
     Output
-      <error/vctrs_error_assert_size>
+      <error/rlang_error>
       Error in `inner_join()`:
-      ! `suffix` must have size 2, not size 1.
+      ! `suffix` must be a character vector of length 2, not a string of length 1.
     Code
       (expect_error(inner_join(lf1, lf2, by = "x", suffix = 1L)))
     Output
       <error/rlang_error>
       Error in `inner_join()`:
-      ! `suffix` must be a character vector, not the number 1.
+      ! `suffix` must be a character vector of length 2, not an integer of length 1.
 
 # joins reuse queries in cte mode
 
     Code
       left_join(lf, lf) %>% remote_query(cte = TRUE)
     Message
-      Joining, by = "x"
+      Joining with `by = join_by(x)`
     Output
       <SQL> WITH `q01` AS (
         SELECT `lf1_LHS`.`x` AS `x`

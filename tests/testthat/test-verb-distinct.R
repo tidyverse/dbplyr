@@ -243,13 +243,11 @@ test_that("distinct produces correct vars when .keep_all is TRUE", {
 })
 
 test_that("distinct respects order of the specified variables (#3195, #6156)",{
-  skip_if(packageVersion("dplyr") < "1.1.0")
   d <- lazy_frame(x = 1:2, y = 3:4)
   expect_equal(colnames(distinct(d, y, x)), c("y", "x"))
 })
 
 test_that("distinct adds grouping variables to front if missing",{
-  skip_if(packageVersion("dplyr") < "1.1.0")
   d <- lazy_frame(x = 1:2, y = 3:4)
   expect_equal(colnames(distinct(group_by(d, y), x)), c("y", "x"))
   expect_equal(colnames(distinct(group_by(d, y), x, y)), c("x", "y"))
