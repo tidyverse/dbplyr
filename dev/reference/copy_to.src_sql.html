@@ -202,7 +202,7 @@ writing to a table.</p></div>
 <span class="r-in"><span><span class="co"># copy_to() is called automatically if you set copy = TRUE</span></span></span>
 <span class="r-in"><span><span class="co"># in the join functions</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">df2</span>, copy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "y"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(y)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [5 x 3]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x y     fruit</span>
