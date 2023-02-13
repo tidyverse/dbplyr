@@ -129,6 +129,7 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
   }
 
   # must use `add_order()` as `window_order()` only allows variables
+  # this is only okay to do because the previous, legal window order is restored
   .data$lazy_query <- add_order(.data, quos({{order_by}}))
 
   out <- filter(.data, !!window_fun) %>%
