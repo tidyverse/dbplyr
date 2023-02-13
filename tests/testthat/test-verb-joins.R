@@ -4,6 +4,19 @@ test_that("complete join pipeline works with SQLite", {
 
   out <- collect(left_join(df1, df2, by = "x"))
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+
+  df1 <- memdb_frame(x = 1:3, y = c("x", "y", "z"))
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"), z = 11:13)
+
+  expect_equal(
+    collect(full_join(df1, df2, by = "x")),
+    tibble(
+      x = c(1, 2, 3, 5),
+      y.x = c("x", "y", "z", NA),
+      y.y = c("a", NA, "b", "c"),
+      z = c(11, NA, 12, 13)
+    )
+  )
 })
 
 test_that("complete join pipeline works with SQLite and table alias", {
