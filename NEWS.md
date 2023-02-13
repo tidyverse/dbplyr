@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `full_join()` and `right_join()` are now translated directly to `FULL JOIN`
+  and `RIGHT JOIN` for SQLite as native support was finally added (@mgirlich, #1150).
+
 * `case_match()` now works with strings on the left hand side (@mgirlich, #1143).
 
 * The `rows_*()` function work again for tables in a schema in PostgreSQL
