@@ -343,7 +343,6 @@ add_join <- function(x,
     keep = keep,
     error_call = call
   )
-  suffix <- check_suffix(suffix, call)
 
   na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
@@ -653,7 +652,6 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   y_names <- setdiff(y_names, by$y)
 
   # Add suffix where needed
-  suffix <- check_suffix(suffix, call)
   x_new <- add_suffixes(x_names, y_names, suffix$x)
   y_new <- add_suffixes(y_names, x_names, suffix$y)
 
@@ -709,13 +707,6 @@ join_two_table_alias <- function(names, from) {
   out[may_repair] <- out_repaired[may_repair]
 
   out
-}
-
-# TODO this can probably be removed
-check_suffix <- function(x, call) {
-  check_character(x, arg = "suffix", call = call)
-  vctrs::vec_assert(x, character(), size = 2, arg = "suffix", call = call)
-  list(x = x[1], y = x[2])
 }
 
 check_join_by_supported <- function(by, call = caller_env()) {
