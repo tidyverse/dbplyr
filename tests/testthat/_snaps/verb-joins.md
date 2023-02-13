@@ -43,16 +43,14 @@
 # joins with non by variables gives cross join
 
     Code
-      (expect_warning(out_inner <- collect(inner_join(df1, df2, by = character()))))
-    Output
-      <warning/lifecycle_warning_deprecated>
+      out_inner <- collect(inner_join(df1, df2, by = character()))
+    Condition
       Warning:
       Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
       i Please use `cross_join()` instead.
     Code
-      (expect_warning(out_full <- collect(full_join(df1, df2, by = character()))))
-    Output
-      <warning/lifecycle_warning_deprecated>
+      out_full <- collect(full_join(df1, df2, by = character()))
+    Condition
       Warning:
       Using `by = character()` to perform a cross join was deprecated in dbplyr 1.1.0.
       i Please use `cross_join()` instead.

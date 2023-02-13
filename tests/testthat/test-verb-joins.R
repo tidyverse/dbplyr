@@ -90,8 +90,8 @@ test_that("joins with non by variables gives cross join", {
   df2 <- memdb_frame(y = 1:5)
 
   expect_snapshot({
-    (expect_warning(out_inner <- collect(inner_join(df1, df2, by = character()))))
-    (expect_warning(out_full <- collect(full_join(df1, df2, by = character()))))
+    out_inner <- collect(inner_join(df1, df2, by = character()))
+    out_full <- collect(full_join(df1, df2, by = character()))
   })
 
   expect_equal(nrow(out_inner), 25)
