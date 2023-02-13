@@ -40,7 +40,7 @@
       LEFT JOIN `foo2`.`df` AS `df_RHS`
         ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
-# joins with non by variables gives cross join
+# cross join via by = character() is deprecated
 
     Code
       out_inner <- collect(inner_join(df1, df2, by = character()))

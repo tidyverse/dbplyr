@@ -85,7 +85,7 @@ test_that("join works with in_schema", {
   )
 })
 
-test_that("joins with non by variables gives cross join", {
+test_that("cross join via by = character() is deprecated", {
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
 
