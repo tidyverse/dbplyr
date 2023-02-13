@@ -78,15 +78,15 @@ check_join_vars <- function(vars,
   check_dots_empty0(...)
 
   if (!is.character(vars)) {
-    message <- glue("Join columns in `{input}` must be character vectors.")
-    abort(message, call = error_call)
+    message <- "Join columns in `{input}` must be character vectors."
+    cli_abort(message, call = error_call)
   }
 
   na <- is.na(vars)
   if (any(na)) {
     bullets <- c(
-      glue("Join columns in `{input}` can't be `NA`."),
-      x = glue("Problem at position {err_vars(na)}.")
+      "Join columns in `{input}` can't be `NA`.",
+      x = "Problem at position {err_vars(na)}."
     )
     abort(bullets, call = error_call)
   }
@@ -103,20 +103,20 @@ check_join_vars <- function(vars,
     vars <- unique(vars[dup])
 
     bullets <- c(
-      glue("Join columns in `{input}` must be unique."),
-      x = glue("Problem with {err_vars(vars)}.")
+      "Join columns in `{input}` must be unique.",
+      x = "Problem with {err_vars(vars)}."
     )
 
-    abort(bullets, call = error_call)
+    cli_abort(bullets, call = error_call)
   }
 
   missing <- setdiff(vars, names)
   if (length(missing) > 0) {
     bullets <- c(
-      glue("Join columns in `{input}` must be present in the data."),
-      x = glue("Problem with {err_vars(missing)}.")
+      "Join columns in `{input}` must be present in the data.",
+      x = "Problem with {err_vars(missing)}."
     )
-    abort(bullets, call = error_call)
+    cli_abort(bullets, call = error_call)
   }
 }
 
@@ -130,10 +130,10 @@ check_duplicate_vars <- function(vars,
 
   if (any(dup)) {
     bullets <- c(
-      glue("Input columns in `{input}` must be unique."),
-      x = glue("Problem with {err_vars(vars[dup])}.")
+      "Input columns in `{input}` must be unique.",
+      x = "Problem with {err_vars(vars[dup])}."
     )
-    abort(bullets, call = error_call)
+    cli_abort(bullets, call = error_call)
   }
 }
 
@@ -150,8 +150,8 @@ standardise_join_suffix <- function(x,
   }
 
   if (any(is.na(x))) {
-    msg <- glue("`suffix` can't be `NA`.")
-    abort(msg, call = error_call)
+    msg <- "`suffix` can't be `NA`."
+    cli_abort(msg, call = error_call)
   }
 
   list(x = x[[1]], y = x[[2]])
