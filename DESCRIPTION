@@ -48,7 +48,7 @@ Suggests:
     rmarkdown,
     RPostgres (>= 1.1.3),
     RPostgreSQL,
-    RSQLite (>= 2.1.0),
+    RSQLite (>= 2.2.15),
     testthat (>= 3.0.2)
 VignetteBuilder: 
     knitr

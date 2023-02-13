@@ -135,58 +135,6 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y) {
 }
 
 #' @export
-sql_query_join.SQLiteConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
-  # workaround as SQLite doesn't support FULL OUTER JOIN and RIGHT JOIN
-  # see: https://www.sqlite.org/omitted.html
-
-  if (type %in% c("left", "inner", "semi", "cross")) {
-    return(NextMethod())
-  }
-
-  # as `x` and `y` the vars also need to be swapped in vars and by
-  vars_right <- list(
-    alias = vars$alias,
-    x = vars$y,
-    y = vars$x,
-    all_x = vars$all_y,
-    all_y = vars$all_x
-  )
-  by_right <- list(
-    x = by$y,
-    y = by$x,
-    x_as = by$y_as,
-    y_as = by$x_as,
-    condition = by$condition
-  )
-
-  if (type == "full") {
-    if (any(by$condition != "==")) {
-      cli_abort("Full joins with non-equi conditions are not supported for SQLite.")
-    }
-
-    x_join <- sql_query_join(con, x, y, vars, type = "left", by = by, na_matches = na_matches, ..., lvl = lvl + 1)
-    y_join <- sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl + 1)
-    join_sql <- sql_query_set_op(
-      con,
-      x = x_join,
-      y = y_join,
-      method = "UNION",
-      lvl = lvl + 1
-    )
-
-    sql_query_select(
-      con,
-      select = ident(vars$alias),
-      from = dbplyr_sql_subquery(con, join_sql, lvl = lvl),
-      subquery = TRUE,
-      lvl = lvl
-    )
-  } else if (type == "right") {
-    sql_query_join(con, y, x, vars_right, type = "left", by = by_right, na_matches = na_matches, ..., lvl = lvl)
-  }
-}
-
-#' @export
 values_prepare.SQLiteConnection <- function(con, df) {
   needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))

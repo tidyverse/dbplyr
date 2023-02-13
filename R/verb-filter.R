@@ -5,7 +5,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::filter
-#' @inheritParams args_by
 #' @param .preserve Not supported by this method.
 #' @inherit arrange.tbl_lazy return
 #' @examples
@@ -54,8 +53,8 @@ add_filter <- function(.data, dots) {
     return(filter_via_having(lazy_query, dots))
   }
 
-  if (!uses_window_fun(dots, con)) {
-    if (uses_mutated_vars(dots, lazy_query$select)) {
+  if (!dots_use_window_fun) {
+    if (filter_needs_new_query(dots, lazy_query, con)) {
       lazy_select_query(
         x = lazy_query,
         where = dots
@@ -89,6 +88,26 @@ add_filter <- function(.data, dots) {
   }
 }
 
+filter_needs_new_query <- function(dots, lazy_query, con) {
+  if (!inherits(lazy_query, "lazy_select_query")) {
+    return(TRUE)
+  }
+
+  if (uses_mutated_vars(dots, lazy_query$select)) {
+    return(TRUE)
+  }
+
+  if (uses_window_fun(lazy_query$select$expr, con)) {
+    return(TRUE)
+  }
+
+  if (any_expr_uses_sql(lazy_query$select$expr)) {
+    return(TRUE)
+  }
+
+  FALSE
+}
+
 filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
   # From the Postgres documentation: https://www.postgresql.org/docs/current/sql-select.html#SQL-HAVING
   # Each column referenced in condition must unambiguously reference a grouping
@@ -116,7 +135,7 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
 
 filter_via_having <- function(lazy_query, dots) {
   names <- lazy_query$select$name
-  exprs <- lazy_query$select$expr
+  exprs <- purrr::map_if(lazy_query$select$expr, is_quosure, quo_get_expr)
   dots <- purrr::map(dots, replace_sym, names, exprs)
 
   lazy_query$having <- c(lazy_query$having, dots)

@@ -231,7 +231,9 @@ sql_translation.PqConnection <- function(con) {
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+      median = sql_win_not_supported("median", "PostgreSQL"),
+      quantile = sql_win_not_supported("quantile", "PostgreSQL")
     )
   )
 }

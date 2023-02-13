@@ -144,8 +144,14 @@ win_rank <- function(f) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
+    order_expr <- enexpr(order)
+
     if (!is_null(order)) {
-      cond <- translate_sql((case_when(is.na(!!order) ~ 1L, TRUE ~ 0L)))
+      if (is_call(order_expr, "desc", n = 1L)) {
+        order_expr <- call_args(order_expr)[[1L]]
+      }
+
+      cond <- translate_sql((case_when(is.na(!!order_expr) ~ 1L, TRUE ~ 0L)))
       group <- sql(group, cond)
     }
 
@@ -159,7 +165,7 @@ win_rank <- function(f) {
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!is.na(!!order) ~ !!rank_sql))
+      translate_sql(case_when(!is.na(!!order_expr) ~ !!rank_sql))
     }
   }
 }

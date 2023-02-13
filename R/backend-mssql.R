@@ -351,10 +351,8 @@ simulate_mssql <- function(version = "15.0") {
       var           = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
-      # percentile_cont needs `OVER()` in mssql
-      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
-      median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
-      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
+      median = sql_agg_not_supported("median", "SQL Server"),
+      quantile = sql_agg_not_supported("quantile", "SQL Server")
 
     ),
     sql_translator(.parent = base_odbc_win,
@@ -366,7 +364,12 @@ simulate_mssql <- function(version = "15.0") {
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+
+      # percentile_cont needs `OVER()` in mssql
+      # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
+      median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
+      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
     )
 
   )}

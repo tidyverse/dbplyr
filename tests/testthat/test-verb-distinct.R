@@ -49,6 +49,14 @@ test_that("distinct respects groups when .keep_all is TRUE", {
   expect_equal(group_vars(result), "x")
 })
 
+test_that("distinct can select variables via pick() #1125", {
+  lf <- lazy_frame(x_1 = 1, x_2 = 1, y = 1)
+  expect_equal(
+    lf %>% distinct(pick(starts_with("x_"))) %>% remote_query(),
+    sql("SELECT DISTINCT `x_1`, `x_2`\nFROM `df`")
+  )
+})
+
 test_that("distinct() produces optimized SQL", {
   lf <- lazy_frame(x = 1, y = 1)
 

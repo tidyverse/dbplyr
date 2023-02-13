@@ -6,7 +6,6 @@
 #'
 #' @inheritParams arrange.tbl_lazy
 #' @inheritParams dplyr::mutate
-#' @inheritParams args_by
 #' @inherit arrange.tbl_lazy return
 #' @export
 #' @importFrom dplyr mutate
@@ -115,7 +114,7 @@ add_mutate <- function(.data, vars) {
     # the logic in get_mutate_layers()
     select <- lazy_query$select
     is_select_op <- lazy_query$select_operation %in% c("select", "mutate")
-    if (is_pure_projection(select$expr, select$name) && is_select_op) {
+    if (is_pure_projection(select$expr, select$name) && is_select_op && !is_true(lazy_query$distinct)) {
       lazy_query$select <- new_lazy_select(
         vars,
         group_vars = op_grps(lazy_query),

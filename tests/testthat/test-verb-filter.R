@@ -120,6 +120,33 @@ test_that("filter() inlined after mutate()", {
   expect_equal(lq3$where, list(quo(y == sql("1"))), ignore_formula_env = TRUE)
 })
 
+test_that("filter isn't inlined after mutate with window function #1135", {
+  lf <- lazy_frame(x = 1L, y = 1:2)
+  out <- lf %>%
+    dplyr::mutate(z = sum(y, na.rm = TRUE)) %>%
+    dplyr::filter(y <= 1)
+
+  lq <- out$lazy_query
+  expect_equal(lq$select$expr, syms(c("x", "y", "z")))
+  expect_equal(lq$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
+  expect_equal(
+    quo_get_expr(lq$x$select$expr[[3]]),
+    expr(sum(y, na.rm = TRUE))
+  )
+
+  out2 <- lf %>%
+    dplyr::mutate(z = sql("SUM(y) OVER ()")) %>%
+    dplyr::filter(y <= 1)
+
+  lq2 <- out2$lazy_query
+  expect_equal(lq2$select$expr, syms(c("x", "y", "z")))
+  expect_equal(lq2$where, list(quo(y <= 1)), ignore_formula_env = TRUE)
+  expect_equal(
+    quo_get_expr(lq2$x$select$expr[[3]]),
+    expr(sql("SUM(y) OVER ()"))
+  )
+})
+
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
@@ -210,7 +237,7 @@ test_that("filter() after summarise() uses `HAVING`", {
   # Can use freshly aggregated column
   expect_snapshot((out <- lf %>% filter(x_mean > 1)))
   expect_equal(
-    out$lazy_query$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    out$lazy_query$having, list(quo(mean(x, na.rm = TRUE) > 1)),
     ignore_formula_env = TRUE
   )
 
@@ -252,12 +279,46 @@ test_that("filter() after summarise() uses `HAVING`", {
 
   lq <- out$lazy_query
   expect_equal(
-    lq$having, list(quo(!!quo(mean(x, na.rm = TRUE)) > 1)),
+    lq$having, list(quo(mean(x, na.rm = TRUE) > 1)),
     ignore_formula_env = TRUE
   )
   # TODO should the `order_vars` and the `frame` really survive `summarise()`?
   expect_equal(lq$order_vars, list(quo(h)), ignore_formula_env = TRUE)
   expect_equal(lq$frame, list(range = c(-3, Inf)))
+})
+
+test_that("`HAVING` supports expressions #1128", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot({
+    lf %>%
+      summarise(x_sum = sum(x, na.rm = TRUE)) %>%
+      filter(!is.na(x_sum))
+  })
+
+  out <- lf %>%
+    summarise(x_sum = sum(x, na.rm = TRUE)) %>%
+    filter(!is.na(x_sum))
+  expect_equal(
+    out$lazy_query$having,
+    list(quo(!is.na(sum(x, na.rm = TRUE)))),
+    ignore_formula_env = TRUE
+  )
+
+  # correctly handles environments
+  y <- 1L
+  f <- function(lf, y = 2L) {
+    lf %>% summarise(x_sum = sum(x, na.rm = TRUE) - y)
+  }
+
+  out <- f(lf) %>%
+    filter(!is.na(x_sum + y))
+
+  expect_equal(
+    out$lazy_query$having,
+    list(quo(!is.na(sum(x, na.rm = TRUE) - 2L + 1L))),
+    ignore_formula_env = TRUE
+  )
 })
 
 test_that("filter() after mutate() does not use `HAVING`", {

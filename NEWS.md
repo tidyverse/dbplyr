@@ -1,5 +1,31 @@
 # dbplyr (development version)
 
+* `full_join()` and `right_join()` are now translated directly to `FULL JOIN`
+  and `RIGHT JOIN` for SQLite as native support was finally added (@mgirlich, #1150).
+
+* `case_match()` now works with strings on the left hand side (@mgirlich, #1143).
+
+* The `rows_*()` function work again for tables in a schema in PostgreSQL
+  (@mgirlich, #1133).
+
+* `mutate()` + `filter()` now again produces a new query if the `mutate()`
+  uses a window function or SQL (@mgirlich, #1135).
+
+* `quantile()` and `median()` now error for SQL Server when used in `summarise()`
+  and for PostgreSQL when used in `mutate()` as they can't be properly
+  translated (@mgirlich, #1110).
+
+* Fixed an issue when using `filter()` on a summarised variable (@mgirlich, #1128).
+
+* `across()` and `pick()` can be used (again) in `distinct()` (@mgirlich, #1125).
+
+* The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+  `percent_rank()`, and `cume_dist()`) now work again for variables wrapped in
+  `desc()`, e.g. `row_number(desc(x))` (@mgirlich, #1118).
+
+* `mutate()` and `select()` after `distinct()` now again produce a subquery to
+  generate the correct translation (@mgirlich, #1119, #1141).
+
 * Moved argument `auto_index` after `...` in `*_join()` (@mgirlich, #1115).
 
 * Removed dependency on assertthat (@mgirlich, #1112).

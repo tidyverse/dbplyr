@@ -1,3 +1,22 @@
+# custom window functions translated correctly
+
+    Code
+      (expect_error(translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
+    Code
+      (expect_error(translate_sql(median(x, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `median()`:
+      ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
+
 # custom SQL translation
 
     Code
@@ -93,8 +112,8 @@
       FROM "test"
       
       <PLAN>
-                                                                                                                                                                                                                                                                 QUERY PLAN
-      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
+                                                                                                                                                                                                                                                                                                QUERY PLAN
+      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Async Capable": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
 
 # can insert with returning
 
