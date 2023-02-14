@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `window_order()` now only accepts bare symbols or symbols wrapped in `desc()`.
+  This breaking change is necessary to allow `select()` to drop and rename
+  variables used in `window_order()` (@mgirlich, #1103).
+
 * Added support for `join_by()` added in dplyr 1.1.0 (@mgirlich, #1074).
 
 * Using `by = character()` to perform a cross join is now soft-deprecated in
