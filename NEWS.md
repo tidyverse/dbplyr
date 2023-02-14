@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `pull()` now supports the argument `name` (@mgirlich, #1136).
+
 * `window_order()` now only accepts bare symbols or symbols wrapped in `desc()`.
   This breaking change is necessary to allow `select()` to drop and rename
   variables used in `window_order()` (@mgirlich, #1103).
