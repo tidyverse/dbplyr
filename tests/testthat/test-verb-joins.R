@@ -42,7 +42,7 @@ test_that("complete semi join works with SQLite and table alias", {
 })
 
 test_that("join works with in_schema", {
-  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+  con <- withr::local_db_connection(dbConnect(RSQLite::SQLite(), ":memory:"))
 
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
   DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
@@ -73,8 +73,7 @@ test_that("join works with in_schema", {
 })
 
 test_that("alias truncates long table names at database limit", {
-  # Postgres has max table name length of 63; ensure it's not exceeded when generating table alias
-  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+  con <- withr::local_db_connection(dbConnect(RSQLite::SQLite(), ":memory:"))
 
   nm1 <- paste0("a", paste0(0:62 %% 10, collapse = ""))
   DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
