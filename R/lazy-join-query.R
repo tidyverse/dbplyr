@@ -213,9 +213,11 @@ generate_join_table_names <- function(table_names) {
   # avoid database aliases exceeding the database-specific maximum length
   abbreviate(
     table_names_prepared,
-    # arbitrarily floor at 63 (Postgres limit) to avoid unnecessarily truncating reasonable lengths
+    # arbitrarily floor at identifier limit for Postgres backend to avoid unnecessarily truncating reasonable lengths
+    # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+    # "By default, NAMEDATALEN is 64 so the maximum identifier length is 63 bytes."
     minlength = max(table_name_length_max, 63),
-    # (explicit, default) err on the side of unique table names instead of exact length
+    # Explicitly set `strict = FALSE` (the default) to ensure table names are unique
     strict = FALSE,
     named = FALSE
   )
