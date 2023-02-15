@@ -73,13 +73,13 @@ test_that("join works with in_schema", {
 })
 
 test_that("alias truncates long table names at database limit", {
-  con <- withr::local_db_connection(dbConnect(RSQLite::SQLite(), ":memory:"))
+  con <- src_test("postgres")
 
-  nm1 <- paste0("a", paste0(0:62 %% 10, collapse = ""))
+  nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
   DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
   mf1 <- tbl(con, nm1)
 
-  nm2 <- paste0("b", paste0(0:62 %% 10, collapse = ""))
+  nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
   DBI::dbWriteTable(con, nm2, tibble(x = 2:3, y = "b"))
   mf2 <- tbl(con, nm2)
 
