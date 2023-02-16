@@ -210,7 +210,8 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 })
 
-test_that("inner join doesn't result in duplicated columns ",  expect_equal(colnames(inner_join(df1, df1, by = c("x", "y"))), c("x", "y"))
+test_that("inner join doesn't result in duplicated columns ", {
+  expect_equal(colnames(inner_join(df1, df1, by = c("x", "y"))), c("x", "y"))
 })
 
 test_that("self-joins allowed with named by", {
