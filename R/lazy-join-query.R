@@ -199,7 +199,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
 }
 
 generate_join_table_names <- function(table_names) {
-  table_name_length_max <- max(nchar(table_names$name))
+  table_name_length_max <- dplyr::coalesce(max(nchar(table_names$name)), 0)
 
   if (length(table_names$name) != 2) {
     table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
@@ -217,6 +217,7 @@ generate_join_table_names <- function(table_names) {
     # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
     # "By default, NAMEDATALEN is 64 so the maximum identifier length is 63 bytes."
     minlength = max(table_name_length_max, 63),
+    method = "both.sides",
     # Explicitly set `strict = FALSE` (the default) to ensure table names are unique
     strict = FALSE,
     named = FALSE

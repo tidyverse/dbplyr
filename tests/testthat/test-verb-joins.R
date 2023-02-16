@@ -42,7 +42,7 @@ test_that("complete semi join works with SQLite and table alias", {
 })
 
 test_that("join works with in_schema", {
-  con <- withr::local_db_connection(dbConnect(RSQLite::SQLite(), ":memory:"))
+  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
 
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
   DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
@@ -90,6 +90,7 @@ test_that("alias truncates long table names at database limit", {
     self_join2 %>% collect(),
     tibble(x = 1:3, y = "a")
   )
+
   expect_snapshot(
     self_join2 %>% remote_query()
   )
