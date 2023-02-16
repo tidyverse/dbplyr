@@ -82,7 +82,7 @@ retrieving just the specified column.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for tbl_sql</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.data</span>, var <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.data</span>, var <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, name <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -100,6 +100,16 @@ column you've created most recently).</p>
 <p>This argument is taken by expression and supports
 <a href="https://rlang.r-lib.org/reference/topic-inject.html" class="external-link">quasiquotation</a> (you can unquote column
 names and column locations).</p></dd>
+
+
+<dt>name</dt>
+<dd><p>An optional parameter that specifies the column to be used
+as names for a named vector. Specified in a similar manner as <code>var</code>.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>&lt;<code><a href="https://dplyr.tidyverse.org/reference/dplyr_data_masking.html" class="external-link">data-masking</a></code>&gt; Variables, or functions of
+variables. Use <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc()</a></code> to sort a variable in descending order.</p></dd>
 
 </dl></div>
     <div class="section level2">
