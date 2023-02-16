@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
+  `percent_rank()`, and `cume_dist()`) now support multiple variables by
+  wrapping them in `tibble()`, e.g. `rank(tibble(x, y))` (@mgirlich, #1118).
+
 * `pull()` now supports the argument `name` (@mgirlich, #1136).
 
 * `window_order()` now only accepts bare symbols or symbols wrapped in `desc()`.

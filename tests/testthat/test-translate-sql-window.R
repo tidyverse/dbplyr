@@ -107,6 +107,32 @@ END")
   )
 })
 
+test_that("win_rank(tibble()) works", {
+  local_con(simulate_dbi())
+
+  expect_equal(
+    translate_sql(row_number(tibble(x))),
+    translate_sql(row_number(x))
+  )
+  expect_equal(
+    translate_sql(row_number(tibble(desc(x)))),
+    translate_sql(row_number(desc(x)))
+  )
+
+  expect_equal(
+    translate_sql(row_number(tibble(x, desc(y)))),
+    sql("CASE
+WHEN (NOT((`x` IS NULL)) AND NOT((`y` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL) OR (`y` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`, `y` DESC)
+END")
+  )
+})
+
+test_that("win_rank(c()) gives an informative error", {
+  expect_snapshot(error = TRUE, {
+    translate_sql(row_number(c(x)))
+  })
+})
+
 test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")

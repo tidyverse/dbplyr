@@ -9,6 +9,15 @@
       Error in `rows()`:
       ! `from` (1) must be less than `to` (0)
 
+# win_rank(c()) gives an informative error
+
+    Code
+      translate_sql(row_number(c(x)))
+    Condition
+      Error in `prepare_win_rank_over()`:
+      ! Can't use `c()` in `ROW_NUMBER()`
+      i Did you mean to use `tibble(x)` instead?
+
 # window_frame()
 
     Code
