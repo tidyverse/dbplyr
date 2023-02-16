@@ -144,30 +144,60 @@ win_rank <- function(f) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
-    order_expr <- enexpr(order)
+    order <- prepare_win_rank_over(enexpr(order), f = f)
 
     if (!is_null(order)) {
-      if (is_call(order_expr, "desc", n = 1L)) {
-        order_expr <- call_args(order_expr)[[1L]]
-      }
+      order_over <- translate_sql_(order, con = sql_current_con())
 
-      cond <- translate_sql((case_when(is.na(!!order_expr) ~ 1L, TRUE ~ 0L)))
+      order_symbols <- purrr::map_if(order, ~ is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
+
+      is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
+      any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
+
+      cond <- translate_sql((case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)))
       group <- sql(group, cond)
+
+      not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
+      no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
+    } else {
+      order_over <- win_current_order()
     }
 
     rank_sql <- win_over(
       build_sql(sql(f), list()),
       partition = group,
-      order = order %||% win_current_order(),
+      order = order_over,
       frame = win_current_frame()
     )
 
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!is.na(!!order_expr) ~ !!rank_sql))
+      translate_sql(case_when(!!no_na_expr ~ !!rank_sql))
     }
   }
+}
+
+prepare_win_rank_over <- function(order, f, error_call = caller_env()) {
+  if (is.null(order)) {
+    return()
+  }
+
+  if (is_call(order, "c")) {
+    args <- call_args(order)
+    tibble_expr <- expr_text(expr(tibble(!!!args)))
+    cli_abort(c(
+      "Can't use `c()` in {.fun {f}}",
+      i = "Did you mean to use `{tibble_expr}` instead?"
+    ))
+  }
+
+  if (is_call(order, "tibble")) {
+    tibble_args <- call_args(order)
+    return(tibble_args)
+  }
+
+  list(order)
 }
 
 #' @rdname win_over
