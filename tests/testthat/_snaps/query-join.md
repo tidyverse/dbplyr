@@ -22,7 +22,7 @@
     Code
       inner_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT `df_LHS`.*
@@ -35,7 +35,7 @@
     Code
       left_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT `df_LHS`.*
@@ -48,7 +48,7 @@
     Code
       right_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT `df_RHS`.*
@@ -61,7 +61,7 @@
     Code
       full_join(lf, lf)
     Message
-      Joining, by = c("x", "y")
+      Joining with `by = join_by(x, y)`
     Output
       <SQL>
       SELECT
@@ -76,7 +76,7 @@
     Code
       left_join(lf1, lf2)
     Message
-      Joining, by = "x"
+      Joining with `by = join_by(x)`
     Output
       <SQL>
       SELECT `df_LHS`.*, `z`

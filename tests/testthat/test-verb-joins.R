@@ -4,6 +4,19 @@ test_that("complete join pipeline works with SQLite", {
 
   out <- collect(left_join(df1, df2, by = "x"))
   expect_equal(out, tibble(x = 1:5, y = c("a", NA, "b", NA, "c")))
+
+  df1 <- memdb_frame(x = 1:3, y = c("x", "y", "z"))
+  df2 <- memdb_frame(x = c(1, 3, 5), y = c("a", "b", "c"), z = 11:13)
+
+  expect_equal(
+    collect(full_join(df1, df2, by = "x")),
+    tibble(
+      x = c(1, 2, 3, 5),
+      y.x = c("x", "y", "z", NA),
+      y.y = c("a", NA, "b", "c"),
+      z = c(11, NA, 12, 13)
+    )
+  )
 })
 
 test_that("complete join pipeline works with SQLite and table alias", {
@@ -140,17 +153,18 @@ test_that("alias truncates long table names at database limit", {
   )
 })
 
-test_that("joins with non by variables gives cross join", {
+test_that("cross join via by = character() is deprecated", {
+
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
 
-  out <- collect(inner_join(df1, df2, by = character()))
-  expect_equal(nrow(out), 25)
+  expect_snapshot({
+    out_inner <- collect(inner_join(df1, df2, by = character()))
+    out_full <- collect(full_join(df1, df2, by = character()))
+  })
 
-  # full_join() goes through a slightly different path and
-  # generates CROSS JOIN for reasons I don't fully understand
-  out <- collect(full_join(df1, df2, by = character()))
-  expect_equal(nrow(out), 25)
+  expect_equal(nrow(out_inner), 25)
+  expect_equal(nrow(out_full), 25)
 })
 
 df1 <- memdb_frame(x = 1:5, y = 1:5)
@@ -186,7 +200,7 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.z"))
-  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x.x)
+  j2 <- collect(left_join(df1, df3, by = c("x" = "z"))) %>% mutate(z = x) %>% rename(x.x = x)
   expect_equal(j1, j2)
 
   j1 <- collect(left_join(df1, df3, x_as = "LHS", y_as = "RHS", sql_on = "LHS.x = RHS.x"))
@@ -196,8 +210,7 @@ test_that("joining over arbitrary predicates", {
   expect_equal(j1, j2)
 })
 
-test_that("inner join doesn't result in duplicated columns ", {
-  expect_equal(colnames(inner_join(df1, df1, by = c("x", "y"))), c("x", "y"))
+test_that("inner join doesn't result in duplicated columns ",  expect_equal(colnames(inner_join(df1, df1, by = c("x", "y"))), c("x", "y"))
 })
 
 test_that("self-joins allowed with named by", {
@@ -206,8 +219,8 @@ test_that("self-joins allowed with named by", {
   j1 <- fam %>% left_join(fam, by = c("parent" = "id"))
   j2 <- fam %>% inner_join(fam, by = c("parent" = "id"))
 
-  expect_equal(op_vars(j1), c("id", "parent.x", "parent.y"))
-  expect_equal(op_vars(j2), c("id", "parent.x", "parent.y"))
+  expect_equal(op_vars(j1), c("id", "parent", "parent.y"))
+  expect_equal(op_vars(j2), c("id", "parent", "parent.y"))
   expect_equal(nrow(collect(j1)), 5)
   expect_equal(nrow(collect(j2)), 4)
 
@@ -223,8 +236,8 @@ test_that("suffix modifies duplicated variable names", {
   j1 <- collect(inner_join(fam, fam, by = c("parent" = "id"), suffix = c("1", "2")))
   j2 <- collect(left_join(fam, fam, by = c("parent" = "id"), suffix = c("1", "2")))
 
-  expect_named(j1, c("id", "parent1", "parent2"))
-  expect_named(j2, c("id", "parent1", "parent2"))
+  expect_named(j1, c("id", "parent", "parent2"))
+  expect_named(j2, c("id", "parent", "parent2"))
 })
 
 test_that("join variables always disambiguated (#2823)", {
@@ -240,11 +253,11 @@ test_that("join functions error on column not found for SQL sources #1928", {
   # Rely on dplyr to test precise code
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "x"),
-    "missing|(not found)"
+    "present"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5), by = "y"),
-    "missing|(not found)"
+    "present"
   )
   expect_error(
     left_join(memdb_frame(x = 1:5), memdb_frame(y = 1:5)),
@@ -364,10 +377,9 @@ test_that("select() before join is inlined", {
   expect_equal(vars$var, list("a", c("x1", "x2"), "b"))
   expect_equal(vars$table, list(1, c(1, 2), 2))
 
-  out_cross <- full_join(
+  out_cross <- cross_join(
     lf %>% select(a2 = a, x = x1),
-    lf2 %>% select(x = x2, b),
-    by = character()
+    lf2 %>% select(x = x2, b)
   )
   vars <- out_cross$lazy_query$vars
   expect_equal(vars$name, c("a2", "x.x", "x.y", "b"))
@@ -387,7 +399,7 @@ test_that("select() before join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_left), "a")
-  expect_equal(op_sort(out_left), list(quo(a)), ignore_formula_env = TRUE)
+  expect_equal(op_sort(out_left), list(expr(a)))
   expect_equal(op_frame(out_left), list(range = c(0, 1)))
 })
 
@@ -495,7 +507,7 @@ test_that("select() before semi_join is inlined", {
     by = "x"
   )
   expect_equal(op_grps(out_semi), "a")
-  expect_equal(op_sort(out_semi), list(quo(a)), ignore_formula_env = TRUE)
+  expect_equal(op_sort(out_semi), list(expr(a)))
   expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 
@@ -655,6 +667,222 @@ test_that("multi joins work with x_as", {
     .$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_s3_class(lq$x, "lazy_multi_join_query")
+})
+
+test_that("when keep = TRUE, left_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- left_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(2, 3))
+  expect_equal(out$x, c(NA, 3))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- left_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(2, 3))
+  expect_equal(out$a.y, c(NA, 3))
+})
+
+test_that("when keep = TRUE, right_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- right_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(3, NA))
+  expect_equal(out$x, c(3, 4))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- right_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(3, NA))
+  expect_equal(out$a.y, c(3, 4))
+})
+
+test_that("when keep = TRUE, full_join() preserves both sets of keys", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- full_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>%
+    collect() %>%
+    arrange(a)
+  expect_equal(out$a, c(2, 3, NA))
+  expect_equal(out$x, c(NA, 3, 4))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- full_join(df1, df2, by = c("a"), keep = TRUE) %>%
+    collect() %>%
+    arrange(a.x)
+  expect_equal(out$a.x, c(2, 3, NA))
+  expect_equal(out$a.y, c(NA, 3, 4))
+})
+
+test_that("when keep = TRUE, inner_join() preserves both sets of keys (#5581)", {
+  # when keys have different names
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(x = c(3, 4), y = c(3, 4))
+  out <- inner_join(df1, df2, by = c("a" = "x"), keep = TRUE) %>% collect()
+  expect_equal(out$a, c(3))
+  expect_equal(out$x, c(3))
+
+  # when keys have same name
+  df1 <- memdb_frame(a = c(2, 3), b = c(1, 2))
+  df2 <- memdb_frame(a = c(3, 4), y = c(3, 4))
+  out <- inner_join(df1, df2, by = c("a"), keep = TRUE) %>% collect()
+  expect_equal(out$a.x, c(3))
+  expect_equal(out$a.y, c(3))
+})
+
+test_that("can't use `keep = FALSE` with non-equi conditions (#6499)", {
+  join_by <- dplyr::join_by
+  df1 <- memdb_frame(xl = c(1, 3), xu = c(4, 7))
+  df2 <- memdb_frame(yl = c(2, 5, 8), yu = c(6, 8, 9))
+
+  expect_snapshot(error = TRUE, {
+    left_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+  })
+
+  # Would never make sense here.
+  # Based on how the binary conditions are generated we'd merge:
+  # - `yu` into `xl`
+  # - `yl` into `xu`
+  # Which results in `xl` and `xu` columns that don't maintain `xl <= xu`.
+  expect_snapshot(error = TRUE, {
+    full_join(df1, df2, join_by(overlaps(xl, xu, yl, yu)), keep = FALSE)
+  })
+})
+
+test_that("by default, `by` columns omitted from `y` with equi-conditions, but not non-equi conditions" , {
+  # equi keys always keep the LHS name, regardless of whether of not a duplicate exists in the RHS
+  # non-equi keys will get a suffix if a duplicate exists
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  lf2 <- lazy_frame(x = 2, y = 1, z = 2)
+  out <- right_join(
+    lf,
+    lf2,
+    by = join_by(x == y, y > z),
+    keep = NULL
+  )
+  vars <- out$lazy_query$vars
+  expect_equal(vars$name, c("x", "y", "z.x", "x.y", "z.y"))
+  expect_equal(vars$table, list(2L, 1L, 1L, 2L, 2L))
+  expect_equal(vars$var, list("y", "y", "z", "x", "z"))
+
+  # unless specifically requested with `keep = TRUE`
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  lf2 <- lazy_frame(x = 2, y = 1, z = 2)
+  out <- right_join(
+    lf,
+    lf2,
+    by = join_by(x == y, y > z),
+    keep = TRUE
+  )
+  vars <- out$lazy_query$vars
+  expect_equal(vars$name, c("x.x", "y.x", "z.x", "x.y", "y.y", "z.y"))
+  expect_equal(vars$table, list(1L, 1L, 1L, 2L, 2L, 2L))
+  expect_equal(vars$var, list("x", "y", "z", "x", "y", "z"))
+})
+
+test_that("can translate join conditions", {
+  lf1 <- lazy_frame(a = 1, b = 1, c = 1)
+  expect_snapshot({
+    left_join(
+      lf1,
+      lf1,
+      by = join_by(
+        a == a,
+        b >= b,
+        c < c
+      ),
+      keep = TRUE
+    )
+  })
+})
+
+test_that("joins using `between(bounds =)` work as expected", {
+  df1 <- memdb_frame(x = 1:5)
+  df2 <- memdb_frame(lower = 2, upper = 4)
+
+  out <- left_join(df1, df2, by = join_by(between(x, lower, upper, bounds = "[]"))) %>%
+    collect()
+  # out <- full_join(df1, df2, by = join_by(between(x, lower, upper, bounds = "[]")))
+  expect_identical(out$lower, c(NA, 2, 2, 2, NA))
+  expect_identical(out$upper, c(NA, 4, 4, 4, NA))
+
+  out <- left_join(df1, df2, by = join_by(between(x, lower, upper, bounds = "[)"))) %>%
+    collect()
+  expect_identical(out$lower, c(NA, 2, 2, NA, NA))
+  expect_identical(out$upper, c(NA, 4, 4, NA, NA))
+
+  out <- left_join(df1, df2, by = join_by(between(x, lower, upper, bounds = "(]"))) %>%
+    collect()
+  expect_identical(out$lower, c(NA, NA, 2, 2, NA))
+  expect_identical(out$upper, c(NA, NA, 4, 4, NA))
+
+  out <- left_join(df1, df2, by = join_by(between(x, lower, upper, bounds = "()"))) %>%
+    collect()
+  expect_identical(out$lower, c(NA, NA, 2, NA, NA))
+  expect_identical(out$upper, c(NA, NA, 4, NA, NA))
+})
+
+test_that("joins using `overlaps(bounds =)` work as expected", {
+  df1 <- tibble(x_lower = c(1, 1, 3, 4), x_upper = c(2, 3, 4, 5))
+  df2 <- tibble(y_lower = 2, y_upper = 4)
+
+  expect_closed <- vctrs::vec_cbind(df1, vctrs::vec_c(df2, df2, df2, df2))
+  mf1 <- memdb_frame(x_lower = c(1, 1, 3, 4), x_upper = c(2, 3, 4, 5))
+  mf2 <- memdb_frame(y_lower = 2, y_upper = 4)
+
+  out <- left_join(mf1, mf2, by = join_by(overlaps(x_lower, x_upper, y_lower, y_upper, bounds = "[]"))) %>%
+    collect()
+  expect_identical(out, expect_closed)
+
+  # `[)`, `(]`, and `()` all generate the same binary conditions but are useful
+  # for consistency with `between(bounds =)`
+  expect_open <- vctrs::vec_cbind(df1, vctrs::vec_c(NA, df2, df2, NA))
+
+  out <- left_join(mf1, mf2, by = join_by(overlaps(x_lower, x_upper, y_lower, y_upper, bounds = "[)"))) %>%
+    collect()
+  expect_identical(out, expect_open)
+  out <- left_join(mf1, mf2, by = join_by(overlaps(x_lower, x_upper, y_lower, y_upper, bounds = "(]"))) %>%
+    collect()
+  expect_identical(out, expect_open)
+  out <- left_join(mf1, mf2, by = join_by(overlaps(x_lower, x_upper, y_lower, y_upper, bounds = "()"))) %>%
+    collect()
+  expect_identical(out, expect_open)
+})
+
+test_that("rolling joins aren't supported", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot({
+    (expect_error(left_join(lf, lf, join_by(closest(x >= y)))))
+    (expect_error(semi_join(lf, lf, join_by(closest(x >= y)))))
+  })
+})
+
+test_that("`na_matches` is validated", {
+  df <- lazy_frame(x = 1)
+
+  # Mutating joins
+  expect_snapshot(error = TRUE, {
+    left_join(df, df, by = "x", na_matches = 1)
+  })
+  expect_snapshot(error = TRUE, {
+    left_join(df, df, by = "x", na_matches = "foo")
+  })
+
+  # Filtering joins
+  expect_snapshot(error = TRUE, {
+    semi_join(df, df, by = "x", na_matches = 1)
+  })
+  expect_snapshot(error = TRUE, {
+    semi_join(df, df, by = "x", na_matches = "foo")
+  })
 })
 
 # sql_build ---------------------------------------------------------------
@@ -858,7 +1086,7 @@ test_that("cross_join uses *", {
 
   con <- simulate_dbi()
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     sql_build()
 
   expect_equal(
@@ -868,7 +1096,7 @@ test_that("cross_join uses *", {
 
   # also works after relocate
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(x, y, a, b) %>%
     sql_build()
 
@@ -878,7 +1106,7 @@ test_that("cross_join uses *", {
   )
 
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(x, a, b, y) %>%
     sql_build()
 
@@ -888,7 +1116,7 @@ test_that("cross_join uses *", {
   )
 
   out <- lf1 %>%
-    full_join(lf2, by = character()) %>%
+    cross_join(lf2) %>%
     select(a, x, y, b) %>%
     sql_build()
 

@@ -4,7 +4,7 @@
 \alias{pull.tbl_sql}
 \title{Extract a single column}
 \usage{
-\method{pull}{tbl_sql}(.data, var = -1)
+\method{pull}{tbl_sql}(.data, var = -1, name = NULL, ...)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
@@ -22,6 +22,12 @@ column you've created most recently).
 This argument is taken by expression and supports
 \link[rlang:topic-inject]{quasiquotation} (you can unquote column
 names and column locations).}
+
+\item{name}{An optional parameter that specifies the column to be used
+as names for a named vector. Specified in a similar manner as \code{var}.}
+
+\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
+variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
 }
 \value{
 A vector of data.

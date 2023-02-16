@@ -337,9 +337,7 @@ sql_values_clause <- function(con, df, row = FALSE) {
 
 sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
   if (nrow(df) != 0L) {
-    # TODO use `cli_abort()` after https://github.com/r-lib/rlang/issues/1386
-    # is fixed
-    abort("`df` does not have 0 rows", .internal = TRUE)
+    cli_abort("{.arg df} does not have 0 rows", .internal = TRUE)
   }
 
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)

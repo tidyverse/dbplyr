@@ -132,6 +132,7 @@ add_select <- function(.data, vars) {
   }
 
   lazy_query <- rename_groups(lazy_query, vars)
+  lazy_query <- rename_order(lazy_query, vars)
 
   is_join <- inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")
   if (is_join) {
@@ -172,6 +173,22 @@ rename_groups <- function(lazy_query, vars) {
   grps[renamed] <- old2new[grps[renamed]]
 
   lazy_query$group_vars <- grps
+  lazy_query
+}
+
+rename_order <- function(lazy_query, vars) {
+  old2new <- set_names(names(vars), vars)
+  order <- op_sort(lazy_query)
+
+  is_desc <- purrr::map_lgl(order, ~ is_call(.x, "desc", n = 1L))
+  order <- purrr::map_if(order, is_desc, ~ call_args(.x)[[1L]])
+  order <- purrr::map_chr(order, as_name)
+
+  keep <- order %in% names(old2new)
+  order[keep] <- syms(old2new[order[keep]])
+
+  order <- purrr::map_if(order, is_desc, ~ call2("desc", .x))
+  lazy_query$order_vars <- order[keep]
   lazy_query
 }
 

@@ -1,5 +1,19 @@
 # dbplyr (development version)
 
+* `pull()` now supports the argument `name` (@mgirlich, #1136).
+
+* `window_order()` now only accepts bare symbols or symbols wrapped in `desc()`.
+  This breaking change is necessary to allow `select()` to drop and rename
+  variables used in `window_order()` (@mgirlich, #1103).
+
+* Added support for `join_by()` added in dplyr 1.1.0 (@mgirlich, #1074).
+
+* Using `by = character()` to perform a cross join is now soft-deprecated in
+  favor of `cross_join()`.
+
+* `full_join()` and `right_join()` are now translated directly to `FULL JOIN`
+  and `RIGHT JOIN` for SQLite as native support was finally added (@mgirlich, #1150).
+
 * `case_match()` now works with strings on the left hand side (@mgirlich, #1143).
 
 * The `rows_*()` function work again for tables in a schema in PostgreSQL
