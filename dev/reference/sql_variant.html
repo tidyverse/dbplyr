@@ -214,9 +214,9 @@ conversion function.</p></div>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cor(x, y):</span> cor() is not available in this SQL variant.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in cor(x, y):</span> `cor()` is not available in this SQL variant.</span>
 <span class="r-in"><span><span class="fu"><a href="translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">income</span> <span class="op">/</span> <span class="va">years</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span>, window <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sd(income/years):</span> sd() is not available in this SQL variant.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in sd(income/years):</span> `sd()` is not available in this SQL variant.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Any functions not explicitly listed in the converter will be translated</span></span></span>
 <span class="r-in"><span><span class="co"># to sql as is, so you don't need to convert all functions.</span></span></span>
