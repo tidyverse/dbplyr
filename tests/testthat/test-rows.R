@@ -764,7 +764,11 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
     returning = everything()
   )
 
-  expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
+  if (packageVersion("RSQLite") >= "2.3.0") {
+    expect_equal(get_returned_rows(df_upserted), tibble(x = 2:4, y = 22:24))
+  } else {
+    expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
+  }
 
   expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
