@@ -136,7 +136,6 @@ across_fun <- function(fun, env, data, dots, fn) {
     function(x, cur_col) call2(fun, x, !!!dots)
   } else if (is_call(fun, "~")) {
     if (!is_empty(dots)) {
-      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
       cli_abort(c(
         "Can't use `...` when a purrr-style lambda is used in {.arg .fns}.",
         i = "Use a lambda instead.",

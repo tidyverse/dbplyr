@@ -172,8 +172,7 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-      cli_abort("No known translation for `{pkg}::{name}()`")
+      cli_abort("No known translation for {.fun {pkg}::{name}}")
     }
   }
 

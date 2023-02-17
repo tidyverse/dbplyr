@@ -53,7 +53,6 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
-      # TODO use {.code {expr}} after https://github.com/r-lib/cli/issues/422 is fixed
       cli::cli_warn(c(
         "Windowed expression `{expr}` does not have explicit order.",
         i = "Please use {.fun arrange} or {.fun window_order} to make deterministic."
@@ -259,8 +258,7 @@ win_absent <- function(f) {
   force(f)
 
   function(...) {
-    # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("Window function `{f}()` is not supported by this database.")
+    cli_abort("Window function {.fun {f}} is not supported by this database.")
   }
 }
 

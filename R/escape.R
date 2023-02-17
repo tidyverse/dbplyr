@@ -135,7 +135,6 @@ escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL)
 
 # Also used in default_ops() for reactives
 error_embed <- function(type, expr) {
-  # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
   cli_abort(c(
     "Cannot translate {type} to SQL.",
     `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"

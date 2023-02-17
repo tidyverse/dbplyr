@@ -93,13 +93,13 @@ sql_translation.SQLiteConnection <- function(con) {
     sql_translator(.parent = base_agg,
       sd = sql_aggregate("STDEV", "sd"),
       median = sql_aggregate("MEDIAN"),
-      quantile = sql_not_supported("quantile()"),
+      quantile = sql_not_supported("quantile"),
     ),
     if (sqlite_version() >= "3.25") {
       sql_translator(.parent = base_win,
         sd = win_aggregate("STDEV"),
         median = win_absent("median"),
-        quantile = sql_not_supported("quantile()"),
+        quantile = sql_not_supported("quantile"),
       )
     } else {
       base_no_win # nocov

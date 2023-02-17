@@ -257,8 +257,8 @@ simulate_mssql <- function(version = "15.0") {
       ceiling       = sql_prefix("CEILING"),
 
       # https://dba.stackexchange.com/questions/187090
-      pmin          = sql_not_supported("pmin()"),
-      pmax          = sql_not_supported("pmax()"),
+      pmin          = sql_not_supported("pmin"),
+      pmax          = sql_not_supported("pmax"),
 
       is.null       = mssql_is_null,
       is.na         = mssql_is_null,
@@ -274,7 +274,7 @@ simulate_mssql <- function(version = "15.0") {
       str_length = sql_prefix("LEN"),
       str_c = sql_paste_infix("", "+", function(x) sql_expr(cast(!!x %as% text))),
       # no built in function: https://stackoverflow.com/questions/230138
-      str_to_title = sql_not_supported("str_to_title()"),
+      str_to_title = sql_not_supported("str_to_title"),
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15
       str_sub = sql_str_sub("SUBSTRING", "LEN", optional_length = FALSE),
 
