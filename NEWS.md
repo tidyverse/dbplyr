@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `sql()` now evaluates its arguments locally also when used in `across()` (@mgirlich, #1039).
+
 * The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
   `percent_rank()`, and `cume_dist()`) now support multiple variables by
   wrapping them in `tibble()`, e.g. `rank(tibble(x, y))` (@mgirlich, #1118).
