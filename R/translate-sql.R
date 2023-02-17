@@ -178,7 +178,10 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
 
   special_calls2$sql <- function(...) {
     dots <- exprs(...)
-    dots <- purrr::map(dots, eval_tidy, env = top_env)
+
+    env <- get_env(expr)
+    dots <- purrr::map(dots, eval_tidy, env = env)
+
     exec(sql, !!!dots)
   }
 

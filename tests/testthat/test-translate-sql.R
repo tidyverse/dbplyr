@@ -88,6 +88,19 @@ test_that("sql() evaluates input locally", {
   expect_equal(f(), sql("y"))
 })
 
+test_that("sql() evaluates input locally in across()", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_equal(
+    lf %>%
+      summarise(
+        across(x, ~ sql(gsub("x","y",cur_column())))
+      ) %>%
+      remote_query(),
+    sql("SELECT y AS `x`\nFROM `df`")
+  )
+})
+
 # casts -------------------------------------------------------------------
 
 test_that("casts as expected", {
