@@ -20,6 +20,8 @@
   ...,
   keep = NULL,
   na_matches = c("never", "na"),
+  multiple = NULL,
+  unmatched = "drop",
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -35,6 +37,8 @@
   ...,
   keep = NULL,
   na_matches = c("never", "na"),
+  multiple = NULL,
+  unmatched = "drop",
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -50,6 +54,8 @@
   ...,
   keep = NULL,
   na_matches = c("never", "na"),
+  multiple = NULL,
+  unmatched = "drop",
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -65,6 +71,7 @@
   ...,
   keep = NULL,
   na_matches = c("never", "na"),
+  multiple = NULL,
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -171,6 +178,9 @@ inequality conditions.
 The default, "never", is how databases usually work. \code{"na"} makes
 the joins behave like the dplyr join functions, \code{\link[=merge]{merge()}}, \code{\link[=match]{match()}},
 and \code{\%in\%}.}
+
+\item{multiple, unmatched}{Unsupported in database backends. As a workaround
+for multiple use a unique key and for unmatched a foreign key constraint.}
 
 \item{sql_on}{A custom join predicate as an SQL expression.
 Usually joins use column equality, but you can perform more complex

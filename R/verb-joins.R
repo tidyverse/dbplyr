@@ -34,6 +34,8 @@
 #'   The default, "never", is how databases usually work. `"na"` makes
 #'   the joins behave like the dplyr join functions, [merge()], [match()],
 #'   and `%in%`.
+#' @param multiple,unmatched Unsupported in database backends. As a workaround
+#'   for multiple use a unique key and for unmatched a foreign key constraint.
 #' @param x_as,y_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
 #'   `"RHS"`
 #' @inherit arrange.tbl_lazy return
