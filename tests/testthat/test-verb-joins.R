@@ -817,6 +817,26 @@ test_that("`na_matches` is validated", {
   })
 })
 
+test_that("using multiple gives an informative error", {
+  lf <- lazy_frame(x = 1)
+
+  expect_no_error(left_join(lf, lf, by = "x", multiple = NULL))
+  expect_no_error(left_join(lf, lf, by = "x", multiple = "all"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", multiple = "first")
+  })
+})
+
+test_that("using unmatched gives an informative error", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(left_join(lf, lf, by = "x", unmatched = "drop"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", unmatched = "error")
+  })
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {

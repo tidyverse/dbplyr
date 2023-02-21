@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Add an informative error for unsupported join arguments `unmatched` and
+  `multiple` (@mgirlich).
+
 * `sql()` now evaluates its arguments locally also when used in `across()` (@mgirlich, #1039).
 
 * The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
