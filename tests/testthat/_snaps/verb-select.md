@@ -173,6 +173,14 @@
       Caused by error:
       ! object 'non_existent' not found
 
+# where() isn't suppored
+
+    Code
+      lf %>% select(where(is.integer))
+    Condition
+      Error in `select()`:
+      ! This tidyselect interface doesn't support predicates.
+
 # multiple selects are collapsed
 
     Code

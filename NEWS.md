@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Using predicates, e.g. `where(is.integer)`, in `across()` now produces an
+  error as they never worked anyway (@mgirlich, #1169).
+
 * `sql()` now evaluates its arguments locally also when used in `across()` (@mgirlich, #1039).
 
 * The rank functions (`row_number()`, `min_rank()`, `rank()`, `dense_rank()`,
