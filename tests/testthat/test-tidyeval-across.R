@@ -373,6 +373,13 @@ test_that("across() throws error if unpack = TRUE", {
   )
 })
 
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    capture_across(lf, across(where(is.integer), as.character))
+  })
+})
+
 
 # if_all ------------------------------------------------------------------
 

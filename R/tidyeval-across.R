@@ -186,8 +186,8 @@ across_setup <- function(data,
                          fn,
                          error_call) {
   grps <- group_vars(data)
-  tbl <- ungroup(tidyselect_data_proxy(data))
-  tbl <- tbl[setdiff(colnames(tbl), grps)]
+  tbl <- ungroup(data)
+  tbl <- select(tbl, -all_of(grps))
 
   .cols <- call$.cols %||% expr(everything())
   locs <- tidyselect::eval_select(
