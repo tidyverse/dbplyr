@@ -112,6 +112,8 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">...</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -128,6 +130,8 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">...</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -144,6 +148,8 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">...</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -160,6 +166,7 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">...</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -275,6 +282,11 @@ inequality conditions.</p></li>
 The default, "never", is how databases usually work. <code>"na"</code> makes
 the joins behave like the dplyr join functions, <code><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge()</a></code>, <code><a href="https://rdrr.io/r/base/match.html" class="external-link">match()</a></code>,
 and <code>%in%</code>.</p></dd>
+
+
+<dt>multiple, unmatched</dt>
+<dd><p>Unsupported in database backends. As a workaround
+for multiple use a unique key and for unmatched a foreign key constraint.</p></dd>
 
 
 <dt>sql_on</dt>
