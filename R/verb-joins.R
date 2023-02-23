@@ -34,6 +34,8 @@
 #'   The default, "never", is how databases usually work. `"na"` makes
 #'   the joins behave like the dplyr join functions, [merge()], [match()],
 #'   and `%in%`.
+#' @param multiple,unmatched Unsupported in database backends. As a workaround
+#'   for multiple use a unique key and for unmatched a foreign key constraint.
 #' @param x_as,y_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
 #'   `"RHS"`
 #' @inherit arrange.tbl_lazy return
@@ -75,6 +77,8 @@ inner_join.tbl_lazy <- function(x,
                                 ...,
                                 keep = NULL,
                                 na_matches = c("never", "na"),
+                                multiple = NULL,
+                                unmatched = "drop",
                                 sql_on = NULL,
                                 auto_index = FALSE,
                                 x_as = NULL,
@@ -89,6 +93,8 @@ inner_join.tbl_lazy <- function(x,
     suffix = suffix,
     keep = keep,
     na_matches = na_matches,
+    multiple = multiple,
+    unmatched = unmatched,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -109,6 +115,8 @@ left_join.tbl_lazy <- function(x,
                                ...,
                                keep = NULL,
                                na_matches = c("never", "na"),
+                               multiple = NULL,
+                               unmatched = "drop",
                                sql_on = NULL,
                                auto_index = FALSE,
                                x_as = NULL,
@@ -123,6 +131,8 @@ left_join.tbl_lazy <- function(x,
     suffix = suffix,
     keep = keep,
     na_matches = na_matches,
+    multiple = multiple,
+    unmatched = unmatched,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -143,6 +153,8 @@ right_join.tbl_lazy <- function(x,
                                 ...,
                                 keep = NULL,
                                 na_matches = c("never", "na"),
+                                multiple = NULL,
+                                unmatched = "drop",
                                 sql_on = NULL,
                                 auto_index = FALSE,
                                 x_as = NULL,
@@ -157,6 +169,8 @@ right_join.tbl_lazy <- function(x,
     suffix = suffix,
     keep = keep,
     na_matches = na_matches,
+    multiple = multiple,
+    unmatched = unmatched,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -177,6 +191,7 @@ full_join.tbl_lazy <- function(x,
                                ...,
                                keep = NULL,
                                na_matches = c("never", "na"),
+                               multiple = NULL,
                                sql_on = NULL,
                                auto_index = FALSE,
                                x_as = NULL,
@@ -191,6 +206,7 @@ full_join.tbl_lazy <- function(x,
     suffix = suffix,
     keep = keep,
     na_matches = na_matches,
+    multiple = multiple,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -296,6 +312,8 @@ add_join <- function(x,
                      suffix = NULL,
                      keep = NULL,
                      na_matches = "never",
+                     multiple = NULL,
+                     unmatched = "drop",
                      sql_on = NULL,
                      auto_index = FALSE,
                      x_as = NULL,
@@ -327,6 +345,9 @@ add_join <- function(x,
   }
 
   check_join_by_supported(by, call = call)
+
+  check_join_multiple(multiple, by, call = call)
+  check_join_unmatched(unmatched, by, call = call)
 
   y <- auto_copy(
     x, y,
@@ -713,4 +734,44 @@ check_join_by_supported <- function(by, call = caller_env()) {
   if (any(by$filter != "none")) {
     cli_abort("Rolling joins aren't supported on database backends.", call = call)
   }
+}
+
+check_join_multiple <- function(multiple, by, call = caller_env()) {
+  if (is.null(multiple) || identical(multiple, "all")) {
+    return()
+  }
+
+  msg <- "Argument {.arg multiple} isn't supported on database backends."
+
+  if (all(by$condition == "==")) {
+    code <- glue::glue("
+      db_create_index(
+        con = remote_con(y),
+        table = remote_name(y),
+        columns = {deparse(by$y)},
+        unique = TRUE
+      )"
+    )
+
+    msg <- c(
+      msg,
+      i = c(
+        "For equi joins you can instead add a unique index for the join columns in {.arg y}.",
+        "{.code {code}}"
+      )
+    )
+  }
+
+  cli_abort(msg, call = call)
+}
+
+check_join_unmatched <- function(unmatched, by, call = caller_env()) {
+  if (is.null(unmatched) || identical(unmatched, "drop")) {
+    return()
+  }
+
+  cli_abort(c(
+    "Argument {.arg unmatched} isn't supported on database backends.",
+    i = "For equi joins you can instead add a foreign key from {.arg x} to {.arg y} for the join columns."
+  ), call = call)
 }

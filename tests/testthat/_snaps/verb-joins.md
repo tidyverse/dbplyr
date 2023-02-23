@@ -224,6 +224,25 @@
       Error in `semi_join()`:
       ! `na_matches` must be one of "never" or "na", not "foo".
 
+# using multiple gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", multiple = "first")
+    Condition
+      Error in `left_join()`:
+      ! Argument `multiple` isn't supported on database backends.
+      For equi joins you can instead add a unique index for the join columns in `y`.
+      `db_create_index( con = remote_con(y), table = remote_name(y), columns = "x", unique = TRUE )`
+
+# using unmatched gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", unmatched = "error")
+    Condition
+      Error in `left_join()`:
+      ! Argument `unmatched` isn't supported on database backends.
+      i For equi joins you can instead add a foreign key from `x` to `y` for the join columns.
+
 # can optionally match NA values
 
     Code
