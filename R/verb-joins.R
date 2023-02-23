@@ -773,5 +773,5 @@ check_join_unmatched <- function(unmatched, by, call = caller_env()) {
   cli_abort(c(
     "Argument {.arg unmatched} isn't supported on database backends.",
     i = "For equi joins you can instead add a foreign key from {.arg x} to {.arg y} for the join columns."
-  ))
+  ), call = call)
 }

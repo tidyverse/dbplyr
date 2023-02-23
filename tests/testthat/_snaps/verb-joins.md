@@ -239,7 +239,7 @@
     Code
       left_join(lf, lf, by = "x", unmatched = "error")
     Condition
-      Error in `check_join_unmatched()`:
+      Error in `left_join()`:
       ! Argument `unmatched` isn't supported on database backends.
       i For equi joins you can instead add a foreign key from `x` to `y` for the join columns.
 
