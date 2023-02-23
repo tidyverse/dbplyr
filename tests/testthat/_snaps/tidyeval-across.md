@@ -114,6 +114,14 @@
       ! `.unpack = TRUE` isn't supported on database backends.
       i It must be FALSE instead.
 
+# where() isn't suppored
+
+    Code
+      capture_across(lf, across(where(is.integer), as.character))
+    Condition
+      Error in `across()`:
+      ! This tidyselect interface doesn't support predicates.
+
 # if_all() gives informative errors
 
     Code

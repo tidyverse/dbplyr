@@ -277,6 +277,13 @@ test_that("select() produces nice error messages", {
   })
 })
 
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    lf %>% select(where(is.integer))
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

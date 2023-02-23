@@ -1,7 +1,10 @@
 # dbplyr (development version)
 
-* Add an informative error for unsupported join arguments `unmatched` and
+* Added an informative error for unsupported join arguments `unmatched` and
   `multiple` (@mgirlich).
+
+* Using predicates, e.g. `where(is.integer)`, in `across()` now produces an
+  error as they never worked anyway (@mgirlich, #1169).
 
 * `sql()` now evaluates its arguments locally also when used in `across()` (@mgirlich, #1039).
 
