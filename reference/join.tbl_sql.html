@@ -8,7 +8,7 @@ full_join(x, y):  SELECT * FROM x FULL JOIN y ON x.a = y.a
 semi_join(x, y):  SELECT * FROM x WHERE EXISTS (SELECT 1 FROM y WHERE x.a = y.a)
 anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = y.a)
 
-"><title>Join SQL tables — join.tbl_sql • dbplyr</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.4/font.css" rel="stylesheet"><link href="../deps/Source_Code_Pro-0.4.4/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Join SQL tables — join.tbl_sql"><meta property="og:description" content="These are methods for the dplyr join generics. They are translated
+"><title>Join SQL tables — join.tbl_sql • dbplyr</title><!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png"><link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png"><link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png"><link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png"><link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png"><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.5/font.css" rel="stylesheet"><link href="../deps/Source_Code_Pro-0.4.5/font.css" rel="stylesheet"><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Join SQL tables — join.tbl_sql"><meta property="og:description" content="These are methods for the dplyr join generics. They are translated
 to the following SQL queries:
 inner_join(x, y): SELECT * FROM x JOIN y ON x.a = y.a
 left_join(x, y):  SELECT * FROM x LEFT JOIN y ON x.a = y.a
@@ -28,7 +28,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
@@ -108,10 +109,13 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -123,10 +127,13 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -138,10 +145,13 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -153,10 +163,23 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for tbl_lazy</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/cross_join.html" class="external-link">cross_join</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".x"</span>, <span class="st">".y"</span><span class="op">)</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -167,10 +190,10 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">y</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
@@ -181,10 +204,10 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  <span class="va">y</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  copy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
+<span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  y_as <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -197,19 +220,28 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 
 
 <dt>by</dt>
-<dd><p>A character vector of variables to join by.</p>
+<dd><p>A join specification created with <code><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by()</a></code>, or a character
+vector of variables to join by.</p>
 <p>If <code>NULL</code>, the default, <code>*_join()</code> will perform a natural join, using all
-variables in common across <code>x</code> and <code>y</code>. A message lists the variables so that you
-can check they're correct; suppress the message by supplying <code>by</code> explicitly.</p>
-<p>To join by different variables on <code>x</code> and <code>y</code>, use a named vector.
-For example, <code>by = c("a" = "b")</code> will match <code>x$a</code> to <code>y$b</code>.</p>
-<p>To join by multiple variables, use a vector with length &gt; 1.
-For example, <code>by = c("a", "b")</code> will match <code>x$a</code> to <code>y$a</code> and <code>x$b</code> to
-<code>y$b</code>. Use a named vector to match different variables in <code>x</code> and <code>y</code>.
-For example, <code>by = c("a" = "b", "c" = "d")</code> will match <code>x$a</code> to <code>y$b</code> and
-<code>x$c</code> to <code>y$d</code>.</p>
-<p>To perform a cross-join, generating all combinations of <code>x</code> and <code>y</code>,
-use <code>by = character()</code>.</p></dd>
+variables in common across <code>x</code> and <code>y</code>. A message lists the variables so
+that you can check they're correct; suppress the message by supplying <code>by</code>
+explicitly.</p>
+<p>To join on different variables between <code>x</code> and <code>y</code>, use a <code><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by()</a></code>
+specification. For example, <code>join_by(a == b)</code> will match <code>x$a</code> to <code>y$b</code>.</p>
+<p>To join by multiple variables, use a <code><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by()</a></code> specification with
+multiple expressions. For example, <code>join_by(a == b, c == d)</code> will match
+<code>x$a</code> to <code>y$b</code> and <code>x$c</code> to <code>y$d</code>. If the column names are the same between
+<code>x</code> and <code>y</code>, you can shorten this by listing only the variable names, like
+<code>join_by(a, c)</code>.</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by()</a></code> can also be used to perform inequality, rolling, and overlap
+joins. See the documentation at <a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">?join_by</a> for details on
+these types of joins.</p>
+<p>For simple equality joins, you can alternatively specify a character vector
+of variable names to join by. For example, <code>by = c("a", "b")</code> joins <code>x$a</code>
+to <code>y$a</code> and <code>x$b</code> to <code>y$b</code>. If variable names differ between <code>x</code> and <code>y</code>,
+use a named character vector like <code>by = c("x_a" = "y_a", "x_b" = "y_b")</code>.</p>
+<p>To perform a cross-join, generating all combinations of <code>x</code> and <code>y</code>, see
+<code><a href="https://dplyr.tidyverse.org/reference/cross_join.html" class="external-link">cross_join()</a></code>.</p></dd>
 
 
 <dt>copy</dt>
@@ -229,14 +261,32 @@ operation so you must opt into it.</p></dd>
 Should be a character vector of length 2.</p></dd>
 
 
-<dt>auto_index</dt>
-<dd><p>if <code>copy</code> is <code>TRUE</code>, automatically create
-indices for the variables in <code>by</code>. This may speed up the join if
-there are matching indexes in <code>x</code>.</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Other parameters passed onto methods.</p></dd>
+
+
+<dt>keep</dt>
+<dd><p>Should the join keys from both <code>x</code> and <code>y</code> be preserved in the
+output?</p><ul><li><p>If <code>NULL</code>, the default, joins on equality retain only the keys from <code>x</code>,
+while joins on inequality retain the keys from both inputs.</p></li>
+<li><p>If <code>TRUE</code>, all keys from both inputs are retained.</p></li>
+<li><p>If <code>FALSE</code>, only keys from <code>x</code> are retained. For right and full joins,
+the data in key columns corresponding to rows that only exist in <code>y</code> are
+merged into the key columns from <code>x</code>. Can't be used when joining on
+inequality conditions.</p></li>
+</ul></dd>
+
+
+<dt>na_matches</dt>
+<dd><p>Should NA (NULL) values match one another?
+The default, "never", is how databases usually work. <code>"na"</code> makes
+the joins behave like the dplyr join functions, <code><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge()</a></code>, <code><a href="https://rdrr.io/r/base/match.html" class="external-link">match()</a></code>,
+and <code>%in%</code>.</p></dd>
+
+
+<dt>multiple, unmatched</dt>
+<dd><p>Unsupported in database backends. As a workaround
+for multiple use a unique key and for unmatched a foreign key constraint.</p></dd>
 
 
 <dt>sql_on</dt>
@@ -247,11 +297,10 @@ uses <code>LHS</code> and <code>RHS</code> aliases to refer to the left-hand sid
 right-hand side of the join respectively.</p></dd>
 
 
-<dt>na_matches</dt>
-<dd><p>Should NA (NULL) values match one another?
-The default, "never", is how databases usually work. <code>"na"</code> makes
-the joins behave like the dplyr join functions, <code><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge()</a></code>, <code><a href="https://rdrr.io/r/base/match.html" class="external-link">match()</a></code>,
-and <code>%in%</code>.</p></dd>
+<dt>auto_index</dt>
+<dd><p>if <code>copy</code> is <code>TRUE</code>, automatically create
+indices for the variables in <code>by</code>. This may speed up the join if
+there are matching indexes in <code>x</code>.</p></dd>
 
 
 <dt>x_as, y_as</dt>
@@ -275,7 +324,7 @@ and return data to R.</p>
 <span class="r-in"><span><span class="va">band_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_members</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">instrument_db</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">tbl_memdb</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_instruments</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">band_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">instrument_db</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(name)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dplyr::band_members`.*, `plays`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dplyr::band_members`</span>
@@ -285,9 +334,9 @@ and return data to R.</p>
 <span class="r-in"><span><span class="co"># Can join with local data frames by setting copy = TRUE</span></span></span>
 <span class="r-in"><span><span class="va">band_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="va"><a href="https://dplyr.tidyverse.org/reference/band_members.html" class="external-link">band_instruments</a></span>, copy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(name)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [3 x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.0 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.1 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   name  band    plays </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Mick  Stones  <span style="color: #BB0000;">NA</span>    </span>
@@ -299,7 +348,7 @@ and return data to R.</p>
 <span class="r-in"><span><span class="va">label</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span>, label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"one"</span>, <span class="st">"missing"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">label</span>, by <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [3 x 2]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.0 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.1 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x label</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 one  </span>
@@ -308,7 +357,7 @@ and return data to R.</p>
 <span class="r-in"><span><span class="co"># But you can activate R's usual behaviour with the na_matches argument</span></span></span>
 <span class="r-in"><span><span class="va">db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">label</span>, by <span class="op">=</span> <span class="st">"x"</span>, na_matches <span class="op">=</span> <span class="st">"na"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [3 x 2]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.0 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.40.1 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       x label  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 one    </span>
@@ -320,7 +369,7 @@ and return data to R.</p>
 <span class="r-in"><span><span class="va">db1</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">db2</span> <span class="op">&lt;-</span> <span class="fu"><a href="memdb_frame.html">memdb_frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, y <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">db1</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">db2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "x"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(x)`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `dbplyr_016`.`x`<span style="color: #0000BB;"> AS </span>`x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> `dbplyr_016`</span>
