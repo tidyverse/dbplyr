@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,20 +73,23 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.3.1" id="dbplyr-231">dbplyr 2.3.1<a class="anchor" aria-label="anchor" href="#dbplyr-231"></a></h2><p class="text-muted">CRAN release: 2023-02-24</p>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-2-3-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-3-1"></a></h3>
 <ul><li>
 <code><a href="../reference/window_order.html">window_order()</a></code> now only accepts bare symbols or symbols wrapped in <code><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc()</a></code>. This breaking change is necessary to allow <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> to drop and rename variables used in <code><a href="../reference/window_order.html">window_order()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1103" class="external-link">#1103</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="improved-error-messages-development-version">Improved error messages<a class="anchor" aria-label="anchor" href="#improved-error-messages-development-version"></a></h3>
+<h3 id="improved-error-messages-2-3-1">Improved error messages<a class="anchor" aria-label="anchor" href="#improved-error-messages-2-3-1"></a></h3>
 <ul><li><p><code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile()</a></code> and <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">median()</a></code> now error for SQL Server when used in <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> and for PostgreSQL when used in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> as they can’t be properly translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1110" class="external-link">#1110</a>).</p></li>
 <li><p>Added an informative error for unsupported join arguments <code>unmatched</code> and <code>multiple</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p>Using predicates, e.g. <code>where(is.integer)</code>, in <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now produces an error as they never worked anyway (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1169" class="external-link">#1169</a>).</p></li>
 <li><p>Catch unsupported argument <code>pivot_wider(id_expand = TRUE)</code> and <code>pivot_longer(cols_vary)</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1109" class="external-link">#1109</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-in-sql-generation-development-version">Bug fixes in SQL generation<a class="anchor" aria-label="anchor" href="#bug-fixes-in-sql-generation-development-version"></a></h3>
+<h3 id="bug-fixes-in-sql-generation-2-3-1">Bug fixes in SQL generation<a class="anchor" aria-label="anchor" href="#bug-fixes-in-sql-generation-2-3-1"></a></h3>
 <ul><li><p>Fixed an issue when using a window function after a <code><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1104" class="external-link">#1104</a>).</p></li>
 <li><p>Fixed an issue when there where at least 3 joins and renamed variables (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1101" class="external-link">#1101</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> after <code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> now again produce a subquery to generate the correct translation (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1119" class="external-link">#1119</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1141" class="external-link">#1141</a>).</p></li>
@@ -96,7 +99,7 @@
 <li><p>The <code>rows_*()</code> function work again for tables in a schema in PostgreSQL (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1133" class="external-link">#1133</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-2-3-1">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-3-1"></a></h3>
 <ul><li><p><code><a href="../reference/sql.html">sql()</a></code> now evaluates its arguments locally also when used in <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1039" class="external-link">#1039</a>).</p></li>
 <li><p>The rank functions (<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">min_rank()</a></code>, <code><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">dense_rank()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/percent_rank.html" class="external-link">percent_rank()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/percent_rank.html" class="external-link">cume_dist()</a></code>) now support multiple variables by wrapping them in <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble()</a></code>, e.g. <code>rank(tibble(x, y))</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1118" class="external-link">#1118</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull()</a></code> now supports the argument <code>name</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1136" class="external-link">#1136</a>).</p></li>
