@@ -85,7 +85,76 @@ test_that("join works with in_schema", {
   )
 })
 
+test_that("alias truncates long table names at database limit", {
+  # Postgres has max identifier length of 63; ensure it's not exceeded when generating table alias
+  # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+  con <- src_test("postgres")
+
+  nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
+  DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
+  mf1 <- tbl(con, nm1)
+
+  nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
+  DBI::dbWriteTable(con, nm2, tibble(x = 2:3, y = "b"))
+  mf2 <- tbl(con, nm2)
+
+  # 2 tables
+  # aliased names are as expected
+  self_join2_names <- generate_join_table_names(
+    tibble::tibble(
+      name = c(nm1, nm1),
+      from = "name"
+    )
+  )
+
+  expect_equal(max(nchar(self_join2_names)), 63)
+  expect_equal(
+    length(self_join2_names),
+    length(unique(self_join2_names))
+  )
+
+  # joins correctly work
+  self_join2 <- left_join(mf1, mf1, by = c("x", "y"))
+
+  expect_equal(
+    self_join2 %>% collect(),
+    tibble(x = 1:3, y = "a")
+  )
+
+  expect_snapshot(
+    self_join2 %>% remote_query()
+  )
+
+  # 3 tables
+  # aliased names are as expected
+  self_join3_names <- generate_join_table_names(
+    tibble::tibble(
+      name = c(nm1, nm1, nm2),
+      from = "name"
+    )
+  )
+
+  expect_equal(max(nchar(self_join3_names)), 63)
+  expect_equal(
+    length(self_join3_names),
+    length(unique(self_join3_names))
+  )
+
+  # joins correctly work
+  self_join3 <- left_join(mf1, mf1, by = c("x", "y")) %>%
+    inner_join(mf2, by = "x")
+
+  expect_equal(
+    self_join3 %>% collect(),
+    tibble(x = 2:3, y.x = "a", y.y = "b")
+  )
+  expect_snapshot(
+    self_join3 %>% remote_query()
+  )
+})
+
 test_that("cross join via by = character() is deprecated", {
+
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
 

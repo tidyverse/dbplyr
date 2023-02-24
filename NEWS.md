@@ -82,6 +82,8 @@
   ```
   
   (@mgirlich, #1015).
+  
+* Restricted length of table aliases to avoid truncation on certain backends (e.g., Postgres) (@fh-mthomson, #1096)
 
 # dbplyr 2.3.0
 

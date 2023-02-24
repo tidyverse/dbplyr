@@ -194,15 +194,33 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
 }
 
 generate_join_table_names <- function(table_names) {
+  table_name_length_max <- dplyr::coalesce(max(nchar(table_names$name)), 0)
+
   if (length(table_names$name) != 2) {
     table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
     auto_name <- table_names$from != "as"
     table_names$name[auto_name] <- table_names_repaired[auto_name]
-
-    return(table_names$name)
+    table_names_prepared <- table_names$name
+  } else{
+    table_names_prepared <- join_two_table_alias(table_names$name, table_names$from)
   }
 
-  join_two_table_alias(table_names$name, table_names$from)
+  # avoid database aliases exceeding the database-specific maximum length
+  abbreviate(
+    table_names_prepared,
+    # arbitrarily floor at identifier limit for Postgres backend to avoid unnecessarily truncating reasonable lengths
+    # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+    # "By default, NAMEDATALEN is 64 so the maximum identifier length is 63 bytes."
+    minlength = max(table_name_length_max, 63),
+    # Explicitly set `strict = FALSE` (the default) to ensure table names are unique;
+    # NB: non-zero (but low) chance that name is longer than DB limit
+    strict = FALSE,
+    named = FALSE,
+    # Mitigation for non-zero chance of strings over limit:
+    # don't over anchor to the start of the string,
+    # since we opt to add qualifiers (...1, _{R/L}HS, etc.) to end of table name
+    method = "both.sides"
+  )
 }
 
 #' @export
