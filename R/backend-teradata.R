@@ -30,15 +30,55 @@ dbplyr_edition.Teradata <- function(con) {
 }
 
 #' @export
-sql_query_select.Teradata <- function(con, select, from, where = NULL,
-                                             group_by = NULL, having = NULL,
-                                             window = NULL,
-                                             order_by = NULL,
-                                             limit = NULL,
-                                             distinct = FALSE,
-                                             ...,
-                                             subquery = FALSE,
-                                             lvl = 0) {
+sql_query_select.Teradata <- function(con,
+                                      select,
+                                      from,
+                                      where = NULL,
+                                      group_by = NULL,
+                                      having = NULL,
+                                      window = NULL,
+                                      order_by = NULL,
+                                      limit = NULL,
+                                      distinct = FALSE,
+                                      ...,
+                                      subquery = FALSE,
+                                      lvl = 0) {
+  # #685
+  # https://docs.teradata.com/r/2_MC9vCtAJRlKle2Rpb0mA/frQm7Rn09FJZZLQAuaUvJA
+  # You cannot specify these options in a SELECT statement that specifies the TOP n operator:
+  # * DISTINCT option
+  # * QUALIFY clause
+  # * SAMPLE clause
+  # * WITH clause
+
+  limit_needs_subquery <- is_true(distinct)
+
+  if (!is_null(limit) && limit_needs_subquery) {
+    unlimited_query <- sql_select_clauses(con,
+      select    = sql_clause_select(con, select, distinct, top = NULL),
+      from      = sql_clause_from(from),
+      where     = sql_clause_where(where),
+      group_by  = sql_clause_group_by(group_by),
+      having    = sql_clause_having(having),
+      window    = sql_clause_window(window),
+      order_by  = sql_clause_order_by(order_by, subquery, limit = NULL),
+      lvl       = lvl + 1
+    )
+
+    from <- sql_subquery(con, unlimited_query)
+    out <- sql_select_clauses(con,
+      select   = sql_clause_select(con, select, distinct = FALSE, top = limit),
+      from     = sql_clause_from(from),
+      where    = NULL,
+      group_by = NULL,
+      having   = NULL,
+      window   = NULL,
+      order_by = NULL,
+      lvl = lvl
+    )
+
+    return(out)
+  }
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),

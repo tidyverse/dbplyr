@@ -91,3 +91,8 @@ test_that("queries do not use *", {
     sql("SELECT `x`, `x` AS `y`\nFROM `df`")
   )
 })
+
+test_that("head after distinct() produces subquery", {
+  lf <- lazy_frame(x = 1, y = 2, con = simulate_teradata())
+  expect_snapshot(lf %>% distinct() %>% head())
+})

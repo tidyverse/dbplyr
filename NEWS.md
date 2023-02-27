@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
+
 # dbplyr 2.3.1
 
 ## Breaking changes
