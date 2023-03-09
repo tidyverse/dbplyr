@@ -240,7 +240,7 @@ test_that("can insert with returning", {
 })
 
 test_that("can use `rows_*()` inside a transaction #1183", {
-  con <- withr::local_db_connection(DBI::dbConnect(RPostgres::Postgres()))
+  con <- src_test("postgres")
 
   DBI::dbWriteTable(
     con,
