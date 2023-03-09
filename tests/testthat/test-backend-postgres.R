@@ -242,18 +242,16 @@ test_that("can insert with returning", {
 test_that("can use `rows_*()` inside a transaction #1183", {
   con <- src_test("postgres")
 
-  DBI::dbWriteTable(
-    con,
-    "df_x",
-    tibble(a = 1:2e3, b = 2, x = "a"),
-    temporary = TRUE
-  )
+  DBI::dbWriteTable(con, "df_x", tibble(a = 1:2e3, b = 2, x = "a"), temporary = TRUE)
+  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
 
-  DBI::dbWithTransaction(
-    con, {
-      dbplyr:::get_col_types(con, "df_x", rlang::current_env())
-      DBI::dbGetQuery(con, "SELECT * FROM df_x LIMIT 1")
-    }
+  expect_no_error(
+    DBI::dbWithTransaction(
+      con, {
+        dbplyr:::get_col_types(con, "df_x", rlang::current_env())
+        DBI::dbGetQuery(con, "SELECT * FROM df_x LIMIT 1")
+      }
+    )
   )
 })
 
