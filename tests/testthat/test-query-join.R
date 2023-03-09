@@ -53,8 +53,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
       con,
       vars = tibble(
         name = c("x", "a", "b"),
-        var = list("x", "a", "b"),
-        table = list(1L, 1L, 2L)
+        var = c("x", "a", "b"),
+        table = c(1L, 1L, 2L)
       ),
       table_vars = list(left = c("x", "a"), right = c("x", "b"))
     ),
@@ -63,14 +63,18 @@ test_that("sql_multi_join_vars generates expected SQL", {
 
   # full_join(lf(x, a), lf(x, b), by = "x")
   expect_equal(
-    sql_multi_join_vars(
+    sql_rf_join_vars(
       con,
-      vars = tibble(
+      type = "full",
+      vars = list(
         name = c("x", "a.x", "a.y", "b"),
-        table = list(c(1, 2), 1, 2, 2),
-        var = list(c("x", "x"), "a", "a", "b")
+        x = c("x", "a", NA, NA),
+        y = c("x", NA, "a", "b"),
+        all_x = c("x", "a"),
+        all_y = c("x", "a", "b")
       ),
-      table_vars = list(left = c("x", "a"), right = c("x", "a", "b"))
+      x_as = ident("left"),
+      y_as = ident("right")
     ),
     sql(
       x = "COALESCE(`left`.`x`, `right`.`x`)",

@@ -372,7 +372,7 @@ sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = N
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  select <- sql_join_vars(con, vars, x_as = by$x_as, y_as = by$y_as, type = type)
+  select <- sql_rf_join_vars(con, type = type, vars, x_as = by$x_as, y_as = by$y_as)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned

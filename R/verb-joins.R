@@ -321,28 +321,16 @@ add_join <- function(x,
                      call = caller_env()) {
   x_names <- tbl_vars(x)
   y_names <- tbl_vars(y)
-  if (identical(by, character()) && is.null(sql_on)) {
-    if (type != "cross") {
-      lifecycle::deprecate_soft(
-        when = "1.1.0",
-        what = I("Using `by = character()` to perform a cross join"),
-        with = "cross_join()",
-        env = caller_env(),
-        user_env = caller_env(2)
-      )
-    }
-    type <- "cross"
-  }
 
-  if (!is.null(sql_on)) {
-    by <- list(x = character(0), y = character(0), on = unclass(sql_on))
-  } else if (type == "cross") {
-    by <- list(x = character(0), y = character(0))
-  } else if (is_null(by)) {
-    by <- join_by_common(x_names, y_names, error_call = call)
-  } else {
-    by <- dbplyr_as_join_by(by, error_call = call)
-  }
+  by <- join_prepare_by(
+    by = by,
+    sql_on = sql_on,
+    type = type,
+    x_names = x_names,
+    y_names = y_names,
+    error_call = call
+  )
+  type <- by$type
 
   check_join_by_supported(by, call = call)
 
@@ -370,7 +358,6 @@ add_join <- function(x,
   # the table alias can only be determined after `select()` was inlined.
   # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
-  # TODO can this be really be done before inlining?
   join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
 
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
@@ -378,39 +365,50 @@ add_join <- function(x,
   x_vars <- inline_result$vars
   by$x <- inline_result$by
 
-  new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
-  if (new_query) {
-    x_join_vars <- tibble(
-      name = op_vars(x),
-      table = list(1L),
-      var = as.list(x_vars)
-    )
-    table_id <- 2L
-  } else {
-    x_join_vars <- x_lq$vars
-    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
-  }
-
   inline_result <- join_inline_select(y$lazy_query, by$y, by$on)
   y_lq <- inline_result$lq
   y_vars <- inline_result$vars
   by$y <- inline_result$by
 
-  y_join_vars <- tibble(
-    name = op_vars(y),
-    table = list(table_id),
-    var = as.list(y_vars)
-  )
+  if (type %in% c("full", "right")) {
+    vars <- rf_join_vars(
+      x_vars = x_vars,
+      y_vars = y_vars,
+      vars_info = vars,
+      keep = keep,
+      condition = by$condition,
+      by_y = by$y,
+      type = type
+    )
 
+    table_names_x <- make_table_names(join_alias$x, x_lq)
+    table_names_y <- make_table_names(join_alias$y, y_lq)
+    out <- lazy_rf_join_query(
+      x = x_lq,
+      y = y_lq,
+      type = type,
+      by = list(
+        x = ident(by$x),
+        y = ident(by$y),
+        condition = by$condition,
+        on = sql(by$on),
+        na_matches = na_matches
+      ),
+      table_names = vctrs::vec_rbind(table_names_x, table_names_y),
+      vars = vars
+    )
+
+    return(out)
+  }
+
+  new_query <- join_needs_new_query(x$lazy_query, join_alias, type)
   vars <- multi_join_vars(
-    x_join_vars = x_join_vars,
-    y_join_vars = y_join_vars,
+    x_lq = x_lq,
+    x_vars = x_vars,
+    y_vars = y_vars,
+    new_query = new_query,
     vars_info = vars,
-    keep = keep,
-    condition = by$condition,
-    by_y = by$y,
-    type = type,
-    table_id = table_id,
+    error_call = call
   )
 
   joins_data <- new_joins_data(
@@ -476,10 +474,6 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
     return(TRUE)
   }
 
-  if (type %in% c("full", "right")) {
-    return(TRUE)
-  }
-
   x_as <- join_alias$x
   y_as <- join_alias$y
 
@@ -504,46 +498,99 @@ join_needs_new_query <- function(x_lq, join_alias, type) {
   FALSE
 }
 
-multi_join_vars <- function(x_join_vars,
-                            y_join_vars,
+multi_join_vars <- function(x_lq,
+                            x_vars,
+                            y_vars,
+                            new_query,
                             vars_info,
-                            keep,
-                            condition,
-                            by_y,
-                            type,
-                            table_id,
-                            call) {
-  x_join_vars <- vctrs::vec_slice(x_join_vars, vars_info$x$out)
-  x_join_vars$name <- names(vars_info$x$out)
-  y_join_vars <- vctrs::vec_slice(y_join_vars, vars_info$y$out)
-  y_join_vars$name <- names(vars_info$y$out)
+                            error_call) {
+  if (new_query) {
+    x_join_vars <- tibble(
+      name = names(vars_info$x$out),
+      table = 1L,
+      var = vctrs::vec_slice(x_vars, vars_info$x$out)
+    )
+    table_id <- 2L
+  } else {
+    x_join_vars <- vctrs::vec_slice(x_lq$vars, vars_info$x$out, error_call = error_call)
+    x_join_vars$name <- names(vars_info$x$out)
+    table_id <- vctrs::vec_size(x_lq$table_names) + 1L
+  }
+
+  y_join_vars <- tibble(
+    name = names(vars_info$y$out),
+    table = table_id,
+    var = vctrs::vec_slice(y_vars, vars_info$y$out, error_call = error_call)
+  )
+
+  vctrs::vec_rbind(x_join_vars, y_join_vars, .error_call = error_call)
+}
+
+rf_join_vars <- function(x_vars,
+                         y_vars,
+                         vars_info,
+                         keep,
+                         condition,
+                         by_y,
+                         type,
+                         call) {
+  x_join_vars <- tibble(
+    name = names(vars_info$x$out),
+    x = vctrs::vec_slice(x_vars, vars_info$x$out),
+    y = NA_character_
+  )
+
+  y_join_vars <- tibble(
+    name = names(vars_info$y$out),
+    x = NA_character_,
+    y = vctrs::vec_slice(y_vars, vars_info$y$out)
+  )
 
   keep <- keep %||% (condition != "==")
   idx <- vars_info$x$key[!keep]
-  if (type %in% c("left", "inner")) {
-    # use all variables from `x` as is
-    # use non-join variables from `y`
-  } else if (type == "right") {
-    # Careful: this relies on the assumption that right_join()` starts a new query
+  if (type == "right") {
     # `x`: non-join variables; `y`: all variables
-    # -> must update table id of `x` join vars
-    x_join_vars$table[idx] <- list(table_id)
-    x_join_vars$var[idx] <- as.list(by_y[!keep])
-  } else if (type == "full") {
-    # Careful: this relies on the assumption that `full_join()` starts a new query
-    x_join_vars$table[idx] <- purrr::map(
-      x_join_vars$table[idx],
-      ~ c(.x, table_id)
-    )
-    x_join_vars$var[idx] <- purrr::map2(
-      x_join_vars$var[idx], by_y[!keep],
-      ~ c(.x, .y)
-    )
-  } else if (type == "cross") {
-    # -> simply append `y_rows`
+    x_join_vars$x[idx] <- NA
   }
+  x_join_vars$y[idx] <- by_y[!keep]
 
   vctrs::vec_rbind(x_join_vars, y_join_vars)
+}
+
+
+join_prepare_by <- function(by,
+                            sql_on,
+                            type,
+                            x_names,
+                            y_names,
+                            error_call,
+                            env = caller_env(2),
+                            user_env = caller_env(3)) {
+  if (identical(by, character()) && is.null(sql_on)) {
+    if (type != "cross") {
+      lifecycle::deprecate_soft(
+        when = "1.1.0",
+        what = I("Using `by = character()` to perform a cross join"),
+        with = "cross_join()",
+        env = env,
+        user_env = user_env
+      )
+    }
+    type <- "cross"
+  }
+
+  if (!is.null(sql_on)) {
+    by <- list(x = character(0), y = character(0), on = unclass(sql_on))
+  } else if (type == "cross") {
+    by <- list(x = character(0), y = character(0))
+  } else if (is_null(by)) {
+    by <- join_by_common(x_names, y_names, error_call = error_call)
+  } else {
+    by <- dbplyr_as_join_by(by, error_call = error_call)
+  }
+
+  by$type <- type
+  by
 }
 
 new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
@@ -551,11 +598,10 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
     by_x_table_id <- rep_along(by$x, 1L)
   } else {
     idx <- vctrs::vec_match(by$x, x_lq$vars$name)
-    vctrs::list_check_all_size(x_lq$vars$var[idx], size = 1)
 
     # need to fix `by$x` in case it was renamed in an inlined select
-    by$x <- unlist(x_lq$vars$var)[idx]
-    by_x_table_id <- unlist(x_lq$vars$table)[idx]
+    by$x <- x_lq$vars$var[idx]
+    by_x_table_id <- x_lq$vars$table[idx]
   }
 
   tibble(
