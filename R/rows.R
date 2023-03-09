@@ -752,6 +752,10 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
 }
 
 rows_auto_copy <- function(x, y, copy, call = caller_env()) {
+  if (same_src(x, y)) {
+    return(y)
+  }
+
   name <- remote_name(x)
   x_types <- get_col_types(remote_con(x), name, call)
 
