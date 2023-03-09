@@ -752,6 +752,10 @@ rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
 }
 
 rows_auto_copy <- function(x, y, copy, call = caller_env()) {
+  if (same_src(x, y)) {
+    return(y)
+  }
+
   name <- remote_name(x)
   x_types <- get_col_types(remote_con(x), name, call)
 
@@ -784,7 +788,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
   name <- as.sql(name, con)
-  res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name))
+  res <- DBI::dbSendQuery(con, paste0("SELECT * FROM ", name, " LIMIT 0"))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
   col_info_df <- DBI::dbColumnInfo(res)
