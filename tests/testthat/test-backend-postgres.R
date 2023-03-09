@@ -239,6 +239,24 @@ test_that("can insert with returning", {
   )
 })
 
+test_that("can use `rows_*()` inside a transaction #1183", {
+  con <- withr::local_db_connection(DBI::dbConnect(RPostgres::Postgres()))
+
+  DBI::dbWriteTable(
+    con,
+    "df_x",
+    tibble(a = 1:2e3, b = 2, x = "a"),
+    temporary = TRUE
+  )
+
+  DBI::dbWithTransaction(
+    con, {
+      dbplyr:::get_col_types(con, "df_x", rlang::current_env())
+      DBI::dbGetQuery(con, "SELECT * FROM df_x LIMIT 1")
+    }
+  )
+})
+
 test_that("casts `y` column for local df", {
   con <- src_test("postgres")
 
