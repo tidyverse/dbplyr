@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The `rows_*()` functions now also work inside a transaction for Postgres
+  (@mgirlich, #1183).
+
 # dbplyr 2.3.1
 
 ## Breaking changes
