@@ -55,11 +55,11 @@ test_that("complete semi join works with SQLite and table alias", {
 })
 
 test_that("join works with in_schema", {
-  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+  con <- local_sqlite_connection()
 
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df2"), tibble(x = 2:3, z = "b"))
+  local_db_table(con, tibble(x = 1:3, y = "a"), DBI::Id(schema = "foo", table = "df"), temporary = FALSE)
+  local_db_table(con, tibble(x = 2:3, z = "b"), DBI::Id(schema = "foo", table = "df2"), temporary = FALSE)
 
   # same schema, different name
   df1 <- tbl(con, in_schema("foo", "df"))
@@ -74,7 +74,7 @@ test_that("join works with in_schema", {
 
   # different schema, same name
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo2")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo2", table = "df"), tibble(x = 2:3, z = "c"))
+  local_db_table(con, tibble(x = 2:3, z = "c"), DBI::Id(schema = "foo2", table = "df"), temporary = FALSE)
   df3 <- tbl(con, in_schema("foo2", "df"))
   expect_equal(
     left_join(df1, df3, by = "x") %>% collect(),
@@ -91,12 +91,10 @@ test_that("alias truncates long table names at database limit", {
   con <- src_test("postgres")
 
   nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
-  DBI::dbWriteTable(con, nm1, tibble(x = 1:3, y = "a"))
-  mf1 <- tbl(con, nm1)
+  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), nm1)
 
   nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
-  DBI::dbWriteTable(con, nm2, tibble(x = 2:3, y = "b"))
-  mf2 <- tbl(con, nm2)
+  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), nm2)
 
   # 2 tables
   # aliased names are as expected

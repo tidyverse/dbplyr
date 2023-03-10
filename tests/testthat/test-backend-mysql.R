@@ -98,9 +98,9 @@ test_that("can update", {
   con <- src_test("MariaDB")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
 
   # `RETURNING` in an `UPDATE` clause is not (yet) supported for MariaDB
