@@ -22,6 +22,7 @@ db_write_table.PostgreSQLConnection <- function(con,
       i = "Either set {.code temporary = FALSE} or switch to {.pkg RPostgres}"
     ))
   }
+  dots <- list(...)
 
   dbWriteTable(
     con,
