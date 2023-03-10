@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `*_join()` after `full_join()` works again (@mgirlich, #1178).
+
 * The `rows_*()` functions now also work inside a transaction for Postgres
   (@mgirlich, #1183).
 

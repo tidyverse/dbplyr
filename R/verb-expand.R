@@ -51,9 +51,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
 
   by <- group_vars(data)
   if (is_empty(by)) {
-    # We want a cross join if `by` is empty which is done with
-    # a `full_join()` and `by = character()`
-    purrr::reduce(distinct_tables, full_join, by = character())
+    purrr::reduce(distinct_tables, cross_join)
   } else {
     # In this case a `full_join()` and a `left_join()` produce the same result
     # but a `left_join()` produces much nicer SQL for SQLite
