@@ -517,6 +517,28 @@ test_that("select() before semi_join is inlined", {
   expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 
+test_that("can combine full_join with other joins #1178", {
+  lf1 <- lazy_frame(x = 1)
+  lf2 <- lazy_frame(x = 1, y = 1)
+  lf3 <- lazy_frame(x = 1, z = 1)
+
+  # left join after full join
+  expect_snapshot(
+    full_join(lf1, lf2, by = "x") %>%
+      left_join(lf3, by = "x")
+  )
+  # full join after left join
+  expect_snapshot(
+    left_join(lf1, lf2, by = "x") %>%
+      full_join(lf3, by = "x")
+  )
+  # full join after full join
+  expect_snapshot(
+    full_join(lf1, lf2, by = "x") %>%
+      full_join(lf3, by = "x")
+  )
+})
+
 test_that("select() before join is not inlined when using `sql_on`", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
