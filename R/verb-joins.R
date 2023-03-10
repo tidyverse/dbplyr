@@ -512,7 +512,7 @@ multi_join_vars <- function(x_lq,
     )
     table_id <- 2L
   } else {
-    x_join_vars <- vctrs::vec_slice(x_lq$vars, vars_info$x$out, error_call = error_call)
+    x_join_vars <- vctrs::vec_slice(x_lq$vars, vars_info$x$out)
     x_join_vars$name <- names(vars_info$x$out)
     table_id <- vctrs::vec_size(x_lq$table_names) + 1L
   }
@@ -520,7 +520,7 @@ multi_join_vars <- function(x_lq,
   y_join_vars <- tibble(
     name = names(vars_info$y$out),
     table = table_id,
-    var = vctrs::vec_slice(y_vars, vars_info$y$out, error_call = error_call)
+    var = vctrs::vec_slice(y_vars, vars_info$y$out)
   )
 
   vctrs::vec_rbind(x_join_vars, y_join_vars, .error_call = error_call)
