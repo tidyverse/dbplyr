@@ -31,7 +31,9 @@ lazy_multi_join_query(
 
 lazy_rf_join_query(
   x,
-  joins,
+  y,
+  type,
+  by,
   table_names,
   vars,
   group_vars = op_grps(x),
