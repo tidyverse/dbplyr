@@ -236,7 +236,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   )
 }
 
-sql_values_subquery_column_alias <- function(con, df, types, lvl) {
+sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
     return(sql_values_zero_rows(con, df, types, lvl))
