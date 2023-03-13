@@ -159,7 +159,7 @@ test_that("can explain", {
 test_that("can overwrite temp tables", {
   src <- src_test("postgres")
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
-  on.exit(DBI::dbRemoveTable(src, "mtcars"))
+  withr::defer(DBI::dbRemoveTable(src, "mtcars"))
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
 })
 
