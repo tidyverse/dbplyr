@@ -101,12 +101,10 @@ local_methods <- function(..., .frame = caller_env()) {
 
 local_db_table <- function(con, value, name, ..., temporary = TRUE, envir = parent.frame()) {
   if (inherits(con, "Microsoft SQL Server") && temporary) {
-    rm_name <- paste0("#", name)
-  } else {
-    rm_name <- name
+    name <- paste0("#", name)
   }
 
-  withr::defer(DBI::dbRemoveTable(con, rm_name), envir = envir)
+  withr::defer(DBI::dbRemoveTable(con, name), envir = envir)
   copy_to(con, value, name, temporary = temporary, ...)
   tbl(con, name)
 }
