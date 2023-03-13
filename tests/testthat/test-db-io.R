@@ -1,7 +1,6 @@
 test_that("db_copy_to() wraps DBI errors", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
-  DBI::dbWriteTable(con, "tmp", data.frame(x = 1), overwrite = TRUE, temporary = TRUE)
+  con <- local_sqlite_connection()
+  local_db_table(con, data.frame(x = 1), "tmp")
 
   # error when writing
   expect_snapshot(

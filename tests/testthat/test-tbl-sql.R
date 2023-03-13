@@ -6,9 +6,8 @@ test_that("tbl_sql() works with string argument", {
 })
 
 test_that("same_src distinguishes srcs", {
-  con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
-  con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:", create = TRUE)
-  on.exit({dbDisconnect(con1); dbDisconnect(con2)}, add = TRUE)
+  con1 <- local_sqlite_connection()
+  con2 <- local_sqlite_connection()
 
   db1 <- copy_to(con1, iris[1:3, ], 'data1', temporary = FALSE)
   db2 <- copy_to(con2, iris[1:3, ], 'data2', temporary = FALSE)
@@ -37,8 +36,7 @@ test_that("sql tbl can be printed", {
 })
 
 test_that("can refer to default schema explicitly", {
-  con <- sqlite_con_with_aux()
-  on.exit(DBI::dbDisconnect(con))
+  con <- local_sqlite_con_with_aux()
   DBI::dbExecute(con, "CREATE TABLE t1 (x)")
 
   expect_equal(as.character(tbl_vars(tbl(con, "t1"))), "x")
@@ -46,8 +44,7 @@ test_that("can refer to default schema explicitly", {
 })
 
 test_that("can distinguish 'schema.table' from 'schema'.'table'", {
-  con <- sqlite_con_with_aux()
-  on.exit(DBI::dbDisconnect(con))
+  con <- local_sqlite_con_with_aux()
   DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
   DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
 

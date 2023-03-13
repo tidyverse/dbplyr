@@ -99,6 +99,23 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
+local_db_table <- function(con, value, name, ..., temporary = TRUE, envir = parent.frame()) {
+  if (inherits(con, "Microsoft SQL Server") && temporary) {
+    name <- paste0("#", name)
+  }
+
+  withr::defer(DBI::dbRemoveTable(con, name), envir = envir)
+  copy_to(con, value, name, temporary = temporary, ...)
+  tbl(con, name)
+}
+
+local_sqlite_connection <- function(envir = parent.frame()) {
+  withr::local_db_connection(
+    DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
+    .local_envir = envir
+  )
+}
+
 check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = caller_env()) {
   if (vctrs::vec_is_list(x)) {
     return()

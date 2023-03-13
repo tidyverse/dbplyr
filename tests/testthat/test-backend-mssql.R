@@ -343,12 +343,10 @@ test_that("can insert", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_insert(
@@ -371,12 +369,10 @@ test_that("can insert with returning", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_insert(
@@ -400,12 +396,10 @@ test_that("can append", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 1:3, b = 11:13, c = -(2:4), d = c("y", "z", "w"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_append(
@@ -426,12 +420,10 @@ test_that("can append with returning", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 1:3, b = 11:13, c = -(2:4), d = c("y", "z", "w"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_append(
@@ -453,12 +445,10 @@ test_that("can update", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_update(
@@ -481,12 +471,10 @@ test_that("can update with returning", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_update(
@@ -510,12 +498,10 @@ test_that("can upsert", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_upsert(
@@ -537,12 +523,10 @@ test_that("can upsert with returning", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
 
   expect_equal(
     rows_upsert(
@@ -566,11 +550,9 @@ test_that("can delete", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+  y <- local_db_table(con, df_y, "df_y")
 
   expect_equal(
     rows_delete(
@@ -593,11 +575,9 @@ test_that("can delete with returning", {
   con <- src_test("mssql")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_x")))
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("#df_y")))
+  y <- local_db_table(con, df_y, "df_y")
 
   expect_equal(
     rows_delete(

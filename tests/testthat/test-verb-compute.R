@@ -94,7 +94,7 @@ test_that("compute can handle named name", {
 
 test_that("compute can handle schema", {
   df <- memdb_frame(x = 1:10)
-  on.exit(DBI::dbRemoveTable(remote_con(df), "db1"))
+  withr::defer(DBI::dbRemoveTable(remote_con(df), "db1"))
 
   expect_equal(
     df %>%
