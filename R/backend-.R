@@ -375,25 +375,31 @@ base_win <- sql_translator(
   },
 
   # Variants that take more arguments
-  first = function(x, order_by = NULL) {
+  first = function(x, order_by = NULL, na_rm = FALSE) {
     sql_nth(
       x = x,
       n = 1L,
-      order_by = order_by
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
-  last = function(x, order_by = NULL) {
+  last = function(x, order_by = NULL, na_rm = FALSE) {
     sql_nth(
       x = x,
       n = Inf,
-      order_by = order_by
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
-  nth = function(x, n, order_by = NULL) {
+  nth = function(x, n, order_by = NULL, na_rm = FALSE) {
     sql_nth(
       x = x,
       n = n,
-      order_by = order_by
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
 

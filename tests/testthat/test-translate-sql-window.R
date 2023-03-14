@@ -57,6 +57,10 @@ test_that("first, last, and nth translated to _value", {
     translate_sql(first(x)),
     sql("FIRST_VALUE(`x`) OVER ()")
   )
+  expect_equal(
+    translate_sql(first(x, na_rm = TRUE)),
+    sql("FIRST_VALUE(`x` IGNORE NULLS) OVER ()")
+  )
   # `last()` must default to unbounded preceding and following
   expect_equal(
     translate_sql(last(x), vars_order = "a"),
