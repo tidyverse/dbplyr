@@ -13,6 +13,8 @@
 #'   Mainly useful for better performance when creating
 #'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
+  check_dots_empty0(...)
+
   # If not literal sql, must be a table identifier
   from_sql <- as.sql(from, con = src$con)
   if (!(is.ident(from) || is.sql(from) || is_schema(from))) {
