@@ -449,6 +449,7 @@ sql_query_multi_join <- function(con,
                                  joins,
                                  table_vars,
                                  vars,
+                                 by_list,
                                  ...,
                                  lvl = 0) {
   UseMethod("sql_query_multi_join")
@@ -489,6 +490,7 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                joins,
                                                table_vars,
                                                vars,
+                                               by_list,
                                                ...,
                                                lvl = 0) {
   check_dots_empty0(...)
