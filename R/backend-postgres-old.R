@@ -37,6 +37,7 @@ db_write_table.PostgreSQLConnection <- function(con,
 
 #' @export
 db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
+  check_dots_empty0(...)
   fields <- build_sql(
     "SELECT * FROM ", sql_subquery(con, sql), " WHERE 0=1",
     con = con
