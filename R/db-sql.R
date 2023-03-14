@@ -548,6 +548,8 @@ sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
 }
 #' @export
 sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
+  check_dots_empty0(...)
+
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
