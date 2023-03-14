@@ -368,11 +368,29 @@ sql_select.DBIConnection <- function(con,
 
 #' @rdname db-sql
 #' @export
-sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join <- function(con,
+                           x,
+                           y,
+                           vars,
+                           type = "inner",
+                           by = NULL,
+                           na_matches = FALSE,
+                           ...,
+                           lvl = 0) {
   UseMethod("sql_query_join")
 }
 #' @export
-sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join.DBIConnection <- function(con,
+                                         x,
+                                         y,
+                                         vars,
+                                         type = "inner",
+                                         by = NULL,
+                                         na_matches = FALSE,
+                                         ...,
+                                         lvl = 0) {
+  check_dots_empty0(...)
+
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),

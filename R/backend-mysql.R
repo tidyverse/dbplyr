@@ -117,7 +117,17 @@ sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
 sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 
 #' @export
-sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_query_join.MariaDBConnection <- function(con,
+                                             x,
+                                             y,
+                                             vars,
+                                             type = "inner",
+                                             by = NULL,
+                                             na_matches = FALSE,
+                                             ...,
+                                             lvl = 0) {
+  check_dots_empty0(...)
+
   if (identical(type, "full")) {
     cli_abort("MySQL does not support full joins")
   }
