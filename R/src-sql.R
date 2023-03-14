@@ -27,6 +27,7 @@ same_src.src_sql <- function(x, y) {
 #' @importFrom dplyr src_tbls
 #' @export
 src_tbls.src_sql <- function(x, ...) {
+  check_dots_empty0(...)
   dbListTables(x$con)
 }
 
