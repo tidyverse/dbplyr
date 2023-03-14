@@ -138,15 +138,18 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
+# https://modern-sql.com/blog/2018-08/whats-new-in-mariadb-10.3#3.values
+# MariaDB doesn't accept `ROW` unlike MySQL
 #' @export
-sql_values_subquery.MariaDBConnection <- function(con, df, types, lvl = 0, ...) {
-  sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
-}
+sql_values_subquery.MariaDBConnection <- sql_values_subquery.DBIConnection
 
 #' @export
-sql_values_subquery.MySQL <- sql_values_subquery.MariaDBConnection
+sql_values_subquery.MySQL <-function(con, df, types, lvl = 0, ...) {
+  # https://dev.mysql.com/doc/refman/8.0/en/values.html
+  sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
+}
 #' @export
-sql_values_subquery.MySQLConnection <- sql_values_subquery.MariaDBConnection
+sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
 
 #' @export
 sql_random.MariaDBConnection <- function(con) {

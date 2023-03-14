@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `copy_inline()` now works for MariaDB (@mgirlich, #1188).
+
 * `*_join()` after `full_join()` works again (@mgirlich, #1178).
 
 * The `rows_*()` functions now also work inside a transaction for Postgres
