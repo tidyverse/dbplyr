@@ -197,7 +197,14 @@ sql_query_fields <- function(con, sql, ...) {
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
-  dbplyr_query_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
+  check_dots_empty0(...)
+
+  dbplyr_query_select(
+    con,
+    sql("*"),
+    dbplyr_sql_subquery(con, sql),
+    where = sql("0 = 1")
+  )
 }
 
 #' @rdname db-sql
