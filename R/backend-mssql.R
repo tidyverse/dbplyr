@@ -458,8 +458,12 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
-                                                  temporary = TRUE, ...){
+`sql_query_save.Microsoft SQL Server` <- function(con,
+                                                  sql,
+                                                  name,
+                                                  temporary = TRUE,
+                                                  ...) {
+  check_dots_empty0(...)
 
   # https://stackoverflow.com/q/16683758/946850
   build_sql(

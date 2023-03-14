@@ -214,6 +214,8 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 }
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  check_dots_empty0(...)
+
   build_sql(
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
     as.sql(name, con), " AS\n", sql,

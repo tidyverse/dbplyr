@@ -162,6 +162,8 @@ sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
+  check_dots_empty0(...)
+
   build_sql(
     "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
     as.sql(name, con), " AS\n", sql,
