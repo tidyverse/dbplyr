@@ -100,10 +100,28 @@ value of <code>x</code> in each group.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for tbl_lazy</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_min</a></span><span class="op">(</span><span class="va">.data</span>, <span class="va">order_by</span>, <span class="va">...</span>, <span class="va">n</span>, <span class="va">prop</span>, by <span class="op">=</span> <span class="cn">NULL</span>, with_ties <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_min</a></span><span class="op">(</span></span>
+<span>  <span class="va">.data</span>,</span>
+<span>  <span class="va">order_by</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  <span class="va">n</span>,</span>
+<span>  <span class="va">prop</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  with_ties <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na_rm <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for tbl_lazy</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span><span class="va">.data</span>, <span class="va">order_by</span>, <span class="va">...</span>, <span class="va">n</span>, by <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">prop</span>, with_ties <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_max</a></span><span class="op">(</span></span>
+<span>  <span class="va">.data</span>,</span>
+<span>  <span class="va">order_by</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  <span class="va">n</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">prop</span>,</span>
+<span>  with_ties <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  na_rm <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for tbl_lazy</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="va">.data</span>, <span class="va">...</span>, <span class="va">n</span>, <span class="va">prop</span>, by <span class="op">=</span> <span class="cn">NULL</span>, weight_by <span class="op">=</span> <span class="cn">NULL</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
@@ -143,6 +161,13 @@ details and examples, see <a href="https://dplyr.tidyverse.org/reference/dplyr_b
 <dd><p>Should ties be kept together? The default, <code>TRUE</code>, may
 return more rows than you request. Use FALSE to ignore ties, and return
 the first n rows.</p></dd>
+
+
+<dt>na_rm</dt>
+<dd><p>Should missing values in <code>order_by</code> be removed from the result?
+If <code>FALSE</code>, <code>NA</code> values are sorted to the end (like in <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>), so
+they will only be included if there are insufficient non-missing values to
+reach <code>n</code>/<code>prop</code>.</p></dd>
 
 
 <dt>weight_by, replace</dt>
