@@ -141,6 +141,8 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
+  check_dots_empty0(...)
+
   build_sql("ANALYZE ", as.sql(table, con = con), con = con)
 }
 

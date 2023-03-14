@@ -222,7 +222,9 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 # functions that performed similar operations, and found none.
 # Link to full list: https://docs.snowflake.com/en/sql-reference/sql-all.html
 #' @export
-sql_table_analyze.Snowflake <- function(con, table, ...) {}
+sql_table_analyze.Snowflake <- function(con, table, ...) {
+  check_dots_empty0(...)
+}
 
 snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html

@@ -443,6 +443,8 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
+  check_dots_empty0(...)
+
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
   build_sql("UPDATE STATISTICS ", as.sql(table, con = con), con = con)
 }

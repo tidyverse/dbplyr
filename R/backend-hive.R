@@ -88,6 +88,8 @@ sql_translation.Hive <- function(con) {
 
 #' @export
 sql_table_analyze.Hive <- function(con, table, ...) {
+  check_dots_empty0(...)
+
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
   build_sql(
     "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",

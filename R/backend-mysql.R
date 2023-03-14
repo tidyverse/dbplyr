@@ -109,6 +109,8 @@ sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
+  check_dots_empty0(...)
+
   build_sql("ANALYZE TABLE ", as.sql(table, con = con), con = con)
 }
 #' @export

@@ -74,6 +74,8 @@ db_table_temporary.HDB <- function(con, table, temporary, ...) {
 `sql_table_analyze.HDB` <- function(con, table, ...) {
   # CREATE STATISTICS doesn't work for temporary tables, so
   # don't do anything at all
+
+  check_dots_empty0(...)
 }
 
 #' @export

@@ -165,6 +165,8 @@ sql_translation.ACCESS <- function(con) {
 
 #' @export
 sql_table_analyze.ACCESS <- function(con, table, ...) {
+  check_dots_empty0(...)
+
   # Do nothing. Access doesn't support an analyze / update statistics function
   NULL # nocov
 }
