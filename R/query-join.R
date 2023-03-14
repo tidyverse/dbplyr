@@ -59,7 +59,11 @@ print.multi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.join_query <- function(query,
+                                  con = NULL,
+                                  ...,
+                                  subquery = FALSE,
+                                  lvl = 0) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
@@ -73,7 +77,11 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 }
 
 #' @export
-sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.multi_join_query <- function(query,
+                                        con = NULL,
+                                        ...,
+                                        subquery = FALSE,
+                                        lvl = 0) {
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,

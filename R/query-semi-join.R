@@ -29,7 +29,11 @@ print.semi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.semi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.semi_join_query <- function(query,
+                                       con = NULL,
+                                       ...,
+                                       subquery = FALSE,
+                                       lvl = 0) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 

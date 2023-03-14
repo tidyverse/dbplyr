@@ -170,7 +170,14 @@ sql_build.lazy_values_query <- function(op, con, ...) {
 }
 
 #' @export
-sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.lazy_values_query <- function(query,
+                                         con = query$src$con,
+                                         ...,
+                                         subquery = FALSE,
+                                         lvl = 0,
+                                         cte = FALSE) {
+  check_dots_empty0(...)
+
   sql_values_subquery(con, query$x, types = query$col_types, lvl = lvl)
 }
 

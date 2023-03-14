@@ -53,12 +53,22 @@ sql_render <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = 
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.tbl_lazy <- function(query,
+                                con = query$src$con,
+                                ...,
+                                subquery = FALSE,
+                                lvl = 0,
+                                cte = FALSE) {
   sql_render(query$lazy_query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
 }
 
 #' @export
-sql_render.lazy_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.lazy_query <- function(query,
+                                  con = NULL,
+                                  ...,
+                                  subquery = FALSE,
+                                  lvl = 0,
+                                  cte = FALSE) {
   qry <- sql_build(query, con = con, ...)
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
 
@@ -184,12 +194,26 @@ flatten_query.sql <- function(qry, query_list) {
 }
 
 #' @export
-sql_render.sql <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.sql <- function(query,
+                           con = NULL,
+                           ...,
+                           subquery = FALSE,
+                           lvl = 0,
+                           cte = FALSE) {
+  check_dots_empty0(...)
+
   query
 }
 
 #' @export
-sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.ident <- function(query,
+                             con = NULL,
+                             ...,
+                             subquery = FALSE,
+                             lvl = 0,
+                             cte = FALSE) {
+  check_dots_empty0(...)
+
   if (subquery) {
     query
   } else {
@@ -198,7 +222,12 @@ sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, 
 }
 
 #' @export
-sql_render.dbplyr_schema <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.dbplyr_schema <- function(query,
+                                     con = NULL,
+                                     ...,
+                                     subquery = FALSE,
+                                     lvl = 0,
+                                     cte = FALSE) {
   query <- as.sql(query, con)
   sql_render(query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
 }

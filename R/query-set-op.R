@@ -24,7 +24,11 @@ print.set_op_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.set_op_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.set_op_query <- function(query,
+                                    con = NULL,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
   sub_lvl <- lvl + !inherits(con, "SQLiteConnection")
   from_x <- sql_render(query$x, con, ..., subquery = FALSE, lvl = sub_lvl)
   from_y <- sql_render(query$y, con, ..., subquery = FALSE, lvl = sub_lvl)
