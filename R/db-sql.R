@@ -394,7 +394,15 @@ dbplyr_query_join <- function(con, ..., lvl = 0) {
 }
 #' @export
 #' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_join.DBIConnection <- function(con,
+                                   x,
+                                   y,
+                                   vars,
+                                   type = "inner",
+                                   by = NULL,
+                                   na_matches = FALSE,
+                                   ...,
+                                   lvl = 0) {
   sql_query_join(
     con, x, y, vars,
     type = type,
