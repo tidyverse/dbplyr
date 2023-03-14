@@ -80,5 +80,6 @@ db_table_temporary.HDB <- function(con, table, temporary, ...) {
 
 #' @export
 sql_values_subquery.HDB <- function(con, df, types, lvl = 0, ...) {
+  check_dots_empty0(...)
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUMMY")
 }

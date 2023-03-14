@@ -182,6 +182,7 @@ sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
 
 #' @export
 sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
+  check_dots_empty0(...)
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 

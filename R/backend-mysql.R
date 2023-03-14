@@ -160,6 +160,7 @@ sql_values_subquery.MariaDBConnection <- sql_values_subquery.DBIConnection
 
 #' @export
 sql_values_subquery.MySQL <-function(con, df, types, lvl = 0, ...) {
+  check_dots_empty0(...)
   # https://dev.mysql.com/doc/refman/8.0/en/values.html
   sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
 }

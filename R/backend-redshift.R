@@ -128,6 +128,7 @@ sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
 
 #' @export
 sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
+  check_dots_empty0(...)
   sql_values_subquery_union(con, df, types = types, lvl = lvl)
 }
 

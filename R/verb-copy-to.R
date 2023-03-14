@@ -198,6 +198,7 @@ sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
 
 #' @export
 sql_values_subquery.DBIConnection <- function(con, df, types, lvl = 0, ...) {
+  check_dots_empty0(...)
   sql_values_subquery_default(con, df, types = types, lvl = lvl, row = FALSE)
 }
 
@@ -244,6 +245,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
 }
 
 sql_values_subquery_column_alias <- function(con, df, types, lvl, ...) {
+  check_dots_empty0(...)
   df <- values_prepare(con, df)
   if (nrow(df) == 0L) {
     return(sql_values_zero_rows(con, df, types, lvl))
