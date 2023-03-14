@@ -39,11 +39,18 @@ db_copy_to <-  function(con, table, values,
   UseMethod("db_copy_to")
 }
 #' @export
-db_copy_to.DBIConnection <- function(con, table, values,
-                            overwrite = FALSE, types = NULL, temporary = TRUE,
-                            unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...,
-                            in_transaction = TRUE) {
+db_copy_to.DBIConnection <- function(con,
+                                     table,
+                                     values,
+                                     overwrite = FALSE,
+                                     types = NULL,
+                                     temporary = TRUE,
+                                     unique_indexes = NULL,
+                                     indexes = NULL,
+                                     analyze = TRUE,
+                                     ...,
+                                     in_transaction = TRUE) {
+  check_dots_empty0(...)
 
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
