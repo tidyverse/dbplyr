@@ -119,6 +119,8 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 
 #' @export
 sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
+  check_dots_empty0(...)
+
   if (is.ident(from)) {
     setNames(from, name)
   } else {

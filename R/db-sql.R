@@ -229,6 +229,8 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 #' @export
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
+  check_dots_empty0(...)
+
   if (is.ident(from)) {
     setNames(from, name)
   } else if (is_schema(from) || is_catalog(from)) {
