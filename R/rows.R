@@ -559,11 +559,6 @@ has_returned_rows <- function(x) {
   !identical(attr(x, "returned_rows"), NULL)
 }
 
-#' @export
-sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
-  cli_abort("DuckDB does not support the {.arg returning} argument.")
-}
-
 sql_coalesce <- function(x, y) {
   sql(paste0("COALESCE(", x, ", ", y, ")"))
 }

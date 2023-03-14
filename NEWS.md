@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* DuckDB now supports the `returning` argument of `rows_*()`.
+
 * `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
 
 * `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
