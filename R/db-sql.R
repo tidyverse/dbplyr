@@ -913,6 +913,8 @@ dbplyr_analyze <- function(con, ...) {
 #' @export
 #' @importFrom dplyr db_analyze
 db_analyze.DBIConnection <- function(con, table, ...) {
+  check_dots_used()
+
   sql <- sql_table_analyze(con, table, ...)
   if (is.null(sql)) {
     return() # nocov
