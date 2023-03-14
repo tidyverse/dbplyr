@@ -2,6 +2,8 @@
 
 * `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
 
+* `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
+
 * `copy_inline()` now works for MariaDB (@mgirlich, #1188).
 
 * `*_join()` after `full_join()` works again (@mgirlich, #1178).
