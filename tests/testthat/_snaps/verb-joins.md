@@ -129,6 +129,54 @@
         WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
+# can combine full_join with other joins #1178
+
+    Code
+      full_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT `LHS`.*, `z`
+      FROM (
+        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        FULL JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) `LHS`
+      LEFT JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
+---
+
+    Code
+      left_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      FROM (
+        SELECT `df_LHS`.`x` AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        LEFT JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) `LHS`
+      FULL JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
+---
+
+    Code
+      full_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      FROM (
+        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        FULL JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) `LHS`
+      FULL JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
 # multiple joins create a single query
 
     Code

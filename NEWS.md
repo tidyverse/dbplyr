@@ -2,6 +2,13 @@
 
 * `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
 
+* `copy_inline()` now works for MariaDB (@mgirlich, #1188).
+
+* `*_join()` after `full_join()` works again (@mgirlich, #1178).
+
+* The `rows_*()` functions now also work inside a transaction for Postgres
+  (@mgirlich, #1183).
+
 # dbplyr 2.3.1
 
 ## Breaking changes

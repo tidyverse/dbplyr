@@ -134,7 +134,9 @@ add_select <- function(.data, vars) {
   lazy_query <- rename_groups(lazy_query, vars)
   lazy_query <- rename_order(lazy_query, vars)
 
-  is_join <- inherits(lazy_query, "lazy_multi_join_query") || inherits(lazy_query, "lazy_semi_join_query")
+  is_join <- inherits(lazy_query, "lazy_multi_join_query") ||
+    inherits(lazy_query, "lazy_rf_join_query") ||
+    inherits(lazy_query, "lazy_semi_join_query")
   if (is_join) {
     idx <- vctrs::vec_match(vars, vars_data)
 

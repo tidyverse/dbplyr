@@ -155,9 +155,8 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("rows_get_or_execute() gives error context", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
-  DBI::dbWriteTable(con, "mtcars", tibble(x = 1, y = 1), overwrite = TRUE, temporary = TRUE)
+  con <- local_sqlite_connection()
+  local_db_table(con, tibble(x = 1, y = 1), "mtcars", overwrite = TRUE)
   DBI::dbExecute(con, "CREATE UNIQUE INDEX `mtcars_x` ON `mtcars` (`x`)")
 
   expect_snapshot({

@@ -134,7 +134,6 @@ db_write_table.DBIConnection <- function(con,
                                          types,
                                          values,
                                          temporary = TRUE,
-                                         overwrite = FALSE,
                                          ...) {
   tryCatch(
     dbWriteTable(
@@ -143,7 +142,7 @@ db_write_table.DBIConnection <- function(con,
       value = values,
       field.types = types,
       temporary = temporary,
-      overwrite = overwrite,
+      ...,
       row.names = FALSE
     ),
     error = function(cnd) {
