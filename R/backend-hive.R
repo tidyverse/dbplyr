@@ -54,7 +54,34 @@ sql_translation.Hive <- function(con) {
     sql_translator(.parent = base_odbc_win,
       var = win_aggregate("VARIANCE"),
       quantile = sql_quantile("PERCENTILE", window = TRUE),
-      median = sql_median("PERCENTILE", window = TRUE)
+      median = sql_median("PERCENTILE", window = TRUE),
+      first = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = 1L,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "bool"
+        )
+      },
+      last = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = Inf,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "bool"
+        )
+      },
+      nth = function(x, n, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = n,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "bool"
+        )
+      },
     )
   )
 }
@@ -66,11 +93,6 @@ sql_table_analyze.Hive <- function(con, table, ...) {
     "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",
     con = con
   )
-}
-
-#' @export
-last_value_sql.Hive <- function(con, x) {
-  translate_sql(last_value(!!x, TRUE), con = con)
 }
 
 #' @export

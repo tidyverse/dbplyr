@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
+
 * `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
 
 * `copy_inline()` now works for MariaDB (@mgirlich, #1188).

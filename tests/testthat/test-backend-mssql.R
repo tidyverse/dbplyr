@@ -107,7 +107,11 @@ test_that("custom lubridate functions translated correctly", {
 })
 
 test_that("last_value_sql() translated correctly", {
-  expect_equal(last_value_sql(simulate_mssql(), "x"), sql("LAST_VALUE(`x`) IGNORE NULLS"))
+  con <- simulate_mssql()
+  expect_equal(
+    translate_sql(last(x, na_rm = TRUE), vars_order = "a", con = con),
+    sql("LAST_VALUE(`x`) IGNORE NULLS OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+  )
 })
 
 # verb translation --------------------------------------------------------

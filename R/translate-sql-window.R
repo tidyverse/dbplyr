@@ -252,6 +252,48 @@ win_cumulative <- function(f) {
   }
 }
 
+sql_nth <- function(x,
+                    n,
+                    order_by = NULL,
+                    na_rm = FALSE,
+                    ignore_nulls = c("inside", "outside", "bool"),
+                    error_call = caller_env()) {
+  check_bool(na_rm, call = error_call)
+  check_number_whole_inf(n, call = error_call)
+  ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
+
+  frame <- win_current_frame()
+  args <- translate_sql(!!x)
+  if (n == 1) {
+    sql_f <- "FIRST_VALUE"
+  } else if (is.infinite(n) && n > 0) {
+    sql_f <- "LAST_VALUE"
+    frame <- frame %||% c(-Inf, Inf)
+  } else {
+    sql_f <- "NTH_VALUE"
+    args <- paste0(args, ", ", translate_sql(!!as.integer(n)))
+  }
+
+  if (na_rm) {
+    if (ignore_nulls == "inside") {
+      sql_expr <- paste0(sql_f, "(", args, " IGNORE NULLS)")
+    } else if (ignore_nulls == "outside") {
+      sql_expr <- paste0(sql_f, "(", args, ") IGNORE NULLS")
+    } else {
+      sql_expr <- paste0(sql_f, "(", args, ", TRUE)")
+    }
+  } else {
+    sql_expr <- paste0(sql_f, "(", args, ")")
+  }
+
+  win_over(
+    sql(sql_expr),
+    win_current_group(),
+    order_by %||% win_current_order(),
+    frame
+  )
+}
+
 #' @rdname win_over
 #' @export
 win_absent <- function(f) {
