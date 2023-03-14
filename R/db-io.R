@@ -101,6 +101,8 @@ db_compute.DBIConnection <- function(con,
                                      indexes = list(),
                                      analyze = TRUE,
                                      ...) {
+  check_dots_empty0()
+
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
