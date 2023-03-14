@@ -34,18 +34,21 @@ test_that("custom stringr functions translated correctly", {
 # verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
-  con <- simulate_mysql()
+  con_maria <- simulate_mysql()
 
-  expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
-  expect_snapshot(sql_query_explain(con, sql("SELECT * FROM table")))
+  expect_snapshot(sql_table_analyze(con_maria, in_schema("schema", "tbl")))
+  expect_snapshot(sql_query_explain(con_maria, sql("SELECT * FROM table")))
 
-  lf <- lazy_frame(x = 1, con = con)
+  lf <- lazy_frame(x = 1, con = con_maria)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
   expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
 
   expect_snapshot(slice_sample(lf, n = 1))
 
-  expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+
+  con_mysql <- simulate_dbi("MySQLConnection")
+  expect_snapshot(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
 
 test_that("`sql_query_update_from()` is correct", {
