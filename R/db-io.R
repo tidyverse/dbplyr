@@ -122,6 +122,8 @@ db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
 }
 #' @export
 db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
+  check_dots_empty0(...)
+
   res <- dbSendQuery(con, sql)
   tryCatch({
     out <- dbFetch(res, n = n)
