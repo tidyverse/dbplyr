@@ -37,7 +37,8 @@ dbplyr_edition.PostgreSQL <- function(con) {
 dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PqConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con, ...) {
+  check_dots_empty0(...)
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 

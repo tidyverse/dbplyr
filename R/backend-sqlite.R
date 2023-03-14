@@ -33,7 +33,8 @@ dbplyr_edition.SQLiteConnection <- function(con) {
 }
 
 #' @export
-db_connection_describe.SQLiteConnection <- function(con) {
+db_connection_describe.SQLiteConnection <- function(con, ...) {
+  check_dots_empty0(...)
   paste0("sqlite ", sqlite_version(), " [", con@dbname, "]")
 }
 

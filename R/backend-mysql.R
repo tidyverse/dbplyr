@@ -36,7 +36,8 @@ dbplyr_edition.MySQL <- dbplyr_edition.MariaDBConnection
 dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
-db_connection_describe.MariaDBConnection <- function(con) {
+db_connection_describe.MariaDBConnection <- function(con, ...) {
+  check_dots_empty0(...)
   info <- dbGetInfo(con)
 
   paste0(

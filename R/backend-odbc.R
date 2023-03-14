@@ -66,7 +66,8 @@ base_odbc_win <- sql_translator(
 
 # nocov start
 #' @export
-db_connection_describe.OdbcConnection <- function(con) {
+db_connection_describe.OdbcConnection <- function(con, ...) {
+  check_dots_empty0(...)
   info <- DBI::dbGetInfo(con)
 
   host <- if (info$servername == "") "localhost" else info$servername
