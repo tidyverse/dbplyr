@@ -376,27 +376,24 @@ base_win <- sql_translator(
 
   # Variants that take more arguments
   first = function(x, order_by = NULL) {
-    win_over(
-      sql_expr(FIRST_VALUE(!!x)),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame()
+    sql_nth(
+      x = x,
+      n = 1L,
+      order_by = order_by
     )
   },
   last = function(x, order_by = NULL) {
-    win_over(
-      sql_expr(LAST_VALUE(!!x)),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame() %||% c(-Inf, Inf)
+    sql_nth(
+      x = x,
+      n = Inf,
+      order_by = order_by
     )
   },
   nth = function(x, n, order_by = NULL) {
-    win_over(
-      sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame()
+    sql_nth(
+      x = x,
+      n = n,
+      order_by = order_by
     )
   },
 
