@@ -14,6 +14,7 @@
 #' db <- memdb_frame(a = c(3, 4, 1, 2), b = c(5, 1, 2, NA))
 #' db %>% filter(a <= 2) %>% collect()
 collapse.tbl_sql <- function(x, ...) {
+  check_dots_empty0(...)
   sql <- db_sql_render(x$src$con, x)
 
   tbl_src_dbi(x$src, sql, colnames(x)) %>%
