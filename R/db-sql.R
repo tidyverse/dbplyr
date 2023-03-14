@@ -319,15 +319,21 @@ sql_query_select <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
-                               group_by = NULL, having = NULL,
-                               window = NULL,
-                               order_by = NULL,
-                               limit = NULL,
-                               distinct = FALSE,
-                               ...,
-                               subquery = FALSE,
-                               lvl = 0) {
+sql_query_select.DBIConnection <- function(con,
+                                           select,
+                                           from,
+                                           where = NULL,
+                                           group_by = NULL,
+                                           having = NULL,
+                                           window = NULL,
+                                           order_by = NULL,
+                                           limit = NULL,
+                                           distinct = FALSE,
+                                           ...,
+                                           subquery = FALSE,
+                                           lvl = 0) {
+  check_dots_empty0(...)
+
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),

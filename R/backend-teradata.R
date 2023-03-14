@@ -43,6 +43,8 @@ sql_query_select.Teradata <- function(con,
                                       ...,
                                       subquery = FALSE,
                                       lvl = 0) {
+  check_dots_empty0(...)
+
   # #685
   # https://docs.teradata.com/r/2_MC9vCtAJRlKle2Rpb0mA/frQm7Rn09FJZZLQAuaUvJA
   # You cannot specify these options in a SELECT statement that specifies the TOP n operator:

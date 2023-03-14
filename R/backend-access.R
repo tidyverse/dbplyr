@@ -37,12 +37,20 @@ dbplyr_edition.ACCESS <- function(con) {
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_query_select.ACCESS <- function(con, select, from,
-                              where = NULL,  group_by = NULL,
-                              having = NULL, window = NULL, order_by = NULL,
-                              limit = NULL,  distinct = FALSE, ...,
-                              subquery = FALSE,
-                              lvl = 0) {
+sql_query_select.ACCESS <- function(con,
+                                    select,
+                                    from,
+                                    where = NULL,
+                                    group_by = NULL,
+                                    having = NULL,
+                                    window = NULL,
+                                    order_by = NULL,
+                                    limit = NULL,
+                                    distinct = FALSE,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
+  check_dots_empty0(...)
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
