@@ -26,6 +26,8 @@
 #' db2 <- lazy_frame(x = 1:100, con = simulate_mssql())
 #' db2 %>% head() %>% show_query()
 head.tbl_lazy <- function(x, n = 6L, ...) {
+  check_dots_empty0(...)
+
   if (!is.numeric(n) || length(n) != 1L || n < 0) {
     cli_abort("{.arg n} must be a non-negative integer")
   }
