@@ -271,6 +271,8 @@ sql_query_rows <- function(con, sql, ...) {
 }
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
+  check_dots_empty0(...)
+
   from <- dbplyr_sql_subquery(con, sql, "master")
   build_sql("SELECT COUNT(*) FROM ", from, con = con)
 }
