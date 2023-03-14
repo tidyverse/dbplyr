@@ -12,7 +12,10 @@ test_that("generates custom sql", {
   con <- simulate_hive()
   expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
 
-  expect_snapshot(last_value_sql(con, ident("a")))
+  expect_equal(
+    translate_sql(last(x, na_rm = TRUE), vars_order = "a", con = con),
+    sql("LAST_VALUE(`x`, TRUE) OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+  )
 
   lf <- lazy_frame(tibble(x = 1), con = con)
   expect_snapshot(union_all(lf, lf))
