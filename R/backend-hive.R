@@ -97,6 +97,8 @@ sql_table_analyze.Hive <- function(con, table, ...) {
 
 #' @export
 sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+  check_dots_empty0(...)
+
   # SQLite does not allow parentheses
   method <- paste0(method, if (all) " ALL")
   # `x` and `y` already have the correct indent, so use `build_sql()` instead
