@@ -76,6 +76,7 @@ slice_min.tbl_lazy <- function(.data,
                                by = NULL,
                                with_ties = TRUE,
                                na_rm = TRUE) {
+  check_dots_empty0(...)
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
   slice_by(
@@ -98,6 +99,7 @@ slice_max.tbl_lazy <- function(.data,
                                prop,
                                with_ties = TRUE,
                                na_rm = TRUE) {
+  check_dots_empty0(...)
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
   slice_by(
@@ -119,6 +121,7 @@ slice_sample.tbl_lazy <- function(.data,
                                   by = NULL,
                                   weight_by = NULL,
                                   replace = FALSE) {
+  check_dots_empty0(...)
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
