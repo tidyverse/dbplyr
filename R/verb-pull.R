@@ -16,6 +16,8 @@
 #'   mutate(z = x + y * 2) %>%
 #'   pull()
 pull.tbl_sql <- function(.data, var = -1, name = NULL, ...) {
+  check_dots_empty0(...)
+
   vars <- tbl_vars(.data)
   var <- tidyselect::vars_pull(vars, !!enquo(var), error_arg = "var")
   name_quo <- enquo(name)
