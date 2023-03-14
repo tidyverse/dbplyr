@@ -489,6 +489,8 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                vars,
                                                ...,
                                                lvl = 0) {
+  check_dots_empty0(...)
+
   table_names <- names(table_vars)
   if (vctrs::vec_duplicate_any(table_names)) {
     cli_abort("{.arg table_names} must be unique.")
