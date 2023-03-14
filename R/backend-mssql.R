@@ -431,7 +431,8 @@ mssql_version <- function(con) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary) {
+`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
+  check_dots_empty0(...)
   if (temporary && substr(table, 1, 1) != "#") {
     table <- hash_temp(table)
   }
