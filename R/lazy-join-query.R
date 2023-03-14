@@ -181,6 +181,8 @@ op_vars.lazy_semi_join_query <- function(op) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ...) {
+  check_dots_empty0(...)
+
   table_names_out <- generate_join_table_names(op$table_names)
 
   table_vars <- purrr::map(
@@ -238,6 +240,8 @@ generate_join_table_names <- function(table_names) {
 
 #' @export
 sql_build.lazy_rf_join_query <- function(op, con, ...) {
+  check_dots_empty0(...)
+
   table_names_out <- generate_join_table_names(op$table_names)
 
   vars_classic <- as.list(op$vars)
@@ -261,6 +265,8 @@ sql_build.lazy_rf_join_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_semi_join_query <- function(op, con, ...) {
+  check_dots_empty0(...)
+
   vars_prev <- op_vars(op$x)
   if (identical(op$vars$var, op$vars$name) &&
       identical(op$vars$var, vars_prev)) {

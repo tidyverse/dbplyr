@@ -165,6 +165,8 @@ op_desc.lazy_query <- function(op) {
 
 #' @export
 sql_build.lazy_select_query <- function(op, con, ...) {
+  check_dots_empty0(...)
+
   if (!is.null(op$message_summarise)) {
     inform(op$message_summarise)
   }

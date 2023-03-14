@@ -37,6 +37,8 @@ op_vars.lazy_set_op_query <- function(op) {
 
 #' @export
 sql_build.lazy_set_op_query <- function(op, con, ...) {
+  check_dots_empty0(...)
+
   # add_op_set_op() ensures that both have same variables
   set_op_query(
     sql_optimise(sql_build(op$x, con), con),

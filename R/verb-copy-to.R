@@ -166,6 +166,7 @@ lazy_values_query <- function(df, types) {
 
 #' @export
 sql_build.lazy_values_query <- function(op, con, ...) {
+  check_dots_empty0(...)
   op
 }
 

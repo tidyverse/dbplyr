@@ -1,5 +1,6 @@
 #' @export
 sql_build.query <- function(op, con = NULL, ...) {
+  check_dots_empty0(...)
   op
 }
 

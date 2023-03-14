@@ -57,11 +57,13 @@ print.lazy_base_local_query <- function(x, ...) {
 
 #' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
+  check_dots_empty0(...)
   as.sql(op$x, con = con)
 }
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
+  check_dots_empty0(...)
   ident(op$name)
 }
 
