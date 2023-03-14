@@ -185,6 +185,8 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
+  check_dots_empty0(...)
+
   build_sql("EXPLAIN ", sql, con = con)
 }
 

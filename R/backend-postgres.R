@@ -254,6 +254,8 @@ sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 # http://www.postgresql.org/docs/9.3/static/sql-explain.html
 #' @export
 sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
+  check_dots_empty0(...)
+
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
   build_sql(

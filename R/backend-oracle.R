@@ -135,6 +135,8 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
+  check_dots_empty0(...)
+
   build_sql(
     "EXPLAIN PLAN FOR ", sql, ";\n",
     "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",

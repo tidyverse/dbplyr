@@ -40,6 +40,8 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
+  check_dots_empty0(...)
+
   build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
 }
 
