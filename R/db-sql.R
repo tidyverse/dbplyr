@@ -159,11 +159,12 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
+  check_dots_empty0(...)
+
   if (!(is_string(table) || is_schema(table))) {
     stop_input_type(
       table,
       c("a string", "a schema"),
-      ...,
       call = call
     )
   }
@@ -888,6 +889,8 @@ sql_returning_cols <- function(con, cols, table, ...) {
 
 #' @export
 sql_returning_cols.DBIConnection <- function(con, cols, table, ...) {
+  check_dots_empty0(...)
+
   returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("RETURNING", returning_cols)

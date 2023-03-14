@@ -561,6 +561,8 @@ has_returned_rows <- function(x) {
 
 #' @export
 sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
+  check_dots_empty0(...)
+
   cli_abort("DuckDB does not support the {.arg returning} argument.")
 }
 
