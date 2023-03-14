@@ -242,7 +242,9 @@ sql_translation.PqConnection <- function(con) {
 sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y, ...) {
+  check_dots_empty0(...)
+
   # https://www.postgresql.org/docs/current/functions-comparison.html
   build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
 }

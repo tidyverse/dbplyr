@@ -130,7 +130,9 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 
 
 #' @export
-sql_expr_matches.MariaDBConnection <- function(con, x, y) {
+sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
+  check_dots_empty0(...)
+
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
   build_sql(x, " <=> ", y, con = con)
 }

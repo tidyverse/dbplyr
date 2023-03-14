@@ -93,12 +93,14 @@ NULL
 
 #' @export
 #' @rdname db-sql
-sql_expr_matches <- function(con, x, y) {
+sql_expr_matches <- function(con, x, y, ...) {
   UseMethod("sql_expr_matches")
 }
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y) {
+sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
+  check_dots_empty0(...)
+
   build_sql(
     "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
     "THEN 0 ",

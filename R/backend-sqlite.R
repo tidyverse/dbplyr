@@ -130,7 +130,9 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0
 }
 
 #' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y) {
+sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
+  check_dots_empty0(...)
+
   # https://sqlite.org/lang_expr.html#isisnot
   build_sql(x, " IS ", y, con = con)
 }
