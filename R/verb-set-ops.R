@@ -10,6 +10,8 @@
 # registered onLoad
 #' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  check_dots_empty0(...)
+
   lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
 
   x$lazy_query <- lazy_query
@@ -19,6 +21,8 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union
 #' @rdname intersect.tbl_lazy
 union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  check_dots_empty0(...)
+
   lazy_query <- add_set_op(x, y, "UNION", copy = copy, ..., all = all)
 
   x$lazy_query <- lazy_query
@@ -28,6 +32,8 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
+  check_dots_empty0(...)
+
   lazy_query <- add_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
 
   x$lazy_query <- lazy_query
@@ -37,6 +43,8 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 #' @importFrom dplyr setdiff
 #' @rdname intersect.tbl_lazy
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
+  check_dots_empty0(...)
+
   lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)
 
   x$lazy_query <- lazy_query
@@ -44,6 +52,8 @@ setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 }
 
 add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller_env()) {
+  check_dots_empty0(...)
+
   y <- auto_copy(x, y, copy)
 
   if (inherits(x$src$con, "SQLiteConnection")) {
