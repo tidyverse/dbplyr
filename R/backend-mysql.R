@@ -54,10 +54,22 @@ db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnecti
 sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
+      # basic type casts as per:
+      # https://mariadb.com/kb/en/cast/
+      # https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#function_cast
+      # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Vector-objects
       as.logical = function(x) {
         sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
+      as.numeric  = sql_cast("DOUBLE"),
+      as.double   = sql_cast("DOUBLE"),
+      as.POSIXct  = sql_cast("DATETIME"),
+      as_datetime = sql_cast("DATETIME"),
+      # Neither MySQL nor MariaDB support CASTing to BIGINT. MariaDB may
+      # silently cast an INTEGER into a BIGINT type, MySQL outright fails.
+      # https://dba.stackexchange.com/a/205822
+      as.integer64  = sql_cast("INTEGER"),
 
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
@@ -174,11 +186,23 @@ sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
-
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
+
+#' @export
+sql_escape_datetime.MariaDBConnection <- function(con, x) {
+  # DateTime format as per:
+  # https://dev.mysql.com/doc/refman/8.0/en/datetime.html
+  # https://mariadb.com/kb/en/datetime/
+  x <- strftime(x, "%Y-%m-%d %H:%M:%OS", tz = "UTC")
+  dbplyr:::sql_escape_string(con, x)
+}
+#' @export
+sql_escape_datetime.MySQLConnection <- sql_escape_datetime.MariaDBConnection
+#' @export
+sql_escape_datetime.MySQL <- sql_escape_datetime.MariaDBConnection
 
 #' @export
 supports_window_clause.MariaDBConnection <- function(con) {
