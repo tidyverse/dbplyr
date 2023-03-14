@@ -275,6 +275,8 @@ sql_query_insert.PqConnection <- function(con,
                                           ...,
                                           returning_cols = NULL,
                                           method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "on_conflict"
   arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
   if (method == "where_not_exists") {
@@ -310,6 +312,8 @@ sql_query_upsert.PqConnection <- function(con,
                                           ...,
                                           returning_cols = NULL,
                                           method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "on_conflict"
   arg_match(method, c("cte_update", "on_conflict"), error_arg = "method")
 

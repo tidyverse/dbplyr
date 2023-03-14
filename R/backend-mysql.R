@@ -167,6 +167,8 @@ sql_random.MySQL <- sql_random.MariaDBConnection
 sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
                                                     update_values, ...,
                                                     returning_cols = NULL) {
+  check_dots_empty0(...)
+
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_table_prefix(con, names(update_values), x_name)

@@ -94,10 +94,16 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+`sql_query_insert.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    ...,
                                                     conflict = c("error", "ignore"),
                                                     returning_cols = NULL,
                                                     method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "where_not_exists"
   arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
@@ -119,6 +125,8 @@ simulate_mssql <- function(version = "15.0") {
 #' @export
 `sql_query_append.Microsoft SQL Server` <- function(con, x_name, y, ...,
                                                     returning_cols = NULL) {
+  check_dots_empty0(...)
+
   parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
 
@@ -136,6 +144,8 @@ simulate_mssql <- function(version = "15.0") {
 `sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
                                                          update_values, ...,
                                                          returning_cols = NULL) {
+  check_dots_empty0(...)
+
   # https://stackoverflow.com/a/2334741/946850
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
@@ -160,6 +170,8 @@ simulate_mssql <- function(version = "15.0") {
                                                     ...,
                                                     returning_cols = NULL,
                                                     method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
@@ -190,6 +202,8 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_delete.Microsoft SQL Server` <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  check_dots_empty0(...)
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list2(

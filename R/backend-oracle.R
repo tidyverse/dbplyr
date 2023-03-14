@@ -69,6 +69,8 @@ sql_query_upsert.Oracle <- function(con,
                                     ...,
                                     returning_cols = NULL,
                                     method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "merge"
   arg_match(method, c("merge", "cte_update"), error_arg = "method")
   if (method == "cte_update") {

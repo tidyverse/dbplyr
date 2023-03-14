@@ -666,6 +666,8 @@ sql_query_insert.DBIConnection <- function(con,
                                            conflict = c("error", "ignore"),
                                            returning_cols = NULL,
                                            method = NULL) {
+  check_dots_empty0(...)
+
   method <- method %||% "where_not_exists"
   arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
@@ -693,6 +695,8 @@ sql_query_append <- function(con, x_name, y, ..., returning_cols = NULL) {
 
 #' @export
 sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols = NULL) {
+  check_dots_empty0(...)
+
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
@@ -719,6 +723,8 @@ sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
 sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
                                                 update_values, ...,
                                                 returning_cols = NULL) {
+  check_dots_empty0(...)
+
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
@@ -760,6 +766,9 @@ sql_query_upsert.DBIConnection <- function(con,
                                            ...,
                                            returning_cols = NULL,
                                            method = NULL) {
+  check_dots_empty0(...)
+
+
   method <- method %||% "cte_update"
   arg_match(method, "cte_update", error_arg = "method")
 
@@ -805,6 +814,8 @@ sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
 
 #' @export
 sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+  check_dots_empty0(...)
+
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list2(
