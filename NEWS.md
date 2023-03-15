@@ -2,6 +2,9 @@
 
 * Added translation for `runif()` (@mgirlich, #1200).
 
+* `sql_random()` is now deprecated. It was used to power `slice_sample()` which
+  is now done via the translation for `runif()` (@mgirlich, #1200).
+
 * DuckDB now supports the `returning` argument of `rows_*()`.
 
 * `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).

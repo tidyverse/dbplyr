@@ -127,6 +127,11 @@ sql_translate_env.DBIConnection <- function(con) {
 #' @export
 #' @rdname db-sql
 sql_random <- function(con) {
+  lifecycle::deprecate_warn(
+    "2.3.2",
+    "sql_random()",
+    with = I("Please add a translation for `runif(n())` instead.")
+  )
   UseMethod("sql_random")
 }
 
