@@ -224,7 +224,12 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 #' @export
 sql_table_analyze.Snowflake <- function(con, table, ...) {}
 
-snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+snowflake_grepl <- function(pattern,
+                            x,
+                            ignore.case = FALSE,
+                            perl = FALSE,
+                            fixed = FALSE,
+                            useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
   check_unsupported_arg(ignore.case, FALSE, backend = "Snowflake")
   check_unsupported_arg(perl, FALSE, backend = "Snowflake")

@@ -47,7 +47,12 @@ db_connection_describe.PqConnection <- function(con) {
 #' @export
 db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 
-postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+postgres_grepl <- function(pattern,
+                           x,
+                           ignore.case = FALSE,
+                           perl = FALSE,
+                           fixed = FALSE,
+                           useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
   check_unsupported_arg(perl, FALSE, backend = "PostgreSQL")
   check_unsupported_arg(fixed, FALSE, backend = "PostgreSQL")

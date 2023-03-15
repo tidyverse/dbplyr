@@ -72,15 +72,19 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
-                                             group_by = NULL, having = NULL,
-                                             window = NULL,
-                                             order_by = NULL,
-                                             limit = NULL,
-                                             distinct = FALSE,
-                                             ...,
-                                             subquery = FALSE,
-                                             lvl = 0) {
+`sql_query_select.Microsoft SQL Server` <- function(con,
+                                                    select,
+                                                    from,
+                                                    where = NULL,
+                                                    group_by = NULL,
+                                                    having = NULL,
+                                                    window = NULL,
+                                                    order_by = NULL,
+                                                    limit = NULL,
+                                                    distinct = FALSE,
+                                                    ...,
+                                                    subquery = FALSE,
+                                                    lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
     from      = sql_clause_from(from),
@@ -94,7 +98,11 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+`sql_query_insert.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    ...,
                                                     conflict = c("error", "ignore"),
                                                     returning_cols = NULL,
                                                     method = NULL) {
@@ -117,7 +125,10 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_append.Microsoft SQL Server` <- function(con, x_name, y, ...,
+`sql_query_append.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    ...,
                                                     returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
@@ -133,8 +144,12 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
-                                                         update_values, ...,
+`sql_query_update_from.Microsoft SQL Server` <- function(con,
+                                                         x_name,
+                                                         y,
+                                                         by,
+                                                         update_values,
+                                                         ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
@@ -189,7 +204,12 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_delete.Microsoft SQL Server` <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+`sql_query_delete.Microsoft SQL Server` <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    ...,
+                                                    returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list2(
@@ -415,7 +435,6 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
-
   if (is.null(x)) {
     "NULL"
   } else {
@@ -447,8 +466,11 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
-                                                  temporary = TRUE, ...){
+`sql_query_save.Microsoft SQL Server` <- function(con,
+                                                  sql,
+                                                  name,
+                                                  temporary = TRUE,
+                                                  ...) {
 
   # https://stackoverflow.com/q/16683758/946850
   build_sql(

@@ -71,8 +71,11 @@ print.tbl_sql <- function(x, ..., n = NULL, width = NULL, n_extra = NULL) {
 }
 
 #' @export
-as.data.frame.tbl_sql <- function(x, row.names = NULL, optional = NULL,
-                                  ..., n = Inf) {
+as.data.frame.tbl_sql <- function(x,
+                                  row.names = NULL,
+                                  optional = NULL,
+                                  ...,
+                                  n = Inf) {
   as.data.frame(collect(x, n = n))
 }
 

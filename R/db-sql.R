@@ -297,8 +297,12 @@ supports_star_without_alias.DBIConnection <- function(con) {
 
 #' @rdname db-sql
 #' @export
-sql_query_select <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
+sql_query_select <- function(con,
+                             select,
+                             from,
+                             where = NULL,
+                             group_by = NULL,
+                             having = NULL,
                              window = NULL,
                              order_by = NULL,
                              limit = NULL,
@@ -310,15 +314,19 @@ sql_query_select <- function(con, select, from, where = NULL,
 }
 
 #' @export
-sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
-                               group_by = NULL, having = NULL,
-                               window = NULL,
-                               order_by = NULL,
-                               limit = NULL,
-                               distinct = FALSE,
-                               ...,
-                               subquery = FALSE,
-                               lvl = 0) {
+sql_query_select.DBIConnection <- function(con,
+                                           select,
+                                           from,
+                                           where = NULL,
+                                           group_by = NULL,
+                                           having = NULL,
+                                           window = NULL,
+                                           order_by = NULL,
+                                           limit = NULL,
+                                           distinct = FALSE,
+                                           ...,
+                                           subquery = FALSE,
+                                           lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),
@@ -363,11 +371,27 @@ sql_select.DBIConnection <- function(con,
 
 #' @rdname db-sql
 #' @export
-sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join <- function(con,
+                           x,
+                           y,
+                           vars,
+                           type = "inner",
+                           by = NULL,
+                           na_matches = FALSE,
+                           ...,
+                           lvl = 0) {
   UseMethod("sql_query_join")
 }
 #' @export
-sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join.DBIConnection <- function(con,
+                                         x,
+                                         y,
+                                         vars,
+                                         type = "inner",
+                                         by = NULL,
+                                         na_matches = FALSE,
+                                         ...,
+                                         lvl = 0) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -398,7 +422,15 @@ dbplyr_query_join <- function(con, ..., lvl = 0) {
 }
 #' @export
 #' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_join.DBIConnection <- function(con,
+                                   x,
+                                   y,
+                                   vars,
+                                   type = "inner",
+                                   by = NULL,
+                                   na_matches = FALSE,
+                                   ...,
+                                   lvl = 0) {
   sql_query_join(
     con, x, y, vars,
     type = type,
@@ -498,11 +530,25 @@ sql_query_multi_join.DBIConnection <- function(con,
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
+sql_query_semi_join <- function(con,
+                                x,
+                                y,
+                                anti,
+                                by,
+                                vars,
+                                ...,
+                                lvl = 0) {
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con,
+                                              x,
+                                              y,
+                                              anti,
+                                              by,
+                                              vars,
+                                              ...,
+                                              lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
@@ -526,17 +572,35 @@ dbplyr_query_semi_join <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_semi_join.DBIConnection <- function(con,
+                                        x,
+                                        y,
+                                        anti = FALSE,
+                                        by = NULL,
+                                        ...,
+                                        lvl = 0) {
   sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op <- function(con,
+                             x,
+                             y,
+                             method,
+                             ...,
+                             all = FALSE,
+                             lvl = 0) {
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op.DBIConnection <- function(con,
+                                           x,
+                                           y,
+                                           method,
+                                           ...,
+                                           all = FALSE,
+                                           lvl = 0) {
   method <- paste0(method, if (all) " ALL")
   method <- style_kw(method)
   lines <- list(
@@ -682,13 +746,21 @@ sql_query_insert.DBIConnection <- function(con,
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_append <- function(con, x_name, y, ..., returning_cols = NULL) {
+sql_query_append <- function(con,
+                             x_name,
+                             y,
+                             ...,
+                             returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_append")
 }
 
 #' @export
-sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols = NULL) {
+sql_query_append.DBIConnection <- function(con,
+                                           x_name,
+                                           y,
+                                           ...,
+                                           returning_cols = NULL) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
@@ -705,15 +777,24 @@ sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols =
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
+sql_query_update_from <- function(con,
+                                  x_name,
+                                  y,
+                                  by,
+                                  update_values,
+                                  ...,
                                   returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_update_from")
 }
 
 #' @export
-sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
-                                                update_values, ...,
+sql_query_update_from.DBIConnection <- function(con,
+                                                x_name,
+                                                y,
+                                                by,
+                                                update_values,
+                                                ...,
                                                 returning_cols = NULL) {
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
@@ -794,13 +875,23 @@ sql_query_upsert.DBIConnection <- function(con,
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+sql_query_delete <- function(con,
+                             x_name,
+                             y,
+                             by,
+                             ...,
+                             returning_cols = NULL) {
   rlang::check_dots_used()
   UseMethod("sql_query_delete")
 }
 
 #' @export
-sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
+sql_query_delete.DBIConnection <- function(con,
+                                           x_name,
+                                           y,
+                                           by,
+                                           ...,
+                                           returning_cols = NULL) {
   parts <- rows_prep(con, x_name, y, by, lvl = 0)
 
   clauses <- list2(
@@ -941,6 +1032,10 @@ dbplyr_sql_subquery <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_subquery.DBIConnection <- function(con,
+                                       from,
+                                       name = unique_subquery_name(),
+                                       ...,
+                                       lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
 }

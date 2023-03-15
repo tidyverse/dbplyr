@@ -143,7 +143,10 @@ translate_sql_ <- function(dots,
   sql(unlist(pieces))
 }
 
-sql_data_mask <- function(expr, variant, con, window = FALSE,
+sql_data_mask <- function(expr,
+                          variant,
+                          con,
+                          window = FALSE,
                           strict = getOption("dplyr.strict_sql", FALSE)) {
   stopifnot(is.sql_variant(variant))
 

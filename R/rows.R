@@ -271,13 +271,13 @@ rows_update.tbl_lazy <- function(x,
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db
 rows_patch.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 unmatched = c("error", "ignore"),
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL) {
+                                y,
+                                by = NULL,
+                                ...,
+                                unmatched = c("error", "ignore"),
+                                copy = FALSE,
+                                in_place = FALSE,
+                                returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
