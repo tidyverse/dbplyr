@@ -96,7 +96,6 @@ functions.  All other functions will be preserved as is. R's infix functions
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">translate_sql</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  con <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  vars_group <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vars_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vars_frame <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -127,10 +126,6 @@ a list of already quoted objects.</p></dd>
 the translation. The default, <code>NULL</code>, generates ANSI SQL.</p></dd>
 
 
-<dt>vars</dt>
-<dd><p>Deprecated. Now call <code><a href="partial_eval.html">partial_eval()</a></code> directly.</p></dd>
-
-
 <dt>vars_group, vars_order, vars_frame</dt>
 <dd><p>Parameters used in the <code>OVER</code>
 expression of windowed functions.</p></dd>
@@ -144,6 +139,10 @@ SQL for a grouped summary.</p></dd>
 
 <dt>context</dt>
 <dd><p>Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.</p></dd>
+
+
+<dt>vars</dt>
+<dd><p>Deprecated. Now call <code><a href="partial_eval.html">partial_eval()</a></code> directly.</p></dd>
 
 </dl></div>
 
