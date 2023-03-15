@@ -4,8 +4,9 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
-sql_random(con) generates SQL to get a random number which can be used
-to select random rows in slice_sample().
+Deprecated: sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample(). This is now replaced by adding
+a translation for runif(n()).
 supports_window_clause(con) does the backend support named windows?
 supports_star_without_alias(con) does the backend support using *
 in a SELECT query without prefixing by a table alias?
@@ -54,8 +55,9 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
-sql_random(con) generates SQL to get a random number which can be used
-to select random rows in slice_sample().
+Deprecated: sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample(). This is now replaced by adding
+a translation for runif(n()).
 supports_window_clause(con) does the backend support named windows?
 supports_star_without_alias(con) does the backend support using *
 in a SELECT query without prefixing by a table alias?
@@ -177,8 +179,9 @@ sql_returning_cols() generates SQL for a RETURNING clause
 pair of <code>NULL</code>s should match. The default translation uses a <code>CASE WHEN</code>
 as described in <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link">https://modern-sql.com/feature/is-distinct-from</a>.</p></li>
 <li><p><code>sql_translation(con)</code> generates a SQL translation environment.</p></li>
-<li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
-to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
+<li><p>Deprecated: <code>sql_random(con)</code> generates SQL to get a random number which can be used
+to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>. This is now replaced by adding
+a translation for <code>runif(n())</code>.</p></li>
 <li><p><code>supports_window_clause(con)</code> does the backend support named windows?</p></li>
 <li><p><code>supports_star_without_alias(con)</code> does the backend support using <code>*</code>
 in a <code>SELECT</code> query without prefixing by a table alias?</p></li>

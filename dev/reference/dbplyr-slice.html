@@ -200,7 +200,9 @@ reach <code>n</code>/<code>prop</code>.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SELECT</span> `x`, `y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> *, ROW_NUMBER() OVER (ORDER BY RANDOM())<span style="color: #0000BB;"> AS </span>`q01`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     *,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ROW_NUMBER() OVER (ORDER BY (0.5 + RANDOM() / 18446744073709551616.0))<span style="color: #0000BB;"> AS </span>`q01`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">FROM</span> `dbplyr_006`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">WHERE</span> (`q01` &lt;= 1)</span>
