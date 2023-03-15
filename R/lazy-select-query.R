@@ -67,7 +67,10 @@ is_lazy_sql_part <- function(x) {
   purrr::every(x, ~ is_quosure(.x) || is_symbol(.x) || is_call(.x))
 }
 
-new_lazy_select <- function(vars, group_vars = character(), order_vars = NULL, frame = NULL) {
+new_lazy_select <- function(vars,
+                            group_vars = character(),
+                            order_vars = NULL,
+                            frame = NULL) {
   vctrs::vec_as_names(names2(vars), repair = "check_unique")
 
   var_names <- names(vars)
@@ -135,7 +138,7 @@ print.lazy_select_query <- function(x, ...) {
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
-  if (length(select))   cat("Select:   ", named_commas2(select), "\n", sep = "")
+  if (length(select))     cat("Select:   ", named_commas2(select), "\n", sep = "")
   if (length(x$where))    cat("Where:    ", named_commas2(x$where), "\n", sep = "")
   if (length(x$group_by)) cat("Group by: ", named_commas2(x$group_by), "\n", sep = "")
   if (length(x$order_by)) cat("Order by: ", named_commas2(x$order_by), "\n", sep = "")

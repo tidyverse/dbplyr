@@ -118,7 +118,6 @@ sql_paste_redshift <- function(sep) {
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
 sql_query_explain.Redshift <- function(con, sql, ...) {
-
   build_sql("EXPLAIN ", sql, con = con)
 }
 

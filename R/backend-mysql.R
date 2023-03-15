@@ -119,7 +119,13 @@ sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
 sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 
 #' @export
-sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_query_join.MariaDBConnection <- function(con,
+                                             x,
+                                             y,
+                                             vars,
+                                             type = "inner",
+                                             by = NULL,
+                                             ...) {
   if (identical(type, "full")) {
     cli_abort("MySQL does not support full joins")
   }
@@ -155,8 +161,12 @@ sql_values_subquery.MySQL <-function(con, df, types, lvl = 0, ...) {
 sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
 
 #' @export
-sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
-                                                    update_values, ...,
+sql_query_update_from.MariaDBConnection <- function(con,
+                                                    x_name,
+                                                    y,
+                                                    by,
+                                                    update_values,
+                                                    ...,
                                                     returning_cols = NULL) {
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, x_name, y, by, lvl = 0)

@@ -94,10 +94,10 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
 # * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
 #' @export
 dbplyr_fill0.DBIConnection <- function(.con,
-                                          .data,
-                                          cols_to_fill,
-                                          order_by_cols,
-                                          .direction) {
+                                       .data,
+                                       cols_to_fill,
+                                       order_by_cols,
+                                       .direction) {
   # strategy:
   # 1. construct a window
   # * from the first row to the current row
@@ -139,10 +139,10 @@ dbplyr_fill0.DBIConnection <- function(.con,
 #   -> `IGNORE NULLS` only in Azure SQL Edge
 #' @export
 dbplyr_fill0.SQLiteConnection <- function(.con,
-                                             .data,
-                                             cols_to_fill,
-                                             order_by_cols,
-                                             .direction) {
+                                          .data,
+                                          cols_to_fill,
+                                          order_by_cols,
+                                          .direction) {
   # this strategy is used for databases that don't support `IGNORE NULLS` in
   # `LAST_VALUE()`.
   #
