@@ -1,6 +1,12 @@
 #' @export
 #' @rdname sql_build
-join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
+join_query <- function(x,
+                       y,
+                       vars,
+                       type = "inner",
+                       by = NULL,
+                       suffix = c(".x", ".y"),
+                       na_matches = FALSE) {
   structure(
     list(
       x = x,
@@ -73,7 +79,11 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 }
 
 #' @export
-sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.multi_join_query <- function(query,
+                                        con = NULL,
+                                        ...,
+                                        subquery = FALSE,
+                                        lvl = 0) {
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
