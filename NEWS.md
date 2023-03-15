@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The `vars` argument of `translate_sql()` has been removed after it threw an
+  error for the last 7 years (@mgirlich).
+
 * Added translation for `runif()` (@mgirlich, #1200).
 
 * `sql_random()` is now deprecated. It was used to power `slice_sample()` which

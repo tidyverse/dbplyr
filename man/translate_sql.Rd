@@ -8,7 +8,6 @@
 translate_sql(
   ...,
   con = NULL,
-  vars = character(),
   vars_group = NULL,
   vars_order = NULL,
   vars_frame = NULL,
@@ -32,8 +31,6 @@ a list of already quoted objects.}
 
 \item{con}{An optional database connection to control the details of
 the translation. The default, \code{NULL}, generates ANSI SQL.}
-
-\item{vars}{Deprecated. Now call \code{\link[=partial_eval]{partial_eval()}} directly.}
 
 \item{vars_group, vars_order, vars_frame}{Parameters used in the \code{OVER}
 expression of windowed functions.}

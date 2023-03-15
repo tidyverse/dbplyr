@@ -35,11 +35,3 @@
       Error:
       ! No known translation for `base::abbreviate()`
 
-# vars is deprecated
-
-    Code
-      translate_sql(sin(x), vars = c("x", "y"))
-    Condition
-      Error in `translate_sql()`:
-      ! `vars` is deprecated. Please use `partial_eval()` directly.
-

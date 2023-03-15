@@ -68,10 +68,6 @@ test_that("magrittr pipe is translated", {
   expect_identical(translate_sql(1 %>% is.na()), translate_sql(is.na(1)))
 })
 
-test_that("vars is deprecated", {
-  expect_snapshot(error = TRUE, translate_sql(sin(x), vars = c("x", "y")))
-})
-
 test_that("user infix functions are translated", {
   expect_equal(translate_sql(x %like% y), sql("`x` like `y`"))
 })
