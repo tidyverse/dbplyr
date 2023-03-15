@@ -132,7 +132,7 @@ slice_sample.tbl_lazy <- function(.data,
     cli_abort("Sampling with replacement is not supported on database backends")
   }
 
-  slice_by(.data, !!sql_random(remote_con(.data)), size, {{ by }}, with_ties = FALSE)
+  slice_by(.data, runif(n()), size, {{ by }}, with_ties = FALSE)
 }
 
 slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {

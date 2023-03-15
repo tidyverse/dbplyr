@@ -251,6 +251,9 @@ base_scalar <- sql_translator(
   substr = sql_substr("SUBSTR"),
   substring = sql_substr("SUBSTR"),
   cut = sql_cut,
+  runif = function(n = n(), min = 0, max = 1) {
+    sql_runif(RANDOM(), n = {{ n }}, min = min, max = max)
+  },
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),
@@ -506,10 +509,5 @@ base_no_win <- sql_translator(
   str_flatten  = win_absent("str_flatten"),
   count        = win_absent("count")
 )
-
-#' @export
-sql_random.DBIConnection <- function(con) {
-  sql_expr(RANDOM())
-}
 
 utils::globalVariables(c("RANDOM", "%LIKE%"))

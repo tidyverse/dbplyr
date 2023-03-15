@@ -346,4 +346,25 @@ sql_cot <- function(){
   }
 }
 
+#' @rdname sql_variant
+#' @export
+sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
+  n_expr <- quo_get_expr(enquo(n))
+  if (!is_call(n_expr, "n", n = 0)) {
+    cli_abort("Only {.code n = n()} is supported.")
+  }
+
+  rand_expr <- enexpr(rand_expr)
+  range <- max - min
+  if (range != 1) {
+    rand_expr <- expr(!!rand_expr * !!range)
+  }
+
+  if (min != 0) {
+    rand_expr <- expr(!!rand_expr + !!min)
+  }
+
+  sql_expr(!!rand_expr)
+}
+
 globalVariables(c("%as%", "cast", "ln", "try_cast"))

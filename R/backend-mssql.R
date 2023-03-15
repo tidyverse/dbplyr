@@ -263,6 +263,10 @@ simulate_mssql <- function(version = "15.0") {
       is.null       = mssql_is_null,
       is.na         = mssql_is_null,
 
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+      },
+
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
       paste = sql_paste_infix(" ", "+", function(x) sql_expr(cast(!!x %as% text))),
@@ -456,11 +460,6 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
-
-#' @export
-`sql_random.Microsoft SQL Server` <- function(con) {
-  sql_expr(RAND())
-}
 
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {

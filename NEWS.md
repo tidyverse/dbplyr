@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Added translation for `runif()` (@mgirlich, #1200).
+
 * DuckDB now supports the `returning` argument of `rows_*()`.
 
 * `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
