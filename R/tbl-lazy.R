@@ -13,9 +13,8 @@
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
 #' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
 tbl_lazy <- function(df, con = NULL, src = NULL, name = "df") {
-
   if (!is.null(src)) {
-    warn("`src` is deprecated; please use `con` instead")
+    lifecycle::deprecate_warn("1.4.0", "tbl_lazy(src)", "tbl_lazy(con)")
     con <- src
   }
   con <- con %||% sql_current_con() %||% simulate_dbi()

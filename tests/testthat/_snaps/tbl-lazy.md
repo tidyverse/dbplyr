@@ -4,7 +4,8 @@
       dummy <- tbl_lazy(mtcars, src = simulate_sqlite())
     Condition
       Warning:
-      `src` is deprecated; please use `con` instead
+      The `src` argument of `tbl_lazy()` is deprecated as of dbplyr 1.4.0.
+      i Please use the `con` argument instead.
 
 # cannot convert tbl_lazy to data.frame
 
@@ -12,7 +13,8 @@
       as.data.frame(tbl_lazy(mtcars, src = simulate_sqlite()))
     Condition
       Warning:
-      `src` is deprecated; please use `con` instead
+      The `src` argument of `tbl_lazy()` is deprecated as of dbplyr 1.4.0.
+      i Please use the `con` argument instead.
       Error in `as.data.frame()`:
       ! Can not coerce <tbl_lazy> to <data.frame>
 
