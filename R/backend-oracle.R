@@ -231,4 +231,4 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 #' @export
 supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.RANDOM"))
+globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
