@@ -34,15 +34,19 @@ dbplyr_edition.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_select.Oracle <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
-                             window = NULL,
-                             order_by = NULL,
-                             limit = NULL,
-                             distinct = FALSE,
-                             ...,
-                             subquery = FALSE,
-                             lvl = 0) {
+sql_query_select.Oracle <- function(con,
+                                    select,
+                                    from,
+                                    where = NULL,
+                                    group_by = NULL,
+                                    having = NULL,
+                                    window = NULL,
+                                    order_by = NULL,
+                                    limit = NULL,
+                                    distinct = FALSE,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
