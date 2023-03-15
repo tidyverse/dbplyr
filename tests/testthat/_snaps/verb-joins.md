@@ -277,7 +277,7 @@
       left_join(df, df, by = "x", na_matches = 1)
     Condition
       Error in `left_join()`:
-      ! `na_matches` must be a character vector, not a number.
+      ! `na_matches` must be a character vector, not the number 1.
 
 ---
 
@@ -293,7 +293,7 @@
       semi_join(df, df, by = "x", na_matches = 1)
     Condition
       Error in `semi_join()`:
-      ! `na_matches` must be a character vector, not a number.
+      ! `na_matches` must be a character vector, not the number 1.
 
 ---
 
