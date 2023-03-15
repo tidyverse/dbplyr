@@ -115,6 +115,9 @@ sql_translation.Oracle <- function(con) {
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER"),
 
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
+      },
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
@@ -189,11 +192,6 @@ supports_star_without_alias.Oracle <- function(con) {
   FALSE
 }
 
-#' @export
-sql_random.Oracle <- function(con) {
-  sql_expr(dbms_random.RANDOM())
-}
-
 
 # roacle package ----------------------------------------------------------
 
@@ -232,8 +230,5 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
 #' @export
 supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
-
-#' @export
-sql_random.OraConnection <- sql_random.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.RANDOM"))

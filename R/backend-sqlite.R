@@ -73,6 +73,16 @@ sql_translation.SQLiteConnection <- function(con) {
       pmin = sql_aggregate_n("MIN", "pmin"),
       pmax = sql_aggregate_n("MAX", "pmax"),
 
+      runif = function(n = n(), min = 0, max = 1) {
+        # https://stackoverflow.com/a/23785593/7529482
+        sql_runif(
+          (0.5 + RANDOM() / 18446744073709551616.0),
+          n = {{ n }},
+          min = min,
+          max = max
+        )
+      },
+
       # lubridate,
       today = function() {
         date <- function(x) {} # suppress R CMD check note

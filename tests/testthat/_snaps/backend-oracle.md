@@ -82,7 +82,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.RANDOM()) AS `q01`
+        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
         FROM (`df`) 
       ) `q01`
       WHERE (`q01` <= 1)

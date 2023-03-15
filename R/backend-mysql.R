@@ -58,6 +58,9 @@ sql_translation.MariaDBConnection <- function(con) {
         sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+      },
 
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
@@ -150,15 +153,6 @@ sql_values_subquery.MySQL <-function(con, df, types, lvl = 0, ...) {
 }
 #' @export
 sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
-
-#' @export
-sql_random.MariaDBConnection <- function(con) {
-  sql_expr(RAND())
-}
-#' @export
-sql_random.MySQLConnection <- sql_random.MariaDBConnection
-#' @export
-sql_random.MySQL <- sql_random.MariaDBConnection
 
 #' @export
 sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,

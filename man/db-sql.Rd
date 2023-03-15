@@ -92,8 +92,9 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
-\item \code{sql_random(con)} generates SQL to get a random number which can be used
-to select random rows in \code{slice_sample()}.
+\item Deprecated: \code{sql_random(con)} generates SQL to get a random number which can be used
+to select random rows in \code{slice_sample()}. This is now replaced by adding
+a translation for \code{runif(n())}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
 \item \code{supports_star_without_alias(con)} does the backend support using \code{*}
 in a \code{SELECT} query without prefixing by a table alias?

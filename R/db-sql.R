@@ -10,8 +10,9 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
-#' * `sql_random(con)` generates SQL to get a random number which can be used
-#'   to select random rows in `slice_sample()`.
+#' * Deprecated: `sql_random(con)` generates SQL to get a random number which can be used
+#'   to select random rows in `slice_sample()`. This is now replaced by adding
+#'   a translation for `runif(n())`.
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'

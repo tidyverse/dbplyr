@@ -24,6 +24,13 @@
       LEFT JOIN `df` AS `df_RHS`
         ON (`df_LHS`.`x` IS `df_RHS`.`x`)
 
+---
+
+    Code
+      translate_sql(runif(n()))
+    Output
+      <SQL> (0.5 + RANDOM() / 18446744073709551616.0)
+
 # case_when translates correctly to ELSE when TRUE ~ is used
 
     Code
