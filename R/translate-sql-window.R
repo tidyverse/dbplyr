@@ -21,7 +21,11 @@
 #' win_over(sql("avg(x)"), order = "y", con = con)
 #' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
-win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
+win_over <- function(expr,
+                     partition = NULL,
+                     order = NULL,
+                     frame = NULL,
+                     con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
 
@@ -63,7 +67,11 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
     frame <- build_sql("ROWS ", frame, con = con)
   }
 
-  over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE, con = con)
+  over <- sql_vector(
+    purrr::compact(list(partition, order, frame)),
+    parens = TRUE,
+    con = con
+  )
 
   if (sql_context$register_windows) {
     win_register(over)
