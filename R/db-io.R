@@ -31,20 +31,31 @@ NULL
 
 #' @export
 #' @rdname db-io
-db_copy_to <-  function(con, table, values,
-                        overwrite = FALSE, types = NULL, temporary = TRUE,
-                        unique_indexes = NULL, indexes = NULL,
-                        analyze = TRUE, ...,
+db_copy_to <-  function(con,
+                        table,
+                        values,
+                        overwrite = FALSE,
+                        types = NULL,
+                        temporary = TRUE,
+                        unique_indexes = NULL,
+                        indexes = NULL,
+                        analyze = TRUE,
+                        ...,
                         in_transaction = TRUE) {
   UseMethod("db_copy_to")
 }
 #' @export
-db_copy_to.DBIConnection <- function(con, table, values,
-                            overwrite = FALSE, types = NULL, temporary = TRUE,
-                            unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...,
-                            in_transaction = TRUE) {
-
+db_copy_to.DBIConnection <- function(con,
+                                     table,
+                                     values,
+                                     overwrite = FALSE,
+                                     types = NULL,
+                                     temporary = TRUE,
+                                     unique_indexes = NULL,
+                                     indexes = NULL,
+                                     analyze = TRUE,
+                                     ...,
+                                     in_transaction = TRUE) {
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -76,13 +87,13 @@ db_copy_to.DBIConnection <- function(con, table, values,
 #' @export
 #' @rdname db-io
 db_compute <- function(con,
-                      table,
-                      sql,
-                      temporary = TRUE,
-                      unique_indexes = list(),
-                      indexes = list(),
-                      analyze = TRUE,
-                      ...) {
+                       table,
+                       sql,
+                       temporary = TRUE,
+                       unique_indexes = list(),
+                       indexes = list(),
+                       analyze = TRUE,
+                       ...) {
   UseMethod("db_compute")
 }
 #' @export
