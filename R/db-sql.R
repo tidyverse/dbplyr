@@ -186,6 +186,7 @@ sql_table_index.DBIConnection <- function(con,
 #' @rdname db-sql
 #' @export
 sql_query_explain <- function(con, sql, ...) {
+  check_scalar_sql(sql)
   UseMethod("sql_query_explain")
 }
 #' @export
