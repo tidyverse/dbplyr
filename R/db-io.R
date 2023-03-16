@@ -102,6 +102,10 @@ db_compute <- function(con,
                        indexes = list(),
                        analyze = TRUE,
                        ...) {
+  check_table_ident(table)
+  check_scalar_sql(sql)
+  check_bool(temporary)
+
   UseMethod("db_compute")
 }
 #' @export
