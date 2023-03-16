@@ -42,6 +42,14 @@ db_copy_to <-  function(con,
                         analyze = TRUE,
                         ...,
                         in_transaction = TRUE) {
+  check_table_ident(table)
+  check_bool(overwrite)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+  check_bool(analyze)
+  check_bool(in_transaction)
+
   UseMethod("db_copy_to")
 }
 #' @export
