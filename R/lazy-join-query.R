@@ -127,7 +127,6 @@ lazy_semi_join_query <- function(x,
                                  vars,
                                  anti,
                                  by,
-                                 na_matches = c("never", "na"),
                                  group_vars = op_grps(x),
                                  order_vars = op_sort(x),
                                  frame = op_frame(x),
@@ -136,7 +135,6 @@ lazy_semi_join_query <- function(x,
   check_lazy_query(y, call = call)
   check_bool(anti, call = call)
   join_check_by(by, call)
-  na_matches <- arg_match(na_matches, c("never", "na"), error_call = call)
 
   lazy_query(
     query_type = "semi_join",
@@ -144,7 +142,6 @@ lazy_semi_join_query <- function(x,
     y = y,
     anti = anti,
     by = by,
-    na_matches = na_matches,
     vars = vars,
     group_vars = group_vars,
     order_vars = order_vars,
@@ -275,6 +272,6 @@ sql_build.lazy_semi_join_query <- function(op, con, ...) {
     vars = vars,
     anti = op$anti,
     by = op$by,
-    na_matches = op$na_matches
+    na_matches = op$by$na_matches
   )
 }

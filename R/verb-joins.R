@@ -641,6 +641,7 @@ add_semi_join <- function(x,
   }
 
   check_join_by_supported(by, call = call)
+  na_matches <- arg_match(na_matches, c("na", "never"), error_call = call)
 
   y <- auto_copy(
     x, y, copy,
@@ -654,6 +655,7 @@ add_semi_join <- function(x,
     name = op_vars(x),
     var = inline_result$vars
   )
+  by$na_matches <- na_matches
 
   # the table alias can only be determined after `select()` was inlined
   join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
@@ -673,7 +675,6 @@ add_semi_join <- function(x,
     vars = vars,
     anti = anti,
     by = by,
-    na_matches = na_matches,
     call = call
   )
 }

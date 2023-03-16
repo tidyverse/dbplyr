@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The `na_matches` argument of `semi_join()` and `anti_join()` works again
+  (@mgirlich, #1211).
+
 * The `vars` argument of `translate_sql()` has been removed after it threw an
   error for the last 7 years (@mgirlich).
 
