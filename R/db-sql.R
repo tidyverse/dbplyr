@@ -271,6 +271,8 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
 #' @rdname db-sql
 #' @export
 sql_query_rows <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+
   UseMethod("sql_query_rows")
 }
 #' @export
