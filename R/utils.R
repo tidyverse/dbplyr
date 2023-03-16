@@ -272,3 +272,24 @@ check_table_ident <- function(x,
     cli_abort("{.arg {arg}} must have size 1, not size {n}.", call = call)
   }
 }
+
+check_scalar_sql <- function(x,
+                             ...,
+                             string = TRUE,
+                             arg = caller_arg(x),
+                             call = caller_env()) {
+  if (is.sql(x) && length(x) == 1L) {
+    return()
+  }
+
+  if (string && is_string(x)) {
+    return()
+  }
+
+  stop_input_type(
+    x,
+    what = c("a single SQL query", if (string) "a single string"),
+    call = call,
+    arg = arg
+  )
+}
