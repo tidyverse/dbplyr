@@ -225,6 +225,8 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 #' @export
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
+  check_name(name, allow_null = TRUE)
+
   UseMethod("sql_query_wrap")
 }
 #' @export
