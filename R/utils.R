@@ -225,7 +225,11 @@ check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   }
 }
 
-check_table_ident <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
+check_table_ident <- function(x,
+                              ...,
+                              sql = FALSE,
+                              arg = caller_arg(x),
+                              call = caller_env()) {
   if (is_bare_string(x)) {
     return()
   }
@@ -249,10 +253,16 @@ check_table_ident <- function(x, ..., arg = caller_arg(x), call = caller_env()) 
       ), call = call
       )
     }
+  } else if (sql && is.sql(x)) {
+    n <- length(x)
   } else {
+    what <- c("ident", "schema", "catalog", "Id")
+    if (sql) {
+      what <- c(what, "sql")
+    }
     stop_input_type(
       x,
-      what = c("ident", "schema", "catalog", "Id"),
+      what = what,
       call = call,
       arg = arg
     )
