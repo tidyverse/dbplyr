@@ -150,7 +150,18 @@ sql_table_analyze.DBIConnection <- function(con, table, ...) {
 
 #' @rdname db-sql
 #' @export
-sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+sql_table_index <- function(con,
+                            table,
+                            columns,
+                            name = NULL,
+                            unique = FALSE,
+                            ...,
+                            call = caller_env()) {
+  check_table_ident(table, call = call)
+  check_character(columns, call = call)
+  check_name(name, allow_null = TRUE, call = call)
+  check_bool(unique, call = call)
+
   UseMethod("sql_table_index")
 }
 #' @export
@@ -161,16 +172,6 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  if (!(is_string(table) || is_schema(table))) {
-    stop_input_type(
-      table,
-      c("a string", "a schema"),
-      ...,
-      call = call
-    )
-  }
-  check_character(columns)
-
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   build_sql(

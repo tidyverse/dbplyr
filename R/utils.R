@@ -224,3 +224,41 @@ check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
     cli_abort("The names of {.arg {arg}} must be unique.", call = call)
   }
 }
+
+check_table_ident <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
+  if (is_bare_string(x)) {
+    return()
+  }
+
+  # also covers `ident_q`
+  if (is.ident(x)) {
+    n <- length(x)
+  } else if (is_schema(x)) {
+    n <- vctrs::vec_size_common(x$schema, x$table)
+  } else if (is_catalog(x)) {
+    n <- vctrs::vec_size_common(x$catalog, x$schema, x$table)
+  } else if (inherits(x, "Id")) {
+    n <- 1L
+    id <- x@name
+    known_names <- c("catalog", "schema", "table")
+    unknown_names <- setdiff(names(id), known_names)
+    if (!is_empty(unknown_names)) {
+      cli_abort(c(
+        "{.arg {arg}} is an {.cls Id} object with unknown names {.val {unknown_names}}.",
+        i = "An {.cls Id} object may only have the names {.val {known_names}}."
+      ), call = call
+      )
+    }
+  } else {
+    stop_input_type(
+      x,
+      what = c("ident", "schema", "catalog", "Id"),
+      call = call,
+      arg = arg
+    )
+  }
+
+  if (n != 1L) {
+    cli_abort("{.arg {arg}} must have size 1, not size {n}.", call = call)
+  }
+}
