@@ -208,6 +208,10 @@ sql_query_fields.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  check_table_ident(sql, sql = TRUE)
+  check_table_ident(name)
+  check_bool(temporary)
+
   UseMethod("sql_query_save")
 }
 #' @export
