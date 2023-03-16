@@ -301,7 +301,7 @@
       semi_join(df, df, by = "x", na_matches = "foo")
     Condition
       Error in `semi_join()`:
-      ! `na_matches` must be one of "never" or "na", not "foo".
+      ! `na_matches` must be one of "na" or "never", not "foo".
 
 # using multiple gives an informative error
 
@@ -332,6 +332,19 @@
       FROM `lf1`
       LEFT JOIN `lf2`
         ON (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+
+---
+
+    Code
+      semi_join(lf1, lf2, by = "x", na_matches = "na")
+    Output
+      <SQL>
+      SELECT *
+      FROM `lf1`
+      WHERE EXISTS (
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+      )
 
 # suffix arg is checked
 

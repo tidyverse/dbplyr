@@ -552,7 +552,7 @@ sql_query_semi_join.DBIConnection <- function(con,
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
-  on <- sql_join_tbls(con, by)
+  on <- sql_join_tbls(con, by, na_matches = by$na_matches)
 
   lines <- list(
     sql_clause_select(con, vars),

@@ -262,7 +262,7 @@ sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS") {
   )
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never") {
+sql_join_tbls <- function(con, by, na_matches) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {

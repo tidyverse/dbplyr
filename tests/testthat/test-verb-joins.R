@@ -967,6 +967,7 @@ test_that("can optionally match NA values", {
   lf1 <- lazy_frame(x = 1, .name = "lf1", con = con)
   lf2 <- lazy_frame(x = 1, .name = "lf2", con = con)
   expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
+  expect_snapshot(semi_join(lf1, lf2, by = "x", na_matches = "na"))
 })
 
 test_that("join captures both tables", {
