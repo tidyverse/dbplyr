@@ -196,6 +196,8 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_fields <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+
   UseMethod("sql_query_fields")
 }
 #' @export
