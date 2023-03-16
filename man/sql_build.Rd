@@ -48,7 +48,6 @@ lazy_semi_join_query(
   vars,
   anti,
   by,
-  na_matches = c("never", "na"),
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
