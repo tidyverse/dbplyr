@@ -99,8 +99,9 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_insert.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
+                                                    cols,
                                                     by,
                                                     ...,
                                                     conflict = c("error", "ignore"),
@@ -111,7 +112,7 @@ simulate_mssql <- function(version = "15.0") {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,

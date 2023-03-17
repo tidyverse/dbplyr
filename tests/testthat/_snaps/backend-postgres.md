@@ -47,8 +47,9 @@
 # `sql_query_insert()` works
 
     Code
-      (sql_query_insert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
+      (sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), cols = colnames(df_y), by = c("a", "b"), conflict = "error",
+      returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` isn't supported on database backends.
@@ -57,8 +58,9 @@
 ---
 
     Code
-      sql_query_insert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+      returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *

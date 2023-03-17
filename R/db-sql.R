@@ -718,8 +718,9 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 #'   update_cols = "name"
 #' )
 sql_query_insert <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
+                             cols,
                              by,
                              ...,
                              conflict = c("error", "ignore"),
@@ -731,8 +732,9 @@ sql_query_insert <- function(con,
 
 #' @export
 sql_query_insert.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
+                                           cols,
                                            by,
                                            ...,
                                            conflict = c("error", "ignore"),
@@ -743,14 +745,14 @@ sql_query_insert.DBIConnection <- function(con,
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!parts$conflict_clauses,
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)

@@ -182,18 +182,20 @@ test_that("rows_get_or_execute() gives error context", {
 })
 
 test_that("`sql_query_insert()` works", {
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_dbi(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(error = TRUE,
     (sql_query_insert(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "error",
       returning_cols = c("a", b2 = "b")
@@ -202,9 +204,10 @@ test_that("`sql_query_insert()` works", {
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "ignore",
       returning_cols = c("a", b2 = "b")

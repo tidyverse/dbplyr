@@ -285,8 +285,9 @@
 # `sql_query_insert()` is correct
 
     Code
-      sql_query_insert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+      returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`

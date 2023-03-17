@@ -114,8 +114,9 @@ rows_insert.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_insert(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
+      cols = colnames(y),
       by = by,
       ...,
       conflict = conflict,
@@ -745,15 +746,15 @@ rows_prep_legacy <- function(con, x_name, y, by, lvl = 0) {
   )
 }
 
-rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
-  out <- rows_prep_legacy(con, x_name, y, by, lvl = lvl)
+rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
+  out <- rows_prep(con, table, from, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"), condition = "=")
+  join_by <- list(x = by, y = by, x_as = table, y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  out$conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+  out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
-  out$insert_clause <- sql_clause_insert(con, insert_cols, x_name)
+  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
+  out$insert_clause <- sql_clause_insert(con, insert_cols, table)
 
   out
 }
