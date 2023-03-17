@@ -1,5 +1,14 @@
 # dbplyr (development version)
 
+* `sql_query_append()`, `sql_query_insert()`, `sql_query_update()`,
+  `sql_query_upsert()`, and `sql_query_delete()` changed their arguments to
+  make them more consistent to the other `sql_query_*()` functions:
+  
+  * `x_name` was renamed to `table`.
+  * `y` was renamed to `from` and must now be a table identifier or SQL instead
+    of a lazy table.
+  * `sql_query_append()` and `sql_query_insert()` have gained the argument `cols`.
+
 * The `na_matches` argument of `semi_join()` and `anti_join()` works again
   (@mgirlich, #1211).
 
