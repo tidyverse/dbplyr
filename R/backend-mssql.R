@@ -146,21 +146,21 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_update_from.Microsoft SQL Server` <- function(con,
-                                                         x_name,
-                                                         y,
+                                                         table,
+                                                         from,
                                                          by,
                                                          update_values,
                                                          ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_from(x_name),
+    sql_clause_from(table),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )

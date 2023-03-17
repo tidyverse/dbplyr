@@ -233,8 +233,8 @@ rows_update.tbl_lazy <- function(x,
 
     sql <- sql_query_update_from(
       con = con,
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
       ...,
@@ -314,8 +314,8 @@ rows_patch.tbl_lazy <- function(x,
 
     sql <- sql_query_update_from(
       con = con,
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
       ...,

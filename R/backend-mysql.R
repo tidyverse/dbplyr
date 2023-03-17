@@ -162,22 +162,22 @@ sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
 
 #' @export
 sql_query_update_from.MariaDBConnection <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     update_values,
                                                     ...,
                                                     returning_cols = NULL) {
   # https://stackoverflow.com/a/19346375/946850
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_table_prefix(con, names(update_values), x_name)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+  update_cols <- sql_table_prefix(con, names(update_values), table)
 
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }

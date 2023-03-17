@@ -792,8 +792,8 @@ sql_query_append.DBIConnection <- function(con,
 #' @export
 #' @rdname sql_query_insert
 sql_query_update_from <- function(con,
-                                  x_name,
-                                  y,
+                                  table,
+                                  from,
                                   by,
                                   update_values,
                                   ...,
@@ -804,23 +804,23 @@ sql_query_update_from <- function(con,
 
 #' @export
 sql_query_update_from.DBIConnection <- function(con,
-                                                x_name,
-                                                y,
+                                                table,
+                                                from,
                                                 by,
                                                 update_values,
                                                 ...,
                                                 returning_cols = NULL) {
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }

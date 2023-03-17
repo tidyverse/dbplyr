@@ -298,8 +298,8 @@
 # `sql_query_update_from()` works
 
     Code
-      sql_query_update_from(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
