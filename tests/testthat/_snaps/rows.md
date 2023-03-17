@@ -207,7 +207,7 @@
       Warning:
       The `from` argument of `sql_query_append()` must be a table identifier or an SQL query, not a lazy table. as of dbplyr 2.3.2.
     Output
-      <SQL> INSERT INTO `df_x` ()
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`

@@ -778,12 +778,13 @@ sql_query_append <- function(con,
       what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
     )
 
+    insert_cols <- colnames(from)
     from <- sql_render(from, con = con, lvl = 1)
     out <- sql_query_append(
       con = con,
       table = table,
       from = from,
-      insert_cols = colnames(from),
+      insert_cols = insert_cols,
       returning_cols = returning_cols
     )
 
