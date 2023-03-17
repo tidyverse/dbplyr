@@ -726,6 +726,12 @@ sql_query_insert <- function(con,
                              conflict = c("error", "ignore"),
                              returning_cols = NULL,
                              method = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(insert_cols)
+  check_character(by)
+  check_character(returning_cols, allow_null = TRUE)
+
   rlang::check_dots_used()
   UseMethod("sql_query_insert")
 }
@@ -784,6 +790,11 @@ sql_query_append <- function(con,
     return(out)
   }
 
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(insert_cols)
+  check_character(returning_cols, allow_null = TRUE)
+
   rlang::check_dots_used()
   UseMethod("sql_query_append")
 }
@@ -818,6 +829,13 @@ sql_query_update_from <- function(con,
                                   update_values,
                                   ...,
                                   returning_cols = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(update_values)
+  check_named(update_values)
+  check_character(returning_cols, allow_null = TRUE)
+
   rlang::check_dots_used()
   UseMethod("sql_query_update_from")
 }
@@ -856,6 +874,12 @@ sql_query_upsert <- function(con,
                              ...,
                              returning_cols = NULL,
                              method = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(update_cols)
+  check_character(returning_cols, allow_null = TRUE)
+
   # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
   # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
   rlang::check_dots_used()
@@ -917,6 +941,11 @@ sql_query_delete <- function(con,
                              by,
                              ...,
                              returning_cols = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(returning_cols, allow_null = TRUE)
+
   rlang::check_dots_used()
   UseMethod("sql_query_delete")
 }
