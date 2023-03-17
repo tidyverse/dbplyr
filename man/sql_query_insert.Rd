@@ -10,8 +10,9 @@
 \usage{
 sql_query_insert(
   con,
-  x_name,
-  y,
+  table,
+  from,
+  insert_cols,
   by,
   ...,
   conflict = c("error", "ignore"),
@@ -19,12 +20,12 @@ sql_query_insert(
   method = NULL
 )
 
-sql_query_append(con, x_name, y, ..., returning_cols = NULL)
+sql_query_append(con, table, from, insert_cols, ..., returning_cols = NULL)
 
 sql_query_update_from(
   con,
-  x_name,
-  y,
+  table,
+  from,
   by,
   update_values,
   ...,
@@ -33,8 +34,8 @@ sql_query_update_from(
 
 sql_query_upsert(
   con,
-  x_name,
-  y,
+  table,
+  from,
   by,
   update_cols,
   ...,
@@ -42,14 +43,10 @@ sql_query_upsert(
   method = NULL
 )
 
-sql_query_delete(con, x_name, y, by, ..., returning_cols = NULL)
+sql_query_delete(con, table, from, by, ..., returning_cols = NULL)
 }
 \arguments{
 \item{con}{Database connection.}
-
-\item{x_name}{Name of the table to update.}
-
-\item{y}{A lazy tbl.}
 
 \item{by}{An unnamed character vector giving the key columns. The key columns
 must exist in both \code{x} and \code{y}. Keys typically uniquely identify each row,
@@ -80,6 +77,10 @@ conflict with keys in \code{x}.
 \item{update_values}{A named SQL vector that specify how to update the columns.}
 
 \item{update_cols}{Names of columns to update.}
+
+\item{x_name}{Name of the table to update.}
+
+\item{y}{A lazy tbl.}
 }
 \value{
 A SQL query.
