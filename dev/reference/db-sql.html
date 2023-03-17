@@ -221,7 +221,15 @@ queries.</p></li>
 <span></span>
 <span><span class="fu">sql_table_analyze</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_table_index</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">columns</span>, name <span class="op">=</span> <span class="cn">NULL</span>, unique <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sql_table_index</span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  <span class="va">table</span>,</span>
+<span>  <span class="va">columns</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_query_explain</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
