@@ -48,6 +48,14 @@ sql_query_delete(con, table, from, by, ..., returning_cols = NULL)
 \arguments{
 \item{con}{Database connection.}
 
+\item{table}{Table to update. Must be a table identifier, e.g. single string
+or created via \code{in_schema()}.}
+
+\item{from}{Table or query that contains the new data. Either a table
+identifier or SQL.}
+
+\item{insert_cols}{Names of columns to insert.}
+
 \item{by}{An unnamed character vector giving the key columns. The key columns
 must exist in both \code{x} and \code{y}. Keys typically uniquely identify each row,
 but this is only enforced for the key values of \code{y} when \code{rows_update()},
@@ -77,10 +85,6 @@ conflict with keys in \code{x}.
 \item{update_values}{A named SQL vector that specify how to update the columns.}
 
 \item{update_cols}{Names of columns to update.}
-
-\item{x_name}{Name of the table to update.}
-
-\item{y}{A lazy tbl.}
 }
 \value{
 A SQL query.

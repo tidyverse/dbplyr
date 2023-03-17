@@ -639,9 +639,12 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 #' These functions generate the SQL used in `rows_*(in_place = TRUE)`.
 #'
 #' @param con Database connection.
-#' @param x_name Name of the table to update.
-#' @param y A lazy tbl.
+#' @param table Table to update. Must be a table identifier, e.g. single string
+#'   or created via `in_schema()`.
+#' @param from Table or query that contains the new data. Either a table
+#'   identifier or SQL.
 #' @inheritParams dplyr::rows_upsert
+#' @param insert_cols Names of columns to insert.
 #' @param update_cols Names of columns to update.
 #' @param update_values A named SQL vector that specify how to update the columns.
 #' @param ... Other parameters passed onto methods.
