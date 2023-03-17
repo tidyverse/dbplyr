@@ -729,23 +729,6 @@ rows_prep <- function(con, table, from, by, lvl = 0) {
   )
 }
 
-rows_prep_legacy <- function(con, x_name, y, by, lvl = 0) {
-  y_name <- ident("...y")
-  from <- dbplyr_sql_subquery(con,
-    sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
-    name = y_name,
-    lvl = lvl
-  )
-
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name, condition = "=")
-  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-
-  list(
-    from = from,
-    where = where
-  )
-}
-
 rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
   out <- rows_prep(con, table, from, by, lvl = lvl)
 

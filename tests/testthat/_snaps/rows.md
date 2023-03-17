@@ -198,6 +198,23 @@
       ) `...y`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
+# sql_query_append supports old interface works
+
+    Code
+      sql_query_append(con = con, table = ident("df_x"), from = df_y, returning_cols = c(
+        "a", b2 = "b"))
+    Condition
+      Warning:
+      The `from` argument of `sql_query_append()` must be a table identifier or an SQL query, not a lazy table. as of dbplyr 2.3.2.
+    Output
+      <SQL> INSERT INTO `df_x` ()
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
 # arguments are checked
 
     Code

@@ -132,7 +132,18 @@ simulate_mssql <- function(version = "15.0") {
                                                     cols,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep_legacy(con, table, from, by = list(), lvl = 0)
+  if (is_tbl_lazy(from)) {
+    lifecycle::deprecate_soft(
+      when = "2.3.2",
+      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
+      with = ""
+    )
+
+    cols <- cols %||% colnames(from)
+    from <- sql_render(from, con = con, lvl = 1)
+  }
+
+  parts <- rows_prep(con, table, from, by = list(), lvl = 0)
   insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(

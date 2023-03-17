@@ -325,6 +325,25 @@ test_that("`sql_query_append()` works", {
   )
 })
 
+test_that("sql_query_append supports old interface works", {
+  con <- simulate_dbi()
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = con,
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_append(
+      con = con,
+      table = ident("df_x"),
+      from = df_y,
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
 # rows_update -------------------------------------------------------------
 
 test_that("arguments are checked", {

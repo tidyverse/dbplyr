@@ -766,6 +766,24 @@ sql_query_append <- function(con,
                              cols,
                              ...,
                              returning_cols = NULL) {
+  if (is_tbl_lazy(from)) {
+    lifecycle::deprecate_soft(
+      when = "2.3.2",
+      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
+    )
+
+    from <- sql_render(from, con = con, lvl = 1)
+    out <- sql_query_append(
+      con = con,
+      table = table,
+      from = from,
+      cols = colnames(from),
+      returning_cols = returning_cols
+    )
+
+    return(out)
+  }
+
   rlang::check_dots_used()
   UseMethod("sql_query_append")
 }
