@@ -75,9 +75,9 @@
 # `sql_query_upsert()` with method = 'on_conflict' is correct
 
     Code
-      sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
-      method = "on_conflict")
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"), method = "on_conflict")
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *

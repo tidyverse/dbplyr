@@ -831,8 +831,8 @@ sql_query_update_from.DBIConnection <- function(con,
 #' @export
 #' @rdname sql_query_insert
 sql_query_upsert <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
                              by,
                              update_cols,
                              ...,
@@ -846,8 +846,8 @@ sql_query_upsert <- function(con,
 
 #' @export
 sql_query_upsert.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
                                            by,
                                            update_cols,
                                            ...,
@@ -856,17 +856,20 @@ sql_query_upsert.DBIConnection <- function(con,
   method <- method %||% "cte_update"
   arg_match(method, "cte_update", error_arg = "method")
 
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+
+  insert_cols <- c(by, update_cols)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("RETURNING ", escape(x_name, con = con), ".*"))
+    sql(paste0("RETURNING ", escape(table, con = con), ".*"))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
@@ -874,16 +877,15 @@ sql_query_upsert.DBIConnection <- function(con,
   join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   clauses <- list2(
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)

@@ -11,9 +11,9 @@
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_oracle(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
-      method = "merge")
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"), method = "merge")
     Output
       <SQL> MERGE INTO `df_x`
       USING (
@@ -24,8 +24,8 @@
       WHEN MATCHED THEN
         UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
       WHEN NOT MATCHED THEN
-        INSERT (`c`, `d`)
-        VALUES (`...y`.`c`, `...y`.`d`)
+        INSERT (`a`, `b`, `c`, `d`)
+        VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
       ;
 

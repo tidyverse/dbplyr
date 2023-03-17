@@ -306,8 +306,8 @@ sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' @export
 sql_query_upsert.PqConnection <- function(con,
-                                          x_name,
-                                          y,
+                                          table,
+                                          from,
                                           by,
                                           update_cols,
                                           ...,
@@ -322,7 +322,10 @@ sql_query_upsert.PqConnection <- function(con,
 
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+
+  insert_cols <- c(by, update_cols)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
     sql_table_prefix(con, update_cols, ident("excluded")),
@@ -330,10 +333,9 @@ sql_query_upsert.PqConnection <- function(con,
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
@@ -341,7 +343,7 @@ sql_query_upsert.PqConnection <- function(con,
     sql_clause("ON CONFLICT ", by_sql),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }

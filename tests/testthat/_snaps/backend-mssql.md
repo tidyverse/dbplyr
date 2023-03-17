@@ -352,8 +352,9 @@
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> MERGE INTO `df_x`
       USING (

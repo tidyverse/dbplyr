@@ -66,8 +66,8 @@ sql_query_select.Oracle <- function(con,
 
 #' @export
 sql_query_upsert.Oracle <- function(con,
-                                    x_name,
-                                    y,
+                                    table,
+                                    from,
                                     by,
                                     update_cols,
                                     ...,
@@ -80,22 +80,25 @@ sql_query_upsert.Oracle <- function(con,
   }
 
   # https://oracle-base.com/articles/9i/merge-statement
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  insert_cols <- c(by, update_cols)
+  insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
+  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, update_cols_esc, lvl = 1),
-    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name),
+    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause("VALUES", insert_values, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
   sql_format_clauses(clauses, lvl = 0, con)

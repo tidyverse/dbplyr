@@ -29,18 +29,19 @@ test_that("queries do not use *", {
 })
 
 test_that("`sql_query_upsert()` is correct", {
+  con <- simulate_oracle()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_oracle(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_upsert(
-      con = simulate_oracle(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_cols = c("c", "d"),
       returning_cols = c("a", b2 = "b"),

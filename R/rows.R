@@ -393,8 +393,8 @@ rows_upsert.tbl_lazy <- function(x,
 
     sql <- sql_query_upsert(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
       by = by,
       update_cols = setdiff(colnames(y), by),
       ...,

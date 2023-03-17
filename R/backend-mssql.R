@@ -170,8 +170,8 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     update_cols,
                                                     ...,
@@ -180,7 +180,7 @@ simulate_mssql <- function(version = "15.0") {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
-  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -191,7 +191,7 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),

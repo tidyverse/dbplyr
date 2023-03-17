@@ -429,8 +429,9 @@
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> WITH `updated` AS (
         UPDATE `df_x`
