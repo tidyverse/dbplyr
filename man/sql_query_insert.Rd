@@ -155,16 +155,10 @@ values are then inserted outside of the CTE.
 }
 }
 \examples{
-lf <- lazy_frame(
-  carrier = c("9E", "AA"),
-  name = c("Endeavor Air Inc.", "American Airlines Inc."),
-  con = simulate_postgres()
-)
-
 sql_query_upsert(
-  simulate_postgres(),
-  ident("airlines"),
-  lf,
+  con = simulate_postgres(),
+  table = ident("airlines"),
+  from = ident("df"),
   by = "carrier",
   update_cols = "name"
 )
