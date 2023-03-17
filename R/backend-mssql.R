@@ -126,15 +126,16 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_append.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
+                                                    cols,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep_legacy(con, x_name, y, by = list(), lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_prep_legacy(con, table, from, by = list(), lvl = 0)
+  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from)

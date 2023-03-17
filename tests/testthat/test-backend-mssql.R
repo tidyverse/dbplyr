@@ -210,18 +210,20 @@ test_that("`sql_query_insert()` is correct", {
 })
 
 test_that("`sql_query_append()` is correct", {
+  con <- simulate_mssql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_append(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      cols = colnames(df_y),
       returning_cols = c("a", b2 = "b")
     )
   )

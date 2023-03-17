@@ -163,8 +163,9 @@ rows_append.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_append(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
+      cols = colnames(y),
       ...,
       returning_cols = returning_cols
     )

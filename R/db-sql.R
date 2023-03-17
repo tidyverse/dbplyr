@@ -759,8 +759,9 @@ sql_query_insert.DBIConnection <- function(con,
 #' @export
 #' @rdname sql_query_insert
 sql_query_append <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
+                             cols,
                              ...,
                              returning_cols = NULL) {
   rlang::check_dots_used()
@@ -769,19 +770,20 @@ sql_query_append <- function(con,
 
 #' @export
 sql_query_append.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
+                                           cols,
                                            ...,
                                            returning_cols = NULL) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
-  parts <- rows_prep_legacy(con, x_name, y, by = list(), lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_prep(con, table, from, by = list(), lvl = 0)
+  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)

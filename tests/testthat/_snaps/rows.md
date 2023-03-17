@@ -185,8 +185,8 @@
 # `sql_query_append()` works
 
     Code
-      sql_query_append(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
-      returning_cols = c("a", b2 = "b"))
+      sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
