@@ -150,7 +150,18 @@ sql_table_analyze.DBIConnection <- function(con, table, ...) {
 
 #' @rdname db-sql
 #' @export
-sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+sql_table_index <- function(con,
+                            table,
+                            columns,
+                            name = NULL,
+                            unique = FALSE,
+                            ...,
+                            call = caller_env()) {
+  check_table_ident(table, call = call)
+  check_character(columns, call = call)
+  check_name(name, allow_null = TRUE, call = call)
+  check_bool(unique, call = call)
+
   UseMethod("sql_table_index")
 }
 #' @export
@@ -161,16 +172,6 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  if (!(is_string(table) || is_schema(table))) {
-    stop_input_type(
-      table,
-      c("a string", "a schema"),
-      ...,
-      call = call
-    )
-  }
-  check_character(columns)
-
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   build_sql(
@@ -185,6 +186,7 @@ sql_table_index.DBIConnection <- function(con,
 #' @rdname db-sql
 #' @export
 sql_query_explain <- function(con, sql, ...) {
+  check_scalar_sql(sql)
   UseMethod("sql_query_explain")
 }
 #' @export
@@ -195,6 +197,8 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_fields <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+
   UseMethod("sql_query_fields")
 }
 #' @export
@@ -205,6 +209,10 @@ sql_query_fields.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  check_table_ident(sql, sql = TRUE)
+  check_table_ident(name)
+  check_bool(temporary)
+
   UseMethod("sql_query_save")
 }
 #' @export
@@ -218,6 +226,8 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 #' @export
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
+  check_name(name, allow_null = TRUE)
+
   UseMethod("sql_query_wrap")
 }
 #' @export
@@ -262,6 +272,8 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
 #' @rdname db-sql
 #' @export
 sql_query_rows <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+
   UseMethod("sql_query_rows")
 }
 #' @export

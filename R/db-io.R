@@ -42,6 +42,14 @@ db_copy_to <-  function(con,
                         analyze = TRUE,
                         ...,
                         in_transaction = TRUE) {
+  check_table_ident(table)
+  check_bool(overwrite)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+  check_bool(analyze)
+  check_bool(in_transaction)
+
   UseMethod("db_copy_to")
 }
 #' @export
@@ -94,6 +102,10 @@ db_compute <- function(con,
                        indexes = list(),
                        analyze = TRUE,
                        ...) {
+  check_table_ident(table)
+  check_scalar_sql(sql)
+  check_bool(temporary)
+
   UseMethod("db_compute")
 }
 #' @export
@@ -146,6 +158,11 @@ db_write_table.DBIConnection <- function(con,
                                          values,
                                          temporary = TRUE,
                                          ...) {
+  check_table_ident(table)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+
   tryCatch(
     dbWriteTable(
       con,

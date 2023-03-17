@@ -31,7 +31,15 @@ sql_random(con)
 
 sql_table_analyze(con, table, ...)
 
-sql_table_index(con, table, columns, name = NULL, unique = FALSE, ...)
+sql_table_index(
+  con,
+  table,
+  columns,
+  name = NULL,
+  unique = FALSE,
+  ...,
+  call = caller_env()
+)
 
 sql_query_explain(con, sql, ...)
 
