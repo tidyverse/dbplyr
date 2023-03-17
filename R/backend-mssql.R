@@ -101,7 +101,7 @@ simulate_mssql <- function(version = "15.0") {
 `sql_query_insert.Microsoft SQL Server` <- function(con,
                                                     table,
                                                     from,
-                                                    cols,
+                                                    insert_cols,
                                                     by,
                                                     ...,
                                                     conflict = c("error", "ignore"),
@@ -112,7 +112,7 @@ simulate_mssql <- function(version = "15.0") {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, table, from, cols, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
@@ -129,22 +129,11 @@ simulate_mssql <- function(version = "15.0") {
 `sql_query_append.Microsoft SQL Server` <- function(con,
                                                     table,
                                                     from,
-                                                    cols,
+                                                    insert_cols,
                                                     ...,
                                                     returning_cols = NULL) {
-  if (is_tbl_lazy(from)) {
-    lifecycle::deprecate_soft(
-      when = "2.3.2",
-      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
-      with = ""
-    )
-
-    cols <- cols %||% colnames(from)
-    from <- sql_render(from, con = con, lvl = 1)
-  }
-
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
-  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),

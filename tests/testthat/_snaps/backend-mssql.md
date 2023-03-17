@@ -286,7 +286,7 @@
 
     Code
       sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
-        lvl = 1), cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
@@ -305,7 +305,7 @@
 
     Code
       sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
-        lvl = 1), cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
+        lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`

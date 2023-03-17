@@ -720,7 +720,7 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 sql_query_insert <- function(con,
                              table,
                              from,
-                             cols,
+                             insert_cols,
                              by,
                              ...,
                              conflict = c("error", "ignore"),
@@ -734,7 +734,7 @@ sql_query_insert <- function(con,
 sql_query_insert.DBIConnection <- function(con,
                                            table,
                                            from,
-                                           cols,
+                                           insert_cols,
                                            by,
                                            ...,
                                            conflict = c("error", "ignore"),
@@ -745,7 +745,7 @@ sql_query_insert.DBIConnection <- function(con,
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, table, from, cols, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
@@ -763,7 +763,7 @@ sql_query_insert.DBIConnection <- function(con,
 sql_query_append <- function(con,
                              table,
                              from,
-                             cols,
+                             insert_cols,
                              ...,
                              returning_cols = NULL) {
   if (is_tbl_lazy(from)) {
@@ -777,7 +777,7 @@ sql_query_append <- function(con,
       con = con,
       table = table,
       from = from,
-      cols = colnames(from),
+      insert_cols = colnames(from),
       returning_cols = returning_cols
     )
 
@@ -792,12 +792,12 @@ sql_query_append <- function(con,
 sql_query_append.DBIConnection <- function(con,
                                            table,
                                            from,
-                                           cols,
+                                           insert_cols,
                                            ...,
                                            returning_cols = NULL) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
-  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
     sql_clause_insert(con, insert_cols, table),

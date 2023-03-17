@@ -272,7 +272,7 @@ sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 sql_query_insert.PqConnection <- function(con,
                                           table,
                                           from,
-                                          cols,
+                                          insert_cols,
                                           by,
                                           conflict = c("error", "ignore"),
                                           ...,
@@ -288,7 +288,7 @@ sql_query_insert.PqConnection <- function(con,
   # https://www.sqlite.org/lang_UPSERT.html
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, table, from, cols, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
 
   clauses <- list(

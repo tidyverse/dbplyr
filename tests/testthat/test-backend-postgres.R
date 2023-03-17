@@ -107,7 +107,7 @@ test_that("`sql_query_insert()` works", {
       con = con,
       table = ident("df_x"),
       from = sql_render(df_y, con, lvl = 1),
-      cols = colnames(df_y),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "error",
       returning_cols = c("a", b2 = "b")
@@ -119,7 +119,7 @@ test_that("`sql_query_insert()` works", {
       con = con,
       table = ident("df_x"),
       from = sql_render(df_y, con, lvl = 1),
-      cols = colnames(df_y),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "ignore",
       returning_cols = c("a", b2 = "b")
