@@ -261,8 +261,8 @@ test_that("`sql_query_delete()` is correct", {
   expect_snapshot(
     sql_query_delete(
       con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      table = ident("df_x"),
+      from = sql_render(df_y, simulate_mssql(), lvl = 2),
       by = c("a", "b"),
       returning_cols = c("a", b2 = "b")
     )

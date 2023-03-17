@@ -774,7 +774,7 @@ sql_query_append.DBIConnection <- function(con,
                                            ...,
                                            returning_cols = NULL) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
-  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
@@ -809,7 +809,7 @@ sql_query_update_from.DBIConnection <- function(con,
                                                 ...,
                                                 returning_cols = NULL) {
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   # avoid CTEs for the general case as they do not work everywhere
@@ -852,7 +852,7 @@ sql_query_upsert.DBIConnection <- function(con,
   method <- method %||% "cte_update"
   arg_match(method, "cte_update", error_arg = "method")
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
 
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_cols <- sql_escape_ident(con, update_cols)
@@ -888,8 +888,8 @@ sql_query_upsert.DBIConnection <- function(con,
 #' @export
 #' @rdname sql_query_insert
 sql_query_delete <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
                              by,
                              ...,
                              returning_cols = NULL) {
@@ -899,17 +899,17 @@ sql_query_delete <- function(con,
 
 #' @export
 sql_query_delete.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
                                            by,
                                            ...,
                                            returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", x_name),
+    sql_clause("DELETE FROM", table),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }

@@ -467,8 +467,8 @@ rows_delete.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_delete(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 2),
       by = by,
       ...,
       returning_cols = returning_cols
@@ -716,7 +716,18 @@ target_table_name <- function(x, in_place) {
   name
 }
 
-rows_prep <- function(con, x_name, y, by, lvl = 0) {
+rows_prep <- function(con, table, from, by, lvl = 0) {
+  y_name <- ident("...y")
+  join_by <- list(x = by, y = by, x_as = y_name, y_as = table, condition = "=")
+  where <- sql_join_tbls(con, by = join_by, na_matches = "never")
+
+  list(
+    from = sql_query_wrap(con, from, y_name, lvl = lvl),
+    where = where
+  )
+}
+
+rows_prep_legacy <- function(con, x_name, y, by, lvl = 0) {
   y_name <- ident("...y")
   from <- dbplyr_sql_subquery(con,
     sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
@@ -734,7 +745,7 @@ rows_prep <- function(con, x_name, y, by, lvl = 0) {
 }
 
 rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
-  out <- rows_prep(con, x_name, y, by, lvl = lvl)
+  out <- rows_prep_legacy(con, x_name, y, by, lvl = lvl)
 
   join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")

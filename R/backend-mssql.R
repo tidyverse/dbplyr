@@ -130,7 +130,7 @@ simulate_mssql <- function(version = "15.0") {
                                                     y,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by = list(), lvl = 0)
   insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
@@ -152,7 +152,7 @@ simulate_mssql <- function(version = "15.0") {
                                                          ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
@@ -178,7 +178,7 @@ simulate_mssql <- function(version = "15.0") {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -205,15 +205,15 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_delete.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", x_name),
+    sql_clause("DELETE FROM", table),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )

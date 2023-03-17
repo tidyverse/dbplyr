@@ -321,7 +321,7 @@ sql_query_upsert.PqConnection <- function(con,
 
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep_legacy(con, x_name, y, by, lvl = 0)
 
   update_values <- set_names(
     sql_table_prefix(con, update_cols, ident("excluded")),
