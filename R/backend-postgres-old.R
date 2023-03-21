@@ -9,8 +9,14 @@ dbplyr_edition.PostgreSQLConnection <- function(con) {
 }
 
 #' @export
-db_write_table.PostgreSQLConnection <- function(con, table, types, values,
-                                                temporary = TRUE, overwrite = FALSE, ....) {
+db_write_table.PostgreSQLConnection <- function(con,
+                                                table,
+                                                types,
+                                                values,
+                                                temporary = TRUE,
+                                                ....,
+                                                overwrite = FALSE
+                                                ) {
 
   if (!isFALSE(temporary)) {
     cli_abort(c(
