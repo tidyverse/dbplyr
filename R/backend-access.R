@@ -122,7 +122,9 @@ sql_translation.ACCESS <- function(con) {
       ifelse        = function(test, yes, no){
        sql_expr(iif(!!test, !!yes, !!no))
       },
-
+      # Access uses <> for inequality
+      `!=` = sql_infix("<>"),
+      
       # Coalesce doesn't exist in Access.
       # NZ() only works while in Access, not with the Access driver
       # IIF(ISNULL()) is the best way to construct this

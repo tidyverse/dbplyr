@@ -33,6 +33,8 @@
 * The `rows_*()` functions now also work inside a transaction for Postgres
   (@mgirlich, #1183).
 
+* Added translation for `!=` to `<>` for Microsoft Access (@erikvona, #1219).
+
 # dbplyr 2.3.1
 
 ## Breaking changes
