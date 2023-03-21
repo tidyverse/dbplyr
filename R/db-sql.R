@@ -142,6 +142,7 @@ sql_random <- function(con) {
 #' @rdname db-sql
 #' @export
 sql_table_analyze <- function(con, table, ...) {
+  check_dots_used()
   UseMethod("sql_table_analyze")
 }
 #' @export
@@ -188,6 +189,7 @@ sql_table_index.DBIConnection <- function(con,
 #' @export
 sql_query_explain <- function(con, sql, ...) {
   check_scalar_sql(sql)
+  check_dots_used()
   UseMethod("sql_query_explain")
 }
 #' @export
@@ -199,6 +201,7 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 #' @export
 sql_query_fields <- function(con, sql, ...) {
   check_table_ident(sql, sql = TRUE)
+  check_dots_used()
 
   UseMethod("sql_query_fields")
 }
@@ -213,6 +216,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
   check_table_ident(sql, sql = TRUE)
   check_table_ident(name)
   check_bool(temporary)
+  check_dots_used()
 
   UseMethod("sql_query_save")
 }
@@ -228,6 +232,7 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
   check_name(name, allow_null = TRUE)
+  check_dots_used()
 
   UseMethod("sql_query_wrap")
 }
@@ -274,6 +279,7 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
 #' @export
 sql_query_rows <- function(con, sql, ...) {
   check_table_ident(sql, sql = TRUE)
+  check_dots_used()
 
   UseMethod("sql_query_rows")
 }
@@ -323,6 +329,7 @@ sql_query_select <- function(con,
                              ...,
                              subquery = FALSE,
                              lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_select")
 }
 
@@ -393,6 +400,7 @@ sql_query_join <- function(con,
                            na_matches = FALSE,
                            ...,
                            lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_join")
 }
 #' @export
@@ -460,9 +468,11 @@ sql_query_multi_join <- function(con,
                                  x,
                                  joins,
                                  table_vars,
+                                 by_list,
                                  vars,
                                  ...,
                                  lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_multi_join")
 }
 
@@ -500,6 +510,7 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                x,
                                                joins,
                                                table_vars,
+                                               by_list,
                                                vars,
                                                ...,
                                                lvl = 0) {
@@ -551,6 +562,7 @@ sql_query_semi_join <- function(con,
                                 vars,
                                 ...,
                                 lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_semi_join")
 }
 #' @export
@@ -604,6 +616,7 @@ sql_query_set_op <- function(con,
                              ...,
                              all = FALSE,
                              lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_set_op")
 }
 #' @export
@@ -730,7 +743,7 @@ sql_query_insert <- function(con,
   check_character(by)
   check_character(returning_cols, allow_null = TRUE)
 
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_insert")
 }
 
@@ -794,7 +807,7 @@ sql_query_append <- function(con,
   check_character(insert_cols)
   check_character(returning_cols, allow_null = TRUE)
 
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_append")
 }
 
@@ -835,7 +848,7 @@ sql_query_update_from <- function(con,
   check_named(update_values)
   check_character(returning_cols, allow_null = TRUE)
 
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_update_from")
 }
 
@@ -881,7 +894,7 @@ sql_query_upsert <- function(con,
 
   # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
   # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_upsert")
 }
 
@@ -945,7 +958,7 @@ sql_query_delete <- function(con,
   check_character(by)
   check_character(returning_cols, allow_null = TRUE)
 
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_delete")
 }
 
@@ -973,7 +986,7 @@ sql_returning_cols <- function(con, cols, table, ...) {
     return(NULL)
   }
 
-  rlang::check_dots_empty()
+  check_dots_used()
   UseMethod("sql_returning_cols")
 }
 

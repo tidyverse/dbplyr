@@ -49,6 +49,7 @@ sql_build.ident <- function(op, con = NULL, ...) {
 #'   This is important because you can place a bare table name in a subquery
 #'   and  ORDER BY does not work in subqueries.
 sql_render <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  check_dots_used()
   UseMethod("sql_render")
 }
 
