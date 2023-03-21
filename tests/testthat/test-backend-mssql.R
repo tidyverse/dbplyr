@@ -190,18 +190,20 @@ test_that("generates custom sql", {
 })
 
 test_that("`sql_query_insert()` is correct", {
+  con <- simulate_mssql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "ignore",
       returning_cols = c("a", b2 = "b")
@@ -210,36 +212,39 @@ test_that("`sql_query_insert()` is correct", {
 })
 
 test_that("`sql_query_append()` is correct", {
+  con <- simulate_mssql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_append(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       returning_cols = c("a", b2 = "b")
     )
   )
 })
 
 test_that("`sql_query_update_from()` is correct", {
+  con <- simulate_mssql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_update_from(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(
         c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
@@ -261,8 +266,8 @@ test_that("`sql_query_delete()` is correct", {
   expect_snapshot(
     sql_query_delete(
       con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      table = ident("df_x"),
+      from = sql_render(df_y, simulate_mssql(), lvl = 2),
       by = c("a", "b"),
       returning_cols = c("a", b2 = "b")
     )
@@ -270,18 +275,19 @@ test_that("`sql_query_delete()` is correct", {
 })
 
 test_that("`sql_query_upsert()` is correct", {
+  con <- simulate_mssql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mssql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_upsert(
-      con = simulate_mssql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_cols = c("c", "d"),
       returning_cols = c("a", b2 = "b")

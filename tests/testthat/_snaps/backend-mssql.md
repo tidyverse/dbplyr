@@ -285,8 +285,9 @@
 # `sql_query_insert()` is correct
 
     Code
-      sql_query_insert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+      returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
@@ -303,8 +304,8 @@
 # `sql_query_append()` is correct
 
     Code
-      sql_query_append(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
-      returning_cols = c("a", b2 = "b"))
+      sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
@@ -317,8 +318,8 @@
 # `sql_query_update_from()` is correct
 
     Code
-      sql_query_update_from(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
@@ -334,15 +335,16 @@
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_delete(con = simulate_mssql(), table = ident("df_x"), from = sql_render(
+        df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> DELETE FROM `df_x`
       OUTPUT `DELETED`.`a`, `DELETED`.`b` AS `b2`
       WHERE EXISTS (
         SELECT 1 FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
+          SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+          FROM `df_y`
       ) `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
@@ -350,8 +352,9 @@
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> MERGE INTO `df_x`
       USING (

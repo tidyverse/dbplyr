@@ -99,8 +99,9 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_insert.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
+                                                    insert_cols,
                                                     by,
                                                     ...,
                                                     conflict = c("error", "ignore"),
@@ -111,7 +112,7 @@ simulate_mssql <- function(version = "15.0") {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
@@ -126,15 +127,16 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_append.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
+                                                    insert_cols,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_prep(con, table, from, by = list(), lvl = 0)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from)
@@ -145,21 +147,21 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_update_from.Microsoft SQL Server` <- function(con,
-                                                         x_name,
-                                                         y,
+                                                         table,
+                                                         from,
                                                          by,
                                                          update_values,
                                                          ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_from(x_name),
+    sql_clause_from(table),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )
@@ -168,8 +170,8 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     update_cols,
                                                     ...,
@@ -178,7 +180,7 @@ simulate_mssql <- function(version = "15.0") {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -189,7 +191,7 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
@@ -205,15 +207,15 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_delete.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", x_name),
+    sql_clause("DELETE FROM", table),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )
