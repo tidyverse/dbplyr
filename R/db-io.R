@@ -218,11 +218,12 @@ with_transaction <- function(con, in_transaction, code) {
 
 #' @export
 #' @rdname db-io
-db_table_temporary <- function(con, table, temporary) {
+db_table_temporary <- function(con, table, temporary, ...) {
+  check_dots_used()
   UseMethod("db_table_temporary")
 }
 #' @export
-db_table_temporary.DBIConnection <- function(con, table, temporary) {
+db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
   list(
     table = table,
     temporary = temporary

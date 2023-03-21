@@ -23,7 +23,7 @@
 \alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
-sql_expr_matches(con, x, y)
+sql_expr_matches(con, x, y, ...)
 
 sql_translation(con)
 

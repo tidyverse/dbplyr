@@ -37,7 +37,7 @@ dbplyr_edition.PostgreSQL <- function(con) {
 dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PqConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
@@ -246,7 +246,7 @@ sql_translation.PqConnection <- function(con) {
 sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
   build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
 }

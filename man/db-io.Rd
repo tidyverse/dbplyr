@@ -34,7 +34,7 @@ db_compute(
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)
 
-db_table_temporary(con, table, temporary)
+db_table_temporary(con, table, temporary, ...)
 }
 \description{
 These generics are responsible for getting data into and out of the
