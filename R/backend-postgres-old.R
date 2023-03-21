@@ -14,7 +14,7 @@ db_write_table.PostgreSQLConnection <- function(con,
                                                 types,
                                                 values,
                                                 temporary = TRUE,
-                                                ....,
+                                                ...,
                                                 overwrite = FALSE
                                                 ) {
 
