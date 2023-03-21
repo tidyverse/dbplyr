@@ -365,9 +365,9 @@ sql_select.DBIConnection <- function(con,
                                      order_by = NULL,
                                      limit = NULL,
                                      distinct = FALSE,
-                                     ...,
-                                     subquery = FALSE) {
+                                     ...) {
   # TODO should add argument `window` after tidyverse/dplyr#4663
+  # TODO should add argument `subquery` after tidyverse/dplyr#4663
   sql_query_select(
     con, select, from,
     where = where,
@@ -376,8 +376,7 @@ sql_select.DBIConnection <- function(con,
     order_by = order_by,
     limit = limit,
     distinct = distinct,
-    ...,
-    subquery = subquery
+    ...
   )
 }
 
