@@ -73,7 +73,16 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>The <code>na_matches</code> argument of <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join()</a></code> works again (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1211" class="external-link">#1211</a>).</p></li>
+<ul><li>
+<p><code><a href="../reference/sql_query_insert.html">sql_query_append()</a></code>, <code><a href="../reference/sql_query_insert.html">sql_query_insert()</a></code>, <code>sql_query_update()</code>, <code><a href="../reference/sql_query_insert.html">sql_query_upsert()</a></code>, and <code><a href="../reference/sql_query_insert.html">sql_query_delete()</a></code> changed their arguments to make them more consistent to the other <code>sql_query_*()</code> functions:</p>
+<ul><li>
+<code>x_name</code> was renamed to <code>table</code>.</li>
+<li>
+<code>y</code> was renamed to <code>from</code> and must now be a table identifier or SQL instead of a lazy table.</li>
+<li>
+<code><a href="../reference/sql_query_insert.html">sql_query_append()</a></code> and <code><a href="../reference/sql_query_insert.html">sql_query_insert()</a></code> have gained the argument <code>cols</code>.</li>
+</ul></li>
+<li><p>The <code>na_matches</code> argument of <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join()</a></code> works again (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1211" class="external-link">#1211</a>).</p></li>
 <li><p>The <code>vars</code> argument of <code><a href="../reference/translate_sql.html">translate_sql()</a></code> has been removed after it threw an error for the last 7 years (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 <li><p>Added translation for <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1200" class="external-link">#1200</a>).</p></li>
 <li><p><code><a href="../reference/db-sql.html">sql_random()</a></code> is now deprecated. It was used to power <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code> which is now done via the translation for <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1200" class="external-link">#1200</a>).</p></li>
