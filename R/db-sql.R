@@ -330,13 +330,17 @@ dbplyr_query_select <- function(con, ...) {
 }
 #' @importFrom dplyr sql_select
 #' @export
-sql_select.DBIConnection <- function(con, select, from, where = NULL,
-                                     group_by = NULL, having = NULL,
-                                     window = NULL,
+sql_select.DBIConnection <- function(con,
+                                     select,
+                                     from,
+                                     where = NULL,
+                                     group_by = NULL,
+                                     having = NULL,
                                      order_by = NULL,
                                      limit = NULL,
                                      distinct = FALSE,
                                      ...,
+                                     window = NULL,
                                      subquery = FALSE) {
   sql_query_select(
     con, select, from,

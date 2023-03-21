@@ -134,8 +134,8 @@ db_write_table.DBIConnection <- function(con,
                                          types,
                                          values,
                                          temporary = TRUE,
-                                         overwrite = FALSE,
-                                         ...) {
+                                         ...,
+                                         overwrite = FALSE) {
   tryCatch(
     dbWriteTable(
       con,

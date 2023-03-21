@@ -184,8 +184,7 @@ op_vars.lazy_values_query <- function(op) {
   colnames(op$x)
 }
 
-sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
-  check_dots_empty()
+sql_values_subquery <- function(con, df, types, lvl = 0) {
   UseMethod("sql_values_subquery")
 }
 
