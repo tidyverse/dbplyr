@@ -28,7 +28,7 @@
 
 # dbplyr 2.3.1
 
-## Breaking changes 
+## Breaking changes
 
 * `window_order()` now only accepts bare symbols or symbols wrapped in `desc()`.
   This breaking change is necessary to allow `select()` to drop and rename
