@@ -25,6 +25,7 @@
 #' @param ... Other arguments passed on to the methods. Not currently used.
 sql_build <- function(op, con = NULL, ...) {
   unique_subquery_name_reset()
+  check_dots_used()
   UseMethod("sql_build")
 }
 
