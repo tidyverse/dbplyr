@@ -156,25 +156,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        build_sql("INTERVAL '", x, " second'")
+        glue_sql2("INTERVAL '{x} second'", .con = sql_current_con())
       },
       minutes = function(x) {
-        build_sql("INTERVAL '", x, " minute'")
+        glue_sql2("INTERVAL '{x} minute'", .con = sql_current_con())
       },
       hours = function(x) {
-        build_sql("INTERVAL '", x, " hour'")
+        glue_sql2("INTERVAL '{x} hour'", .con = sql_current_con())
       },
       days = function(x) {
-        build_sql("INTERVAL '", x, " day'")
+        glue_sql2("INTERVAL '{x} day'", .con = sql_current_con())
       },
       weeks = function(x) {
-        build_sql("INTERVAL '", x, " week'")
+        glue_sql2("INTERVAL '{x} week'", .con = sql_current_con())
       },
       months = function(x) {
-        build_sql("INTERVAL '", x, " month'")
+        glue_sql2("INTERVAL '{x} month'", .con = sql_current_con())
       },
       years = function(x) {
-        build_sql("INTERVAL '", x, " year'")
+        glue_sql2("INTERVAL '{x} year'", .con = sql_current_con())
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {

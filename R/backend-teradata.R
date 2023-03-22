@@ -110,7 +110,7 @@ sql_translation.Teradata <- function(con) {
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       as.Date       = function(x) {
-                        build_sql("DATE ",x)
+                        glue_sql2("DATE {x}", .con = sql_current_con())
                       },
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
@@ -128,9 +128,7 @@ sql_translation.Teradata <- function(con) {
                         sql_expr(SUBSTR(!!x, !!start, !!len))
                       },
       startsWith    = function(string, pattern) {
-                        build_sql('CAST(CASE WHEN INSTR(',
-                        string, ', ', pattern,
-                        ") = 1 THEN 1 ELSE 0 END AS INTEGER)")
+                        glue_sql2("CAST(CASE WHEN INSTR({string}, {pattern}) = 1 THEN 1 ELSE 0 END AS INTEGER)", .con = sql_current_con())
                       },
       paste         = sql_paste_infix(" ", "||", function(x) sql_expr(!!x)),
       paste0        = sql_paste_infix("", "||", function(x) sql_expr(!!x)),
@@ -139,7 +137,7 @@ sql_translation.Teradata <- function(con) {
                         sql_expr(WEEKNUMBER_OF_YEAR(!!x, 'iso'))
                       },
       quarter       = function(x) {
-                        build_sql('to_char(',x,",'q')")
+                        glue_sql2("to_char({x}, 'q')", .con = sql_current_con())
                       }
     ),
     sql_translator(.parent = base_odbc_agg,
@@ -201,7 +199,7 @@ sql_translation.Teradata <- function(con) {
 #' @export
 sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
-  build_sql("COLLECT STATISTICS ", as.sql(table, con = con) , con = con)
+  glue_sql2("COLLECT STATISTICS {.tbl table}", .con = con)
 }
 
 #' @export

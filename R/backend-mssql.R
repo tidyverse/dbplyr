@@ -250,7 +250,7 @@ simulate_mssql <- function(version = "15.0") {
 
       `[` = function(x, i) {
         i <- with_mssql_bool(i)
-        build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+        glue_sql2("CASE WHEN ({i}) THEN ({x}) END", .con = sql_current_con())
       },
 
       bitwShiftL     = sql_not_supported("bitwShiftL"),
@@ -449,7 +449,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_table_analyze.Microsoft SQL Server` <- function(con, table, ...) {
   # https://docs.microsoft.com/en-us/sql/t-sql/statements/update-statistics-transact-sql
-  build_sql("UPDATE STATISTICS ", as.sql(table, con = con), con = con)
+  glue_sql2("UPDATE STATISTICS {.tbl table}", .con = con)
 }
 
 # SQL server does not use CREATE TEMPORARY TABLE and instead prefixes
@@ -475,10 +475,10 @@ mssql_version <- function(con) {
                                                   ...) {
 
   # https://stackoverflow.com/q/16683758/946850
-  build_sql(
-    "SELECT * INTO ", as.sql(name, con), " ",
-    "FROM (\n  ", sql, "\n) AS temp",
-    con = con
+  glue_sql2(
+    "SELECT * INTO {.tbl name} ",
+    "FROM (\n  {.sql sql}\n) AS temp",
+    .con = con
   )
 }
 
@@ -521,7 +521,7 @@ mssql_infix_comparison <- function(f) {
   check_string(f)
   f <- toupper(f)
   function(x, y) {
-    mssql_as_bit(build_sql(x, " ", sql(f), " ", y))
+    mssql_as_bit(glue_sql2("{x} {sql(f)} {y}", .con = sql_current_con()))
   }
 }
 

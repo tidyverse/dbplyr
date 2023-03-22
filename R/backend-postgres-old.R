@@ -37,10 +37,8 @@ db_write_table.PostgreSQLConnection <- function(con,
 
 #' @export
 db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
-  fields <- build_sql(
-    "SELECT * FROM ", sql_subquery(con, sql), " WHERE 0=1",
-    con = con
-  )
+  sql <- sql_subquery(con, sql)
+  fields <- glue_sql2("SELECT * FROM {sql} WHERE 0=1", .con = con)
 
   qry <- dbSendQuery(con, fields)
   on.exit(dbClearResult(qry))

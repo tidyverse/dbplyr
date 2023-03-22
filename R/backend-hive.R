@@ -89,23 +89,22 @@ sql_translation.Hive <- function(con) {
 #' @export
 sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  build_sql(
-    "ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS",
-    con = con
+  glue_sql2(
+    "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS",
+    .con = con
   )
 }
 
 #' @export
 sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
-  # SQLite does not allow parentheses
+  # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
-  # `x` and `y` already have the correct indent, so use `build_sql()` instead
-  # of `sql_format_clauses()`
-  build_sql(
-    x, "\n",
-    indent_lvl(style_kw(method), lvl = lvl), "\n",
+  glue_sql2(
+    "\n", # dummy line to protect indent
+    "{x}\n",
+    lvl_indent(lvl), "{.kw method}\n",
     y,
-    con = con
+    .con = con
   )
 }
 

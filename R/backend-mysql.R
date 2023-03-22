@@ -111,7 +111,7 @@ sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
-  build_sql("ANALYZE TABLE ", as.sql(table, con = con), con = con)
+  glue_sql2("ANALYZE TABLE {.tbl table}", .con = con)
 }
 #' @export
 sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
@@ -140,7 +140,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 #' @export
 sql_expr_matches.MariaDBConnection <- function(con, x, y) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
-  build_sql(x, " <=> ", y, con = con)
+  glue_sql2("{x} <=> {y}", .con = con)
 }
 #' @export
 sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection

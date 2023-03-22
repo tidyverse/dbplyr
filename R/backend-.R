@@ -63,16 +63,15 @@ base_scalar <- sql_translator(
   `[[`   = function(x, i) {
     i <- enexpr(i)
     if (is.character(i)) {
-      build_sql(x, ".", ident(i))
+      glue_sql2("{.tbl x}.{.col i}", .con = sql_current_con())
     } else if (is.numeric(i)) {
-      build_sql(x, "[", as.integer(i), "]")
+      glue_sql2("{.tbl x}[", as.integer(i), "]", .con = sql_current_con())
     } else {
       cli_abort("Can only index with strings and numbers")
     }
-
   },
   `[` = function(x, i) {
-    build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+    glue_sql2("CASE WHEN ({i}) THEN ({x}) END", .con = sql_current_con())
   },
 
   `!=`    = sql_infix("!="),
@@ -176,7 +175,7 @@ base_scalar <- sql_translator(
     sql_expr(((!!x)))
   },
   desc = function(x) {
-    build_sql(x, sql(" DESC"))
+    glue_sql2("{x} DESC", .con = sql_current_con())
   },
 
   is.null = sql_is_null,
@@ -354,7 +353,7 @@ base_agg <- sql_translator(
   # nth = sql_prefix("NTH_VALUE", 2),
 
   n_distinct = function(x) {
-    build_sql("COUNT(DISTINCT ", x, ")")
+    glue_sql2("COUNT(DISTINCT {x})", .con = sql_current_con())
   }
 )
 
@@ -452,7 +451,7 @@ base_win <- sql_translator(
     )
   },
   n_distinct = function(x) {
-    win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
+    win_over(glue_sql2("COUNT(DISTINCT {x})", .con = sql_current_con()), win_current_group())
   },
 
   # Cumulative function are like recycled aggregates except that R names

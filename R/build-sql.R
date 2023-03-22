@@ -46,3 +46,89 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   pieces <- purrr::map_chr(enexprs(...), escape_expr, con = con)
   sql(paste0(pieces, collapse = ""))
 }
+
+glue_sql2 <- function(...,
+                      .con,
+                      .sep = "",
+                      .envir = parent.frame(),
+                      .open = "{",
+                      .close = "}",
+                      .na = DBI::SQL("NULL"),
+                      .null = "",
+                      .comment = "#",
+                      .literal = FALSE,
+                      .trim = TRUE) {
+  sql(glue(
+    ...,
+    .sep = .sep,
+    .envir = .envir,
+    .open = .open,
+    .close = .close,
+    .na = .na,
+    .null = .null,
+    .comment = .comment,
+    .literal = .literal,
+    .transformer = sql_quote_transformer(.con, .na),
+    .trim = .trim
+  ))
+}
+
+sql_quote_transformer <- function(connection, .na) {
+  if (is.null(.na)) {
+    .na <- DBI::SQL(NA)
+  }
+
+  function(text, envir) {
+    # TODO should check size
+    should_collapse <- grepl("[*][[:space:]]*$", text)
+    if (should_collapse) {
+      text <- sub("[*][[:space:]]*$", "", text)
+    }
+
+    regex <- "^\\.(tbl|sql|col|name|from|kw) (.*)"
+    m <- regexec(regex, text)
+    is_quoted <- any(m[[1]] != -1)
+    if (is_quoted) {
+      matches <- regmatches(text, regexec(regex, text))[[1]]
+
+      type <- matches[[2]]
+      value <- matches[[3]]
+    } else {
+      value <- text
+      type <- "raw"
+    }
+
+    value <- eval(parse(text = value, keep.source = FALSE), envir)
+
+    if (type == "tbl") {
+      if (is_bare_character(value)) {
+        value <- ident(value)
+      }
+    } else if (type == "from") {
+      # TODO maybe this could call dbplyr_sql_subquery()
+      if (is_bare_character(value)) {
+        value <- ident(value)
+      }
+    } else if (type == "col") {
+      if (is_bare_character(value)) {
+        value <- ident(value)
+      }
+    } else if (type == "name") {
+      if (is_bare_character(value)) {
+        value <- ident(value)
+      }
+    } else if (type == "kw") {
+      value <- sql(style_kw(value))
+    }
+
+    if (type != "sql") {
+      value <- escape(value, con = connection)
+    }
+
+    if (should_collapse) {
+      value <- paste0(unclass(value), collapse = ", ")
+    }
+
+    unclass(value)
+  }
+}

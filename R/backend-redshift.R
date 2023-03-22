@@ -90,11 +90,15 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
       str_flatten = function(x, collapse = "") {
         order <- win_current_order()
+        listagg_sql <- sql_expr(LISTAGG(!!x, !!collapse))
+
         if(length(order) > 0){
-          sql <- build_sql(sql_expr(LISTAGG(!!x, !!collapse)),
-                           " WITHIN GROUP (ORDER BY ", order, ")")
+          sql <- glue_sql2(
+            "{listagg_sql} WITHIN GROUP (ORDER BY {order})",
+            .con = sql_current_con()
+          )
         } else {
-          sql <- sql_expr(LISTAGG(!!x, !!collapse))
+          sql <- listagg_sql
         }
 
         win_over(
@@ -118,7 +122,7 @@ sql_paste_redshift <- function(sep) {
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
 sql_query_explain.Redshift <- function(con, sql, ...) {
-  build_sql("EXPLAIN ", sql, con = con)
+  glue_sql2("EXPLAIN {sql}", .con = con)
 }
 
 #' @export

@@ -58,7 +58,8 @@ sql_query_select.Oracle <- function(con,
     order_by  = sql_clause_order_by(order_by, subquery, limit),
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
-      build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
+      limit <- as.integer(limit)
+      glue_sql2("FETCH FIRST {limit} ROWS ONLY", .con = con)
     },
     lvl = lvl
   )
@@ -114,7 +115,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = function(x) build_sql("DATE ", x),
+      as.Date = function(x) glue_sql2("DATE {x}", .con = sql_current_con()),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -143,35 +144,39 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  build_sql(
-    "EXPLAIN PLAN FOR ", sql, ";\n",
+  glue_sql2(
+    "EXPLAIN PLAN FOR {.sql sql};\n",
     "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
-    con = con
+    .con = con
   )
 }
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  build_sql("ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS", con = con)
+  glue_sql2("ANALYZE TABLE {.tbl table} COMPUTE STATISTICS", .con = con)
 }
 
 #' @export
 sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
-    build_sql("(", from, ") ", as_subquery_name(name, default = NULL), con = con)
+    from <- glue_sql2("({from})", .con = con)
+    name <- as_subquery_name(name, default = NULL)
   } else {
-    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
+    from <- sql_indent_subquery(from, con, lvl)
+    name <- as_subquery_name(name)
   }
+
+  glue_sql2("{from}", if (!is.null(name)) " {name}", .con = con)
 }
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  build_sql(
-    "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " AS\n", sql,
-    con = con
+  glue_sql2(
+    "CREATE ", if (temporary) "GLOBAL TEMPORARY " else "", "TABLE {.tbl name} AS
+    {.sql sql}",
+    .con = con
   )
 }
 
@@ -191,7 +196,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 #' @export
 sql_expr_matches.Oracle <- function(con, x, y) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
+  glue_sql2("decode({x}, {y}, 0, 1) = 0", .con = con)
 }
 
 #' @export

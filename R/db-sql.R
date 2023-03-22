@@ -100,12 +100,12 @@ sql_expr_matches <- function(con, x, y) {
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
 sql_expr_matches.DBIConnection <- function(con, x, y) {
-  build_sql(
-    "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
+  glue_sql2(
+    "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) ",
     "THEN 0 ",
     "ELSE 1 ",
     "END = 0",
-    con = con
+    .con = con
   )
 }
 
@@ -145,7 +145,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  build_sql("ANALYZE ", as.sql(table, con = con), con = con)
+  glue_sql2("ANALYZE {.tbl {table}}", .con = con)
 }
 
 #' @rdname db-sql
@@ -173,11 +173,10 @@ sql_table_index.DBIConnection <- function(con,
                                           ...,
                                           call = caller_env()) {
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
-  fields <- escape(ident(columns), parens = TRUE, con = con)
-  build_sql(
-    "CREATE ", if (unique) sql("UNIQUE "), "INDEX ", as.sql(name, con = con),
-    " ON ", as.sql(table, con = con), " ", fields,
-    con = con
+  glue_sql2(
+    "CREATE ", if (unique) "UNIQUE " else "", "INDEX {.name name}",
+    " ON {.tbl table} ({.col columns*})",
+    .con = con
   )
 }
 
@@ -191,7 +190,7 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  build_sql("EXPLAIN ", sql, con = con)
+  glue_sql2("EXPLAIN {sql}", .con = con)
 }
 
 #' @rdname db-sql
@@ -217,10 +216,10 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 }
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
-  build_sql(
-    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " AS\n", sql,
-    con = con
+  glue_sql2(
+    "CREATE ", if (temporary) sql("TEMPORARY ") else "", "TABLE \n",
+    "{.tbl {name}} AS\n", sql,
+    .con = con
   )
 }
 #' @export
@@ -279,7 +278,7 @@ sql_query_rows <- function(con, sql, ...) {
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
-  build_sql("SELECT COUNT(*) FROM ", from, con = con)
+  glue_sql2("SELECT COUNT(*) FROM {.from from}", .con = con)
 }
 
 #' @rdname db-sql
@@ -568,7 +567,7 @@ sql_query_semi_join.DBIConnection <- function(con,
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    build_sql("WHERE ", if (anti) sql("NOT "), "EXISTS (", con = con),
+    glue_sql2("WHERE ", if (anti) "NOT " else "", "EXISTS (", .con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     # don't use `sql_clause_where()` to avoid wrapping each element in parens

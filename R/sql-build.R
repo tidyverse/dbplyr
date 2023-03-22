@@ -91,13 +91,12 @@ cte_render <- function(query_list, con) {
 
   ctes <- purrr::imap(query_list[-n],
     function(query, name) {
-      build_sql(ident(name), sql(style_kw(" AS")), " (\n", sql(query), "\n)", con = con)
+      glue_sql2("{.name `name`} {.kw 'AS'} (\n{.sql query}\n)", .con = con)
     }
   )
   cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
 
-  with_sql <- style_kw("WITH ")
-  build_sql(sql(with_sql), cte_query, "\n", query_list[[n]], con = con)
+  glue_sql2("{.kw 'WITH'} ", cte_query, "\n", query_list[[n]], .con = con)
 }
 
 get_subquery_name <- function(x, query_list) {
