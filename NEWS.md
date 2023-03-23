@@ -35,6 +35,10 @@
 
 * Added translation for `!=` to `<>` for Microsoft Access (@erikvona, #1219).
 
+# dbplyr 2.3.2
+
+* Hot patch to fix R CMD check issues
+
 # dbplyr 2.3.1
 
 ## Breaking changes
