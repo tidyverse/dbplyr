@@ -68,28 +68,24 @@ glue_sql2 <- function(...,
     .null = .null,
     .comment = .comment,
     .literal = .literal,
-    .transformer = sql_quote_transformer(.con, .na),
+    .transformer = sql_quote_transformer(.con),
     .trim = .trim
   ))
 }
 
-sql_quote_transformer <- function(connection, .na) {
-  if (is.null(.na)) {
-    .na <- DBI::SQL(NA)
-  }
-
+sql_quote_transformer <- function(connection) {
   function(text, envir) {
-    # TODO should check size
-    should_collapse <- grepl("[*][[:space:]]*$", text)
+    collapse_regex <- "[*][[:space:]]*$"
+    should_collapse <- grepl(collapse_regex, text)
     if (should_collapse) {
-      text <- sub("[*][[:space:]]*$", "", text)
+      text <- sub(collapse_regex, "", text)
     }
 
-    regex <- "^\\.(tbl|sql|col|name|from|kw) (.*)"
-    m <- regexec(regex, text)
+    type_regex <- "^\\.(tbl|sql|col|name|from|kw) (.*)"
+    m <- regexec(type_regex, text)
     is_quoted <- any(m[[1]] != -1)
     if (is_quoted) {
-      matches <- regmatches(text, regexec(regex, text))[[1]]
+      matches <- regmatches(text, regexec(type_regex, text))[[1]]
 
       type <- matches[[2]]
       value <- matches[[3]]
@@ -97,8 +93,8 @@ sql_quote_transformer <- function(connection, .na) {
       value <- text
       type <- "raw"
     }
-
     value <- eval(parse(text = value, keep.source = FALSE), envir)
+    glue_check_collapse(type, should_collapse)
 
     if (type == "tbl") {
       if (is_bare_character(value)) {
@@ -122,13 +118,26 @@ sql_quote_transformer <- function(connection, .na) {
     }
 
     if (type != "sql") {
-      value <- escape(value, con = connection)
+      value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
     }
 
     if (should_collapse) {
       value <- paste0(unclass(value), collapse = ", ")
     }
 
+    vctrs::vec_check_size(value, size = 1L)
+
     unclass(value)
+  }
+}
+
+glue_check_collapse <- function(type, collapse) {
+  # collapse is only allowed for type `col`
+  if (type %in% c("col", "raw")) {
+    return()
+  }
+
+  if (collapse) {
+    cli_abort("Collapsing is only allowed for {.val col}, nor for {.val {type}}.")
   }
 }
