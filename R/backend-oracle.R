@@ -174,7 +174,7 @@ sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   glue_sql2(
-    "CREATE ", if (temporary) "GLOBAL TEMPORARY " else "", "TABLE {.tbl name} AS
+    "CREATE ", if (temporary) "GLOBAL TEMPORARY ", "TABLE {.tbl name} AS
     {.sql sql}",
     .con = con
   )

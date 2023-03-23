@@ -174,7 +174,7 @@ sql_table_index.DBIConnection <- function(con,
                                           call = caller_env()) {
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   glue_sql2(
-    "CREATE ", if (unique) "UNIQUE " else "", "INDEX {.name name}",
+    "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
     " ON {.tbl table} ({.col columns*})",
     .con = con
   )
@@ -217,8 +217,9 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   glue_sql2(
-    "CREATE ", if (temporary) sql("TEMPORARY ") else "", "TABLE \n",
-    "{.tbl {name}} AS\n", sql,
+    "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
+    "{.tbl {name}} AS\n",
+    sql,
     .con = con
   )
 }
@@ -567,7 +568,7 @@ sql_query_semi_join.DBIConnection <- function(con,
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    glue_sql2("WHERE ", if (anti) "NOT " else "", "EXISTS (", .con = con),
+    glue_sql2("WHERE ", if (anti) "NOT ", "EXISTS (", .con = con),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     # don't use `sql_clause_where()` to avoid wrapping each element in parens
