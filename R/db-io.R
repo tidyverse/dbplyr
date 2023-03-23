@@ -83,8 +83,7 @@ db_copy_to.DBIConnection <- function(con,
         if (analyze) dbplyr_analyze(con, table)
       },
       error = function(cnd) {
-        table <- as.sql(table, con = con)
-        cli_abort("Can't copy to table {.val {table}}", parent = cnd, call = call)
+        cli_abort("Can't copy to table {.field {format(table)}}.", parent = cnd, call = call)
       }
     )
   })
@@ -174,8 +173,7 @@ db_write_table.DBIConnection <- function(con,
       row.names = FALSE
     ),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't write table {.val {table}}."
+      msg <- "Can't write table table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )

@@ -1006,8 +1006,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't analyze table {.val {table}}."
+      msg <- "Can't analyze table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1028,8 +1027,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't create index on {.val {table}}."
+      msg <- "Can't create index on table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1082,8 +1080,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
-      name <- as.sql(name, con = con)
-      cli_abort("Can't save query to {.val {name}}.", parent = cnd)
+      cli_abort("Can't save query to table {.table {format(name)}}.", parent = cnd)
     }
   )
   name
