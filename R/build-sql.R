@@ -125,7 +125,10 @@ sql_quote_transformer <- function(connection) {
       value <- paste0(unclass(value), collapse = ", ")
     }
 
-    vctrs::vec_check_size(value, size = 1L)
+    # TODO use `vctrs::vec_check_size(value, size = 1L)`
+    if (length(value) != 1) {
+      cli_abort("{.arg value} must have size 1, not {length(value)}.")
+    }
 
     unclass(value)
   }
@@ -138,6 +141,6 @@ glue_check_collapse <- function(type, collapse) {
   }
 
   if (collapse) {
-    cli_abort("Collapsing is only allowed for {.val col}, nor for {.val {type}}.")
+    cli_abort("Collapsing is only allowed for {.val col}, not for {.val {type}}.")
   }
 }

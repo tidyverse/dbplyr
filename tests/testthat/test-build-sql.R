@@ -58,23 +58,25 @@ test_that("glue_sql() interpolates .kw correctly", {
   expect_equal(glue_sql2("{.kw 'FROM'}", .con = con), sql("\033[34mFROM\033[39m"))
 })
 
-test_that("glue_sql() checks input", {
+test_that("glue_sql() checks size", {
   con <- simulate_dbi()
+  x <- c("a", "b")
   expect_snapshot(error = TRUE, {
-    glue_sql2("{.tbl 1}", .con = con)
-    glue_sql2("{.tbl sql('a')}", .con = con)
+    glue_sql2("{.col x}", .con = con)
+    glue_sql2("{.col character()}", .con = con)
   })
+})
+
+test_that("glue_sql() can collapse", {
+  con <- simulate_dbi()
+  x <- c("a", "b")
+  expect_equal(glue_sql2("{.col x*}", .con = con), sql("`a`, `b`"))
+  expect_equal(glue_sql2("{x*}", .con = con), sql("'a', 'b'"))
+
   expect_snapshot(error = TRUE, {
-    glue_sql2("{.name 1}", .con = con)
-    glue_sql2("{.name sql('a')}", .con = con)
-  })
-  expect_snapshot(error = TRUE, {
-    glue_sql2("{.col 1}", .con = con)
-    glue_sql2("{.col sql('a')}", .con = con)
-    glue_sql2("{.col in_schema('a', 'b')}", .con = con)
-  })
-  expect_snapshot(error = TRUE, {
-    glue_sql2("{.kw 1}", .con = con)
-    glue_sql2("{.kw sql('a')}", .con = con)
+    glue_sql2("{.tbl x*}", .con = con)
+    glue_sql2("{.name x*}", .con = con)
+    glue_sql2("{.sql x*}", .con = con)
+    glue_sql2("{.from x*}", .con = con)
   })
 })
