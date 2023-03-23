@@ -33,13 +33,6 @@ win_over <- function(expr,
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-    order_collapsed <- sql_vector(
-      escape(order, con = con),
-      collapse = ", ",
-      parens = FALSE,
-      con = con
-    )
-
     order <- glue_sql2("ORDER BY {order*}", .con = con)
   }
   if (length(frame) > 0) {
