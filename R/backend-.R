@@ -61,11 +61,12 @@ base_scalar <- sql_translator(
 
   `$`   = sql_infix(".", pad = FALSE),
   `[[`   = function(x, i) {
+    # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
-      glue_sql2("{.tbl x}.{.col i}", .con = sql_current_con())
+      glue_sql2("{x}.{.col i}", .con = sql_current_con())
     } else if (is.numeric(i)) {
-      glue_sql2("{.tbl x}[", as.integer(i), "]", .con = sql_current_con())
+      glue_sql2("{x}[", as.integer(i), "]", .con = sql_current_con())
     } else {
       cli_abort("Can only index with strings and numbers")
     }
