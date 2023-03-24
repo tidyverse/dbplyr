@@ -48,6 +48,7 @@ db_copy_to <-  function(con,
   check_named(types)
   check_bool(temporary)
   check_bool(analyze)
+  check_dots_used()
   check_bool(in_transaction)
 
   UseMethod("db_copy_to")
@@ -104,6 +105,7 @@ db_compute <- function(con,
   check_table_ident(table)
   check_scalar_sql(sql)
   check_bool(temporary)
+  check_dots_used()
 
   UseMethod("db_compute")
 }
@@ -131,6 +133,7 @@ db_compute.DBIConnection <- function(con,
 #' @export
 #' @rdname db-io
 db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
+  check_dots_used()
   UseMethod("db_collect")
 }
 #' @export
@@ -216,11 +219,12 @@ with_transaction <- function(con, in_transaction, code) {
 
 #' @export
 #' @rdname db-io
-db_table_temporary <- function(con, table, temporary) {
+db_table_temporary <- function(con, table, temporary, ...) {
+  check_dots_used()
   UseMethod("db_table_temporary")
 }
 #' @export
-db_table_temporary.DBIConnection <- function(con, table, temporary) {
+db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
   list(
     table = table,
     temporary = temporary

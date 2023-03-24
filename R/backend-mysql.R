@@ -36,7 +36,7 @@ dbplyr_edition.MySQL <- dbplyr_edition.MariaDBConnection
 dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
-db_connection_describe.MariaDBConnection <- function(con) {
+db_connection_describe.MariaDBConnection <- function(con, ...) {
   info <- dbGetInfo(con)
 
   paste0(
@@ -138,7 +138,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 
 
 #' @export
-sql_expr_matches.MariaDBConnection <- function(con, x, y) {
+sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
   build_sql(x, " <=> ", y, con = con)
 }

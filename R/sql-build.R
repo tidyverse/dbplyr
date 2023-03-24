@@ -25,6 +25,7 @@
 #' @param ... Other arguments passed on to the methods. Not currently used.
 sql_build <- function(op, con = NULL, ...) {
   unique_subquery_name_reset()
+  check_dots_used()
   UseMethod("sql_build")
 }
 
@@ -49,6 +50,7 @@ sql_build.ident <- function(op, con = NULL, ...) {
 #'   This is important because you can place a bare table name in a subquery
 #'   and  ORDER BY does not work in subqueries.
 sql_render <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  check_dots_used()
   UseMethod("sql_render")
 }
 

@@ -33,7 +33,7 @@ dbplyr_edition.SQLiteConnection <- function(con) {
 }
 
 #' @export
-db_connection_describe.SQLiteConnection <- function(con) {
+db_connection_describe.SQLiteConnection <- function(con, ...) {
   paste0("sqlite ", sqlite_version(), " [", con@dbname, "]")
 }
 
@@ -139,7 +139,7 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0
 }
 
 #' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y) {
+sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   build_sql(x, " IS ", y, con = con)
 }
