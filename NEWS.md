@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `sql_join_suffix()` gains the argument `suffix` so that methods can check
+  whether the suffix is valid for the backend (@mgirlich).
+
 * `sql_query_append()`, `sql_query_insert()`, `sql_query_update()`,
   `sql_query_upsert()`, and `sql_query_delete()` changed their arguments to
   make them more consistent to the other `sql_query_*()` functions:

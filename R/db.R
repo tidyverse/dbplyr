@@ -45,12 +45,12 @@ db_connection_describe.DBIConnection <- function(con, ...) {
 
 #' @rdname db-misc
 #' @export
-sql_join_suffix <- function(con, ...) {
+sql_join_suffix <- function(con, suffix, ...) {
   UseMethod("sql_join_suffix")
 }
 #' @export
-sql_join_suffix.DBIConnection <- function(con, ...) {
-  c(".x", ".y")
+sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
+  suffix %||% c(".x", ".y")
 }
 
 #' @rdname db-misc
