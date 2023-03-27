@@ -3,6 +3,10 @@ test_that("adds src class", {
   expect_s3_class(tb, "tbl_SQLiteConnection")
 })
 
+test_that("argument src is deprecated", {
+  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = simulate_sqlite()))
+})
+
 test_that("cannot convert tbl_lazy to data.frame", {
   expect_snapshot(
     error = TRUE,

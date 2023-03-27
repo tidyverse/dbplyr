@@ -1,3 +1,13 @@
+# argument src is deprecated
+
+    Code
+      tbl_lazy(mtcars, src = simulate_sqlite())
+    Condition
+      Error in `tbl_lazy()`:
+      ! `...` must be empty.
+      x Problematic argument:
+      * src = simulate_sqlite()
+
 # cannot convert tbl_lazy to data.frame
 
     Code
