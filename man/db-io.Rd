@@ -11,13 +11,13 @@ db_copy_to(
   con,
   table,
   values,
+  ...,
   overwrite = FALSE,
   types = NULL,
   temporary = TRUE,
   unique_indexes = NULL,
   indexes = NULL,
   analyze = TRUE,
-  ...,
   in_transaction = TRUE
 )
 
@@ -25,11 +25,11 @@ db_compute(
   con,
   table,
   sql,
+  ...,
   temporary = TRUE,
   unique_indexes = list(),
   indexes = list(),
-  analyze = TRUE,
-  ...
+  analyze = TRUE
 )
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)

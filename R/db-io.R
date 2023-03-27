@@ -34,13 +34,13 @@ NULL
 db_copy_to <-  function(con,
                         table,
                         values,
+                        ...,
                         overwrite = FALSE,
                         types = NULL,
                         temporary = TRUE,
                         unique_indexes = NULL,
                         indexes = NULL,
                         analyze = TRUE,
-                        ...,
                         in_transaction = TRUE) {
   check_table_ident(table)
   check_bool(overwrite)
@@ -57,13 +57,13 @@ db_copy_to <-  function(con,
 db_copy_to.DBIConnection <- function(con,
                                      table,
                                      values,
+                                     ...,
                                      overwrite = FALSE,
                                      types = NULL,
                                      temporary = TRUE,
                                      unique_indexes = NULL,
                                      indexes = NULL,
                                      analyze = TRUE,
-                                     ...,
                                      in_transaction = TRUE) {
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
@@ -97,11 +97,11 @@ db_copy_to.DBIConnection <- function(con,
 db_compute <- function(con,
                        table,
                        sql,
+                       ...,
                        temporary = TRUE,
                        unique_indexes = list(),
                        indexes = list(),
-                       analyze = TRUE,
-                       ...) {
+                       analyze = TRUE) {
   check_table_ident(table)
   check_scalar_sql(sql)
   check_bool(temporary)
@@ -113,11 +113,11 @@ db_compute <- function(con,
 db_compute.DBIConnection <- function(con,
                                      table,
                                      sql,
+                                     ...,
                                      temporary = TRUE,
                                      unique_indexes = list(),
                                      indexes = list(),
-                                     analyze = TRUE,
-                                     ...) {
+                                     analyze = TRUE) {
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
