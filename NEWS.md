@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
+  (@mgirlich, #1208).
+
 * `sql_join_suffix()` gains the argument `suffix` so that methods can check
   whether the suffix is valid for the backend (@mgirlich).
 
