@@ -51,13 +51,21 @@ in_catalog <- function(catalog, schema, table) {
 }
 
 #' @export
+format.dbplyr_schema <- function(x, ...) {
+  paste0(escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+#' @export
 print.dbplyr_schema <- function(x, ...) {
-  cat_line("<SCHEMA> ", escape_ansi(x$schema), ".", escape_ansi(x$table))
+  cat_line("<SCHEMA> ", format(x))
 }
 
 #' @export
+format.dbplyr_catalog <- function(x, ...) {
+  paste0(escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+#' @export
 print.dbplyr_catalog <- function(x, ...) {
-  cat_line("<CATALOG> ", escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+  cat_line("<CATALOG> ", format(x))
 }
 
 #' @export

@@ -118,7 +118,6 @@ sql_paste_redshift <- function(sep) {
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
 sql_query_explain.Redshift <- function(con, sql, ...) {
-
   build_sql("EXPLAIN ", sql, con = con)
 }
 
@@ -141,4 +140,4 @@ supports_window_clause.Redshift <- function(con) {
 #' @export
 supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float"))
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float", "text"))

@@ -1,14 +1,14 @@
 # generates custom sql
 
     Code
-      sql_table_analyze(con, in_schema("schema", "tbl"))
+      sql_table_analyze(con_maria, in_schema("schema", "tbl"))
     Output
       <SQL> ANALYZE TABLE `schema`.`tbl`
 
 ---
 
     Code
-      sql_query_explain(con, sql("SELECT * FROM table"))
+      sql_query_explain(con_maria, sql("SELECT * FROM table"))
     Output
       <SQL> EXPLAIN SELECT * FROM table
 
@@ -47,7 +47,22 @@
 ---
 
     Code
-      copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+      copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+    Output
+      <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
+      FROM (
+        (
+          SELECT NULL AS `x`, NULL AS `y`
+          WHERE (0 = 1)
+        )
+        UNION ALL
+        (VALUES (1, 'a'), (2, 'b'))
+      ) `values_table`
+
+---
+
+    Code
+      copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
@@ -62,8 +77,8 @@
 # `sql_query_update_from()` is correct
 
     Code
-      sql_query_update_from(con = simulate_mysql(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`

@@ -114,8 +114,9 @@
 # `sql_query_insert()` works
 
     Code
-      (sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
+      (sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "error",
+      returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
       ! `conflict = "error"` isn't supported on database backends.
@@ -124,8 +125,9 @@
 ---
 
     Code
-      sql_query_insert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+      returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
@@ -185,8 +187,25 @@
 # `sql_query_append()` works
 
     Code
-      sql_query_append(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
-      returning_cols = c("a", b2 = "b"))
+      sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) `...y`
+      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
+# sql_query_append supports old interface works
+
+    Code
+      sql_query_append(con = con, table = ident("df_x"), from = df_y, returning_cols = c(
+        "a", b2 = "b"))
+    Condition
+      Warning:
+      The `from` argument of `sql_query_append()` must be a table identifier or an SQL query, not a lazy table. as of dbplyr 2.3.2.
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
@@ -298,8 +317,8 @@
 # `sql_query_update_from()` works
 
     Code
-      sql_query_update_from(con = simulate_dbi(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
@@ -427,8 +446,9 @@
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> WITH `updated` AS (
         UPDATE `df_x`
@@ -478,15 +498,15 @@
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = simulate_dbi(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_delete(con = simulate_dbi(), table = ident("df_x"), from = sql_render(
+        df_y, simulate_dbi(), lvl = 2), by = c("a", "b"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> DELETE FROM `df_x`
       WHERE EXISTS (
         SELECT 1 FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
+          SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+          FROM `df_y`
+        ) `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`

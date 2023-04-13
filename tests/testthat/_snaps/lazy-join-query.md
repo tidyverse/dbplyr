@@ -26,9 +26,4 @@
     Condition
       Error in `my_lazy_semi_join_query()`:
       ! `anti` must be `TRUE` or `FALSE`, not `NA`.
-    Code
-      (my_lazy_semi_join_query(na_matches = "sometimes"))
-    Condition
-      Error in `my_lazy_semi_join_query()`:
-      ! `na_matches` must be one of "never" or "na", not "sometimes".
 

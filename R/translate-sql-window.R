@@ -21,7 +21,11 @@
 #' win_over(sql("avg(x)"), order = "y", con = con)
 #' win_over(sql("avg(x)"), order = c("x", "y"), con = con)
 #' win_over(sql("avg(x)"), frame = c(-Inf, 0), order = "y", con = con)
-win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = sql_current_con()) {
+win_over <- function(expr,
+                     partition = NULL,
+                     order = NULL,
+                     frame = NULL,
+                     con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
 
@@ -63,7 +67,11 @@ win_over <- function(expr, partition = NULL, order = NULL, frame = NULL, con = s
     frame <- build_sql("ROWS ", frame, con = con)
   }
 
-  over <- sql_vector(purrr::compact(list(partition, order, frame)), parens = TRUE, con = con)
+  over <- sql_vector(
+    purrr::compact(list(partition, order, frame)),
+    parens = TRUE,
+    con = con
+  )
 
   if (sql_context$register_windows) {
     win_register(over)
@@ -250,6 +258,48 @@ win_cumulative <- function(f) {
       frame = c(-Inf, 0)
     )
   }
+}
+
+sql_nth <- function(x,
+                    n,
+                    order_by = NULL,
+                    na_rm = FALSE,
+                    ignore_nulls = c("inside", "outside", "bool"),
+                    error_call = caller_env()) {
+  check_bool(na_rm, call = error_call)
+  check_number_whole_inf(n, call = error_call)
+  ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
+
+  frame <- win_current_frame()
+  args <- translate_sql(!!x)
+  if (n == 1) {
+    sql_f <- "FIRST_VALUE"
+  } else if (is.infinite(n) && n > 0) {
+    sql_f <- "LAST_VALUE"
+    frame <- frame %||% c(-Inf, Inf)
+  } else {
+    sql_f <- "NTH_VALUE"
+    args <- paste0(args, ", ", translate_sql(!!as.integer(n)))
+  }
+
+  if (na_rm) {
+    if (ignore_nulls == "inside") {
+      sql_expr <- paste0(sql_f, "(", args, " IGNORE NULLS)")
+    } else if (ignore_nulls == "outside") {
+      sql_expr <- paste0(sql_f, "(", args, ") IGNORE NULLS")
+    } else {
+      sql_expr <- paste0(sql_f, "(", args, ", TRUE)")
+    }
+  } else {
+    sql_expr <- paste0(sql_f, "(", args, ")")
+  }
+
+  win_over(
+    sql(sql_expr),
+    win_current_group(),
+    order_by %||% win_current_order(),
+    frame
+  )
 }
 
 #' @rdname win_over

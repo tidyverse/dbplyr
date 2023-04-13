@@ -31,20 +31,40 @@ NULL
 
 #' @export
 #' @rdname db-io
-db_copy_to <-  function(con, table, values,
-                        overwrite = FALSE, types = NULL, temporary = TRUE,
-                        unique_indexes = NULL, indexes = NULL,
-                        analyze = TRUE, ...,
+db_copy_to <-  function(con,
+                        table,
+                        values,
+                        ...,
+                        overwrite = FALSE,
+                        types = NULL,
+                        temporary = TRUE,
+                        unique_indexes = NULL,
+                        indexes = NULL,
+                        analyze = TRUE,
                         in_transaction = TRUE) {
+  check_table_ident(table)
+  check_bool(overwrite)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+  check_bool(analyze)
+  check_dots_used()
+  check_bool(in_transaction)
+
   UseMethod("db_copy_to")
 }
 #' @export
-db_copy_to.DBIConnection <- function(con, table, values,
-                            overwrite = FALSE, types = NULL, temporary = TRUE,
-                            unique_indexes = NULL, indexes = NULL,
-                            analyze = TRUE, ...,
-                            in_transaction = TRUE) {
-
+db_copy_to.DBIConnection <- function(con,
+                                     table,
+                                     values,
+                                     ...,
+                                     overwrite = FALSE,
+                                     types = NULL,
+                                     temporary = TRUE,
+                                     unique_indexes = NULL,
+                                     indexes = NULL,
+                                     analyze = TRUE,
+                                     in_transaction = TRUE) {
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -64,8 +84,7 @@ db_copy_to.DBIConnection <- function(con, table, values,
         if (analyze) dbplyr_analyze(con, table)
       },
       error = function(cnd) {
-        table <- as.sql(table, con = con)
-        cli_abort("Can't copy to table {.val {table}}", parent = cnd, call = call)
+        cli_abort("Can't copy to table {.field {format(table)}}.", parent = cnd, call = call)
       }
     )
   })
@@ -76,24 +95,29 @@ db_copy_to.DBIConnection <- function(con, table, values,
 #' @export
 #' @rdname db-io
 db_compute <- function(con,
-                      table,
-                      sql,
-                      temporary = TRUE,
-                      unique_indexes = list(),
-                      indexes = list(),
-                      analyze = TRUE,
-                      ...) {
+                       table,
+                       sql,
+                       ...,
+                       temporary = TRUE,
+                       unique_indexes = list(),
+                       indexes = list(),
+                       analyze = TRUE) {
+  check_table_ident(table)
+  check_scalar_sql(sql)
+  check_bool(temporary)
+  check_dots_used()
+
   UseMethod("db_compute")
 }
 #' @export
 db_compute.DBIConnection <- function(con,
                                      table,
                                      sql,
+                                     ...,
                                      temporary = TRUE,
                                      unique_indexes = list(),
                                      indexes = list(),
-                                     analyze = TRUE,
-                                     ...) {
+                                     analyze = TRUE) {
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -109,6 +133,7 @@ db_compute.DBIConnection <- function(con,
 #' @export
 #' @rdname db-io
 db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
+  check_dots_used()
   UseMethod("db_collect")
 }
 #' @export
@@ -135,6 +160,11 @@ db_write_table.DBIConnection <- function(con,
                                          values,
                                          temporary = TRUE,
                                          ...) {
+  check_table_ident(table)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+
   tryCatch(
     dbWriteTable(
       con,
@@ -146,8 +176,7 @@ db_write_table.DBIConnection <- function(con,
       row.names = FALSE
     ),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't write table {.val {table}}."
+      msg <- "Can't write table table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -190,11 +219,12 @@ with_transaction <- function(con, in_transaction, code) {
 
 #' @export
 #' @rdname db-io
-db_table_temporary <- function(con, table, temporary) {
+db_table_temporary <- function(con, table, temporary, ...) {
+  check_dots_used()
   UseMethod("db_table_temporary")
 }
 #' @export
-db_table_temporary.DBIConnection <- function(con, table, temporary) {
+db_table_temporary.DBIConnection <- function(con, table, temporary, ...) {
   list(
     table = table,
     temporary = temporary

@@ -8,13 +8,6 @@
 ---
 
     Code
-      last_value_sql(con, ident("a"))
-    Output
-      <SQL> last_value(`a`, TRUE)
-
----
-
-    Code
       union_all(lf, lf)
     Output
       <SQL>

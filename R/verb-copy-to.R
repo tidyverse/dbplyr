@@ -185,7 +185,7 @@ op_vars.lazy_values_query <- function(op) {
 }
 
 sql_values_subquery <- function(con, df, types, lvl = 0, ...) {
-  check_dots_empty()
+  check_dots_used()
   UseMethod("sql_values_subquery")
 }
 

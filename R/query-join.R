@@ -1,6 +1,12 @@
 #' @export
 #' @rdname sql_build
-join_query <- function(x, y, vars, type = "inner", by = NULL, suffix = c(".x", ".y"), na_matches = FALSE) {
+join_query <- function(x,
+                       y,
+                       vars,
+                       type = "inner",
+                       by = NULL,
+                       suffix = c(".x", ".y"),
+                       na_matches = FALSE) {
   structure(
     list(
       x = x,
@@ -73,11 +79,15 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
 }
 
 #' @export
-sql_render.multi_join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.multi_join_query <- function(query,
+                                        con = NULL,
+                                        ...,
+                                        subquery = FALSE,
+                                        lvl = 0) {
   x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   query$joins$table <- purrr::map(
     query$joins$table,
-    ~ sql_render(.x, con, ..., subquery = TRUE, lvl = lvl + 1)
+    function(table) sql_render(table, con, ..., subquery = TRUE, lvl = lvl + 1)
   )
 
   sql_query_multi_join(
@@ -252,7 +262,7 @@ sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS") {
   )
 }
 
-sql_join_tbls <- function(con, by, na_matches = "never") {
+sql_join_tbls <- function(con, by, na_matches) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {

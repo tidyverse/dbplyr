@@ -37,12 +37,19 @@ dbplyr_edition.ACCESS <- function(con) {
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_query_select.ACCESS <- function(con, select, from,
-                              where = NULL,  group_by = NULL,
-                              having = NULL, window = NULL, order_by = NULL,
-                              limit = NULL,  distinct = FALSE, ...,
-                              subquery = FALSE,
-                              lvl = 0) {
+sql_query_select.ACCESS <- function(con,
+                                    select,
+                                    from,
+                                    where = NULL,
+                                    group_by = NULL,
+                                    having = NULL,
+                                    window = NULL,
+                                    order_by = NULL,
+                                    limit = NULL,
+                                    distinct = FALSE,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
@@ -115,7 +122,9 @@ sql_translation.ACCESS <- function(con) {
       ifelse        = function(test, yes, no){
        sql_expr(iif(!!test, !!yes, !!no))
       },
-
+      # Access uses <> for inequality
+      `!=` = sql_infix("<>"),
+      
       # Coalesce doesn't exist in Access.
       # NZ() only works while in Access, not with the Access driver
       # IIF(ISNULL()) is the best way to construct this
@@ -193,4 +202,4 @@ supports_window_clause.ACCESS <- function(con) {
   TRUE
 }
 
-globalVariables(c("CStr", "iif", "isnull", "text"))
+globalVariables(c("CStr", "iif", "isnull"))

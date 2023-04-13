@@ -99,6 +99,23 @@ local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
 
+local_db_table <- function(con, value, name, ..., temporary = TRUE, envir = parent.frame()) {
+  if (inherits(con, "Microsoft SQL Server") && temporary) {
+    name <- paste0("#", name)
+  }
+
+  withr::defer(DBI::dbRemoveTable(con, name), envir = envir)
+  copy_to(con, value, name, temporary = temporary, ...)
+  tbl(con, name)
+}
+
+local_sqlite_connection <- function(envir = parent.frame()) {
+  withr::local_db_connection(
+    DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
+    .local_envir = envir
+  )
+}
+
 check_list <- function(x, ..., allow_null = FALSE, arg = caller_arg(x), call = caller_env()) {
   if (vctrs::vec_is_list(x)) {
     return()
@@ -206,4 +223,73 @@ check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   if (vctrs::vec_duplicate_any(names2(x))) {
     cli_abort("The names of {.arg {arg}} must be unique.", call = call)
   }
+}
+
+check_table_ident <- function(x,
+                              ...,
+                              sql = FALSE,
+                              arg = caller_arg(x),
+                              call = caller_env()) {
+  if (is_bare_string(x)) {
+    return()
+  }
+
+  # also covers `ident_q`
+  if (is.ident(x)) {
+    n <- length(x)
+  } else if (is_schema(x)) {
+    n <- vctrs::vec_size_common(x$schema, x$table)
+  } else if (is_catalog(x)) {
+    n <- vctrs::vec_size_common(x$catalog, x$schema, x$table)
+  } else if (inherits(x, "Id")) {
+    n <- 1L
+    id <- x@name
+    known_names <- c("catalog", "schema", "table")
+    unknown_names <- setdiff(names(id), known_names)
+    if (!is_empty(unknown_names)) {
+      cli_abort(c(
+        "{.arg {arg}} is an {.cls Id} object with unknown names {.val {unknown_names}}.",
+        i = "An {.cls Id} object may only have the names {.val {known_names}}."
+      ), call = call
+      )
+    }
+  } else if (sql && is.sql(x)) {
+    n <- length(x)
+  } else {
+    what <- c("ident", "schema", "catalog", "Id")
+    if (sql) {
+      what <- c(what, "sql")
+    }
+    stop_input_type(
+      x,
+      what = what,
+      call = call,
+      arg = arg
+    )
+  }
+
+  if (n != 1L) {
+    cli_abort("{.arg {arg}} must have size 1, not size {n}.", call = call)
+  }
+}
+
+check_scalar_sql <- function(x,
+                             ...,
+                             string = TRUE,
+                             arg = caller_arg(x),
+                             call = caller_env()) {
+  if (is.sql(x) && length(x) == 1L) {
+    return()
+  }
+
+  if (string && is_string(x)) {
+    return()
+  }
+
+  stop_input_type(
+    x,
+    what = c("a single SQL query", if (string) "a single string"),
+    call = call,
+    arg = arg
+  )
 }

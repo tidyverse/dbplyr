@@ -34,15 +34,19 @@ dbplyr_edition.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_select.Oracle <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
-                             window = NULL,
-                             order_by = NULL,
-                             limit = NULL,
-                             distinct = FALSE,
-                             ...,
-                             subquery = FALSE,
-                             lvl = 0) {
+sql_query_select.Oracle <- function(con,
+                                    select,
+                                    from,
+                                    where = NULL,
+                                    group_by = NULL,
+                                    having = NULL,
+                                    window = NULL,
+                                    order_by = NULL,
+                                    limit = NULL,
+                                    distinct = FALSE,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
@@ -62,8 +66,8 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
 
 #' @export
 sql_query_upsert.Oracle <- function(con,
-                                    x_name,
-                                    y,
+                                    table,
+                                    from,
                                     by,
                                     update_cols,
                                     ...,
@@ -76,22 +80,25 @@ sql_query_upsert.Oracle <- function(con,
   }
 
   # https://oracle-base.com/articles/9i/merge-statement
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  insert_cols <- c(by, update_cols)
+  insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
+  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, update_cols_esc, lvl = 1),
-    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name),
+    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause("VALUES", insert_values, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
   sql_format_clauses(clauses, lvl = 0, con)
@@ -115,6 +122,9 @@ sql_translation.Oracle <- function(con) {
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER"),
 
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
+      },
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
@@ -179,7 +189,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y) {
+sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
 }
@@ -187,11 +197,6 @@ sql_expr_matches.Oracle <- function(con, x, y) {
 #' @export
 supports_star_without_alias.Oracle <- function(con) {
   FALSE
-}
-
-#' @export
-sql_random.Oracle <- function(con) {
-  sql_expr(dbms_random.RANDOM())
 }
 
 
@@ -233,7 +238,4 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 #' @export
 supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
-#' @export
-sql_random.OraConnection <- sql_random.Oracle
-
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.RANDOM"))
+globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

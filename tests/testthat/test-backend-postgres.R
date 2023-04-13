@@ -94,18 +94,20 @@ test_that("custom SQL translation", {
 })
 
 test_that("`sql_query_insert()` works", {
+  con <- simulate_postgres()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_postgres(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(error = TRUE,
     (sql_query_insert(
-      con = simulate_postgres(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "error",
       returning_cols = c("a", b2 = "b")
@@ -114,9 +116,10 @@ test_that("`sql_query_insert()` works", {
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_postgres(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "ignore",
       returning_cols = c("a", b2 = "b")
@@ -125,18 +128,19 @@ test_that("`sql_query_insert()` works", {
 })
 
 test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
+  con <- simulate_postgres()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_postgres(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_upsert(
-      con = simulate_postgres(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_cols = c("c", "d"),
       returning_cols = c("a", b2 = "b"),
@@ -159,6 +163,7 @@ test_that("can explain", {
 test_that("can overwrite temp tables", {
   src <- src_test("postgres")
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
+  withr::defer(DBI::dbRemoveTable(src, "mtcars"))
   expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
 })
 
@@ -180,13 +185,11 @@ test_that("can insert with returning", {
   con <- src_test("postgres")
 
   df_x <- tibble(a = 1L, b = 11L, c = 1L, d = "a")
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+  x <- local_db_table(con, df_x, "df_x")
 
   df_y <- tibble(a = 1:3, b = 11:13, c = -(1:3), d = c("x", "y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
 
   # This errors because there is no unique constraint on (`a`, `b`)
   expect_snapshot(error = TRUE, {
@@ -212,8 +215,8 @@ test_that("can insert with returning", {
     NA
   )
 
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
+  x <- local_db_table(con, df_x, "df_x2", overwrite = TRUE)
+  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_insert(
@@ -242,8 +245,7 @@ test_that("can insert with returning", {
 test_that("can use `rows_*()` inside a transaction #1183", {
   con <- src_test("postgres")
 
-  DBI::dbWriteTable(con, "df_x", tibble(a = 1:2e3, b = 2, x = "a"), temporary = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+  local_db_table(con, tibble(a = 1:2e3, b = 2, x = "a"), "df_x")
 
   expect_no_error(
     DBI::dbWithTransaction(
@@ -259,17 +261,12 @@ test_that("casts `y` column for local df", {
   con <- src_test("postgres")
 
   DBI::dbExecute(con, "CREATE SCHEMA dbplyr_test_schema")
+  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema"))
   df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
   types <- c(id = "bigint", val = "bigint", arr = "integer[]")
-  DBI::dbWriteTable(con, "df_x", value = df, field.types = types)
+  local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")
   table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x")
-  DBI::dbWriteTable(con, table2, value = df, field.types = types)
-
-  withr::defer({
-    DBI::dbRemoveTable(con, DBI::SQL("df_x"))
-    DBI::dbRemoveTable(con, DBI::Id(schema = "dbplyr_test_schema", table = "df_x"))
-    DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema")
-  })
+  local_db_table(con, value = df, types = types, temporary = FALSE, table2)
 
   y <- tibble(
     id = "2",
@@ -311,13 +308,11 @@ test_that("can upsert with returning", {
   con <- src_test("postgres")
 
   df_x <- tibble(a = 1:2, b = 11:12, c = 1:2, d = c("a", "b"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_x")))
+  x <- local_db_table(con, df_x, "df_x")
 
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
-  withr::defer(DBI::dbRemoveTable(con, DBI::SQL("df_y")))
 
   # Errors because there is no unique index
   expect_snapshot(error = TRUE, {
@@ -342,8 +337,8 @@ test_that("can upsert with returning", {
     NA
   )
 
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
-  db_create_index(con, "df_x", columns = c("a", "b"), unique = TRUE)
+  x <- local_db_table(con, df_x, "df_x2")
+  db_create_index(con, "df_x2", columns = c("a", "b"), unique = TRUE)
 
   expect_equal(
     rows_upsert(

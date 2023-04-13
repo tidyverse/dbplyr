@@ -62,3 +62,15 @@
       SELECT `x`, `y`, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
       FROM `df`
 
+# head after distinct() produces subquery
+
+    Code
+      lf %>% distinct() %>% head()
+    Output
+      <SQL>
+      SELECT TOP 6 *
+      FROM (
+        SELECT DISTINCT *
+        FROM `df`
+      ) `q01`
+

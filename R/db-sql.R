@@ -10,8 +10,9 @@
 #'
 #' * `sql_translation(con)` generates a SQL translation environment.
 #'
-#' * `sql_random(con)` generates SQL to get a random number which can be used
-#'   to select random rows in `slice_sample()`.
+#' * Deprecated: `sql_random(con)` generates SQL to get a random number which can be used
+#'   to select random rows in `slice_sample()`. This is now replaced by adding
+#'   a translation for `runif(n())`.
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
@@ -93,12 +94,13 @@ NULL
 
 #' @export
 #' @rdname db-sql
-sql_expr_matches <- function(con, x, y) {
+sql_expr_matches <- function(con, x, y, ...) {
+  check_dots_used()
   UseMethod("sql_expr_matches")
 }
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y) {
+sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
   build_sql(
     "CASE WHEN (", x, " = ", y, ") OR (", x, " IS NULL AND ", y, " IS NULL) ",
     "THEN 0 ",
@@ -126,6 +128,11 @@ sql_translate_env.DBIConnection <- function(con) {
 #' @export
 #' @rdname db-sql
 sql_random <- function(con) {
+  lifecycle::deprecate_warn(
+    "2.3.2",
+    "sql_random()",
+    with = I("Please add a translation for `runif(n())` instead.")
+  )
   UseMethod("sql_random")
 }
 
@@ -135,6 +142,7 @@ sql_random <- function(con) {
 #' @rdname db-sql
 #' @export
 sql_table_analyze <- function(con, table, ...) {
+  check_dots_used()
   UseMethod("sql_table_analyze")
 }
 #' @export
@@ -144,7 +152,18 @@ sql_table_analyze.DBIConnection <- function(con, table, ...) {
 
 #' @rdname db-sql
 #' @export
-sql_table_index <- function(con, table, columns, name = NULL, unique = FALSE, ...) {
+sql_table_index <- function(con,
+                            table,
+                            columns,
+                            name = NULL,
+                            unique = FALSE,
+                            ...,
+                            call = caller_env()) {
+  check_table_ident(table, call = call)
+  check_character(columns, call = call)
+  check_name(name, allow_null = TRUE, call = call)
+  check_bool(unique, call = call)
+
   UseMethod("sql_table_index")
 }
 #' @export
@@ -155,16 +174,6 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  if (!(is_string(table) || is_schema(table))) {
-    stop_input_type(
-      table,
-      c("a string", "a schema"),
-      ...,
-      call = call
-    )
-  }
-  check_character(columns)
-
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   fields <- escape(ident(columns), parens = TRUE, con = con)
   build_sql(
@@ -179,6 +188,8 @@ sql_table_index.DBIConnection <- function(con,
 #' @rdname db-sql
 #' @export
 sql_query_explain <- function(con, sql, ...) {
+  check_scalar_sql(sql)
+  check_dots_used()
   UseMethod("sql_query_explain")
 }
 #' @export
@@ -189,6 +200,9 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_fields <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+  check_dots_used()
+
   UseMethod("sql_query_fields")
 }
 #' @export
@@ -199,6 +213,11 @@ sql_query_fields.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
+  check_table_ident(sql, sql = TRUE)
+  check_table_ident(name)
+  check_bool(temporary)
+  check_dots_used()
+
   UseMethod("sql_query_save")
 }
 #' @export
@@ -212,6 +231,9 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
 #' @export
 #' @rdname db-sql
 sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
+  check_name(name, allow_null = TRUE)
+  check_dots_used()
+
   UseMethod("sql_query_wrap")
 }
 #' @export
@@ -256,6 +278,9 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
 #' @rdname db-sql
 #' @export
 sql_query_rows <- function(con, sql, ...) {
+  check_table_ident(sql, sql = TRUE)
+  check_dots_used()
+
   UseMethod("sql_query_rows")
 }
 #' @export
@@ -291,8 +316,12 @@ supports_star_without_alias.DBIConnection <- function(con) {
 
 #' @rdname db-sql
 #' @export
-sql_query_select <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
+sql_query_select <- function(con,
+                             select,
+                             from,
+                             where = NULL,
+                             group_by = NULL,
+                             having = NULL,
                              window = NULL,
                              order_by = NULL,
                              limit = NULL,
@@ -300,19 +329,24 @@ sql_query_select <- function(con, select, from, where = NULL,
                              ...,
                              subquery = FALSE,
                              lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_select")
 }
 
 #' @export
-sql_query_select.DBIConnection <- function(con, select, from, where = NULL,
-                               group_by = NULL, having = NULL,
-                               window = NULL,
-                               order_by = NULL,
-                               limit = NULL,
-                               distinct = FALSE,
-                               ...,
-                               subquery = FALSE,
-                               lvl = 0) {
+sql_query_select.DBIConnection <- function(con,
+                                           select,
+                                           from,
+                                           where = NULL,
+                                           group_by = NULL,
+                                           having = NULL,
+                                           window = NULL,
+                                           order_by = NULL,
+                                           limit = NULL,
+                                           distinct = FALSE,
+                                           ...,
+                                           subquery = FALSE,
+                                           lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),
@@ -339,9 +373,9 @@ sql_select.DBIConnection <- function(con,
                                      order_by = NULL,
                                      limit = NULL,
                                      distinct = FALSE,
-                                     ...,
-                                     subquery = FALSE) {
+                                     ...) {
   # TODO should add argument `window` after tidyverse/dplyr#4663
+  # TODO should add argument `subquery` after tidyverse/dplyr#4663
   sql_query_select(
     con, select, from,
     where = where,
@@ -350,18 +384,34 @@ sql_select.DBIConnection <- function(con,
     order_by = order_by,
     limit = limit,
     distinct = distinct,
-    ...,
-    subquery = subquery
+    ...
   )
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_join <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join <- function(con,
+                           x,
+                           y,
+                           vars,
+                           type = "inner",
+                           by = NULL,
+                           na_matches = FALSE,
+                           ...,
+                           lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_join")
 }
 #' @export
-sql_query_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_query_join.DBIConnection <- function(con,
+                                         x,
+                                         y,
+                                         vars,
+                                         type = "inner",
+                                         by = NULL,
+                                         na_matches = FALSE,
+                                         ...,
+                                         lvl = 0) {
   JOIN <- switch(
     type,
     left = sql("LEFT JOIN"),
@@ -392,7 +442,15 @@ dbplyr_query_join <- function(con, ..., lvl = 0) {
 }
 #' @export
 #' @importFrom dplyr sql_join
-sql_join.DBIConnection <- function(con, x, y, vars, type = "inner", by = NULL, na_matches = FALSE, ..., lvl = 0) {
+sql_join.DBIConnection <- function(con,
+                                   x,
+                                   y,
+                                   vars,
+                                   type = "inner",
+                                   by = NULL,
+                                   na_matches = FALSE,
+                                   ...,
+                                   lvl = 0) {
   sql_query_join(
     con, x, y, vars,
     type = type,
@@ -409,9 +467,11 @@ sql_query_multi_join <- function(con,
                                  x,
                                  joins,
                                  table_vars,
+                                 by_list,
                                  vars,
                                  ...,
                                  lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_multi_join")
 }
 
@@ -449,6 +509,7 @@ sql_query_multi_join.DBIConnection <- function(con,
                                                x,
                                                joins,
                                                table_vars,
+                                               by_list,
                                                vars,
                                                ...,
                                                lvl = 0) {
@@ -492,15 +553,30 @@ sql_query_multi_join.DBIConnection <- function(con,
 
 #' @rdname db-sql
 #' @export
-sql_query_semi_join <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
+sql_query_semi_join <- function(con,
+                                x,
+                                y,
+                                anti,
+                                by,
+                                vars,
+                                ...,
+                                lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_semi_join")
 }
 #' @export
-sql_query_semi_join.DBIConnection <- function(con, x, y, anti, by, vars, ..., lvl = 0) {
+sql_query_semi_join.DBIConnection <- function(con,
+                                              x,
+                                              y,
+                                              anti,
+                                              by,
+                                              vars,
+                                              ...,
+                                              lvl = 0) {
   x <- dbplyr_sql_subquery(con, x, name = by$x_as)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as)
 
-  on <- sql_join_tbls(con, by)
+  on <- sql_join_tbls(con, by, na_matches = by$na_matches)
 
   lines <- list(
     sql_clause_select(con, vars),
@@ -520,17 +596,36 @@ dbplyr_query_semi_join <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_semi_join
-sql_semi_join.DBIConnection <- function(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0) {
+sql_semi_join.DBIConnection <- function(con,
+                                        x,
+                                        y,
+                                        anti = FALSE,
+                                        by = NULL,
+                                        ...,
+                                        lvl = 0) {
   sql_query_semi_join(con, x, y, anti = anti, by = by, ..., lvl = lvl)
 }
 
 #' @rdname db-sql
 #' @export
-sql_query_set_op <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op <- function(con,
+                             x,
+                             y,
+                             method,
+                             ...,
+                             all = FALSE,
+                             lvl = 0) {
+  check_dots_used()
   UseMethod("sql_query_set_op")
 }
 #' @export
-sql_query_set_op.DBIConnection <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+sql_query_set_op.DBIConnection <- function(con,
+                                           x,
+                                           y,
+                                           method,
+                                           ...,
+                                           all = FALSE,
+                                           lvl = 0) {
   method <- paste0(method, if (all) " ALL")
   method <- style_kw(method)
   lines <- list(
@@ -557,9 +652,12 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 #' These functions generate the SQL used in `rows_*(in_place = TRUE)`.
 #'
 #' @param con Database connection.
-#' @param x_name Name of the table to update.
-#' @param y A lazy tbl.
+#' @param table Table to update. Must be a table identifier, e.g. single string
+#'   or created via `in_schema()`.
+#' @param from Table or query that contains the new data. Either a table
+#'   identifier or SQL.
 #' @inheritParams dplyr::rows_upsert
+#' @param insert_cols Names of columns to insert.
 #' @param update_cols Names of columns to update.
 #' @param update_values A named SQL vector that specify how to update the columns.
 #' @param ... Other parameters passed onto methods.
@@ -622,35 +720,37 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
 #' @export
 #'
 #' @examples
-#' lf <- lazy_frame(
-#'   carrier = c("9E", "AA"),
-#'   name = c("Endeavor Air Inc.", "American Airlines Inc."),
-#'   con = simulate_postgres()
-#' )
-#'
 #' sql_query_upsert(
-#'   simulate_postgres(),
-#'   ident("airlines"),
-#'   lf,
+#'   con = simulate_postgres(),
+#'   table = ident("airlines"),
+#'   from = ident("df"),
 #'   by = "carrier",
 #'   update_cols = "name"
 #' )
 sql_query_insert <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
+                             insert_cols,
                              by,
                              ...,
                              conflict = c("error", "ignore"),
                              returning_cols = NULL,
                              method = NULL) {
-  rlang::check_dots_used()
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(insert_cols)
+  check_character(by)
+  check_character(returning_cols, allow_null = TRUE)
+
+  check_dots_used()
   UseMethod("sql_query_insert")
 }
 
 #' @export
 sql_query_insert.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
+                                           insert_cols,
                                            by,
                                            ...,
                                            conflict = c("error", "ignore"),
@@ -661,14 +761,14 @@ sql_query_insert.DBIConnection <- function(con,
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!parts$conflict_clauses,
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
@@ -676,22 +776,56 @@ sql_query_insert.DBIConnection <- function(con,
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_append <- function(con, x_name, y, ..., returning_cols = NULL) {
-  rlang::check_dots_used()
+sql_query_append <- function(con,
+                             table,
+                             from,
+                             insert_cols,
+                             ...,
+                             returning_cols = NULL) {
+  if (is_tbl_lazy(from)) {
+    lifecycle::deprecate_soft(
+      when = "2.3.2",
+      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
+    )
+
+    insert_cols <- colnames(from)
+    from <- sql_render(from, con = con, lvl = 1)
+    out <- sql_query_append(
+      con = con,
+      table = table,
+      from = from,
+      insert_cols = insert_cols,
+      returning_cols = returning_cols
+    )
+
+    return(out)
+  }
+
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(insert_cols)
+  check_character(returning_cols, allow_null = TRUE)
+
+  check_dots_used()
   UseMethod("sql_query_append")
 }
 
 #' @export
-sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols = NULL) {
+sql_query_append.DBIConnection <- function(con,
+                                           table,
+                                           from,
+                                           insert_cols,
+                                           ...,
+                                           returning_cols = NULL) {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
-  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_prep(con, table, from, by = list(), lvl = 0)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
@@ -699,27 +833,43 @@ sql_query_append.DBIConnection <- function(con, x_name, y, ..., returning_cols =
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_update_from <- function(con, x_name, y, by, update_values, ...,
+sql_query_update_from <- function(con,
+                                  table,
+                                  from,
+                                  by,
+                                  update_values,
+                                  ...,
                                   returning_cols = NULL) {
-  rlang::check_dots_used()
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(update_values)
+  check_named(update_values)
+  check_character(returning_cols, allow_null = TRUE)
+
+  check_dots_used()
   UseMethod("sql_query_update_from")
 }
 
 #' @export
-sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
-                                                update_values, ...,
+sql_query_update_from.DBIConnection <- function(con,
+                                                table,
+                                                from,
+                                                by,
+                                                update_values,
+                                                ...,
                                                 returning_cols = NULL) {
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   # avoid CTEs for the general case as they do not work everywhere
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -728,23 +878,29 @@ sql_query_update_from.DBIConnection <- function(con, x_name, y, by,
 #' @export
 #' @rdname sql_query_insert
 sql_query_upsert <- function(con,
-                             x_name,
-                             y,
+                             table,
+                             from,
                              by,
                              update_cols,
                              ...,
                              returning_cols = NULL,
                              method = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(update_cols)
+  check_character(returning_cols, allow_null = TRUE)
+
   # https://wiki.postgresql.org/wiki/UPSERT#SQL_MERGE_syntax
   # https://github.com/cynkra/dm/pull/616#issuecomment-920613435
-  rlang::check_dots_used()
+  check_dots_used()
   UseMethod("sql_query_upsert")
 }
 
 #' @export
 sql_query_upsert.DBIConnection <- function(con,
-                                           x_name,
-                                           y,
+                                           table,
+                                           from,
                                            by,
                                            update_cols,
                                            ...,
@@ -753,17 +909,20 @@ sql_query_upsert.DBIConnection <- function(con,
   method <- method %||% "cte_update"
   arg_match(method, "cte_update", error_arg = "method")
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+
+  insert_cols <- c(by, update_cols)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("RETURNING ", escape(x_name, con = con), ".*"))
+    sql(paste0("RETURNING ", escape(table, con = con), ".*"))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
@@ -771,16 +930,15 @@ sql_query_upsert.DBIConnection <- function(con,
   join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   clauses <- list2(
     sql(paste0("WITH ", update_name, " AS (")),
     updated_sql,
     sql(")"),
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     !!!sql_clause_where_exists(update_name, where, not = TRUE),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
 
   sql_format_clauses(clauses, lvl = 0, con)
@@ -788,19 +946,34 @@ sql_query_upsert.DBIConnection <- function(con,
 
 #' @export
 #' @rdname sql_query_insert
-sql_query_delete <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  rlang::check_dots_used()
+sql_query_delete <- function(con,
+                             table,
+                             from,
+                             by,
+                             ...,
+                             returning_cols = NULL) {
+  check_table_ident(table)
+  check_table_ident(from, sql = TRUE)
+  check_character(by)
+  check_character(returning_cols, allow_null = TRUE)
+
+  check_dots_used()
   UseMethod("sql_query_delete")
 }
 
 #' @export
-sql_query_delete.DBIConnection <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+sql_query_delete.DBIConnection <- function(con,
+                                           table,
+                                           from,
+                                           by,
+                                           ...,
+                                           returning_cols = NULL) {
+  parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", x_name),
+    sql_clause("DELETE FROM", table),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -812,7 +985,7 @@ sql_returning_cols <- function(con, cols, table, ...) {
     return(NULL)
   }
 
-  rlang::check_dots_empty()
+  check_dots_used()
   UseMethod("sql_returning_cols")
 }
 
@@ -847,8 +1020,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't analyze table {.val {table}}."
+      msg <- "Can't analyze table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -869,8 +1041,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      table <- as.sql(table, con = con)
-      msg <- "Can't create index on {.val {table}}."
+      msg <- "Can't create index on table {.field {format(table)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -923,8 +1094,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
-      name <- as.sql(name, con = con)
-      cli_abort("Can't save query to {.val {name}}.", parent = cnd)
+      cli_abort("Can't save query to table {.table {format(name)}}.", parent = cnd)
     }
   )
   name
@@ -935,6 +1105,10 @@ dbplyr_sql_subquery <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr sql_subquery
-sql_subquery.DBIConnection <- function(con, from, name = unique_subquery_name(), ..., lvl = 0) {
+sql_subquery.DBIConnection <- function(con,
+                                       from,
+                                       name = unique_subquery_name(),
+                                       ...,
+                                       lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
 }

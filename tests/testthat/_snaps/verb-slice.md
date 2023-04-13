@@ -40,6 +40,15 @@
       Error in `slice_by()`:
       ! Can only use `prop` when `with_ties = TRUE`
 
+---
+
+    Code
+      db %>% slice_min(id, n = 1, na_rm = FALSE)
+    Condition
+      Error in `slice_min()`:
+      ! `na_rm = FALSE` isn't supported on database backends.
+      i It must be TRUE instead.
+
 # slice_max orders in opposite order
 
     Code
@@ -47,6 +56,15 @@
     Condition
       Error in `slice_max()`:
       ! `order_by` is absent but must be supplied.
+
+---
+
+    Code
+      db %>% slice_max(id, n = 1, na_rm = FALSE)
+    Condition
+      Error in `slice_max()`:
+      ! `na_rm = FALSE` isn't supported on database backends.
+      i It must be TRUE instead.
 
 # slice_sample errors when expected
 

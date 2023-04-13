@@ -68,24 +68,57 @@ slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_min
 #' @export
-slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, by = NULL, with_ties = TRUE) {
+slice_min.tbl_lazy <- function(.data,
+                               order_by,
+                               ...,
+                               n,
+                               prop,
+                               by = NULL,
+                               with_ties = TRUE,
+                               na_rm = TRUE) {
   size <- check_slice_size(n, prop)
-  slice_by(.data, {{order_by}}, size, {{ by }}, with_ties = with_ties)
+  check_unsupported_arg(na_rm, allowed = TRUE)
+  slice_by(
+    .data,
+    {{order_by}},
+    size,
+    {{ by }},
+    with_ties = with_ties
+  )
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_max
 #' @export
-slice_max.tbl_lazy <- function(.data, order_by, ..., n, by = NULL, prop, with_ties = TRUE) {
+slice_max.tbl_lazy <- function(.data,
+                               order_by,
+                               ...,
+                               n,
+                               by = NULL,
+                               prop,
+                               with_ties = TRUE,
+                               na_rm = TRUE) {
   size <- check_slice_size(n, prop)
-
-  slice_by(.data, desc({{order_by}}), size, {{ by }}, with_ties = with_ties)
+  check_unsupported_arg(na_rm, allowed = TRUE)
+  slice_by(
+    .data,
+    desc({{order_by}}),
+    size,
+    {{ by }},
+    with_ties = with_ties
+  )
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_sample
 #' @export
-slice_sample.tbl_lazy <- function(.data, ..., n, prop, by = NULL, weight_by = NULL, replace = FALSE) {
+slice_sample.tbl_lazy <- function(.data,
+                                  ...,
+                                  n,
+                                  prop,
+                                  by = NULL,
+                                  weight_by = NULL,
+                                  replace = FALSE) {
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
@@ -99,7 +132,7 @@ slice_sample.tbl_lazy <- function(.data, ..., n, prop, by = NULL, weight_by = NU
     cli_abort("Sampling with replacement is not supported on database backends")
   }
 
-  slice_by(.data, !!sql_random(remote_con(.data)), size, {{ by }}, with_ties = FALSE)
+  slice_by(.data, runif(n()), size, {{ by }}, with_ties = FALSE)
 }
 
 slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
@@ -170,4 +203,4 @@ check_slice_size <- function(n, prop) {
   }
 }
 
-globalVariables(c("min_rank", "cume_dist", "row_number", "desc"))
+globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))

@@ -251,6 +251,9 @@ base_scalar <- sql_translator(
   substr = sql_substr("SUBSTR"),
   substring = sql_substr("SUBSTR"),
   cut = sql_cut,
+  runif = function(n = n(), min = 0, max = 1) {
+    sql_runif(RANDOM(), n = {{ n }}, min = min, max = max)
+  },
 
   # stringr functions
   str_length = sql_prefix("LENGTH", 1),
@@ -375,28 +378,31 @@ base_win <- sql_translator(
   },
 
   # Variants that take more arguments
-  first = function(x, order_by = NULL) {
-    win_over(
-      sql_expr(FIRST_VALUE(!!x)),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame()
+  first = function(x, order_by = NULL, na_rm = FALSE) {
+    sql_nth(
+      x = x,
+      n = 1L,
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
-  last = function(x, order_by = NULL) {
-    win_over(
-      sql_expr(LAST_VALUE(!!x)),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame() %||% c(-Inf, Inf)
+  last = function(x, order_by = NULL, na_rm = FALSE) {
+    sql_nth(
+      x = x,
+      n = Inf,
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
-  nth = function(x, n, order_by = NULL) {
-    win_over(
-      sql_expr(NTH_VALUE(!!x, !!as.integer(n))),
-      win_current_group(),
-      order_by %||% win_current_order(),
-      win_current_frame()
+  nth = function(x, n, order_by = NULL, na_rm = FALSE) {
+    sql_nth(
+      x = x,
+      n = n,
+      order_by = order_by,
+      na_rm = na_rm,
+      ignore_nulls = "inside"
     )
   },
 
@@ -503,10 +509,5 @@ base_no_win <- sql_translator(
   str_flatten  = win_absent("str_flatten"),
   count        = win_absent("count")
 )
-
-#' @export
-sql_random.DBIConnection <- function(con) {
-  sql_expr(RANDOM())
-}
 
 utils::globalVariables(c("RANDOM", "%LIKE%"))

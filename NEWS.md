@@ -1,9 +1,49 @@
 # dbplyr (development version)
 
+* Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
+  (@mgirlich, #1208).
+
+* `sql_join_suffix()` gains the argument `suffix` so that methods can check
+  whether the suffix is valid for the backend (@mgirlich).
+
+* `sql_query_append()`, `sql_query_insert()`, `sql_query_update()`,
+  `sql_query_upsert()`, and `sql_query_delete()` changed their arguments to
+  make them more consistent to the other `sql_query_*()` functions:
+  
+  * `x_name` was renamed to `table`.
+  * `y` was renamed to `from` and must now be a table identifier or SQL instead
+    of a lazy table.
+  * `sql_query_append()` and `sql_query_insert()` have gained the argument `cols`.
+
+* The `na_matches` argument of `semi_join()` and `anti_join()` works again
+  (@mgirlich, #1211).
+
+* The `vars` argument of `translate_sql()` has been removed after it threw an
+  error for the last 7 years (@mgirlich).
+
+* Added translation for `runif()` (@mgirlich, #1200).
+
+* `sql_random()` is now deprecated. It was used to power `slice_sample()` which
+  is now done via the translation for `runif()` (@mgirlich, #1200).
+
+* DuckDB now supports the `returning` argument of `rows_*()`.
+
+* `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
+
+* `distinct()` + `head()` now work for Teradata (@mgirlich, #685).
+
+* `copy_inline()` now works for MariaDB (@mgirlich, #1188).
+
 * `*_join()` after `full_join()` works again (@mgirlich, #1178).
 
 * The `rows_*()` functions now also work inside a transaction for Postgres
   (@mgirlich, #1183).
+
+* Added translation for `!=` to `<>` for Microsoft Access (@erikvona, #1219).
+
+# dbplyr 2.3.2
+
+* Hot patch to fix R CMD check issues
 
 # dbplyr 2.3.1
 

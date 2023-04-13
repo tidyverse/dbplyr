@@ -20,6 +20,7 @@
 \alias{sql_try_cast}
 \alias{sql_log}
 \alias{sql_cot}
+\alias{sql_runif}
 \alias{base_scalar}
 \alias{base_agg}
 \alias{base_win}
@@ -64,6 +65,8 @@ sql_try_cast(type)
 sql_log()
 
 sql_cot()
+
+sql_runif(rand_expr, n = n(), min = 0, max = 1)
 
 base_scalar
 

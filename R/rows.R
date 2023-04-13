@@ -114,8 +114,9 @@ rows_insert.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_insert(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
+      insert_cols = colnames(y),
       by = by,
       ...,
       conflict = conflict,
@@ -163,8 +164,9 @@ rows_append.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_append(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
+      insert_cols = colnames(y),
       ...,
       returning_cols = returning_cols
     )
@@ -232,8 +234,8 @@ rows_update.tbl_lazy <- function(x,
 
     sql <- sql_query_update_from(
       con = con,
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
       ...,
@@ -271,13 +273,13 @@ rows_update.tbl_lazy <- function(x,
 #' @importFrom dplyr rows_patch
 #' @rdname rows-db
 rows_patch.tbl_lazy <- function(x,
-                                 y,
-                                 by = NULL,
-                                 ...,
-                                 unmatched = c("error", "ignore"),
-                                 copy = FALSE,
-                                 in_place = FALSE,
-                                 returning = NULL) {
+                                y,
+                                by = NULL,
+                                ...,
+                                unmatched = c("error", "ignore"),
+                                copy = FALSE,
+                                in_place = FALSE,
+                                returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
   name <- target_table_name(x, in_place)
@@ -313,8 +315,8 @@ rows_patch.tbl_lazy <- function(x,
 
     sql <- sql_query_update_from(
       con = con,
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
       ...,
@@ -391,8 +393,8 @@ rows_upsert.tbl_lazy <- function(x,
 
     sql <- sql_query_upsert(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 1),
       by = by,
       update_cols = setdiff(colnames(y), by),
       ...,
@@ -467,8 +469,8 @@ rows_delete.tbl_lazy <- function(x,
   if (!is_null(name)) {
     sql <- sql_query_delete(
       con = remote_con(x),
-      x_name = name,
-      y = y,
+      table = name,
+      from = sql_render(y, remote_con(x), lvl = 2),
       by = by,
       ...,
       returning_cols = returning_cols
@@ -557,11 +559,6 @@ get_returned_rows <- function(x) {
 #' @export
 has_returned_rows <- function(x) {
   !identical(attr(x, "returned_rows"), NULL)
-}
-
-#' @export
-sql_returning_cols.duckdb_connection <- function(con, cols, ...) {
-  cli_abort("DuckDB does not support the {.arg returning} argument.")
 }
 
 sql_coalesce <- function(x, y) {
@@ -721,32 +718,26 @@ target_table_name <- function(x, in_place) {
   name
 }
 
-rows_prep <- function(con, x_name, y, by, lvl = 0) {
+rows_prep <- function(con, table, from, by, lvl = 0) {
   y_name <- ident("...y")
-  from <- dbplyr_sql_subquery(con,
-    sql_render(y, con, subquery = TRUE, lvl = lvl + 1),
-    name = y_name,
-    lvl = lvl
-  )
-
-  join_by <- list(x = by, y = by, x_as = y_name, y_as = x_name, condition = "=")
+  join_by <- list(x = by, y = by, x_as = y_name, y_as = table, condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   list(
-    from = from,
+    from = sql_query_wrap(con, from, y_name, lvl = lvl),
     where = where
   )
 }
 
-rows_insert_prep <- function(con, x_name, y, by, lvl = 0) {
-  out <- rows_prep(con, x_name, y, by, lvl = lvl)
+rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
+  out <- rows_prep(con, table, from, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = x_name, y_as = ident("...y"), condition = "=")
+  join_by <- list(x = by, y = by, x_as = table, y_as = ident("...y"), condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
-  out$conflict_clauses <- sql_clause_where_exists(x_name, where, not = TRUE)
+  out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
-  out$insert_clause <- sql_clause_insert(con, insert_cols, x_name)
+  insert_cols <- escape(ident(cols), collapse = ", ", parens = TRUE, con = con)
+  out$insert_clause <- sql_clause_insert(con, insert_cols, table)
 
   out
 }

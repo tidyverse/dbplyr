@@ -37,10 +37,13 @@ if (test_srcs$length() == 0) {
   }
 }
 
-sqlite_con_with_aux <- function() {
+local_sqlite_con_with_aux <- function(envir = parent.frame()) {
   tmp <- tempfile()
 
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  con <- withr::local_db_connection(
+    DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
+    .local_envir = envir
+  )
   DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
 
   con

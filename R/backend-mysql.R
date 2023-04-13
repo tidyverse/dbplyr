@@ -36,7 +36,7 @@ dbplyr_edition.MySQL <- dbplyr_edition.MariaDBConnection
 dbplyr_edition.MySQLConnection <- dbplyr_edition.MariaDBConnection
 
 #' @export
-db_connection_describe.MariaDBConnection <- function(con) {
+db_connection_describe.MariaDBConnection <- function(con, ...) {
   info <- dbGetInfo(con)
 
   paste0(
@@ -70,6 +70,10 @@ sql_translation.MariaDBConnection <- function(con) {
       # silently cast an INTEGER into a BIGINT type, MySQL outright fails.
       # https://dba.stackexchange.com/a/205822
       as.integer64  = sql_cast("INTEGER"),
+
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+      },
 
       # string functions ------------------------------------------------
       paste = sql_paste(" "),
@@ -128,7 +132,13 @@ sql_table_analyze.MySQL <- sql_table_analyze.MariaDBConnection
 sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 
 #' @export
-sql_query_join.MariaDBConnection <- function(con, x, y, vars, type = "inner", by = NULL, ...) {
+sql_query_join.MariaDBConnection <- function(con,
+                                             x,
+                                             y,
+                                             vars,
+                                             type = "inner",
+                                             by = NULL,
+                                             ...) {
   if (identical(type, "full")) {
     cli_abort("MySQL does not support full joins")
   }
@@ -141,7 +151,7 @@ sql_query_join.MySQLConnection <- sql_query_join.MariaDBConnection
 
 
 #' @export
-sql_expr_matches.MariaDBConnection <- function(con, x, y) {
+sql_expr_matches.MariaDBConnection <- function(con, x, y, ...) {
   # https://dev.mysql.com/doc/refman/5.7/en/comparison-operators.html#operator_equal-to
   build_sql(x, " <=> ", y, con = con)
 }
@@ -150,39 +160,37 @@ sql_expr_matches.MySQL <- sql_expr_matches.MariaDBConnection
 #' @export
 sql_expr_matches.MySQLConnection <- sql_expr_matches.MariaDBConnection
 
+# https://modern-sql.com/blog/2018-08/whats-new-in-mariadb-10.3#3.values
+# MariaDB doesn't accept `ROW` unlike MySQL
 #' @export
-sql_values_subquery.MariaDBConnection <- function(con, df, types, lvl = 0, ...) {
+sql_values_subquery.MariaDBConnection <- sql_values_subquery.DBIConnection
+
+#' @export
+sql_values_subquery.MySQL <-function(con, df, types, lvl = 0, ...) {
+  # https://dev.mysql.com/doc/refman/8.0/en/values.html
   sql_values_subquery_default(con, df, types = types, lvl = lvl, row = TRUE)
 }
+#' @export
+sql_values_subquery.MySQLConnection <- sql_values_subquery.MySQL
 
 #' @export
-sql_values_subquery.MySQL <- sql_values_subquery.MariaDBConnection
-#' @export
-sql_values_subquery.MySQLConnection <- sql_values_subquery.MariaDBConnection
-
-#' @export
-sql_random.MariaDBConnection <- function(con) {
-  sql_expr(RAND())
-}
-#' @export
-sql_random.MySQLConnection <- sql_random.MariaDBConnection
-#' @export
-sql_random.MySQL <- sql_random.MariaDBConnection
-
-#' @export
-sql_query_update_from.MariaDBConnection <- function(con, x_name, y, by,
-                                                    update_values, ...,
+sql_query_update_from.MariaDBConnection <- function(con,
+                                                    table,
+                                                    from,
+                                                    by,
+                                                    update_values,
+                                                    ...,
                                                     returning_cols = NULL) {
   # https://stackoverflow.com/a/19346375/946850
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
-  update_cols <- sql_table_prefix(con, names(update_values), x_name)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+  update_cols <- sql_table_prefix(con, names(update_values), table)
 
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql_clause_set(update_cols, update_values),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }

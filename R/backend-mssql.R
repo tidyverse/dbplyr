@@ -72,15 +72,19 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_select.Microsoft SQL Server` <- function(con, select, from, where = NULL,
-                                             group_by = NULL, having = NULL,
-                                             window = NULL,
-                                             order_by = NULL,
-                                             limit = NULL,
-                                             distinct = FALSE,
-                                             ...,
-                                             subquery = FALSE,
-                                             lvl = 0) {
+`sql_query_select.Microsoft SQL Server` <- function(con,
+                                                    select,
+                                                    from,
+                                                    where = NULL,
+                                                    group_by = NULL,
+                                                    having = NULL,
+                                                    window = NULL,
+                                                    order_by = NULL,
+                                                    limit = NULL,
+                                                    distinct = FALSE,
+                                                    ...,
+                                                    subquery = FALSE,
+                                                    lvl = 0) {
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
     from      = sql_clause_from(from),
@@ -94,7 +98,12 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_insert.Microsoft SQL Server` <- function(con, x_name, y, by, ...,
+`sql_query_insert.Microsoft SQL Server` <- function(con,
+                                                    table,
+                                                    from,
+                                                    insert_cols,
+                                                    by,
+                                                    ...,
                                                     conflict = c("error", "ignore"),
                                                     returning_cols = NULL,
                                                     method = NULL) {
@@ -103,7 +112,7 @@ simulate_mssql <- function(version = "15.0") {
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
   clauses <- list2(
     parts$insert_clause,
@@ -117,13 +126,17 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_append.Microsoft SQL Server` <- function(con, x_name, y, ...,
+`sql_query_append.Microsoft SQL Server` <- function(con,
+                                                    table,
+                                                    from,
+                                                    insert_cols,
+                                                    ...,
                                                     returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by = list(), lvl = 0)
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
+  parts <- rows_prep(con, table, from, by = list(), lvl = 0)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   clauses <- list2(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_returning_cols(con, returning_cols, "INSERTED"),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from)
@@ -133,18 +146,22 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_update_from.Microsoft SQL Server` <- function(con, x_name, y, by,
-                                                         update_values, ...,
+`sql_query_update_from.Microsoft SQL Server` <- function(con,
+                                                         table,
+                                                         from,
+                                                         by,
+                                                         update_values,
+                                                         ...,
                                                          returning_cols = NULL) {
   # https://stackoverflow.com/a/2334741/946850
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
 
   clauses <- list(
-    sql_clause_update(x_name),
+    sql_clause_update(table),
     sql_clause_set(update_cols, update_values),
     sql_returning_cols(con, returning_cols, "INSERTED"),
-    sql_clause_from(x_name),
+    sql_clause_from(table),
     sql_clause("INNER JOIN", parts$from),
     sql_clause_on(parts$where, lvl = 1)
   )
@@ -153,8 +170,8 @@ simulate_mssql <- function(version = "15.0") {
 
 #' @export
 `sql_query_upsert.Microsoft SQL Server` <- function(con,
-                                                    x_name,
-                                                    y,
+                                                    table,
+                                                    from,
                                                     by,
                                                     update_cols,
                                                     ...,
@@ -163,7 +180,7 @@ simulate_mssql <- function(version = "15.0") {
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
   update_values <- sql_table_prefix(con, update_cols, ident("...y"))
@@ -174,7 +191,7 @@ simulate_mssql <- function(version = "15.0") {
   insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
     sql_clause_on(parts$where, lvl = 1),
     sql("WHEN MATCHED THEN"),
@@ -189,11 +206,16 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
-`sql_query_delete.Microsoft SQL Server` <- function(con, x_name, y, by, ..., returning_cols = NULL) {
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+`sql_query_delete.Microsoft SQL Server` <- function(con,
+                                                    table,
+                                                    from,
+                                                    by,
+                                                    ...,
+                                                    returning_cols = NULL) {
+  parts <- rows_prep(con, table, from, by, lvl = 0)
 
   clauses <- list2(
-    sql_clause("DELETE FROM", x_name),
+    sql_clause("DELETE FROM", table),
     sql_returning_cols(con, returning_cols, table = "DELETED"),
     !!!sql_clause_where_exists(parts$from, parts$where, not = FALSE)
   )
@@ -262,6 +284,10 @@ simulate_mssql <- function(version = "15.0") {
 
       is.null       = mssql_is_null,
       is.na         = mssql_is_null,
+
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+      },
 
       # string functions ------------------------------------------------
       nchar = sql_prefix("LEN"),
@@ -369,7 +395,34 @@ simulate_mssql <- function(version = "15.0") {
       # percentile_cont needs `OVER()` in mssql
       # https://docs.microsoft.com/en-us/sql/t-sql/functions/percentile-cont-transact-sql?view=sql-server-ver15
       median = sql_median("PERCENTILE_CONT", "ordered", window = TRUE),
-      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE)
+      quantile = sql_quantile("PERCENTILE_CONT", "ordered", window = TRUE),
+      first = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = 1L,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "outside"
+        )
+      },
+      last = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = Inf,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "outside"
+        )
+      },
+      nth = function(x, n, order_by = NULL, na_rm = FALSE) {
+        sql_nth(
+          x = x,
+          n = n,
+          order_by = order_by,
+          na_rm = na_rm,
+          ignore_nulls = "outside"
+        )
+      },
     )
 
   )}
@@ -384,7 +437,6 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_escape_raw.Microsoft SQL Server` <- function(con, x) {
-
   if (is.null(x)) {
     "NULL"
   } else {
@@ -404,7 +456,7 @@ mssql_version <- function(con) {
 # temporary table names with #
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
-`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary) {
+`db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
   if (temporary && substr(table, 1, 1) != "#") {
     table <- hash_temp(table)
   }
@@ -416,8 +468,11 @@ mssql_version <- function(con) {
 }
 
 #' @export
-`sql_query_save.Microsoft SQL Server` <- function(con, sql, name,
-                                                  temporary = TRUE, ...){
+`sql_query_save.Microsoft SQL Server` <- function(con,
+                                                  sql,
+                                                  name,
+                                                  temporary = TRUE,
+                                                  ...) {
 
   # https://stackoverflow.com/q/16683758/946850
   build_sql(
@@ -429,11 +484,6 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_values_subquery.Microsoft SQL Server` <- sql_values_subquery_column_alias
-
-#' @export
-`sql_random.Microsoft SQL Server` <- function(con) {
-  sql_expr(RAND())
-}
 
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
