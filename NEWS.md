@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
+
 * The first argument of `ntile()` has been renamed from `order_by` to `x` to
   match the interface of `dplyr::ntile()` (@mgirlich, #1242).
 
