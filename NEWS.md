@@ -3,6 +3,8 @@
 * Using a function with a namespace in `across()` now works, e.g.
   `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
 
+* The dots in `db_copy_to()` are now passed to `db_write_table()` (@mgirlich, #1237).
+
 * Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
 
 * The first argument of `ntile()` has been renamed from `order_by` to `x` to
