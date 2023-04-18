@@ -77,7 +77,8 @@ db_copy_to.DBIConnection <- function(con,
           types = types,
           values = values,
           temporary = temporary,
-          overwrite = overwrite
+          overwrite = overwrite,
+          ...
         )
         create_indexes(con, table, unique_indexes, unique = TRUE)
         create_indexes(con, table, indexes)
