@@ -245,7 +245,6 @@ sql_nth <- function(x,
                     ignore_nulls = c("inside", "outside", "bool"),
                     error_call = caller_env()) {
   check_bool(na_rm, call = error_call)
-  check_number_whole_inf(n, call = error_call)
   ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
 
   frame <- win_current_frame()
@@ -257,7 +256,9 @@ sql_nth <- function(x,
     frame <- frame %||% c(-Inf, Inf)
   } else {
     sql_f <- "NTH_VALUE"
-    n <- as.integer(n)
+    if (is.numeric(n)) {
+      n <- as.integer(n)
+    }
     args <- glue_sql2(sql_current_con(), "{.sql args}, {n}")
   }
 

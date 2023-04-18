@@ -74,6 +74,12 @@ test_that("first, last, and nth translated to _value", {
     translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
     sql("NTH_VALUE(`x`, 3) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
   )
+
+  # can also use a column #1236
+  expect_equal(
+    translate_sql(nth(x, n), vars_order = "a", vars_frame = c(-Inf, 0)),
+    sql("NTH_VALUE(`x`, `n`) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
+  )
 })
 
 test_that("can override frame of recycled functions", {
