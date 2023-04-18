@@ -86,6 +86,8 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     names_spec <- names_spec %||% "{.col}"
   } else if (is_quosure(funs)) {
     return(across_funs(quo_squash(funs), env, data, dots, names_spec, fn, evaluated = evaluated))
+  } else if (is_call(funs, "::")) {
+    return(across_funs(funs[[3]], env, data, dots, names_spec, fn, evaluated = evaluated))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
     is_local_list <- function(funs) {
