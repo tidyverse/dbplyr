@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
+
 * Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
   (@mgirlich, #1208).
 
