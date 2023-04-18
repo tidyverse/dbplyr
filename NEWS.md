@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
+  (@mgirlich, #1208).
+
+* `sql_join_suffix()` gains the argument `suffix` so that methods can check
+  whether the suffix is valid for the backend (@mgirlich).
+
 * `sql_query_append()`, `sql_query_insert()`, `sql_query_update()`,
   `sql_query_upsert()`, and `sql_query_delete()` changed their arguments to
   make them more consistent to the other `sql_query_*()` functions:
@@ -34,6 +40,10 @@
   (@mgirlich, #1183).
 
 * Added translation for `!=` to `<>` for Microsoft Access (@erikvona, #1219).
+
+# dbplyr 2.3.2
+
+* Hot patch to fix R CMD check issues
 
 # dbplyr 2.3.1
 

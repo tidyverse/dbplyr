@@ -191,7 +191,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y) {
+sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   glue_sql2("decode({x}, {y}, 0, 1) = 0", .con = con)
 }

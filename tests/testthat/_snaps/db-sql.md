@@ -15,7 +15,7 @@
     Output
       <error/rlang_error>
       Error in `db_analyze()`:
-      ! Can't analyze table "tbl".
+      ! Can't analyze table tbl.
       Caused by error:
       ! dummy DBI error
     Code
@@ -23,7 +23,7 @@
     Output
       <error/rlang_error>
       Error in `db_create_index()`:
-      ! Can't create index on "tbl".
+      ! Can't create index on table tbl.
       Caused by error:
       ! dummy DBI error
     Code
@@ -47,7 +47,7 @@
     Output
       <error/rlang_error>
       Error in `db_save_query()`:
-      ! Can't save query to "tbl".
+      ! Can't save query to table tbl.
       Caused by error:
       ! dummy DBI error
 

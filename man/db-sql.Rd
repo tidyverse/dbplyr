@@ -23,7 +23,7 @@
 \alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
-sql_expr_matches(con, x, y)
+sql_expr_matches(con, x, y, ...)
 
 sql_translation(con)
 
@@ -85,7 +85,7 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_multi_join(con, x, joins, table_vars, vars, ..., lvl = 0)
+sql_query_multi_join(con, x, joins, table_vars, by_list, vars, ..., lvl = 0)
 
 sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
 

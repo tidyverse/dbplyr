@@ -37,7 +37,7 @@ dbplyr_edition.PostgreSQL <- function(con) {
 dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PqConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
@@ -67,6 +67,12 @@ postgres_grepl <- function(pattern,
 postgres_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
   sql_expr(round(((!!x)) %::% numeric, !!digits))
+}
+
+postgres_period <- function(x, unit) {
+  x <- escape(x, con = sql_current_con())
+  interval <- paste0(x, " ", unit)
+  sql_expr(CAST(!!interval %AS% INTERVAL))
 }
 
 #' @export
@@ -176,32 +182,25 @@ sql_translation.PqConnection <- function(con) {
 
       # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
       seconds = function(x) {
-        interval <- paste(x, "seconds")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "seconds")
       },
       minutes = function(x) {
-        interval <- paste(x, "minutes")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "minutes")
       },
       hours = function(x) {
-        interval <- paste(x, "hours")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "hours")
       },
       days = function(x) {
-        interval <- paste(x, "days")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "days")
       },
       weeks = function(x) {
-        interval <- paste(x, "weeks")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "weeks")
       },
       months = function(x) {
-        interval <- paste(x, "months")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "months")
       },
       years = function(x) {
-        interval <- paste(x, "years")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "years")
       },
 
       # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
@@ -246,7 +245,7 @@ sql_translation.PqConnection <- function(con) {
 sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
   glue_sql2("{x} IS NOT DISTINCT FROM {y}", .con = con)
 }
