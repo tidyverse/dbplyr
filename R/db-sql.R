@@ -100,7 +100,7 @@ sql_expr_matches <- function(con, x, y, ...) {
 }
 # https://modern-sql.com/feature/is-distinct-from
 #' @export
-sql_expr_matches.DBIConnection <- function(con, x, y) {
+sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
   glue_sql2(
     "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) ",
     "THEN 0 ",
