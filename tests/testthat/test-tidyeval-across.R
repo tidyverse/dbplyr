@@ -37,6 +37,15 @@ test_that("across() translates functions", {
   )
 })
 
+test_that("across() translates functions in namespace #1231", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, dplyr::dense_rank)),
+    exprs(a = dense_rank(a), b = dense_rank(b))
+  )
+})
+
 test_that("across() captures anonymous functions", {
   lf <- lazy_frame(a = 1)
 
