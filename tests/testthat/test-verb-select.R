@@ -374,12 +374,11 @@ test_that("mutate preserves grouping vars (#396)", {
   expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
 })
 
-test_that("select after arrange(desc()) works", {
-  out <- mtcars %>%
-    tbl_lazy() %>%
-    arrange(desc(mpg)) %>%
-    select(cyl)
-  expect_equal(op_vars(out), c("cyl"))
+test_that("select after arrange(desc()) works (#1206)", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    arrange(desc(x)) %>%
+    select(x)
+  expect_equal(op_vars(out), "x")
 })
 
 
