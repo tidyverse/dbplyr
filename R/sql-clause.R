@@ -45,11 +45,15 @@ sql_clause_select <- function(con,
     cli_abort("Query contains no columns")
   }
 
-  clause <- build_sql(
+  if (!is.null(top)) {
+    top <- as.integer(top)
+  }
+
+  clause <- glue_sql2(
+    con,
     "SELECT",
-    if (distinct) sql(" DISTINCT"),
-    if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
-    con = con
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) " TOP {top}"
   )
 
   sql_clause(clause, select)
