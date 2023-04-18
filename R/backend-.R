@@ -370,11 +370,11 @@ base_win <- sql_translator(
   dense_rank   = win_rank("DENSE_RANK"),
   percent_rank = win_rank("PERCENT_RANK"),
   cume_dist    = win_rank("CUME_DIST"),
-  ntile        = function(order_by, n) {
+  ntile        = function(x, n) {
     win_over(
       sql_expr(NTILE(!!as.integer(n))),
       win_current_group(),
-      order_by %||% win_current_order()
+      x %||% win_current_order()
     )
   },
 

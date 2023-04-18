@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The first argument of `ntile()` has been renamed from `order_by` to `x` to
+  match the interface of `dplyr::ntile()`.
+
 * Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
   (@mgirlich, #1208).
 
