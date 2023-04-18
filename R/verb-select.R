@@ -182,7 +182,15 @@ rename_order <- function(lazy_query, vars) {
   old2new <- set_names(names(vars), vars)
   order <- op_sort(lazy_query)
 
-  is_desc <- purrr::map_lgl(order, ~ is_call(.x, "desc", n = 1L))
+  is_desc <- purrr::map_lgl(
+    order,
+    ~ if (is_quosure(.x)) {
+      quo_is_call(.x, "desc", n = 1L)
+    } else {
+      is_call(.x, "desc", n = 1L)
+    }
+  )
+
   order <- purrr::map_if(order, is_desc, ~ call_args(.x)[[1L]])
   order <- purrr::map_chr(order, as_name)
 
