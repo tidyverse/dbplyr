@@ -12,7 +12,8 @@ sql_quantile <- function(f,
     sql <- switch(style,
       infix = sql_call2(f, x, probs),
       ordered = glue_sql2(
-        sql_call2(f, probs), " WITHIN GROUP (ORDER BY {x})", .con = sql_current_con()
+        sql_current_con(),
+        sql_call2(f, probs), " WITHIN GROUP (ORDER BY {x})"
       )
     )
 

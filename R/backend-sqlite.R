@@ -39,7 +39,7 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  glue_sql2("EXPLAIN QUERY PLAN {.sql sql}", .con = con)
+  glue_sql2(con, "EXPLAIN QUERY PLAN {.sql sql}")
 }
 
 #' @export
@@ -141,7 +141,7 @@ sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0
 #' @export
 sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
-  glue_sql2("{x} IS {y}", .con = con)
+  glue_sql2(con, "{x} IS {y}")
 }
 
 #' @export

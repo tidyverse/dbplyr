@@ -152,14 +152,14 @@ sql_infix <- function(f, pad = TRUE) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      glue_sql2("{.val x} {f} {.val y}", .con = sql_current_con())
+      glue_sql2(sql_current_con(), "{.val x} {f} {.val y}")
     }
   } else {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      glue_sql2("{.val x}{f}{.val y}", .con = sql_current_con())
+      glue_sql2(sql_current_con(), "{.val x}{f}{.val y}")
     }
   }
 }

@@ -89,10 +89,7 @@ sql_translation.Hive <- function(con) {
 #' @export
 sql_table_analyze.Hive <- function(con, table, ...) {
   # https://cwiki.apache.org/confluence/display/Hive/StatsDev
-  glue_sql2(
-    "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS",
-    .con = con
-  )
+  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
@@ -100,11 +97,11 @@ sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) 
   # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
   glue_sql2(
+    con,
     "\n", # dummy line to protect indent
     "{x}\n",
     lvl_indent(lvl), "{.kw method}\n",
-    y,
-    .con = con
+    y
   )
 }
 

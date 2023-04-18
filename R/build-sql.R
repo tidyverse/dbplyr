@@ -47,8 +47,8 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   sql(paste0(pieces, collapse = ""))
 }
 
-glue_sql2 <- function(...,
-                      .con,
+glue_sql2 <- function(.con,
+                      ...,
                       .sep = "",
                       .envir = parent.frame(),
                       .open = "{",

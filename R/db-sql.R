@@ -102,11 +102,11 @@ sql_expr_matches <- function(con, x, y, ...) {
 #' @export
 sql_expr_matches.DBIConnection <- function(con, x, y, ...) {
   glue_sql2(
+    con,
     "CASE WHEN ({x} = {y}) OR ({x} IS NULL AND {y} IS NULL) ",
     "THEN 0 ",
     "ELSE 1 ",
-    "END = 0",
-    .con = con
+    "END = 0"
   )
 }
 
@@ -147,7 +147,7 @@ sql_table_analyze <- function(con, table, ...) {
 }
 #' @export
 sql_table_analyze.DBIConnection <- function(con, table, ...) {
-  glue_sql2("ANALYZE {.tbl {table}}", .con = con)
+  glue_sql2(con, "ANALYZE {.tbl {table}}")
 }
 
 #' @rdname db-sql
@@ -176,9 +176,9 @@ sql_table_index.DBIConnection <- function(con,
                                           call = caller_env()) {
   name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
   glue_sql2(
+    con,
     "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
-    " ON {.tbl table} ({.col columns*})",
-    .con = con
+    " ON {.tbl table} ({.col columns*})"
   )
 }
 
@@ -193,7 +193,7 @@ sql_query_explain <- function(con, sql, ...) {
 }
 #' @export
 sql_query_explain.DBIConnection <- function(con, sql, ...) {
-  glue_sql2("EXPLAIN {sql}", .con = con)
+  glue_sql2(con, "EXPLAIN {sql}")
 }
 
 #' @rdname db-sql
@@ -222,10 +222,10 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   glue_sql2(
+    con,
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
     "{.tbl {name}} AS\n",
-    sql,
-    .con = con
+    sql
   )
 }
 #' @export
@@ -286,7 +286,7 @@ sql_query_rows <- function(con, sql, ...) {
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
   from <- dbplyr_sql_subquery(con, sql, "master")
-  glue_sql2("SELECT COUNT(*) FROM {.from from}", .con = con)
+  glue_sql2(con, "SELECT COUNT(*) FROM {.from from}")
 }
 
 #' @rdname db-sql
@@ -581,7 +581,7 @@ sql_query_semi_join.DBIConnection <- function(con,
   lines <- list(
     sql_clause_select(con, vars),
     sql_clause_from(x),
-    glue_sql2("WHERE ", if (anti) "NOT ", "EXISTS (", .con = con),
+    glue_sql2(con, "WHERE ", if (anti) "NOT ", "EXISTS ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
     # don't use `sql_clause_where()` to avoid wrapping each element in parens

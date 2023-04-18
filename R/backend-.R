@@ -64,16 +64,16 @@ base_scalar <- sql_translator(
     # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
-      glue_sql2("{x}.{.col i}", .con = sql_current_con())
+      glue_sql2(sql_current_con(), "{x}.{.col i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      glue_sql2("{x}[{i}]", .con = sql_current_con())
+      glue_sql2(sql_current_con(), "{x}[{i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
   },
   `[` = function(x, i) {
-    glue_sql2("CASE WHEN ({i}) THEN ({x}) END", .con = sql_current_con())
+    glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
   },
 
   `!=`    = sql_infix("!="),
@@ -177,7 +177,7 @@ base_scalar <- sql_translator(
     sql_expr(((!!x)))
   },
   desc = function(x) {
-    glue_sql2("{x} DESC", .con = sql_current_con())
+    glue_sql2(sql_current_con(), "{x} DESC")
   },
 
   is.null = sql_is_null,
@@ -355,7 +355,7 @@ base_agg <- sql_translator(
   # nth = sql_prefix("NTH_VALUE", 2),
 
   n_distinct = function(x) {
-    glue_sql2("COUNT(DISTINCT {x})", .con = sql_current_con())
+    glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})")
   }
 )
 
@@ -453,7 +453,7 @@ base_win <- sql_translator(
     )
   },
   n_distinct = function(x) {
-    win_over(glue_sql2("COUNT(DISTINCT {x})", .con = sql_current_con()), win_current_group())
+    win_over(glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"), win_current_group())
   },
 
   # Cumulative function are like recycled aggregates except that R names

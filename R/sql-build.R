@@ -93,12 +93,12 @@ cte_render <- function(query_list, con) {
 
   ctes <- purrr::imap(query_list[-n],
     function(query, name) {
-      glue_sql2("{.name `name`} {.kw 'AS'} (\n{.sql query}\n)", .con = con)
+      glue_sql2(con, "{.name `name`} {.kw 'AS'} (\n{.sql query}\n)")
     }
   )
   cte_query <- sql_vector(unname(ctes), parens = FALSE, collapse = ",\n", con = con)
 
-  glue_sql2("{.kw 'WITH'} ", cte_query, "\n", query_list[[n]], .con = con)
+  glue_sql2(con, "{.kw 'WITH'} ", cte_query, "\n", query_list[[n]])
 }
 
 get_subquery_name <- function(x, query_list) {

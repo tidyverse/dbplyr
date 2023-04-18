@@ -50,5 +50,5 @@ sql_translation.Impala <- function(con) {
 sql_table_analyze.Impala <- function(con, table, ...) {
   # Using COMPUTE STATS instead of ANALYZE as recommended in this article
   # https://www.cloudera.com/documentation/enterprise/5-9-x/topics/impala_compute_stats.html
-  glue_sql2("COMPUTE STATS {.tbl table}", .con = con)
+  glue_sql2(con, "COMPUTE STATS {.tbl table}")
 }

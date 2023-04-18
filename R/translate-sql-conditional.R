@@ -99,7 +99,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   # Together these cases cover every possible case. So, if `if_false` and
   # `missing` are identical they can be simplified to `ELSE <if_false>`
   if (!quo_is_null(if_false) && identical(if_false, missing)) {
-    out <- glue_sql2(out, " ELSE {.val enpared_if_false} END", .con = sql_current_con())
+    out <- glue_sql2(sql_current_con(), out, " ELSE {.val enpared_if_false} END")
     return(out)
   }
 
@@ -114,7 +114,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
     out <- paste0(out, missing_sql)
   }
 
-  glue_sql2(out, " END", .con = sql_current_con())
+  glue_sql2(sql_current_con(), out, " END")
 }
 
 sql_case_when <- function(...,
@@ -172,7 +172,7 @@ sql_switch <- function(x, ...) {
   named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
-    glue_sql2("WHEN ({.val x}) THEN ({.val y})", .con = sql_current_con())
+    glue_sql2(sql_current_con(), "WHEN ({.val x}) THEN ({.val y})")
   })
 
   n_unnamed <- sum(!named)
@@ -185,7 +185,7 @@ sql_switch <- function(x, ...) {
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2("CASE {.val x} {.sql clauses_collapsed} END", .con = sql_current_con())
+  glue_sql2(sql_current_con(), "CASE {.val x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {

@@ -59,7 +59,7 @@ sql_query_select.Oracle <- function(con,
     # Requires Oracle 12c, released in 2013
     limit =   if (!is.null(limit)) {
       limit <- as.integer(limit)
-      glue_sql2("FETCH FIRST {limit} ROWS ONLY", .con = con)
+      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
     },
     lvl = lvl
   )
@@ -115,7 +115,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = function(x) glue_sql2("DATE {x}", .con = sql_current_con()),
+      as.Date = function(x) glue_sql2(sql_current_con(), "DATE {x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -145,36 +145,36 @@ sql_translation.Oracle <- function(con) {
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
   glue_sql2(
+    con,
     "EXPLAIN PLAN FOR {.sql sql};\n",
     "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
-    .con = con
   )
 }
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  glue_sql2("ANALYZE TABLE {.tbl table} COMPUTE STATISTICS", .con = con)
+  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
 sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
   # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
   if (is.ident(from)) {
-    from <- glue_sql2("({.from from})", .con = con)
+    from <- glue_sql2(con, "({.from from})")
     name <- as_subquery_name(name, default = NULL)
   } else {
     from <- sql_indent_subquery(from, con, lvl)
     name <- as_subquery_name(name)
   }
 
-  glue_sql2("{.sql from}", if (!is.null(name)) " {.name name}", .con = con)
+  glue_sql2(con, "{.sql from}", if (!is.null(name)) " {.name name}")
 }
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
-  glue_sql2("CREATE {type}TABLE {.tbl name} AS\n{.sql sql}", .con = con)
+  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
 }
 
 #' @export
@@ -193,7 +193,7 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 #' @export
 sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  glue_sql2("decode({x}, {y}, 0, 1) = 0", .con = con)
+  glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
 #' @export

@@ -156,25 +156,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        glue_sql2("INTERVAL '{x} second'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} second'")
       },
       minutes = function(x) {
-        glue_sql2("INTERVAL '{x} minute'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} minute'")
       },
       hours = function(x) {
-        glue_sql2("INTERVAL '{x} hour'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} hour'")
       },
       days = function(x) {
-        glue_sql2("INTERVAL '{x} day'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} day'")
       },
       weeks = function(x) {
-        glue_sql2("INTERVAL '{x} week'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} week'")
       },
       months = function(x) {
-        glue_sql2("INTERVAL '{x} month'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} month'")
       },
       years = function(x) {
-        glue_sql2("INTERVAL '{x} year'", .con = sql_current_con())
+        glue_sql2(sql_current_con(), "INTERVAL '{x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {

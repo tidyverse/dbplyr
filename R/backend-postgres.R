@@ -247,7 +247,7 @@ sql_translation.PostgreSQL <- sql_translation.PqConnection
 #' @export
 sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
-  glue_sql2("{x} IS NOT DISTINCT FROM {y}", .con = con)
+  glue_sql2(con, "{x} IS NOT DISTINCT FROM {y}")
 }
 #' @export
 sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
@@ -257,11 +257,7 @@ sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
-  glue_sql2(
-    "EXPLAIN ", if (!is.null(format)) "(FORMAT {format}) ",
-    sql,
-    .con = con
-  )
+  glue_sql2(con, "EXPLAIN ", if (!is.null(format)) "(FORMAT {format}) ", sql)
 }
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection

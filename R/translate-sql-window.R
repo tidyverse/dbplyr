@@ -28,12 +28,12 @@ win_over <- function(expr,
                      con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
-    partition <- glue_sql2("PARTITION BY {.val partition*}", .con = con)
+    partition <- glue_sql2(con, "PARTITION BY {.val partition*}")
   }
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-    order <- glue_sql2("ORDER BY {.val order*}", .con = con)
+    order <- glue_sql2(con, "ORDER BY {.val order*}")
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
@@ -44,7 +44,7 @@ win_over <- function(expr,
     }
 
     if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
-    frame <- glue_sql2("ROWS {frame}", .con = con)
+    frame <- glue_sql2(con, "ROWS {frame}")
   }
 
   over <- sql_vector(
@@ -58,7 +58,7 @@ win_over <- function(expr,
   } else {
     over <- win_get(over, con)
   }
-  glue_sql2("{.val expr} OVER {.val over}", .con = con)
+  glue_sql2(con, "{.val expr} OVER {.val over}")
 }
 
 win_register_activate <- function() {
@@ -118,7 +118,7 @@ rows <- function(from = -Inf, to = 0) {
   if (to == 0) {
     sql(bound(from))
   } else {
-    glue_sql2("BETWEEN {.sql bound(from)} AND {.sql bound(to)}", .con = sql_current_con())
+    glue_sql2(sql_current_con(), "BETWEEN {.sql bound(from)} AND {.sql bound(to)}")
   }
 }
 
@@ -258,7 +258,7 @@ sql_nth <- function(x,
   } else {
     sql_f <- "NTH_VALUE"
     n <- as.integer(n)
-    args <- glue_sql2("{.sql args}, {n}", .con = sql_current_con())
+    args <- glue_sql2(sql_current_con(), "{.sql args}, {n}")
   }
 
   if (na_rm) {
@@ -274,7 +274,7 @@ sql_nth <- function(x,
   }
 
   win_over(
-    glue_sql2(sql_expr, .con = sql_current_con()),
+    glue_sql2(sql_current_con(), sql_expr),
     win_current_group(),
     order_by %||% win_current_order(),
     frame

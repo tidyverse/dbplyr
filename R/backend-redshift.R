@@ -94,8 +94,8 @@ sql_translation.RedshiftConnection <- function(con) {
 
         if(length(order) > 0){
           sql <- glue_sql2(
-            "{listagg_sql} WITHIN GROUP (ORDER BY {order})",
-            .con = sql_current_con()
+            sql_current_con(),
+            "{listagg_sql} WITHIN GROUP (ORDER BY {order})"
           )
         } else {
           sql <- listagg_sql
@@ -122,7 +122,7 @@ sql_paste_redshift <- function(sep) {
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
 sql_query_explain.Redshift <- function(con, sql, ...) {
-  glue_sql2("EXPLAIN {sql}", .con = con)
+  glue_sql2(con, "EXPLAIN {sql}")
 }
 
 #' @export
