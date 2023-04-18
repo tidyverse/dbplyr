@@ -26,8 +26,9 @@ names and column locations).}
 \item{name}{An optional parameter that specifies the column to be used
 as names for a named vector. Specified in a similar manner as \code{var}.}
 
-\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
-variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+\item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> Variables, or
+functions of variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending
+order.}
 }
 \value{
 A vector of data.
