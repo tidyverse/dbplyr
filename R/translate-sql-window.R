@@ -28,32 +28,12 @@ win_over <- function(expr,
                      con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
-
-    partition <- build_sql(
-      "PARTITION BY ",
-      sql_vector(
-        escape(partition, con = con),
-        collapse = ", ",
-        parens = FALSE,
-        con = con
-      ),
-      con = con
-    )
+    partition <- glue_sql2(con, "PARTITION BY {.val partition*}")
   }
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-
-    order <- build_sql(
-      "ORDER BY ",
-      sql_vector(
-        escape(order, con = con),
-        collapse = ", ",
-        parens = FALSE,
-        con = con
-      ),
-      con = con
-    )
+    order <- glue_sql2(con, "ORDER BY {.val order*}")
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
@@ -64,7 +44,7 @@ win_over <- function(expr,
     }
 
     if (is.numeric(frame)) frame <- rows(frame[1], frame[2])
-    frame <- build_sql("ROWS ", frame, con = con)
+    frame <- glue_sql2(con, "ROWS {frame}")
   }
 
   over <- sql_vector(
@@ -78,9 +58,7 @@ win_over <- function(expr,
   } else {
     over <- win_get(over, con)
   }
-  sql <- build_sql(expr, " OVER ", over, con = con)
-
-  sql
+  glue_sql2(con, "{.val expr} OVER {.val over}")
 }
 
 win_register_activate <- function() {
@@ -140,7 +118,7 @@ rows <- function(from = -Inf, to = 0) {
   if (to == 0) {
     sql(bound(from))
   } else {
-    sql(paste0("BETWEEN ", bound(from), " AND ", bound(to)))
+    glue_sql2(sql_current_con(), "BETWEEN {.sql bound(from)} AND {.sql bound(to)}")
   }
 }
 
@@ -279,23 +257,24 @@ sql_nth <- function(x,
     frame <- frame %||% c(-Inf, Inf)
   } else {
     sql_f <- "NTH_VALUE"
-    args <- paste0(args, ", ", translate_sql(!!as.integer(n)))
+    n <- as.integer(n)
+    args <- glue_sql2(sql_current_con(), "{.sql args}, {n}")
   }
 
   if (na_rm) {
     if (ignore_nulls == "inside") {
-      sql_expr <- paste0(sql_f, "(", args, " IGNORE NULLS)")
+      sql_expr <- "{.sql sql_f}({.sql args} IGNORE NULLS)"
     } else if (ignore_nulls == "outside") {
-      sql_expr <- paste0(sql_f, "(", args, ") IGNORE NULLS")
+      sql_expr <- "{.sql sql_f}({.sql args}) IGNORE NULLS"
     } else {
-      sql_expr <- paste0(sql_f, "(", args, ", TRUE)")
+      sql_expr <- "{.sql sql_f}({.sql args}, TRUE)"
     }
   } else {
-    sql_expr <- paste0(sql_f, "(", args, ")")
+    sql_expr <- "{.sql sql_f}({.sql args})"
   }
 
   win_over(
-    sql(sql_expr),
+    glue_sql2(sql_current_con(), sql_expr),
     win_current_group(),
     order_by %||% win_current_order(),
     frame

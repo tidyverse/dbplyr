@@ -81,7 +81,11 @@ sql_case_match_clause <- function(f, x, con) {
 
 
 sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
-  out <- build_sql("CASE WHEN ", enpar(cond), " THEN ", enpar(if_true))
+  enpared_cond <- enpar(cond)
+  enpared_if_true <- enpar(if_true)
+  enpared_if_false <- enpar(if_false)
+  enpared_missing <- enpar(missing)
+  out <- "CASE WHEN {.val enpared_cond} THEN {.val enpared_if_true}"
 
   # `ifelse()` and `if_else()` have a three value logic: they return `NA` resp.
   # `missing` if `cond` is `NA`. To get the same in SQL it is necessary to
@@ -95,22 +99,22 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   # Together these cases cover every possible case. So, if `if_false` and
   # `missing` are identical they can be simplified to `ELSE <if_false>`
   if (!quo_is_null(if_false) && identical(if_false, missing)) {
-    out <- paste0(out, " ELSE ", enpar(if_false), " END")
-    return(sql(out))
+    out <- glue_sql2(sql_current_con(), out, " ELSE {.val enpared_if_false} END")
+    return(out)
   }
 
   if (!quo_is_null(if_false)) {
-    false_sql <- build_sql(" WHEN NOT ", enpar(cond), " THEN ", enpar(if_false))
+    false_sql <- " WHEN NOT {.val enpared_cond} THEN {.val enpared_if_false}"
     out <- paste0(out, false_sql)
   }
 
   if (!quo_is_null(missing)) {
     missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
-    missing_sql <- build_sql(" WHEN ", missing_cond, " THEN ", enpar(missing))
+    missing_sql <- " WHEN {.val missing_cond} THEN {.val enpared_missing}"
     out <- paste0(out, missing_sql)
   }
 
-  sql(paste0(out, " END"))
+  glue_sql2(sql_current_con(), out, " END")
 }
 
 sql_case_when <- function(...,
@@ -168,19 +172,20 @@ sql_switch <- function(x, ...) {
   named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
-    build_sql("WHEN (", x , ") THEN (", y, ") ")
+    glue_sql2(sql_current_con(), "WHEN ({.val x}) THEN ({.val y})")
   })
 
   n_unnamed <- sum(!named)
   if (n_unnamed == 0) {
     # do nothing
   } else if (n_unnamed == 1) {
-    clauses <- c(clauses, build_sql("ELSE ", input[!named], " "))
+    clauses <- c(clauses, build_sql("ELSE ", input[!named]))
   } else {
     cli_abort("Can only have one unnamed (ELSE) input")
   }
 
-  build_sql("CASE ", x, " ", !!!clauses, "END")
+  clauses_collapsed <- paste0(clauses, collapse = " ")
+  glue_sql2(sql_current_con(), "CASE {.val x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {

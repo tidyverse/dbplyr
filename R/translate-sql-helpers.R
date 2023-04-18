@@ -145,20 +145,21 @@ sql_infix <- function(f, pad = TRUE) {
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   check_string(f)
+  f <- sql(f)
 
   if (pad) {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, " ", sql(f), " ", y)
+      glue_sql2(sql_current_con(), "{.val x} {f} {.val y}")
     }
   } else {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, sql(f), y)
+      glue_sql2(sql_current_con(), "{.val x}{f}{.val y}")
     }
   }
 }

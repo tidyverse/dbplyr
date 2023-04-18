@@ -232,11 +232,11 @@
       show_query(out, cte = TRUE)
     Output
       <SQL>
-      [34mWITH [39m`q01`[34m AS[39m (
+      [34mWITH[39m `q01` [34mAS[39m (
         [34mSELECT[39m `x`, AVG(`y`) OVER (PARTITION BY `x`)[34m AS [39m`y`, `z` + 1.0[34m AS [39m`z`
         [34mFROM[39m `df`
       ),
-      `q02`[34m AS[39m (
+      `q02` [34mAS[39m (
         [34mSELECT[39m *
         [34mFROM[39m `q01`
         [34mWHERE[39m (`z` = 1.0)
