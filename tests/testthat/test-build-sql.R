@@ -71,7 +71,7 @@ test_that("glue_sql() can collapse", {
   con <- simulate_dbi()
   x <- c("a", "b")
   expect_equal(glue_sql2("{.col x*}", .con = con), sql("`a`, `b`"))
-  expect_equal(glue_sql2("{x*}", .con = con), sql("'a', 'b'"))
+  expect_equal(glue_sql2("{.val x*}", .con = con), sql("'a', 'b'"))
 
   expect_snapshot(error = TRUE, {
     glue_sql2("{.tbl x*}", .con = con)

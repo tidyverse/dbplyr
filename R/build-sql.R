@@ -81,7 +81,7 @@ sql_quote_transformer <- function(connection) {
       text <- sub(collapse_regex, "", text)
     }
 
-    type_regex <- "^\\.(tbl|sql|col|name|from|kw) (.*)"
+    type_regex <- "^\\.(tbl|sql|col|name|from|kw|val) (.*)"
     m <- regexec(type_regex, text)
     is_quoted <- any(m[[1]] != -1)
     if (is_quoted) {
@@ -115,9 +115,11 @@ sql_quote_transformer <- function(connection) {
       }
     } else if (type == "kw") {
       value <- sql(style_kw(value))
+    } else if (type == "val") {
+      # keep as is
     }
 
-    if (type != "sql") {
+    if (!type %in% c("sql", "raw")) {
       value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
     }
 
@@ -136,7 +138,7 @@ sql_quote_transformer <- function(connection) {
 
 glue_check_collapse <- function(type, collapse) {
   # collapse is only allowed for type `col`
-  if (type %in% c("col", "raw")) {
+  if (type %in% c("col", "val")) {
     return()
   }
 

@@ -28,12 +28,12 @@ win_over <- function(expr,
                      con = sql_current_con()) {
   if (length(partition) > 0) {
     partition <- as.sql(partition, con = con)
-    partition <- glue_sql2("PARTITION BY {partition*}", .con = con)
+    partition <- glue_sql2("PARTITION BY {.val partition*}", .con = con)
   }
 
   if (length(order) > 0) {
     order <- as.sql(order, con = con)
-    order <- glue_sql2("ORDER BY {order*}", .con = con)
+    order <- glue_sql2("ORDER BY {.val order*}", .con = con)
   }
   if (length(frame) > 0) {
     if (length(order) == 0) {
@@ -58,7 +58,7 @@ win_over <- function(expr,
   } else {
     over <- win_get(over, con)
   }
-  glue_sql2("{expr} OVER {over}", .con = con)
+  glue_sql2("{.val expr} OVER {.val over}", .con = con)
 }
 
 win_register_activate <- function() {
@@ -258,19 +258,19 @@ sql_nth <- function(x,
   } else {
     sql_f <- "NTH_VALUE"
     n <- as.integer(n)
-    args <- glue_sql2("{args}, {n}", .con = sql_current_con())
+    args <- glue_sql2("{.sql args}, {n}", .con = sql_current_con())
   }
 
   if (na_rm) {
     if (ignore_nulls == "inside") {
-      sql_expr <- "{.sql sql_f}({args} IGNORE NULLS)"
+      sql_expr <- "{.sql sql_f}({.sql args} IGNORE NULLS)"
     } else if (ignore_nulls == "outside") {
-      sql_expr <- "{.sql sql_f}({args}) IGNORE NULLS"
+      sql_expr <- "{.sql sql_f}({.sql args}) IGNORE NULLS"
     } else {
-      sql_expr <- "{.sql sql_f}({args}, TRUE)"
+      sql_expr <- "{.sql sql_f}({.sql args}, TRUE)"
     }
   } else {
-    sql_expr <- "{.sql sql_f}({args})"
+    sql_expr <- "{.sql sql_f}({.sql args})"
   }
 
   win_over(
