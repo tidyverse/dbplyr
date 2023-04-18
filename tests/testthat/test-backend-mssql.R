@@ -114,6 +114,15 @@ test_that("last_value_sql() translated correctly", {
   )
 })
 
+test_that("between translation respects context", {
+  local_con(simulate_mssql())
+
+  local_context(list(clause = "WHERE"))
+  expect_equal(translate_sql(between(a, 1L, 2L)), sql("`a` BETWEEN 1 AND 2"))
+  local_context(list(clause = "SELECT"))
+  expect_equal(translate_sql(between(a, 1L, 2L)), sql("IIF(`a` BETWEEN 1 AND 2)"))
+})
+
 # verb translation --------------------------------------------------------
 
 test_that("convert between bit and boolean as needed", {

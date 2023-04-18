@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The translation of `between()` now also works for MS SQL when used in `mutate()`
+  (@mgirlich, #1241).
+
 * The first argument of `ntile()` has been renamed from `order_by` to `x` to
   match the interface of `dplyr::ntile()` (@mgirlich, #1242).
 
