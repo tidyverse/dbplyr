@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Fixed an issue with `full_join()` where duplicate column names weren't
+  detected if they differed by case (@ejneer, #1255)
+
 * Using a function with a namespace in `across()` now works, e.g.
   `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
 

@@ -67,11 +67,11 @@ test_that("sql_multi_join_vars generates expected SQL", {
       con,
       type = "full",
       vars = list(
-        name = c("x", "a.x", "a.y", "b"),
-        x = c("x", "a", NA, NA),
-        y = c("x", NA, "a", "b"),
-        all_x = c("x", "a"),
-        all_y = c("x", "a", "b")
+        name = c("x", "a.x", "a.y", "b", "c.x", "C.y"),
+        x = c("x", "a", NA, NA, "c", NA),
+        y = c("x", NA, "a", "b", NA, "C"),
+        all_x = c("x", "a", "c"),
+        all_y = c("x", "a", "b", "C")
       ),
       x_as = ident("left"),
       y_as = ident("right")
@@ -80,7 +80,9 @@ test_that("sql_multi_join_vars generates expected SQL", {
       x = "COALESCE(`left`.`x`, `right`.`x`)",
       a.x = "`left`.`a`",
       a.y = "`right`.`a`",
-      b = "`b`"
+      b = "`b`",
+      c.x = "`left`.`c`",
+      C.y = "`right`.`C`"
     )
   )
 })
