@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
+
 * Using a function with a namespace in `across()` now works, e.g.
   `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
 
