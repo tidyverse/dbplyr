@@ -302,7 +302,11 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data, 
   keys_cond <- purrr::imap(
     keys,
     function(value, name) {
-      expr(!!sym(name) == !!value)
+      if (is.na(value)) {
+        expr(is.na(!!sym(name)))
+      } else {
+        expr(!!sym(name) == !!value)
+      }
     }
   ) %>%
     purrr::reduce(~ expr(!!.x & !!.y))
