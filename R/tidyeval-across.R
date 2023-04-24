@@ -54,8 +54,8 @@ partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_e
   } else {
     fn <- "if_any()"
   }
-  out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
-  Reduce(function(x, y) call2(reduce, x, y), out)
+  conditions <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
+  Reduce(function(x, y) call2(reduce, x, y), conditions)
 }
 
 deprecate_across_dots <- function(call, env, user_env) {
