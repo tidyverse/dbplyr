@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
+  This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
+
 * `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
 
 * Using a function with a namespace in `across()` now works, e.g.
