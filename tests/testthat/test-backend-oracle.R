@@ -24,7 +24,7 @@ test_that("queries do not use *", {
   lf <- lazy_frame(x = 1L, con = simulate_oracle())
   expect_equal(
     lf %>% mutate(y = x) %>% remote_query(),
-    sql("SELECT `x`, `x` AS `y`\nFROM (`df`)")
+    sql("SELECT `x`, `x` AS `y`\nFROM `df`")
   )
 })
 

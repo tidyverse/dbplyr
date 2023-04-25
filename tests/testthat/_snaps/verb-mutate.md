@@ -35,8 +35,8 @@
         FROM (
           SELECT `x` + 1.0 AS `x`
           FROM `multi_mutate`
-        )
-      )
+        ) AS `q01`
+      ) AS `q02`
 
 # transmute includes all needed variables
 
@@ -141,7 +141,7 @@
       FROM (
         SELECT `x` + 1.0 AS `x`
         FROM `df`
-      )
+      ) AS `q01`
 
 ---
 
@@ -153,7 +153,7 @@
       FROM (
         SELECT *, `x` + 1.0 AS `x1`
         FROM `df`
-      )
+      ) AS `q01`
 
 # mutate collapses over nested select
 
