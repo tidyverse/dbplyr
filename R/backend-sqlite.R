@@ -39,7 +39,7 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
+  glue_sql2(con, "EXPLAIN QUERY PLAN {.sql sql}")
 }
 
 #' @export
@@ -126,22 +126,19 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 
 #' @export
 sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-
-    if (is.null(name)) {
-      build_sql(sql_indent_subquery(from, con, lvl), con = con)
-    } else {
-      build_sql(sql_indent_subquery(from, con, lvl), " AS ", as_subquery_name(name), con = con)
-    }
-  }
+  sql_query_wrap_helper(
+    con = con,
+    from = from,
+    name = name,
+    lvl = lvl,
+    as = TRUE
+  )
 }
 
 #' @export
 sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
-  build_sql(x, " IS ", y, con = con)
+  glue_sql2(con, "{x} IS {y}")
 }
 
 #' @export

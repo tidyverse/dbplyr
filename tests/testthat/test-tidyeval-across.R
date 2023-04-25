@@ -37,6 +37,15 @@ test_that("across() translates functions", {
   )
 })
 
+test_that("across() translates functions in namespace #1231", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, dplyr::dense_rank)),
+    exprs(a = dense_rank(a), b = dense_rank(b))
+  )
+})
+
 test_that("across() captures anonymous functions", {
   lf <- lazy_frame(a = 1)
 
@@ -243,7 +252,7 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
 
   expect_equal(
     partial_eval_dots(lf, if_all(all_of(y), ~ .x < 2)),
-    list(quo(x < 2)),
+    list(quo((x < 2))),
     ignore_attr = "names"
   )
 })
@@ -439,6 +448,15 @@ test_that("if_all/any works in filter()", {
   expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
 })
 
+test_that("if_all/any is wrapped in parantheses #1153", {
+  lf <- lazy_frame(a = 1,  b = 2, c = 3)
+
+  expect_equal(
+    lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
+    sql("SELECT *\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
+  )
+})
+
 test_that("if_all/any works in mutate()", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -479,11 +497,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
   # Single inputs
   expect_equal(
     filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT *\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
     filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT *\nFROM `df`\nWHERE ((FALSE))")
   )
 })
 

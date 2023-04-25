@@ -231,7 +231,7 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   sql_query_select(
     con,
     select = sql_values_cast_clauses(con, df, types, na = FALSE),
-    from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
+    from = sql_query_wrap(con, subquery, name = "values_table", lvl = lvl),
     lvl = lvl
   )
 }
@@ -322,7 +322,7 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   sql_query_select(
     con,
     select = sql_values_cast_clauses(con, df, types, na = FALSE),
-    from = sql_subquery(con, subquery, name = "values_table", lvl = lvl),
+    from = sql_query_wrap(con, subquery, name = "values_table", lvl = lvl),
     lvl = lvl
   )
 }

@@ -16,7 +16,7 @@
       FROM (
         SELECT *, AVG(`x`) OVER () AS `q01`
         FROM `df`
-      )
+      ) AS `q01`
       WHERE (`q01` > 3.0) AND (`y` < 3.0)
 
 # errors for named input
@@ -66,10 +66,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, MAX(`x`) OVER () AS `q01`
+        SELECT *, MAX(`x`) OVER () AS `q02`
         FROM `df`
       ) `q01`
-      WHERE (`x` = `q01`) AND (`x` IN (1, 2))
+      WHERE (`x` = `q02`) AND (`x` IN (1, 2))
 
 # filter() after summarise() uses `HAVING`
 

@@ -54,8 +54,8 @@ partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_e
   } else {
     fn <- "if_any()"
   }
-  out <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
-  Reduce(function(x, y) call2(reduce, x, y), out)
+  conditions <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
+  Reduce(function(x, y) call2(reduce, x, y), conditions)
 }
 
 deprecate_across_dots <- function(call, env, user_env) {
@@ -86,6 +86,8 @@ across_funs <- function(funs, env, data, dots, names_spec, fn, evaluated = FALSE
     names_spec <- names_spec %||% "{.col}"
   } else if (is_quosure(funs)) {
     return(across_funs(quo_squash(funs), env, data, dots, names_spec, fn, evaluated = evaluated))
+  } else if (is_call(funs, "::")) {
+    return(across_funs(funs[[3]], env, data, dots, names_spec, fn, evaluated = evaluated))
   } else if (is_symbol(funs) || is_function(funs) ||
              is_call(funs, "~") || is_call(funs, "function")) {
     is_local_list <- function(funs) {

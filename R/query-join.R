@@ -209,7 +209,7 @@ sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS") {
   table_names <- c(unclass(x_as), unclass(y_as))
 
   if (type == "full") {
-    duplicated_vars <- intersect(vars$all_x, vars$all_y)
+    duplicated_vars <- intersect(tolower(vars$all_x), tolower(vars$all_y))
     out <- purrr::map2(
       vars$x, vars$y,
       ~ {
@@ -285,6 +285,9 @@ sql_join_tbls <- function(con, by, na_matches) {
 }
 
 sql_table_prefix <- function(con, var, table = NULL) {
+  if (!is_bare_character(var)) {
+    cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
+  }
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {

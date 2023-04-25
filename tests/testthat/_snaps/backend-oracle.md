@@ -5,7 +5,7 @@
     Output
       <SQL>
       SELECT *
-      FROM (`df`) 
+      FROM `df`
       FETCH FIRST 6 ROWS ONLY
 
 # `sql_query_upsert()` is correct
@@ -18,7 +18,7 @@
       <SQL> MERGE INTO `df_x`
       USING (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM (`df_y`) 
+        FROM `df_y`
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
@@ -51,8 +51,8 @@
     Output
       <SQL>
       SELECT `df_LHS`.`x` AS `x`
-      FROM (`df`) `df_LHS`
-      LEFT JOIN (`df`) `df_RHS`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
         ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---
@@ -60,8 +60,7 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> CREATE GLOBAL TEMPORARY TABLE 
-      `schema`.`tbl` AS
+      <SQL> CREATE GLOBAL TEMPORARY TABLE `schema`.`tbl` AS
       SELECT * FROM foo
 
 ---
@@ -70,8 +69,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> CREATE TABLE 
-      `schema`.`tbl` AS
+      <SQL> CREATE TABLE `schema`.`tbl` AS
       SELECT * FROM foo
 
 ---
@@ -83,7 +81,7 @@
       SELECT `x`
       FROM (
         SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
-        FROM (`df`) 
+        FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)
 
@@ -93,7 +91,7 @@
       copy_inline(con, y %>% slice(0)) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS INT) AS `id`, CAST(NULL AS VARCHAR2(255)) AS `arr`
-      FROM (`DUAL`) 
+      FROM `DUAL`
       WHERE (0 = 1)
     Code
       copy_inline(con, y) %>% remote_query()
@@ -102,7 +100,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
-          FROM (`DUAL`) 
+          FROM `DUAL`
           WHERE (0 = 1)
         )
         UNION ALL
@@ -112,7 +110,7 @@
       copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
-      FROM (`DUAL`) 
+      FROM `DUAL`
       WHERE (0 = 1)
     Code
       copy_inline(con, y, types = types) %>% remote_query()
@@ -121,7 +119,7 @@
       FROM (
         (
           SELECT NULL AS `id`, NULL AS `arr`
-          FROM (`DUAL`) 
+          FROM `DUAL`
           WHERE (0 = 1)
         )
         UNION ALL

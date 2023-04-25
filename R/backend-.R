@@ -61,18 +61,19 @@ base_scalar <- sql_translator(
 
   `$`   = sql_infix(".", pad = FALSE),
   `[[`   = function(x, i) {
+    # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
     if (is.character(i)) {
-      build_sql(x, ".", ident(i))
+      glue_sql2(sql_current_con(), "{x}.{.col i}")
     } else if (is.numeric(i)) {
-      build_sql(x, "[", as.integer(i), "]")
+      i <- as.integer(i)
+      glue_sql2(sql_current_con(), "{x}[{i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
-
   },
   `[` = function(x, i) {
-    build_sql("CASE WHEN (", i, ") THEN (", x, ") END")
+    glue_sql2(sql_current_con(), "CASE WHEN ({i}) THEN ({x}) END")
   },
 
   `!=`    = sql_infix("!="),
@@ -176,7 +177,7 @@ base_scalar <- sql_translator(
     sql_expr(((!!x)))
   },
   desc = function(x) {
-    build_sql(x, sql(" DESC"))
+    glue_sql2(sql_current_con(), "{x} DESC")
   },
 
   is.null = sql_is_null,
@@ -354,7 +355,7 @@ base_agg <- sql_translator(
   # nth = sql_prefix("NTH_VALUE", 2),
 
   n_distinct = function(x) {
-    build_sql("COUNT(DISTINCT ", x, ")")
+    glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})")
   }
 )
 
@@ -369,11 +370,11 @@ base_win <- sql_translator(
   dense_rank   = win_rank("DENSE_RANK"),
   percent_rank = win_rank("PERCENT_RANK"),
   cume_dist    = win_rank("CUME_DIST"),
-  ntile        = function(order_by, n) {
+  ntile        = function(x, n) {
     win_over(
       sql_expr(NTILE(!!as.integer(n))),
       win_current_group(),
-      order_by %||% win_current_order()
+      x %||% win_current_order()
     )
   },
 
@@ -452,7 +453,7 @@ base_win <- sql_translator(
     )
   },
   n_distinct = function(x) {
-    win_over(build_sql("COUNT(DISTINCT ", x, ")"), win_current_group())
+    win_over(glue_sql2(sql_current_con(), "COUNT(DISTINCT {x})"), win_current_group())
   },
 
   # Cumulative function are like recycled aggregates except that R names

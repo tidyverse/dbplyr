@@ -1,5 +1,25 @@
 # dbplyr (development version)
 
+* `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
+
+* Subqueries now also get an alias for SQLite. This makes it consistent with
+  other backends and simplifies the implementation.
+
+* The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
+  This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
+
+* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
+
+* Using a function with a namespace in `across()` now works, e.g.
+  `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
+
+* The dots in `db_copy_to()` are now passed to `db_write_table()` (@mgirlich, #1237).
+
+* Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
+
+* The first argument of `ntile()` has been renamed from `order_by` to `x` to
+  match the interface of `dplyr::ntile()` (@mgirlich, #1242).
+
 * Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
   (@mgirlich, #1208).
 
