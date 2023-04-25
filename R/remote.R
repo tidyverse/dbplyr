@@ -61,6 +61,11 @@ query_name.lazy_base_remote_query <- function(x) {
     return(name$table)
   }
 
+  if (inherits(name, "Id")) {
+    out <- name@name[["table"]]
+    return(ident(out))
+  }
+
   abort("Unexpected type", .internal = TRUE)
 }
 
