@@ -14,14 +14,14 @@
 #'   multiple `tbl` objects.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL) {
   check_dots_used()
-  # If not literal sql, must be a table identifier
+  check_character(vars, allow_null = TRUE)
   from_sql <- as.sql(from, con = src$con)
-  if (!(is.ident(from) || is.sql(from) || is_schema(from))) {
+  vars <- vars %||% dbplyr_query_fields(src$con, from_sql)
+
+  # If not literal sql, must be a table identifier
+  if (!(is.ident(from) || is.sql(from) || is_schema(from) || inherits(from, "Id"))) {
     from <- as.sql(from, con = src$con)
   }
-
-  check_character(vars, allow_null = TRUE)
-  vars <- vars %||% dbplyr_query_fields(src$con, from_sql)
 
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
