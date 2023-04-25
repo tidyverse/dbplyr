@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
+
 * MySQL/MariaDB:
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
     `as.integer64()` (@avsdev-cw, #1189).

@@ -83,6 +83,15 @@ test_that("join works with in_schema", {
   expect_snapshot(
     left_join(df1, df3, by = "x") %>% remote_query()
   )
+
+  # use auto name for `ident_q`
+  df4 <- tbl(con, ident_q("`foo`.`df`"))
+  df5 <- tbl(con, ident_q("`foo2`.`df`"))
+  expect_snapshot(
+    left_join(df4, df5, by = "x") %>% remote_query()
+  )
+  out <- left_join(df4, df5, by = "x")
+  expect_equal(out$lazy_query$table_names, tibble(name = c(NA_character_, NA), from = ""))
 })
 
 test_that("alias truncates long table names at database limit", {

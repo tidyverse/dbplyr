@@ -49,7 +49,7 @@ query_name.tbl_lazy <- function(x) {
 #' @export
 query_name.lazy_base_remote_query <- function(x) {
   name <- x$x
-  if (is.sql(name)) {
+  if (is.sql(name) || inherits(name, "ident_q")) {
     return(NULL)
   }
 
