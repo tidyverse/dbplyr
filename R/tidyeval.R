@@ -73,9 +73,11 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
   } else if (is_quosure(call)) {
     partial_eval(get_expr(call), data, get_env(call), error_call = error_call)
   } else if (is_call(call, "if_any")) {
-    partial_eval_if(call, data, env, reduce = "|", error_call = error_call)
+    out <- partial_eval_if(call, data, env, reduce = "|", error_call = error_call)
+    expr(((!!out)))
   } else if (is_call(call, "if_all")) {
-    partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
+    out <- partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
+    expr(((!!out)))
   } else if (is_call(call, "across")) {
     partial_eval_across(call, data, env, error_call)
   } else if (is_call(call, "pick")) {

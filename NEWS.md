@@ -3,6 +3,14 @@
 * Fixed an issue with `full_join()` where duplicate column names weren't
   detected if they differed by case (@ejneer, #1255)
 
+* Subqueries now also get an alias for SQLite. This makes it consistent with
+  other backends and simplifies the implementation.
+
+* The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
+  This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
+
+* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
+
 * Using a function with a namespace in `across()` now works, e.g.
   `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
 

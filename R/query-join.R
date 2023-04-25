@@ -285,6 +285,9 @@ sql_join_tbls <- function(con, by, na_matches) {
 }
 
 sql_table_prefix <- function(con, var, table = NULL) {
+  if (!is_bare_character(var)) {
+    cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
+  }
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {

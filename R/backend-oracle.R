@@ -158,20 +158,6 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
-  # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
-  if (is.ident(from)) {
-    from <- glue_sql2(con, "({.from from})")
-    name <- as_subquery_name(name, default = NULL)
-  } else {
-    from <- sql_indent_subquery(from, con, lvl)
-    name <- as_subquery_name(name)
-  }
-
-  glue_sql2(con, "{.sql from}", if (!is.null(name)) " {.name name}")
-}
-
-#' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
   glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
@@ -221,9 +207,6 @@ sql_query_explain.OraConnection <- sql_query_explain.Oracle
 
 #' @export
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
-
-#' @export
-sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
 
 #' @export
 sql_query_save.OraConnection <- sql_query_save.Oracle

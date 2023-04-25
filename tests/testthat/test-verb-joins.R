@@ -339,8 +339,8 @@ test_that("select() before join is inlined", {
     expect_equal(lq$vars$var, var)
     expect_equal(lq$vars$table, table)
 
-    expect_equal(lq$joins$by[[1]]$x, ident("x1"))
-    expect_equal(lq$joins$by[[1]]$y, ident("x2"))
+    expect_equal(lq$joins$by[[1]]$x, "x1")
+    expect_equal(lq$joins$by[[1]]$y, "x2")
   }
 
   out_left <- left_join(
@@ -368,8 +368,8 @@ test_that("select() before join is inlined", {
   expect_equal(out_right$vars$name, c("a2", "x", "b"))
   expect_equal(out_right$vars$x, c("a", NA, NA))
   expect_equal(out_right$vars$y, c(NA, "x2", "b"))
-  expect_equal(out_right$by$x, ident("x1"))
-  expect_equal(out_right$by$y, ident("x2"))
+  expect_equal(out_right$by$x, "x1")
+  expect_equal(out_right$by$y, "x2")
 
   out_full <- full_join(
     lf %>% select(a2 = a, x = x1),
@@ -437,8 +437,8 @@ test_that("named by works in combination with inlined select", {
   expect_equal(op_vars(lq), c("id_x", "x.x"))
   expect_equal(lq$vars$var, c("id_x", "x"))
   expect_equal(lq$vars$table, c(1, 1))
-  expect_equal(lq$joins$by[[1]]$x, ident(c("id_x", "x")))
-  expect_equal(lq$joins$by[[1]]$y, ident(c("id_y", "x")))
+  expect_equal(lq$joins$by[[1]]$x, c("id_x", "x"))
+  expect_equal(lq$joins$by[[1]]$y, c("id_y", "x"))
 })
 
 test_that("suffix works in combination with inlined select", {
@@ -626,10 +626,10 @@ test_that("multiple joins can use by column from any table", {
   out <- left_join(lf, lf2, by = "x") %>%
     left_join(lf3, by = c("x", "y"))
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
@@ -644,10 +644,10 @@ test_that("multiple joins can use by column from any table", {
     left_join(lf3, by = c("x", "y"))
 
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y2")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y2"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 })
 
