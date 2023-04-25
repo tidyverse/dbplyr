@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* MySQL/MariaDB:
+  * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
+    `as.integer64()` (@avsdev-cw, #1189).
+
 * `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
 
 * Subqueries now also get an alias for SQLite. This makes it consistent with
