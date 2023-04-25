@@ -19,8 +19,8 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q02`
         FROM `df`
       ) `q01`
-      WHERE (`q01` = 1)
+      WHERE (`q02` = 1)
 

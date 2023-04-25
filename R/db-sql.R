@@ -259,9 +259,7 @@ sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
   }
 
   from <- sql_indent_subquery(from, con, lvl)
-  if (!is.null(name) && name != "values_table" && name != ident("...y") && name != "LHS" && name != "RHS") {
-    browser()
-  }
+  # some backends, e.g. Postgres, require an alias for a subquery
   name <- as_subquery_name(name)
   glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
 }

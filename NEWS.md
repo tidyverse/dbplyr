@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Subqueries now also get an alias for SQLite. This makes it consistent with
+  other backends and simplifies the implementation.
+
 * The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
   This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
 
