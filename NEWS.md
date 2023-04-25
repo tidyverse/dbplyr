@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
+
 * Subqueries now also get an alias for SQLite. This makes it consistent with
   other backends and simplifies the implementation.
 

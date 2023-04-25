@@ -106,6 +106,20 @@
       LEFT JOIN `df` AS `df_RHS`
         ON (`df_LHS`.`y` = `df_RHS`.`y`)
 
+---
+
+    Code
+      full_join(lf1, lf2, by = "y")
+    Output
+      <SQL>
+      SELECT
+        `df_LHS`.`x` AS `x`,
+        COALESCE(`df_LHS`.`y`, `df_RHS`.`y`) AS `y`,
+        `df_RHS`.`X` AS `X`
+      FROM `df` AS `df_LHS`
+      FULL JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`y` = `df_RHS`.`y`)
+
 # sql_on query doesn't change unexpectedly
 
     Code
