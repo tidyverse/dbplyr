@@ -238,13 +238,32 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 #' @export
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
+  sql_query_wrap_helper(
+    con = con,
+    from = from,
+    name = name,
+    lvl = lvl,
+    as = FALSE
+  )
+}
+
+sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
   if (is.ident(from)) {
-    setNames(from, name)
-  } else if (is_schema(from) || is_catalog(from)) {
-    setNames(as.sql(from, con), name)
-  } else {
-    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
+    out <- setNames(from, name)
+    return(out)
   }
+
+  if (is_schema(from) || is_catalog(from) || inherits(from, "Id")) {
+    out <- setNames(as.sql(from, con), name)
+    return(out)
+  }
+
+  from <- sql_indent_subquery(from, con, lvl)
+  if (!is.null(name) && name != "values_table" && name != ident("...y") && name != "LHS" && name != "RHS") {
+    browser()
+  }
+  name <- as_subquery_name(name)
+  glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
 }
 
 as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
