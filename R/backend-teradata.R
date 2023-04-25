@@ -65,7 +65,7 @@ sql_query_select.Teradata <- function(con,
       lvl       = lvl + 1
     )
 
-    from <- sql_subquery(con, unlimited_query)
+    from <- sql_query_wrap(con, unlimited_query)
     out <- sql_select_clauses(con,
       select   = sql_clause_select(con, select, distinct = FALSE, top = limit),
       from     = sql_clause_from(from),
