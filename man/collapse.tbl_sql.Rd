@@ -10,7 +10,7 @@
 
 \method{compute}{tbl_sql}(
   x,
-  name = unique_table_name(),
+  name = NULL,
   temporary = TRUE,
   unique_indexes = list(),
   indexes = list(),
