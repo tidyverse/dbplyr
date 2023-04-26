@@ -244,6 +244,15 @@ base_scalar <- sql_translator(
 
   # base R
   nchar = sql_prefix("LENGTH", 1),
+  nzchar = function(x, keepNA = FALSE) {
+    if (keepNA) {
+      exp <- expr(!!x != "")
+      translate_sql(!!exp)
+    } else {
+      exp <- expr((is.na(!!x) | !!x != ""))
+      translate_sql(!!exp)
+    }
+  },
   tolower = sql_prefix("LOWER", 1),
   toupper = sql_prefix("UPPER", 1),
   trimws = function(x, which = "both") sql_str_trim(x, side = which),
