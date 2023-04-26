@@ -32,6 +32,10 @@ lazy_base_query <- function(x, vars, class = character(), ...) {
 }
 
 lazy_query_local <- function(df, name) {
+  if (is_bare_character(name)) {
+    name <- ident(name)
+  }
+
   lazy_base_query(df, names(df), class = "local", name = name)
 }
 
@@ -62,7 +66,7 @@ sql_build.lazy_base_remote_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
-  ident(op$name)
+  as.sql(op$name, con = con)
 }
 
 # op_grps -----------------------------------------------------------------
