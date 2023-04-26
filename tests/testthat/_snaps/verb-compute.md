@@ -36,3 +36,7 @@
       Caused by error:
       ! dummy DBI error
 
+# compute(temporary = FALSE) without a name is deprecated
+
+    The `name` argument of `compute()` must be provided when `temporary = FALSE` as of dbplyr 2.3.3.
+

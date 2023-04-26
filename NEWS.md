@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Using `compute(temporary = FALSE)` without providing a name is now
+  deprecated (@mgirlich, #1154).
+
 * Added translation for `nzchar()` (@MichaelChirico, @mgirlich, #1094).
 
 * MySQL/MariaDB:
