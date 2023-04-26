@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Added translation for `nzchar()` (@MichaelChirico, @mgirlich, #1094).
+
 * MySQL/MariaDB:
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
     `as.integer64()` (@avsdev-cw, #1189).
