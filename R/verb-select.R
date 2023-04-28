@@ -23,7 +23,7 @@ select.tbl_lazy <- function(.data, ...) {
   loc <- ensure_group_vars(loc, .data, notify = TRUE)
   new_vars <- set_names(colnames(.data)[loc], names(loc))
 
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data$lazy_query, new_vars)
   .data
 }
 
@@ -52,7 +52,7 @@ rename.tbl_lazy <- function(.data, ...) {
   new_vars <- set_names(colnames(.data), colnames(.data))
   names(new_vars)[loc] <- names(loc)
 
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data$lazy_query, new_vars)
   .data
 }
 
@@ -68,7 +68,7 @@ rename_with.tbl_lazy <- function(.data, .fn, .cols = everything(), ...) {
   new_vars <- set_names(op_vars(.data))
   names(new_vars)[cols] <- .fn(new_vars[cols], ...)
 
-  .data$lazy_query <- add_select(.data, new_vars)
+  .data$lazy_query <- add_select(.data$lazy_query, new_vars)
   .data
 }
 
@@ -122,10 +122,9 @@ simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
 
 # op_select ---------------------------------------------------------------
 
-add_select <- function(.data, vars) {
-  lazy_query <- .data$lazy_query
+add_select <- function(lazy_query, vars) {
   check_character(vars)
-  vars_data <- op_vars(.data)
+  vars_data <- op_vars(lazy_query)
 
   if (is_identity(syms(vars), names(vars), vars_data)) {
     return(lazy_query)

@@ -98,7 +98,10 @@ summarise_bind_error <- function(cur_data, dots, i, error_env) {
     summarise_bind_error1(error_env, dot_name)
     # remove variable from `cur_data` so that `partial_eval_sym()` evaluates
     # variable in `error_env`
-    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(colnames(cur_data), dot_name)))
+    cur_data$lazy_query <- add_select(
+      cur_data$lazy_query,
+      set_names(setdiff(colnames(cur_data), dot_name))
+    )
   }
 
   cur_data
