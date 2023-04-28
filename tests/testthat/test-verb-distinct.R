@@ -197,6 +197,11 @@ test_that("distinct respects window_order when .keep_all is TRUE", {
   )
 })
 
+test_that("distinct uses dummy window order when .keep_all is TRUE and no order is used", {
+  lf <- lazy_frame(x = 1, y = 2)
+  expect_snapshot(lf %>% distinct(x, .keep_all = TRUE))
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("distinct sets flagged", {

@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `distinct(.keep_all = TRUE)` now works for SQL Server (@mgirlich, #1053).
+
 * Using `compute(temporary = FALSE)` without providing a name is now
   deprecated (@mgirlich, #1154).
 
