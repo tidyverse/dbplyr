@@ -55,7 +55,7 @@ add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
     tmp <- list(lazy_query = x_lq$x)
     class(tmp) <- "tbl_lazy"
     x_lq$x <- fill_vars(tmp, vars)$lazy_query
-    x_lq$unions$table <- purrr::map(x_lq$unions$table, \(x) fill_vars(x, vars))
+    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) fill_vars(table, vars))
     y <- fill_vars(y, vars)
 
     x_lq$unions$table <- c(x_lq$unions$table, list(y))
