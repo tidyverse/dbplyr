@@ -82,6 +82,7 @@ sql_query_join(
   by = NULL,
   na_matches = FALSE,
   ...,
+  select = NULL,
   lvl = 0
 )
 

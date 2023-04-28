@@ -85,6 +85,8 @@ join_query(
   x,
   y,
   vars,
+  ...,
+  select,
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),
