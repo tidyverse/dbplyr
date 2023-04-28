@@ -9,10 +9,12 @@
 \alias{lazy_query}
 \alias{lazy_select_query}
 \alias{lazy_set_op_query}
+\alias{lazy_union_query}
 \alias{join_query}
 \alias{select_query}
 \alias{semi_join_query}
 \alias{set_op_query}
+\alias{union_query}
 \alias{sql_build}
 \alias{sql_render}
 \alias{sql_optimise}
@@ -81,6 +83,8 @@ lazy_select_query(
 
 lazy_set_op_query(x, y, type, all, call = caller_env())
 
+lazy_union_query(x, unions, call = caller_env())
+
 join_query(
   x,
   y,
@@ -106,6 +110,8 @@ select_query(
 semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
 
 set_op_query(x, y, type, all = FALSE)
+
+union_query(x, unions)
 
 sql_build(op, con = NULL, ...)
 

@@ -181,16 +181,14 @@
       lf %>% arrange(a) %>% union(rf)
     Output
       <SQL>
-      (
-        SELECT *, NULL AS `c`
-        FROM `df`
-        ORDER BY `a`
-      )
+      SELECT *, NULL AS `c`
+      FROM `df`
+      ORDER BY `a`
+      
       UNION
-      (
-        SELECT `a`, NULL AS `b`, `c`
-        FROM `df`
-      )
+      
+      SELECT `a`, NULL AS `b`, `c`
+      FROM `df`
     Code
       # can arrange after join
       lf %>% left_join(rf) %>% arrange(a)
@@ -228,15 +226,13 @@
       <SQL>
       SELECT *
       FROM (
-        (
-          SELECT *, NULL AS `c`
-          FROM `df`
-        )
+        SELECT *, NULL AS `c`
+        FROM `df`
+      
         UNION
-        (
-          SELECT `a`, NULL AS `b`, `c`
-          FROM `df`
-        )
+      
+        SELECT `a`, NULL AS `b`, `c`
+        FROM `df`
       ) `q01`
       ORDER BY `a`
 

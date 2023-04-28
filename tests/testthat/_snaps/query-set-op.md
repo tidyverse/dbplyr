@@ -21,15 +21,13 @@
       union(lf, lf)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df`
-      )
+      SELECT *
+      FROM `df`
+      
       UNION
-      (
-        SELECT *
-        FROM `df`
-      )
+      
+      SELECT *
+      FROM `df`
 
 ---
 
@@ -69,15 +67,13 @@
       union(lf, lf, all = TRUE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df`
-      )
+      SELECT *
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT *
-        FROM `df`
-      )
+      
+      SELECT *
+      FROM `df`
 
 ---
 
