@@ -55,6 +55,18 @@ test_that("union and union all work for all backends", {
     expect_equal_tbls()
 })
 
+test_that("can combine multiple union in one query", {
+  lf1 <- lazy_frame(x = 1, y = 1, .name = "lf1")
+  lf2 <- lazy_frame(y = 1, .name = "lf2")
+  lf3 <- lazy_frame(z = 1, .name = "lf3")
+
+  expect_snapshot(
+    lf1 %>%
+      union_all(lf2) %>%
+      union(lf3)
+  )
+})
+
 test_that("intersect and setdiff work for supported backends", {
   df <- tibble(x = 1:10, y = x %% 2)
 
