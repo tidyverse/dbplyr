@@ -153,6 +153,8 @@ always call <code>sql_render()</code>.</p>
 <span></span>
 <span><span class="fu">lazy_set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, <span class="va">all</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">lazy_union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span>, call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">join_query</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
@@ -178,6 +180,8 @@ always call <code>sql_render()</code>.</p>
 <span><span class="fu">semi_join_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">vars</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, na_matches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_build</span><span class="op">(</span><span class="va">op</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>

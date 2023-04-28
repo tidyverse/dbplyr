@@ -73,7 +73,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>Using <code>compute(temporary = FALSE)</code> without providing a name is now deprecated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1154" class="external-link">#1154</a>).</p></li>
+<ul><li><p>A sequence of <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union()</a></code> resp. <code><a href="https://dplyr.tidyverse.org/reference/setops.html" class="external-link">union_all()</a></code> now produces a flat query instead of subqueries (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1269" class="external-link">#1269</a>).</p></li>
+<li><p>Using <code>compute(temporary = FALSE)</code> without providing a name is now deprecated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1154" class="external-link">#1154</a>).</p></li>
 <li><p>Added translation for <code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar()</a></code> (<a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>, <a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1094" class="external-link">#1094</a>).</p></li>
 <li>
 <p>MySQL/MariaDB:</p>
