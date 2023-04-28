@@ -434,9 +434,19 @@ simulate_mssql <- function(version = "15.0") {
       },
       all = mssql_bit_int_bit(win_aggregate("MIN")),
       any = mssql_bit_int_bit(win_aggregate("MAX")),
+      # mssql requires a subquery that returns a constant to work if no ordering
+      # is specified
+      # https://stackoverflow.com/questions/44105691/row-number-without-order-by
+      row_number = win_rank("ROW_NUMBER", function() {
+        curr_order <- win_current_order()
+        if (is_empty(curr_order)) {
+          return(sql("(SELECT 1)"))
+        }
+        curr_order
+      })
     )
-
-  )}
+  )
+}
 
 mssql_version <- function(con) {
   if (inherits(con, "TestConnection")) {

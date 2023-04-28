@@ -22,7 +22,7 @@ win_over(
   con = sql_current_con()
 )
 
-win_rank(f)
+win_rank(f, empty_order_over = win_current_order)
 
 win_aggregate(f)
 

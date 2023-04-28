@@ -125,7 +125,7 @@ rows <- function(from = -Inf, to = 0) {
 
 #' @rdname win_over
 #' @export
-win_rank <- function(f) {
+win_rank <- function(f, empty_order_over = win_current_order) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
@@ -146,7 +146,7 @@ win_rank <- function(f) {
       not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
       no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
     } else {
-      order_over <- win_current_order()
+      order_over <- empty_order_over()
     }
 
     rank_sql <- win_over(
