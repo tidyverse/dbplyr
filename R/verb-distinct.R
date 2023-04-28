@@ -20,21 +20,9 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   can_use_distinct <- !.keep_all || (empty_dots && is_empty(grps))
   if (!can_use_distinct) {
     .data <- .data %>%
-      group_by(..., .add = TRUE)
-
-    needs_dummy_order <- is.null(op_sort(.data))
-    if (needs_dummy_order) {
-      dummy_order_vars <- setdiff(colnames(.data), group_vars(.data))[[1]]
-      .data <- .data %>% window_order(!!sym(dummy_order_vars))
-    }
-
-    .data <- .data %>%
+      group_by(..., .add = TRUE) %>%
       filter(row_number() == 1L) %>%
       group_by(!!!grps)
-
-    if (needs_dummy_order) {
-      .data <- .data %>% window_order()
-    }
 
     return(.data)
   }
