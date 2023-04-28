@@ -67,18 +67,16 @@
       y = 23:24, .name = "df_y"), by = "x", conflict = "ignore", in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-      )
+      SELECT *
+      FROM `df_x`
+      
       UNION ALL
-      (
-        SELECT *
-        FROM `df_y`
-        WHERE NOT EXISTS (
-          SELECT 1 FROM `df_x`
-          WHERE (`df_y`.`x` = `df_x`.`x`)
-        )
+      
+      SELECT *
+      FROM `df_y`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_x`
+        WHERE (`df_y`.`x` = `df_x`.`x`)
       )
 
 # `rows_insert()` works with `in_place = TRUE`
@@ -165,15 +163,13 @@
       y = 23:24, .name = "df_y"), in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-      )
+      SELECT *
+      FROM `df_x`
+      
       UNION ALL
-      (
-        SELECT *
-        FROM `df_y`
-      )
+      
+      SELECT *
+      FROM `df_y`
 
 # `rows_append()` works with `in_place = TRUE`
 
@@ -289,21 +285,19 @@
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-        WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y`
-          WHERE (`df_x`.`x` = `df_y`.`x`)
-        )
+      SELECT *
+      FROM `df_x`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
       )
+      
       UNION ALL
-      (
-        SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
-        FROM `df_x`
-        INNER JOIN `df_y`
-          ON (`df_x`.`x` = `df_y`.`x`)
-      )
+      
+      SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
+      FROM `df_x`
+      INNER JOIN `df_y`
+        ON (`df_x`.`x` = `df_y`.`x`)
 
 # `rows_update()` works with `in_place = TRUE`
 
@@ -348,24 +342,22 @@
       in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-        WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y`
-          WHERE (`df_x`.`x` = `df_y`.`x`)
-        )
+      SELECT *
+      FROM `df_x`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
       )
+      
       UNION ALL
-      (
-        SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
-        FROM (
-          SELECT `df_x`.*, `df_y`.`y` AS `y...y`
-          FROM `df_x`
-          INNER JOIN `df_y`
-            ON (`df_x`.`x` = `df_y`.`x`)
-        ) `q01`
-      )
+      
+      SELECT `x`, COALESCE(`y`, `y...y`) AS `y`
+      FROM (
+        SELECT `df_x`.*, `df_y`.`y` AS `y...y`
+        FROM `df_x`
+        INNER JOIN `df_y`
+          ON (`df_x`.`x` = `df_y`.`x`)
+      ) `q01`
 
 # `rows_patch()` works with `in_place = TRUE`
 
@@ -383,22 +375,20 @@
       .name = "df_y"), by = "x", in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-      )
+      SELECT *
+      FROM `df_x`
+      
       UNION ALL
-      (
-        SELECT *, NULL AS `y`
-        FROM (
-          SELECT *
-          FROM `df_y`
-          WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x`
-            WHERE (`df_y`.`x` = `df_x`.`x`)
-          )
-        ) `q01`
-      )
+      
+      SELECT *, NULL AS `y`
+      FROM (
+        SELECT *
+        FROM `df_y`
+        WHERE NOT EXISTS (
+          SELECT 1 FROM `df_x`
+          WHERE (`df_y`.`x` = `df_x`.`x`)
+        )
+      ) `q01`
 
 # `rows_upsert()` works with `in_place = FALSE`
 
@@ -407,31 +397,27 @@
       y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df_x`
-        WHERE NOT EXISTS (
-          SELECT 1 FROM `df_y`
-          WHERE (`df_x`.`x` = `df_y`.`x`)
-        )
+      SELECT *
+      FROM `df_x`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
       )
+      
       UNION ALL
-      (
-        (
-          SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
-          FROM `df_x`
-          INNER JOIN `df_y`
-            ON (`df_x`.`x` = `df_y`.`x`)
-        )
-        UNION ALL
-        (
-          SELECT *
-          FROM `df_y`
-          WHERE NOT EXISTS (
-            SELECT 1 FROM `df_x`
-            WHERE (`df_y`.`x` = `df_x`.`x`)
-          )
-        )
+      
+      SELECT `df_x`.`x` AS `x`, `df_y`.`y` AS `y`
+      FROM `df_x`
+      INNER JOIN `df_y`
+        ON (`df_x`.`x` = `df_y`.`x`)
+      
+      UNION ALL
+      
+      SELECT *
+      FROM `df_y`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_x`
+        WHERE (`df_y`.`x` = `df_x`.`x`)
       )
 
 # `rows_upsert()` works with `in_place = TRUE`

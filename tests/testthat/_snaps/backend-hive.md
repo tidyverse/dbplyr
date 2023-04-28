@@ -11,9 +11,11 @@
       union_all(lf, lf)
     Output
       <SQL>
-        SELECT *
-        FROM `df`
+      SELECT *
+      FROM `df`
+      
       UNION ALL
-        SELECT *
-        FROM `df`
+      
+      SELECT *
+      FROM `df`
 

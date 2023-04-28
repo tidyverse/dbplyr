@@ -45,3 +45,48 @@ sql_build.lazy_set_op_query <- function(op, con, ...) {
     all = op$all
   )
 }
+
+#' @export
+#' @rdname sql_build
+lazy_union_query <- function(x,
+                             unions,
+                             call = caller_env()) {
+  check_lazy_query(x, call = call)
+  # check_lazy_query(y, call = call)
+
+  lazy_query(
+    query_type = "union",
+    x = x,
+    unions = unions
+  )
+}
+
+#' @export
+print.lazy_union_query <- function(x, ..., con = NULL) {
+  cat_line("<SQL ", toupper(x$type), ">")
+
+  cat_line("X:")
+  cat_line(indent_print(sql_build(x$x, simulate_dbi())))
+
+  cat_line("Y:")
+  cat_line(indent_print(sql_build(x$y, simulate_dbi())))
+}
+
+#' @export
+op_vars.lazy_union_query <- function(op) {
+  purrr::reduce(op$unions$table, ~ union(.x, op_vars(.y$lazy_query)), .init = op_vars(op$x))
+}
+
+#' @export
+sql_build.lazy_union_query <- function(op, con, ...) {
+  # add_union() ensures that both have same variables
+  unions <- list(
+    table = purrr::map(op$unions$table, ~ sql_optimise(sql_build(.x, con), con)),
+    all = op$unions$all
+  )
+
+  union_query(
+    sql_optimise(sql_build(op$x, con), con),
+    unions
+  )
+}

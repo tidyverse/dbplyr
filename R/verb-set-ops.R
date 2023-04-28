@@ -19,7 +19,7 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union
 #' @rdname intersect.tbl_lazy
 union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
-  lazy_query <- add_set_op(x, y, "UNION", copy = copy, ..., all = all)
+  lazy_query <- add_union(x, y, all = all, copy = copy, ...)
 
   x$lazy_query <- lazy_query
   x
@@ -28,7 +28,7 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 #' @importFrom dplyr union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
-  lazy_query <- add_set_op(x, y, "UNION ALL", copy = copy, ..., all = FALSE)
+  lazy_query <- add_union(x, y, all = TRUE, copy = copy, ...)
 
   x$lazy_query <- lazy_query
   x
@@ -43,19 +43,44 @@ setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   x
 }
 
+add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
+  y <- auto_copy(x, y, copy)
+  check_set_op_sqlite(x, y, call = call)
+
+  # Ensure each has same variables
+  vars <- union(op_vars(x), op_vars(y))
+
+  x_lq <- x$lazy_query
+  if (inherits(x_lq, "lazy_union_query")) {
+    tmp <- list(lazy_query = x_lq$x)
+    class(tmp) <- "tbl_lazy"
+    x_lq$x <- fill_vars(tmp, vars)$lazy_query
+    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) fill_vars(table, vars))
+    y <- fill_vars(y, vars)
+
+    x_lq$unions$table <- c(x_lq$unions$table, list(y))
+    x_lq$unions$all <- c(x_lq$unions$all, all)
+
+    return(x_lq)
+  }
+
+  x <- fill_vars(x, vars)
+
+  unions <- list(
+    table = list(fill_vars(y, vars)),
+    all = all
+  )
+
+  lazy_union_query(
+    x$lazy_query,
+    unions,
+    call = call
+  )
+}
+
 add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller_env()) {
   y <- auto_copy(x, y, copy)
-
-  if (inherits(x$src$con, "SQLiteConnection")) {
-    # LIMIT only part the compound-select-statement not the select-core.
-    #
-    # https://www.sqlite.org/syntax/compound-select-stmt.html
-    # https://www.sqlite.org/syntax/select-core.html
-
-    if (!is.null(x$lazy_query$limit) || !is.null(y$lazy_query$limit)) {
-      cli_abort("SQLite does not support set operations on LIMITs", call = call)
-    }
-  }
+  check_set_op_sqlite(x, y, call = call)
 
   # Ensure each has same variables
   vars <- union(op_vars(x), op_vars(y))
@@ -68,6 +93,19 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller
     all = all,
     call = call
   )
+}
+
+check_set_op_sqlite <- function(x, y, call) {
+  if (inherits(x$src$con, "SQLiteConnection")) {
+    # LIMIT only part the compound-select-statement not the select-core.
+    #
+    # https://www.sqlite.org/syntax/compound-select-stmt.html
+    # https://www.sqlite.org/syntax/select-core.html
+
+    if (!is.null(x$lazy_query$limit) || !is.null(y$lazy_query$limit)) {
+      cli_abort("SQLite does not support set operations on LIMITs", call = call)
+    }
+  }
 }
 
 fill_vars <- function(x, vars) {
