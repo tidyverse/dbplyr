@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* A sequence of `union()` resp. `union_all()` now produces a flat query
+  instead of subqueries (@mgirlich, #1269).
+
 * Using `compute(temporary = FALSE)` without providing a name is now
   deprecated (@mgirlich, #1154).
 
