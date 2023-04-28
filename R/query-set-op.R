@@ -66,12 +66,19 @@ union_query <- function(x, unions) {
 
 #' @export
 print.union_query <- function(x, ...) {
-  cat_line("<SQL ", toupper(x$type), ">")
-
   cat_line(indent_print(sql_build(x$x)))
 
-  for (table in x$unions$table) {
-    cat_line(indent_print(sql_build(table)))
+  for (i in seq_along(x$unions$table)) {
+    if (x$unions$all[[i]]) {
+      method <- "UNION ALL"
+    } else {
+      method <- "UNION"
+    }
+    cat_line()
+    cat_line(indent(sql(method)))
+    cat_line()
+
+    cat_line(indent_print(sql_build(x$unions$table[[i]])))
   }
 }
 
