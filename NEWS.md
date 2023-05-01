@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `any()` and `all()` now work for MS SQL (@ejneer, #1273).
+
 * A sequence of `union()` resp. `union_all()` now produces a flat query
   instead of subqueries (@mgirlich, #1269).
 
