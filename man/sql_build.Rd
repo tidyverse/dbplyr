@@ -114,9 +114,17 @@ set_op_query(x, y, type, all = FALSE)
 
 union_query(x, unions)
 
-sql_build(op, con = NULL, ...)
+sql_build(op, con = NULL, ..., use_star = TRUE)
 
-sql_render(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE)
+sql_render(
+  query,
+  con = NULL,
+  ...,
+  use_star = TRUE,
+  subquery = FALSE,
+  lvl = 0,
+  cte = FALSE
+)
 
 sql_optimise(x, con = NULL, ..., subquery = FALSE)
 }

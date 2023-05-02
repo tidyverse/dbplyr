@@ -165,7 +165,7 @@ lazy_values_query <- function(df, types) {
 }
 
 #' @export
-sql_build.lazy_values_query <- function(op, con, ...) {
+sql_build.lazy_values_query <- function(op, con, ..., use_star = TRUE) {
   op
 }
 

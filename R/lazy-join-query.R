@@ -177,15 +177,18 @@ op_vars.lazy_semi_join_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_multi_join_query <- function(op, con, ...) {
+sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
   table_names_out <- generate_join_table_names(op$table_names)
   table_vars <- purrr::map(
     set_names(c(list(op$x), op$joins$table), table_names_out),
     op_vars
   )
-  select_sql <- sql_multi_join_vars(con, op$vars, table_vars)
+  select_sql <- sql_multi_join_vars(con, op$vars, table_vars, use_star = use_star)
 
-  op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
+  op$joins$table <- purrr::map(
+    op$joins$table,
+    ~ sql_optimise(sql_build(.x, con, use_star = use_star), con)
+  )
   op$joins$by <- purrr::map2(
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
@@ -196,7 +199,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
   )
 
   multi_join_query(
-    x = sql_optimise(sql_build(op$x, con), con),
+    x = sql_optimise(sql_build(op$x, con, use_star = use_star), con),
     joins = op$joins,
     table_names = table_names_out,
     select = select_sql
@@ -234,7 +237,7 @@ generate_join_table_names <- function(table_names) {
 }
 
 #' @export
-sql_build.lazy_rf_join_query <- function(op, con, ...) {
+sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
   table_names_out <- generate_join_table_names(op$table_names)
 
   vars_classic <- as.list(op$vars)
@@ -250,12 +253,13 @@ sql_build.lazy_rf_join_query <- function(op, con, ...) {
     type = op$type,
     vars = vars_classic,
     x_as = by$x_as,
-    y_as = by$y_as
+    y_as = by$y_as,
+    use_star = use_star
   )
 
   join_query(
-    sql_optimise(sql_build(op$x, con), con),
-    sql_optimise(sql_build(op$y, con), con),
+    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$y, con, use_star = use_star), con),
     select = select,
     type = op$type,
     by = by,
@@ -265,9 +269,10 @@ sql_build.lazy_rf_join_query <- function(op, con, ...) {
 }
 
 #' @export
-sql_build.lazy_semi_join_query <- function(op, con, ...) {
+sql_build.lazy_semi_join_query <- function(op, con, ..., use_star = TRUE) {
   vars_prev <- op_vars(op$x)
-  if (identical(op$vars$var, op$vars$name) &&
+  if (use_star &&
+      identical(op$vars$var, op$vars$name) &&
       identical(op$vars$var, vars_prev)) {
     vars <- sql("*")
   } else {
@@ -275,8 +280,8 @@ sql_build.lazy_semi_join_query <- function(op, con, ...) {
   }
 
   semi_join_query(
-    sql_optimise(sql_build(op$x, con), con),
-    sql_optimise(sql_build(op$y, con), con),
+    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$y, con, use_star = use_star), con),
     vars = vars,
     anti = op$anti,
     by = op$by,

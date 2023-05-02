@@ -1039,6 +1039,20 @@ test_that("left_join/inner_join uses *", {
 
   expect_equal(out$select, sql("`df_LHS`.*", z = "`z`"))
 
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b")) %>%
+    sql_build(use_star = FALSE)
+
+  expect_equal(
+    out$select,
+    sql(
+      a = "`df_LHS`.`a`",
+      b = "`df_LHS`.`b`",
+      c = "`c`",
+      z = "`z`"
+    )
+  )
+
   # also works after relocate
   out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
@@ -1091,6 +1105,22 @@ test_that("right_join uses *", {
     sql("`df_RHS`.*", c = "`c`")
   )
 
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b")) %>%
+    select(a, b, z, c) %>%
+    sql_build(use_star = FALSE)
+
+  expect_equal(
+    out$select,
+    sql(
+      a = "`df_RHS`.`a`",
+      b = "`df_RHS`.`b`",
+      z = "`z`",
+      c = "`c`"
+    )
+  )
+
   # does not use * if variable are missing
   out <- lf1 %>%
     right_join(lf2, by = c("a", "b")) %>%
@@ -1125,6 +1155,21 @@ test_that("cross_join uses *", {
     sql_build()
 
   expect_equal(out$select, set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", "")))
+
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    cross_join(lf2) %>%
+    sql_build(use_star = FALSE)
+
+  expect_equal(
+    out$select,
+    sql(
+      a = "`a`",
+      b = "`b`",
+      x = "`x`",
+      y = "`y`"
+    )
+  )
 
   # also works after relocate
   out <- lf1 %>%

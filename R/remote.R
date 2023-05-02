@@ -8,6 +8,8 @@
 #' @param x Remote table, currently must be a [tbl_sql].
 #' @param cte `r lifecycle::badge("experimental")`
 #'   Use common table expressions in the generated SQL?
+#' @param use_star `r lifecycle::badge("experimental")`
+#'   Use `*` to select every column?
 #' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
@@ -96,8 +98,8 @@ remote_con <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query <- function(x, cte = FALSE) {
-  db_sql_render(remote_con(x), x, cte = cte)
+remote_query <- function(x, cte = FALSE, use_star = TRUE) {
+  db_sql_render(remote_con(x), x, cte = cte, use_star = use_star)
 }
 
 #' @export
