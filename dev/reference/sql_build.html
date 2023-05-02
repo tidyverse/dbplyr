@@ -184,9 +184,17 @@ always call <code>sql_render()</code>.</p>
 <span></span>
 <span><span class="fu">union_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">unions</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_build</span><span class="op">(</span><span class="va">op</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sql_build</span><span class="op">(</span><span class="va">op</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, use_star <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_render</span><span class="op">(</span><span class="va">query</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, subquery <span class="op">=</span> <span class="cn">FALSE</span>, lvl <span class="op">=</span> <span class="fl">0</span>, cte <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">sql_render</span><span class="op">(</span></span>
+<span>  <span class="va">query</span>,</span>
+<span>  con <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  use_star <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  subquery <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  lvl <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  cte <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_optimise</span><span class="op">(</span><span class="va">x</span>, con <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span>, subquery <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>

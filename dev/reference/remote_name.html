@@ -93,7 +93,7 @@ the query plan (as computed by the remote database). <code>remote_src()</code> a
 <span></span>
 <span><span class="fu">remote_con</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">remote_query</span><span class="op">(</span><span class="va">x</span>, cte <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">remote_query</span><span class="op">(</span><span class="va">x</span>, cte <span class="op">=</span> <span class="cn">FALSE</span>, use_star <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">remote_query_plan</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,6 +107,11 @@ the query plan (as computed by the remote database). <code>remote_src()</code> a
 <dt>cte</dt>
 <dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
 Use common table expressions in the generated SQL?</p></dd>
+
+
+<dt>use_star</dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a>
+Use <code>*</code> to select every column?</p></dd>
 
 
 <dt>...</dt>
