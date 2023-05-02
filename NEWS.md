@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `show_query()` and `remote_query()` get the argument `use_star` that controls
+  whether to use `SELECT *` to select every column (@mgirlich, #1146).
+
 * `any()` and `all()` now work for MS SQL (@ejneer, #1273).
 
 * Fixed negation of bit (boolean) fields in MS SQL (@ejneer, #1239)

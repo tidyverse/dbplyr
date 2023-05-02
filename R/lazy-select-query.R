@@ -167,16 +167,22 @@ op_desc.lazy_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_select_query <- function(op, con, ...) {
+sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
   if (!is.null(op$message_summarise)) {
     inform(op$message_summarise)
   }
 
-  select_sql_list <- get_select_sql(op$select, op$select_operation, op_vars(op$x), con)
+  select_sql_list <- get_select_sql(
+    op$select,
+    op$select_operation,
+    op_vars(op$x),
+    con,
+    use_star = use_star
+  )
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
-    from = sql_build(op$x, con),
+    from = sql_build(op$x, con, use_star = use_star),
     select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
@@ -188,7 +194,7 @@ sql_build.lazy_select_query <- function(op, con, ...) {
   )
 }
 
-get_select_sql <- function(select, select_operation, in_vars, con) {
+get_select_sql <- function(select, select_operation, in_vars, con, use_star) {
   if (select_operation == "summarise") {
     select_expr <- set_names(select$expr, select$name)
     select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
@@ -196,11 +202,11 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
     return(list(select_sql = select_sql, window_sql = character()))
   }
 
-  if (is_select_identity(select, in_vars)) {
+  if (use_star && is_select_identity(select, in_vars)) {
     return(list(select_sql = sql("*"), window_sql = character()))
   }
 
-  select <- select_use_star(select, in_vars, con)
+  select <- select_use_star(select, in_vars, con, use_star)
 
   # translate once just to register windows
   win_register_activate()
@@ -228,7 +234,11 @@ get_select_sql <- function(select, select_operation, in_vars, con) {
   )
 }
 
-select_use_star <- function(select, vars_prev, con) {
+select_use_star <- function(select, vars_prev, con, use_star) {
+  if (!use_star) {
+    return(select)
+  }
+
   if (!supports_star_without_alias(con)) {
     return(select)
   }
