@@ -216,17 +216,20 @@ sql_values_subquery_default <- function(con, df, types, lvl, row) {
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
-  null_row_query <- select_query(
-    from = ident(),
-    select = sql(cols_clause),
-    where = sql("0 = 1")
+  null_row_clauses <- list(
+    select = sql_clause_select(con, cols_clause),
+    where = sql_clause_where(sql("0 = 1"))
   )
 
   rows_clauses <- sql_values_clause(con, df, row = row)
   rows_query <- sql_format_clauses(rows_clauses, lvl = lvl + 1, con = con)
 
-  union_query <- set_op_query(null_row_query, rows_query, type = "UNION", all = TRUE)
-  subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
+  subquery <- sql_query_union(
+    con,
+    x = sql_format_clauses(null_row_clauses, lvl + 1, con),
+    unions = list(table = as.character(rows_query), all = TRUE),
+    lvl = lvl + 1
+  )
 
   sql_query_select(
     con,
@@ -293,31 +296,29 @@ sql_values_subquery_union <- function(con, df, types, lvl, row, from = NULL) {
   sim_data <- rep_named(colnames(df), list(NULL))
   cols_clause <- escape(sim_data, con = con, parens = FALSE, collapse = NULL)
 
-  null_row_query <- select_query(
-    from = ident(from),
-    select = sql(cols_clause),
-    where = sql("0 = 1")
+  clauses <- list(
+    select = sql_clause_select(con, cols_clause),
+    from = if (!is.null(from)) sql_clause_from(ident(from)),
+    where = sql_clause_where(sql("0 = 1"))
   )
+  null_row_query <- sql_format_clauses(clauses, lvl + 1, con)
 
   escaped_values <- purrr::map(df, escape, con = con, collapse = NULL, parens = FALSE)
 
-  select_kw <- style_kw("SELECT ")
-  union_kw <- style_kw("UNION ALL ")
-
   rows <- rlang::exec(paste, !!!escaped_values, sep = ", ")
-  if (is_null(from)) {
-    values_queries <- paste0(lvl_indent(lvl + 2), select_kw, rows, collapse = paste0(" ", union_kw, "\n"))
-  } else {
+  select_kw <- style_kw("SELECT ")
+  tables <- paste0(lvl_indent(lvl + 1), select_kw, rows)
+  if (!is_null(from)) {
     from_kw <- style_kw("FROM ")
-    values_queries <- paste0(
-      lvl_indent(lvl + 2), select_kw, rows, " ", from_kw, from,
-      collapse = paste0(" ", union_kw, "\n")
-    )
+    tables <- paste0(tables, " ", from_kw, from)
   }
 
-
-  union_query <- set_op_query(null_row_query, sql(values_queries), type = "UNION", all = TRUE)
-  subquery <- sql_render(union_query, con = con, lvl = lvl + 1)
+  subquery <- sql_query_union(
+    con,
+    x = null_row_query,
+    unions = list(all = TRUE, table = tables),
+    lvl = lvl + 1
+  )
 
   sql_query_select(
     con,
@@ -342,13 +343,12 @@ sql_values_zero_rows <- function(con, df, types, lvl, from = NULL) {
 
   typed_cols <- sql_values_cast_clauses(con, df, types, na = TRUE)
 
-  query <- select_query(
-    from = ident(from),
-    select = typed_cols,
-    where = sql("0 = 1")
+  clauses <- list(
+    select = sql_clause_select(con, typed_cols),
+    from = if (!is.null(from)) sql_clause_from(ident(from)),
+    where = sql_clause_where(sql("0 = 1"))
   )
-
-  sql_render(query, con = con, lvl = lvl)
+  sql_format_clauses(clauses, lvl, con)
 }
 
 sql_values_cast_clauses <- function(con, df, types, na) {
