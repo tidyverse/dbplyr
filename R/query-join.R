@@ -2,7 +2,8 @@
 #' @rdname sql_build
 join_query <- function(x,
                        y,
-                       vars,
+                       select,
+                       ...,
                        type = "inner",
                        by = NULL,
                        suffix = c(".x", ".y"),
@@ -11,7 +12,7 @@ join_query <- function(x,
     list(
       x = x,
       y = y,
-      vars = vars,
+      select = select,
       type = type,
       by = by,
       na_matches = na_matches
@@ -20,13 +21,13 @@ join_query <- function(x,
   )
 }
 
-multi_join_query <- function(x, joins, table_vars, vars) {
+multi_join_query <- function(x, joins, table_names, select) {
   structure(
     list(
       x = x,
       joins = joins,
-      table_vars = table_vars,
-      vars = vars
+      table_names = table_names,
+      select = select
     ),
     class = c("multi_join_query", "query")
   )
@@ -74,6 +75,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
+    select = query$select,
     lvl = lvl
   )
 }
@@ -94,9 +96,9 @@ sql_render.multi_join_query <- function(query,
     con = con,
     x = x,
     joins = query$joins,
-    table_vars = query$table_vars,
+    table_names = query$table_names,
     by_list = query$by_list,
-    vars = query$vars,
+    select = query$select,
     lvl = lvl
   )
 }

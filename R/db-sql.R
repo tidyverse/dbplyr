@@ -410,7 +410,7 @@ sql_select.DBIConnection <- function(con,
 sql_query_join <- function(con,
                            x,
                            y,
-                           vars,
+                           select,
                            type = "inner",
                            by = NULL,
                            na_matches = FALSE,
@@ -423,7 +423,7 @@ sql_query_join <- function(con,
 sql_query_join.DBIConnection <- function(con,
                                          x,
                                          y,
-                                         vars,
+                                         select,
                                          type = "inner",
                                          by = NULL,
                                          na_matches = FALSE,
@@ -442,7 +442,6 @@ sql_query_join.DBIConnection <- function(con,
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  select <- sql_rf_join_vars(con, type = type, vars, x_as = by$x_as, y_as = by$y_as)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -467,9 +466,10 @@ sql_join.DBIConnection <- function(con,
                                    by = NULL,
                                    na_matches = FALSE,
                                    ...,
+                                   select = NULL,
                                    lvl = 0) {
   sql_query_join(
-    con, x, y, vars,
+    con, x, y, select,
     type = type,
     by = by,
     na_matches = na_matches,
@@ -483,9 +483,9 @@ sql_join.DBIConnection <- function(con,
 sql_query_multi_join <- function(con,
                                  x,
                                  joins,
-                                 table_vars,
+                                 table_names,
                                  by_list,
-                                 vars,
+                                 select,
                                  ...,
                                  lvl = 0) {
   check_dots_used()
@@ -502,8 +502,8 @@ sql_query_multi_join <- function(con,
 #'     from different tables
 #'   * `on` `<character>`
 #'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
-#' @param vars See [sql_multi_join_vars()].
-#' @param table_vars `named <list_of<character>>`: All variables in each table.
+#' @param select A named SQL vector.
+#' @param table_names `<character>` The names of the tables.
 #' @noRd
 #' @examples
 #' # Left join with *
@@ -525,17 +525,15 @@ sql_query_multi_join <- function(con,
 sql_query_multi_join.DBIConnection <- function(con,
                                                x,
                                                joins,
-                                               table_vars,
+                                               table_names,
                                                by_list,
-                                               vars,
+                                               select,
                                                ...,
                                                lvl = 0) {
-  table_names <- names(table_vars)
   if (vctrs::vec_duplicate_any(table_names)) {
     cli_abort("{.arg table_names} must be unique.")
   }
 
-  select_sql <- sql_multi_join_vars(con, vars, table_vars)
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
 
   join_table_queries <- purrr::map2(
@@ -560,7 +558,7 @@ sql_query_multi_join.DBIConnection <- function(con,
   join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
 
   clauses <- list2(
-    sql_clause_select(con, select_sql),
+    sql_clause_select(con, select),
     sql_clause_from(from),
     !!!join_on_clauses
   )

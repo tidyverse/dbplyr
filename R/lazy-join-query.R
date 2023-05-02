@@ -179,11 +179,11 @@ op_vars.lazy_semi_join_query <- function(op) {
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ...) {
   table_names_out <- generate_join_table_names(op$table_names)
-
   table_vars <- purrr::map(
     set_names(c(list(op$x), op$joins$table), table_names_out),
     op_vars
   )
+  select_sql <- sql_multi_join_vars(con, op$vars, table_vars)
 
   op$joins$table <- purrr::map(op$joins$table, ~ sql_optimise(sql_build(.x, con), con))
   op$joins$by <- purrr::map2(
@@ -198,8 +198,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ...) {
   multi_join_query(
     x = sql_optimise(sql_build(op$x, con), con),
     joins = op$joins,
-    table_vars = table_vars,
-    vars = op$vars
+    table_names = table_names_out,
+    select = select_sql
   )
 }
 
@@ -245,10 +245,18 @@ sql_build.lazy_rf_join_query <- function(op, con, ...) {
   by$x_as <- ident(table_names_out[[1]])
   by$y_as <- ident(table_names_out[[2]])
 
+  select <- sql_rf_join_vars(
+    con,
+    type = op$type,
+    vars = vars_classic,
+    x_as = by$x_as,
+    y_as = by$y_as
+  )
+
   join_query(
     sql_optimise(sql_build(op$x, con), con),
     sql_optimise(sql_build(op$y, con), con),
-    vars = vars_classic,
+    select = select,
     type = op$type,
     by = by,
     suffix = NULL, # it seems like the suffix is not used for rendering

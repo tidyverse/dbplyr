@@ -88,7 +88,8 @@ lazy_union_query(x, unions, call = caller_env())
 join_query(
   x,
   y,
-  vars,
+  select,
+  ...,
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),
