@@ -230,7 +230,7 @@ simulate_mssql <- function(version = "15.0") {
       `!`           = function(x) {
                         if (mssql_needs_bit()) {
                           x <- with_mssql_bool(x)
-                          mssql_as_bit(sql_expr(~ !!x))
+                          sql_expr(~ !!mssql_as_bit(x))
                         } else {
                           sql_expr(NOT(!!x))
                         }

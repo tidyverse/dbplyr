@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fixed negation of bit (boolean) fields in MS SQL (@ejneer, #1239)
+
 * A sequence of `union()` resp. `union_all()` now produces a flat query
   instead of subqueries (@mgirlich, #1269).
 
