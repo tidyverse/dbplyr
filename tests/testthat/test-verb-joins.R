@@ -1076,7 +1076,7 @@ test_that("right_join uses *", {
 
   # cannot use * without relocate or select
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", b = "`df_RHS`.`b`", c = "`c`", z = "`z`")
   )
 
@@ -1087,7 +1087,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql("`df_RHS`.*", c = "`c`")
   )
 
@@ -1098,7 +1098,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", z = "`z`")
   )
 
@@ -1110,7 +1110,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
@@ -1159,7 +1159,7 @@ test_that("full_join() does not use *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "full", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(
       a = "COALESCE(`df_LHS`.`a`, `df_RHS`.`a`)",
       b = "COALESCE(`df_LHS`.`b`, `df_RHS`.`b`)"

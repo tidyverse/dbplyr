@@ -77,12 +77,11 @@ sql_query_join(
   con,
   x,
   y,
-  vars,
+  select,
   type = "inner",
   by = NULL,
   na_matches = FALSE,
   ...,
-  select = NULL,
   lvl = 0
 )
 

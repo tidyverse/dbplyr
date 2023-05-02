@@ -135,7 +135,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 sql_query_join.MariaDBConnection <- function(con,
                                              x,
                                              y,
-                                             vars,
+                                             select,
                                              type = "inner",
                                              by = NULL,
                                              ...) {

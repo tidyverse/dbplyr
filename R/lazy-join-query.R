@@ -256,7 +256,6 @@ sql_build.lazy_rf_join_query <- function(op, con, ...) {
   join_query(
     sql_optimise(sql_build(op$x, con), con),
     sql_optimise(sql_build(op$y, con), con),
-    vars = vars_classic,
     select = select,
     type = op$type,
     by = by,

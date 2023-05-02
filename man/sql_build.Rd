@@ -84,9 +84,8 @@ lazy_set_op_query(x, y, type, all, call = caller_env())
 join_query(
   x,
   y,
-  vars,
-  ...,
   select,
+  ...,
   type = "inner",
   by = NULL,
   suffix = c(".x", ".y"),

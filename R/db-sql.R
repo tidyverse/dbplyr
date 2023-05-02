@@ -410,12 +410,11 @@ sql_select.DBIConnection <- function(con,
 sql_query_join <- function(con,
                            x,
                            y,
-                           vars,
+                           select,
                            type = "inner",
                            by = NULL,
                            na_matches = FALSE,
                            ...,
-                           select = NULL,
                            lvl = 0) {
   check_dots_used()
   UseMethod("sql_query_join")
@@ -424,12 +423,11 @@ sql_query_join <- function(con,
 sql_query_join.DBIConnection <- function(con,
                                          x,
                                          y,
-                                         vars,
+                                         select,
                                          type = "inner",
                                          by = NULL,
                                          na_matches = FALSE,
                                          ...,
-                                         select = NULL,
                                          lvl = 0) {
   JOIN <- switch(
     type,
@@ -444,9 +442,6 @@ sql_query_join.DBIConnection <- function(con,
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  if (is.null(select)) {
-    select <- sql_rf_join_vars(con, type = type, vars, x_as = by$x_as, y_as = by$y_as)
-  }
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -474,12 +469,11 @@ sql_join.DBIConnection <- function(con,
                                    select = NULL,
                                    lvl = 0) {
   sql_query_join(
-    con, x, y, vars,
+    con, x, y, select,
     type = type,
     by = by,
     na_matches = na_matches,
     ...,
-    select = select,
     lvl = lvl
   )
 }

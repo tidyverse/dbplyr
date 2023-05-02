@@ -2,9 +2,8 @@
 #' @rdname sql_build
 join_query <- function(x,
                        y,
-                       vars,
-                       ...,
                        select,
+                       ...,
                        type = "inner",
                        by = NULL,
                        suffix = c(".x", ".y"),
@@ -13,7 +12,6 @@ join_query <- function(x,
     list(
       x = x,
       y = y,
-      vars = vars,
       select = select,
       type = type,
       by = by,
