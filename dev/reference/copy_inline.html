@@ -137,7 +137,9 @@ If <code>NULL</code>, the default, the types are determined from <code>df</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">FROM</span> (</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">SELECT</span> NULL<span style="color: #0000BB;"> AS </span>`x`, NULL<span style="color: #0000BB;"> AS </span>`y`</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">WHERE</span> (0 = 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">UNION ALL</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB;">VALUES</span> (1, 'a'), (2, 'b'), (3, 'c')</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ) AS `values_table`</span>
 </code></pre></div>
