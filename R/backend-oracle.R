@@ -182,11 +182,6 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
-#' @export
-supports_star_without_alias.Oracle <- function(con) {
-  FALSE
-}
-
 
 # roacle package ----------------------------------------------------------
 
@@ -219,8 +214,5 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
-
-#' @export
-supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
