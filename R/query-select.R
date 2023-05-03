@@ -9,7 +9,6 @@ select_query <- function(from,
                          order_by = character(),
                          limit = NULL,
                          distinct = FALSE) {
-
   check_character(select)
   check_character(where)
   check_character(group_by)
