@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
+
 * `show_query()` and `remote_query()` get the argument `use_star` that controls
   whether to use `SELECT *` to select every column (@mgirlich, #1146).
 

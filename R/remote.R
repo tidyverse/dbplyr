@@ -59,7 +59,7 @@ query_name.lazy_base_local_query <- function(x) {
 }
 
 get_table_ident_name <- function(x) {
-  if (is.sql(x)) {
+  if (is.sql(x) || inherits(x, "ident_q")) {
     return(NULL)
   }
 

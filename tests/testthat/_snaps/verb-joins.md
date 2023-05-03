@@ -40,6 +40,16 @@
       LEFT JOIN `foo2`.`df` AS `df_RHS`
         ON (`df_LHS`.`x` = `df_RHS`.`x`)
 
+---
+
+    Code
+      left_join(df4, df5, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `LHS`.*, `z`
+      FROM `foo`.`df` AS `LHS`
+      LEFT JOIN `foo2`.`df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
 # alias truncates long table names at database limit
 
     Code
