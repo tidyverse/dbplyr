@@ -1,8 +1,8 @@
 #' @importFrom dplyr show_query
 #' @export
-show_query.tbl_lazy <- function(x, ..., cte = FALSE) {
+show_query.tbl_lazy <- function(x, ..., cte = FALSE, use_star = TRUE) {
   withr::local_options(list(dbplyr_use_colour = TRUE))
-  sql <- remote_query(x, cte = cte)
+  sql <- remote_query(x, cte = cte, use_star = use_star)
   cat_line("<SQL>")
   cat_line(sql)
   invisible(x)

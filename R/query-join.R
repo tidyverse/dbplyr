@@ -2,7 +2,8 @@
 #' @rdname sql_build
 join_query <- function(x,
                        y,
-                       vars,
+                       select,
+                       ...,
                        type = "inner",
                        by = NULL,
                        suffix = c(".x", ".y"),
@@ -11,7 +12,7 @@ join_query <- function(x,
     list(
       x = x,
       y = y,
-      vars = vars,
+      select = select,
       type = type,
       by = by,
       na_matches = na_matches
@@ -20,13 +21,13 @@ join_query <- function(x,
   )
 }
 
-multi_join_query <- function(x, joins, table_vars, vars) {
+multi_join_query <- function(x, joins, table_names, select) {
   structure(
     list(
       x = x,
       joins = joins,
-      table_vars = table_vars,
-      vars = vars
+      table_names = table_names,
+      select = select
     ),
     class = c("multi_join_query", "query")
   )
@@ -74,6 +75,7 @@ sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
     type = query$type,
     by = query$by,
     na_matches = query$na_matches,
+    select = query$select,
     lvl = lvl
   )
 }
@@ -94,9 +96,9 @@ sql_render.multi_join_query <- function(query,
     con = con,
     x = x,
     joins = query$joins,
-    table_vars = query$table_vars,
+    table_names = query$table_names,
     by_list = query$by_list,
-    vars = query$vars,
+    select = query$select,
     lvl = lvl
   )
 }
@@ -139,7 +141,7 @@ sql_render.multi_join_query <- function(query,
 #' )
 #'
 #' # Full and right join are handled via `sql_rf_join_vars`
-sql_multi_join_vars <- function(con, vars, table_vars) {
+sql_multi_join_vars <- function(con, vars, table_vars, use_star) {
   all_vars <- tolower(unlist(table_vars))
   duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
   duplicated_vars <- unique(duplicated_vars)
@@ -154,7 +156,7 @@ sql_multi_join_vars <- function(con, vars, table_vars) {
     used_vars_current <- vars$var[vars_idx]
     out_vars_current <- vars$name[vars_idx]
 
-    if (join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
+    if (use_star && join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
       id <- vars_idx[[1]]
       tbl_alias <- escape(ident(table_names[i]), con = con)
       out[[id]] <- sql(paste0(tbl_alias, ".*"))
@@ -204,7 +206,7 @@ sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars)
   }
 }
 
-sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS") {
+sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS", use_star) {
   type <- arg_match0(type, c("right", "full"))
   table_names <- c(unclass(x_as), unclass(y_as))
 
@@ -258,7 +260,8 @@ sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS") {
   sql_multi_join_vars(
     con = con,
     vars = multi_join_vars,
-    table_vars = table_vars
+    table_vars = table_vars,
+    use_star = use_star
   )
 }
 

@@ -14,7 +14,7 @@ remote_src(x)
 
 remote_con(x)
 
-remote_query(x, cte = FALSE)
+remote_query(x, cte = FALSE, use_star = TRUE)
 
 remote_query_plan(x, ...)
 }
@@ -23,6 +23,9 @@ remote_query_plan(x, ...)
 
 \item{cte}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 Use common table expressions in the generated SQL?}
+
+\item{use_star}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+Use \code{*} to select every column?}
 
 \item{...}{Additional arguments passed on to methods.}
 }

@@ -8,6 +8,8 @@
 #' @param x Remote table, currently must be a [tbl_sql].
 #' @param cte `r lifecycle::badge("experimental")`
 #'   Use common table expressions in the generated SQL?
+#' @param use_star `r lifecycle::badge("experimental")`
+#'   Use `*` to select every column?
 #' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
@@ -48,30 +50,33 @@ query_name.tbl_lazy <- function(x) {
 
 #' @export
 query_name.lazy_base_remote_query <- function(x) {
-  name <- x$x
-  if (is.sql(name) || inherits(name, "ident_q")) {
-    return(NULL)
-  }
-
-  if (is.ident(name)) {
-    return(name)
-  }
-
-  if (is_schema(name) || is_catalog(name)) {
-    return(name$table)
-  }
-
-  if (inherits(name, "Id")) {
-    out <- name@name[["table"]]
-    return(ident(out))
-  }
-
-  abort("Unexpected type", .internal = TRUE)
+  get_table_ident_name(x$x)
 }
 
 #' @export
 query_name.lazy_base_local_query <- function(x) {
-  ident(x$name)
+  get_table_ident_name(x$name)
+}
+
+get_table_ident_name <- function(x) {
+  if (is.sql(x) || inherits(x, "ident_q")) {
+    return(NULL)
+  }
+
+  if (is.ident(x)) {
+    return(x)
+  }
+
+  if (is_schema(x) || is_catalog(x)) {
+    return(x$table)
+  }
+
+  if (inherits(x, "Id")) {
+    out <- x@name[["table"]]
+    return(ident(out))
+  }
+
+  abort("Unexpected type", .internal = TRUE)
 }
 
 #' @export
@@ -93,8 +98,8 @@ remote_con <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query <- function(x, cte = FALSE) {
-  db_sql_render(remote_con(x), x, cte = cte)
+remote_query <- function(x, cte = FALSE, use_star = TRUE) {
+  db_sql_render(remote_con(x), x, cte = cte, use_star = use_star)
 }
 
 #' @export

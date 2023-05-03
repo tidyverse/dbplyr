@@ -135,7 +135,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 sql_query_join.MariaDBConnection <- function(con,
                                              x,
                                              y,
-                                             vars,
+                                             select,
                                              type = "inner",
                                              by = NULL,
                                              ...) {
@@ -205,7 +205,7 @@ sql_escape_datetime.MariaDBConnection <- function(con, x) {
   # https://dev.mysql.com/doc/refman/8.0/en/datetime.html
   # https://mariadb.com/kb/en/datetime/
   x <- strftime(x, "%Y-%m-%d %H:%M:%OS", tz = "UTC")
-  dbplyr:::sql_escape_string(con, x)
+  sql_escape_string(con, x)
 }
 #' @export
 sql_escape_datetime.MySQLConnection <- sql_escape_datetime.MariaDBConnection

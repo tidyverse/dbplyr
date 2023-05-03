@@ -23,21 +23,21 @@
 #'   rules that should be very similar to ANSI 92, and allows for testing
 #'   without an active database connection.
 #' @param ... Other arguments passed on to the methods. Not currently used.
-sql_build <- function(op, con = NULL, ...) {
+sql_build <- function(op, con = NULL, ..., use_star = TRUE) {
   unique_subquery_name_reset()
   check_dots_used()
   UseMethod("sql_build")
 }
 
 #' @export
-sql_build.tbl_lazy <- function(op, con = op$src$con, ...) {
+sql_build.tbl_lazy <- function(op, con = op$src$con, ..., use_star = TRUE) {
   # only used for testing
-  qry <- sql_build(op$lazy_query, con = con, ...)
+  qry <- sql_build(op$lazy_query, con = con, ..., use_star = use_star)
   sql_optimise(qry, con = con, ...)
 }
 
 #' @export
-sql_build.ident <- function(op, con = NULL, ...) {
+sql_build.ident <- function(op, con = NULL, ..., use_star = TRUE) {
   op
 }
 
@@ -49,19 +49,45 @@ sql_build.ident <- function(op, con = NULL, ...) {
 #' @param subquery Is this SQL going to be used in a subquery?
 #'   This is important because you can place a bare table name in a subquery
 #'   and  ORDER BY does not work in subqueries.
-sql_render <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render <- function(query,
+                       con = NULL,
+                       ...,
+                       use_star = TRUE,
+                       subquery = FALSE,
+                       lvl = 0,
+                       cte = FALSE) {
   check_dots_used()
   UseMethod("sql_render")
 }
 
 #' @export
-sql_render.tbl_lazy <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  sql_render(query$lazy_query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
+sql_render.tbl_lazy <- function(query,
+                                con = query$src$con,
+                                ...,
+                                use_star = TRUE,
+                                subquery = FALSE,
+                                lvl = 0,
+                                cte = FALSE) {
+  sql_render(
+    query$lazy_query,
+    con = con,
+    ...,
+    use_star = use_star,
+    subquery = subquery,
+    lvl = lvl,
+    cte = cte
+  )
 }
 
 #' @export
-sql_render.lazy_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  qry <- sql_build(query, con = con, ...)
+sql_render.lazy_query <- function(query,
+                                  con = NULL,
+                                  ...,
+                                  use_star = TRUE,
+                                  subquery = FALSE,
+                                  lvl = 0,
+                                  cte = FALSE) {
+  qry <- sql_build(query, con = con, ..., use_star = use_star)
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
 
   if (cte) {

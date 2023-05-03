@@ -2,6 +2,21 @@
 
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
+* `show_query()` and `remote_query()` get the argument `use_star` that controls
+  whether to use `SELECT *` to select every column (@mgirlich, #1146).
+
+* `any()` and `all()` now work for MS SQL (@ejneer, #1273).
+
+* Fixed negation of bit (boolean) fields in MS SQL (@ejneer, #1239)
+
+* A sequence of `union()` resp. `union_all()` now produces a flat query
+  instead of subqueries (@mgirlich, #1269).
+
+* Using `compute(temporary = FALSE)` without providing a name is now
+  deprecated (@mgirlich, #1154).
+
+* Added translation for `nzchar()` (@MichaelChirico, @mgirlich, #1094).
+
 * MySQL/MariaDB:
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
     `as.integer64()` (@avsdev-cw, #1189).

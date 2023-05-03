@@ -73,7 +73,10 @@ test_that("can translate case insensitive like", {
   )
 })
 
-
+test_that("can translate nzchar", {
+  expect_equal(translate_sql(nzchar(y)), sql("((`y` IS NULL) OR `y` != '')"))
+  expect_equal(translate_sql(nzchar(y, TRUE)), sql("`y` != ''"))
+})
 
 # aggregates --------------------------------------------------------------
 

@@ -1,18 +1,25 @@
 # print method doesn't change unexpectedly
 
     Code
-      sql_build(union(lf1, lf2))
+      sql_build(union(lf1, lf2) %>% union_all(lf3))
     Output
-      <SQL UNION>
-      X:
         <SQL SELECT>
         From:
-          <IDENT> df
+          <IDENT> lf1
         Select:   *, NULL
-      Y:
+      
+        UNION
+      
         <SQL SELECT>
         From:
-          <IDENT> df
+          <IDENT> lf2
+        Select:   `x`, NULL, `z`
+      
+        UNION ALL
+      
+        <SQL SELECT>
+        From:
+          <IDENT> lf3
         Select:   `x`, NULL, `z`
 
 # generated sql doesn't change unexpectedly
@@ -21,15 +28,13 @@
       union(lf, lf)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df`
-      )
+      SELECT *
+      FROM `df`
+      
       UNION
-      (
-        SELECT *
-        FROM `df`
-      )
+      
+      SELECT *
+      FROM `df`
 
 ---
 
@@ -69,15 +74,13 @@
       union(lf, lf, all = TRUE)
     Output
       <SQL>
-      (
-        SELECT *
-        FROM `df`
-      )
+      SELECT *
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT *
-        FROM `df`
-      )
+      
+      SELECT *
+      FROM `df`
 
 ---
 

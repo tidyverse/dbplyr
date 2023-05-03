@@ -51,12 +51,12 @@
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
-        (
-          SELECT NULL AS `x`, NULL AS `y`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `x`, NULL AS `y`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (VALUES (1, 'a'), (2, 'b'))
+      
+        VALUES (1, 'a'), (2, 'b')
       ) `values_table`
 
 ---
@@ -66,12 +66,12 @@
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
-        (
-          SELECT NULL AS `x`, NULL AS `y`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `x`, NULL AS `y`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (VALUES ROW(1, 'a'), ROW(2, 'b'))
+      
+        VALUES ROW(1, 'a'), ROW(2, 'b')
       ) `values_table`
 
 # `sql_query_update_from()` is correct

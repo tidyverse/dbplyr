@@ -118,6 +118,12 @@ test_that("collect() handles DBI error", {
   )
 })
 
+test_that("compute(temporary = FALSE) without a name is deprecated", {
+  df <- memdb_frame(x = 1:10)
+
+  expect_snapshot_warning(df %>% compute(temporary = FALSE))
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("sorting preserved across compute and collapse", {
