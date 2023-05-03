@@ -168,7 +168,7 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM (
         SELECT `df`.*
         FROM `df`
@@ -212,7 +212,7 @@
       <SQL>
       SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df_LHS`.*
         FROM `df` AS `df_LHS`
         WHERE EXISTS (
           SELECT 1 FROM `df` AS `df_RHS`

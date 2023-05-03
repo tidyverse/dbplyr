@@ -72,7 +72,7 @@
       
       UNION ALL
       
-      SELECT *
+      SELECT `df_y`.*
       FROM `df_y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
@@ -285,7 +285,7 @@
       y = 22:23, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df_x`.*
       FROM `df_x`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y`
@@ -342,7 +342,7 @@
       in_place = FALSE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df_x`.*
       FROM `df_x`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y`
@@ -382,7 +382,7 @@
       
       SELECT `q01`.*, NULL AS `y`
       FROM (
-        SELECT *
+        SELECT `df_y`.*
         FROM `df_y`
         WHERE NOT EXISTS (
           SELECT 1 FROM `df_x`
@@ -397,7 +397,7 @@
       y = 22:23, .name = "df_y"), by = "x", in_place = FALSE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df_x`.*
       FROM `df_x`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y`
@@ -413,7 +413,7 @@
       
       UNION ALL
       
-      SELECT *
+      SELECT `df_y`.*
       FROM `df_y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
@@ -465,7 +465,7 @@
         x = 2:3, .name = "df_y"), by = "x", unmatched = "ignore", in_place = FALSE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df_x`.*
       FROM `df_x`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_y`

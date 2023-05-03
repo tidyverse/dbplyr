@@ -170,7 +170,7 @@
       semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
@@ -183,7 +183,7 @@
       anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df` AS `RHS`

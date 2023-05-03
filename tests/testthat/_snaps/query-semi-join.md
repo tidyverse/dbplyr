@@ -21,7 +21,7 @@
       Joining with `by = join_by(x, y)`
     Output
       <SQL>
-      SELECT *
+      SELECT `df_LHS`.*
       FROM `df` AS `df_LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `df_RHS`
@@ -36,7 +36,7 @@
       Joining with `by = join_by(x, y)`
     Output
       <SQL>
-      SELECT *
+      SELECT `df_LHS`.*
       FROM `df` AS `df_LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df` AS `df_RHS`
