@@ -133,9 +133,9 @@ subqueries if you want to use a freshly created variable in
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `q01`.*, POWER(`a`, 2.0)<span style="color: #0000BB;"> AS </span>`b`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> (</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> *, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">SELECT</span> `dbplyr_001`.*, `y` * `x`<span style="color: #0000BB;"> AS </span>`a`</span></span>
 <span><span class="co">#&gt;   <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span><span class="co">#&gt; ) AS `q01`</span></span></code></pre></div>
 <p>In general, it’s much easier to work iteratively in dbplyr. You can
@@ -160,14 +160,14 @@ cases, you’ll need to write SQL code directly.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>z <span class="op">=</span> <span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_001`.*, foofify(`x`, `y`)<span style="color: #0000BB;"> AS </span>`z`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> *</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `dbplyr_001`.*</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_001`</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">WHERE</span> (`x` LIKE '%foo%')</span></span></code></pre></div>
 <p>SQL functions tend to have a greater variety of syntax than R. That
