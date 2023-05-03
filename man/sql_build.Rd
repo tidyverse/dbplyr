@@ -105,7 +105,8 @@ select_query(
   window = character(),
   order_by = character(),
   limit = NULL,
-  distinct = FALSE
+  distinct = FALSE,
+  from_alias = NULL
 )
 
 semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
