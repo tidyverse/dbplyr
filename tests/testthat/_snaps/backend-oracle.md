@@ -4,7 +4,7 @@
       mf %>% head()
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       FETCH FIRST 6 ROWS ONLY
 

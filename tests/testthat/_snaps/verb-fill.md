@@ -7,7 +7,7 @@
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          *,
+          `df`.*,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       ) AS `q01`
@@ -69,7 +69,7 @@
       SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          *,
+          `df`.*,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       ) AS `q01`
@@ -98,7 +98,7 @@
         MAX(`n1`) OVER (PARTITION BY `group`, `..dbplyr_partion_1`) AS `n1`
       FROM (
         SELECT
-          *,
+          `df`.*,
           SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (PARTITION BY `group` ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
         FROM `df`
       ) AS `q01`

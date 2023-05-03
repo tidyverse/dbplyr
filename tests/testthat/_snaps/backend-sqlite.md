@@ -45,7 +45,7 @@
       db %>% filter(x > 2) %>% explain()
     Output
       <SQL>
-      SELECT *
+      SELECT `test`.*
       FROM `test`
       WHERE (`x` > 2.0)
       

@@ -6,7 +6,7 @@
       <SQL>
       SELECT 0.0 AS `x`
       FROM (
-        SELECT DISTINCT *
+        SELECT DISTINCT `df`.*
         FROM `df`
       ) `q01`
 
@@ -16,7 +16,7 @@
       (expect_no_error(lf %>% mutate(r = row_number())))
     Output
       <SQL>
-      SELECT *, ROW_NUMBER() OVER () AS `r`
+      SELECT `q01`.*, ROW_NUMBER() OVER () AS `r`
       FROM (
         SELECT `g`
         FROM `df`
@@ -36,7 +36,7 @@
           SELECT `x` + 1.0 AS `x`
           FROM `multi_mutate`
         ) AS `q01`
-      ) AS `q02`
+      ) AS `q01`
 
 # transmute includes all needed variables
 
@@ -75,7 +75,7 @@
     Output
       <SQL> SELECT `x`, SQRT(`y`) AS `y`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
@@ -92,16 +92,16 @@
           SELECT -`x` AS `x`, `y`, `z`
           FROM `df`
         ) `q01`
-      ) `q02`
+      ) `q01`
 
 # new columns take precedence over global variables
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT *, `y` + 1.0 AS `z`
+      <SQL> SELECT `q01`.*, `y` + 1.0 AS `z`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
       ) `q01`
 
@@ -149,9 +149,9 @@
       lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
-      SELECT *, `x1` + 1.0 AS `x2`
+      SELECT `q01`.*, `x1` + 1.0 AS `x2`
       FROM (
-        SELECT *, `x` + 1.0 AS `x1`
+        SELECT `df`.*, `x` + 1.0 AS `x1`
         FROM `df`
       ) AS `q01`
 
@@ -189,7 +189,7 @@
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT *, 3.0 AS `y`
+      <SQL> SELECT `df`.*, 3.0 AS `y`
       FROM `df`
 
 # temp var with nested arguments
@@ -199,7 +199,7 @@
     Output
       <SQL> SELECT `x`, `y` * 2.0 AS `z`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
       ) `q01`
 

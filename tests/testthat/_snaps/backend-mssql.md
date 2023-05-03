@@ -30,7 +30,7 @@
       mf %>% filter(is.na(x))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE ((`x` IS NULL))
 
@@ -40,7 +40,7 @@
       mf %>% filter(!is.na(x))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (NOT((`x` IS NULL)))
 
@@ -50,7 +50,7 @@
       mf %>% filter(x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = 1 OR `x` = 2)
 
@@ -60,7 +60,7 @@
       mf %>% mutate(z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT *, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
       FROM `df`
 
 ---
@@ -69,7 +69,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT *, CASE WHEN (`x` = 1) THEN 1 END AS `z`
+      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -78,7 +78,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT *, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -146,7 +146,7 @@
       mf %>% filter(x == a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = 0x616263)
 
@@ -156,7 +156,7 @@
       mf %>% filter(x %in% L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
@@ -166,7 +166,7 @@
       qry
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
@@ -176,7 +176,7 @@
       mf %>% filter(x == TRUE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = 1)
 
@@ -223,7 +223,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)

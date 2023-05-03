@@ -3,7 +3,7 @@
     Code
       sql_render(out)
     Output
-      <SQL> SELECT *
+      <SQL> SELECT `test-verb-arrange`.*
       FROM `test-verb-arrange`
       ORDER BY `y`
 
@@ -16,7 +16,7 @@
       lf %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `a`
     Code
@@ -24,7 +24,7 @@
       lf %>% arrange(a) %>% arrange(b)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `b`
     Code
@@ -47,7 +47,7 @@
       lf %>% arrange(a) %>% arrange()
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange()
@@ -72,9 +72,9 @@
       lf %>% head(1) %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
         LIMIT 1
       ) `q01`
@@ -83,7 +83,7 @@
       lf %>% arrange(a) %>% head(1)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `a`
       LIMIT 1
@@ -91,9 +91,9 @@
       lf %>% arrange(a) %>% head(1) %>% arrange(b)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
         ORDER BY `a`
         LIMIT 1
@@ -153,7 +153,7 @@
       <SQL>
       SELECT `LHS`.*, `c`
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
       ) `LHS`
       LEFT JOIN `df`
@@ -170,7 +170,7 @@
       <SQL>
       SELECT *
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
       ) `LHS`
       WHERE EXISTS (
@@ -181,7 +181,7 @@
       lf %>% arrange(a) %>% union(rf)
     Output
       <SQL>
-      SELECT *, NULL AS `c`
+      SELECT `df`.*, NULL AS `c`
       FROM `df`
       ORDER BY `a`
       
@@ -196,7 +196,7 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
         SELECT `df_LHS`.*, `c`
         FROM `df` AS `df_LHS`
@@ -210,7 +210,7 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
         SELECT *
         FROM `df` AS `df_LHS`
@@ -224,9 +224,9 @@
       lf %>% union(rf) %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *, NULL AS `c`
+        SELECT `df`.*, NULL AS `c`
         FROM `df`
       
         UNION

@@ -380,7 +380,7 @@
       
       UNION ALL
       
-      SELECT *, NULL AS `y`
+      SELECT `q01`.*, NULL AS `y`
       FROM (
         SELECT *
         FROM `df_y`

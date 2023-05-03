@@ -10,7 +10,7 @@
     Code
       mf %>% head() %>% sql_render()
     Output
-      <SQL> SELECT TOP 6 *
+      <SQL> SELECT TOP 6 `df`.*
       FROM `df`
 
 # lead, lag work
@@ -68,9 +68,9 @@
       lf %>% distinct() %>% head()
     Output
       <SQL>
-      SELECT TOP 6 *
+      SELECT TOP 6 `q01`.*
       FROM (
-        SELECT DISTINCT *
+        SELECT DISTINCT `df`.*
         FROM `df`
       ) `q01`
 
