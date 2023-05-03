@@ -349,7 +349,7 @@
       semi_join(lf1, lf2, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT *
+      SELECT `lf1`.*
       FROM `lf1`
       WHERE EXISTS (
         SELECT 1 FROM `lf2`

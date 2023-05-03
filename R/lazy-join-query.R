@@ -274,7 +274,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., use_star = TRUE) {
   if (use_star &&
       identical(op$vars$var, op$vars$name) &&
       identical(op$vars$var, vars_prev)) {
-    vars <- sql("*")
+    vars <- sql_star(con, op$by$x_as)
   } else {
     vars <- ident(set_names(op$vars$var, op$vars$name))
   }

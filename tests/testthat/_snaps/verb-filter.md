@@ -1,22 +1,22 @@
 # two filters equivalent to one
 
     Code
-      df1 %>% remote_query()
+      lf1 %>% remote_query()
     Output
-      <SQL> SELECT *
+      <SQL> SELECT `df`.*
       FROM `df`
       WHERE (`x` > 3.0) AND (`y` < 3.0)
 
 ---
 
     Code
-      df1 %>% remote_query()
+      lf1 %>% remote_query()
     Output
       <SQL> SELECT `x`, `y`
       FROM (
-        SELECT *, AVG(`x`) OVER () AS `q01`
+        SELECT `df`.*, AVG(`x`) OVER () AS `q01`
         FROM `df`
-      ) AS `q01`
+      ) `q01`
       WHERE (`q01` > 3.0) AND (`y` < 3.0)
 
 # errors for named input
@@ -66,10 +66,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, MAX(`x`) OVER () AS `q02`
+        SELECT `df`.*, MAX(`x`) OVER () AS `q01`
         FROM `df`
       ) `q01`
-      WHERE (`x` = `q02`) AND (`x` IN (1, 2))
+      WHERE (`x` = `q01`) AND (`x` IN (1, 2))
 
 # filter() after summarise() uses `HAVING`
 
@@ -131,9 +131,9 @@
       (out <- lf %>% filter(x_mean > 1))
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
+        SELECT `df`.*, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
         FROM `df`
       ) `q01`
       WHERE (`x_mean` > 1.0)
@@ -151,13 +151,13 @@
       SELECT `g`, `h`, `x_mean`
       FROM (
         SELECT
-          *,
-          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q02`
+          `q01`.*,
+          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q01`
         FROM (
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`
           FROM `df`
           GROUP BY `g`, `h`
         ) `q01`
-      ) `q02`
-      WHERE (`q02` = 1.0)
+      ) `q01`
+      WHERE (`q01` = 1.0)
 

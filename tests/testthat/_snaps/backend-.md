@@ -12,7 +12,7 @@
       mf %>% filter(x == a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = X'616263')
 
@@ -22,7 +22,7 @@
       mf %>% filter(x %in% L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 
@@ -32,7 +32,7 @@
       qry
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 

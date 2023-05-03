@@ -172,17 +172,20 @@ sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
     inform(op$message_summarise)
   }
 
+  alias <- query_name(op$x) %||% ident(unique_subquery_name())
+  from <- sql_build(op$x, con, use_star = use_star)
   select_sql_list <- get_select_sql(
-    op$select,
-    op$select_operation,
-    op_vars(op$x),
-    con,
+    select = op$select,
+    select_operation = op$select_operation,
+    in_vars = op_vars(op$x),
+    table_alias = alias,
+    con = con,
     use_star = use_star
   )
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 
   select_query(
-    from = sql_build(op$x, con, use_star = use_star),
+    from = from,
     select = select_sql_list$select_sql,
     where = where_sql,
     group_by = translate_sql_(op$group_by, con = con),
@@ -190,11 +193,17 @@ sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
     window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
     distinct = op$distinct,
-    limit = op$limit
+    limit = op$limit,
+    from_alias = alias
   )
 }
 
-get_select_sql <- function(select, select_operation, in_vars, con, use_star) {
+get_select_sql <- function(select,
+                           select_operation,
+                           in_vars,
+                           table_alias,
+                           con,
+                           use_star) {
   if (select_operation == "summarise") {
     select_expr <- set_names(select$expr, select$name)
     select_sql_list <- translate_sql_(select_expr, con, window = FALSE, context = list(clause = "SELECT"))
@@ -203,10 +212,14 @@ get_select_sql <- function(select, select_operation, in_vars, con, use_star) {
   }
 
   if (use_star && is_select_identity(select, in_vars)) {
-    return(list(select_sql = sql("*"), window_sql = character()))
+    out <- list(
+      select_sql = sql_star(con, table_alias),
+      window_sql = character()
+    )
+    return(out)
   }
 
-  select <- select_use_star(select, in_vars, con, use_star)
+  select <- select_use_star(select, in_vars, table_alias, con, use_star)
 
   # translate once just to register windows
   win_register_activate()
@@ -234,12 +247,8 @@ get_select_sql <- function(select, select_operation, in_vars, con, use_star) {
   )
 }
 
-select_use_star <- function(select, vars_prev, con, use_star) {
+select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
   if (!use_star) {
-    return(select)
-  }
-
-  if (!supports_star_without_alias(con)) {
     return(select)
   }
 
@@ -262,7 +271,7 @@ select_use_star <- function(select, vars_prev, con, use_star) {
     idx_end <- seq2(last + 1, n)
     vctrs::vec_rbind(
       vctrs::vec_slice(select, idx_start),
-      tibble(name = "", expr = list(sql("*"))),
+      tibble(name = "", expr = list(sql_star(con, table_alias))),
       vctrs::vec_slice(select, idx_end)
     )
   } else {

@@ -239,10 +239,11 @@ test_that("names windows automatically", {
     )
 
   sql_list <- get_select_sql(
-    lf1$lazy_query$select,
-    "mutate",
-    op_vars(lf),
-    simulate_sqlite(),
+    select = lf1$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(
@@ -273,10 +274,11 @@ test_that("names windows automatically", {
     )
 
   sql_list <- get_select_sql(
-    lf2$lazy_query$select,
-    "mutate",
-    op_vars(lf),
-    simulate_sqlite(),
+    select = lf2$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(
@@ -315,10 +317,11 @@ test_that("only name windows if they appear multiple times", {
     )
 
   sql_list <- get_select_sql(
-    lf$lazy_query$select,
-    "mutate",
-    op_vars(lf),
-    simulate_sqlite(),
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
     use_star = TRUE
   )
   expect_equal(sql_list$window_sql, sql("`win1` AS (PARTITION BY `part`)"))
@@ -346,10 +349,11 @@ test_that("name windows only if supported", {
     )
 
   sql_list <- get_select_sql(
-    lf$lazy_query$select,
-    "mutate",
-    op_vars(lf),
-    simulate_hana(),
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_hana(),
     use_star = TRUE
   )
   expect_equal(sql_list$window_sql, character())

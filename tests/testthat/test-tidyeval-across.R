@@ -453,7 +453,7 @@ test_that("if_all/any is wrapped in parantheses #1153", {
 
   expect_equal(
     lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
   )
 })
 
@@ -497,11 +497,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
   # Single inputs
   expect_equal(
     filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE ((FALSE))")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
     filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE ((FALSE))")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
 })
 
@@ -614,12 +614,12 @@ test_that("can `arrange()` with `pick()` selection", {
 
   expect_identical(
     arrange(df, pick(x, y)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nORDER BY `x`, `y`")
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
   )
 
   expect_identical(
     arrange(df, pick(x), y) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nORDER BY `x`, `y`")
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
   )
 })
 

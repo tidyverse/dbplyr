@@ -6,7 +6,7 @@
         <SQL SELECT>
         From:
           <IDENT> lf1
-        Select:   *, NULL
+        Select:   `lf1`.*, NULL
       
         UNION
       

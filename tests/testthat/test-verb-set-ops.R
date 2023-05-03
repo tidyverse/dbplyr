@@ -71,7 +71,7 @@ test_that("can combine multiple union in one query", {
     union(lf3)
 
   out <- lf_union %>% mutate(a = x + y) %>% sql_build()
-  expect_equal(out$select, sql("*", a = "`x` + `y`"))
+  expect_equal(out$select, sql("`q01`.*", a = "`x` + `y`"))
 })
 
 test_that("intersect and setdiff work for supported backends", {

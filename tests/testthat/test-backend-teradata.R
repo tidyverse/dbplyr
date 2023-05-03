@@ -84,14 +84,6 @@ test_that("row_number with and without group_by", {
   expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
 })
 
-test_that("queries do not use *", {
-  lf <- lazy_frame(x = 1L, con = simulate_teradata())
-  expect_equal(
-    lf %>% mutate(y = x) %>% remote_query(),
-    sql("SELECT `x`, `x` AS `y`\nFROM `df`")
-  )
-})
-
 test_that("head after distinct() produces subquery", {
   lf <- lazy_frame(x = 1, y = 2, con = simulate_teradata())
   expect_snapshot(lf %>% distinct() %>% head())
