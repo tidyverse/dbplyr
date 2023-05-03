@@ -16,9 +16,6 @@
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
-#' * `supports_star_without_alias(con)` does the backend support using `*`
-#'   in a `SELECT` query without prefixing by a table alias?
-#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -315,17 +312,6 @@ supports_window_clause <- function(con) {
 #' @export
 supports_window_clause.DBIConnection <- function(con) {
   FALSE
-}
-
-#' @rdname db-sql
-#' @export
-supports_star_without_alias <- function(con) {
-  UseMethod("supports_star_without_alias")
-}
-
-#' @export
-supports_star_without_alias.DBIConnection <- function(con) {
-  TRUE
 }
 
 

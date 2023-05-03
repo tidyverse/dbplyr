@@ -256,10 +256,6 @@ select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
     return(select)
   }
 
-  if (!supports_star_without_alias(con)) {
-    return(select)
-  }
-
   first_match <- vctrs::vec_match(vars_prev[[1]], select$name)
   if (is.na(first_match)) {
     return(select)
