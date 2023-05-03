@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Queries now qualify `*` with the table alias for better compatibility (@mgirlich, #1003).
+
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
 * `show_query()` and `remote_query()` get the argument `use_star` that controls
