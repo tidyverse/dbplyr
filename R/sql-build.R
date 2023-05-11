@@ -200,29 +200,6 @@ flatten_query.semi_join_query <- flatten_query.join_query
 #' @export
 flatten_query.set_op_query <- flatten_query.join_query
 
-#' @export
-sql_render.sql <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  query
-}
-
-#' @export
-sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  if (subquery) {
-    query
-  } else {
-    dbplyr_query_select(con, sql("*"), query, lvl = lvl)
-  }
-}
-
-#' @export
-sql_render.dbplyr_schema <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  query <- as.sql(query, con)
-  sql_render(query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
-}
-
-#' @export
-sql_render.dbplyr_catalog <- sql_render.dbplyr_schema
-
 # Optimise ----------------------------------------------------------------
 
 #' @export
