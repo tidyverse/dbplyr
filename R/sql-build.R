@@ -130,7 +130,7 @@ cte_render <- function(query_list, con) {
 get_subquery_name <- function(x, query_list) {
   if (inherits(x, "base_query")) return(x)
 
-  ident(query_list$name)
+  base_query(ident(query_list$name))
 }
 
 flatten_query <- function(qry, query_list) {

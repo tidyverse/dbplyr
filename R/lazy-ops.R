@@ -43,6 +43,13 @@ lazy_query_remote <- function(x, vars) {
   lazy_base_query(x, vars, class = "remote")
 }
 
+base_query <- function(from) {
+  structure(
+    list(from = from),
+    class = c("base_query", "query")
+  )
+}
+
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
   if (inherits(x$x, "ident")) {
@@ -61,18 +68,12 @@ print.lazy_base_local_query <- function(x, ...) {
 
 #' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
-  structure(
-    list(from = op$x),
-    class = c("base_query", "query")
-  )
+  base_query(op$x)
 }
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
-  structure(
-    list(from = op$name),
-    class = c("base_query", "query")
-  )
+  base_query(op$name)
 }
 
 #' @export
