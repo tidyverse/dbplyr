@@ -691,7 +691,7 @@ make_join_aliases <- function(x_as, y_as, sql_on, call) {
 }
 
 make_table_names <- function(as, lq) {
-  name <- unclass(query_name(lq))
+  name <- unclass(remote_name(lq, null_if_local = FALSE))
 
   if (!is.null(as)) {
     tibble(name = as, from = "as")
