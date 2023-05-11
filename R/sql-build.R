@@ -128,7 +128,7 @@ cte_render <- function(query_list, con) {
 }
 
 get_subquery_name <- function(x, query_list) {
-  if (is.ident(x) || is.sql(x)) return(x)
+  if (inherits(x, "base_query")) return(x)
 
   ident(query_list$name)
 }

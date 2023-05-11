@@ -38,5 +38,6 @@ test_that("support colwise variants", {
 
 test_that("base source of tbl_lazy is always 'df'", {
   out <- lazy_frame(x = 1, y = 5) %>% sql_build()
-  expect_equal(out, ident("df"))
+  expect_s3_class(out, "base_query")
+  expect_equal(out$from, ident("df"))
 })

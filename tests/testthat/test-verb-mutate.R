@@ -71,7 +71,7 @@ test_that("queries are not nested unnecessarily", {
     sql_build()
 
   expect_s3_class(sql$from, "select_query")
-  expect_s3_class(sql$from$from, "ident")
+  expect_s3_class(sql$from$from, "base_query")
 })
 
 test_that("maintains order of existing columns (#3216, #3223)", {
