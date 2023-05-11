@@ -201,16 +201,6 @@ flatten_query.semi_join_query <- flatten_query.join_query
 flatten_query.set_op_query <- flatten_query.join_query
 
 #' @export
-flatten_query.ident <- function(qry, query_list) {
-  query_list
-}
-
-#' @export
-flatten_query.sql <- function(qry, query_list) {
-  query_list
-}
-
-#' @export
 sql_render.sql <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
   query
 }
