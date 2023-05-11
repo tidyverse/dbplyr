@@ -36,11 +36,6 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ..., use_star = TRUE) {
   sql_optimise(qry, con = con, ...)
 }
 
-#' @export
-sql_build.ident <- function(op, con = NULL, ..., use_star = TRUE) {
-  op
-}
-
 
 # Render ------------------------------------------------------------------
 
