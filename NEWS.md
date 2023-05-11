@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `remote_name()` now returns a string with the name of the table. To get the
+  qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
+
 * Queries now qualify `*` with the table alias for better compatibility (@mgirlich, #1003).
 
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
