@@ -45,7 +45,7 @@ print.select_query <- function(x, ...) {
     sep = ""
   )
   cat_line("From:")
-  cat_line(indent_print(sql_build(x$from)))
+  cat_line(indent_print(x$from))
 
   if (length(x$select))   cat("Select:   ", named_commas(x$select), "\n", sep = "")
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")

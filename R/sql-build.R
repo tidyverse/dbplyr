@@ -36,11 +36,6 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ..., use_star = TRUE) {
   sql_optimise(qry, con = con, ...)
 }
 
-#' @export
-sql_build.ident <- function(op, con = NULL, ..., use_star = TRUE) {
-  op
-}
-
 
 # Render ------------------------------------------------------------------
 
@@ -128,9 +123,9 @@ cte_render <- function(query_list, con) {
 }
 
 get_subquery_name <- function(x, query_list) {
-  if (is.ident(x) || is.sql(x)) return(x)
+  if (inherits(x, "base_query")) return(x)
 
-  ident(query_list$name)
+  base_query(ident(query_list$name))
 }
 
 flatten_query <- function(qry, query_list) {
@@ -200,54 +195,10 @@ flatten_query.semi_join_query <- flatten_query.join_query
 #' @export
 flatten_query.set_op_query <- flatten_query.join_query
 
-#' @export
-flatten_query.ident <- function(qry, query_list) {
-  query_list
-}
-
-#' @export
-flatten_query.sql <- function(qry, query_list) {
-  query_list
-}
-
-#' @export
-sql_render.sql <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  query
-}
-
-#' @export
-sql_render.ident <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  if (subquery) {
-    query
-  } else {
-    dbplyr_query_select(con, sql("*"), query, lvl = lvl)
-  }
-}
-
-#' @export
-sql_render.dbplyr_schema <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
-  query <- as.sql(query, con)
-  sql_render(query, con = con, ..., subquery = subquery, lvl = lvl, cte = cte)
-}
-
-#' @export
-sql_render.dbplyr_catalog <- sql_render.dbplyr_schema
-
 # Optimise ----------------------------------------------------------------
 
 #' @export
 #' @rdname sql_build
 sql_optimise <- function(x, con = NULL, ..., subquery = FALSE) {
   UseMethod("sql_optimise")
-}
-
-#' @export
-sql_optimise.sql <- function(x, con = NULL, ...) {
-  # Can't optimise raw SQL
-  x
-}
-
-#' @export
-sql_optimise.ident <- function(x, con = NULL, ...) {
-  x
 }

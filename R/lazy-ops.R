@@ -43,6 +43,13 @@ lazy_query_remote <- function(x, vars) {
   lazy_base_query(x, vars, class = "remote")
 }
 
+base_query <- function(from) {
+  structure(
+    list(from = from),
+    class = c("base_query", "query")
+  )
+}
+
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
   if (inherits(x$x, "ident")) {
@@ -61,12 +68,33 @@ print.lazy_base_local_query <- function(x, ...) {
 
 #' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
-  as.sql(op$x, con = con)
+  base_query(op$x)
 }
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
-  as.sql(op$name, con = con)
+  base_query(op$name)
+}
+
+#' @export
+sql_render.base_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+  from <- query$from
+  if (subquery || is.sql(from)) {
+    from
+  } else {
+    from <- escape(from, con = con)
+    dbplyr_query_select(con, sql("*"), from, lvl = lvl)
+  }
+}
+
+#' @export
+print.base_query <- function(x, ...) {
+  print(x$from)
+}
+
+#' @export
+flatten_query.base_query <- function(qry, query_list) {
+  query_list
 }
 
 # op_grps -----------------------------------------------------------------

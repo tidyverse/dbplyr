@@ -17,10 +17,10 @@ print.set_op_query <- function(x, ...) {
   cat_line("<SQL ", toupper(x$type), ">")
 
   cat_line("X:")
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(x$x))
 
   cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y)))
+  cat_line(indent_print(x$y))
 }
 
 #' @export
@@ -66,7 +66,7 @@ union_query <- function(x, unions) {
 
 #' @export
 print.union_query <- function(x, ...) {
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(x$x))
 
   for (i in seq_along(x$unions$table)) {
     if (x$unions$all[[i]]) {
@@ -78,7 +78,7 @@ print.union_query <- function(x, ...) {
     cat_line(indent(sql(method)))
     cat_line()
 
-    cat_line(indent_print(sql_build(x$unions$table[[i]])))
+    cat_line(indent_print(x$unions$table[[i]]))
   }
 }
 
