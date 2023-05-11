@@ -166,16 +166,17 @@ lazy_values_query <- function(df, types) {
 
 #' @export
 sql_build.lazy_values_query <- function(op, con, ..., use_star = TRUE) {
+  class(op) <- c("values_query", "query")
   op
 }
 
 #' @export
-sql_render.lazy_values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
   sql_values_subquery(con, query$x, types = query$col_types, lvl = lvl)
 }
 
 #' @export
-flatten_query.lazy_values_query <- function(qry, query_list) {
+flatten_query.values_query <- function(qry, query_list) {
   querylist_reuse_query(qry, query_list)
 }
 
