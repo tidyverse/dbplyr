@@ -207,3 +207,25 @@ as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
   check_table_ident(x, sql = TRUE)
   as_table_ident(x)
 }
+
+table_ident_to_id <- function(x) {
+  vctrs::vec_check_size(x, 1)
+
+  sql <- vctrs::field(x, "sql")
+  if (!is.na(sql)) {
+    out <- DBI::SQL(sql)
+    return(out)
+  }
+
+  catalog <- vctrs::field(x, "catalog")
+  schema <- vctrs::field(x, "schema")
+  table <- vctrs::field(x, "table")
+
+  if (!is.na(catalog)) {
+    DBI::Id(catalog = catalog, schema = schema, table = table)
+  } else if (!is.na(schema)) {
+    DBI::Id(schema = schema, table = table)
+  } else {
+    DBI::Id(table = table)
+  }
+}

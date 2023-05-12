@@ -25,7 +25,7 @@ db_write_table.PostgreSQLConnection <- function(con,
 
   dbWriteTable(
     con,
-    name = SQL(escape(table, con = con)),
+    name = table_ident_to_id(table),
     value = values,
     field.types = types,
     ...,
