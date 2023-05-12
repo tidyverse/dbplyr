@@ -124,6 +124,7 @@ Collate:
     'sql-expr.R'
     'src-sql.R'
     'src_dbi.R'
+    'table-ident.R'
     'tbl-lazy.R'
     'tbl-sql.R'
     'test-frame.R'

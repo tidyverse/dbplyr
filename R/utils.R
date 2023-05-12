@@ -255,6 +255,8 @@ check_table_ident <- function(x,
     }
   } else if (sql && is.sql(x)) {
     n <- length(x)
+  } else if (inherits(x, "dbplyr_table_ident")) {
+    n <- vctrs::vec_size(x)
   } else {
     what <- c("ident", "schema", "catalog", "Id")
     if (sql) {
