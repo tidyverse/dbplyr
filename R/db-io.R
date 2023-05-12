@@ -161,7 +161,7 @@ db_write_table.DBIConnection <- function(con,
                                          values,
                                          temporary = TRUE,
                                          ...) {
-  check_table_ident(table)
+  table <- as_table_ident(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)
@@ -169,7 +169,7 @@ db_write_table.DBIConnection <- function(con,
   tryCatch(
     dbWriteTable(
       con,
-      name = dbi_quote(table, con),
+      name = SQL(escape(table, con = con)),
       value = values,
       field.types = types,
       temporary = temporary,

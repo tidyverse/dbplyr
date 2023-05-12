@@ -15,7 +15,7 @@ db_write_table.PostgreSQLConnection <- function(con,
                                                 values,
                                                 temporary = TRUE,
                                                 ...) {
-
+  table <- as_table_ident(table)
   if (!isFALSE(temporary)) {
     cli_abort(c(
       "RPostgreSQL backend does not support creation of temporary tables",
@@ -25,7 +25,7 @@ db_write_table.PostgreSQLConnection <- function(con,
 
   dbWriteTable(
     con,
-    name = table,
+    name = SQL(escape(table, con = con)),
     value = values,
     field.types = types,
     ...,
