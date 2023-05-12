@@ -9,9 +9,11 @@
       By:
         x-x
       X:
-        <IDENT> df
+        <dbplyr_table_ident[1]>
+        [1] df
       Y:
-        <IDENT> df
+        <dbplyr_table_ident[1]>
+        [1] df
 
 # generated sql doesn't change unexpectedly
 

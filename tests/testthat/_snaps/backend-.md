@@ -55,14 +55,16 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <IDENT> table
+      <dbplyr_table_ident[1]>
+      [1] table
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <IDENT> `schema`.`tbl`
+      <dbplyr_table_ident[1]>
+      [1] schema.tbl
 
 ---
 

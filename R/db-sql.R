@@ -245,20 +245,17 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 
 sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
-  if (is.ident(from)) {
-    out <- setNames(from, name)
+  from <- as_from(from)
+
+  if (is.sql(from)) {
+    from <- sql_indent_subquery(from, con, lvl)
+    # some backends, e.g. Postgres, require an alias for a subquery
+    name <- as_subquery_name(name)
+    out <- glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
     return(out)
   }
 
-  if (is_schema(from) || is_catalog(from) || inherits(from, "Id")) {
-    out <- setNames(as.sql(from, con), name)
-    return(out)
-  }
-
-  from <- sql_indent_subquery(from, con, lvl)
-  # some backends, e.g. Postgres, require an alias for a subquery
-  name <- as_subquery_name(name)
-  glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
+  setNames(from, name)
 }
 
 as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
