@@ -23,9 +23,11 @@ db_write_table.PostgreSQLConnection <- function(con,
     ))
   }
 
+  # RPostgreSQL doesn't handle `Id()` or `SQL()` correctly, so we can only pass
+  # the bare table name
   dbWriteTable(
     con,
-    name = table_ident_to_id(table),
+    name = vctrs::field(table, "table"),
     value = values,
     field.types = types,
     ...,
