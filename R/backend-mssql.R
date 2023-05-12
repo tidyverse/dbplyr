@@ -72,6 +72,39 @@ simulate_mssql <- function(version = "15.0") {
 }
 
 #' @export
+#' @importFrom dplyr db_write_table
+`db_write_table.Microsoft SQL Server` <- function(con,
+                                                  table,
+                                                  types,
+                                                  values,
+                                                  temporary = TRUE,
+                                                  ...) {
+  table <- as_table_ident(table)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+  name <- DBI::dbQuoteIdentifier(con, table_ident_to_id(table))
+
+  tryCatch(
+    dbWriteTable(
+      con,
+      name = name,
+      value = values,
+      field.types = types,
+      temporary = temporary,
+      ...,
+      row.names = FALSE
+    ),
+    error = function(cnd) {
+      msg <- "Can't write table table {.field {format(table)}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
+
+  table
+}
+
+#' @export
 `sql_query_select.Microsoft SQL Server` <- function(con,
                                                     select,
                                                     from,
