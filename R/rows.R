@@ -778,7 +778,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
-  name <- as.sql(name, con)
+  name <- as_table_ident(name)
   res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl name} LIMIT 0"))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
