@@ -116,8 +116,8 @@ join_check_by <- function(by, call) {
   if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
     cli_abort("{.arg by$x} and {.arg by$y} must have the same size", .internal = TRUE)
   }
-  vctrs::vec_assert(by$x_as, ident(), size = 1L, arg = "by$x_as", call = call)
-  vctrs::vec_assert(by$y_as, ident(), size = 1L, arg = "by$y_as", call = call)
+  check_string(by$x_as, arg = "by$x_as", call = call)
+  check_string(by$y_as, arg = "by$y_as", call = call)
 }
 
 #' @export
@@ -192,8 +192,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
   op$joins$by <- purrr::map2(
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
-      by$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
-      by$y_as <- ident(table_names_out[i + 1L])
+      by$x_as <- table_names_out[op$joins$by_x_table_id[[i]]]
+      by$y_as <- table_names_out[i + 1L]
       by
     }
   )
@@ -245,8 +245,8 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
   vars_classic$all_y <- op_vars(op$y)
 
   by <- op$by
-  by$x_as <- ident(table_names_out[[1]])
-  by$y_as <- ident(table_names_out[[2]])
+  by$x_as <- table_names_out[[1]]
+  by$y_as <- table_names_out[[2]]
 
   select <- sql_rf_join_vars(
     con,

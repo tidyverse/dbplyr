@@ -942,7 +942,7 @@ sql_query_upsert.DBIConnection <- function(con,
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
 
-  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"), condition = "=")
+  join_by <- list(x = by, y = by, x_as = "updated", y_as = "...y", condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(

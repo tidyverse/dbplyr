@@ -491,7 +491,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
   stopifnot(table %in% c("DELETED", "INSERTED"))
-  returning_cols <- sql_named_cols(con, cols, table = ident(table))
+  returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("OUTPUT", returning_cols)
 }
