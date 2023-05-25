@@ -112,10 +112,13 @@ as_table_ident.dbplyr_catalog <- function(x, ..., error_call = current_env()) {
 as_table_ident.Id <- function(x, ..., error_call = current_env()) {
   id <- x@name
   nms <- names(id)
-  unknown_names <- setdiff(nms, c("catalog", "schema", "table"))
+  known_names <- c("catalog", "schema", "table")
+  unknown_names <- setdiff(nms, known_names)
   if (!is_empty(unknown_names)) {
-    # TODO
-    cli_abort("{.arg table} is an <Id> with unknown names {.val {unknown_names}}.", call = error_call)
+    cli_abort(c(
+      "{.arg table} is an <Id> with unknown names {.val {unknown_names}}.",
+      i = "Only {.val {known_names}} are supported."
+    ), call = error_call)
   }
 
   new_table_ident(
@@ -173,8 +176,6 @@ quote_table_ident <- function(x, con) {
 }
 
 table_ident_name <- function(x) {
-  # TODO should error if `x$table` is NA?
-  # TODO or should this support `x$sql`?
   table <- vctrs::field(x, "table")
   quoted <- vctrs::field(x, "quoted")
   if (quoted) {
@@ -187,7 +188,6 @@ table_ident_name <- function(x) {
 #' @export
 names.dbplyr_table_ident <- function(x) {
   names <- vctrs::field(x, "name")
-  # TODO remove hack later
   if (all(is.na(names))) {
     return(NULL)
   }
