@@ -253,7 +253,7 @@ sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
   if (is.sql(from)) {
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
-    name <- as_subquery_name(name)
+    name <- name %||% unique_subquery_name()
     out <- glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
     return(out)
   }
@@ -262,16 +262,6 @@ sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
     return(from)
   }
   setNames(from, name)
-}
-
-as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
-  if (is.ident(x)) {
-    x
-  } else if (is.null(x)) {
-    default
-  } else {
-    ident(x)
-  }
 }
 
 #' @export
