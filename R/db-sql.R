@@ -258,6 +258,9 @@ sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
     return(out)
   }
 
+  if (identical(table_ident_name(from), name)) {
+    return(from)
+  }
   setNames(from, name)
 }
 

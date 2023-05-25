@@ -26,8 +26,8 @@
       left_join(df1, df2, by = "x") %>% remote_query()
     Output
       <SQL> SELECT `df`.*, `z`
-      FROM `foo`.`df` AS `df`
-      LEFT JOIN `foo`.`df2` AS `df2`
+      FROM `foo`.`df`
+      LEFT JOIN `foo`.`df2`
         ON (`df`.`x` = `df2`.`x`)
 
 ---
