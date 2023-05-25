@@ -81,20 +81,25 @@ as_table_ident.ident <- function(x, ..., error_call = current_env()) {
 
 #' @export
 as_table_ident.ident_q <- function(x, ..., error_call = current_env()) {
-  cli::cli_inform(c(
-    i = "{.cls ident_q} is intended as fallback in case of bugs.",
-    i = "If you need it to work around a bug please open an issue {.url https://github.com/tidyverse/dbplyr/issues}."
-  ))
+  inform_unwanted_table_ident("ident_q")
   new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
 }
 
 #' @export
 as_table_ident.sql <- function(x, ..., error_call = current_env()) {
-  cli::cli_inform(c(
-    i = "Using {.cls sql} for a table identifier is intended as fallback in case of bugs.",
-    i = "If you need it to work around a bug please open an issue {.url https://github.com/tidyverse/dbplyr/issues}."
-  ))
+  inform_unwanted_table_ident("sql")
   new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
+}
+
+inform_unwanted_table_ident <- function(f) {
+  cli::cli_inform(
+    c(
+      i = "Using {.fn {f}} for a table identifier is intended as fallback in case of bugs.",
+      i = "If you need it to work around a bug please open an issue {.url https://github.com/tidyverse/dbplyr/issues}."
+    ),
+    .frequency = "regularly",
+    .frequency_id = paste0("dbplyr_", f)
+  )
 }
 
 #' @export

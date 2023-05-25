@@ -96,12 +96,14 @@
       expect_equal(as_table_ident(ident_q("my schema.my table")), new_table_ident(
         table = "my schema.my table", quoted = TRUE))
     Message
-      i <ident_q> is intended as fallback in case of bugs.
+      i Using `ident_q()` for a table identifier is intended as fallback in case of bugs.
       i If you need it to work around a bug please open an issue <https://github.com/tidyverse/dbplyr/issues>.
+      This message is displayed once every 8 hours.
     Code
       expect_equal(as_table_ident(sql("my schema.my table")), new_table_ident(table = "my schema.my table",
         quoted = TRUE))
     Message
-      i Using <sql> for a table identifier is intended as fallback in case of bugs.
+      i Using `sql()` for a table identifier is intended as fallback in case of bugs.
       i If you need it to work around a bug please open an issue <https://github.com/tidyverse/dbplyr/issues>.
+      This message is displayed once every 8 hours.
 
