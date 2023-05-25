@@ -86,10 +86,9 @@ test_that("join works with in_schema", {
 
   # use auto name for `ident_q`
   # suppress info about <ident_q> only meant as a workaround
-  suppressMessages({
-    df4 <- tbl(con, ident_q("`foo`.`df`"))
-    df5 <- tbl(con, ident_q("`foo2`.`df`"))
-  })
+  withr::local_options(rlib_message_verbosity = "quiet")
+  df4 <- tbl(con, ident_q("`foo`.`df`"))
+  df5 <- tbl(con, ident_q("`foo2`.`df`"))
   expect_snapshot(
     left_join(df4, df5, by = "x") %>% remote_query()
   )

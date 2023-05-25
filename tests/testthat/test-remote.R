@@ -51,8 +51,9 @@ test_that("remote_name and remote_table can handle different table identifiers",
   test_remote_table(in_catalog("catalog", "schema", "tbl"))
   test_remote_table(DBI::Id(catalog = "catalog", schema = "schema", table = "tbl"))
 
-  suppressMessages(expect_message(test_remote_table(ident_q("schema.tbl"), exp_name = NULL)))
-  suppressMessages(test_remote_table(sql("schema.tbl"), exp_name = NULL))
+  withr::local_options(rlib_message_verbosity = "quiet")
+  test_remote_table(ident_q("schema.tbl"), exp_name = NULL)
+  test_remote_table(sql("schema.tbl"), exp_name = NULL)
 })
 
 test_that("can retrieve query, src and con metadata", {

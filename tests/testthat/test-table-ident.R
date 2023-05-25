@@ -112,6 +112,7 @@ test_that("as_table_ident works", {
     table
   )
 
+  withr::local_options(rlib_message_verbosity = "verbose")
   expect_snapshot({
     expect_equal(
       as_table_ident(ident_q("my schema.my table")),
