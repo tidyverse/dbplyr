@@ -929,7 +929,7 @@ sql_query_upsert.DBIConnection <- function(con,
   insert_cols <- c(by, update_cols)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_values <- sql_table_prefix(con, update_cols, "...y")
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(

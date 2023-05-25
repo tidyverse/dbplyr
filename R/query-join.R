@@ -200,7 +200,7 @@ sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars)
   }
 
   if (tolower(var) %in% duplicated_vars) {
-    sql_table_prefix(con, var, ident(table_names[[table_id]]))
+    sql_table_prefix(con, var, table_names[[table_id]])
   } else {
     sql_escape_ident(con, var)
   }
@@ -269,8 +269,8 @@ sql_join_tbls <- function(con, by, na_matches) {
   na_matches <- arg_match(na_matches, c("na", "never"))
 
   if (na_matches == "na" || length(by$x) + length(by$y) > 0) {
-    lhs <- sql_table_prefix(con, by$x, by$x_as %||% ident("LHS"))
-    rhs <- sql_table_prefix(con, by$y, by$y_as %||% ident("RHS"))
+    lhs <- sql_table_prefix(con, by$x, by$x_as %||% "LHS")
+    rhs <- sql_table_prefix(con, by$y, by$y_as %||% "RHS")
 
     if (na_matches == "na") {
       compare <- purrr::map_chr(seq_along(lhs), function(i) {
@@ -294,6 +294,7 @@ sql_table_prefix <- function(con, var, table = NULL) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
+    table <- as_table_ident(table)
     table <- escape(table, collapse = NULL, con = con)
     sql(paste0(table, ".", var))
   } else {

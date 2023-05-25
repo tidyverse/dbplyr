@@ -228,7 +228,7 @@ rows_update.tbl_lazy <- function(x,
     con <- remote_con(x)
     update_cols <- setdiff(colnames(y), by)
     update_values <- set_names(
-      sql_table_prefix(con, update_cols, ident("...y")),
+      sql_table_prefix(con, update_cols, "...y"),
       update_cols
     )
 
@@ -309,7 +309,7 @@ rows_patch.tbl_lazy <- function(x,
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
       sql_table_prefix(con, update_cols, name),
-      sql_table_prefix(con, update_cols, ident("...y"))
+      sql_table_prefix(con, update_cols, "...y")
     )
     update_values <- set_names(update_values, update_cols)
 
