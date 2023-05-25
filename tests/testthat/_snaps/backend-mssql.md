@@ -370,3 +370,48 @@
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       ;
 
+# atoms and symbols are cast to bit in `filter`
+
+    Code
+      mf %>% filter(x)
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (cast(`x` AS `BIT`) = 1.0)
+
+---
+
+    Code
+      mf %>% filter(TRUE)
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (cast(1 AS `BIT`) = 1.0)
+
+---
+
+    Code
+      mf %>% filter((!x) | FALSE)
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE ((NOT(cast(`x` AS `BIT`) = 1.0)) OR cast(0 AS `BIT`) = 1.0)
+
+---
+
+    Code
+      mf %>% filter(x) %>% inner_join(mf, by = "x")
+    Output
+      <SQL>
+      SELECT `LHS`.`x` AS `x`
+      FROM (
+        SELECT `df`.*
+        FROM `df`
+        WHERE (cast(`x` AS `BIT`) = 1.0)
+      ) `LHS`
+      INNER JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+

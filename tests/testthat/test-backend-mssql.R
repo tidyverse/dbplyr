@@ -313,6 +313,20 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("atoms and symbols are cast to bit in `filter`", {
+  mf <- lazy_frame(x = TRUE, con = simulate_mssql())
+
+  # as simple symbol and atom
+  expect_snapshot(mf %>% filter(x))
+  expect_snapshot(mf %>% filter(TRUE))
+
+  # when involved in a (perhaps nested) logical expression
+  expect_snapshot(mf %>% filter((!x) | FALSE))
+
+  # in a subquery
+  expect_snapshot(mf %>% filter(x) %>% inner_join(mf, by = "x"))
+})
+
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#272)", {
