@@ -2,38 +2,38 @@ new_table_ident <- function(...,
                             table = NA_character_,
                             schema = NA_character_,
                             catalog = NA_character_,
-                            sql = NA_character_,
+                            quoted = FALSE,
                             error_call = caller_env()) {
   check_dots_empty(call = error_call)
 
-  check_character(table, character(), call = error_call)
-  check_character(schema, character(), call = error_call)
-  check_character(catalog, character(), call = error_call)
-  check_character(sql, character(), call = error_call)
+  check_character(table, call = error_call)
+  check_character(schema, call = error_call)
+  check_character(catalog, call = error_call)
+  check_logical(quoted, call = error_call)
 
   n <- vctrs::vec_size_common(
     table = table,
     schema = schema,
     catalog = catalog,
-    sql = sql,
+    quoted = quoted,
     .call = error_call
   )
   data <- list(
     table = vctrs::vec_recycle(table, n, call = error_call),
     schema = vctrs::vec_recycle(schema, n, call = error_call),
     catalog = vctrs::vec_recycle(catalog, n, call = error_call),
-    sql = vctrs::vec_recycle(sql, n, call = error_call),
+    quoted = vctrs::vec_recycle(quoted, n, call = error_call),
     name = vctrs::vec_rep(NA_character_, n)
   )
 
   purrr::pmap(
     data,
-    function(table, schema, catalog, sql, name) {
+    function(table, schema, catalog, quoted, name) {
       check_db_table_args(
         table = table,
         schema = schema,
         catalog = catalog,
-        sql = sql,
+        quoted = quoted,
         call = error_call
       )
     }
@@ -45,7 +45,7 @@ new_table_ident <- function(...,
 check_db_table_args <- function(table,
                                 schema,
                                 catalog,
-                                sql,
+                                quoted,
                                 call = caller_env()) {
   if (!is.na(catalog) && is.na(schema)) {
     cli_abort("Must supply {.arg schema} when {.arg catalog} is supplied.", call = call)
@@ -54,8 +54,8 @@ check_db_table_args <- function(table,
     cli_abort("Must supply {.arg table} when {.arg schema} is supplied.", call = call)
   }
 
-  if (!is.na(sql) && !is.na(table)) {
-    cli_abort("Can only supply either {.arg sql} or {.arg table}.", call = call)
+  if (quoted && !is.na(schema)) {
+    cli_abort("Can't supply a schema when {.arg table} is quoted.", call = call)
   }
 }
 
@@ -81,12 +81,14 @@ as_table_ident.ident <- function(x, ..., error_call = current_env()) {
 
 #' @export
 as_table_ident.ident_q <- function(x, ..., error_call = current_env()) {
-  new_table_ident(sql = x)
+  # TODO should inform that this is not intended to be used
+  new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
 }
 
 #' @export
 as_table_ident.sql <- function(x, ..., error_call = current_env()) {
-  cli_abort("Can't convert {.cls sql} to a table ident object.", call = error_call)
+  # TODO should inform that this is not intended to be used
+  new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
 }
 
 #' @export
@@ -133,14 +135,15 @@ as_table_ident_or_sql <- function(x, ..., error_call = current_env()) {
 
 #' @export
 format.dbplyr_table_ident <- function(x, ..., sep = ".") {
-  out <- vctrs::field(x, "table")
+  table <- vctrs::field(x, "table")
+  out <- table
   schema <- vctrs::field(x, "schema")
   out <- ifelse(is.na(schema), out, paste0(schema, sep, out))
   catalog <- vctrs::field(x, "catalog")
   out <- ifelse(is.na(catalog), out, paste0(catalog, sep, out))
 
-  sql <- vctrs::field(x, "sql")
-  ifelse(is.na(sql), out, sql)
+  quoted <- vctrs::field(x, "quoted")
+  ifelse(quoted, table, out)
 }
 
 is_table_ident <- function(x) {
@@ -155,9 +158,11 @@ escape.dbplyr_table_ident <- function(x, parens = FALSE, collapse = ", ", con = 
 }
 
 quote_table_ident <- function(x, con) {
+  quoted <- vctrs::field(x, "quoted")
+
   for (field in c("table", "schema", "catalog")) {
     xf <- vctrs::field(x, field)
-    idx <- !is.na(xf)
+    idx <- !is.na(xf) & !quoted
     xf[idx] <- sql_escape_ident(con, xf[idx])
     x <- vctrs::`field<-`(x, field, xf)
   }
@@ -171,7 +176,8 @@ table_ident_name <- function(x) {
   # TODO should error if `x$table` is NA?
   # TODO or should this support `x$sql`?
   table <- vctrs::field(x, "table")
-  if (is.na(table)) {
+  quoted <- vctrs::field(x, "quoted")
+  if (quoted) {
     NULL
   } else {
     table
@@ -211,8 +217,8 @@ as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
 table_ident_to_id <- function(x) {
   vctrs::vec_check_size(x, 1)
 
-  sql <- vctrs::field(x, "sql")
-  if (!is.na(sql)) {
+  quoted <- vctrs::field(x, "quoted")
+  if (quoted) {
     out <- DBI::SQL(sql)
     return(out)
   }

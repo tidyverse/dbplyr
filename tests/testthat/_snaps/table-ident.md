@@ -9,12 +9,12 @@
 # can't supply table and sql
 
     Code
-      new_table_ident(table = "my table", sql = "SELECT * FROM `my table`")
+      new_table_ident(schema = "my schema", table = "my table", quoted = TRUE)
     Condition
       Error in `purrr::pmap()`:
       i In index: 1.
       Caused by error:
-      ! Can only supply either `sql` or `table`.
+      ! Can't supply a schema when `table` is quoted.
 
 # must supply table and schema when catalog is used
 
@@ -74,19 +74,19 @@
       <dbplyr_table_ident[1]>
       [1] catalog.schema.table
     Code
-      new_table_ident(sql = "select * from table")
+      new_table_ident(table = "`my schema`.`my table`", quoted = TRUE)
     Output
       <dbplyr_table_ident[1]>
-      [1] select * from table
+      [1] `my schema`.`my table`
 
 ---
 
     Code
-      new_table_ident(table = c(NA, "table1", "table2", "table3"), schema = c(NA, NA,
-        "schema2", "schema3"), catalog = c(NA, NA, NA, "catalog3"), sql = c("sql", NA,
-        NA, NA))
+      new_table_ident(table = c("`my schema`.`my table`", "table1", "table2",
+        "table3"), schema = c(NA, NA, "schema2", "schema3"), catalog = c(NA, NA, NA,
+        "catalog3"), quoted = c(TRUE, FALSE, FALSE, FALSE))
     Output
       <dbplyr_table_ident[4]>
-      [1] sql                     table1                  schema2.table2         
+      [1] `my schema`.`my table`  table1                  schema2.table2         
       [4] catalog3.schema3.table3
 

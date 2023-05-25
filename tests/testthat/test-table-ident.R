@@ -8,7 +8,7 @@ test_that("can create table idents", {
       table = c("A", "B", "C"),
       schema = vctrs::vec_rep("schema", 3),
       catalog = vctrs::vec_rep(NA_character_, 3),
-      sql = vctrs::vec_rep(NA_character_, 3),
+      quoted = vctrs::vec_rep(FALSE, 3),
       name = vctrs::vec_rep(NA_character_, 3)
     ), class = "dbplyr_table_ident")
   )
@@ -25,7 +25,7 @@ test_that("is properly vectorised", {
       table = c("A", "B"),
       schema = c("schema1", "schema2"),
       catalog = c("cat1", "cat2"),
-      sql = vctrs::vec_rep(NA_character_, 2),
+      quoted = vctrs::vec_rep(FALSE, 2),
       name = vctrs::vec_rep(NA_character_, 2)
     ), class = "dbplyr_table_ident")
   )
@@ -37,7 +37,7 @@ test_that("is properly vectorised", {
 
 test_that("can't supply table and sql", {
   expect_snapshot(error = TRUE, {
-    new_table_ident(table = "my table", sql = "SELECT * FROM `my table`")
+    new_table_ident(schema = "my schema", table = "my table", quoted = TRUE)
   })
 })
 
@@ -66,16 +66,16 @@ test_that("can print", {
     new_table_ident(table = "table")
     new_table_ident(schema = "schema", table = "table")
     new_table_ident(catalog = "catalog", schema = "schema", table = "table")
-    new_table_ident(sql = "select * from table")
+    new_table_ident(table = "`my schema`.`my table`", quoted = TRUE)
   })
 
   # is correctly vectorised
   expect_snapshot(
     new_table_ident(
-      table   = c(   NA, "table1",  "table2",   "table3"),
-      schema  = c(   NA,       NA, "schema2",  "schema3"),
-      catalog = c(   NA,       NA,        NA, "catalog3"),
-      sql     = c("sql",       NA,        NA,         NA)
+      table   = c("`my schema`.`my table`", "table1",  "table2",   "table3"),
+      schema  = c(                      NA,       NA, "schema2",  "schema3"),
+      catalog = c(                      NA,       NA,        NA, "catalog3"),
+      quoted  = c(                    TRUE,    FALSE,     FALSE,      FALSE)
     )
   )
 })
