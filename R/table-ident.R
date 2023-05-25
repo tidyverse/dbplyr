@@ -81,13 +81,19 @@ as_table_ident.ident <- function(x, ..., error_call = current_env()) {
 
 #' @export
 as_table_ident.ident_q <- function(x, ..., error_call = current_env()) {
-  # TODO should inform that this is not intended to be used
+  cli::cli_inform(c(
+    i = "{.cls ident_q} is intended as fallback in case of bugs.",
+    i = "If you need it to work around a bug please open an issue {.url https://github.com/tidyverse/dbplyr/issues}."
+  ))
   new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
 }
 
 #' @export
 as_table_ident.sql <- function(x, ..., error_call = current_env()) {
-  # TODO should inform that this is not intended to be used
+  cli::cli_inform(c(
+    i = "Using {.cls sql} for a table identifier is intended as fallback in case of bugs.",
+    i = "If you need it to work around a bug please open an issue {.url https://github.com/tidyverse/dbplyr/issues}."
+  ))
   new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
 }
 
@@ -202,16 +208,12 @@ names.dbplyr_table_ident <- function(x) {
 }
 
 as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
-  # TODO should only allow size = 1
-  if (inherits(x, "dbplyr_table_ident")) {
-    return(x)
-  }
-  if (inherits(x, "sql")) {
-    return(x)
+  check_table_ident(x, sql = TRUE)
+  if (!inherits(x, "sql")) {
+    x <- as_table_ident(x)
   }
 
-  check_table_ident(x, sql = TRUE)
-  as_table_ident(x)
+  x
 }
 
 table_ident_to_id <- function(x) {

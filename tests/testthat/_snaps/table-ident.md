@@ -90,3 +90,18 @@
       [1] `my schema`.`my table`  table1                  schema2.table2         
       [4] catalog3.schema3.table3
 
+# as_table_ident works
+
+    Code
+      expect_equal(as_table_ident(ident_q("my schema.my table")), new_table_ident(
+        table = "my schema.my table", quoted = TRUE))
+    Message
+      i <ident_q> is intended as fallback in case of bugs.
+      i If you need it to work around a bug please open an issue <https://github.com/tidyverse/dbplyr/issues>.
+    Code
+      expect_equal(as_table_ident(sql("my schema.my table")), new_table_ident(table = "my schema.my table",
+        quoted = TRUE))
+    Message
+      i Using <sql> for a table identifier is intended as fallback in case of bugs.
+      i If you need it to work around a bug please open an issue <https://github.com/tidyverse/dbplyr/issues>.
+

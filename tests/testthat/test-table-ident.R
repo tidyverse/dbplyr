@@ -111,6 +111,17 @@ test_that("as_table_ident works", {
     as_table_ident(table),
     table
   )
+
+  expect_snapshot({
+    expect_equal(
+      as_table_ident(ident_q("my schema.my table")),
+      new_table_ident(table = "my schema.my table", quoted = TRUE)
+    )
+    expect_equal(
+      as_table_ident(sql("my schema.my table")),
+      new_table_ident(table = "my schema.my table", quoted = TRUE)
+    )
+  })
 })
 
 test_that("escaped as needed", {
