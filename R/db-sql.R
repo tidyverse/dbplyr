@@ -937,7 +937,7 @@ sql_query_upsert.DBIConnection <- function(con,
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("RETURNING ", escape(table, con = con), ".*"))
+    sql(paste0("RETURNING ", sql_star(con, table)))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))

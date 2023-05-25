@@ -158,8 +158,7 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star) {
 
     if (use_star && join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
       id <- vars_idx[[1]]
-      tbl_alias <- escape(ident(table_names[i]), con = con)
-      out[[id]] <- sql(paste0(tbl_alias, ".*"))
+      out[[id]] <- sql_star(con, table_names[i])
       names(out)[id] <- ""
     } else {
       out[vars_idx] <- purrr::map2(
