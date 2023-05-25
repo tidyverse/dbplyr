@@ -86,10 +86,6 @@ sql_render.lazy_query <- function(query,
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
 
   if (cte) {
-    if (is.ident(qry) || is.sql(qry)) {
-      return(sql_render(qry, con))
-    }
-
     query_list <- flatten_query(qry, list(queries = list(), name = NULL))
     queries <- query_list$queries
 
