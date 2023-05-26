@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Oracle:
+  * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
+
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
 
