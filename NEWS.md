@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Fix translation of `TRUE` and `FALSE` for Oracle (@mgirlich, #1180).
+
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
 

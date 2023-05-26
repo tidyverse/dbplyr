@@ -5,6 +5,12 @@ test_that("custom scalar functions translated correctly", {
   expect_equal(translate_sql(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
   expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
   expect_equal(translate_sql(as.Date(x)),    sql("DATE `x`"))
+
+  # logical translated correctly # 1180
+  expect_equal(translate_sql(TRUE), sql("1 = 1"))
+  expect_equal(translate_sql(FALSE), sql("1 = 0"))
+  expect_equal(translate_sql(NA), sql("NULL"))
+  expect_equal(translate_sql(if (x) TRUE else FALSE), sql("CASE WHEN `x` THEN 1 = 1 WHEN NOT `x` THEN 1 = 0 END"))
 })
 
 test_that("paste and paste0 translate correctly", {
