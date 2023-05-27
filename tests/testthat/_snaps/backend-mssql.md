@@ -378,7 +378,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      WHERE (cast(`x` AS `BIT`) = 1.0)
+      WHERE (cast(`x` AS `BIT`) = 1)
 
 ---
 
@@ -388,7 +388,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      WHERE (cast(1 AS `BIT`) = 1.0)
+      WHERE (cast(1 AS `BIT`) = 1)
 
 ---
 
@@ -398,7 +398,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      WHERE ((NOT(cast(`x` AS `BIT`) = 1.0)) OR cast(0 AS `BIT`) = 1.0)
+      WHERE ((NOT(cast(`x` AS `BIT`) = 1)) OR cast(0 AS `BIT`) = 1)
 
 ---
 
@@ -410,7 +410,7 @@
       FROM (
         SELECT `df`.*
         FROM `df`
-        WHERE (cast(`x` AS `BIT`) = 1.0)
+        WHERE (cast(`x` AS `BIT`) = 1)
       ) `LHS`
       INNER JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)

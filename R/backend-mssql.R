@@ -604,7 +604,7 @@ mssql_where_cast <- function(x_expr) {
     args <- as.list(x_expr[2:length(x_expr)])
     x_expr[2:length(x_expr)] <- purrr::map(args, mssql_where_cast)
   } else if (is_atomic(x_expr) || is_symbol(x_expr)) {
-    x_expr <- expr(cast(!!x_expr %AS% BIT) == 1)
+    x_expr <- expr(cast(!!x_expr %AS% BIT) == 1L)
   }
   x_expr
 }
