@@ -181,6 +181,10 @@ sql_query_update_from.MariaDBConnection <- function(con,
                                                     update_values,
                                                     ...,
                                                     returning_cols = NULL) {
+  if (!is_empty(returning_cols)) {
+    check_unsupported_arg(returning_cols, backend = "MariaDB")
+  }
+
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_table_prefix(con, names(update_values), table)
@@ -198,6 +202,23 @@ sql_query_update_from.MariaDBConnection <- function(con,
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
+
+
+#' @export
+sql_query_upsert.MariaDBConnection <- function(con,
+                                               table,
+                                               from,
+                                               by,
+                                               update_cols,
+                                               ...,
+                                               returning_cols = NULL,
+                                               method = NULL) {
+  cli_abort("{.fun rows_upsert} is not supported for MariaDB.")
+}
+#' @export
+sql_query_upsert.MySQLConnection <- sql_query_upsert.MariaDBConnection
+#' @export
+sql_query_upsert.MySQL <- sql_query_upsert.MariaDBConnection
 
 #' @export
 sql_escape_datetime.MariaDBConnection <- function(con, x) {
