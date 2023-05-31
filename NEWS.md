@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* MariaDB:
+  * `rows_update()` and `rows_patch()` now give an informative error when the
+    unsupported `returning` is used (@mgirlich, #1279).
+  * `rows_upsert()` now gives an informative error that it isn't supported
+    (@mgirlich, #1279).
+
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
 
