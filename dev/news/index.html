@@ -74,6 +74,13 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
 <ul><li>
+<p>MariaDB:</p>
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_patch()</a></code> now give an informative error when the unsupported <code>returning</code> is used (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
+</ul></li>
+<li>
 <p>Oracle:</p>
 <ul><li>Fix translation of <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/TBlackmore" class="external-link">@TBlackmore</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1286" class="external-link">#1286</a>)</li>
 </ul></li>
