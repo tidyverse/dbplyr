@@ -120,7 +120,7 @@ test_that("between translation respects context", {
   local_context(list(clause = "WHERE"))
   expect_equal(translate_sql(between(a, 1L, 2L)), sql("`a` BETWEEN 1 AND 2"))
   local_context(list(clause = "SELECT"))
-  expect_equal(translate_sql(between(a, 1L, 2L)), sql("IIF(`a` BETWEEN 1 AND 2)"))
+  expect_equal(translate_sql(between(a, 1L, 2L)), sql("IIF(`a` BETWEEN 1 AND 2, 1, 0)"))
 })
 
 # verb translation --------------------------------------------------------

@@ -271,7 +271,7 @@ simulate_mssql <- function(version = "15.0") {
         if (context$clause == "WHERE") {
           sql_expr(!!x %BETWEEN% !!left %AND% !!right)
         } else {
-          sql_expr(IIF(!!x %BETWEEN% !!left %AND% !!right))
+          sql_expr(IIF(!!x %BETWEEN% !!left %AND% !!right, 1L, 0L))
         }
       },
 
