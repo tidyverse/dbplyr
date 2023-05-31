@@ -32,14 +32,27 @@ collapse.tbl_sql <- function(x, ...) {
 #' @export
 #' @importFrom dplyr compute
 compute.tbl_sql <- function(x,
-                            name = unique_table_name(),
+                            name = NULL,
                             temporary = TRUE,
                             unique_indexes = list(),
                             indexes = list(),
                             analyze = TRUE,
                             ...,
                             cte = FALSE) {
-  if (is_bare_character(x) || is.ident(x) || is.sql(x)) {
+  check_bool(temporary)
+
+  if (is.null(name)) {
+    if (!temporary) {
+      lifecycle::deprecate_warn(
+        "2.3.3",
+        # what = I(cli::format_inline("Not providing a name when {.code temporary = FALSE}"))
+        what = "compute(name = 'must be provided when `temporary = FALSE`')"
+      )
+    }
+    name <- unique_table_name()
+  }
+
+  if (is_bare_character(name) || is.ident(name) || is.sql(name)) {
     name <- unname(name)
   }
   vars <- op_vars(x)

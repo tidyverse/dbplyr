@@ -14,12 +14,12 @@
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{supports_window_clause}
-\alias{supports_star_without_alias}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_multi_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_query_union}
 \alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
@@ -55,8 +55,6 @@ sql_query_rows(con, sql, ...)
 
 supports_window_clause(con)
 
-supports_star_without_alias(con)
-
 sql_query_select(
   con,
   select,
@@ -77,7 +75,7 @@ sql_query_join(
   con,
   x,
   y,
-  vars,
+  select,
   type = "inner",
   by = NULL,
   na_matches = FALSE,
@@ -85,11 +83,13 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_multi_join(con, x, joins, table_vars, by_list, vars, ..., lvl = 0)
+sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
 
 sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_query_union(con, x, unions, ..., lvl = 0)
 
 sql_returning_cols(con, cols, table, ...)
 }
@@ -104,8 +104,6 @@ as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 to select random rows in \code{slice_sample()}. This is now replaced by adding
 a translation for \code{runif(n())}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
-\item \code{supports_star_without_alias(con)} does the backend support using \code{*}
-in a \code{SELECT} query without prefixing by a table alias?
 }
 
 Tables:

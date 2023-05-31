@@ -1,13 +1,19 @@
 #' Metadata about a remote table
 #'
-#' `remote_name()` gives the name remote table, or `NULL` if it's a query.
+#' `remote_name()` gives the unescaped name of the remote table, or `NULL` if it
+#' is a query (created by `sql()`) or already escape (created by `ident_q()`).
+#' `remote_table()` gives the remote table or the query.
 #' `remote_query()` gives the text of the query, and `remote_query_plan()`
 #' the query plan (as computed by the remote database). `remote_src()` and
 #' `remote_con()` give the dplyr source and DBI connection respectively.
 #'
 #' @param x Remote table, currently must be a [tbl_sql].
+#' @param null_if_local Return `NULL` if the remote table is created via
+#'   `tbl_lazy()` or `lazy_frame()`?
 #' @param cte `r lifecycle::badge("experimental")`
 #'   Use common table expressions in the generated SQL?
+#' @param use_star `r lifecycle::badge("experimental")`
+#'   Use `*` to select every column?
 #' @param ... Additional arguments passed on to methods.
 #' @return The value, or `NULL` if not remote table, or not applicable.
 #'    For example, computed queries do not have a "name"
@@ -24,54 +30,67 @@
 #' remote_src(mf2)
 #' remote_con(mf2)
 #' remote_query(mf2)
-remote_name <- function(x) {
-  lq <- x$lazy_query
-  if (inherits(lq, "lazy_base_remote_query")) {
-    return(lq$x)
-  }
+remote_name <- function(x, null_if_local = TRUE) {
+  table <- remote_table(x, null_if_local = null_if_local)
 
-  if (!is_lazy_select_query_simple(lq, ignore_group_by = TRUE, select = "identity")) {
-    return()
-  }
-
-  lq$x$x
-}
-
-query_name <- function(x) {
-  UseMethod("query_name")
-}
-
-#' @export
-query_name.tbl_lazy <- function(x) {
-  query_name(x$lazy_query)
-}
-
-#' @export
-query_name.lazy_base_remote_query <- function(x) {
-  name <- x$x
-  if (is.sql(name)) {
+  if (is.null(table)) {
     return(NULL)
   }
 
-  if (is.ident(name)) {
-    return(name)
+  if (is.sql(table) || inherits(table, "ident_q")) {
+    return(NULL)
   }
 
-  if (is_schema(name) || is_catalog(name)) {
-    return(name$table)
+  if (is.ident(table)) {
+    return(unclass(table))
+  }
+
+  if (is_schema(table) || is_catalog(table)) {
+    return(unclass(table$table))
+  }
+
+  if (inherits(table, "Id")) {
+    out <- table@name[["table"]]
+    return(out)
   }
 
   abort("Unexpected type", .internal = TRUE)
 }
 
 #' @export
-query_name.lazy_base_local_query <- function(x) {
-  ident(x$name)
+#' @rdname remote_name
+remote_table <- function(x, null_if_local = TRUE) {
+  check_bool(null_if_local)
+
+  UseMethod("remote_table")
 }
 
 #' @export
-query_name.lazy_query <- function(x) {
-  NULL
+remote_table.tbl_lazy <- function(x, null_if_local = TRUE) {
+  remote_table(x$lazy_query, null_if_local = null_if_local)
+}
+
+#' @export
+remote_table.lazy_base_remote_query <- function(x, null_if_local = TRUE) {
+  x$x
+}
+
+#' @export
+remote_table.lazy_base_local_query <- function(x, null_if_local = TRUE) {
+  if (null_if_local) {
+    return()
+  }
+
+  x$name
+}
+
+#' @export
+remote_table.lazy_query <- function(x, null_if_local = TRUE) {
+  if (!is_lazy_select_query_simple(x, ignore_group_by = TRUE, select = "identity")) {
+    return()
+  }
+
+  remote_table(x$x)
 }
 
 #' @export
@@ -88,8 +107,8 @@ remote_con <- function(x) {
 
 #' @export
 #' @rdname remote_name
-remote_query <- function(x, cte = FALSE) {
-  db_sql_render(remote_con(x), x, cte = cte)
+remote_query <- function(x, cte = FALSE, use_star = TRUE) {
+  db_sql_render(remote_con(x), x, cte = cte, use_star = use_star)
 }
 
 #' @export

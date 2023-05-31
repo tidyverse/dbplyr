@@ -142,9 +142,9 @@
       lf %>% filter(if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 AND `b` > 0.0)
+      WHERE ((`a` > 0.0 AND `b` > 0.0))
 
 ---
 
@@ -152,9 +152,9 @@
       lf %>% filter(if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 OR `b` > 0.0)
+      WHERE ((`a` > 0.0 OR `b` > 0.0))
 
 # if_all/any works in mutate()
 
@@ -162,7 +162,7 @@
       lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *, `a` > 0.0 AND `b` > 0.0 AS `c`
+      SELECT `df`.*, (`a` > 0.0 AND `b` > 0.0) AS `c`
       FROM `df`
 
 ---
@@ -171,7 +171,7 @@
       lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *, `a` > 0.0 OR `b` > 0.0 AS `c`
+      SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
       FROM `df`
 
 # if_all/any uses every colum as default
@@ -180,9 +180,9 @@
       lf %>% filter(if_all(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 AND `b` > 0.0)
+      WHERE ((`a` > 0.0 AND `b` > 0.0))
 
 ---
 
@@ -190,9 +190,9 @@
       lf %>% filter(if_any(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 OR `b` > 0.0)
+      WHERE ((`a` > 0.0 OR `b` > 0.0))
 
 # if_all/any works without `.fns` argument
 
@@ -200,9 +200,9 @@
       lf %>% filter(if_all(a:b))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` AND `b`)
+      WHERE ((`a` AND `b`))
 
 ---
 
@@ -210,9 +210,9 @@
       lf %>% filter(if_any(a:b))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` OR `b`)
+      WHERE ((`a` OR `b`))
 
 # if_all() cannot rename variables
 

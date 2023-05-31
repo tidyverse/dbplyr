@@ -16,9 +16,6 @@
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
-#' * `supports_star_without_alias(con)` does the backend support using `*`
-#'   in a `SELECT` query without prefixing by a table alias?
-#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -238,13 +235,30 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 #' @export
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
+  sql_query_wrap_helper(
+    con = con,
+    from = from,
+    name = name,
+    lvl = lvl,
+    as = FALSE
+  )
+}
+
+sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
   if (is.ident(from)) {
-    setNames(from, name)
-  } else if (is_schema(from) || is_catalog(from)) {
-    setNames(as.sql(from, con), name)
-  } else {
-    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
+    out <- setNames(from, name)
+    return(out)
   }
+
+  if (is_schema(from) || is_catalog(from) || inherits(from, "Id")) {
+    out <- setNames(as.sql(from, con), name)
+    return(out)
+  }
+
+  from <- sql_indent_subquery(from, con, lvl)
+  # some backends, e.g. Postgres, require an alias for a subquery
+  name <- as_subquery_name(name)
+  glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
 }
 
 as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
@@ -298,17 +312,6 @@ supports_window_clause <- function(con) {
 #' @export
 supports_window_clause.DBIConnection <- function(con) {
   FALSE
-}
-
-#' @rdname db-sql
-#' @export
-supports_star_without_alias <- function(con) {
-  UseMethod("supports_star_without_alias")
-}
-
-#' @export
-supports_star_without_alias.DBIConnection <- function(con) {
-  TRUE
 }
 
 
@@ -393,7 +396,7 @@ sql_select.DBIConnection <- function(con,
 sql_query_join <- function(con,
                            x,
                            y,
-                           vars,
+                           select,
                            type = "inner",
                            by = NULL,
                            na_matches = FALSE,
@@ -406,7 +409,7 @@ sql_query_join <- function(con,
 sql_query_join.DBIConnection <- function(con,
                                          x,
                                          y,
-                                         vars,
+                                         select,
                                          type = "inner",
                                          by = NULL,
                                          na_matches = FALSE,
@@ -425,7 +428,6 @@ sql_query_join.DBIConnection <- function(con,
   x <- dbplyr_sql_subquery(con, x, name = by$x_as, lvl = lvl)
   y <- dbplyr_sql_subquery(con, y, name = by$y_as, lvl = lvl)
 
-  select <- sql_rf_join_vars(con, type = type, vars, x_as = by$x_as, y_as = by$y_as)
   on <- sql_join_tbls(con, by, na_matches = na_matches)
 
   # Wrap with SELECT since callers assume a valid query is returned
@@ -450,9 +452,10 @@ sql_join.DBIConnection <- function(con,
                                    by = NULL,
                                    na_matches = FALSE,
                                    ...,
+                                   select = NULL,
                                    lvl = 0) {
   sql_query_join(
-    con, x, y, vars,
+    con, x, y, select,
     type = type,
     by = by,
     na_matches = na_matches,
@@ -466,9 +469,9 @@ sql_join.DBIConnection <- function(con,
 sql_query_multi_join <- function(con,
                                  x,
                                  joins,
-                                 table_vars,
+                                 table_names,
                                  by_list,
-                                 vars,
+                                 select,
                                  ...,
                                  lvl = 0) {
   check_dots_used()
@@ -485,8 +488,8 @@ sql_query_multi_join <- function(con,
 #'     from different tables
 #'   * `on` `<character>`
 #'   * `na_matches` `<character>`: Either `"na"` or `"never"`.
-#' @param vars See [sql_multi_join_vars()].
-#' @param table_vars `named <list_of<character>>`: All variables in each table.
+#' @param select A named SQL vector.
+#' @param table_names `<character>` The names of the tables.
 #' @noRd
 #' @examples
 #' # Left join with *
@@ -508,17 +511,15 @@ sql_query_multi_join <- function(con,
 sql_query_multi_join.DBIConnection <- function(con,
                                                x,
                                                joins,
-                                               table_vars,
+                                               table_names,
                                                by_list,
-                                               vars,
+                                               select,
                                                ...,
                                                lvl = 0) {
-  table_names <- names(table_vars)
   if (vctrs::vec_duplicate_any(table_names)) {
     cli_abort("{.arg table_names} must be unique.")
   }
 
-  select_sql <- sql_multi_join_vars(con, vars, table_vars)
   from <- dbplyr_sql_subquery(con, x, name = table_names[[1]], lvl = lvl)
 
   join_table_queries <- purrr::map2(
@@ -543,7 +544,7 @@ sql_query_multi_join.DBIConnection <- function(con,
   join_on_clauses <- vctrs::vec_interleave(join_clauses, on_clauses)
 
   clauses <- list2(
-    sql_clause_select(con, select_sql),
+    sql_clause_select(con, select),
     sql_clause_from(from),
     !!!join_on_clauses
   )
@@ -646,6 +647,27 @@ sql_set_op.DBIConnection <- function(con, x, y, method) {
   sql_query_set_op(con, x, y, method)
 }
 # nocov end
+
+#' @rdname db-sql
+#' @export
+sql_query_union <- function(con, x, unions, ..., lvl = 0) {
+  UseMethod("sql_query_union")
+}
+#' @export
+sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
+  methods <- ifelse(unions$all, "UNION ALL", "UNION")
+  methods <- indent_lvl(style_kw(methods), lvl)
+  tables <- unlist(unions$table)
+
+  union_clauses <- vctrs::vec_interleave(as.character(methods), tables)
+  out <- paste0(
+    x,
+    "\n\n",
+    paste0(union_clauses, collapse = "\n\n")
+  )
+
+  sql(out)
+}
 
 #' Generate SQL for Insert, Update, Upsert, and Delete
 #'

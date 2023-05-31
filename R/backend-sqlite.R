@@ -126,16 +126,13 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 
 #' @export
 sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-
-    if (is.null(name)) {
-      build_sql(sql_indent_subquery(from, con, lvl), con = con)
-    } else {
-      build_sql(sql_indent_subquery(from, con, lvl), " AS ", as_subquery_name(name), con = con)
-    }
-  }
+  sql_query_wrap_helper(
+    con = con,
+    from = from,
+    name = name,
+    lvl = lvl,
+    as = TRUE
+  )
 }
 
 #' @export

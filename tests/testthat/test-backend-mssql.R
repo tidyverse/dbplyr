@@ -65,6 +65,15 @@ test_that("custom aggregators translated correctly", {
     translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
     translate_sql(median(x, na.rm = TRUE), window = FALSE)
   })
+
+  expect_equal(
+    translate_sql(all(x, na.rm = TRUE), window = FALSE),
+    sql("CAST(MIN(CAST(`x` AS INT)) AS BIT)")
+  )
+  expect_equal(
+    translate_sql(any(x, na.rm = TRUE), window = FALSE),
+    sql("CAST(MAX(CAST(`x` AS INT)) AS BIT)")
+  )
 })
 
 test_that("custom window functions translated correctly", {
@@ -82,6 +91,15 @@ test_that("custom window functions translated correctly", {
   expect_equal(
     translate_sql(median(x, na.rm = TRUE), window = TRUE),
     sql("PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY `x`) OVER ()")
+  )
+
+  expect_equal(
+    translate_sql(all(x, na.rm = TRUE)),
+    sql("CAST(MIN(CAST(`x` AS INT)) OVER () AS BIT)")
+  )
+  expect_equal(
+    translate_sql(any(x, na.rm = TRUE)),
+    sql("CAST(MAX(CAST(`x` AS INT)) OVER () AS BIT)")
   )
 })
 

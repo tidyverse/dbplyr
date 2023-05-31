@@ -54,10 +54,23 @@ db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnecti
 sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
+      # basic type casts as per:
+      # https://mariadb.com/kb/en/cast/
+      # https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html#function_cast
+      # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Vector-objects
       as.logical = function(x) {
         sql_expr(IF(!!x, TRUE, FALSE))
       },
       as.character = sql_cast("CHAR"),
+      as.numeric  = sql_cast("DOUBLE"),
+      as.double   = sql_cast("DOUBLE"),
+      as.POSIXct  = sql_cast("DATETIME"),
+      as_datetime = sql_cast("DATETIME"),
+      # Neither MySQL nor MariaDB support CASTing to BIGINT. MariaDB may
+      # silently cast an INTEGER into a BIGINT type, MySQL outright fails.
+      # https://dba.stackexchange.com/a/205822
+      as.integer64  = sql_cast("INTEGER"),
+
       runif = function(n = n(), min = 0, max = 1) {
         sql_runif(RAND(), n = {{ n }}, min = min, max = max)
       },
@@ -122,7 +135,7 @@ sql_table_analyze.MySQLConnection <- sql_table_analyze.MariaDBConnection
 sql_query_join.MariaDBConnection <- function(con,
                                              x,
                                              y,
-                                             vars,
+                                             select,
                                              type = "inner",
                                              by = NULL,
                                              ...) {
@@ -168,6 +181,10 @@ sql_query_update_from.MariaDBConnection <- function(con,
                                                     update_values,
                                                     ...,
                                                     returning_cols = NULL) {
+  if (!is_empty(returning_cols)) {
+    check_unsupported_arg(returning_cols, backend = "MariaDB")
+  }
+
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_table_prefix(con, names(update_values), table)
@@ -181,11 +198,40 @@ sql_query_update_from.MariaDBConnection <- function(con,
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
-
 #' @export
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
+
+
+#' @export
+sql_query_upsert.MariaDBConnection <- function(con,
+                                               table,
+                                               from,
+                                               by,
+                                               update_cols,
+                                               ...,
+                                               returning_cols = NULL,
+                                               method = NULL) {
+  cli_abort("{.fun rows_upsert} is not supported for MariaDB.")
+}
+#' @export
+sql_query_upsert.MySQLConnection <- sql_query_upsert.MariaDBConnection
+#' @export
+sql_query_upsert.MySQL <- sql_query_upsert.MariaDBConnection
+
+#' @export
+sql_escape_datetime.MariaDBConnection <- function(con, x) {
+  # DateTime format as per:
+  # https://dev.mysql.com/doc/refman/8.0/en/datetime.html
+  # https://mariadb.com/kb/en/datetime/
+  x <- strftime(x, "%Y-%m-%d %H:%M:%OS", tz = "UTC")
+  sql_escape_string(con, x)
+}
+#' @export
+sql_escape_datetime.MySQLConnection <- sql_escape_datetime.MariaDBConnection
+#' @export
+sql_escape_datetime.MySQL <- sql_escape_datetime.MariaDBConnection
 
 #' @export
 supports_window_clause.MariaDBConnection <- function(con) {

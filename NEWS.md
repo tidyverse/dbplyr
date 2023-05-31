@@ -3,6 +3,56 @@
 * The translation of `between()` now also works for MS SQL when used in `mutate()`
   (@mgirlich, #1241).
 
+* MariaDB:
+  * `rows_update()` and `rows_patch()` now give an informative error when the
+    unsupported `returning` is used (@mgirlich, #1279).
+  * `rows_upsert()` now gives an informative error that it isn't supported
+    (@mgirlich, #1279).
+
+* Oracle:
+  * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
+
+* `remote_name()` now returns a string with the name of the table. To get the
+  qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
+
+* Queries now qualify `*` with the table alias for better compatibility (@mgirlich, #1003).
+
+* Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
+
+* `show_query()` and `remote_query()` get the argument `use_star` that controls
+  whether to use `SELECT *` to select every column (@mgirlich, #1146).
+
+* `any()` and `all()` now work for MS SQL (@ejneer, #1273).
+
+* Fixed negation of bit (boolean) fields in MS SQL (@ejneer, #1239)
+
+* A sequence of `union()` resp. `union_all()` now produces a flat query
+  instead of subqueries (@mgirlich, #1269).
+
+* Using `compute(temporary = FALSE)` without providing a name is now
+  deprecated (@mgirlich, #1154).
+
+* Added translation for `nzchar()` (@MichaelChirico, @mgirlich, #1094).
+
+* MySQL/MariaDB:
+  * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
+    `as.integer64()` (@avsdev-cw, #1189).
+
+* `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
+
+* Subqueries now also get an alias for SQLite. This makes it consistent with
+  other backends and simplifies the implementation.
+
+* The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
+  This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
+
+* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
+
+* Using a function with a namespace in `across()` now works, e.g.
+  `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
+
+* The dots in `db_copy_to()` are now passed to `db_write_table()` (@mgirlich, #1237).
+
 * Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
 
 * The first argument of `ntile()` has been renamed from `order_by` to `x` to

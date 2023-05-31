@@ -39,7 +39,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)
@@ -51,12 +51,12 @@
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
-        (
-          SELECT NULL AS `x`, NULL AS `y`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `x`, NULL AS `y`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (VALUES (1, 'a'), (2, 'b'))
+      
+        VALUES (1, 'a'), (2, 'b')
       ) `values_table`
 
 ---
@@ -66,12 +66,12 @@
     Output
       <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
-        (
-          SELECT NULL AS `x`, NULL AS `y`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `x`, NULL AS `y`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (VALUES ROW(1, 'a'), ROW(2, 'b'))
+      
+        VALUES ROW(1, 'a'), ROW(2, 'b')
       ) `values_table`
 
 # `sql_query_update_from()` is correct
@@ -79,7 +79,7 @@
     Code
       sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
         con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
-        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
+        d = "`...y`.`d`"))
     Output
       <SQL> UPDATE `df_x`
       INNER JOIN (
@@ -88,7 +88,10 @@
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
+---
+
+    Argument `returning_cols` isn't supported in MariaDB translation.
 
 # can explain
 
@@ -96,7 +99,7 @@
       db %>% mutate(y = x + 1) %>% explain()
     Output
       <SQL>
-      SELECT *, `x` + 1.0 AS `y`
+      SELECT `test`.*, `x` + 1.0 AS `y`
       FROM `test`
       
       <PLAN>

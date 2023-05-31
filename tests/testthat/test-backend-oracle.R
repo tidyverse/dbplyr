@@ -20,14 +20,6 @@ test_that("queries translate correctly", {
   expect_snapshot(mf %>% head())
 })
 
-test_that("queries do not use *", {
-  lf <- lazy_frame(x = 1L, con = simulate_oracle())
-  expect_equal(
-    lf %>% mutate(y = x) %>% remote_query(),
-    sql("SELECT `x`, `x` AS `y`\nFROM (`df`)")
-  )
-})
-
 test_that("`sql_query_upsert()` is correct", {
   con <- simulate_oracle()
   df_y <- lazy_frame(

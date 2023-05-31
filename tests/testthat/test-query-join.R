@@ -30,6 +30,7 @@ test_that("disambiguate variables that only differ in case", {
   lf1 <- lazy_frame(x = 1, y = 2)
   lf2 <- lazy_frame(X = 1, y = 2)
   expect_snapshot(left_join(lf1, lf2, by = "y"))
+  expect_snapshot(full_join(lf1, lf2, by = "y"))
 })
 
 test_that("sql_on query doesn't change unexpectedly", {
@@ -56,7 +57,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
         var = c("x", "a", "b"),
         table = c(1L, 1L, 2L)
       ),
-      table_vars = list(left = c("x", "a"), right = c("x", "b"))
+      table_vars = list(left = c("x", "a"), right = c("x", "b")),
+      use_star = TRUE
     ),
     sql("`left`.*", b = "`b`")
   )
@@ -74,13 +76,37 @@ test_that("sql_multi_join_vars generates expected SQL", {
         all_y = c("x", "a", "b")
       ),
       x_as = ident("left"),
-      y_as = ident("right")
+      y_as = ident("right"),
+      use_star = TRUE
     ),
     sql(
       x = "COALESCE(`left`.`x`, `right`.`x`)",
       a.x = "`left`.`a`",
       a.y = "`right`.`a`",
       b = "`b`"
+    )
+  )
+
+  # disambiguate variables that only differ in case
+  expect_equal(
+    sql_rf_join_vars(
+      con,
+      type = "full",
+      vars = list(
+        name = c("a", "b.x", "b.y"),
+        x = c("a", "b", NA),
+        y = c("a", NA, "B"),
+        all_x = c("a", "b"),
+        all_y = c("a", "B")
+      ),
+      x_as = ident("left"),
+      y_as = ident("right"),
+      use_star = TRUE
+    ),
+    sql(
+      a = "COALESCE(`left`.`a`, `right`.`a`)",
+      b.x = "`left`.`b`",
+      b.y = "`right`.`B`"
     )
   )
 })

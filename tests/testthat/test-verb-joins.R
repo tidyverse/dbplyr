@@ -83,6 +83,15 @@ test_that("join works with in_schema", {
   expect_snapshot(
     left_join(df1, df3, by = "x") %>% remote_query()
   )
+
+  # use auto name for `ident_q`
+  df4 <- tbl(con, ident_q("`foo`.`df`"))
+  df5 <- tbl(con, ident_q("`foo2`.`df`"))
+  expect_snapshot(
+    left_join(df4, df5, by = "x") %>% remote_query()
+  )
+  out <- left_join(df4, df5, by = "x")
+  expect_equal(out$lazy_query$table_names, tibble(name = c(NA_character_, NA), from = ""))
 })
 
 test_that("alias truncates long table names at database limit", {
@@ -277,57 +286,57 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   # self joins
-  table_vars <- sql_build(left_join(x, x, by = "a"))$table_vars
-  expect_named(table_vars, c("x_LHS", "x_RHS"))
+  table_names <- sql_build(left_join(x, x, by = "a"))$table_names
+  expect_equal(table_names, c("x_LHS", "x_RHS"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_vars
-  expect_named(table_vars, c("my_x", "x"))
+  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_names, c("my_x", "x"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("x", "my_y"))
+  table_names <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("x", "my_y"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("my_x", "my_y"))
+  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("my_x", "my_y"))
 
   # x-y joins
-  table_vars <- sql_build(left_join(x, y, by = "a"))$table_vars
-  expect_named(table_vars, c("x", "y"))
+  table_names <- sql_build(left_join(x, y, by = "a"))$table_names
+  expect_equal(table_names, c("x", "y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_vars
-  expect_named(table_vars, c("my_x", "y"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_names, c("my_x", "y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("x", "my_y"))
+  table_names <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("x", "my_y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("my_x", "my_y"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("my_x", "my_y"))
 
   # x_as same name as `y`
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_vars
-  expect_named(table_vars, c("y", "y...2"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
+  expect_equal(table_names, c("y", "y...2"))
 
-  table_vars <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_vars
-  expect_named(table_vars, c("LHS...1", "LHS"))
+  table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
+  expect_equal(table_names, c("LHS...1", "LHS"))
 
   # sql_on -> use alias or LHS/RHS
-  table_vars <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_vars
-  expect_named(table_vars, c("LHS", "RHS"))
+  table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
+  expect_equal(table_names, c("LHS", "RHS"))
 
-  table_vars <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_vars
-  expect_named(table_vars, c("my_x", "RHS"))
+  table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
+  expect_equal(table_names, c("my_x", "RHS"))
 
   # triple join
   z <- lazy_frame(a = 1, z = 1, .name = "z")
   out <- left_join(x, y, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_named(out$table_vars, c("x", "y", "z"))
+  expect_equal(out$table_names, c("x", "y", "z"))
 
   # triple join where names need to be repaired
   out <- left_join(x, x, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_named(out$table_vars, c("x...1", "x...2", "z"))
+  expect_equal(out$table_names, c("x...1", "x...2", "z"))
 })
 
 test_that("select() before join is inlined", {
@@ -339,8 +348,8 @@ test_that("select() before join is inlined", {
     expect_equal(lq$vars$var, var)
     expect_equal(lq$vars$table, table)
 
-    expect_equal(lq$joins$by[[1]]$x, ident("x1"))
-    expect_equal(lq$joins$by[[1]]$y, ident("x2"))
+    expect_equal(lq$joins$by[[1]]$x, "x1")
+    expect_equal(lq$joins$by[[1]]$y, "x2")
   }
 
   out_left <- left_join(
@@ -368,8 +377,8 @@ test_that("select() before join is inlined", {
   expect_equal(out_right$vars$name, c("a2", "x", "b"))
   expect_equal(out_right$vars$x, c("a", NA, NA))
   expect_equal(out_right$vars$y, c(NA, "x2", "b"))
-  expect_equal(out_right$by$x, ident("x1"))
-  expect_equal(out_right$by$y, ident("x2"))
+  expect_equal(out_right$by$x, "x1")
+  expect_equal(out_right$by$y, "x2")
 
   out_full <- full_join(
     lf %>% select(a2 = a, x = x1),
@@ -437,8 +446,8 @@ test_that("named by works in combination with inlined select", {
   expect_equal(op_vars(lq), c("id_x", "x.x"))
   expect_equal(lq$vars$var, c("id_x", "x"))
   expect_equal(lq$vars$table, c(1, 1))
-  expect_equal(lq$joins$by[[1]]$x, ident(c("id_x", "x")))
-  expect_equal(lq$joins$by[[1]]$y, ident(c("id_y", "x")))
+  expect_equal(lq$joins$by[[1]]$x, c("id_x", "x"))
+  expect_equal(lq$joins$by[[1]]$y, c("id_y", "x"))
 })
 
 test_that("suffix works in combination with inlined select", {
@@ -626,10 +635,10 @@ test_that("multiple joins can use by column from any table", {
   out <- left_join(lf, lf2, by = "x") %>%
     left_join(lf3, by = c("x", "y"))
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
@@ -644,10 +653,10 @@ test_that("multiple joins can use by column from any table", {
     left_join(lf3, by = c("x", "y"))
 
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y2")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y2"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 })
 
@@ -994,7 +1003,7 @@ test_that("set ops captures both tables", {
   lf2 <- lazy_frame(x = 1, z = 2)
 
   out <- union(lf1, lf2) %>% sql_build()
-  expect_equal(out$type, "UNION")
+  expect_s3_class(out, "union_query")
 })
 
 test_that("extra args generates error", {
@@ -1037,9 +1046,20 @@ test_that("left_join/inner_join uses *", {
     left_join(lf2, by = c("a", "b")) %>%
     sql_build()
 
+  expect_equal(out$select, sql("`df_LHS`.*", z = "`z`"))
+
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b")) %>%
+    sql_build(use_star = FALSE)
+
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql("`df_LHS`.*", z = "`z`")
+    out$select,
+    sql(
+      a = "`df_LHS`.`a`",
+      b = "`df_LHS`.`b`",
+      c = "`c`",
+      z = "`z`"
+    )
   )
 
   # also works after relocate
@@ -1048,10 +1068,7 @@ test_that("left_join/inner_join uses *", {
     relocate(z) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(z = "`z`", "`df_LHS`.*")
-  )
+  expect_equal(out$select, sql(z = "`z`", "`df_LHS`.*"))
 
   # does not use * if variable are missing
   out <- lf1 %>%
@@ -1059,10 +1076,7 @@ test_that("left_join/inner_join uses *", {
     select(a, c) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", c = "`c`")
-  )
+  expect_equal(out$select, sql(a = "`df_LHS`.`a`", c = "`c`"))
 
   # does not use * if variable names changed
   lf1 <- lazy_frame(a = 1, b = 2)
@@ -1071,10 +1085,7 @@ test_that("left_join/inner_join uses *", {
     left_join(lf2, by = c("a")) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
-  )
+  expect_equal(out$select, sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`"))
 })
 
 test_that("right_join uses *", {
@@ -1088,7 +1099,7 @@ test_that("right_join uses *", {
 
   # cannot use * without relocate or select
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", b = "`df_RHS`.`b`", c = "`c`", z = "`z`")
   )
 
@@ -1099,8 +1110,24 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql("`df_RHS`.*", c = "`c`")
+  )
+
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b")) %>%
+    select(a, b, z, c) %>%
+    sql_build(use_star = FALSE)
+
+  expect_equal(
+    out$select,
+    sql(
+      a = "`df_RHS`.`a`",
+      b = "`df_RHS`.`b`",
+      z = "`z`",
+      c = "`c`"
+    )
   )
 
   # does not use * if variable are missing
@@ -1110,7 +1137,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", z = "`z`")
   )
 
@@ -1122,7 +1149,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
@@ -1136,9 +1163,21 @@ test_that("cross_join uses *", {
     cross_join(lf2) %>%
     sql_build()
 
+  expect_equal(out$select, set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", "")))
+
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    cross_join(lf2) %>%
+    sql_build(use_star = FALSE)
+
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
+    out$select,
+    sql(
+      a = "`a`",
+      b = "`b`",
+      x = "`x`",
+      y = "`y`"
+    )
   )
 
   # also works after relocate
@@ -1147,30 +1186,21 @@ test_that("cross_join uses *", {
     select(x, y, a, b) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
-  )
+  expect_equal(out$select, set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", "")))
 
   out <- lf1 %>%
     cross_join(lf2) %>%
     select(x, a, b, y) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(x = "`x`", "`df_LHS`.*", y = "`y`")
-  )
+  expect_equal(out$select, sql(x = "`x`", "`df_LHS`.*", y = "`y`"))
 
   out <- lf1 %>%
     cross_join(lf2) %>%
     select(a, x, y, b) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`a`", "`df_RHS`.*", b = "`b`")
-  )
+  expect_equal(out$select, sql(a = "`a`", "`df_RHS`.*", b = "`b`"))
 })
 
 test_that("full_join() does not use *", {
@@ -1183,7 +1213,7 @@ test_that("full_join() does not use *", {
     sql_build()
 
   expect_equal(
-    sql_rf_join_vars(con, out$vars, type = "full", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(
       a = "COALESCE(`df_LHS`.`a`, `df_RHS`.`a`)",
       b = "COALESCE(`df_LHS`.`b`, `df_RHS`.`b`)"

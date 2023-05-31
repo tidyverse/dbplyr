@@ -55,7 +55,7 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   } else {
     row_id_col <- .id
   }
-  tbl_name <- unclass(query_name(data)) %||% "LHS"
+  tbl_name <- unclass(remote_name(data, null_if_local = FALSE)) %||% "LHS"
   sql_on_expr <- expr(RHS[[!!row_id_col]] <= (!!sym(tbl_name))[[!!weights_col]])
 
   con <- remote_con(data)

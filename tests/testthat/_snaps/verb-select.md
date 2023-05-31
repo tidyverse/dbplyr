@@ -6,7 +6,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT DISTINCT *
+        SELECT DISTINCT `df`.*
         FROM `df`
       ) `q01`
 
@@ -187,7 +187,7 @@
       lf %>% select(2:1) %>% select(2:1)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
 
 ---
@@ -237,7 +237,7 @@
         [34mFROM[39m `df`
       ),
       `q02` [34mAS[39m (
-        [34mSELECT[39m *
+        [34mSELECT[39m `q01`.*
         [34mFROM[39m `q01`
         [34mWHERE[39m (`z` = 1.0)
       )

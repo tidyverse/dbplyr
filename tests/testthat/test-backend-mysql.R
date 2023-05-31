@@ -19,6 +19,16 @@ test_that("use CHAR type for as.character", {
   expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
 })
 
+test_that("custom date escaping works as expected", {
+  con <- simulate_mysql()
+
+  expect_equal(escape(as.Date("2020-01-01"), con = con), sql("'2020-01-01'"))
+  expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
+
+  expect_equal(escape(as.POSIXct("2020-01-01"), con = con), sql("'2020-01-01 00:00:00'"))
+  expect_equal(escape(as.POSIXct(NA), con = con), sql("NULL"))
+})
+
 
 test_that("custom stringr functions translated correctly", {
   local_con(simulate_mysql())
@@ -61,6 +71,19 @@ test_that("`sql_query_update_from()` is correct", {
     mutate(c = c + 1)
 
   expect_snapshot(
+    sql_query_update_from(
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      by = c("a", "b"),
+      update_values = sql(
+        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"
+      )
+    )
+  )
+
+  expect_snapshot_error(
     sql_query_update_from(
       con = con,
       table = ident("df_x"),

@@ -83,7 +83,7 @@ sql_query_upsert.Oracle <- function(con,
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
@@ -93,7 +93,7 @@ sql_query_upsert.Oracle <- function(con,
   clauses <- list(
     sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
-    sql_clause_on(parts$where, lvl = 1),
+    sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
@@ -158,20 +158,6 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 }
 
 #' @export
-sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
-  # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
-  if (is.ident(from)) {
-    from <- glue_sql2(con, "({.from from})")
-    name <- as_subquery_name(name, default = NULL)
-  } else {
-    from <- sql_indent_subquery(from, con, lvl)
-    name <- as_subquery_name(name)
-  }
-
-  glue_sql2(con, "{.sql from}", if (!is.null(name)) " {.name name}")
-}
-
-#' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
   glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
@@ -196,11 +182,6 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
-#' @export
-supports_star_without_alias.Oracle <- function(con) {
-  FALSE
-}
-
 
 # roacle package ----------------------------------------------------------
 
@@ -223,9 +204,6 @@ sql_query_explain.OraConnection <- sql_query_explain.Oracle
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
 
 #' @export
-sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
-
-#' @export
 sql_query_save.OraConnection <- sql_query_save.Oracle
 
 #' @export
@@ -236,8 +214,5 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
-
-#' @export
-supports_star_without_alias.OraConnection <- supports_star_without_alias.Oracle
 
 globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

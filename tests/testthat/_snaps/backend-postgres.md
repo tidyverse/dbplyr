@@ -97,7 +97,7 @@
       db %>% mutate(y = x + 1) %>% explain()
     Output
       <SQL>
-      SELECT *, "x" + 1.0 AS "y"
+      SELECT "test".*, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>
@@ -110,7 +110,7 @@
       db %>% mutate(y = x + 1) %>% explain(format = "json")
     Output
       <SQL>
-      SELECT *, "x" + 1.0 AS "y"
+      SELECT "test".*, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>

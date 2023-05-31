@@ -136,6 +136,19 @@ test_that("dbplyr_build_wider_spec can handle multiple columns", {
   )
 })
 
+test_that("pivot_wider handles NA column names consistent with tidyr", {
+  df <- memdb_frame(
+    id = "id",
+    x = 1:3,
+    y = c("A", NA, "B")
+  )
+
+  expect_equal(
+    df %>% tidyr::pivot_wider(names_from = y, values_from = x) %>% collect(),
+    df %>% collect() %>% tidyr::pivot_wider(names_from = y, values_from = x)
+  )
+})
+
 # keys ---------------------------------------------------------
 
 test_that("can override default keys", {

@@ -3,7 +3,7 @@
     Code
       sql_render(out)
     Output
-      <SQL> SELECT *
+      <SQL> SELECT `test-verb-arrange`.*
       FROM `test-verb-arrange`
       ORDER BY `y`
 
@@ -16,7 +16,7 @@
       lf %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `a`
     Code
@@ -24,7 +24,7 @@
       lf %>% arrange(a) %>% arrange(b)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `b`
     Code
@@ -47,7 +47,7 @@
       lf %>% arrange(a) %>% arrange()
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
     Code
       lf %>% arrange(a) %>% select(-a) %>% arrange()
@@ -72,9 +72,9 @@
       lf %>% head(1) %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
         LIMIT 1
       ) `q01`
@@ -83,7 +83,7 @@
       lf %>% arrange(a) %>% head(1)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       ORDER BY `a`
       LIMIT 1
@@ -91,9 +91,9 @@
       lf %>% arrange(a) %>% head(1) %>% arrange(b)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
         ORDER BY `a`
         LIMIT 1
@@ -153,7 +153,7 @@
       <SQL>
       SELECT `LHS`.*, `c`
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
       ) `LHS`
       LEFT JOIN `df`
@@ -168,9 +168,9 @@
       i Do you need to move arrange() later in the pipeline or use window_order() instead?
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
       ) `LHS`
       WHERE EXISTS (
@@ -181,16 +181,14 @@
       lf %>% arrange(a) %>% union(rf)
     Output
       <SQL>
-      (
-        SELECT *, NULL AS `c`
-        FROM `df`
-        ORDER BY `a`
-      )
+      SELECT `df`.*, NULL AS `c`
+      FROM `df`
+      ORDER BY `a`
+      
       UNION
-      (
-        SELECT `a`, NULL AS `b`, `c`
-        FROM `df`
-      )
+      
+      SELECT `a`, NULL AS `b`, `c`
+      FROM `df`
     Code
       # can arrange after join
       lf %>% left_join(rf) %>% arrange(a)
@@ -198,7 +196,7 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
         SELECT `df_LHS`.*, `c`
         FROM `df` AS `df_LHS`
@@ -212,9 +210,9 @@
       Joining with `by = join_by(a)`
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df_LHS`.*
         FROM `df` AS `df_LHS`
         WHERE EXISTS (
           SELECT 1 FROM `df` AS `df_RHS`
@@ -226,17 +224,15 @@
       lf %>% union(rf) %>% arrange(a)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        (
-          SELECT *, NULL AS `c`
-          FROM `df`
-        )
+        SELECT `df`.*, NULL AS `c`
+        FROM `df`
+      
         UNION
-        (
-          SELECT `a`, NULL AS `b`, `c`
-          FROM `df`
-        )
+      
+        SELECT `a`, NULL AS `b`, `c`
+        FROM `df`
       ) `q01`
       ORDER BY `a`
 

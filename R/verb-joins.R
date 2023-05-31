@@ -388,8 +388,8 @@ add_join <- function(x,
       y = y_lq,
       type = type,
       by = list(
-        x = ident(by$x),
-        y = ident(by$y),
+        x = by$x,
+        y = by$y,
         condition = by$condition,
         on = sql(by$on),
         na_matches = na_matches
@@ -609,8 +609,8 @@ new_joins_data <- function(x_lq, y_lq, new_query, type, by, na_matches) {
     type = type,
     by_x_table_id = list(by_x_table_id),
     by = list(list(
-      x = ident(by$x),
-      y = ident(by$y),
+      x = by$x,
+      y = by$y,
       condition = by$condition,
       on = sql(by$on),
       na_matches = na_matches
@@ -691,7 +691,7 @@ make_join_aliases <- function(x_as, y_as, sql_on, call) {
 }
 
 make_table_names <- function(as, lq) {
-  name <- unclass(query_name(lq))
+  name <- unclass(remote_name(lq, null_if_local = FALSE))
 
   if (!is.null(as)) {
     tibble(name = as, from = "as")
