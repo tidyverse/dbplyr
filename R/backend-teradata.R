@@ -65,9 +65,11 @@ sql_query_select.Teradata <- function(con,
       lvl       = lvl + 1
     )
 
-    from <- sql_query_wrap(con, unlimited_query)
+    alias <- ident(unique_subquery_name())
+    from <- sql_query_wrap(con, unlimited_query, name = alias)
+    select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(con,
-      select   = sql_clause_select(con, select, distinct = FALSE, top = limit),
+      select   = sql_clause_select(con, select_outer, distinct = FALSE, top = limit),
       from     = sql_clause_from(from),
       where    = NULL,
       group_by = NULL,
@@ -200,11 +202,6 @@ sql_translation.Teradata <- function(con) {
 sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
   glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
-}
-
-#' @export
-supports_star_without_alias.Teradata <- function(con) {
-  FALSE
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SUM"))

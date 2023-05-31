@@ -25,7 +25,7 @@
         show_query()
     Output
       <SQL>
-      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
 ---
@@ -36,7 +36,7 @@
     Output
       <SQL>
       SELECT
-        *,
+        `df`.*,
         SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 

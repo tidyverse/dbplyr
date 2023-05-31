@@ -238,7 +238,14 @@ test_that("names windows automatically", {
       across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
     )
 
-  sql_list <- get_select_sql(lf1$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf1$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(
     sql_list$window_sql,
     sql(
@@ -266,7 +273,14 @@ test_that("names windows automatically", {
       col4 = order_by(desc(ord), cumsum(col4))
     )
 
-  sql_list <- get_select_sql(lf2$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf2$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(
     sql_list$window_sql,
     sql(
@@ -302,7 +316,14 @@ test_that("only name windows if they appear multiple times", {
       across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
     )
 
-  sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(sql_list$window_sql, sql("`win1` AS (PARTITION BY `part`)"))
   expect_equal(
     sql_list$select_sql,
@@ -327,7 +348,14 @@ test_that("name windows only if supported", {
       across(c(col1, col2), ~ sum(.x, na.rm = TRUE))
     )
 
-  sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_hana())
+  sql_list <- get_select_sql(
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_hana(),
+    use_star = TRUE
+  )
   expect_equal(sql_list$window_sql, character())
   expect_equal(
     sql_list$select_sql,

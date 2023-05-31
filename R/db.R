@@ -55,12 +55,12 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 
 #' @rdname db-misc
 #' @export
-db_sql_render <- function(con, sql, ..., cte = FALSE) {
+db_sql_render <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE) {
-  sql_render(sql, con = con, ..., cte = cte)
+db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
+  sql_render(sql, con = con, ..., cte = cte, use_star = use_star)
 }
 
 #' @rdname db-misc

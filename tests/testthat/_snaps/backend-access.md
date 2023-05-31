@@ -4,6 +4,6 @@
       mf %>% head()
     Output
       <SQL>
-      SELECT TOP 6 *
+      SELECT TOP 6 `df`.*
       FROM `df`
 

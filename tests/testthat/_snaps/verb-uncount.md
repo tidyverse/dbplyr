@@ -11,7 +11,9 @@
         FROM (
           SELECT NULL AS `..dbplyr_row_id`
           WHERE (0 = 1)
+      
           UNION ALL
+      
           VALUES (1)
         ) AS `values_table`
       ) AS `RHS`
@@ -33,7 +35,9 @@
         FROM (
           SELECT NULL AS `..dbplyr_row_id`
           WHERE (0 = 1)
+      
           UNION ALL
+      
           VALUES (1), (2)
         ) AS `values_table`
       ) AS `RHS`

@@ -8,8 +8,8 @@ select_query <- function(from,
                          window = character(),
                          order_by = character(),
                          limit = NULL,
-                         distinct = FALSE) {
-
+                         distinct = FALSE,
+                         from_alias = NULL) {
   check_character(select)
   check_character(where)
   check_character(group_by)
@@ -18,6 +18,7 @@ select_query <- function(from,
   check_character(order_by)
   check_number_whole_inf(limit, allow_null = TRUE)
   check_bool(distinct)
+  check_string(from_alias, allow_null = TRUE)
 
   structure(
     list(
@@ -29,7 +30,8 @@ select_query <- function(from,
       window = window,
       order_by = order_by,
       distinct = distinct,
-      limit = limit
+      limit = limit,
+      from_alias = from_alias
     ),
     class = c("select_query", "query")
   )
@@ -43,7 +45,7 @@ print.select_query <- function(x, ...) {
     sep = ""
   )
   cat_line("From:")
-  cat_line(indent_print(sql_build(x$from)))
+  cat_line(indent_print(x$from))
 
   if (length(x$select))   cat("Select:   ", named_commas(x$select), "\n", sep = "")
   if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
@@ -106,9 +108,10 @@ select_query_clauses <- function(x, subquery = FALSE) {
 
 #' @export
 sql_render.select_query <- function(query, con, ..., subquery = FALSE, lvl = 0) {
+  # browser()
   from <- dbplyr_sql_subquery(con,
     sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
-    name = NULL,
+    name = query$from_alias,
     lvl = lvl
   )
 

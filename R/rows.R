@@ -715,7 +715,7 @@ target_table_name <- function(x, in_place) {
     cli_abort("Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table.")
   }
 
-  name
+  ident(name)
 }
 
 rows_prep <- function(con, table, from, by, lvl = 0) {

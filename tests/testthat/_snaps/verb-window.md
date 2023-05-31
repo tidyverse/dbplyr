@@ -31,7 +31,9 @@
         x_cum = cumsum(x))
     Output
       <SQL>
-      SELECT *, SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
+      SELECT
+        `q01`.*,
+        SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
       FROM (
         SELECT `x`, `y` AS `y2`
         FROM `df`
@@ -41,7 +43,9 @@
         x_cum = cumsum(x))
     Output
       <SQL>
-      SELECT *, SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
+      SELECT
+        `q01`.*,
+        SUM(`x`) OVER (ORDER BY `y2` ROWS UNBOUNDED PRECEDING) AS `x_cum`
       FROM (
         SELECT `x`, `y` AS `y2`
         FROM `df`

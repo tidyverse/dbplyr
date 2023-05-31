@@ -4,7 +4,7 @@
       mf %>% head()
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       FETCH FIRST 6 ROWS ONLY
 
@@ -20,9 +20,9 @@
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
       ) `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        ON (`...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`)
       WHEN MATCHED THEN
-        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
       WHEN NOT MATCHED THEN
         INSERT (`a`, `b`, `c`, `d`)
         VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
@@ -80,7 +80,7 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
         FROM `df`
       ) `q01`
       WHERE (`q01` <= 1)
@@ -98,13 +98,13 @@
     Output
       <SQL> SELECT CAST(`id` AS INT) AS `id`, CAST(`arr` AS VARCHAR2(255)) AS `arr`
       FROM (
-        (
-          SELECT NULL AS `id`, NULL AS `arr`
-          FROM `DUAL`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `id`, NULL AS `arr`
+        FROM `DUAL`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (SELECT 1, '{1,2,3}' FROM DUAL)
+      
+        SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
     Code
       copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
@@ -117,12 +117,12 @@
     Output
       <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
       FROM (
-        (
-          SELECT NULL AS `id`, NULL AS `arr`
-          FROM `DUAL`
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `id`, NULL AS `arr`
+        FROM `DUAL`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (SELECT 1, '{1,2,3}' FROM DUAL)
+      
+        SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
 

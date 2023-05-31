@@ -10,15 +10,16 @@ test_that("filter captures local variables", {
 
 test_that("two filters equivalent to one", {
   mf <- memdb_frame(x = 1:5, y = 5:1)
+  lf <- lazy_frame(x = 1:5, y = 5:1)
 
   df1 <- mf %>% filter(x > 3) %>% filter(y < 3)
   df2 <- mf %>% filter(x > 3, y < 3)
   compare_tbl(df1, df2)
 
-  expect_equal(df1 %>% remote_query(), df2 %>% remote_query())
-  expect_snapshot(df1 %>% remote_query(), transform = function(x) {
-    gsub("FROM `dbplyr_\\d+`", "FROM `df`", x)
-  })
+  lf1 <- lf %>% filter(x > 3) %>% filter(y < 3)
+  lf2 <- lf %>% filter(x > 3, y < 3)
+  expect_equal(lf1 %>% remote_query(), lf2 %>% remote_query())
+  expect_snapshot(lf1 %>% remote_query())
 
   unique_subquery_name_reset()
   df1 <- mf %>% filter(mean(x, na.rm = TRUE) > 3) %>% filter(y < 3)
@@ -26,10 +27,11 @@ test_that("two filters equivalent to one", {
   df2 <- mf %>% filter(mean(x, na.rm = TRUE) > 3, y < 3)
   compare_tbl(df1, df2)
 
-  expect_equal(df1 %>% remote_query(), df2 %>% remote_query())
-  expect_snapshot(df1 %>% remote_query(), transform = function(x) {
-    gsub("FROM `dbplyr_\\d+`", "FROM `df`", x)
-  })
+  lf1 <- lf %>% filter(mean(x, na.rm = TRUE) > 3) %>% filter(y < 3)
+  unique_subquery_name_reset()
+  lf2 <- lf %>% filter(mean(x, na.rm = TRUE) > 3, y < 3)
+  expect_equal(lf1 %>% remote_query(), lf2 %>% remote_query())
+  expect_snapshot(lf1 %>% remote_query())
 })
 
 

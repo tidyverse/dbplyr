@@ -27,10 +27,10 @@ print.semi_join_query <- function(x, ...) {
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
 
   cat_line("X:")
-  cat_line(indent_print(sql_build(x$x)))
+  cat_line(indent_print(x$x))
 
   cat_line("Y:")
-  cat_line(indent_print(sql_build(x$y)))
+  cat_line(indent_print(x$y))
 }
 
 #' @export

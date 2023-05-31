@@ -230,7 +230,7 @@ simulate_mssql <- function(version = "15.0") {
       `!`           = function(x) {
                         if (mssql_needs_bit()) {
                           x <- with_mssql_bool(x)
-                          mssql_as_bit(sql_expr(~ !!x))
+                          sql_expr(~ !!mssql_as_bit(x))
                         } else {
                           sql_expr(NOT(!!x))
                         }
@@ -378,8 +378,9 @@ simulate_mssql <- function(version = "15.0") {
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
 
       median = sql_agg_not_supported("median", "SQL Server"),
-      quantile = sql_agg_not_supported("quantile", "SQL Server")
-
+      quantile = sql_agg_not_supported("quantile", "SQL Server"),
+      all = mssql_bit_int_bit(sql_aggregate("MIN")),
+      any = mssql_bit_int_bit(sql_aggregate("MAX"))
     ),
     sql_translator(.parent = base_odbc_win,
       sd            = win_aggregate("STDEV"),
@@ -423,6 +424,8 @@ simulate_mssql <- function(version = "15.0") {
           ignore_nulls = "outside"
         )
       },
+      all = mssql_bit_int_bit(win_aggregate("MIN")),
+      any = mssql_bit_int_bit(win_aggregate("MAX")),
     )
 
   )}
@@ -553,6 +556,19 @@ mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
 
 mssql_case_when <- function(...) {
   with_mssql_bool(sql_case_when(...))
+}
+
+mssql_bit_int_bit <- function(f) {
+  # bit fields must be cast to numeric before aggregating (e.g. min/max).
+  function(x, na.rm = FALSE) {
+    f_wrapped <- purrr::compose(
+      sql_cast("BIT"),
+      purrr::partial(f, na.rm = na.rm),
+      sql_cast("INT")
+    )
+
+    f_wrapped(x)
+  }
 }
 
 #' @export
