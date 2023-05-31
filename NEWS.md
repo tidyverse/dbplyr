@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The translation of `between()` now also works for MS SQL when used in `mutate()`
+  (@mgirlich, #1241).
+
 * MariaDB:
   * `rows_update()` and `rows_patch()` now give an informative error when the
     unsupported `returning` is used (@mgirlich, #1279).
