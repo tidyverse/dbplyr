@@ -143,7 +143,7 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
 
 #' @export
 values_prepare.SQLiteConnection <- function(con, df) {
-  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  needs_escape <- purrr::map_lgl(df, ~ methods::is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
 }
 
