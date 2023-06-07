@@ -281,4 +281,4 @@ check_list_of_functions <- function(x, names, arg, call = caller_env()) {
 }
 # nocov end
 
-globalVariables(".")
+utils::globalVariables(".")

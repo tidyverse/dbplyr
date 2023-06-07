@@ -94,4 +94,4 @@ check_cut_labels <- function(labels, breaks, include.lowest, right, call = calle
   labels
 }
 
-globalVariables(c("case_when"))
+utils::globalVariables(c("case_when"))

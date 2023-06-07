@@ -152,4 +152,4 @@ supports_window_clause.SQLiteConnection <- function(con) {
   TRUE
 }
 
-globalVariables(c("datetime", "NUMERIC", "REAL"))
+utils::globalVariables(c("datetime", "NUMERIC", "REAL"))

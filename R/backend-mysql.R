@@ -242,4 +242,4 @@ supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnecti
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
 
-globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%"))
+utils::globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%"))

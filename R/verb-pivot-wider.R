@@ -270,7 +270,7 @@ dbplyr_pivot_wider_spec <- function(data,
     group_by(!!!syms(group_vars(data)))
 }
 
-globalVariables(c("name", "value"))
+utils::globalVariables(c("name", "value"))
 
 build_wider_id_cols_expr <- function(data,
                                      id_cols = NULL,

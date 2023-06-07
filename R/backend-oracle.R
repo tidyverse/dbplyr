@@ -215,4 +215,4 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
