@@ -254,6 +254,10 @@ check_table_ident <- function(x,
                               sql = FALSE,
                               arg = caller_arg(x),
                               call = caller_env()) {
+  if (inherits(x, "glue")) {
+    x <- unclass(x)
+  }
+
   if (is_bare_string(x)) {
     return()
   }
