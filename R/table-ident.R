@@ -162,7 +162,14 @@ is_table_ident <- function(x) {
 escape.dbplyr_table_ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   # this ignores `parens` and `collapse`; at least for now
   x_quoted <- quote_table_ident(x, con)
-  sql_vector(x_quoted, parens, collapse, con = con)
+
+  canonical_alias <- purrr::map_chr(x, ~ table_ident_name(.x) %||% "")
+  alias <- table_ident_alias(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
+  alias[alias == canonical_alias] <- ""
+
+  out <- names_to_as(x_quoted, alias, con = con)
+
+  sql_vector(out, parens, collapse, con = con)
 }
 
 quote_table_ident <- function(x, con) {
@@ -175,9 +182,7 @@ quote_table_ident <- function(x, con) {
     x <- vctrs::`field<-`(x, field, xf)
   }
 
-  out <- format(x)
-  alias <- table_ident_alias(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
-  names_to_as(out, alias, con = con)
+  format(x)
 }
 
 table_ident_name <- function(x) {
