@@ -166,12 +166,12 @@ sql_infix <- function(f, pad = TRUE) {
 
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (is_call(xq, infix_calls, n = 2)) {
-    return(build_sql("(", x, ")"))
-  }
+  is_infix <- is_call(xq, infix_calls, n = 2)
+  is_unary_minus <- escape_unary_minus && is_call(xq, "-", n = 1)
 
-  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
-    return(build_sql("(", x, ")"))
+  if (is_infix || is_unary_minus) {
+    enpared <- glue_sql2(sql_current_con(), "({x})")
+    return(enpared)
   }
 
   x
@@ -193,7 +193,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    build_sql(sql(f), args)
+    glue_sql2(sql_current_con(), "{f}({.val args*})")
   }
 }
 
@@ -204,7 +204,7 @@ sql_aggregate <- function(f, f_r = f) {
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(x))
+    glue_sql2(sql_current_con(), "{f}({.val x})")
   }
 }
 
@@ -214,7 +214,7 @@ sql_aggregate_2 <- function(f) {
   check_string(f)
 
   function(x, y) {
-    build_sql(sql(f), list(x, y))
+    glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})")
   }
 }
 
@@ -225,7 +225,8 @@ sql_aggregate_n <- function(f, f_r = f) {
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(...))
+    dots <- list(...)
+    glue_sql2(sql_current_con(), "{f}({.val dots*})")
   }
 }
 

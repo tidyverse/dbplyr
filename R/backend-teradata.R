@@ -212,10 +212,10 @@ win_rank_tdata <- function(f) {
   force(f)
   function(order_by = NULL) {
     order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) order_by <- build_sql("(SELECT NULL)")
+    if (is_empty(order_by)) order_by <- sql("(SELECT NULL)")
 
     win_over(
-      build_sql(dplyr::sql(f), list()),
+      sql(glue("{f}()")),
       partition = win_current_group(),
       order = order_by,
       frame = win_current_frame()

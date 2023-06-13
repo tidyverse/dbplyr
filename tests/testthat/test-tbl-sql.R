@@ -21,14 +21,14 @@ test_that("same_src distinguishes srcs", {
 
 test_that("can generate sql tbls with raw sql", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_equal(collect(mf1), collect(mf2))
 })
 
 test_that("sql tbl can be printed", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_snapshot(mf2, transform = function(x) {
     gsub("sqlite .* \\[:memory:\\]", "sqlite ?.?.? [:memory:]", x)
