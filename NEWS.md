@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `tbl()` now informs when the user probably forgot to wrap the table identifier
+  with `in_schema()` or `sql()` (@mgirlich, #1287).
+
 * Added `db_supports_table_alias_with_as()` to customise whether a backend supports
   specifying a table alias with `AS` or not (@mgirlich).
 
