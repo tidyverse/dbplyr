@@ -65,24 +65,24 @@ as_table_ident.dbplyr_table_ident <- function(x, ..., error_call = current_env()
 
 #' @export
 as_table_ident.character <- function(x, ..., error_call = current_env()) {
-  new_table_ident(table = vctrs::vec_data(x))
+  new_table_ident(table = unclass(x))
 }
 
 #' @export
 as_table_ident.ident <- function(x, ..., error_call = current_env()) {
-  new_table_ident(table = vctrs::vec_data(x))
+  new_table_ident(table = unclass(x))
 }
 
 #' @export
 as_table_ident.ident_q <- function(x, ..., error_call = current_env()) {
   inform_unwanted_table_ident("ident_q")
-  new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
+  new_table_ident(table = unclass(x), quoted = TRUE)
 }
 
 #' @export
 as_table_ident.sql <- function(x, ..., error_call = current_env()) {
   inform_unwanted_table_ident("sql")
-  new_table_ident(table = vctrs::vec_data(x), quoted = TRUE)
+  new_table_ident(table = unclass(x), quoted = TRUE)
 }
 
 inform_unwanted_table_ident <- function(f) {
