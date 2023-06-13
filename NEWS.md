@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `slice_*()` now supports the data masking pronouns `.env` and `.data` (@mgirlich, #1294).
+
 * `tbl()` now informs when the user probably forgot to wrap the table identifier
   with `in_schema()` or `sql()` (@mgirlich, #1287).
 

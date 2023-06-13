@@ -28,6 +28,17 @@ test_that("slice_max orders in opposite order", {
   expect_snapshot(error = TRUE, db %>% slice_max(id, n = 1, na_rm = FALSE))
 })
 
+test_that("slice_* can use data masking pronouns", {
+  lf <- lazy_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  x <- -1L
+
+  expect_snapshot({
+    lf %>% slice_max(x)
+    lf %>% slice_max(.data$x)
+    lf %>% slice_max(.data$x * .env$x)
+  })
+})
+
 test_that("slice_sample errors when expected", {
   db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
