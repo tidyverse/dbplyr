@@ -554,11 +554,11 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
 mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
   cond_sql <- with_mssql_bool(eval_tidy(cond))
   if (is_null(missing) || quo_is_null(missing)) {
-    if_true_sql <- build_sql(eval_tidy(if_true))
+    if_true_sql <- escape(eval_tidy(if_true), con = sql_current_con())
     if (is_null(if_false) || quo_is_null(if_false)) {
       if_false_sql <- NULL
     } else {
-      if_false_sql <- build_sql(eval_tidy(if_false))
+      if_false_sql <- escape(eval_tidy(if_false), con = sql_current_con())
     }
     sql_expr(IIF(!!cond_sql, !!if_true_sql, !!if_false_sql))
   } else {
