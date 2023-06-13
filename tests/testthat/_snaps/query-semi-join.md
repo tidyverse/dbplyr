@@ -10,10 +10,10 @@
         x-x
       X:
         <dbplyr_table_ident[1]>
-        [1] df
+        [1] `df`
       Y:
         <dbplyr_table_ident[1]>
-        [1] df
+        [1] `df`
 
 # generated sql doesn't change unexpectedly
 

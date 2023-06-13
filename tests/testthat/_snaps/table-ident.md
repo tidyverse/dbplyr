@@ -62,17 +62,17 @@
       new_table_ident(table = "table")
     Output
       <dbplyr_table_ident[1]>
-      [1] table
+      [1] `table`
     Code
       new_table_ident(schema = "schema", table = "table")
     Output
       <dbplyr_table_ident[1]>
-      [1] schema.table
+      [1] `schema`.`table`
     Code
       new_table_ident(catalog = "catalog", schema = "schema", table = "table")
     Output
       <dbplyr_table_ident[1]>
-      [1] catalog.schema.table
+      [1] `catalog`.`schema`.`table`
     Code
       new_table_ident(table = "`my schema`.`my table`", quoted = TRUE)
     Output
@@ -87,8 +87,8 @@
         "catalog3"), quoted = c(TRUE, FALSE, FALSE, FALSE))
     Output
       <dbplyr_table_ident[4]>
-      [1] `my schema`.`my table`  table1                  schema2.table2         
-      [4] catalog3.schema3.table3
+      [1] `my schema`.`my table`        `table1`                     
+      [3] `schema2`.`table2`            `catalog3`.`schema3`.`table3`
 
 # as_table_ident works
 

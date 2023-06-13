@@ -172,7 +172,7 @@ sql_table_index.DBIConnection <- function(con,
                                           ...,
                                           call = caller_env()) {
   table <- as_table_ident(table)
-  table_name <- format(table, sep = "_")
+  table_name <- collapse_table_ident(table, sep = "_")
 
   name <- name %||% paste0(c(table_name, columns), collapse = "_")
   glue_sql2(
@@ -1032,7 +1032,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      msg <- "Can't analyze table {.field {format(table)}}."
+      msg <- "Can't analyze table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1053,7 +1053,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      msg <- "Can't create index on table {.field {format(table)}}."
+      msg <- "Can't create index on table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1106,7 +1106,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
-      cli_abort("Can't save query to table {.table {format(name)}}.", parent = cnd)
+      cli_abort("Can't save query to table {.table {format(name, con = con)}}.", parent = cnd)
     }
   )
   name

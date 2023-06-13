@@ -6,19 +6,19 @@
       <SQL JOINS>
       X:
         <dbplyr_table_ident[1]>
-        [1] lf1
+        [1] `lf1`
       Type: left
       By:
         x-x
       Y:
         <dbplyr_table_ident[1]>
-        [1] lf2
+        [1] `lf2`
       Type: left
       By:
         x-x
       Y:
         <dbplyr_table_ident[1]>
-        [1] lf3
+        [1] `lf3`
 
 # generated sql doesn't change unexpectedly
 

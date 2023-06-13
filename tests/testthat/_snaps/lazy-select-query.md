@@ -8,7 +8,7 @@
       <SQL SELECT>
       From:
         <dbplyr_table_ident[1]>
-        [1] df
+        [1] `df`
       Select:   x_mean = mean(x), y2 = y
       Where:    y > 1, x == y - 2
       Group by: "x"

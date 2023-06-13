@@ -6,7 +6,7 @@
         <SQL SELECT>
         From:
           <dbplyr_table_ident[1]>
-          [1] lf1
+          [1] `lf1`
         Select:   `lf1`.*, NULL
       
         UNION
@@ -14,7 +14,7 @@
         <SQL SELECT>
         From:
           <dbplyr_table_ident[1]>
-          [1] lf2
+          [1] `lf2`
         Select:   `x`, NULL, `z`
       
         UNION ALL
@@ -22,7 +22,7 @@
         <SQL SELECT>
         From:
           <dbplyr_table_ident[1]>
-          [1] lf3
+          [1] `lf3`
         Select:   `x`, NULL, `z`
 
 # generated sql doesn't change unexpectedly

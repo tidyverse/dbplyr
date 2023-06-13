@@ -142,16 +142,12 @@ as_table_ident_or_sql <- function(x, ..., error_call = caller_env()) {
 }
 
 #' @export
-format.dbplyr_table_ident <- function(x, ..., sep = ".") {
-  table <- vctrs::field(x, "table")
-  out <- table
-  schema <- vctrs::field(x, "schema")
-  out <- ifelse(is.na(schema), out, paste0(schema, sep, out))
-  catalog <- vctrs::field(x, "catalog")
-  out <- ifelse(is.na(catalog), out, paste0(catalog, sep, out))
-
+format.dbplyr_table_ident <- function(x, ..., sep = ".", con = NULL) {
   quoted <- vctrs::field(x, "quoted")
-  ifelse(quoted, table, out)
+  con <- con %||% simulate_dbi()
+  x <- quote_table_ident(x, con)
+
+  collapse_table_ident(x, sep = sep)
 }
 
 is_table_ident <- function(x) {
@@ -161,7 +157,7 @@ is_table_ident <- function(x) {
 #' @export
 escape.dbplyr_table_ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   # this ignores `parens` and `collapse`; at least for now
-  x_quoted <- quote_table_ident(x, con)
+  x_quoted <- format(x, con = con)
 
   canonical_alias <- purrr::map_chr(x, ~ table_ident_name(.x) %||% "")
   alias <- table_ident_alias(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
@@ -182,7 +178,19 @@ quote_table_ident <- function(x, con) {
     x <- vctrs::`field<-`(x, field, xf)
   }
 
-  format(x)
+  x
+}
+
+collapse_table_ident <- function(x, sep = ".") {
+  table <- vctrs::field(x, "table")
+  schema <- vctrs::field(x, "schema")
+  catalog <- vctrs::field(x, "catalog")
+
+  out <- table
+  out[!is.na(schema)] <- paste0(schema, sep, table)[!is.na(schema)]
+  out[!is.na(catalog)] <- paste0(catalog, sep, schema, sep, table)[!is.na(catalog)]
+
+  out
 }
 
 table_ident_name <- function(x) {

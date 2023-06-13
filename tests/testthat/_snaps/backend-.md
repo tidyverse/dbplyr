@@ -56,7 +56,7 @@
       sql_query_wrap(con, ident("table"))
     Output
       <dbplyr_table_ident[1]>
-      [1] table
+      [1] `table`
 
 ---
 
@@ -64,7 +64,7 @@
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
       <dbplyr_table_ident[1]>
-      [1] schema.tbl
+      [1] `schema`.`tbl`
 
 ---
 
