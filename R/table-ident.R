@@ -53,34 +53,34 @@ check_db_table_args <- function(table,
   }
 }
 
-as_table_ident <- function(x, ..., error_call = current_env()) {
+as_table_ident <- function(x, ..., error_call = caller_env()) {
   check_dots_empty()
   UseMethod("as_table_ident")
 }
 
 #' @export
-as_table_ident.dbplyr_table_ident <- function(x, ..., error_call = current_env()) {
+as_table_ident.dbplyr_table_ident <- function(x, ..., error_call = caller_env()) {
   x
 }
 
 #' @export
-as_table_ident.character <- function(x, ..., error_call = current_env()) {
+as_table_ident.character <- function(x, ..., error_call = caller_env()) {
   new_table_ident(table = unclass(x))
 }
 
 #' @export
-as_table_ident.ident <- function(x, ..., error_call = current_env()) {
+as_table_ident.ident <- function(x, ..., error_call = caller_env()) {
   new_table_ident(table = unclass(x))
 }
 
 #' @export
-as_table_ident.ident_q <- function(x, ..., error_call = current_env()) {
+as_table_ident.ident_q <- function(x, ..., error_call = caller_env()) {
   inform_unwanted_table_ident("ident_q")
   new_table_ident(table = unclass(x), quoted = TRUE)
 }
 
 #' @export
-as_table_ident.sql <- function(x, ..., error_call = current_env()) {
+as_table_ident.sql <- function(x, ..., error_call = caller_env()) {
   inform_unwanted_table_ident("sql")
   new_table_ident(table = unclass(x), quoted = TRUE)
 }
@@ -97,7 +97,7 @@ inform_unwanted_table_ident <- function(f) {
 }
 
 #' @export
-as_table_ident.dbplyr_schema <- function(x, ..., error_call = current_env()) {
+as_table_ident.dbplyr_schema <- function(x, ..., error_call = caller_env()) {
   new_table_ident(
     table = unclass(x$table),
     schema = unclass(x$schema)
@@ -105,7 +105,7 @@ as_table_ident.dbplyr_schema <- function(x, ..., error_call = current_env()) {
 }
 
 #' @export
-as_table_ident.dbplyr_catalog <- function(x, ..., error_call = current_env()) {
+as_table_ident.dbplyr_catalog <- function(x, ..., error_call = caller_env()) {
   new_table_ident(
     table = unclass(x$table),
     schema = unclass(x$schema),
@@ -114,7 +114,7 @@ as_table_ident.dbplyr_catalog <- function(x, ..., error_call = current_env()) {
 }
 
 #' @export
-as_table_ident.Id <- function(x, ..., error_call = current_env()) {
+as_table_ident.Id <- function(x, ..., error_call = caller_env()) {
   id <- x@name
   nms <- names(id)
   known_names <- c("catalog", "schema", "table")
@@ -133,7 +133,7 @@ as_table_ident.Id <- function(x, ..., error_call = current_env()) {
   )
 }
 
-as_table_ident_or_sql <- function(x, ..., error_call = current_env()) {
+as_table_ident_or_sql <- function(x, ..., error_call = caller_env()) {
   if (is.sql(x)) {
     return(x)
   }
