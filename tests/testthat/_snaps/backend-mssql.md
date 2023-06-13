@@ -223,10 +223,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 ---
 

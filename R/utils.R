@@ -43,8 +43,17 @@ unique_subquery_name <- function() {
   options(dbplyr_subquery_name = i)
   sprintf("q%02i", i)
 }
+unique_column_name <- function() {
+  # Needs to use option so can reset at the start of each query
+  i <- getOption("dbplyr_column_name", 0) + 1
+  options(dbplyr_column_name = i)
+  sprintf("col%02i", i)
+}
 unique_subquery_name_reset <- function() {
   options(dbplyr_subquery_name = 0)
+}
+unique_column_name_reset <- function() {
+  options(dbplyr_column_name = 0)
 }
 
 succeeds <- function(x, quiet = FALSE) {

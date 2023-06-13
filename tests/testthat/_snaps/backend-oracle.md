@@ -80,10 +80,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
         FROM `df`
       ) `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 # copy_inline uses UNION ALL
 

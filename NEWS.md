@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The columns generated when using a window function in `filter()` are now named
+  `col01` etc. instead of `q01()` (@mgirlich, #1258).
+
 * `slice_*()` now supports the data masking pronouns `.env` and `.data` (@mgirlich, #1294).
 
 * `tbl()` now informs when the user probably forgot to wrap the table identifier

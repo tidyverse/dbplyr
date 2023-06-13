@@ -434,7 +434,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
       if (is_formula(expr)) {
         translate_window_where(f_rhs(expr), window_funs)
       } else if (is_call(expr, name = window_funs)) {
-        name <- unique_subquery_name()
+        name <- unique_column_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
         args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)

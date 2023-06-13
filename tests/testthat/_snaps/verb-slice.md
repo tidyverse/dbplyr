@@ -74,30 +74,30 @@
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `q01`
+        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
     Code
       lf %>% slice_max(.data$x)
     Output
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `q01`
+        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
     Code
       lf %>% slice_max(.data$x * .env$x)
     Output
       <SQL>
       SELECT `x`, `id`
       FROM (
-        SELECT `df`.*, RANK() OVER (ORDER BY `x` * -1 DESC) AS `q01`
+        SELECT `df`.*, RANK() OVER (ORDER BY `x` * -1 DESC) AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 # slice_sample errors when expected
 

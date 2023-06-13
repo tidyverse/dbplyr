@@ -14,10 +14,10 @@
     Output
       <SQL> SELECT `x`, `y`
       FROM (
-        SELECT `df`.*, AVG(`x`) OVER () AS `q01`
+        SELECT `df`.*, AVG(`x`) OVER () AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`q01` > 3.0) AND (`y` < 3.0)
+      WHERE (`col01` > 3.0) AND (`y` < 3.0)
 
 # errors for named input
 
@@ -66,10 +66,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, MAX(`x`) OVER () AS `q01`
+        SELECT `df`.*, MAX(`x`) OVER () AS `col01`
         FROM `df`
       ) AS `q01`
-      WHERE (`x` = `q01`) AND (`x` IN (1, 2))
+      WHERE (`x` = `col01`) AND (`x` IN (1, 2))
 
 # filter() after summarise() uses `HAVING`
 
@@ -152,12 +152,12 @@
       FROM (
         SELECT
           `q01`.*,
-          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q01`
+          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `col01`
         FROM (
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`
           FROM `df`
           GROUP BY `g`, `h`
         ) AS `q01`
       ) AS `q01`
-      WHERE (`q01` = 1.0)
+      WHERE (`col01` = 1.0)
 
