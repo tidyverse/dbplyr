@@ -84,7 +84,7 @@ The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tbl_sql</span><span class="op">(</span><span class="va">subclass</span>, <span class="va">src</span>, <span class="va">from</span>, <span class="va">...</span>, vars <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tbl_sql</span><span class="op">(</span><span class="va">subclass</span>, <span class="va">src</span>, <span class="va">from</span>, <span class="va">...</span>, vars <span class="op">=</span> <span class="cn">NULL</span>, check_from <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -102,6 +102,10 @@ The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
 to avoid retrieving them from the database.
 Mainly useful for better performance when creating
 multiple <code>tbl</code> objects.</p></dd>
+
+
+<dt>check_from</dt>
+<dd><p>Check if <code>from</code> is likely misspecified SQL or a table in a schema.</p></dd>
 
 </dl></div>
 
