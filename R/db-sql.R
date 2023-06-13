@@ -264,17 +264,18 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 sql_indent_subquery <- function(from, con, lvl = 0) {
   multi_line <- grepl(x = from, pattern = "\\r\\n|\\r|\\n")
   if (multi_line) {
-    build_sql(
+    out <- paste0(
       "(\n",
       from, "\n",
-      indent_lvl(")", lvl),
-      con = con
+      indent_lvl(")", lvl)
     )
   } else {
     # Strip indent
     from <- gsub("^ +", "", from)
-    build_sql("(", from, ")", con = con)
+    out <- paste0("(", from, ")")
   }
+
+  sql(out)
 }
 
 #' @rdname db-sql
