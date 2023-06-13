@@ -99,7 +99,6 @@ sql_quote_transformer <- function(connection) {
     if (type == "tbl") {
       value <- as_table_ident(value)
     } else if (type == "from") {
-      # TODO maybe this could call dbplyr_sql_subquery()
       value <- as_from(value)
     } else if (type == "col") {
       if (is_bare_character(value)) {
