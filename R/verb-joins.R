@@ -666,8 +666,6 @@ add_semi_join <- function(x,
     c(x_alias$name, y_alias$name),
     c(x_alias$from, y_alias$from)
   )
-  by$x_as <- by$x_as
-  by$y_as <- by$y_as
 
   lazy_semi_join_query(
     x_lq,

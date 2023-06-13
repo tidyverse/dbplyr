@@ -11,19 +11,13 @@ new_table_ident <- function(...,
   check_character(catalog, call = error_call)
   check_logical(quoted, call = error_call)
 
-  n <- vctrs::vec_size_common(
+  data <- vctrs::vec_recycle_common(
     table = table,
     schema = schema,
     catalog = catalog,
     quoted = quoted,
+    name = NA_character_,
     .call = error_call
-  )
-  data <- list(
-    table = vctrs::vec_recycle(table, n, call = error_call),
-    schema = vctrs::vec_recycle(schema, n, call = error_call),
-    catalog = vctrs::vec_recycle(catalog, n, call = error_call),
-    quoted = vctrs::vec_recycle(quoted, n, call = error_call),
-    name = vctrs::vec_rep(NA_character_, n)
   )
 
   purrr::pmap(
