@@ -86,10 +86,6 @@ sql_render.lazy_query <- function(query,
   qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
 
   if (cte) {
-    if (is.ident(qry) || is.sql(qry)) {
-      return(sql_render(qry, con))
-    }
-
     query_list <- flatten_query(qry, list(queries = list(), name = NULL))
     queries <- query_list$queries
 
@@ -125,7 +121,7 @@ cte_render <- function(query_list, con) {
 get_subquery_name <- function(x, query_list) {
   if (inherits(x, "base_query")) return(x)
 
-  base_query(ident(query_list$name))
+  base_query(query_list$name)
 }
 
 flatten_query <- function(qry, query_list) {

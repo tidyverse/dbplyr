@@ -88,7 +88,7 @@ sql_query_upsert.Oracle <- function(con,
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_values <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),

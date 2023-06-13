@@ -15,7 +15,7 @@ db_write_table.PostgreSQLConnection <- function(con,
                                                 values,
                                                 temporary = TRUE,
                                                 ...) {
-
+  table <- as_table_ident(table)
   if (!isFALSE(temporary)) {
     cli_abort(c(
       "RPostgreSQL backend does not support creation of temporary tables",
@@ -23,9 +23,11 @@ db_write_table.PostgreSQLConnection <- function(con,
     ))
   }
 
+  # RPostgreSQL doesn't handle `Id()` or `SQL()` correctly, so we can only pass
+  # the bare table name
   dbWriteTable(
     con,
-    name = table,
+    name = vctrs::field(table, "table"),
     value = values,
     field.types = types,
     ...,

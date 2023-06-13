@@ -85,7 +85,7 @@ db_copy_to.DBIConnection <- function(con,
         if (analyze) dbplyr_analyze(con, table)
       },
       error = function(cnd) {
-        cli_abort("Can't copy to table {.field {format(table)}}.", parent = cnd, call = call)
+        cli_abort("Can't copy to table {.field {format(table, con = con)}}.", parent = cnd, call = call)
       }
     )
   })
@@ -161,7 +161,7 @@ db_write_table.DBIConnection <- function(con,
                                          values,
                                          temporary = TRUE,
                                          ...) {
-  check_table_ident(table)
+  table <- as_table_ident(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)
@@ -169,7 +169,7 @@ db_write_table.DBIConnection <- function(con,
   tryCatch(
     dbWriteTable(
       con,
-      name = dbi_quote(table, con),
+      name = table_ident_to_id(table),
       value = values,
       field.types = types,
       temporary = temporary,
@@ -177,7 +177,7 @@ db_write_table.DBIConnection <- function(con,
       row.names = FALSE
     ),
     error = function(cnd) {
-      msg <- "Can't write table table {.field {format(table)}}."
+      msg <- "Can't write table table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -186,11 +186,6 @@ db_write_table.DBIConnection <- function(con,
 }
 
 # Utility functions ------------------------------------------------------------
-
-dbi_quote <- function(x, con) UseMethod("dbi_quote")
-dbi_quote.ident <- function(x, con) DBI::dbQuoteIdentifier(con, as.character(x))
-dbi_quote.character <- function(x, con) DBI::dbQuoteString(con, x)
-dbi_quote.sql <- function(x, con) DBI::SQL(as.character(x)) # nocov
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   if (is.null(indexes)) {

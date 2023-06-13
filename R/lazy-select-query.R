@@ -172,7 +172,7 @@ sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
     inform(op$message_summarise)
   }
 
-  alias <- ident(remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name())
+  alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, use_star = use_star)
   select_sql_list <- get_select_sql(
     select = op$select,

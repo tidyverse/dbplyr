@@ -97,14 +97,9 @@ sql_quote_transformer <- function(connection) {
     glue_check_collapse(type, should_collapse)
 
     if (type == "tbl") {
-      if (is_bare_character(value)) {
-        value <- ident(value)
-      }
+      value <- as_table_ident(value)
     } else if (type == "from") {
-      # TODO maybe this could call dbplyr_sql_subquery()
-      if (is_bare_character(value)) {
-        value <- ident(value)
-      }
+      value <- as_from(value)
     } else if (type == "col") {
       if (is_bare_character(value)) {
         value <- ident(value)

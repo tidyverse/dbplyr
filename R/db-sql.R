@@ -171,7 +171,10 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  name <- name %||% paste0(c(unclass(table), columns), collapse = "_")
+  table <- as_table_ident(table)
+  table_name <- collapse_table_ident(table, sep = "_")
+
+  name <- name %||% paste0(c(table_name, columns), collapse = "_")
   glue_sql2(
     con,
     "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
@@ -245,30 +248,17 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 
 sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
-  if (is.ident(from)) {
-    out <- setNames(from, name)
+  from <- as_from(from)
+
+  if (is.sql(from)) {
+    from <- sql_indent_subquery(from, con, lvl)
+    # some backends, e.g. Postgres, require an alias for a subquery
+    name <- name %||% unique_subquery_name()
+    out <- glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
     return(out)
   }
 
-  if (is_schema(from) || is_catalog(from) || inherits(from, "Id")) {
-    out <- setNames(as.sql(from, con), name)
-    return(out)
-  }
-
-  from <- sql_indent_subquery(from, con, lvl)
-  # some backends, e.g. Postgres, require an alias for a subquery
-  name <- as_subquery_name(name)
-  glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
-}
-
-as_subquery_name <- function(x, default = ident(unique_subquery_name())) {
-  if (is.ident(x)) {
-    x
-  } else if (is.null(x)) {
-    default
-  } else {
-    ident(x)
-  }
+  set_table_ident_alias(from, name)
 }
 
 #' @export
@@ -936,7 +926,7 @@ sql_query_upsert.DBIConnection <- function(con,
   insert_cols <- c(by, update_cols)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_values <- sql_table_prefix(con, update_cols, "...y")
   update_cols <- sql_escape_ident(con, update_cols)
 
   updated_cte <- list(
@@ -944,12 +934,12 @@ sql_query_upsert.DBIConnection <- function(con,
     sql_clause_set(update_cols, update_values),
     sql_clause_from(parts$from),
     sql_clause_where(parts$where),
-    sql(paste0("RETURNING ", escape(table, con = con), ".*"))
+    sql(paste0("RETURNING ", sql_star(con, table)))
   )
   updated_sql <- sql_format_clauses(updated_cte, lvl = 1, con)
   update_name <- sql(escape(ident("updated"), con = con))
 
-  join_by <- list(x = by, y = by, x_as = ident("updated"), y_as = ident("...y"), condition = "=")
+  join_by <- list(x = by, y = by, x_as = "updated", y_as = "...y", condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
   clauses <- list2(
@@ -1042,7 +1032,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      msg <- "Can't analyze table {.field {format(table)}}."
+      msg <- "Can't analyze table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1063,7 +1053,7 @@ db_create_index.DBIConnection <- function(con,
   tryCatch(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
-      msg <- "Can't create index on table {.field {format(table)}}."
+      msg <- "Can't create index on table {.field {format(table, con = con)}}."
       cli_abort(msg, parent = cnd)
     }
   )
@@ -1116,7 +1106,7 @@ db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
   tryCatch(
     DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
-      cli_abort("Can't save query to table {.table {format(name)}}.", parent = cnd)
+      cli_abort("Can't save query to table {.table {format(name, con = con)}}.", parent = cnd)
     }
   )
   name

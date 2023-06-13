@@ -183,12 +183,12 @@ simulate_mssql <- function(version = "15.0") {
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_values <- sql_table_prefix(con, update_cols, "...y")
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- sql(sql_escape_ident(con, insert_cols))
-  insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_cols_qual <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
@@ -468,8 +468,12 @@ mssql_version <- function(con) {
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
 `db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
-  if (temporary && substr(table, 1, 1) != "#") {
-    table <- hash_temp(table)
+  table <- as_table_ident(table)
+  table_name <- vctrs::field(table, "table")
+
+  if (temporary && substr(table_name, 1, 1) != "#") {
+    table_name <- hash_temp(table_name)
+    vctrs::field(table, "table") <- table_name
   }
 
   list(
@@ -495,7 +499,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
   stopifnot(table %in% c("DELETED", "INSERTED"))
-  returning_cols <- sql_named_cols(con, cols, table = ident(table))
+  returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("OUTPUT", returning_cols)
 }

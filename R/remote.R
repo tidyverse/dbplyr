@@ -33,28 +33,11 @@
 remote_name <- function(x, null_if_local = TRUE) {
   table <- remote_table(x, null_if_local = null_if_local)
 
-  if (is.null(table)) {
+  if (is.null(table) || is.sql(table)) {
     return(NULL)
   }
 
-  if (is.sql(table) || inherits(table, "ident_q")) {
-    return(NULL)
-  }
-
-  if (is.ident(table)) {
-    return(unclass(table))
-  }
-
-  if (is_schema(table) || is_catalog(table)) {
-    return(unclass(table$table))
-  }
-
-  if (inherits(table, "Id")) {
-    out <- table@name[["table"]]
-    return(out)
-  }
-
-  abort("Unexpected type", .internal = TRUE)
+  table_ident_name(table)
 }
 
 #' @export

@@ -62,7 +62,7 @@ copy_to.src_sql <- function(dest,
     cli_abort("{.var df} must be a local dataframe or a remote tbl_sql")
   }
 
-  name <- as.sql(name, con = dest$con)
+  name <- as_table_ident(name)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
     out <- compute(df,
