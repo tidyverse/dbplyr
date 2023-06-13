@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Added `db_supports_table_alias_with_as()` to customise whether a backend supports
+  specifying a table alias with `AS` or not (@mgirlich).
+
 * The translation of `between()` now also works for MS SQL when used in `mutate()`
   (@mgirlich, #1241).
 

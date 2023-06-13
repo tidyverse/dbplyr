@@ -161,9 +161,19 @@ escape.dbplyr_table_ident <- function(x, parens = FALSE, collapse = ", ", con = 
 
   canonical_alias <- purrr::map_chr(x, ~ table_ident_name(.x) %||% "")
   alias <- table_ident_alias(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
-  alias[alias == canonical_alias] <- ""
 
-  out <- names_to_as(x_quoted, alias, con = con)
+  if (db_supports_table_alias_with_as(con)) {
+    as_sql <- style_kw(" AS ")
+  } else {
+    as_sql <- " "
+  }
+
+  alias_esc <- sql_escape_ident(con, alias)
+  out <- ifelse(
+    alias == "" | alias == canonical_alias,
+    x_quoted,
+    paste0(x_quoted, as_sql, alias_esc)
+  )
 
   sql_vector(out, parens, collapse, con = con)
 }

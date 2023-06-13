@@ -41,7 +41,7 @@
       FROM (
         SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`q01` <= 1)
 
 ---
@@ -57,7 +57,7 @@
         UNION ALL
       
         VALUES (1, 'a'), (2, 'b')
-      ) `values_table`
+      ) AS `values_table`
 
 ---
 
@@ -72,7 +72,7 @@
         UNION ALL
       
         VALUES ROW(1, 'a'), ROW(2, 'b')
-      ) `values_table`
+      ) AS `values_table`
 
 # `sql_query_update_from()` is correct
 
@@ -85,7 +85,7 @@
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
 

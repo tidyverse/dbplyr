@@ -56,7 +56,7 @@
       
         SELECT 'y' AS `name`, `y` AS `value`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
@@ -69,7 +69,7 @@
       FROM (
         SELECT `id`, '1' AS `n`, `x_1` AS `x`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       
       UNION ALL
       

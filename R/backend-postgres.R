@@ -369,4 +369,14 @@ supports_window_clause.PostgreSQL <- function(con) {
   TRUE
 }
 
+#' @export
+db_supports_table_alias_with_as.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+db_supports_table_alias_with_as.PostgreSQL <- function(con) {
+  TRUE
+}
+
 utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
