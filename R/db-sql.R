@@ -16,6 +16,8 @@
 #'
 #' * `supports_window_clause(con)` does the backend support named windows?
 #'
+#' * `db_supports_table_alias_with_as(con)` does the backend support using `AS` when using a table alias?
+#'
 #' Tables:
 #'
 #' * `sql_table_analyze(con, table)` generates SQL that "analyzes" the table,
@@ -238,23 +240,19 @@ sql_query_wrap <- function(con, from, name = NULL, ..., lvl = 0) {
 }
 #' @export
 sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  sql_query_wrap_helper(
-    con = con,
-    from = from,
-    name = name,
-    lvl = lvl,
-    as = FALSE
-  )
-}
-
-sql_query_wrap_helper <- function(con, from, name, ..., lvl, as) {
   from <- as_from(from)
 
   if (is.sql(from)) {
+    if (db_supports_table_alias_with_as(con)) {
+      as_sql <- style_kw(" AS ")
+    } else {
+      as_sql <- " "
+    }
+
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
-    out <- glue_sql2(con, "{.sql from}", if (as) " AS", " {.name name}")
+    out <- glue_sql2(con, "{.sql from}", as_sql, "{.name name}")
     return(out)
   }
 
@@ -302,6 +300,22 @@ supports_window_clause <- function(con) {
 #' @export
 supports_window_clause.DBIConnection <- function(con) {
   FALSE
+}
+
+#' @rdname db-sql
+#' @export
+db_supports_table_alias_with_as <- function(con) {
+  UseMethod("db_supports_table_alias_with_as")
+}
+
+#' @export
+db_supports_table_alias_with_as.DBIConnection <- function(con) {
+  FALSE
+}
+
+#' @export
+db_supports_table_alias_with_as.TestConnection <- function(con) {
+  TRUE
 }
 
 

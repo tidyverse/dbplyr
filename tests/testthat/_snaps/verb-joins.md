@@ -135,7 +135,7 @@
         SELECT 1 FROM (
         SELECT `x2` AS `x`, `b`
         FROM `lf2`
-      ) `RHS`
+      ) AS `RHS`
         WHERE (`lf1`.`x1` = `RHS`.`x`)
       )
 
@@ -151,7 +151,7 @@
         FROM `df` AS `df_LHS`
         FULL JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       LEFT JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
@@ -167,7 +167,7 @@
         FROM `df` AS `df_LHS`
         LEFT JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       FULL JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
@@ -183,7 +183,7 @@
         FROM `df` AS `df_LHS`
         FULL JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       FULL JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
@@ -225,7 +225,7 @@
         FROM `df1`
         LEFT JOIN `df2`
           ON (`df1`.`x` = `df2`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       RIGHT JOIN `df3`
         ON (`LHS`.`x` = `df3`.`x`)
 

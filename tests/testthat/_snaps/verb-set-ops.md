@@ -13,7 +13,7 @@
       FROM (
         SELECT NULL AS `x`, `lf2`.*
         FROM `lf2`
-      ) `q01`
+      ) AS `q01`
       
       UNION
       

@@ -125,17 +125,6 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  sql_query_wrap_helper(
-    con = con,
-    from = from,
-    name = name,
-    lvl = lvl,
-    as = TRUE
-  )
-}
-
-#' @export
 sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   glue_sql2(con, "{x} IS {y}")
@@ -149,6 +138,11 @@ values_prepare.SQLiteConnection <- function(con, df) {
 
 #' @export
 supports_window_clause.SQLiteConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
   TRUE
 }
 

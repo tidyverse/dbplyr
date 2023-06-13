@@ -10,6 +10,7 @@
 #' @include utils.R
 #' @include compat-obj-type.R
 #' @include compat-types-check.R
+#' @include db-sql.R
 NULL
 
 #' @export

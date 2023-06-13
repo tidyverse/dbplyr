@@ -71,7 +71,7 @@
     Code
       sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> (SELECT * FROM foo) `q01`
+      <SQL> (SELECT * FROM foo) AS `q01`
 
 ---
 

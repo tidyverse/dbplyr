@@ -66,5 +66,5 @@
       FROM (
         SELECT DISTINCT `df`.*
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 

@@ -8,11 +8,11 @@
       FROM (
         SELECT DISTINCT `x`
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       CROSS JOIN (
         SELECT DISTINCT `y`
         FROM `df`
-      ) `RHS`
+      ) AS `RHS`
 
 # nesting doesn't expand values
 
@@ -60,11 +60,11 @@
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       LEFT JOIN (
         SELECT DISTINCT `a`, `c`
         FROM `df`
-      ) `RHS`
+      ) AS `RHS`
         ON (`LHS`.`a` = `RHS`.`a`)
 
 # NULL inputs
@@ -139,13 +139,13 @@
           FROM (
             SELECT DISTINCT `x`
             FROM `df`
-          ) `LHS`
+          ) AS `LHS`
           CROSS JOIN (
             SELECT DISTINCT `y`
             FROM `df`
-          ) `RHS`
-        ) `LHS`
+          ) AS `RHS`
+        ) AS `LHS`
         FULL JOIN `df`
           ON (`LHS`.`x` = `df`.`x` AND `LHS`.`y` = `df`.`y`)
-      ) `q01`
+      ) AS `q01`
 
