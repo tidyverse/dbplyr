@@ -132,7 +132,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
         WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
@@ -191,7 +191,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # sql_query_append supports old interface works
@@ -208,7 +208,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # arguments are checked
@@ -320,7 +320,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
@@ -357,7 +357,7 @@
         FROM `df_x`
         INNER JOIN `df_y`
           ON (`df_x`.`x` = `df_y`.`x`)
-      ) `q01`
+      ) AS `q01`
 
 # `rows_patch()` works with `in_place = TRUE`
 
@@ -388,7 +388,7 @@
           SELECT 1 FROM `df_x`
           WHERE (`df_y`.`x` = `df_x`.`x`)
         )
-      ) `q01`
+      ) AS `q01`
 
 # `rows_upsert()` works with `in_place = FALSE`
 
@@ -442,7 +442,7 @@
         FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
         RETURNING `df_x`.*
       )
@@ -451,7 +451,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `updated`
         WHERE (`updated`.`a` = `...y`.`a`) AND (`updated`.`b` = `...y`.`b`)
@@ -492,7 +492,7 @@
         SELECT 1 FROM (
           SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
           FROM `df_y`
-        ) `...y`
+        ) AS `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`

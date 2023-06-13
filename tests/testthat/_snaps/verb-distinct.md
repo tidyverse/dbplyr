@@ -9,7 +9,7 @@
         SELECT `df`.*
         FROM `df`
         LIMIT 2
-      ) `q01`
+      ) AS `q01`
 
 # distinct respects window_order when .keep_all is TRUE
 
@@ -21,6 +21,6 @@
       FROM (
         SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`q01` = 1)
 

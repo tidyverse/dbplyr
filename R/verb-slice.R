@@ -203,4 +203,4 @@ check_slice_size <- function(n, prop) {
   }
 }
 
-globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))
+utils::globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))

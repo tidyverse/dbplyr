@@ -2,6 +2,21 @@
 
 * Fix translation of `TRUE` and `FALSE` for Oracle (@mgirlich, #1180).
 
+* Added `db_supports_table_alias_with_as()` to customise whether a backend supports
+  specifying a table alias with `AS` or not (@mgirlich).
+
+* The translation of `between()` now also works for MS SQL when used in `mutate()`
+  (@mgirlich, #1241).
+
+* MariaDB:
+  * `rows_update()` and `rows_patch()` now give an informative error when the
+    unsupported `returning` is used (@mgirlich, #1279).
+  * `rows_upsert()` now gives an informative error that it isn't supported
+    (@mgirlich, #1279).
+
+* Oracle:
+  * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
+
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
 

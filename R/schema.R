@@ -106,6 +106,3 @@ ident_q <- function(...) {
 escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
 }
-
-#' @export
-dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))

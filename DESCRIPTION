@@ -59,6 +59,7 @@ Language: en-gb
 Roxygen: {library(tidyr); list(markdown = TRUE)}
 RoxygenNote: 7.2.3
 Collate: 
+    'db-sql.R'
     'compat-types-check.R'
     'compat-obj-type.R'
     'utils.R'
@@ -93,7 +94,6 @@ Collate:
     'data-nycflights13.R'
     'db-escape.R'
     'db-io.R'
-    'db-sql.R'
     'db.R'
     'dbplyr.R'
     'explain.R'
@@ -124,6 +124,7 @@ Collate:
     'sql-expr.R'
     'src-sql.R'
     'src_dbi.R'
+    'table-ident.R'
     'tbl-lazy.R'
     'tbl-sql.R'
     'test-frame.R'

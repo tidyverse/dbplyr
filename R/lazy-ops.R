@@ -32,10 +32,7 @@ lazy_base_query <- function(x, vars, class = character(), ...) {
 }
 
 lazy_query_local <- function(df, name) {
-  if (is_bare_character(name)) {
-    name <- ident(name)
-  }
-
+  name <- as_table_ident(name)
   lazy_base_query(df, names(df), class = "local", name = name)
 }
 
@@ -44,6 +41,7 @@ lazy_query_remote <- function(x, vars) {
 }
 
 base_query <- function(from) {
+  from <- as_from(from)
   structure(
     list(from = from),
     class = c("base_query", "query")
@@ -159,9 +157,10 @@ op_desc <- function(op) UseMethod("op_desc")
 
 #' @export
 op_desc.lazy_base_remote_query <- function(op) {
-  if (is.ident(op$x)) {
-    paste0("table<", op$x, ">")
-  } else {
+  table <- remote_name(op)
+  if (is.null(table)) {
     "SQL"
+  } else {
+    paste0("table<", table, ">")
   }
 }

@@ -83,17 +83,17 @@ sql_query_upsert.Oracle <- function(con,
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_values <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
-    sql_clause_on(parts$where, lvl = 1),
+    sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
@@ -187,6 +187,10 @@ sql_escape_logical.Oracle <- function(con, x) {
   dplyr::if_else(x, "1 = 1", "1 = 0", "NULL")
 }
 
+#' @export
+db_supports_table_alias_with_as.Oracle <- function(con) {
+  FALSE
+}
 
 # roacle package ----------------------------------------------------------
 
@@ -223,4 +227,7 @@ sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 #' @export
 sql_escape_logical.OraConnection <- sql_escape_logical.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
+#' @export
+db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
+
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

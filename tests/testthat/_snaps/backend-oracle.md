@@ -20,9 +20,9 @@
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
       ) `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        ON (`...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`)
       WHEN MATCHED THEN
-        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
       WHEN NOT MATCHED THEN
         INSERT (`a`, `b`, `c`, `d`)
         VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
@@ -51,8 +51,8 @@
     Output
       <SQL>
       SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
+      FROM `df` `df_LHS`
+      LEFT JOIN `df` `df_RHS`
         ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---

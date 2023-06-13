@@ -8,7 +8,7 @@
       FROM (
         SELECT DISTINCT `df`.*
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # rename/relocate after distinct is inlined #1141
 

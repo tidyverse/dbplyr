@@ -67,7 +67,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       ON CONFLICT (`a`, `b`)
       DO NOTHING
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
@@ -84,7 +84,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE true
       ON CONFLICT  (`a`, `b`)
       DO UPDATE

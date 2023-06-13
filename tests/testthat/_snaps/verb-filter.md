@@ -16,7 +16,7 @@
       FROM (
         SELECT `df`.*, AVG(`x`) OVER () AS `q01`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`q01` > 3.0) AND (`y` < 3.0)
 
 # errors for named input
@@ -68,7 +68,7 @@
       FROM (
         SELECT `df`.*, MAX(`x`) OVER () AS `q01`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`x` = `q01`) AND (`x` IN (1, 2))
 
 # filter() after summarise() uses `HAVING`
@@ -135,7 +135,7 @@
       FROM (
         SELECT `df`.*, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`x_mean` > 1.0)
 
 # filter() using a window function after summarise() does not use `HAVING`
@@ -157,7 +157,7 @@
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`
           FROM `df`
           GROUP BY `g`, `h`
-        ) `q01`
-      ) `q01`
+        ) AS `q01`
+      ) AS `q01`
       WHERE (`q01` = 1.0)
 

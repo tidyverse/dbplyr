@@ -85,7 +85,7 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 }
 
 hash_temp <- function(name) {
-  name <- ident(paste0("#", name))
+  name <- paste0("#", name)
   cli::cli_inform(
     paste0("Created a temporary table named ", name),
     class = c("dbplyr_message_temp_table", "dbplyr_message")
@@ -167,6 +167,30 @@ check_integer <- function(x,
   )
 }
 
+check_logical <- function(x,
+                          ...,
+                          allow_null = FALSE,
+                          arg = caller_arg(x),
+                          call = caller_env()) {
+  if (!missing(x)) {
+    if (is.logical(x)) {
+      return(invisible(NULL))
+    }
+    if (allow_null && is_null(x)) {
+      return(invisible(NULL))
+    }
+  }
+
+  stop_input_type(
+    x,
+    what = "a logical vector",
+    ...,
+    allow_null = allow_null,
+    arg = arg,
+    call = call
+  )
+}
+
 check_con <- function(con, ..., arg = caller_arg(con), call = caller_env()) {
   if (is.null(con)) {
     cli_abort("{.arg {arg}} must not be NULL.", call = call)
@@ -230,6 +254,10 @@ check_table_ident <- function(x,
                               sql = FALSE,
                               arg = caller_arg(x),
                               call = caller_env()) {
+  if (inherits(x, "glue")) {
+    x <- unclass(x)
+  }
+
   if (is_bare_string(x)) {
     return()
   }
@@ -255,6 +283,8 @@ check_table_ident <- function(x,
     }
   } else if (sql && is.sql(x)) {
     n <- length(x)
+  } else if (inherits(x, "dbplyr_table_ident")) {
+    n <- vctrs::vec_size(x)
   } else {
     what <- c("ident", "schema", "catalog", "Id")
     if (sql) {

@@ -225,7 +225,7 @@
       FROM (
         SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`q01` <= 1)
 
 ---
@@ -295,7 +295,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
         WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
@@ -313,7 +313,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
 
 # `sql_query_update_from()` is correct
 
@@ -329,7 +329,7 @@
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
 
 # `sql_query_delete()` is correct
@@ -345,7 +345,7 @@
         SELECT 1 FROM (
           SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
           FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
 
@@ -360,7 +360,7 @@
       USING (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
         UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
