@@ -266,6 +266,14 @@ simulate_mssql <- function(version = "15.0") {
         mssql_sql_if(enquo(test), enquo(yes), enquo(no))
       },
       case_when      = mssql_case_when,
+      between        = function(x, left, right) {
+        context <- sql_current_context()
+        if (context$clause == "WHERE") {
+          sql_expr(!!x %BETWEEN% !!left %AND% !!right)
+        } else {
+          sql_expr(IIF(!!x %BETWEEN% !!left %AND% !!right, 1L, 0L))
+        }
+      },
 
       as.logical    = sql_cast("BIT"),
 
@@ -580,4 +588,4 @@ mssql_bit_int_bit <- function(f) {
   dplyr::if_else(x, "1", "0", "NULL")
 }
 
-globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))
+utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%"))

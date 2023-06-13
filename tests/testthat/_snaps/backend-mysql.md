@@ -79,7 +79,7 @@
     Code
       sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
         con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
-        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
+        d = "`...y`.`d`"))
     Output
       <SQL> UPDATE `df_x`
       INNER JOIN (
@@ -88,7 +88,10 @@
       ) `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
+---
+
+    Argument `returning_cols` isn't supported in MariaDB translation.
 
 # can explain
 

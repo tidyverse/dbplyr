@@ -125,8 +125,8 @@ sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
   }
 }
 
-sql_clause_on <- function(on, lvl = 0) {
-  sql_clause("ON", on, sep = " AND", lvl = lvl)
+sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
+  sql_clause("ON", on, sep = " AND", parens = parens, lvl = lvl)
 }
 
 sql_clause_where_exists <- function(table, where, not) {

@@ -72,4 +72,4 @@ sql_str_trim <- function(string, side = c("both", "left", "right")) {
     both = sql_expr(ltrim(rtrim(!!string))),
   )
 }
-globalVariables(c("ltrim", "rtrim"))
+utils::globalVariables(c("ltrim", "rtrim"))

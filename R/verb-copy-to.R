@@ -434,4 +434,4 @@ sql_cast_dispatch.integer64 <- function(x) {
   expr(as.integer64)
 }
 
-globalVariables(c("as.integer64"))
+utils::globalVariables(c("as.integer64"))
