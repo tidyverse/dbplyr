@@ -9,7 +9,7 @@ test_that("can create table idents", {
       schema = vctrs::vec_rep("schema", 3),
       catalog = vctrs::vec_rep(NA_character_, 3),
       quoted = vctrs::vec_rep(FALSE, 3),
-      name = vctrs::vec_rep(NA_character_, 3)
+      alias = vctrs::vec_rep(NA_character_, 3)
     ), class = "dbplyr_table_ident")
   )
 })
@@ -26,7 +26,7 @@ test_that("is properly vectorised", {
       schema = c("schema1", "schema2"),
       catalog = c("cat1", "cat2"),
       quoted = vctrs::vec_rep(FALSE, 2),
-      name = vctrs::vec_rep(NA_character_, 2)
+      alias = vctrs::vec_rep(NA_character_, 2)
     ), class = "dbplyr_table_ident")
   )
 

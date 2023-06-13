@@ -16,13 +16,13 @@ new_table_ident <- function(...,
     schema = schema,
     catalog = catalog,
     quoted = quoted,
-    name = NA_character_,
+    alias = NA_character_,
     .call = error_call
   )
 
   purrr::pmap(
     data,
-    function(table, schema, catalog, quoted, name) {
+    function(table, schema, catalog, quoted, alias) {
       check_db_table_args(
         table = table,
         schema = schema,
@@ -176,8 +176,8 @@ quote_table_ident <- function(x, con) {
   }
 
   out <- format(x)
-  nms <- names(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
-  names_to_as(out, nms, con = con)
+  alias <- table_ident_alias(x) %||% vctrs::vec_rep("", vctrs::vec_size(x))
+  names_to_as(out, alias, con = con)
 }
 
 table_ident_name <- function(x) {
@@ -190,20 +190,18 @@ table_ident_name <- function(x) {
   }
 }
 
-#' @export
-names.dbplyr_table_ident <- function(x) {
-  names <- vctrs::field(x, "name")
-  if (all(is.na(names))) {
+table_ident_alias <- function(x) {
+  alias <- vctrs::field(x, "alias")
+  if (all(is.na(alias))) {
     return(NULL)
   }
 
-  names
+  alias
 }
 
-#' @export
-`names<-.dbplyr_table_ident` <- function(x, value) {
-  value <- value %||% vctrs::vec_rep(NA_character_, times = vctrs::vec_size(x))
-  vctrs::`field<-`(x, "name", value)
+set_table_ident_alias <- function(x, alias) {
+  alias <- alias %||% vctrs::vec_rep(NA_character_, times = vctrs::vec_size(x))
+  vctrs::`field<-`(x, "alias", alias)
 }
 
 as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
