@@ -164,12 +164,6 @@ is_mask_pronoun <- function(call) {
 }
 
 partial_eval_call <- function(call, data, env) {
-  # TODO which of
-  # * `cur_data()`, `cur_data_all()`
-  # * `cur_group()`, `cur_group_id()`, and
-  # * `cur_group_rows()`
-  # are possible?
-
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
