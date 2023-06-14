@@ -55,6 +55,9 @@ partial_eval_if <- function(call, data, env, reduce = "&", error_call = caller_e
     fn <- "if_any()"
   }
   conditions <- across_setup(data, call, env, allow_rename = FALSE, fn = fn, error_call = error_call)
+  if (is_empty(conditions)) {
+    return(TRUE)
+  }
   Reduce(function(x, y) call2(reduce, x, y), conditions)
 }
 
