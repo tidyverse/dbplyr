@@ -242,7 +242,7 @@ dbplyr_pivot_wider_spec <- function(data,
 
   pivot_exprs <- purrr::map(
     set_names(vctrs::vec_seq_along(spec), spec$.name),
-    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, data, call = call)
+    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, call = call)
   )
 
   key_vars <- setdiff(id_cols, non_id_cols)
@@ -259,7 +259,7 @@ dbplyr_pivot_wider_spec <- function(data,
 
   unused_cols <- setdiff(colnames(data), c(id_cols, non_id_cols))
   unused_fn <- check_list_of_functions(unused_fn, unused_cols, "unused_fn")
-  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y), data, call = call))
+  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y), call = call))
 
   data_grouped %>%
     summarise(
@@ -294,7 +294,7 @@ build_wider_id_cols_expr <- function(data,
   expr(c(!!!out))
 }
 
-build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data, call) {
+build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) {
   values_col <- spec[[".value"]][row_id]
   fill_value <- values_fill[[values_col]]
 
@@ -314,7 +314,7 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, data, 
   case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
   agg_fn <- values_fn[[values_col]]
-  resolve_fun(agg_fn, case_expr, data = data, call = call)
+  resolve_fun(agg_fn, case_expr, call = call)
 }
 
 select_wider_id_cols <- function(data,
@@ -350,9 +350,9 @@ is_scalar <- function(x) {
 }
 
 
-resolve_fun <- function(x, var, data, call = caller_env()) {
+resolve_fun <- function(x, var, call = caller_env()) {
   if (is_formula(x)) {
-    .fn_expr <- across_fun(x, env = empty_env(), data = data, dots = NULL, fn = "across")
+    .fn_expr <- across_fun(x, env = empty_env(), dots = NULL, fn = "across")
     exec(.fn_expr, var, NULL)
   } else {
     fn_name <- find_fun(x)

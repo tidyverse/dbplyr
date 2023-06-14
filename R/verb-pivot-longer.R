@@ -140,7 +140,6 @@ dbplyr_pivot_longer_spec <- function(data,
         row[[".name"]],
         row[[".value"]],
         values_transform,
-        data = data,
         call = call
       )
 
@@ -170,7 +169,7 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform, data, call) {
+get_measure_column_exprs <- function(name, value, values_transform, call) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
@@ -180,7 +179,7 @@ get_measure_column_exprs <- function(name, value, values_transform, data, call) 
       if (is_null(f_trans)) {
         .x
       } else {
-        resolve_fun(f_trans, .x, data, call)
+        resolve_fun(f_trans, .x, call)
       }
     }
   )
