@@ -207,44 +207,62 @@ dbplyr_pivot_wider_spec <- function(data,
                                     id_cols = NULL,
                                     values_fill = NULL,
                                     values_fn = ~ max(.x, na.rm = TRUE),
-                                    unused_fn = NULL) {
-  input <- data
-
+                                    unused_fn = NULL,
+                                    error_call = current_env()) {
   spec <- tidyr::check_pivot_spec(spec)
 
   names_from_cols <- names(spec)[-(1:2)]
   values_from_cols <- vctrs::vec_unique(spec$.value)
-  non_id_cols <- c(names_from_cols, values_from_cols)
 
   id_cols <- select_wider_id_cols(
     data = data,
-    id_cols = {{id_cols}},
-    non_id_cols = non_id_cols
+    id_cols = {{ id_cols }},
+    names_from_cols = names_from_cols,
+    values_from_cols = values_from_cols,
+    error_call = error_call
   )
+
+  values_fn <- check_list_of_functions(values_fn, values_from_cols, call = error_call)
+
+  unused_cols <- setdiff(names(data), c(id_cols, names_from_cols, values_from_cols))
+  unused_fn <- check_list_of_functions(unused_fn, unused_cols, call = error_call)
+  unused_cols <- names(unused_fn)
 
   if (is.null(values_fill)) {
     values_fill <- list()
-  }
-  if (is_scalar(values_fill)) {
+  } else if (is_scalar(values_fill)) {
     values_fill <- rep_named(values_from_cols, list(values_fill))
-  }
-  if (!vctrs::vec_is_list(values_fill)) {
-    cli_abort("{.arg values_fill} must be NULL, a scalar, or a named list")
+  } else if (!vctrs::vec_is_list(values_fill)) {
+    cli::cli_abort(
+      "{.arg values_fill} must be {.code NULL}, a scalar, or a named list, not {.obj_type_friendly {values_fill}}.",
+      call = error_call
+    )
   }
   values_fill <- values_fill[intersect(names(values_fill), values_from_cols)]
 
-  call <- current_env()
-  values_fn <- check_list_of_functions(values_fn, values_from_cols, "values_fn", call = call)
   missing_values <- setdiff(values_from_cols, names(values_fn))
   if (!is_empty(missing_values)) {
     cli_abort("{.arg values_fn} must specify a function for each col in {.arg values_from}")
   }
 
+  n_unused_fn <- length(unused_fn)
+
+  unused_col_expr <- vector("list", length = n_unused_fn)
+  names(unused_col_expr) <- unused_cols
+
+  for (i in seq_len(n_unused_fn)) {
+    unused_col <- unused_cols[[i]]
+    unused_fn_i <- unused_fn[[i]]
+
+    unused_col_expr[[i]] <- resolve_fun(unused_fn_i, sym(unused_col), call = error_call)
+  }
+
   pivot_exprs <- purrr::map(
     set_names(vctrs::vec_seq_along(spec), spec$.name),
-    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, call = call)
+    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, call = error_call)
   )
 
+  non_id_cols <- c(names_from_cols, values_from_cols)
   key_vars <- setdiff(id_cols, non_id_cols)
   data_grouped <- group_by(data, !!!syms(key_vars), .add = TRUE)
 
@@ -256,10 +274,6 @@ dbplyr_pivot_wider_spec <- function(data,
     out_nms_repaired <- out_nms_repaired[-(1:length(group_names))]
   }
   pivot_exprs <- set_names(pivot_exprs, out_nms_repaired)
-
-  unused_cols <- setdiff(colnames(data), c(id_cols, non_id_cols))
-  unused_fn <- check_list_of_functions(unused_fn, unused_cols, "unused_fn")
-  unused_col_expr <- purrr::imap(unused_fn, ~ resolve_fun(.x, sym(.y), call = call))
 
   data_grouped %>%
     summarise(
@@ -278,20 +292,61 @@ build_wider_id_cols_expr <- function(data,
                                      values_from = value,
                                      call = caller_env()) {
   # COPIED FROM tidyr
-  # TODO: Use `allow_rename = FALSE`.
-  # Requires https://github.com/r-lib/tidyselect/issues/225.
-  names_from <- names(tidyselect::eval_select(enquo(names_from), data, error_call = call))
-  values_from <- names(tidyselect::eval_select(enquo(values_from), data, error_call = call))
-  non_id_cols <- c(names_from, values_from)
+  names_from <- tidyselect::eval_select(
+    enquo(names_from),
+    data,
+    allow_rename = FALSE,
+    error_call = error_call
+  )
+
+  values_from <- tidyselect::eval_select(
+    enquo(values_from),
+    data,
+    allow_rename = FALSE,
+    error_call = error_call
+  )
 
   out <- select_wider_id_cols(
     data = data,
-    id_cols = {{id_cols}},
-    non_id_cols = non_id_cols,
-    call = call
+    id_cols = {{ id_cols }},
+    names_from_cols = names(names_from),
+    values_from_cols = names(values_from),
+    error_call = error_call
   )
 
   expr(c(!!!out))
+}
+
+select_wider_id_cols <- function(data,
+                                 id_cols = NULL,
+                                 names_from_cols = character(),
+                                 values_from_cols = character(),
+                                 error_call = caller_env()) {
+  # COPIED FROM tidyr
+  id_cols <- enquo(id_cols)
+  sim_data <- tidyselect_data_proxy(data)
+
+  # Remove known non-id-cols so they are never selected
+  sim_data <- sim_data[setdiff(names(sim_data), c(names_from_cols, values_from_cols))]
+
+  if (quo_is_null(id_cols)) {
+    # Default selects everything in `sim_data` after non-id-cols have been removed
+    return(names(sim_data))
+  }
+
+  try_fetch(
+    id_cols <- tidyselect::eval_select(
+      enquo(id_cols),
+      sim_data,
+      allow_rename = FALSE,
+      error_call = error_call
+    ),
+    vctrs_error_subscript_oob = function(cnd) {
+      rethrow_id_cols_oob(cnd, names_from_cols, values_from_cols, error_call)
+    }
+  )
+
+  names(id_cols)
 }
 
 build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) {
@@ -308,33 +363,13 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) 
         expr(!!sym(name) == !!value)
       }
     }
-  ) %>%
-    purrr::reduce(~ expr(!!.x & !!.y))
+  )
+  keys_cond <- purrr::reduce(keys_cond, ~ expr(!!.x & !!.y))
 
   case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
   agg_fn <- values_fn[[values_col]]
   resolve_fun(agg_fn, case_expr, call = call)
-}
-
-select_wider_id_cols <- function(data,
-                                 id_cols = NULL,
-                                 non_id_cols = character(),
-                                 call = caller_env()) {
-  # COPIED FROM tidyr
-  id_cols <- enquo(id_cols)
-  sim_data <- tidyselect_data_proxy(data)
-
-  # Remove known non-id-cols so they are never selected
-  sim_data <- sim_data[setdiff(names(sim_data), non_id_cols)]
-
-  if (quo_is_null(id_cols)) {
-    names(sim_data)
-  } else {
-    # TODO: Use `allow_rename = FALSE`.
-    # Requires https://github.com/r-lib/tidyselect/issues/225.
-    names(tidyselect::eval_select(enquo(id_cols), sim_data, error_call = call))
-  }
 }
 
 is_scalar <- function(x) {

@@ -78,12 +78,9 @@
     Code
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
-      <error/purrr_error_indexed>
-      Error in `map2()`:
-      i In index: 1.
-      i With name: unused.
-      Caused by error in `dbplyr_pivot_wider_spec()`:
-      ! Can't convert to a function.
+      <error/rlang_error>
+      Error in `dbplyr_pivot_wider_spec()`:
+      ! `unused_fn` must be `NULL`, a function, or a named list of functions.
 
 # can fill in missing cells
 
@@ -117,7 +114,7 @@
       dbplyr_pivot_wider_spec(lf, spec, values_fill = 1:2)
     Condition
       Error in `dbplyr_pivot_wider_spec()`:
-      ! `values_fill` must be NULL, a scalar, or a named list
+      ! `values_fill` must be `NULL`, a scalar, or a named list, not an integer vector.
 
 # cannot pivot lazy frames
 
