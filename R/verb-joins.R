@@ -36,6 +36,7 @@
 #'   and `%in%`.
 #' @param multiple,unmatched Unsupported in database backends. As a workaround
 #'   for multiple use a unique key and for unmatched a foreign key constraint.
+#' @param relationship Unsupported in database backends.
 #' @param x_as,y_as Alias to use for `x` resp. `y`. Defaults to `"LHS"` resp.
 #'   `"RHS"`
 #' @inherit arrange.tbl_lazy return
@@ -79,6 +80,7 @@ inner_join.tbl_lazy <- function(x,
                                 na_matches = c("never", "na"),
                                 multiple = NULL,
                                 unmatched = "drop",
+                                relationship = NULL,
                                 sql_on = NULL,
                                 auto_index = FALSE,
                                 x_as = NULL,
@@ -95,6 +97,7 @@ inner_join.tbl_lazy <- function(x,
     na_matches = na_matches,
     multiple = multiple,
     unmatched = unmatched,
+    relationship = relationship,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -117,6 +120,7 @@ left_join.tbl_lazy <- function(x,
                                na_matches = c("never", "na"),
                                multiple = NULL,
                                unmatched = "drop",
+                               relationship = NULL,
                                sql_on = NULL,
                                auto_index = FALSE,
                                x_as = NULL,
@@ -133,6 +137,7 @@ left_join.tbl_lazy <- function(x,
     na_matches = na_matches,
     multiple = multiple,
     unmatched = unmatched,
+    relationship = relationship,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -155,6 +160,7 @@ right_join.tbl_lazy <- function(x,
                                 na_matches = c("never", "na"),
                                 multiple = NULL,
                                 unmatched = "drop",
+                                relationship = NULL,
                                 sql_on = NULL,
                                 auto_index = FALSE,
                                 x_as = NULL,
@@ -171,6 +177,7 @@ right_join.tbl_lazy <- function(x,
     na_matches = na_matches,
     multiple = multiple,
     unmatched = unmatched,
+    relationship = relationship,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -192,6 +199,7 @@ full_join.tbl_lazy <- function(x,
                                keep = NULL,
                                na_matches = c("never", "na"),
                                multiple = NULL,
+                               relationship = NULL,
                                sql_on = NULL,
                                auto_index = FALSE,
                                x_as = NULL,
@@ -207,6 +215,7 @@ full_join.tbl_lazy <- function(x,
     keep = keep,
     na_matches = na_matches,
     multiple = multiple,
+    relationship = relationship,
     sql_on = sql_on,
     auto_index = auto_index,
     x_as = x_as,
@@ -314,6 +323,7 @@ add_join <- function(x,
                      na_matches = "never",
                      multiple = NULL,
                      unmatched = "drop",
+                     relationship = NULL,
                      sql_on = NULL,
                      auto_index = FALSE,
                      x_as = NULL,
@@ -336,6 +346,7 @@ add_join <- function(x,
 
   check_join_multiple(multiple, by, call = call)
   check_join_unmatched(unmatched, by, call = call)
+  check_join_relationship(relationship, call = call)
 
   y <- auto_copy(
     x, y,
@@ -819,4 +830,12 @@ check_join_unmatched <- function(unmatched, by, call = caller_env()) {
     "Argument {.arg unmatched} isn't supported on database backends.",
     i = "For equi joins you can instead add a foreign key from {.arg x} to {.arg y} for the join columns."
   ), call = call)
+}
+
+check_join_relationship <- function(relationship, call = caller_env()) {
+  if (is.null(relationship) || identical(relationship, "many-to-many")) {
+    return()
+  }
+
+  cli_abort("Argument {.arg relationship} isn't supported on database backends.", call = call)
 }

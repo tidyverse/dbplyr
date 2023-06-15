@@ -942,6 +942,16 @@ test_that("using unmatched gives an informative error", {
   })
 })
 
+test_that("using relationship gives an informative error", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(left_join(lf, lf, by = "x", relationship = NULL))
+  expect_no_error(left_join(lf, lf, by = "x", relationship = "many-to-many"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", relationship = "one-to-one")
+  })
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {
