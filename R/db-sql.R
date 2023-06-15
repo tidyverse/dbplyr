@@ -564,6 +564,7 @@ sql_query_semi_join <- function(con,
                                 y,
                                 anti,
                                 by,
+                                where,
                                 vars,
                                 ...,
                                 lvl = 0) {

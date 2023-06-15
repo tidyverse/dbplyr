@@ -50,6 +50,7 @@ lazy_semi_join_query(
   vars,
   anti,
   by,
+  where,
   group_vars = op_grps(x),
   order_vars = op_sort(x),
   frame = op_frame(x),
@@ -109,7 +110,15 @@ select_query(
   from_alias = NULL
 )
 
-semi_join_query(x, y, vars, anti = FALSE, by = NULL, na_matches = FALSE)
+semi_join_query(
+  x,
+  y,
+  vars,
+  anti = FALSE,
+  by = NULL,
+  where = NULL,
+  na_matches = FALSE
+)
 
 set_op_query(x, y, type, all = FALSE)
 
