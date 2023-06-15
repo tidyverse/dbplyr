@@ -117,7 +117,7 @@ dbplyr_pivot_longer_spec <- function(data,
 
   call <- current_env()
   value_names <- unique(spec$.value)
-  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform", call)
+  values_transform <- check_list_of_functions(values_transform, value_names, call = call)
 
   nms_map <- tibble(
     name = colnames(spec_split$key),
@@ -140,7 +140,6 @@ dbplyr_pivot_longer_spec <- function(data,
         row[[".name"]],
         row[[".value"]],
         values_transform,
-        data = data,
         call = call
       )
 
@@ -170,7 +169,7 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform, data, call) {
+get_measure_column_exprs <- function(name, value, values_transform, call) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
@@ -180,7 +179,7 @@ get_measure_column_exprs <- function(name, value, values_transform, data, call) 
       if (is_null(f_trans)) {
         .x
       } else {
-        resolve_fun(f_trans, .x, data, call)
+        resolve_fun(f_trans, .x, call)
       }
     }
   )
@@ -256,28 +255,38 @@ deduplicate_spec <- function(spec, df) {
   spec
 }
 
-check_list_of_functions <- function(x, names, arg, call = caller_env()) {
+check_unique_names <- function(x, arg = caller_arg(x), call = caller_env()) {
+  # COPIED FROM tidyr
+
+  if (length(x) > 0L && !is_named(x)) {
+    cli::cli_abort("All elements of {.arg {arg}} must be named.", call = call)
+  }
+  if (vctrs::vec_duplicate_any(names(x))) {
+    cli::cli_abort("The names of {.arg {arg}} must be unique.", call = call)
+  }
+}
+
+check_list_of_functions <- function(x, names, arg = caller_arg(x), call = caller_env()) {
   # mostly COPIED FROM tidyr
   if (is.null(x)) {
     x <- set_names(list(), character())
-  }
-
-  if (!vctrs::vec_is_list(x)) {
+  } else if (is.function(x) || is_formula(x)) {
     x <- rep_named(names, list(x))
+  } else if (!vctrs::vec_is_list(x)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be `NULL`, a function, or a named list of functions.",
+      call = call
+    )
   }
 
-  if (length(x) > 0L && !is_named(x)) {
-    cli_abort("All elements of {.arg {arg}} must be named.", call = call)
-  }
-
-  if (vctrs::vec_duplicate_any(names(x))) {
-    cli_abort("The names of {.arg {arg}} must be unique.", call = call)
-  }
+  check_unique_names(x, arg = arg, call = call)
+  x_names <- names(x)
 
   # Silently drop user supplied names not found in the data
-  x <- x[intersect(names(x), names)]
+  x <- x[intersect(x_names, names)]
 
   x
+
 }
 # nocov end
 
