@@ -357,6 +357,32 @@ select_wider_id_cols <- function(data,
   names(id_cols)
 }
 
+rethrow_id_cols_oob <- function(cnd, names_from_cols, values_from_cols, call) {
+  i <- cnd[["i"]]
+
+  check_string(i, .internal = TRUE)
+
+  if (i %in% names_from_cols) {
+    stop_id_cols_oob(i, "names_from", call = call)
+  } else if (i %in% values_from_cols) {
+    stop_id_cols_oob(i, "values_from", call = call)
+  } else {
+    # Zap this special handler, throw the normal condition
+    zap()
+  }
+}
+
+stop_id_cols_oob <- function(i, arg, call) {
+  cli::cli_abort(
+    c(
+      "`id_cols` can't select a column already selected by `{arg}`.",
+      i = "Column `{i}` has already been selected."
+    ),
+    parent = NA,
+    call = call
+  )
+}
+
 build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) {
   values_col <- spec[[".value"]][row_id]
   fill_value <- values_fill[[values_col]]
