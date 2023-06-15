@@ -171,7 +171,6 @@ partial_eval_call <- function(call, data, env) {
     vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
-    # TODO what about environment in `dtplyr`?
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)

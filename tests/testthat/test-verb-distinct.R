@@ -115,9 +115,7 @@ test_that("distinct() produces optimized SQL", {
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, "y")
   expect_equal(out$lazy_query$select$expr, syms("y"))
-  # TODO probably `where` should be in the same query but this requires an
-  # optimized `mutate()` resp. `add_select`
-  # expect_equal(out$lazy_query$where, syms("y"))
+  expect_equal(out$lazy_query$where, list(quo(x == 1L)), ignore_formula_env = TRUE)
 
   # Note: currently this needs `distinct()` or `distinct(x, y)` because
   # `summarise()` + `select()` is not inlined.
