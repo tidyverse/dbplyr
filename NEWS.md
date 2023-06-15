@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `*_join()` now allows providing a `relationship` argument (@bairdj, #1305).
+
 * The columns generated when using a window function in `filter()` are now named
   `col01` etc. instead of `q01()` (@mgirlich, #1258).
 
