@@ -346,7 +346,12 @@ add_join <- function(x,
 
   check_join_multiple(multiple, by, call = call)
   check_join_unmatched(unmatched, by, call = call)
-  check_join_relationship(relationship, call = call)
+  check_unsupported_arg(
+    relationship,
+    allowed = "many-to-many",
+    allow_null = TRUE,
+    call = call
+  )
 
   y <- auto_copy(
     x, y,
@@ -830,12 +835,4 @@ check_join_unmatched <- function(unmatched, by, call = caller_env()) {
     "Argument {.arg unmatched} isn't supported on database backends.",
     i = "For equi joins you can instead add a foreign key from {.arg x} to {.arg y} for the join columns."
   ), call = call)
-}
-
-check_join_relationship <- function(relationship, call = caller_env()) {
-  if (is.null(relationship) || identical(relationship, "many-to-many")) {
-    return()
-  }
-
-  cli_abort("Argument {.arg relationship} isn't supported on database backends.", call = call)
 }

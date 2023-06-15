@@ -338,7 +338,8 @@
       left_join(lf, lf, by = "x", relationship = "one-to-one")
     Condition
       Error in `left_join()`:
-      ! Argument `relationship` isn't supported on database backends.
+      ! `relationship = "one-to-one"` isn't supported on database backends.
+      i It must be "many-to-many" or `NULL` instead.
 
 # can optionally match NA values
 
