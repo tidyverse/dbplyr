@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
+
 * The columns generated when using a window function in `filter()` are now named
   `col01` etc. instead of `q01()` (@mgirlich, #1258).
 

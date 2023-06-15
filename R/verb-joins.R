@@ -650,10 +650,17 @@ add_semi_join <- function(x,
 
   inline_result <- join_inline_select(x$lazy_query, by$x, sql_on)
   x_lq <- inline_result$lq
+  x_vars <- inline_result$vars
   by$x <- inline_result$by
+
+  inline_result <- semi_join_inline_select(y$lazy_query, by$y, sql_on)
+  y_lq <- inline_result$lq
+  by$y <- inline_result$by
+  where <- inline_result$where
+
   vars <- tibble(
     name = op_vars(x),
-    var = inline_result$vars
+    var = x_vars
   )
   by$na_matches <- na_matches
 
@@ -661,7 +668,7 @@ add_semi_join <- function(x,
   join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
 
   x_alias <- make_table_names(join_alias$x, x_lq)
-  y_alias <- make_table_names(join_alias$y, y)
+  y_alias <- make_table_names(join_alias$y, y_lq)
   by[c("x_as", "y_as")] <- join_two_table_alias(
     c(x_alias$name, y_alias$name),
     c(x_alias$from, y_alias$from)
@@ -669,11 +676,64 @@ add_semi_join <- function(x,
 
   lazy_semi_join_query(
     x_lq,
-    y$lazy_query,
+    y_lq,
     vars = vars,
     anti = anti,
     by = by,
+    where = where,
     call = call
+  )
+}
+
+can_inline_semi_join <- function(x) {
+  select <- "projection"
+
+  if (!inherits(x, "lazy_select_query")) {
+    return(FALSE)
+  }
+
+  if (select == "projection" && !is_projection(x$select$expr)) {
+    return(FALSE)
+  }
+
+  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
+    return(FALSE)
+  }
+
+  if (is_true(x$distinct)) {
+    return(FALSE)
+  }
+  if (!is_empty(x$limit)) {
+    return(FALSE)
+  }
+
+  TRUE
+}
+
+semi_join_inline_select <- function(lq, by, on) {
+  if (is_empty(on) && can_inline_semi_join(lq)) {
+    vars <- purrr::map_chr(lq$select$expr, as_string)
+
+    idx <- vctrs::vec_match(lq$select$name, by)
+    by <- vctrs::vec_assign(by, idx, vars)
+
+    lq_org <- lq
+    lq <- lq$x
+    lq$group_vars <- op_grps(lq_org)
+    lq$order_vars <- op_sort(lq_org)
+    lq$frame <- op_frame(lq_org)
+
+    where <- lq_org$where
+  } else {
+    vars <- op_vars(lq)
+    where <- NULL
+  }
+
+  list(
+    lq = lq,
+    vars = vars,
+    by = by,
+    where = where
   )
 }
 

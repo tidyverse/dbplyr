@@ -127,6 +127,7 @@ lazy_semi_join_query <- function(x,
                                  vars,
                                  anti,
                                  by,
+                                 where,
                                  group_vars = op_grps(x),
                                  order_vars = op_sort(x),
                                  frame = op_frame(x),
@@ -143,6 +144,7 @@ lazy_semi_join_query <- function(x,
     anti = anti,
     by = by,
     vars = vars,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -155,6 +157,8 @@ print.lazy_semi_join_query <- function(x, ...) {
 
   cat_line("By:")
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
+
+  # TODO where
 
   cat_line("X:")
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
@@ -279,12 +283,22 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., use_star = TRUE) {
     vars <- ident(set_names(op$vars$var, op$vars$name))
   }
 
+  y_vars <- op_vars(op$y)
+  replacements <- purrr::map(y_vars, ~ call2("$", sym(op$by$y_as), sym(.x)))
+  where <- purrr::map(
+    op$where,
+    ~ replace_sym(.x, y_vars, replacements)
+  )
+
+  where_sql <- translate_sql_(where, con = con, context = list(clause = "WHERE"))
+
   semi_join_query(
     sql_optimise(sql_build(op$x, con, use_star = use_star), con),
     sql_optimise(sql_build(op$y, con, use_star = use_star), con),
     vars = vars,
     anti = op$anti,
     by = op$by,
+    where = where_sql,
     na_matches = op$by$na_matches
   )
 }

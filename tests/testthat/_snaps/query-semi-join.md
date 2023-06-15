@@ -27,7 +27,7 @@
       FROM `df` AS `df_LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+        WHERE (`df_LHS`.`x` = `df_RHS`.`x`) AND (`df_LHS`.`y` = `df_RHS`.`y`)
       )
 
 ---
@@ -42,6 +42,6 @@
       FROM `df` AS `df_LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df` AS `df_RHS`
-        WHERE (`df_LHS`.`x` = `df_RHS`.`x` AND `df_LHS`.`y` = `df_RHS`.`y`)
+        WHERE (`df_LHS`.`x` = `df_RHS`.`x`) AND (`df_LHS`.`y` = `df_RHS`.`y`)
       )
 
