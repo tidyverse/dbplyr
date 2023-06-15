@@ -257,9 +257,17 @@ dbplyr_pivot_wider_spec <- function(data,
     unused_col_expr[[i]] <- resolve_fun(unused_fn_i, sym(unused_col), call = error_call)
   }
 
-  pivot_exprs <- purrr::map(
-    set_names(vctrs::vec_seq_along(spec), spec$.name),
-    ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, call = error_call)
+  spec_idx <- set_names(vctrs::vec_seq_along(spec), spec$.name)
+  pivot_exprs <- with_indexed_errors(
+    purrr::map(
+      spec_idx,
+      ~ build_pivot_wider_exprs(.x, spec, values_fill, values_fn, call = NULL)
+    ),
+    message = function(cnd) {
+      col <- spec[[".value"]][cnd$location]
+      cli::format_inline("Can't pivot column {.field {col}}:")
+    },
+    .error_call = error_call
   )
 
   non_id_cols <- c(names_from_cols, values_from_cols)
@@ -369,7 +377,7 @@ build_pivot_wider_exprs <- function(row_id, spec, values_fill, values_fn, call) 
   case_expr <- expr(ifelse(!!keys_cond, !!sym(values_col), !!fill_value))
 
   agg_fn <- values_fn[[values_col]]
-  resolve_fun(agg_fn, case_expr, call = call)
+  resolve_fun(agg_fn, case_expr, arg = paste0("values_fn$", values_col), call = call)
 }
 
 is_scalar <- function(x) {
@@ -385,14 +393,14 @@ is_scalar <- function(x) {
 }
 
 
-resolve_fun <- function(x, var, call = caller_env()) {
+resolve_fun <- function(x, var, arg = caller_arg(x), call = caller_env()) {
   if (is_formula(x)) {
     .fn_expr <- across_fun(x, env = empty_env(), dots = NULL, fn = "across")
     exec(.fn_expr, var, NULL)
   } else {
     fn_name <- find_fun(x)
     if (is_null(fn_name)) {
-      cli_abort("Can't convert to a function.", call = call)
+      cli_abort("Can't convert {.arg {arg}}, {.code {as_label(x)}}, to a function.", call = call)
     }
     call2(fn_name, var)
   }

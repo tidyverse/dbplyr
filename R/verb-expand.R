@@ -31,7 +31,13 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     cli_abort("Must supply variables in `...`")
   }
 
-  distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars, call = current_env())
+  distinct_tbl_vars <- with_indexed_errors(
+    purrr::map(dots, extract_expand_dot_vars, call = NULL),
+    message = function(cnd) {
+      dot <- as_label(dots[[cnd$location]])
+      cli::format_inline("In expression {.code {dot}}:")
+    }
+  )
 
   # now that `nesting()` has been unpacked resolve name conflicts
   out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))

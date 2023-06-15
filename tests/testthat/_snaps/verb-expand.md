@@ -97,9 +97,9 @@
     Code
       tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
     Condition
-      Error in `purrr::map()`:
-      i In index: 1.
-      Caused by error in `tidyr::expand()`:
+      Error in `tidyr::expand()`:
+      ! In expression `nesting(x, x = x + 1)`:
+      Caused by error:
       ! Names must be unique.
       x These names are duplicated:
         * "x" at locations 1 and 2.

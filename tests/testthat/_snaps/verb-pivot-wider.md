@@ -60,10 +60,9 @@
 
 ---
 
-    i In index: 2.
-    i With name: b_x.
-    Caused by error in `dbplyr_pivot_wider_spec()`:
-    ! Can't convert to a function.
+    Can't pivot column b:
+    Caused by error:
+    ! Can't convert `values_fn$b`, `NULL`, to a function.
 
 # values_fn cannot be NULL
 
