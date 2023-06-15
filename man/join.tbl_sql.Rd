@@ -22,6 +22,7 @@
   na_matches = c("never", "na"),
   multiple = NULL,
   unmatched = "drop",
+  relationship = NULL,
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -39,6 +40,7 @@
   na_matches = c("never", "na"),
   multiple = NULL,
   unmatched = "drop",
+  relationship = NULL,
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -56,6 +58,7 @@
   na_matches = c("never", "na"),
   multiple = NULL,
   unmatched = "drop",
+  relationship = NULL,
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -72,6 +75,7 @@
   keep = NULL,
   na_matches = c("never", "na"),
   multiple = NULL,
+  relationship = NULL,
   sql_on = NULL,
   auto_index = FALSE,
   x_as = NULL,
@@ -181,6 +185,8 @@ and \code{\%in\%}.}
 
 \item{multiple, unmatched}{Unsupported in database backends. As a workaround
 for multiple use a unique key and for unmatched a foreign key constraint.}
+
+\item{relationship}{Unsupported in database backends.}
 
 \item{sql_on}{A custom join predicate as an SQL expression.
 Usually joins use column equality, but you can perform more complex

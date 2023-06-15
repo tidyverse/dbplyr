@@ -208,11 +208,16 @@ check_con <- function(con, ..., arg = caller_arg(con), call = caller_env()) {
 
 check_unsupported_arg <- function(x,
                                   allowed = NULL,
+                                  allow_null = FALSE,
                                   ...,
                                   backend = NULL,
                                   arg = caller_arg(x),
                                   call = caller_env()) {
   if (is_missing(x)) {
+    return()
+  }
+
+  if (allow_null && is_null(x)) {
     return()
   }
 
@@ -233,10 +238,13 @@ check_unsupported_arg <- function(x,
   }
 
   if (!is_null(allowed)) {
-    msg <- c(
-      msg,
-      i = "It must be {.val {allowed}} instead."
-    )
+    if (allow_null) {
+      allow_msg <- "It must be {.val {allowed}} or {.code NULL} instead."
+    } else {
+      allow_msg <- "It must be {.val {allowed}} instead."
+    }
+
+    msg <- c(msg, i = allow_msg)
   }
   cli_abort(msg, call = call)
 }

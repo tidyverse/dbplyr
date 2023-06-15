@@ -332,6 +332,15 @@
       ! Argument `unmatched` isn't supported on database backends.
       i For equi joins you can instead add a foreign key from `x` to `y` for the join columns.
 
+# using relationship gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", relationship = "one-to-one")
+    Condition
+      Error in `left_join()`:
+      ! `relationship = "one-to-one"` isn't supported on database backends.
+      i It must be "many-to-many" or `NULL` instead.
+
 # can optionally match NA values
 
     Code
