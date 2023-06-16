@@ -150,7 +150,7 @@ print.lazy_select_query <- function(x, ...) {
 }
 
 #' @export
-op_vars.lazy_query <- function(op) {
+op_vars.lazy_select_query <- function(op) {
   op$select$name
 }
 
