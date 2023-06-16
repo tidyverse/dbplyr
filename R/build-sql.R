@@ -132,12 +132,11 @@ sql_quote_transformer <- function(connection) {
 }
 
 glue_check_collapse <- function(type, collapse) {
-  # collapse is only allowed for type `col`
   if (type %in% c("col", "val")) {
     return()
   }
 
   if (collapse) {
-    cli_abort("Collapsing is only allowed for {.val col}, not for {.val {type}}.")
+    cli_abort("Collapsing is only allowed for {.val col} and {.val val}, not for {.val {type}}.")
   }
 }

@@ -89,7 +89,7 @@ check_scalar_sql <- function(x,
                              ...,
                              arg = caller_arg(x),
                              call = caller_env()) {
-  if (is.sql(x) && length(x) == 1L) {
+  if ((is.sql(x) || is_string(x)) && length(x) == 1L) {
     return()
   }
 

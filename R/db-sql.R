@@ -232,7 +232,7 @@ sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) 
     con,
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
     "{.tbl {name}} AS\n",
-    sql
+    "{.from sql}"
   )
 }
 #' @export
