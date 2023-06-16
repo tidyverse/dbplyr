@@ -85,76 +85,17 @@ check_lazy_query <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   }
 }
 
-check_table_ident <- function(x,
-                              ...,
-                              sql = FALSE,
-                              arg = caller_arg(x),
-                              call = caller_env()) {
-  if (inherits(x, "glue")) {
-    x <- unclass(x)
-  }
-
-  if (is_bare_string(x)) {
-    return()
-  }
-
-  # also covers `ident_q`
-  if (is.ident(x)) {
-    n <- length(x)
-  } else if (is_schema(x)) {
-    n <- vctrs::vec_size_common(x$schema, x$table)
-  } else if (is_catalog(x)) {
-    n <- vctrs::vec_size_common(x$catalog, x$schema, x$table)
-  } else if (inherits(x, "Id")) {
-    n <- 1L
-    id <- x@name
-    known_names <- c("catalog", "schema", "table")
-    unknown_names <- setdiff(names(id), known_names)
-    if (!is_empty(unknown_names)) {
-      cli_abort(c(
-        "{.arg {arg}} is an {.cls Id} object with unknown names {.val {unknown_names}}.",
-        i = "An {.cls Id} object may only have the names {.val {known_names}}."
-      ), call = call
-      )
-    }
-  } else if (sql && is.sql(x)) {
-    n <- length(x)
-  } else if (inherits(x, "dbplyr_table_ident")) {
-    n <- vctrs::vec_size(x)
-  } else {
-    what <- c("ident", "schema", "catalog", "Id")
-    if (sql) {
-      what <- c(what, "sql")
-    }
-    stop_input_type(
-      x,
-      what = what,
-      call = call,
-      arg = arg
-    )
-  }
-
-  if (n != 1L) {
-    cli_abort("{.arg {arg}} must have size 1, not size {n}.", call = call)
-  }
-}
-
 check_scalar_sql <- function(x,
                              ...,
-                             string = TRUE,
                              arg = caller_arg(x),
                              call = caller_env()) {
   if (is.sql(x) && length(x) == 1L) {
     return()
   }
 
-  if (string && is_string(x)) {
-    return()
-  }
-
   stop_input_type(
     x,
-    what = c("a single SQL query", if (string) "a single string"),
+    what = c("a single SQL query"),
     call = call,
     arg = arg
   )

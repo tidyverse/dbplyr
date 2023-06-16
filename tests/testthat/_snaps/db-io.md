@@ -6,7 +6,7 @@
     Output
       <error/rlang_error>
       Error in `db_copy_to()`:
-      ! Can't copy to table tmp.
+      ! Can't copy to table `tmp`.
       Caused by error in `dplyr::db_write_table()`:
       ! Can't write table table `tmp`.
       Caused by error:

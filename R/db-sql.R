@@ -158,7 +158,7 @@ sql_table_index <- function(con,
                             unique = FALSE,
                             ...,
                             call = caller_env()) {
-  check_table_ident(table, call = call)
+  as_table_ident(table, error_call = call)
   check_character(columns, call = call)
   check_name(name, allow_null = TRUE, call = call)
   check_bool(unique, call = call)
@@ -173,7 +173,7 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  table <- as_table_ident(table)
+  table <- as_table_ident(table, error_call = call)
   table_name <- collapse_table_ident(table, sep = "_")
 
   name <- name %||% paste0(c(table_name, columns), collapse = "_")
@@ -201,21 +201,23 @@ sql_query_explain.DBIConnection <- function(con, sql, ...) {
 #' @rdname db-sql
 #' @export
 sql_query_fields <- function(con, sql, ...) {
-  check_table_ident(sql, sql = TRUE)
+  as_from(sql)
   check_dots_used()
 
   UseMethod("sql_query_fields")
 }
 #' @export
 sql_query_fields.DBIConnection <- function(con, sql, ...) {
+  sql <- as_from(sql)
+
   dbplyr_query_select(con, sql("*"), dbplyr_sql_subquery(con, sql), where = sql("0 = 1"))
 }
 
 #' @rdname db-sql
 #' @export
 sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
-  check_table_ident(sql, sql = TRUE)
-  check_table_ident(name)
+  as_from(sql)
+  as_table_ident(name)
   check_bool(temporary)
   check_dots_used()
 
@@ -223,6 +225,9 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 }
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+  sql <- as_from(sql)
+  name <- as_table_ident(name)
+
   glue_sql2(
     con,
     "CREATE ", if (temporary) sql("TEMPORARY "), "TABLE \n",
@@ -281,13 +286,14 @@ sql_indent_subquery <- function(from, con, lvl = 0) {
 #' @rdname db-sql
 #' @export
 sql_query_rows <- function(con, sql, ...) {
-  check_table_ident(sql, sql = TRUE)
+  as_from(sql)
   check_dots_used()
 
   UseMethod("sql_query_rows")
 }
 #' @export
 sql_query_rows.DBIConnection <- function(con, sql, ...) {
+  sql <- as_from(sql)
   from <- dbplyr_sql_subquery(con, sql, "master")
   glue_sql2(con, "SELECT COUNT(*) FROM {.from from}")
 }
@@ -764,8 +770,8 @@ sql_query_insert <- function(con,
                              conflict = c("error", "ignore"),
                              returning_cols = NULL,
                              method = NULL) {
-  check_table_ident(table)
-  check_table_ident(from, sql = TRUE)
+  as_table_ident(table)
+  as_from(from)
   check_character(insert_cols)
   check_character(by)
   check_character(returning_cols, allow_null = TRUE)
@@ -784,6 +790,9 @@ sql_query_insert.DBIConnection <- function(con,
                                            conflict = c("error", "ignore"),
                                            returning_cols = NULL,
                                            method = NULL) {
+  table <- as_table_ident(table)
+  from <- as_from(from)
+
   method <- method %||% "where_not_exists"
   arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
@@ -829,8 +838,8 @@ sql_query_append <- function(con,
     return(out)
   }
 
-  check_table_ident(table)
-  check_table_ident(from, sql = TRUE)
+  as_table_ident(table)
+  as_from(from)
   check_character(insert_cols)
   check_character(returning_cols, allow_null = TRUE)
 
@@ -845,6 +854,9 @@ sql_query_append.DBIConnection <- function(con,
                                            insert_cols,
                                            ...,
                                            returning_cols = NULL) {
+  table <- as_table_ident(table)
+  from <- as_from(from)
+
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   parts <- rows_prep(con, table, from, by = list(), lvl = 0)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
@@ -868,8 +880,8 @@ sql_query_update_from <- function(con,
                                   update_values,
                                   ...,
                                   returning_cols = NULL) {
-  check_table_ident(table)
-  check_table_ident(from, sql = TRUE)
+  as_table_ident(table)
+  as_from(from)
   check_character(by)
   check_character(update_values)
   check_named(update_values)
@@ -887,6 +899,9 @@ sql_query_update_from.DBIConnection <- function(con,
                                                 update_values,
                                                 ...,
                                                 returning_cols = NULL) {
+  table <- as_table_ident(table)
+  from <- as_from(from)
+
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_escape_ident(con, names(update_values))
@@ -913,8 +928,8 @@ sql_query_upsert <- function(con,
                              ...,
                              returning_cols = NULL,
                              method = NULL) {
-  check_table_ident(table)
-  check_table_ident(from, sql = TRUE)
+  as_table_ident(table)
+  as_from(from)
   check_character(by)
   check_character(update_cols)
   check_character(returning_cols, allow_null = TRUE)
@@ -934,6 +949,9 @@ sql_query_upsert.DBIConnection <- function(con,
                                            ...,
                                            returning_cols = NULL,
                                            method = NULL) {
+  table <- as_table_ident(table)
+  from <- as_from(from)
+
   method <- method %||% "cte_update"
   arg_match(method, "cte_update", error_arg = "method")
 
@@ -980,8 +998,8 @@ sql_query_delete <- function(con,
                              by,
                              ...,
                              returning_cols = NULL) {
-  check_table_ident(table)
-  check_table_ident(from, sql = TRUE)
+  as_table_ident(table)
+  as_from(from)
   check_character(by)
   check_character(returning_cols, allow_null = TRUE)
 
@@ -996,6 +1014,8 @@ sql_query_delete.DBIConnection <- function(con,
                                            by,
                                            ...,
                                            returning_cols = NULL) {
+  table <- as_table_ident(table)
+  from <- as_from(from)
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
   clauses <- list2(
