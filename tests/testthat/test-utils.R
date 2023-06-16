@@ -1,18 +1,3 @@
-test_that("deparse_trunc() expression to text", {
-  expect_equal(
-    deparse_trunc(expr(test)),
-    "test"
-  )
-
-  dt <- deparse_trunc(
-    expr(!!paste0(rep("x", 200), collapse = ""))
-  )
-  expect_equal(
-    nchar(dt),
-    getOption("width")
-  )
-})
-
 test_that("Succesful and not-sucessful commands are identified", {
   expect_true(succeeds("success"))
   expect_false(succeeds(x - 1, quiet = TRUE))

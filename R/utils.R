@@ -1,10 +1,3 @@
-deparse_trunc <- function(x, width = getOption("width")) {
-  text <- deparse(x, width.cutoff = width)
-  if (length(text) == 1 && nchar(text) < width) return(text)
-
-  paste0(substr(text[1], 1, width - 3), "...")
-}
-
 deparse_all <- function(x) {
   x <- purrr::map_if(x, is_formula, f_rhs)
   purrr::map_chr(x, expr_text, width = 500L)
