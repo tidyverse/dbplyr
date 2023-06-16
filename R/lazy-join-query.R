@@ -10,20 +10,14 @@ lazy_multi_join_query <- function(x,
                                   call = caller_env()) {
   check_lazy_query(x, call = call)
 
-  if (!identical(colnames(joins), c("table", "type", "by_x_table_id", "by"))) {
-    cli_abort("`joins` must have fields `table`, `type`, `by_x_table_id`, `by`", .internal = TRUE)
-  }
+  check_has_names(joins, c("table", "type", "by_x_table_id", "by"))
   check_character(joins$type, call = call)
 
-  if (!identical(colnames(table_names), c("name", "from"))) {
-    cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
-  }
+  check_has_names(table_names, c("name", "from"), call = call)
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  if (!identical(colnames(vars), c("name", "table", "var"))) {
-    cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
-  }
+  check_has_names(vars, c("name", "table", "var"), call = call)
   check_character(vars$name, call = call)
   check_integer(vars$table, call = call)
   check_character(vars$var, call = call)
@@ -57,15 +51,11 @@ lazy_rf_join_query <- function(x,
 
   check_character(type, call = call)
 
-  if (!identical(colnames(table_names), c("name", "from"))) {
-    cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
-  }
+  check_has_names(table_names, c("name", "from"), call = call)
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  if (!identical(colnames(vars), c("name", "x", "y"))) {
-    cli_abort("`vars` must have fields `name`, `x`, `y`", .internal = TRUE)
-  }
+  check_has_names(vars, c("name", "x", "y"), call = call)
   check_character(vars$name, call = call)
   check_character(vars$x, call = call)
   check_character(vars$y, call = call)
@@ -82,29 +72,6 @@ lazy_rf_join_query <- function(x,
     order_vars = order_vars,
     frame = frame
   )
-}
-
-join_check_vars <- function(vars, call) {
-  if (!vctrs::vec_is_list(vars)) {
-    cli_abort("{.arg vars} must be a list", .internal = TRUE)
-  }
-
-  if (!identical(names(vars), c("alias", "x", "y", "all_x", "all_y"))) {
-    cli_abort(
-      "{.arg vars} must have fields `alias`, `x`, `y`, `all_x`, and `all_y`",
-      .internal = TRUE
-    )
-  }
-
-  check_character(vars$alias, call = call)
-  check_character(vars$x, call = call)
-  check_character(vars$y, call = call)
-  check_character(vars$all_x, call = call)
-  check_character(vars$all_y, call = call)
-
-  n <- vctrs::vec_size(vars$alias)
-  vctrs::vec_assert(vars$x, size = n, arg = "vars$x", call = call)
-  vctrs::vec_assert(vars$y, size = n, arg = "vars$y", call = call)
 }
 
 join_check_by <- function(by, call) {
@@ -187,10 +154,8 @@ op_vars.lazy_semi_join_query <- function(op) {
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
   table_names_out <- generate_join_table_names(op$table_names)
-  table_vars <- purrr::map(
-    set_names(c(list(op$x), op$joins$table), table_names_out),
-    op_vars
-  )
+  tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
+  table_vars <- purrr::map(tables, op_vars)
   select_sql <- sql_multi_join_vars(con, op$vars, table_vars, use_star = use_star)
 
   op$joins$table <- purrr::map(

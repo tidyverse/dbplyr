@@ -129,15 +129,6 @@ flatten_query <- function(qry, query_list) {
   UseMethod("flatten_query")
 }
 
-#' @export
-flatten_query.select_query <- function(qry, query_list) {
-  from <- qry$from
-  query_list <- flatten_query(from, query_list)
-
-  qry$from <- get_subquery_name(from, query_list)
-  querylist_reuse_query(qry, query_list)
-}
-
 querylist_reuse_query <- function(qry, query_list) {
   id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
 
@@ -153,8 +144,7 @@ querylist_reuse_query <- function(qry, query_list) {
   query_list
 }
 
-#' @export
-flatten_query.join_query <- function(qry, query_list) {
+flatten_query_2_tables <- function(qry, query_list) {
   x <- qry$x
   query_list_x <- flatten_query(x, query_list)
   qry$x <- get_subquery_name(x, query_list_x)
@@ -166,31 +156,6 @@ flatten_query.join_query <- function(qry, query_list) {
   querylist_reuse_query(qry, query_list_y)
 }
 
-#' @export
-flatten_query.multi_join_query <- function(qry, query_list) {
-  x <- qry$x
-  query_list_new <- flatten_query(x, query_list)
-  qry$x <- get_subquery_name(x, query_list_new)
-
-  for (i in vctrs::vec_seq_along(qry$joins)) {
-    y <- qry$joins$table[[i]]
-    query_list_new <- flatten_query(y, query_list_new)
-    qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
-  }
-
-  # TODO reuse query
-  name <- unique_subquery_name()
-  wrapped_query <- set_names(list(qry), name)
-
-  query_list$queries <- c(query_list_new$queries, wrapped_query)
-  query_list$name <- name
-  query_list
-}
-
-#' @export
-flatten_query.semi_join_query <- flatten_query.join_query
-#' @export
-flatten_query.set_op_query <- flatten_query.join_query
 
 # Optimise ----------------------------------------------------------------
 

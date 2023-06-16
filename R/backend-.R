@@ -8,8 +8,9 @@
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
-#' @include compat-obj-type.R
-#' @include compat-types-check.R
+#' @include import-standalone-obj-type.R
+#' @include import-standalone-types-check.R
+#' @include utils-check.R
 #' @include db-sql.R
 NULL
 

@@ -42,7 +42,7 @@ db_copy_to <-  function(con,
                         indexes = NULL,
                         analyze = TRUE,
                         in_transaction = TRUE) {
-  check_table_ident(table)
+  as_table_ident(table)
   check_bool(overwrite)
   check_character(types, allow_null = TRUE)
   check_named(types)
@@ -65,6 +65,7 @@ db_copy_to.DBIConnection <- function(con,
                                      indexes = NULL,
                                      analyze = TRUE,
                                      in_transaction = TRUE) {
+  table <- as_table_ident(table)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -103,7 +104,7 @@ db_compute <- function(con,
                        unique_indexes = list(),
                        indexes = list(),
                        analyze = TRUE) {
-  check_table_ident(table)
+  as_table_ident(table)
   check_scalar_sql(sql)
   check_bool(temporary)
   check_dots_used()
@@ -119,6 +120,7 @@ db_compute.DBIConnection <- function(con,
                                      unique_indexes = list(),
                                      indexes = list(),
                                      analyze = TRUE) {
+  table <- as_table_ident(table)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary

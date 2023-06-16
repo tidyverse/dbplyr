@@ -50,18 +50,21 @@ base_query <- function(from) {
 
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
-  if (inherits(x$x, "ident")) {
-    cat("From: ", x$x, "\n", sep = "")
+  if (is_table_ident(x$x)) {
+    cat_line("From: ", format(x$x))
   } else {
-    cat("From: <derived table>\n")
+    cat_line("From: <derived table>")
   }
-
-  cat("<Table: ", x$x, ">\n", sep = "")
 }
 
 #' @export
 print.lazy_base_local_query <- function(x, ...) {
-  cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
+  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
+}
+
+#' @export
+print.base_query <- function(x, ...) {
+  print(x$from)
 }
 
 #' @export
@@ -83,11 +86,6 @@ sql_render.base_query <- function(query, con = NULL, ..., subquery = FALSE, lvl 
     from <- escape(from, con = con)
     dbplyr_query_select(con, sql("*"), from, lvl = lvl)
   }
-}
-
-#' @export
-print.base_query <- function(x, ...) {
-  print(x$from)
 }
 
 #' @export
@@ -154,6 +152,10 @@ op_cols <- function(op) {
 }
 
 op_desc <- function(op) UseMethod("op_desc")
+#' @export
+op_desc.lazy_query <- function(op) {
+  "SQL"
+}
 
 #' @export
 op_desc.lazy_base_remote_query <- function(op) {

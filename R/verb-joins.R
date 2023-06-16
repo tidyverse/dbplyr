@@ -704,7 +704,7 @@ add_semi_join <- function(x,
 can_inline_semi_join <- function(x) {
   select <- "projection"
 
-  if (!inherits(x, "lazy_select_query")) {
+  if (!is_lazy_select_query(x)) {
     return(FALSE)
   }
 

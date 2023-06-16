@@ -106,7 +106,7 @@ add_mutate <- function(lazy_query, vars) {
     return(out)
   }
 
-  if (inherits(lazy_query, "lazy_select_query")) {
+  if (is_lazy_select_query(lazy_query)) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()

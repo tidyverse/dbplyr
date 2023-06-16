@@ -48,7 +48,7 @@ add_distinct <- function(.data) {
     distinct = TRUE
   )
   # TODO this could also work for joins
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(out)
   }
 

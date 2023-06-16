@@ -20,7 +20,7 @@ lazy_set_op_query <- function(x,
 }
 
 #' @export
-print.lazy_set_op_query <- function(x, ..., con = NULL) {
+print.lazy_set_op_query <- function(x, ...) {
   cat_line("<SQL ", toupper(x$type), ">")
 
   cat_line("X:")
@@ -52,7 +52,6 @@ lazy_union_query <- function(x,
                              unions,
                              call = caller_env()) {
   check_lazy_query(x, call = call)
-  # check_lazy_query(y, call = call)
 
   lazy_query(
     query_type = "union",
@@ -62,7 +61,7 @@ lazy_union_query <- function(x,
 }
 
 #' @export
-print.lazy_union_query <- function(x, ..., con = NULL) {
+print.lazy_union_query <- function(x, ...) {
   cat_line("<SQL ", toupper(x$type), ">")
 
   cat_line("X:")

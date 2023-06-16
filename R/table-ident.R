@@ -53,6 +53,10 @@ check_db_table_args <- function(table,
   }
 }
 
+is_table_ident <- function(x) {
+  inherits(x, "dbplyr_table_ident")
+}
+
 as_table_ident <- function(x, ..., error_call = caller_env()) {
   check_dots_empty()
   UseMethod("as_table_ident")
@@ -228,12 +232,11 @@ set_table_ident_alias <- function(x, alias) {
 }
 
 as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
-  check_table_ident(x, sql = TRUE)
-  if (!inherits(x, "sql")) {
-    x <- as_table_ident(x)
+  if (is.sql(x)) {
+    return(x)
   }
 
-  x
+  as_table_ident(x, error_call = error_call)
 }
 
 table_ident_to_id <- function(x) {

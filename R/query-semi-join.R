@@ -61,3 +61,6 @@ sql_render.semi_join_query <- function(query,
     lvl = lvl
   )
 }
+
+#' @export
+flatten_query.semi_join_query <- flatten_query_2_tables

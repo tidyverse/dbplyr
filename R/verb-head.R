@@ -37,7 +37,7 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
 
 add_head <- function(x, n) {
   lazy_query <- x$lazy_query
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     lazy_query <- lazy_select_query(
       x = lazy_query,
       limit = n

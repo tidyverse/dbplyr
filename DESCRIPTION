@@ -30,7 +30,7 @@ Imports:
     pillar (>= 1.5.0),
     purrr (>= 1.0.1),
     R6 (>= 2.2.2),
-    rlang (>= 1.0.6),
+    rlang (>= 1.1.0),
     tibble (>= 1.4.2),
     tidyr (>= 1.3.0),
     tidyselect (>= 1.2.0),
@@ -60,8 +60,9 @@ Roxygen: {library(tidyr); list(markdown = TRUE)}
 RoxygenNote: 7.2.3
 Collate: 
     'db-sql.R'
-    'compat-types-check.R'
-    'compat-obj-type.R'
+    'utils-check.R'
+    'import-standalone-types-check.R'
+    'import-standalone-obj-type.R'
     'utils.R'
     'sql.R'
     'escape.R'
@@ -109,6 +110,7 @@ Collate:
     'optimise-utils.R'
     'pillar.R'
     'progress.R'
+    'sql-build.R'
     'query-join.R'
     'query-select.R'
     'query-semi-join.R'
@@ -119,7 +121,6 @@ Collate:
     'rows.R'
     'schema.R'
     'simulate.R'
-    'sql-build.R'
     'sql-clause.R'
     'sql-expr.R'
     'src-sql.R'
