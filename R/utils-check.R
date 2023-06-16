@@ -223,6 +223,19 @@ check_named <- function(x, ..., arg = caller_arg(x), call = caller_env()) {
   }
 }
 
+check_has_names <- function(x, names, ..., arg = caller_arg(x), call = caller_env()) {
+  if (is.data.frame(x)) {
+    x_nms <- colnames(x)
+  } else {
+    x_nms <- names(x)
+  }
+  if (identical(x_nms, names)) {
+    return()
+  }
+
+  cli_abort("{.arg {arg}} must have fields {.val {names}}", .internal = TRUE)
+}
+
 with_indexed_errors <- function(expr,
                                 message,
                                 ...,
