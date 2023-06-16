@@ -52,7 +52,6 @@ lazy_union_query <- function(x,
                              unions,
                              call = caller_env()) {
   check_lazy_query(x, call = call)
-  # check_lazy_query(y, call = call)
 
   lazy_query(
     query_type = "union",

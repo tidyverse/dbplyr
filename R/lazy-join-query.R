@@ -154,10 +154,8 @@ op_vars.lazy_semi_join_query <- function(op) {
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
   table_names_out <- generate_join_table_names(op$table_names)
-  table_vars <- purrr::map(
-    set_names(c(list(op$x), op$joins$table), table_names_out),
-    op_vars
-  )
+  tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
+  table_vars <- purrr::map(tables, op_vars)
   select_sql <- sql_multi_join_vars(con, op$vars, table_vars, use_star = use_star)
 
   op$joins$table <- purrr::map(
