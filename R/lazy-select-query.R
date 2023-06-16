@@ -59,6 +59,10 @@ lazy_select_query <- function(x,
   )
 }
 
+is_lazy_select_query <- function(x) {
+  inherits(x, "lazy_select_query")
+}
+
 is_lazy_sql_part <- function(x) {
   if (is.null(x)) return(TRUE)
   if (is_quosures(x)) return(TRUE)
@@ -91,7 +95,7 @@ is_lazy_select_query_simple <- function(x,
                                         ignore_group_by = FALSE,
                                         select = c("projection", "identity")) {
   select <- arg_match(select, c("projection", "identity"))
-  if (!inherits(x, "lazy_select_query")) {
+  if (!is_lazy_select_query(x)) {
     return(FALSE)
   }
 
