@@ -1,13 +1,15 @@
 # print method doesn't change unexpectedly
 
     Code
-      sql_build(semi_join(lf1, lf2))
+      sql_build(semi_join(lf1, lf2 %>% filter(z == 2)))
     Message
       Joining with `by = join_by(x)`
     Output
       <SQL SEMI JOIN>
       By:
         x-x
+      Where:
+        "`df_RHS`.`z` = 2.0"
       X:
         <dbplyr_table_ident[1]>
         [1] `df`

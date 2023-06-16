@@ -592,8 +592,6 @@ sql_query_semi_join.DBIConnection <- function(con,
     glue_sql2(con, "WHERE ", if (anti) "NOT ", "EXISTS ("),
     # lvl = 1 because they are basically in a subquery
     sql_clause("SELECT 1 FROM", y, lvl = 1),
-    # don't use `sql_clause_where()` to avoid wrapping each element in parens
-    # sql_clause("WHERE", on, sep = " AND", parens = TRUE, lvl = 1),
     sql_clause_where(c(on, where), lvl = 1),
     sql(")")
   )
