@@ -51,9 +51,9 @@ base_query <- function(from) {
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
   if (inherits(x$x, "ident")) {
-    cat("From: ", x$x, "\n", sep = "")
+    cat_line("From: ", format(x$x))
   } else {
-    cat("From: <derived table>\n")
+    cat_line("From: <derived table>")
   }
 
   cat("<Table: ", x$x, ">\n", sep = "")
@@ -61,7 +61,7 @@ print.lazy_base_remote_query <- function(x, ...) {
 
 #' @export
 print.lazy_base_local_query <- function(x, ...) {
-  cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
+  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
 }
 
 #' @export

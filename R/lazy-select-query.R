@@ -133,24 +133,20 @@ is_select_identity <- function(select, vars_prev) {
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
-  cat(
-    "<SQL SELECT",
-    if (x$distinct) " DISTINCT", ">\n",
-    sep = ""
-  )
+  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
   cat_line("From:")
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
-  if (length(select))     cat("Select:   ", named_commas(select), "\n", sep = "")
-  if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
-  if (length(x$group_by)) cat("Group by: ", named_commas(x$group_by), "\n", sep = "")
-  if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
-  if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
+  if (length(select))     cat_line("Select:   ", named_commas(select))
+  if (length(x$where))    cat_line("Where:    ", named_commas(x$where))
+  if (length(x$group_by)) cat_line("Group by: ", named_commas(x$group_by))
+  if (length(x$order_by)) cat_line("Order by: ", named_commas(x$order_by))
+  if (length(x$limit))    cat_line("Limit:    ", x$limit)
 
-  if (length(x$group_vars)) cat("group_vars: ", named_commas(x$group_vars), "\n", sep = "")
-  if (length(x$order_vars)) cat("order_vars: ", named_commas(x$order_vars), "\n", sep = "")
-  if (length(x$frame))    cat("frame:    ", x$frame, "\n", sep = "")
+  if (length(x$group_vars)) cat_line("group_vars: ", named_commas(x$group_vars))
+  if (length(x$order_vars)) cat_line("order_vars: ", named_commas(x$order_vars))
+  if (length(x$frame))    cat_line("frame:    ", x$frame)
 }
 
 #' @export
