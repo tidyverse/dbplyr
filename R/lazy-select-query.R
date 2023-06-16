@@ -268,26 +268,19 @@ select_use_star <- function(select, vars_prev, table_alias, con, use_star) {
 }
 
 translate_select_sql <- function(con, select_df) {
-  select_df <- transmute(
-    select_df,
-    dots = set_names(expr, name),
-    vars_group = .data$group_vars,
-    vars_order = .data$order_vars,
-    vars_frame = .data$frame
-  )
+  n <- vctrs::vec_size(select_df)
+  out <- vctrs::vec_init(sql(), n)
+  out <- set_names(out, select_df$name)
+  for (i in seq2(1, n)) {
+    out[[i]] <- translate_sql_(
+      dots = select_df$expr[i],
+      con = con,
+      vars_group = translate_sql_(syms(select_df$group_vars[[i]]), con),
+      vars_order = translate_sql_(select_df$order_vars[[i]], con, context = list(clause = "ORDER")),
+      vars_frame = select_df$frame[[i]][[1]],
+      context = list(clause = "SELECT")
+    )
+  }
 
-  out <- purrr::pmap(
-    select_df,
-    function(dots, vars_group, vars_order, vars_frame) {
-      translate_sql_(
-        list(dots), con,
-        vars_group = translate_sql_(syms(vars_group), con),
-        vars_order = translate_sql_(vars_order, con, context = list(clause = "ORDER")),
-        vars_frame = vars_frame[[1]],
-        context = list(clause = "SELECT")
-      )
-    }
-  )
-
-  sql(unlist(out))
+  out
 }
