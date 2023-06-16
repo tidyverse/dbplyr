@@ -13,10 +13,6 @@ test_that("deparse_trunc() expression to text", {
   )
 })
 
-test_that("Says 1.1 is not a whole number", {
-  expect_false(is.wholenumber(1.1))
-})
-
 test_that("Succesful and not-sucessful commands are identified", {
   expect_true(succeeds("success"))
   expect_false(succeeds(x - 1, quiet = TRUE))

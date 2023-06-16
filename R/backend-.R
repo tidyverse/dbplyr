@@ -10,6 +10,7 @@
 #' @include utils.R
 #' @include import-standalone-obj-type.R
 #' @include import-standalone-types-check.R
+#' @include utils-check.R
 #' @include db-sql.R
 NULL
 

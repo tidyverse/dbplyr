@@ -132,6 +132,7 @@ Collate:
     'tidyeval-across.R'
     'tidyeval.R'
     'translate-sql.R'
+    'utils-check.R'
     'utils-format.R'
     'verb-arrange.R'
     'verb-compute.R'

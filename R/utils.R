@@ -5,10 +5,6 @@ deparse_trunc <- function(x, width = getOption("width")) {
   paste0(substr(text[1], 1, width - 3), "...")
 }
 
-is.wholenumber <- function(x) {
-  trunc(x) == x
-}
-
 deparse_all <- function(x) {
   x <- purrr::map_if(x, is_formula, f_rhs)
   purrr::map_chr(x, expr_text, width = 500L)
