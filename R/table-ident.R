@@ -53,6 +53,10 @@ check_db_table_args <- function(table,
   }
 }
 
+is_table_ident <- function(x) {
+  inherits(x, "dbplyr_table_ident")
+}
+
 as_table_ident <- function(x, ..., error_call = caller_env()) {
   check_dots_empty()
   UseMethod("as_table_ident")
