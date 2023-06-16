@@ -94,3 +94,6 @@ sql_render.union_query <- function(query, con = NULL, ..., subquery = FALSE, lvl
 
   sql_query_union(con, from_x, unions, lvl = lvl)
 }
+
+#' @export
+flatten_query.set_op_query <- flatten_query_2_tables

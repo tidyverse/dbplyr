@@ -138,3 +138,12 @@ warn_drop_order_by <- function() {
     i = "Do you need to move arrange() later in the pipeline or use window_order() instead?"
   ))
 }
+
+#' @export
+flatten_query.select_query <- function(qry, query_list) {
+  from <- qry$from
+  query_list <- flatten_query(from, query_list)
+
+  qry$from <- get_subquery_name(from, query_list)
+  querylist_reuse_query(qry, query_list)
+}

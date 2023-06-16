@@ -1,3 +1,5 @@
+#' @include sql-build.R
+
 #' @export
 #' @rdname sql_build
 join_query <- function(x,
@@ -103,6 +105,31 @@ sql_render.multi_join_query <- function(query,
   )
 }
 
+#' @export
+flatten_query.join_query <- flatten_query_2_tables
+
+#' @export
+flatten_query.multi_join_query <- function(qry, query_list) {
+  x <- qry$x
+  query_list_new <- flatten_query(x, query_list)
+  qry$x <- get_subquery_name(x, query_list_new)
+
+  for (i in vctrs::vec_seq_along(qry$joins)) {
+    y <- qry$joins$table[[i]]
+    query_list_new <- flatten_query(y, query_list_new)
+    qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
+  }
+
+  # TODO reuse query
+  name <- unique_subquery_name()
+  wrapped_query <- set_names(list(qry), name)
+
+  query_list$queries <- c(query_list_new$queries, wrapped_query)
+  query_list$name <- name
+  query_list
+}
+
+
 # SQL generation ----------------------------------------------------------
 
 #' @param vars tibble with three columns:
@@ -151,18 +178,18 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star) {
   out <- rep_named(vars$name, list())
 
   for (i in seq_along(table_names)) {
-    all_vars_current <- table_vars[[i]]
-    vars_idx <- which(vars$table == i)
-    used_vars_current <- vars$var[vars_idx]
-    out_vars_current <- vars$name[vars_idx]
+    all_vars_i <- table_vars[[i]]
+    vars_idx_i <- which(vars$table == i)
+    used_vars_i <- vars$var[vars_idx_i]
+    out_vars_i <- vars$name[vars_idx_i]
 
-    if (use_star && join_can_use_star(all_vars_current, used_vars_current, out_vars_current, vars_idx)) {
-      id <- vars_idx[[1]]
+    if (use_star && join_can_use_star(all_vars_i, used_vars_i, out_vars_i, vars_idx_i)) {
+      id <- vars_idx_i[[1]]
       out[[id]] <- sql_star(con, table_names[i])
       names(out)[id] <- ""
     } else {
-      out[vars_idx] <- purrr::map2(
-        used_vars_current, i,
+      out[vars_idx_i] <- purrr::map2(
+        used_vars_i, i,
         ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
       )
 

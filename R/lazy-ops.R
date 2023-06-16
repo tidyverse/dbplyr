@@ -152,6 +152,10 @@ op_cols <- function(op) {
 }
 
 op_desc <- function(op) UseMethod("op_desc")
+#' @export
+op_desc.lazy_query <- function(op) {
+  "SQL"
+}
 
 #' @export
 op_desc.lazy_base_remote_query <- function(op) {
