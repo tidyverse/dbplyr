@@ -132,11 +132,8 @@
       SELECT `a` AS `a2`, `x1` AS `x`
       FROM `lf1`
       WHERE EXISTS (
-        SELECT 1 FROM (
-        SELECT `x2` AS `x`, `b`
-        FROM `lf2`
-      ) AS `RHS`
-        WHERE (`lf1`.`x1` = `RHS`.`x`)
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x1` = `lf2`.`x2`)
       )
 
 # can combine full_join with other joins #1178
@@ -186,6 +183,22 @@
       ) AS `LHS`
       FULL JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
+
+# filter() before semi join is inlined
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df_LHS`.*
+      FROM `df` AS `df_LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `df_RHS`
+        WHERE
+          (`df_LHS`.`x` = `df_RHS`.`x2`) AND
+          (`df_RHS`.`a` = 1) AND
+          (`df_RHS`.`b` = 2)
+      )
 
 # multiple joins create a single query
 

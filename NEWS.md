@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
+
 * `*_join()` now allows using specifying the relationship argument. It must be `NULL` or `"many-to-many"` (@bairdj, #1305).
 
 * The columns generated when using a window function in `filter()` are now named

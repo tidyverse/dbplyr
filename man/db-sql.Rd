@@ -88,7 +88,7 @@ sql_query_join(
 
 sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
 
-sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
+sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 

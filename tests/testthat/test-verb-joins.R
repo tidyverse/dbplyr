@@ -563,6 +563,57 @@ test_that("select() before join is not inlined when using `sql_on`", {
   expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a2", "x")))
 })
 
+test_that("filter() before semi join is inlined", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x2 = 1, a = 2, b = 3, c = 4)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      select(x = x2, a2 = a, b) %>%
+      filter(a2 == 1L, b == 2L),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_equal(lq$where, list(quo(a == 1L), quo(b == 2L)), ignore_formula_env = TRUE)
+  expect_snapshot(out)
+})
+
+test_that("filter() before semi join is not when y has other operations", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x = 1, a = 2, b = 3)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      mutate(a = a + 1),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      distinct(),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      head(10),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+})
+
 test_that("multiple joins create a single query", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
