@@ -21,3 +21,8 @@ lazy_query <- function(query_type,
     class = c(paste0("lazy_", query_type, "_query"), "lazy_query")
   )
 }
+
+#' @export
+op_desc.lazy_query <- function(op) {
+  "SQL"
+}

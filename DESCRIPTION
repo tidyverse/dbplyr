@@ -60,6 +60,7 @@ Roxygen: {library(tidyr); list(markdown = TRUE)}
 RoxygenNote: 7.2.3
 Collate: 
     'db-sql.R'
+    'utils-check.R'
     'import-standalone-types-check.R'
     'import-standalone-obj-type.R'
     'utils.R'
@@ -132,7 +133,6 @@ Collate:
     'tidyeval-across.R'
     'tidyeval.R'
     'translate-sql.R'
-    'utils-check.R'
     'utils-format.R'
     'verb-arrange.R'
     'verb-compute.R'

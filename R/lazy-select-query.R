@@ -155,11 +155,6 @@ op_vars.lazy_select_query <- function(op) {
 }
 
 #' @export
-op_desc.lazy_query <- function(op) {
-  "SQL"
-}
-
-#' @export
 sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
   if (!is.null(op$message_summarise)) {
     inform(op$message_summarise)
