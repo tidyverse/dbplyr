@@ -7,13 +7,16 @@ deparse_all <- function(x) {
 #' @export
 #' @keywords internal
 #' @param ... Arguments to be constructed into the string
-named_commas <- function(...) {
-  x <- unlist(purrr::map(list2(...), as.character))
-  if (is_null(names(x))) {
-    paste0(x, collapse = ", ")
+named_commas <- function(x) {
+  if (is.list(x)) {
+    x <- purrr::map_chr(x, as_label)
   } else {
-    paste0(names(x), " = ", x, collapse = ", ")
+    x <- as.character(x)
   }
+
+  nms <- names2(x)
+  out <- ifelse(nms == "", x, paste0(nms, " = ", x))
+  paste0(out, collapse = ", ")
 }
 
 commas <- function(...) paste0(..., collapse = ", ")

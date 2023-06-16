@@ -138,22 +138,15 @@ print.lazy_select_query <- function(x, ...) {
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
   select <- purrr::set_names(x$select$expr, x$select$name)
-  if (length(select))     cat("Select:   ", named_commas2(select), "\n", sep = "")
-  if (length(x$where))    cat("Where:    ", named_commas2(x$where), "\n", sep = "")
-  if (length(x$group_by)) cat("Group by: ", named_commas2(x$group_by), "\n", sep = "")
-  if (length(x$order_by)) cat("Order by: ", named_commas2(x$order_by), "\n", sep = "")
+  if (length(select))     cat("Select:   ", named_commas(select), "\n", sep = "")
+  if (length(x$where))    cat("Where:    ", named_commas(x$where), "\n", sep = "")
+  if (length(x$group_by)) cat("Group by: ", named_commas(x$group_by), "\n", sep = "")
+  if (length(x$order_by)) cat("Order by: ", named_commas(x$order_by), "\n", sep = "")
   if (length(x$limit))    cat("Limit:    ", x$limit, "\n", sep = "")
 
-  if (length(x$group_vars)) cat("group_vars: ", named_commas2(x$group_vars), "\n", sep = "")
-  if (length(x$order_vars)) cat("order_vars: ", named_commas2(x$order_vars), "\n", sep = "")
+  if (length(x$group_vars)) cat("group_vars: ", named_commas(x$group_vars), "\n", sep = "")
+  if (length(x$order_vars)) cat("order_vars: ", named_commas(x$order_vars), "\n", sep = "")
   if (length(x$frame))    cat("frame:    ", x$frame, "\n", sep = "")
-}
-
-named_commas2 <- function(x) {
-  x <- purrr::map_chr(x, as_label)
-  nms <- names2(x)
-  out <- ifelse(nms == "", x, paste0(nms, " = ", x))
-  paste0(out, collapse = ", ")
 }
 
 #' @export
