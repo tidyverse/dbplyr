@@ -16,7 +16,7 @@ select_query <- function(from,
   check_character(having)
   check_character(window)
   check_character(order_by)
-  check_number_whole_inf(limit, allow_null = TRUE)
+  check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
   check_bool(distinct)
   check_string(from_alias, allow_null = TRUE)
 

@@ -18,7 +18,7 @@ lazy_select_query <- function(x,
   stopifnot(is_lazy_sql_part(where))
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
-  check_number_whole_inf(limit, allow_null = TRUE)
+  check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
   check_bool(distinct)
 
   select <- select %||% syms(set_names(op_vars(x)))
