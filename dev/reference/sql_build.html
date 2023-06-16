@@ -120,6 +120,7 @@ always call <code>sql_render()</code>.</p>
 <span>  <span class="va">vars</span>,</span>
 <span>  <span class="va">anti</span>,</span>
 <span>  <span class="va">by</span>,</span>
+<span>  <span class="va">where</span>,</span>
 <span>  group_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_grps</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  order_vars <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_sort</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  frame <span class="op">=</span> <span class="fu"><a href="lazy_ops.html">op_frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
@@ -179,7 +180,15 @@ always call <code>sql_render()</code>.</p>
 <span>  from_alias <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">semi_join_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">vars</span>, anti <span class="op">=</span> <span class="cn">FALSE</span>, by <span class="op">=</span> <span class="cn">NULL</span>, na_matches <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">semi_join_query</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  <span class="va">vars</span>,</span>
+<span>  anti <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  where <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na_matches <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">set_op_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">type</span>, all <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
