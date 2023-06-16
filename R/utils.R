@@ -18,8 +18,6 @@ named_commas <- function(...) {
 
 commas <- function(...) paste0(..., collapse = ", ")
 
-in_travis <- function() identical(Sys.getenv("TRAVIS"), "true")
-
 unique_table_name <- function() {
   # Needs to use option to unique names across reloads while testing
   i <- getOption("dbplyr_table_name", 0) + 1
