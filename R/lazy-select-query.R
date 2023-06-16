@@ -144,9 +144,9 @@ print.lazy_select_query <- function(x, ...) {
   if (length(x$order_by)) cat_line("Order by: ", named_commas(x$order_by))
   if (length(x$limit))    cat_line("Limit:    ", x$limit)
 
-  if (length(x$group_vars)) cat_line("group_vars: ", named_commas(x$group_vars))
-  if (length(x$order_vars)) cat_line("order_vars: ", named_commas(x$order_vars))
-  if (length(x$frame))    cat_line("frame:    ", x$frame)
+  if (length(x$group_vars)) cat_line("Group vars: ", named_commas(x$group_vars))
+  if (length(x$order_vars)) cat_line("Order vars: ", named_commas(x$order_vars))
+  if (length(x$frame))      cat_line("Frame:      ", x$frame)
 }
 
 #' @export

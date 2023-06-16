@@ -89,12 +89,12 @@ sql_optimise.select_query <- function(x, con = NULL, ..., subquery = FALSE) {
 # List clauses used by a query, in the order they are executed in
 select_query_clauses <- function(x, subquery = FALSE) {
   present <- c(
-    where =    length(x$where) > 0,
+    where    = length(x$where) > 0,
     group_by = length(x$group_by) > 0,
-    having =   length(x$having) > 0,
-    select =   !identical(unname(x$select), sql("*")),
+    having   = length(x$having) > 0,
+    select   = !identical(unname(x$select), sql("*")),
     distinct = x$distinct,
-    window = length(x$window) > 0,
+    window   = length(x$window) > 0,
     order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
     limit    = !is.null(x$limit)
   )
@@ -104,7 +104,6 @@ select_query_clauses <- function(x, subquery = FALSE) {
 
 #' @export
 sql_render.select_query <- function(query, con, ..., subquery = FALSE, lvl = 0) {
-  # browser()
   from <- dbplyr_sql_subquery(con,
     sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
     name = query$from_alias,
