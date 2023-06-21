@@ -161,7 +161,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     op$vars,
     table_vars,
     use_star = sql_options$use_star,
-    use_table_name = sql_options$use_table_name
+    qualify_all_columns = sql_options$qualify_all_columns
   )
 
   op$joins$table <- purrr::map(
@@ -234,7 +234,7 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
     x_as = by$x_as,
     y_as = by$y_as,
     use_star = sql_options$use_star,
-    use_table_name = sql_options$use_table_name
+    qualify_all_columns = sql_options$qualify_all_columns
   )
 
   join_query(

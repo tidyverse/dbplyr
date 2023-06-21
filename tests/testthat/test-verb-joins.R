@@ -1298,6 +1298,18 @@ test_that("joins reuse queries in cte mode", {
   )
 })
 
+test_that("can force to qualify all columns", {
+  lf1 <- lazy_frame(x = 1, a = 2, y = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, a = 2, z = 1, .name = "lf2")
+
+  unforced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = dbplyr_sql_options(qualify_all_columns = FALSE))
+  expect_equal(unforced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`y`", a.y = "`lf2`.`a`", z = "`z`"))
+  forced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = dbplyr_sql_options(qualify_all_columns = TRUE))
+  expect_equal(forced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`lf1`.`y`", a.y = "`lf2`.`a`", z = "`lf2`.`z`"))
+})
+
 # ops ---------------------------------------------------------------------
 
 test_that("joins get vars from both left and right", {

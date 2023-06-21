@@ -168,9 +168,9 @@ flatten_query.multi_join_query <- function(qry, query_list) {
 #' )
 #'
 #' # Full and right join are handled via `sql_rf_join_vars`
-sql_multi_join_vars <- function(con, vars, table_vars, use_star, use_table_name) {
+sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_columns) {
   all_vars <- tolower(unlist(table_vars))
-  if (use_table_name) {
+  if (qualify_all_columns) {
     duplicated_vars <- unique(all_vars)
   } else {
     duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
@@ -242,7 +242,7 @@ sql_rf_join_vars <- function(con,
                              x_as = "LHS",
                              y_as = "RHS",
                              use_star,
-                             use_table_name) {
+                             qualify_all_columns) {
   type <- arg_match0(type, c("right", "full"))
   table_names <- c(unclass(x_as), unclass(y_as))
 
@@ -298,7 +298,7 @@ sql_rf_join_vars <- function(con,
     vars = multi_join_vars,
     table_vars = table_vars,
     use_star = use_star,
-    use_table_name = use_table_name
+    qualify_all_columns = qualify_all_columns
   )
 }
 

@@ -80,11 +80,11 @@ db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options 
   sql_render(sql, con = con, ..., sql_options = sql_options)
 }
 
-dbplyr_sql_options <- function(cte = FALSE, use_star = TRUE, use_table_name = FALSE) {
+dbplyr_sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
   data <- list(
     cte = cte,
     use_star = use_star,
-    use_table_name = use_table_name
+    qualify_all_columns = qualify_all_columns
   )
   class(data) <- "dbplyr_sql_options"
   data
@@ -104,7 +104,7 @@ print.dbplyr_sql_options <- function(x, ...) {
     star <- "Explicitly select all columns"
   }
 
-  if (x$use_table_name) {
+  if (x$qualify_all_columns) {
     join_table_name <- "Qualify all columns"
   } else {
     join_table_name <- "Qualify only ambigous columns"
