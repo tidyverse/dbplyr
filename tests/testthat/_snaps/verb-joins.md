@@ -396,7 +396,7 @@
 # joins reuse queries in cte mode
 
     Code
-      left_join(lf, lf) %>% remote_query(cte = TRUE)
+      left_join(lf, lf) %>% remote_query(sql_options = dbplyr_sql_options(cte = TRUE))
     Message
       Joining with `by = join_by(x)`
     Output

@@ -155,20 +155,20 @@ op_vars.lazy_select_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_select_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
   if (!is.null(op$message_summarise)) {
     inform(op$message_summarise)
   }
 
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
-  from <- sql_build(op$x, con, use_star = use_star)
+  from <- sql_build(op$x, con, sql_options = sql_options)
   select_sql_list <- get_select_sql(
     select = op$select,
     select_operation = op$select_operation,
     in_vars = op_vars(op$x),
     table_alias = alias,
     con = con,
-    use_star = use_star
+    use_star = sql_options$use_star
   )
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
 

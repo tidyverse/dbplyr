@@ -55,12 +55,64 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 
 #' @rdname db-misc
 #' @export
-db_sql_render <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
+db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
+  check_bool(cte)
+  if (cte) {
+    lifecycle::deprecate_soft(
+      when = "2.4.0",
+      what = "db_sql_render(cte)",
+      with = I("db_sql_render(sql_options = dbplyr_sql_options(cte = TRUE))")
+    )
+    sql_options <- dbplyr_sql_options(cte = TRUE)
+  }
+
+  if (is.null(sql_options)) {
+    sql_options <- dbplyr_sql_options()
+
+    out <- db_sql_render(con, sql, sql_options = sql_options)
+    return(out)
+  }
+
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
-  sql_render(sql, con = con, ..., cte = cte, use_star = use_star)
+db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
+  sql_render(sql, con = con, ..., sql_options = sql_options)
+}
+
+dbplyr_sql_options <- function(cte = FALSE, use_star = TRUE, use_table_name = FALSE) {
+  data <- list(
+    cte = cte,
+    use_star = use_star,
+    use_table_name = use_table_name
+  )
+  class(data) <- "dbplyr_sql_options"
+  data
+}
+
+#' @export
+print.dbplyr_sql_options <- function(x, ...) {
+  if (x$cte) {
+    cte <- "Use CTE"
+  } else {
+    cte <- "Use subqueries"
+  }
+
+  if (x$use_star) {
+    star <- "Use {.val SELECT *} where possible"
+  } else {
+    star <- "Explicitly select all columns"
+  }
+
+  if (x$use_table_name) {
+    join_table_name <- "Qualify all columns"
+  } else {
+    join_table_name <- "Qualify only ambigous columns"
+  }
+
+  msg <- c(cte, star, join_table_name)
+  msg <- set_names(msg, "*")
+  cli::cli_inform(msg)
 }
 
 #' @rdname db-misc

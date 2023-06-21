@@ -68,7 +68,7 @@ print.multi_join_query <- function(x, ...) {
 }
 
 #' @export
-sql_render.join_query <- function(query, con = NULL, ..., subquery = FALSE, lvl = 0) {
+sql_render.join_query <- function(query, con = NULL, ..., sql_options = NULL, subquery = FALSE, lvl = 0) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
   from_y <- sql_render(query$y, con, ..., subquery = TRUE, lvl = lvl + 1)
 
@@ -168,10 +168,14 @@ flatten_query.multi_join_query <- function(qry, query_list) {
 #' )
 #'
 #' # Full and right join are handled via `sql_rf_join_vars`
-sql_multi_join_vars <- function(con, vars, table_vars, use_star) {
+sql_multi_join_vars <- function(con, vars, table_vars, use_star, use_table_name) {
   all_vars <- tolower(unlist(table_vars))
-  duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
-  duplicated_vars <- unique(duplicated_vars)
+  if (use_table_name) {
+    duplicated_vars <- unique(all_vars)
+  } else {
+    duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
+    duplicated_vars <- unique(duplicated_vars)
+  }
   table_names <- names(table_vars)
 
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
@@ -232,7 +236,13 @@ sql_multi_join_var <- function(con, var, table_id, table_names, duplicated_vars)
   }
 }
 
-sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS", use_star) {
+sql_rf_join_vars <- function(con,
+                             type,
+                             vars,
+                             x_as = "LHS",
+                             y_as = "RHS",
+                             use_star,
+                             use_table_name) {
   type <- arg_match0(type, c("right", "full"))
   table_names <- c(unclass(x_as), unclass(y_as))
 
@@ -287,7 +297,8 @@ sql_rf_join_vars <- function(con, type, vars, x_as = "LHS", y_as = "RHS", use_st
     con = con,
     vars = multi_join_vars,
     table_vars = table_vars,
-    use_star = use_star
+    use_star = use_star,
+    use_table_name = use_table_name
   )
 }
 

@@ -86,17 +86,9 @@ lazy_set_op_query(x, y, type, all, call = caller_env())
 
 lazy_union_query(x, unions, call = caller_env())
 
-sql_build(op, con = NULL, ..., use_star = TRUE)
+sql_build(op, con = NULL, ..., sql_options = NULL)
 
-sql_render(
-  query,
-  con = NULL,
-  ...,
-  use_star = TRUE,
-  subquery = FALSE,
-  lvl = 0,
-  cte = FALSE
-)
+sql_render(query, con = NULL, ..., subquery = FALSE, lvl = 0)
 
 sql_optimise(x, con = NULL, ..., subquery = FALSE)
 

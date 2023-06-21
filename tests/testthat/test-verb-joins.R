@@ -1113,7 +1113,7 @@ test_that("left_join/inner_join uses *", {
 
   out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1181,7 +1181,7 @@ test_that("right_join uses *", {
   out <- lf1 %>%
     right_join(lf2, by = c("a", "b")) %>%
     select(a, b, z, c) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1231,7 +1231,7 @@ test_that("cross_join uses *", {
   # does not use * if `use_star = FALSE`
   out <- lf1 %>%
     cross_join(lf2) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1294,7 +1294,7 @@ test_that("joins reuse queries in cte mode", {
       lf,
       lf
     ) %>%
-      remote_query(cte = TRUE)
+      remote_query(sql_options = dbplyr_sql_options(cte = TRUE))
   )
 })
 
