@@ -80,7 +80,34 @@ db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options 
   sql_render(sql, con = con, ..., sql_options = sql_options)
 }
 
+#' Options for generating SQL
+#'
+#' @param cte If `FALSE`, the default, subqueries are used. If `TRUE` common
+#'   table expressions are used.
+#' @param use_star If `TRUE`, the default, `*` is used to select all columns of
+#'   a table. If `FALSE` all columns are explicitly selected.
+#' @param qualify_all_columns If `FALSE`, the default, columns are only
+#'   qualified with the table they come from if the same column name appears in
+#'   multiple tables.
+#'
+#' @return A <dbplyr_sql_options> object.
+#' @export
+#'
+#' @examples
+#' lf1 <- lazy_frame(key = 1, a = 1, b = 2)
+#' lf2 <- lazy_frame(key = 1, a = 1, c = 3)
+#'
+#' result <- left_join(lf1, lf2, by = "key") %>%
+#'   filter(c >= 3)
+#'
+#' show_query(result)
+#' sql_options <- dbplyr_sql_options(cte = TRUE, qualify_all_columns = TRUE)
+#' show_query(result, sql_options = sql_options)
 dbplyr_sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
+  check_bool(cte)
+  check_bool(use_star)
+  check_bool(qualify_all_columns)
+
   data <- list(
     cte = cte,
     use_star = use_star,
