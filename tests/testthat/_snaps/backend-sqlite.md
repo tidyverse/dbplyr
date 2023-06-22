@@ -1,13 +1,15 @@
 # custom aggregates translated
 
     Code
-      (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
+      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE))
+      )
     Output
       <error/rlang_error>
       Error in `quantile()`:
       ! `quantile()` is not available in this SQL variant.
     Code
-      (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
+      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE))
+      )
     Output
       <error/rlang_error>
       Error in `quantile()`:
@@ -27,15 +29,15 @@
 ---
 
     Code
-      translate_sql(runif(n()))
+      test_translate_sql(runif(n()))
     Output
       <SQL> (0.5 + RANDOM() / 18446744073709551616.0)
 
 # case_when translates correctly to ELSE when TRUE ~ is used
 
     Code
-      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"),
-      con = simulate_sqlite())
+      test_translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~
+      "undefined"), con = simulate_sqlite())
     Output
       <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
 

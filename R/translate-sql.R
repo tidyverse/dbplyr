@@ -65,13 +65,11 @@
 #' translate_sql(cumsum(mpg))
 #' translate_sql(cumsum(mpg), vars_order = "mpg")
 translate_sql <- function(...,
-                          con = NULL,
+                          con,
                           vars_group = NULL,
                           vars_order = NULL,
                           vars_frame = NULL,
                           window = TRUE) {
-  con <- con %||% sql_current_con() %||% simulate_dbi()
-
   translate_sql_(
     quos(...),
     con = con,
@@ -82,15 +80,32 @@ translate_sql <- function(...,
   )
 }
 
+test_translate_sql <- function(...,
+                          con = NULL,
+                          vars_group = NULL,
+                          vars_order = NULL,
+                          vars_frame = NULL,
+                          window = TRUE) {
+  translate_sql(
+    ...,
+    con = con %||% sql_current_con(),
+    vars_group = vars_group,
+    vars_order = vars_order,
+    vars_frame = vars_frame,
+    window = window
+  )
+}
+
 #' @export
 #' @rdname translate_sql
 translate_sql_ <- function(dots,
-                           con = NULL,
+                           con,
                            vars_group = NULL,
                            vars_order = NULL,
                            vars_frame = NULL,
                            window = TRUE,
                            context = list()) {
+  check_con(con)
 
   if (length(dots) == 0) {
     return(sql())

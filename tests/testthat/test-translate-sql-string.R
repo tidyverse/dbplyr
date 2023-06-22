@@ -21,7 +21,8 @@ test_that("sql_substr works as expected", {
 })
 
 test_that("substring is also translated", {
-  expect_equal(translate_sql(substring(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
+  local_con(simulate_dbi())
+  expect_equal(test_translate_sql(substring(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
 })
 
 test_that("sql_str_sub works as expected", {
