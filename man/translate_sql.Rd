@@ -7,7 +7,7 @@
 \usage{
 translate_sql(
   ...,
-  con = NULL,
+  con,
   vars_group = NULL,
   vars_order = NULL,
   vars_frame = NULL,
@@ -16,7 +16,7 @@ translate_sql(
 
 translate_sql_(
   dots,
-  con = NULL,
+  con,
   vars_group = NULL,
   vars_order = NULL,
   vars_frame = NULL,
