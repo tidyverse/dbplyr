@@ -48,14 +48,16 @@ test_that("win_rank() is accepted by the sql_translator", {
 })
 
 test_that("can translate infix expression without parantheses", {
-  expect_equal(translate_sql(!!expr(2 - 1) * x), sql("(2.0 - 1.0) * `x`"))
-  expect_equal(translate_sql(!!expr(2 / 1) * x), sql("(2.0 / 1.0) * `x`"))
-  expect_equal(translate_sql(!!expr(2 * 1) - x), sql("(2.0 * 1.0) - `x`"))
+  local_con(simulate_dbi())
+  expect_equal(test_translate_sql(!!expr(2 - 1) * x), sql("(2.0 - 1.0) * `x`"))
+  expect_equal(test_translate_sql(!!expr(2 / 1) * x), sql("(2.0 / 1.0) * `x`"))
+  expect_equal(test_translate_sql(!!expr(2 * 1) - x), sql("(2.0 * 1.0) - `x`"))
 })
 
 test_that("unary minus works with expressions", {
-  expect_equal(translate_sql(-!!expr(x+2)), sql("-(`x` + 2.0)"))
-  expect_equal(translate_sql(--x), sql("-(-`x`)"))
+  local_con(simulate_dbi())
+  expect_equal(test_translate_sql(-!!expr(x+2)), sql("-(`x` + 2.0)"))
+  expect_equal(test_translate_sql(--x), sql("-(-`x`)"))
 })
 
 test_that("pad = FALSE works", {
@@ -74,27 +76,28 @@ test_that("sql_prefix checks arguments", {
 })
 
 test_that("runif is translated", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(runif(n())),
+    test_translate_sql(runif(n())),
     sql("RANDOM()")
   )
 
   expect_equal(
-    translate_sql(runif(n(), max = 2)),
+    test_translate_sql(runif(n(), max = 2)),
     sql("RANDOM() * 2.0")
   )
 
   expect_equal(
-    translate_sql(runif(n(), min = 1, max = 2)),
+    test_translate_sql(runif(n(), min = 1, max = 2)),
     sql("RANDOM() + 1.0")
   )
 
   expect_equal(
-    translate_sql(runif(n(), min = 1, max = 3)),
+    test_translate_sql(runif(n(), min = 1, max = 3)),
     sql("RANDOM() * 2.0 + 1.0")
   )
 
   expect_snapshot(error = TRUE, {
-    translate_sql(runif(2))
+    test_translate_sql(runif(2))
   })
 })

@@ -1,18 +1,18 @@
 test_that("custom scalar functions translated correctly", {
   local_con(simulate_oracle())
 
-  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
-  expect_equal(translate_sql(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
-  expect_equal(translate_sql(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
-  expect_equal(translate_sql(as.Date(x)),    sql("DATE `x`"))
+  expect_equal(test_translate_sql(as.character(x)), sql("CAST(`x` AS VARCHAR2(255))"))
+  expect_equal(test_translate_sql(as.integer64(x)), sql("CAST(`x` AS NUMBER(19))"))
+  expect_equal(test_translate_sql(as.double(x)),    sql("CAST(`x` AS NUMBER)"))
+  expect_equal(test_translate_sql(as.Date(x)),    sql("DATE `x`"))
 })
 
 test_that("paste and paste0 translate correctly", {
   local_con(simulate_oracle())
 
-  expect_equal(translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
-  expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
-  expect_equal(translate_sql(str_c(x, y)), sql("`x` || `y`"))
+  expect_equal(test_translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
+  expect_equal(test_translate_sql(paste0(x, y)), sql("`x` || `y`"))
+  expect_equal(test_translate_sql(str_c(x, y)), sql("`x` || `y`"))
 })
 
 test_that("queries translate correctly", {

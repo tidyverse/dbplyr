@@ -1,7 +1,7 @@
 # custom scalar translated correctly
 
     Code
-      (expect_error(translate_sql(grepl("exp", x, ignore.case = TRUE))))
+      (expect_error(test_translate_sql(grepl("exp", x, ignore.case = TRUE))))
     Output
       <error/rlang_error>
       Error in `grepl()`:

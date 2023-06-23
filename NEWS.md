@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `translate_sql()` now requires the `con` argument (@mgirlich, #1311).
+
 * A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
 
 * `*_join()` now allows using specifying the relationship argument. It must be `NULL` or `"many-to-many"` (@bairdj, #1305).

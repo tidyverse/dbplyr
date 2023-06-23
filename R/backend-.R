@@ -249,10 +249,10 @@ base_scalar <- sql_translator(
   nzchar = function(x, keepNA = FALSE) {
     if (keepNA) {
       exp <- expr(!!x != "")
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     } else {
       exp <- expr((is.na(!!x) | !!x != ""))
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     }
   },
   tolower = sql_prefix("LOWER", 1),
