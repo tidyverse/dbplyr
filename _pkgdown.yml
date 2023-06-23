@@ -85,7 +85,7 @@ reference:
   - sql_expr
   - translate_sql
   - window_order
-  - dbplyr_sql_options
+  - sql_options
 
 - title: dbplyr Backends
   desc: Documentation for authors of new dbplyr backends

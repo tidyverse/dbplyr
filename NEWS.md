@@ -35,7 +35,7 @@
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
 * `show_query()` and `remote_query()` gain the argument `sql_options` that allows
-  to control how the SQL is generated. It can be created via `dbplyr_sql_options()`
+  to control how the SQL is generated. It can be created via `sql_options()`
   which has the following arguments:
   * `cte`: use common table expressions?
   * `use_star`: use `SELECT *` or explicitly select every column?
