@@ -702,28 +702,12 @@ add_semi_join <- function(x,
 }
 
 can_inline_semi_join <- function(x) {
-  select <- "projection"
-
-  if (!is_lazy_select_query(x)) {
-    return(FALSE)
-  }
-
-  if (select == "projection" && !is_projection(x$select$expr)) {
-    return(FALSE)
-  }
-
-  if (select == "identity" && !is_select_identity(x$select, op_vars(x$x))) {
-    return(FALSE)
-  }
-
-  if (is_true(x$distinct)) {
-    return(FALSE)
-  }
-  if (!is_empty(x$limit)) {
-    return(FALSE)
-  }
-
-  TRUE
+  is_lazy_select_query_simple(
+    x,
+    ignore_where = TRUE,
+    ignore_group_by = TRUE,
+    select = "projection"
+  )
 }
 
 semi_join_inline_select <- function(lq, by, on) {
