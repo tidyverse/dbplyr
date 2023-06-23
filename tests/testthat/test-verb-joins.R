@@ -1113,7 +1113,7 @@ test_that("left_join/inner_join uses *", {
 
   out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
-    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1181,7 +1181,7 @@ test_that("right_join uses *", {
   out <- lf1 %>%
     right_join(lf2, by = c("a", "b")) %>%
     select(a, b, z, c) %>%
-    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1231,7 +1231,7 @@ test_that("cross_join uses *", {
   # does not use * if `use_star = FALSE`
   out <- lf1 %>%
     cross_join(lf2) %>%
-    sql_build(sql_options = dbplyr_sql_options(use_star = FALSE))
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1294,7 +1294,7 @@ test_that("joins reuse queries in cte mode", {
       lf,
       lf
     ) %>%
-      remote_query(sql_options = dbplyr_sql_options(cte = TRUE))
+      remote_query(sql_options = sql_options(cte = TRUE))
   )
 })
 
@@ -1303,10 +1303,10 @@ test_that("can force to qualify all columns", {
   lf2 <- lazy_frame(x = 1, a = 2, z = 1, .name = "lf2")
 
   unforced <- left_join(lf1, lf2, by = "x") %>%
-    sql_build(sql_options = dbplyr_sql_options(qualify_all_columns = FALSE))
+    sql_build(sql_options = sql_options(qualify_all_columns = FALSE))
   expect_equal(unforced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`y`", a.y = "`lf2`.`a`", z = "`z`"))
   forced <- left_join(lf1, lf2, by = "x") %>%
-    sql_build(sql_options = dbplyr_sql_options(qualify_all_columns = TRUE))
+    sql_build(sql_options = sql_options(qualify_all_columns = TRUE))
   expect_equal(forced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`lf1`.`y`", a.y = "`lf2`.`a`", z = "`lf2`.`z`"))
 })
 

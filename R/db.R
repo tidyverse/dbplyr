@@ -118,6 +118,24 @@ sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALS
   data
 }
 
+as_sql_options <- function(x, error_arg = caller_arg(x), error_call = caller_env()) {
+  if (is.null(x)) {
+    x <- sql_options()
+    return(x)
+  }
+
+  if (!inherits(x, "dbplyr_sql_options")) {
+    stop_input_type(
+      x = x,
+      what = I("an object created by `sql_options()`"),
+      arg = error_arg,
+      call = error_call
+    )
+  }
+
+  x
+}
+
 #' @export
 print.dbplyr_sql_options <- function(x, ...) {
   if (x$cte) {
