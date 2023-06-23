@@ -61,13 +61,13 @@ db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
     lifecycle::deprecate_soft(
       when = "2.4.0",
       what = "db_sql_render(cte)",
-      with = I("db_sql_render(sql_options = dbplyr_sql_options(cte = TRUE))")
+      with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
     )
-    sql_options <- dbplyr_sql_options(cte = TRUE)
+    sql_options <- sql_options(cte = TRUE)
   }
 
   if (is.null(sql_options)) {
-    sql_options <- dbplyr_sql_options()
+    sql_options <- sql_options()
 
     out <- db_sql_render(con, sql, sql_options = sql_options)
     return(out)
@@ -102,9 +102,9 @@ db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options 
 #'   filter(c >= 3)
 #'
 #' show_query(result)
-#' sql_options <- dbplyr_sql_options(cte = TRUE, qualify_all_columns = TRUE)
+#' sql_options <- sql_options(cte = TRUE, qualify_all_columns = TRUE)
 #' show_query(result, sql_options = sql_options)
-dbplyr_sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
+sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
   check_bool(cte)
   check_bool(use_star)
   check_bool(qualify_all_columns)
