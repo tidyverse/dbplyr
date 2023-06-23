@@ -235,6 +235,9 @@
     <loc>https://dbplyr.tidyverse.org/dev/reference/sql_expr.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.html</loc>
   </url>
   <url>
