@@ -56,6 +56,7 @@ sql_build.tbl_lazy <- function(op, con = op$src$con, ..., sql_options = NULL) {
 sql_render <- function(query,
                        con = NULL,
                        ...,
+                       sql_options = NULL,
                        subquery = FALSE,
                        lvl = 0) {
   check_dots_used()
@@ -66,12 +67,14 @@ sql_render <- function(query,
 sql_render.tbl_lazy <- function(query,
                                 con = query$src$con,
                                 ...,
+                                sql_options = NULL,
                                 subquery = FALSE,
                                 lvl = 0) {
   sql_render(
     query$lazy_query,
     con = con,
     ...,
+    sql_options = sql_options,
     subquery = subquery,
     lvl = lvl
   )
@@ -81,19 +84,13 @@ sql_render.tbl_lazy <- function(query,
 sql_render.lazy_query <- function(query,
                                   con = NULL,
                                   ...,
+                                  sql_options = NULL,
                                   subquery = FALSE,
                                   lvl = 0) {
+  # browser()
   # FIXME the handling of `...` seems wrong overall.
-  dots <- list(...)
-  sql_options <- dots$sql_options
-  if (is.null(sql_options)) {
-    sql_options <- dbplyr_sql_options()
-  }
-  dots$sql_options <- NULL
-
-
-  qry <- rlang::exec(sql_build, query, con = con, !!!dots, sql_options = sql_options)
-  qry <- rlang::exec(sql_optimise, qry, con = con, !!!dots, subquery = subquery)
+  qry <- sql_build(query, con = con, ..., sql_options = sql_options)
+  qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
 
   if (sql_options$cte) {
     query_list <- flatten_query(qry, list(queries = list(), name = NULL))
@@ -102,13 +99,13 @@ sql_render.lazy_query <- function(query,
     rendered_queries <- purrr::map2(
       queries, seq_along(queries) != length(queries),
       function(query, indent) {
-        rlang::exec(sql_render, query, con = con, !!!dots, subquery = subquery, lvl = as.integer(indent))
+        sql_render(query, con = con, ..., subquery = subquery, lvl = as.integer(indent))
       }
     )
 
     cte_render(rendered_queries, con)
   } else {
-    rlang::exec(sql_render, qry, con = con, !!!dots, subquery = subquery, lvl = lvl)
+    sql_render(qry, con = con, ..., subquery = subquery, lvl = lvl)
   }
 }
 
