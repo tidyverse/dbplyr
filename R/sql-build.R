@@ -30,6 +30,7 @@ sql_build <- function(op, con = NULL, ..., sql_options = NULL) {
     out <- sql_build(
       op = op,
       con = con,
+      ...,
       sql_options = sql_options
     )
 
@@ -44,6 +45,7 @@ sql_build <- function(op, con = NULL, ..., sql_options = NULL) {
 
 #' @export
 sql_build.tbl_lazy <- function(op, con = op$src$con, ..., sql_options = NULL) {
+  con <- con %||% op$src$con
   sql_options <- sql_options %||% sql_options()
 
   # only used for testing
@@ -75,6 +77,7 @@ sql_render <- function(query,
     out <- sql_render(
       query = query,
       con = con,
+      ...,
       sql_options = sql_options,
       subquery = subquery,
       lvl = lvl
@@ -94,6 +97,7 @@ sql_render.tbl_lazy <- function(query,
                                 sql_options = NULL,
                                 subquery = FALSE,
                                 lvl = 0) {
+  con <- con %||% query$src$con
   sql_render(
     query$lazy_query,
     con = con,
@@ -138,7 +142,8 @@ cte_render <- function(query_list, con) {
     return(query_list[[1]])
   }
 
-  ctes <- purrr::imap(query_list[-n],
+  ctes <- purrr::imap(
+    query_list[-n],
     function(query, name) {
       glue_sql2(con, "{.name `name`} {.kw 'AS'} (\n{.sql query}\n)")
     }
