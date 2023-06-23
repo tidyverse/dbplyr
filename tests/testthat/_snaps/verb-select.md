@@ -229,7 +229,7 @@
 # output is styled
 
     Code
-      show_query(out, sql_options = dbplyr_sql_options(cte = TRUE))
+      show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
       [34mWITH[39m `q01` [34mAS[39m (
