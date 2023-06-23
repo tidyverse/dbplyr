@@ -36,11 +36,11 @@ op_vars.lazy_set_op_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_set_op_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_set_op_query <- function(op, con, ..., sql_options = NULL) {
   # add_op_set_op() ensures that both have same variables
   set_op_query(
-    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
-    sql_optimise(sql_build(op$y, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
+    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
     type = op$type,
     all = op$all
   )
@@ -77,18 +77,18 @@ op_vars.lazy_union_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_union_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
   # add_union() ensures that both have same variables
   unions <- list(
     table = purrr::map(
       op$unions$table,
-      ~ sql_optimise(sql_build(.x, con, use_star = use_star), con)
+      ~ sql_optimise(sql_build(.x, con, sql_options = sql_options), con)
     ),
     all = op$unions$all
   )
 
   union_query(
-    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
     unions
   )
 }

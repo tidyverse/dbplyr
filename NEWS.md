@@ -36,8 +36,15 @@
 
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
-* `show_query()` and `remote_query()` get the argument `use_star` that controls
-  whether to use `SELECT *` to select every column (@mgirlich, #1146).
+* `show_query()` and `remote_query()` gain the argument `sql_options` that allows
+  to control how the SQL is generated. It can be created via `sql_options()`
+  which has the following arguments:
+  * `cte`: use common table expressions?
+  * `use_star`: use `SELECT *` or explicitly select every column?
+  * `qualify_all_columns`: qualify all columns in a join or only the ambiguous ones?
+  (@mgirlich, #1146).
+  
+* The `cte` argument of `show_query()` and `remote_query()` is deprecated (@mgirlich, #1146).
 
 * `any()` and `all()` now work for MS SQL (@ejneer, #1273).
 

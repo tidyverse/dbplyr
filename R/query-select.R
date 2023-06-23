@@ -103,7 +103,12 @@ select_query_clauses <- function(x, subquery = FALSE) {
 }
 
 #' @export
-sql_render.select_query <- function(query, con, ..., subquery = FALSE, lvl = 0) {
+sql_render.select_query <- function(query,
+                                    con,
+                                    ...,
+                                    sql_options = NULL,
+                                    subquery = FALSE,
+                                    lvl = 0) {
   from <- dbplyr_sql_subquery(con,
     sql_render(query$from, con, ..., subquery = TRUE, lvl = lvl + 1),
     name = query$from_alias,
