@@ -49,7 +49,7 @@ mutate.tbl_lazy <- function(.data,
     out$lazy_query$group_vars <- character()
   }
 
-  names_original <- names(.data)
+  names_original <- colnames(.data)
 
   out <- mutate_relocate(
     out = out,
@@ -248,7 +248,7 @@ mutate_relocate <- function(out, before, after, names_original) {
 
   # Only change the order of completely new columns that
   # didn't exist in the original data
-  names <- names(out)
+  names <- colnames(out)
   names <- setdiff(names, names_original)
 
   relocate(
@@ -260,7 +260,7 @@ mutate_relocate <- function(out, before, after, names_original) {
 }
 
 mutate_keep <- function(out, keep, used, names_new, names_groups) {
-  names <- names(out)
+  names <- colnames(out)
 
   if (keep == "all") {
     names_out <- names

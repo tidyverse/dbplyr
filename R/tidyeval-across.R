@@ -203,11 +203,11 @@ across_setup <- function(data,
     error_call = call(fn)
   )
 
-  vars <- syms(names(tbl))[locs]
+  vars <- syms(colnames(tbl))[locs]
   if (allow_rename) {
     names_vars <- names(locs)
   } else {
-    names_vars <- names(tbl)[locs]
+    names_vars <- colnames(tbl)[locs]
   }
 
   dots <- call$...

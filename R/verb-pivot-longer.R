@@ -233,7 +233,7 @@ deduplicate_spec <- function(spec, df) {
   }
 
   # Match spec to data, handling duplicated column names
-  col_id <- vctrs::vec_match(names(df), spec$.name)
+  col_id <- vctrs::vec_match(colnames(df), spec$.name)
   has_match <- !is.na(col_id)
 
   if (!vctrs::vec_duplicate_any(col_id[has_match])) {

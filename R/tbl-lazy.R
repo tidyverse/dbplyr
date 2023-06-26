@@ -100,7 +100,12 @@ tidyselect_data_has_predicates.tbl_lazy <- function(x) {
   FALSE
 }
 
+the <- new_environment()
+the$warned_on_tbl_lazy_names <- FALSE
+
 #' @export
 names.tbl_lazy <- function(x) {
-  colnames(x)
+  # FIXME find a way to nudge users away from using `names()` without RStudio
+  # getting on your nerves
+  NextMethod("names")
 }
