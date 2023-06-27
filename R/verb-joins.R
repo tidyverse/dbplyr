@@ -756,7 +756,7 @@ make_table_names <- function(as, lq) {
   } else if (!is.null(name)) {
     tibble(name = name, from = "name")
   } else {
-    tibble(name = NA_character_, from = "")
+    tibble(name = "", from = "")
   }
 }
 
@@ -810,27 +810,26 @@ join_two_table_alias <- function(names, from) {
   check_character(from)
   vctrs::vec_assert(names, size = 2L)
 
-  out <- dplyr::coalesce(names, c("LHS", "RHS"))
+  out <- names
+  out[from == ""] <- c("LHS", "RHS")[from == ""]
 
   if (!identical(out[1], out[2])) {
     return(out)
   }
   # -> must rename
 
-  if (from[1] != "as" && from[2] != "as") {
-    # self join of named table
-    if (!is.na(names[1]) && !is.na(names[2]) && identical(names[1], names[2])) {
-      out <- c(
-        paste0(names[1], "_LHS"),
-        paste0(names[2], "_RHS")
-      )
-      return(out)
-    }
+  tables_have_same_name <- from[1] == "name" && from[2] == "name" && identical(names[1], names[2])
+  if (tables_have_same_name) {
+    out <- c(
+      paste0(names[1], "_LHS"),
+      paste0(names[2], "_RHS")
+    )
+    return(out)
   }
 
   out_repaired <- vctrs::vec_as_names(out, repair = "unique", quiet = TRUE)
-  may_repair <- c(from[1] != "as", from[2] != "as")
-  out[may_repair] <- out_repaired[may_repair]
+  may_repair_name <- c(from[1] != "as", from[2] != "as")
+  out[may_repair_name] <- out_repaired[may_repair_name]
 
   out
 }
