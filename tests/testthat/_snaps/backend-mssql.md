@@ -370,3 +370,12 @@
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       ;
 
+# `row_number()` without order is translated correctly
+
+    Code
+      mf %>% mutate(rn = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT 1)) AS `rn`
+      FROM `df`
+

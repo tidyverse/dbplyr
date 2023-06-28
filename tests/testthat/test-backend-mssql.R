@@ -322,6 +322,11 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("`row_number()` without order is translated correctly", {
+  mf <- lazy_frame(x = 1, con = simulate_mssql())
+  expect_snapshot(mf %>% mutate(rn = row_number()))
+})
+
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#272)", {
