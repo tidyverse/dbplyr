@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The translation of an unordered `row_number()` now works for MS SQL (@ejneer, #1233)
+
 * The functions `simulate_vars()` and `simulate_vars_is_typed()` were removed
   as they weren't used anymore and tidyselect now offers `tidyselect_data_proxy()`
   and `tidyselect_data_has_predicates()` (@mgirllich, #1199).
