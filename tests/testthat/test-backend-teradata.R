@@ -17,6 +17,8 @@ test_that("custom scalar translated correctly", {
   expect_equal(test_translate_sql(paste0(x,y)),     sql("`x` || `y`"))
   expect_equal(test_translate_sql(paste(x,y)),      sql("`x` || ' ' || `y`"))
   expect_equal(test_translate_sql(as.Date("2020-01-01")), sql("DATE '2020-01-01'"))
+  expect_equal(test_translate_sql(as.Date(sql("x + 1"))), sql("CAST(x + 1 AS DATE)"))
+  expect_equal(test_translate_sql(as.Date(x)),      sql("CAST(`x` AS DATE)"))
   expect_equal(test_translate_sql(week(as.Date("2020-01-01"))), sql("WEEKNUMBER_OF_YEAR(DATE '2020-01-01', 'iso')"))
   expect_equal(test_translate_sql(quarter(as.Date("2020-01-01"))), sql("to_char(DATE '2020-01-01', 'q')"))
 
