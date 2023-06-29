@@ -108,14 +108,11 @@ as.data.frame.tbl_sql <- function(x,
 #' @export
 #' @importFrom tibble tbl_sum
 tbl_sum.tbl_sql <- function(x) {
-  tbl_sum_tbl_sql(x)
-}
-
-tbl_sum_tbl_sql <- function(x, desc = tbl_desc(x)) {
   grps <- op_grps(x$lazy_query)
   sort <- op_sort(x$lazy_query)
   c(
-    "Source" = desc,
+    # Can be overwritten by tbl_format_header.tbl_lazy:
+    "Source" = tbl_desc(x),
     "Database" = dbplyr_connection_describe(x$src$con),
     "Groups" = if (length(grps) > 0) commas(grps),
     "Ordered by" = if (length(sort) > 0) commas(deparse_all(sort))
