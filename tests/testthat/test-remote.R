@@ -4,13 +4,13 @@ test_that("remote_table returns name when it makes sense", {
   # produces name after `group_by()`
   expect_equal(
     mf %>% group_by(x) %>% remote_table(),
-    ident("refxiudlph")
+    as_table_ident(ident("refxiudlph"))
   )
 
   # produces name after unarranging
   expect_equal(
     mf %>% arrange(x) %>% arrange() %>% remote_table(),
-    ident("refxiudlph")
+    as_table_ident(ident("refxiudlph"))
   )
 
   # produces name after compute()
@@ -19,7 +19,7 @@ test_that("remote_table returns name when it makes sense", {
 
 test_that("remote_table returns null for computed tables", {
   mf <- copy_to_test("sqlite", tibble(x = 5, y = 1), name = "refxiudlph")
-  expect_equal(remote_table(mf), ident("refxiudlph"))
+  expect_equal(remote_table(mf), as_table_ident(ident("refxiudlph")))
 
   expect_null(mf %>% filter(x == 3) %>% remote_table())
   expect_null(mf %>% distinct(x) %>% remote_table())
@@ -34,23 +34,24 @@ test_that("remote_table returns null for computed tables", {
   expect_null(lf %>% group_by(x) %>% remote_table())
 
   lf <- lazy_frame(x = 1)
-  expect_equal(lf %>% remote_table(null_if_local = FALSE), ident("df"))
-  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), ident("df"))
+  expect_equal(lf %>% remote_table(null_if_local = FALSE), as_table_ident(ident("df")))
+  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), as_table_ident(ident("df")))
 })
 
 test_that("remote_name and remote_table can handle different table identifiers", {
-  test_remote_table <- function(x, exp_tbl = x, exp_name = "tbl") {
+  test_remote_table <- function(x, exp_tbl = as_table_ident(x), exp_name = "tbl") {
     lf <- lazy_frame(x = 1, .name = x)
     expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)
     expect_equal(remote_name(lf, null_if_local = FALSE), exp_name)
   }
 
-  test_remote_table("tbl", ident("tbl"))
+  test_remote_table("tbl")
   test_remote_table(ident("tbl"))
   test_remote_table(in_schema("schema", "tbl"))
   test_remote_table(in_catalog("catalog", "schema", "tbl"))
   test_remote_table(DBI::Id(catalog = "catalog", schema = "schema", table = "tbl"))
 
+  withr::local_options(rlib_message_verbosity = "quiet")
   test_remote_table(ident_q("schema.tbl"), exp_name = NULL)
   test_remote_table(sql("schema.tbl"), exp_name = NULL)
 })

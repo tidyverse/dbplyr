@@ -89,37 +89,6 @@ relocate.tbl_lazy <- function(.data, ..., .before = NULL, .after = NULL) {
   dplyr::select(.data, !!!loc)
 }
 
-#' Simulate variables to use in tidyselect
-#'
-#' @param x A lazy table
-#' @param drop_groups Should groups be dropped?
-#'
-#' @return A 0 row tibble with the same columns names, and, if possible, types, as `x`.
-#'
-#' @export
-#' @keywords internal
-simulate_vars <- function (x, drop_groups = FALSE) {
-  # keep this for now as this might be used by other packages
-  UseMethod("simulate_vars")
-}
-
-#' @export
-simulate_vars.tbl_lazy <- function(x, drop_groups = FALSE) {
-  if (drop_groups) {
-    vars <- setdiff(op_vars(x), op_grps(x))
-  } else {
-    vars <- op_vars(x)
-  }
-
-  as_tibble(rep_named(vars, list(logical())), .name_repair = "minimal")
-}
-
-#' @rdname simulate_vars
-#' @export
-simulate_vars_is_typed <- function(x) UseMethod("simulate_vars_is_typed")
-#' @export
-simulate_vars_is_typed.tbl_lazy <- function(x) FALSE
-
 # op_select ---------------------------------------------------------------
 
 add_select <- function(lazy_query, vars) {
@@ -144,7 +113,7 @@ add_select <- function(lazy_query, vars) {
     return(lazy_query)
   }
 
-  is_select <- inherits(lazy_query, "lazy_select_query")
+  is_select <- is_lazy_select_query(lazy_query)
   select_can_be_inlined <- is_bijective_projection(vars, vars_data) || !is_true(lazy_query$distinct)
   if (is_select && select_can_be_inlined) {
     idx <- vctrs::vec_match(vars, vars_data)

@@ -322,7 +322,7 @@ sql_query_upsert.PqConnection <- function(con,
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, ident("excluded")),
+    sql_table_prefix(con, update_cols, "excluded"),
     update_cols
   )
   update_cols <- sql_escape_ident(con, update_cols)
@@ -369,4 +369,14 @@ supports_window_clause.PostgreSQL <- function(con) {
   TRUE
 }
 
-globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
+#' @export
+db_supports_table_alias_with_as.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+db_supports_table_alias_with_as.PostgreSQL <- function(con) {
+  TRUE
+}
+
+utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))

@@ -77,7 +77,7 @@
         SELECT `df`.*
         FROM `df`
         LIMIT 1
-      ) `q01`
+      ) AS `q01`
       ORDER BY `a`
     Code
       lf %>% arrange(a) %>% head(1)
@@ -97,7 +97,7 @@
         FROM `df`
         ORDER BY `a`
         LIMIT 1
-      ) `q01`
+      ) AS `q01`
       ORDER BY `b`
     Code
       # mutate
@@ -134,7 +134,7 @@
       FROM (
         SELECT -`a` AS `a`, `b`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # can combine arrange with dual table verbs
 
@@ -155,7 +155,7 @@
       FROM (
         SELECT `df`.*
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       LEFT JOIN `df`
         ON (`LHS`.`a` = `df`.`a`)
     Code
@@ -172,7 +172,7 @@
       FROM (
         SELECT `df`.*
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df`
         WHERE (`LHS`.`a` = `df`.`a`)
@@ -202,7 +202,7 @@
         FROM `df` AS `df_LHS`
         LEFT JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`a` = `df_RHS`.`a`)
-      ) `q01`
+      ) AS `q01`
       ORDER BY `a`
     Code
       lf %>% semi_join(rf) %>% arrange(a)
@@ -218,7 +218,7 @@
           SELECT 1 FROM `df` AS `df_RHS`
           WHERE (`df_LHS`.`a` = `df_RHS`.`a`)
         )
-      ) `q01`
+      ) AS `q01`
       ORDER BY `a`
     Code
       lf %>% union(rf) %>% arrange(a)
@@ -233,6 +233,6 @@
       
         SELECT `a`, NULL AS `b`, `c`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       ORDER BY `a`
 

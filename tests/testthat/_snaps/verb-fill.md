@@ -40,7 +40,7 @@
           `group`,
           LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `n1`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 ---
 
@@ -58,7 +58,7 @@
           `group`,
           LAST_VALUE(`n1` IGNORE NULLS) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `n1`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # up-direction works with descending
 

@@ -163,7 +163,8 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
 
   # must use `add_order()` as `window_order()` only allows variables
   # this is only okay to do because the previous, legal window order is restored
-  .data$lazy_query <- add_order(.data, quos({{order_by}}))
+  dots <- partial_eval_dots(.data, !!!quos({{order_by}}), .named = FALSE)
+  .data$lazy_query <- add_order(.data, dots)
 
   out <- filter(.data, !!window_fun) %>%
     window_order(!!!old_frame)
@@ -203,4 +204,4 @@ check_slice_size <- function(n, prop) {
   }
 }
 
-globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))
+utils::globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))

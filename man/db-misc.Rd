@@ -11,7 +11,7 @@ db_connection_describe(con, ...)
 
 sql_join_suffix(con, suffix, ...)
 
-db_sql_render(con, sql, ..., cte = FALSE, use_star = TRUE)
+db_sql_render(con, sql, ..., cte = FALSE, sql_options = NULL)
 
 dbplyr_edition(con)
 }

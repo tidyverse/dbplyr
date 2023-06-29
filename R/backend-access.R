@@ -202,4 +202,4 @@ supports_window_clause.ACCESS <- function(con) {
   TRUE
 }
 
-globalVariables(c("CStr", "iif", "isnull"))
+utils::globalVariables(c("CStr", "iif", "isnull"))

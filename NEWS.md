@@ -1,5 +1,35 @@
 # dbplyr (development version)
 
+* The functions `simulate_vars()` and `simulate_vars_is_typed()` were removed
+  as they weren't used anymore and tidyselect now offers `tidyselect_data_proxy()`
+  and `tidyselect_data_has_predicates()` (@mgirllich, #1199).
+
+* `translate_sql()` now requires the `con` argument (@mgirlich, #1311).
+
+* A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
+
+* `*_join()` now allows using specifying the relationship argument. It must be `NULL` or `"many-to-many"` (@bairdj, #1305).
+
+* The columns generated when using a window function in `filter()` are now named
+  `col01` etc. instead of `q01()` (@mgirlich, #1258).
+
+* `slice_*()` now supports the data masking pronouns `.env` and `.data` (@mgirlich, #1294).
+
+* `tbl()` now informs when the user probably forgot to wrap the table identifier
+  with `in_schema()` or `sql()` (@mgirlich, #1287).
+
+* Added `db_supports_table_alias_with_as()` to customise whether a backend supports
+  specifying a table alias with `AS` or not (@mgirlich).
+
+* The translation of `between()` now also works for MS SQL when used in `mutate()`
+  (@mgirlich, #1241).
+
+* MariaDB:
+  * `rows_update()` and `rows_patch()` now give an informative error when the
+    unsupported `returning` is used (@mgirlich, #1279).
+  * `rows_upsert()` now gives an informative error that it isn't supported
+    (@mgirlich, #1279).
+
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
 
@@ -10,8 +40,15 @@
 
 * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
-* `show_query()` and `remote_query()` get the argument `use_star` that controls
-  whether to use `SELECT *` to select every column (@mgirlich, #1146).
+* `show_query()` and `remote_query()` gain the argument `sql_options` that allows
+  to control how the SQL is generated. It can be created via `sql_options()`
+  which has the following arguments:
+  * `cte`: use common table expressions?
+  * `use_star`: use `SELECT *` or explicitly select every column?
+  * `qualify_all_columns`: qualify all columns in a join or only the ambiguous ones?
+  (@mgirlich, #1146).
+  
+* The `cte` argument of `show_query()` and `remote_query()` is deprecated (@mgirlich, #1146).
 
 * `any()` and `all()` now work for MS SQL (@ejneer, #1273).
 

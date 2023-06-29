@@ -14,6 +14,7 @@
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{supports_window_clause}
+\alias{db_supports_table_alias_with_as}
 \alias{sql_query_select}
 \alias{sql_query_join}
 \alias{sql_query_multi_join}
@@ -55,6 +56,8 @@ sql_query_rows(con, sql, ...)
 
 supports_window_clause(con)
 
+db_supports_table_alias_with_as(con)
+
 sql_query_select(
   con,
   select,
@@ -85,7 +88,7 @@ sql_query_join(
 
 sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
 
-sql_query_semi_join(con, x, y, anti, by, vars, ..., lvl = 0)
+sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
 
@@ -104,6 +107,7 @@ as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 to select random rows in \code{slice_sample()}. This is now replaced by adding
 a translation for \code{runif(n())}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
+\item \code{db_supports_table_alias_with_as(con)} does the backend support using \code{AS} when using a table alias?
 }
 
 Tables:

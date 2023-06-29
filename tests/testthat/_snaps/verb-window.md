@@ -37,7 +37,7 @@
       FROM (
         SELECT `x`, `y` AS `y2`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
     Code
       lazy_frame(x = 1, y = 1) %>% rename(y2 = y) %>% window_order(y2) %>% mutate(
         x_cum = cumsum(x))
@@ -49,7 +49,7 @@
       FROM (
         SELECT `x`, `y` AS `y2`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # window_frame errors for data frame
 

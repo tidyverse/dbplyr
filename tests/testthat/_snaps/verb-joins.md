@@ -26,8 +26,8 @@
       left_join(df1, df2, by = "x") %>% remote_query()
     Output
       <SQL> SELECT `df`.*, `z`
-      FROM `foo`.`df` AS `df`
-      LEFT JOIN `foo`.`df2` AS `df2`
+      FROM `foo`.`df`
+      LEFT JOIN `foo`.`df2`
         ON (`df`.`x` = `df2`.`x`)
 
 ---
@@ -132,11 +132,8 @@
       SELECT `a` AS `a2`, `x1` AS `x`
       FROM `lf1`
       WHERE EXISTS (
-        SELECT 1 FROM (
-        SELECT `x2` AS `x`, `b`
-        FROM `lf2`
-      ) `RHS`
-        WHERE (`lf1`.`x1` = `RHS`.`x`)
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x1` = `lf2`.`x2`)
       )
 
 # can combine full_join with other joins #1178
@@ -151,7 +148,7 @@
         FROM `df` AS `df_LHS`
         FULL JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       LEFT JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
@@ -167,7 +164,7 @@
         FROM `df` AS `df_LHS`
         LEFT JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       FULL JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
@@ -183,9 +180,25 @@
         FROM `df` AS `df_LHS`
         FULL JOIN `df` AS `df_RHS`
           ON (`df_LHS`.`x` = `df_RHS`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       FULL JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
+
+# filter() before semi join is inlined
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df_LHS`.*
+      FROM `df` AS `df_LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `df_RHS`
+        WHERE
+          (`df_LHS`.`x` = `df_RHS`.`x2`) AND
+          (`df_RHS`.`a` = 1) AND
+          (`df_RHS`.`b` = 2)
+      )
 
 # multiple joins create a single query
 
@@ -225,7 +238,7 @@
         FROM `df1`
         LEFT JOIN `df2`
           ON (`df1`.`x` = `df2`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       RIGHT JOIN `df3`
         ON (`LHS`.`x` = `df3`.`x`)
 
@@ -332,6 +345,15 @@
       ! Argument `unmatched` isn't supported on database backends.
       i For equi joins you can instead add a foreign key from `x` to `y` for the join columns.
 
+# using relationship gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", relationship = "one-to-one")
+    Condition
+      Error in `left_join()`:
+      ! `relationship = "one-to-one"` isn't supported on database backends.
+      i It must be "many-to-many" or `NULL` instead.
+
 # can optionally match NA values
 
     Code
@@ -374,7 +396,7 @@
 # joins reuse queries in cte mode
 
     Code
-      left_join(lf, lf) %>% remote_query(cte = TRUE)
+      left_join(lf, lf) %>% remote_query(sql_options = sql_options(cte = TRUE))
     Message
       Joining with `by = join_by(x)`
     Output

@@ -2,21 +2,21 @@
 
 test_that("custom scalar translated correctly", {
   local_con(simulate_mysql())
-  expect_equal(translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
+  expect_equal(test_translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
 
-  expect_equal(translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
-  expect_equal(translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
+  expect_equal(test_translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
+  expect_equal(test_translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
 })
 
 test_that("custom aggregators translated correctly", {
   local_con(simulate_mysql())
 
-  expect_equal(translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
+  expect_equal(test_translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
 })
 
 test_that("use CHAR type for as.character", {
   local_con(simulate_mysql())
-  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
+  expect_equal(test_translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
 })
 
 test_that("custom date escaping works as expected", {
@@ -33,12 +33,12 @@ test_that("custom date escaping works as expected", {
 test_that("custom stringr functions translated correctly", {
   local_con(simulate_mysql())
 
-  expect_equal(translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
-  expect_equal(translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
-  expect_equal(translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
-  expect_equal(translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
-  expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(test_translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
+  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
+  expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
+  expect_equal(test_translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
+  expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
 })
 
 # verbs -------------------------------------------------------------------
@@ -71,6 +71,19 @@ test_that("`sql_query_update_from()` is correct", {
     mutate(c = c + 1)
 
   expect_snapshot(
+    sql_query_update_from(
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      by = c("a", "b"),
+      update_values = sql(
+        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"
+      )
+    )
+  )
+
+  expect_snapshot_error(
     sql_query_update_from(
       con = con,
       table = ident("df_x"),

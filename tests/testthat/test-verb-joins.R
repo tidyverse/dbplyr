@@ -85,13 +85,15 @@ test_that("join works with in_schema", {
   )
 
   # use auto name for `ident_q`
+  # suppress info about <ident_q> only meant as a workaround
+  withr::local_options(rlib_message_verbosity = "quiet")
   df4 <- tbl(con, ident_q("`foo`.`df`"))
   df5 <- tbl(con, ident_q("`foo2`.`df`"))
   expect_snapshot(
     left_join(df4, df5, by = "x") %>% remote_query()
   )
   out <- left_join(df4, df5, by = "x")
-  expect_equal(out$lazy_query$table_names, tibble(name = c(NA_character_, NA), from = ""))
+  expect_equal(out$lazy_query$table_names, tibble(name = c("", ""), from = ""))
 })
 
 test_that("alias truncates long table names at database limit", {
@@ -561,6 +563,57 @@ test_that("select() before join is not inlined when using `sql_on`", {
   expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a2", "x")))
 })
 
+test_that("filter() before semi join is inlined", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x2 = 1, a = 2, b = 3, c = 4)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      select(x = x2, a2 = a, b) %>%
+      filter(a2 == 1L, b == 2L),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_equal(lq$where, list(quo(a == 1L), quo(b == 2L)), ignore_formula_env = TRUE)
+  expect_snapshot(out)
+})
+
+test_that("filter() before semi join is not when y has other operations", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x = 1, a = 2, b = 3)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      mutate(a = a + 1),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      distinct(),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      head(10),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+})
+
 test_that("multiple joins create a single query", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
@@ -940,6 +993,16 @@ test_that("using unmatched gives an informative error", {
   })
 })
 
+test_that("using relationship gives an informative error", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(left_join(lf, lf, by = "x", relationship = NULL))
+  expect_no_error(left_join(lf, lf, by = "x", relationship = "many-to-many"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", relationship = "one-to-one")
+  })
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {
@@ -1050,7 +1113,7 @@ test_that("left_join/inner_join uses *", {
 
   out <- lf1 %>%
     left_join(lf2, by = c("a", "b")) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1118,7 +1181,7 @@ test_that("right_join uses *", {
   out <- lf1 %>%
     right_join(lf2, by = c("a", "b")) %>%
     select(a, b, z, c) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1168,7 +1231,7 @@ test_that("cross_join uses *", {
   # does not use * if `use_star = FALSE`
   out <- lf1 %>%
     cross_join(lf2) %>%
-    sql_build(use_star = FALSE)
+    sql_build(sql_options = sql_options(use_star = FALSE))
 
   expect_equal(
     out$select,
@@ -1231,8 +1294,20 @@ test_that("joins reuse queries in cte mode", {
       lf,
       lf
     ) %>%
-      remote_query(cte = TRUE)
+      remote_query(sql_options = sql_options(cte = TRUE))
   )
+})
+
+test_that("can force to qualify all columns", {
+  lf1 <- lazy_frame(x = 1, a = 2, y = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, a = 2, z = 1, .name = "lf2")
+
+  unforced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = sql_options(qualify_all_columns = FALSE))
+  expect_equal(unforced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`y`", a.y = "`lf2`.`a`", z = "`z`"))
+  forced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = sql_options(qualify_all_columns = TRUE))
+  expect_equal(forced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`lf1`.`y`", a.y = "`lf2`.`a`", z = "`lf2`.`z`"))
 })
 
 # ops ---------------------------------------------------------------------

@@ -31,7 +31,7 @@ sql_case_match <- function(.x, ..., .default = NULL, .ptype = NULL) {
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN (", .x, ") THEN ", .y))
   if (!is_null(.default)) {
-    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = sql_current_con())
+    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = con)
     clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
@@ -69,11 +69,11 @@ sql_case_match_clause <- function(f, x, con) {
   query <- NULL
   if (!is_empty(f_query)) {
     f_query <- escape(f_query, con = con, parens = TRUE, collapse = ", ")
-    query <- translate_sql(!!x %in% !!f_query)
+    query <- translate_sql(!!x %in% !!f_query, con = sql_current_con())
   }
 
   if (has_na) {
-    query <- paste(c(query, build_sql(x, " IS NULL")), collapse = " OR ")
+    query <- paste(c(query, glue_sql2(con, "{x} IS NULL")), collapse = " OR ")
   }
 
   query
@@ -85,6 +85,8 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   enpared_if_true <- enpar(if_true)
   enpared_if_false <- enpar(if_false)
   enpared_missing <- enpar(missing)
+  con <- sql_current_con()
+
   out <- "CASE WHEN {.val enpared_cond} THEN {.val enpared_if_true}"
 
   # `ifelse()` and `if_else()` have a three value logic: they return `NA` resp.
@@ -99,7 +101,7 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   # Together these cases cover every possible case. So, if `if_false` and
   # `missing` are identical they can be simplified to `ELSE <if_false>`
   if (!quo_is_null(if_false) && identical(if_false, missing)) {
-    out <- glue_sql2(sql_current_con(), out, " ELSE {.val enpared_if_false} END")
+    out <- glue_sql2(con, out, " ELSE {.val enpared_if_false} END")
     return(out)
   }
 
@@ -109,12 +111,12 @@ sql_if <- function(cond, if_true, if_false = quo(NULL), missing = quo(NULL)) {
   }
 
   if (!quo_is_null(missing)) {
-    missing_cond <- translate_sql(is.na(!!cond), con = sql_current_con())
+    missing_cond <- translate_sql(is.na(!!cond), con = con)
     missing_sql <- " WHEN {.val missing_cond} THEN {.val enpared_missing}"
     out <- paste0(out, missing_sql)
   }
 
-  glue_sql2(sql_current_con(), out, " END")
+  glue_sql2(con, out, " END")
 }
 
 sql_case_when <- function(...,
@@ -125,6 +127,7 @@ sql_case_when <- function(...,
   # TODO: switch to dplyr::case_when_prepare when available
   check_unsupported_arg(.ptype, call = error_call)
   check_unsupported_arg(.size, call = error_call)
+  con <- sql_current_con()
 
   formulas <- list2(...)
   n <- length(formulas)
@@ -140,8 +143,8 @@ sql_case_when <- function(...,
     f <- formulas[[i]]
 
     env <- environment(f)
-    query[[i]] <- escape(enpar(quo(!!f[[2]]), tidy = FALSE, env = env), con = sql_current_con())
-    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = sql_current_con())
+    query[[i]] <- escape(enpar(quo(!!f[[2]]), tidy = FALSE, env = env), con = con)
+    value[[i]] <- escape(enpar(quo(!!f[[3]]), tidy = FALSE, env = env), con = con)
   }
 
   clauses <- purrr::map2_chr(query, value, ~ paste0("WHEN ", .x, " THEN ", .y))
@@ -150,7 +153,7 @@ sql_case_when <- function(...,
   if (is_true(formulas[[n]][[2]])) {
     clauses[[n]] <- paste0("ELSE ", value[[n]])
   } else if (!is_null(.default)) {
-    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = sql_current_con())
+    .default <- escape(enpar(quo(.default), tidy = FALSE, env = env), con = con)
     clauses[[n + 1]] <- paste0("ELSE ", .default)
   }
 
@@ -167,25 +170,26 @@ sql_case_when <- function(...,
 }
 
 sql_switch <- function(x, ...) {
+  con <- sql_current_con()
   input <- list2(...)
 
   named <- names2(input) != ""
 
   clauses <- purrr::map2_chr(names(input)[named], input[named], function(x, y) {
-    glue_sql2(sql_current_con(), "WHEN ({.val x}) THEN ({.val y})")
+    glue_sql2(con, "WHEN ({.val x}) THEN ({.val y})")
   })
 
   n_unnamed <- sum(!named)
   if (n_unnamed == 0) {
     # do nothing
   } else if (n_unnamed == 1) {
-    clauses <- c(clauses, build_sql("ELSE ", input[!named]))
+    clauses <- c(clauses, glue_sql2(con, "ELSE ({.val input[!named]})"))
   } else {
     cli_abort("Can only have one unnamed (ELSE) input")
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2(sql_current_con(), "CASE {.val x} {.sql clauses_collapsed} END")
+  glue_sql2(con, "CASE {.val x} {.sql clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {
@@ -204,7 +208,7 @@ enpar <- function(x, tidy = TRUE, env = NULL) {
     x_sql <- eval_bare(x, env = env)
   }
   if (quo_is_call(x)) {
-    build_sql("(", x_sql, ")")
+    glue_sql2(sql_current_con(), "({x_sql})")
   } else {
     x_sql
   }

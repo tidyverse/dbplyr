@@ -19,7 +19,7 @@
 NULL
 
 #' @export
-#' @rdname simulate_dbi
+#' @rdname backend-impala
 simulate_impala <- function() simulate_dbi("Impala")
 
 #' @export

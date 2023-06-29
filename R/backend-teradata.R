@@ -65,7 +65,7 @@ sql_query_select.Teradata <- function(con,
       lvl       = lvl + 1
     )
 
-    alias <- ident(unique_subquery_name())
+    alias <- unique_subquery_name()
     from <- sql_query_wrap(con, unlimited_query, name = alias)
     select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(con,
@@ -212,10 +212,10 @@ win_rank_tdata <- function(f) {
   force(f)
   function(order_by = NULL) {
     order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) order_by <- build_sql("(SELECT NULL)")
+    if (is_empty(order_by)) order_by <- sql("(SELECT NULL)")
 
     win_over(
-      build_sql(dplyr::sql(f), list()),
+      sql(glue("{f}()")),
       partition = win_current_group(),
       order = order_by,
       frame = win_current_frame()

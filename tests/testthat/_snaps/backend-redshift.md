@@ -16,7 +16,7 @@
         UNION ALL
       
         SELECT 1, '{1,2,3}'
-      ) `values_table`
+      ) AS `values_table`
     Code
       copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
     Output
@@ -33,5 +33,5 @@
         UNION ALL
       
         SELECT 1, '{1,2,3}'
-      ) `values_table`
+      ) AS `values_table`
 

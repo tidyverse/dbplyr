@@ -130,16 +130,17 @@ win_rank <- function(f) {
   function(order = NULL) {
     group <- win_current_group()
     order <- prepare_win_rank_over(enexpr(order), f = f)
+    con <- sql_current_con()
 
     if (!is_null(order)) {
-      order_over <- translate_sql_(order, con = sql_current_con())
+      order_over <- translate_sql_(order, con = con)
 
       order_symbols <- purrr::map_if(order, ~ is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
 
       is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
       any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
 
-      cond <- translate_sql((case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)))
+      cond <- translate_sql((case_when(!!any_na_expr ~ 1L, TRUE ~ 0L)), con = con)
       group <- sql(group, cond)
 
       not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
@@ -149,7 +150,7 @@ win_rank <- function(f) {
     }
 
     rank_sql <- win_over(
-      build_sql(sql(f), list()),
+      sql(glue("{f}()")),
       partition = group,
       order = order_over,
       frame = win_current_frame()
@@ -158,7 +159,7 @@ win_rank <- function(f) {
     if (is_null(order)) {
       rank_sql
     } else {
-      translate_sql(case_when(!!no_na_expr ~ !!rank_sql))
+      translate_sql(case_when(!!no_na_expr ~ !!rank_sql), con = con)
     }
   }
 }
@@ -194,7 +195,7 @@ win_aggregate <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      build_sql(sql(f), list(x)),
+      glue_sql2(sql_current_con(), "{f}({.val x})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -210,7 +211,7 @@ win_aggregate_2 <- function(f) {
     frame <- win_current_frame()
 
     win_over(
-      build_sql(sql(f), list(x, y)),
+      glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})"),
       partition = win_current_group(),
       order = if (!is.null(frame)) win_current_order(),
       frame = frame
@@ -230,7 +231,7 @@ win_cumulative <- function(f) {
   force(f)
   function(x, order = NULL) {
     win_over(
-      build_sql(sql(f), list(x)),
+      glue_sql2(sql_current_con(), "{f}({.val x})"),
       partition = win_current_group(),
       order = order %||% win_current_order(),
       frame = c(-Inf, 0)
@@ -246,9 +247,10 @@ sql_nth <- function(x,
                     error_call = caller_env()) {
   check_bool(na_rm, call = error_call)
   ignore_nulls <- arg_match(ignore_nulls, error_call = error_call)
+  con <- sql_current_con()
 
   frame <- win_current_frame()
-  args <- translate_sql(!!x)
+  args <- translate_sql(!!x, con = con)
   if (n == 1) {
     sql_f <- "FIRST_VALUE"
   } else if (is.infinite(n) && n > 0) {
@@ -259,7 +261,7 @@ sql_nth <- function(x,
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
-    args <- glue_sql2(sql_current_con(), "{.sql args}, {n}")
+    args <- glue_sql2(con, "{.sql args}, {n}")
   }
 
   if (na_rm) {
@@ -275,7 +277,7 @@ sql_nth <- function(x,
   }
 
   win_over(
-    glue_sql2(sql_current_con(), sql_expr),
+    glue_sql2(con, sql_expr),
     win_current_group(),
     order_by %||% win_current_order(),
     frame
@@ -434,7 +436,7 @@ translate_window_where <- function(expr, window_funs = common_window_funs()) {
       if (is_formula(expr)) {
         translate_window_where(f_rhs(expr), window_funs)
       } else if (is_call(expr, name = window_funs)) {
-        name <- unique_subquery_name()
+        name <- unique_column_name()
         window_where(sym(name), set_names(list(expr), name))
       } else {
         args <- lapply(expr[-1], translate_window_where, window_funs = window_funs)

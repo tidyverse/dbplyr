@@ -7,40 +7,40 @@ test_that("logicals translated to integers", {
 test_that("vectorised translations", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
-  expect_equal(translate_sql(paste0(x, y)), sql("`x` || `y`"))
+  expect_equal(test_translate_sql(paste(x, y)), sql("`x` || ' ' || `y`"))
+  expect_equal(test_translate_sql(paste0(x, y)), sql("`x` || `y`"))
 })
 
 test_that("pmin and max become MIN and MAX", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(pmin(x, y, na.rm = TRUE)), sql('MIN(`x`, `y`)'))
-  expect_equal(translate_sql(pmax(x, y, na.rm = TRUE)), sql('MAX(`x`, `y`)'))
+  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql('MIN(`x`, `y`)'))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql('MAX(`x`, `y`)'))
 })
 
 test_that("sqlite mimics two argument log", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(log(x)), sql('LOG(`x`)'))
-  expect_equal(translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
+  expect_equal(test_translate_sql(log(x)), sql('LOG(`x`)'))
+  expect_equal(test_translate_sql(log(x, 10)), sql('LOG(`x`) / LOG(10.0)'))
 })
 
 test_that("date-time", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(today()), sql("DATE('now')"))
-  expect_equal(translate_sql(now()), sql("DATETIME('now')"))
+  expect_equal(test_translate_sql(today()), sql("DATE('now')"))
+  expect_equal(test_translate_sql(now()), sql("DATETIME('now')"))
 })
 
 test_that("custom aggregates translated", {
   local_con(simulate_sqlite())
 
-  expect_equal(translate_sql(median(x, na.rm = TRUE), window = FALSE), sql('MEDIAN(`x`)'))
-  expect_equal(translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
+  expect_equal(test_translate_sql(median(x, na.rm = TRUE), window = FALSE), sql('MEDIAN(`x`)'))
+  expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
 
   expect_snapshot({
-    (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
-    (expect_error(translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
+    (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
+    (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
   })
 })
 
@@ -50,12 +50,12 @@ test_that("custom SQL translation", {
   lf <- lazy_frame(x = 1, con = simulate_sqlite())
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
 
-  expect_snapshot(translate_sql(runif(n())))
+  expect_snapshot(test_translate_sql(runif(n())))
 })
 
 test_that("case_when translates correctly to ELSE when TRUE ~ is used", {
   expect_snapshot(
-    translate_sql(
+    test_translate_sql(
       case_when(
         x == 1L ~ "yes",
         x == 0L ~ "no",

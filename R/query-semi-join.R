@@ -5,6 +5,7 @@ semi_join_query <- function(x,
                             vars,
                             anti = FALSE,
                             by = NULL,
+                            where = NULL,
                             na_matches = FALSE) {
   structure(
     list(
@@ -13,6 +14,7 @@ semi_join_query <- function(x,
       vars = vars,
       anti = anti,
       by = by,
+      where = where,
       na_matches = na_matches
     ),
     class = c("semi_join_query", "query")
@@ -26,6 +28,12 @@ print.semi_join_query <- function(x, ...) {
   cat_line("By:")
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
 
+  if (length(x$where)) {
+    cat_line("Where:")
+    where <- purrr::map_chr(x$where, as_label)
+    cat_line(indent(paste0(where)))
+  }
+
   cat_line("X:")
   cat_line(indent_print(x$x))
 
@@ -37,6 +45,7 @@ print.semi_join_query <- function(x, ...) {
 sql_render.semi_join_query <- function(query,
                                        con = NULL,
                                        ...,
+                                       sql_options = NULL,
                                        subquery = FALSE,
                                        lvl = 0) {
   from_x <- sql_render(query$x, con, ..., subquery = TRUE, lvl = lvl + 1)
@@ -49,6 +58,10 @@ sql_render.semi_join_query <- function(query,
     vars = query$vars,
     anti = query$anti,
     by = query$by,
+    where = query$where,
     lvl = lvl
   )
 }
+
+#' @export
+flatten_query.semi_join_query <- flatten_query_2_tables
