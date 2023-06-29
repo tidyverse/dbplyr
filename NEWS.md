@@ -32,6 +32,8 @@
 
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
+  * `head(n)` is now translated to `WHERE ROWNUM <= n` to also support old
+    versions <= 11.2 (@JeremyPasco, #1292).
 
 * Teradata:
   * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
