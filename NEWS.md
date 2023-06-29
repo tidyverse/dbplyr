@@ -32,6 +32,8 @@
 
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
+  * `head(n)` is now translated to `WHERE ROWNUM <= n` to also support old
+    versions <= 11.2 (@JeremyPasco, #1292).
 
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
