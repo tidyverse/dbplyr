@@ -92,6 +92,8 @@
 <li>
 <p>Oracle:</p>
 <ul><li>Fix translation of <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/TBlackmore" class="external-link">@TBlackmore</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1286" class="external-link">#1286</a>)</li>
+<li>
+<code>head(n)</code> is now translated to <code>WHERE ROWNUM &lt;= n</code> to also support old versions &lt;= 11.2 (<a href="https://github.com/JeremyPasco" class="external-link">@JeremyPasco</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1292" class="external-link">#1292</a>).</li>
 </ul></li>
 <li>
 <p>Teradata:</p>
