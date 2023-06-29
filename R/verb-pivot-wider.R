@@ -224,7 +224,7 @@ dbplyr_pivot_wider_spec <- function(data,
 
   values_fn <- check_list_of_functions(values_fn, values_from_cols, call = error_call)
 
-  unused_cols <- setdiff(names(data), c(id_cols, names_from_cols, values_from_cols))
+  unused_cols <- setdiff(colnames(data), c(id_cols, names_from_cols, values_from_cols))
   unused_fn <- check_list_of_functions(unused_fn, unused_cols, call = error_call)
   unused_cols <- names(unused_fn)
 

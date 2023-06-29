@@ -25,3 +25,12 @@
       SELECT *
       FROM `df`
 
+# names() inform that they aren't meant to be used
+
+    Code
+      names(lazy_frame(x = 1))
+    Message
+      Did you mean `colnames()`?
+    Output
+      [1] "lazy_query" "src"       
+

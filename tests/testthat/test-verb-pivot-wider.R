@@ -295,7 +295,7 @@ test_that("`unused_fn` can summarize unused columns (#990)", {
     res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = list(unused1 = max)) %>%
       collect()
   )
-  expect_named(res, c("id", "a", "b", "unused1"))
+  expect_equal(colnames(res), c("id", "a", "b", "unused1"))
   expect_identical(res$unused1, c(2, 4))
 
   # Globally
@@ -303,7 +303,7 @@ test_that("`unused_fn` can summarize unused columns (#990)", {
     res <- tidyr::pivot_wider(df, id_cols = id, unused_fn = min) %>%
       collect()
   )
-  expect_named(res, c("id", "a", "b", "unused1", "unused2"))
+  expect_equal(colnames(res), c("id", "a", "b", "unused1", "unused2"))
   expect_identical(res$unused1, c(1, 3))
   expect_identical(res$unused2, c(11, 13))
 })
