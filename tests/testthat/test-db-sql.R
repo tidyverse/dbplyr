@@ -21,8 +21,7 @@ test_that("sql_query_rows() works", {
 })
 
 test_that("handles DBI error", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
+  con <- local_sqlite_connection()
 
   expect_snapshot({
     (expect_error(db_analyze(con, "tbl")))

@@ -94,7 +94,7 @@ test_that("compute can handle named name", {
 
 test_that("compute can handle schema", {
   df <- memdb_frame(x = 1:10)
-  on.exit(DBI::dbRemoveTable(remote_con(df), "db1"))
+  withr::defer(DBI::dbRemoveTable(remote_con(df), "db1"))
 
   expect_equal(
     df %>%
@@ -116,6 +116,12 @@ test_that("collect() handles DBI error", {
     (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect())),
     transform = snap_transform_dbi
   )
+})
+
+test_that("compute(temporary = FALSE) without a name is deprecated", {
+  df <- memdb_frame(x = 1:10)
+
+  expect_snapshot_warning(df %>% compute(temporary = FALSE))
 })
 
 # ops ---------------------------------------------------------------------

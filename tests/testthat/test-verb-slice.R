@@ -16,6 +16,7 @@ test_that("slice_min handles arguments", {
 
   expect_snapshot(error = TRUE, db %>% slice_min())
   expect_snapshot(error = TRUE, db %>% slice_min(id, prop = 0.5, with_ties = FALSE))
+  expect_snapshot(error = TRUE, db %>% slice_min(id, n = 1, na_rm = FALSE))
 })
 
 test_that("slice_max orders in opposite order", {
@@ -24,6 +25,18 @@ test_that("slice_max orders in opposite order", {
   expect_equal(db %>% slice_max(id) %>% pull(), 3)
   expect_equal(db %>% slice_max(x) %>% pull(), 3)
   expect_snapshot(error = TRUE, db %>% slice_max())
+  expect_snapshot(error = TRUE, db %>% slice_max(id, n = 1, na_rm = FALSE))
+})
+
+test_that("slice_* can use data masking pronouns", {
+  lf <- lazy_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  x <- -1L
+
+  expect_snapshot({
+    lf %>% slice_max(x)
+    lf %>% slice_max(.data$x)
+    lf %>% slice_max(.data$x * .env$x)
+  })
 })
 
 test_that("slice_sample errors when expected", {

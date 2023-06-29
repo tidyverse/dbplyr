@@ -17,7 +17,7 @@ Query <- R6::R6Class("Query",
 
     # nocov start
     print = function(...) {
-      cat("<Query> ", self$sql, "\n", sep = "")
+      cat_line("<Query> ", self$sql)
       print(self$con)
     },
 

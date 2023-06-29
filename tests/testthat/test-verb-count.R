@@ -43,21 +43,21 @@ test_that("count() does not create groups", {
 test_that("informs if n column already present, unless overridden", {
   df1 <- lazy_frame(n = c(1, 1, 2, 2, 2))
   expect_message(out <- count(df1, n), "already present")
-  expect_named(out, c("n", "nn"))
+  expect_equal(colnames(out), c("n", "nn"))
 
   # not a good idea, but supported
   expect_message(out <- count(df1, n, name = "n"), NA)
-  expect_named(out, "n")
+  expect_equal(colnames(out), "n")
 
   expect_message(out <- count(df1, n, name = "nn"), NA)
-  expect_named(out, c("n", "nn"))
+  expect_equal(colnames(out), c("n", "nn"))
 
   df2 <- lazy_frame(n = c(1, 1, 2, 2, 2), nn = 1:5)
   expect_message(out <- count(df2, n), "already present")
-  expect_named(out, c("n", "nn"))
+  expect_equal(colnames(out), c("n", "nn"))
 
   expect_message(out <- count(df2, n, nn), "already present")
-  expect_named(out, c("n", "nn", "nnn"))
+  expect_equal(colnames(out), c("n", "nn", "nnn"))
 })
 
 test_that(".drop is not supported", {

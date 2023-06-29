@@ -1,23 +1,23 @@
 # two filters equivalent to one
 
     Code
-      df1 %>% remote_query()
+      lf1 %>% remote_query()
     Output
-      <SQL> SELECT *
+      <SQL> SELECT `df`.*
       FROM `df`
       WHERE (`x` > 3.0) AND (`y` < 3.0)
 
 ---
 
     Code
-      df1 %>% remote_query()
+      lf1 %>% remote_query()
     Output
       <SQL> SELECT `x`, `y`
       FROM (
-        SELECT *, AVG(`x`) OVER () AS `q01`
+        SELECT `df`.*, AVG(`x`) OVER () AS `col01`
         FROM `df`
-      )
-      WHERE (`q01` > 3.0) AND (`y` < 3.0)
+      ) AS `q01`
+      WHERE (`col01` > 3.0) AND (`y` < 3.0)
 
 # errors for named input
 
@@ -66,10 +66,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, MAX(`x`) OVER () AS `q01`
+        SELECT `df`.*, MAX(`x`) OVER () AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`x` = `q01`) AND (`x` IN (1, 2))
+      ) AS `q01`
+      WHERE (`x` = `col01`) AND (`x` IN (1, 2))
 
 # filter() after summarise() uses `HAVING`
 
@@ -131,11 +131,11 @@
       (out <- lf %>% filter(x_mean > 1))
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        SELECT *, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
+        SELECT `df`.*, AVG(`x`) OVER (PARTITION BY `g`, `h`) AS `x_mean`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (`x_mean` > 1.0)
 
 # filter() using a window function after summarise() does not use `HAVING`
@@ -151,13 +151,13 @@
       SELECT `g`, `h`, `x_mean`
       FROM (
         SELECT
-          *,
-          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `q02`
+          `q01`.*,
+          SUM(`x_mean`) OVER (PARTITION BY `g` ROWS UNBOUNDED PRECEDING) AS `col01`
         FROM (
           SELECT `g`, `h`, AVG(`x`) AS `x_mean`
           FROM `df`
           GROUP BY `g`, `h`
-        ) `q01`
-      ) `q02`
-      WHERE (`q02` = 1.0)
+        ) AS `q01`
+      ) AS `q01`
+      WHERE (`col01` = 1.0)
 

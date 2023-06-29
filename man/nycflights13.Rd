@@ -12,7 +12,7 @@ nycflights13_sqlite(path = NULL)
 
 nycflights13_postgres(dbname = "nycflights13", ...)
 
-has_nycflights13(type = c("sqlite", "postgresql"), ...)
+has_nycflights13(type = c("sqlite", "postgres"), ...)
 
 copy_nycflights13(con, ...)
 }

@@ -32,3 +32,11 @@
       Error in `sin()`:
       ! supplied argument name 'a' does not match 'x'
 
+# runif is translated
+
+    Code
+      test_translate_sql(runif(2))
+    Condition
+      Error in `sql_runif()`:
+      ! Only `n = n()` is supported.
+

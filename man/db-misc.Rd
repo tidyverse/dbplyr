@@ -7,11 +7,11 @@
 \alias{dbplyr_edition}
 \title{Miscellaneous database generics}
 \usage{
-db_connection_describe(con)
+db_connection_describe(con, ...)
 
-sql_join_suffix(con, ...)
+sql_join_suffix(con, suffix, ...)
 
-db_sql_render(con, sql, ..., cte = FALSE)
+db_sql_render(con, sql, ..., cte = FALSE, sql_options = NULL)
 
 dbplyr_edition(con)
 }

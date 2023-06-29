@@ -31,12 +31,13 @@ db_desc.DBIConnection <- function(x) {
 }
 #' @export
 #' @rdname db-misc
-db_connection_describe <- function(con) {
+db_connection_describe <- function(con, ...) {
+  check_dots_used()
   UseMethod("db_connection_describe")
 }
 # nocov start
 #' @export
-db_connection_describe.DBIConnection <- function(con) {
+db_connection_describe.DBIConnection <- function(con, ...) {
   class(con)[[1]]
 }
 # nocov end
@@ -44,22 +45,120 @@ db_connection_describe.DBIConnection <- function(con) {
 
 #' @rdname db-misc
 #' @export
-sql_join_suffix <- function(con, ...) {
+sql_join_suffix <- function(con, suffix, ...) {
   UseMethod("sql_join_suffix")
 }
 #' @export
-sql_join_suffix.DBIConnection <- function(con, ...) {
-  c(".x", ".y")
+sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
+  suffix %||% c(".x", ".y")
 }
 
 #' @rdname db-misc
 #' @export
-db_sql_render <- function(con, sql, ..., cte = FALSE) {
+db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
+  check_bool(cte)
+  if (cte) {
+    lifecycle::deprecate_soft(
+      when = "2.4.0",
+      what = "db_sql_render(cte)",
+      with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
+    )
+    sql_options <- sql_options(cte = TRUE)
+  }
+
+  if (is.null(sql_options)) {
+    sql_options <- sql_options()
+
+    out <- db_sql_render(con, sql, sql_options = sql_options)
+    return(out)
+  }
+
   UseMethod("db_sql_render")
 }
 #' @export
-db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE) {
-  sql_render(sql, con = con, ..., cte = cte)
+db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
+  sql_render(sql, con = con, ..., sql_options = sql_options)
+}
+
+#' Options for generating SQL
+#'
+#' @param cte If `FALSE`, the default, subqueries are used. If `TRUE` common
+#'   table expressions are used.
+#' @param use_star If `TRUE`, the default, `*` is used to select all columns of
+#'   a table. If `FALSE` all columns are explicitly selected.
+#' @param qualify_all_columns If `FALSE`, the default, columns are only
+#'   qualified with the table they come from if the same column name appears in
+#'   multiple tables.
+#'
+#' @return A <dbplyr_sql_options> object.
+#' @export
+#'
+#' @examples
+#' library(dplyr, warn.conflicts = FALSE)
+#' lf1 <- lazy_frame(key = 1, a = 1, b = 2)
+#' lf2 <- lazy_frame(key = 1, a = 1, c = 3)
+#'
+#' result <- left_join(lf1, lf2, by = "key") %>%
+#'   filter(c >= 3)
+#'
+#' show_query(result)
+#' sql_options <- sql_options(cte = TRUE, qualify_all_columns = TRUE)
+#' show_query(result, sql_options = sql_options)
+sql_options <- function(cte = FALSE, use_star = TRUE, qualify_all_columns = FALSE) {
+  check_bool(cte)
+  check_bool(use_star)
+  check_bool(qualify_all_columns)
+
+  data <- list(
+    cte = cte,
+    use_star = use_star,
+    qualify_all_columns = qualify_all_columns
+  )
+  class(data) <- "dbplyr_sql_options"
+  data
+}
+
+as_sql_options <- function(x, error_arg = caller_arg(x), error_call = caller_env()) {
+  if (is.null(x)) {
+    x <- sql_options()
+    return(x)
+  }
+
+  if (!inherits(x, "dbplyr_sql_options")) {
+    stop_input_type(
+      x = x,
+      what = I("an object created by `sql_options()`"),
+      arg = error_arg,
+      call = error_call
+    )
+  }
+
+  x
+}
+
+#' @export
+print.dbplyr_sql_options <- function(x, ...) {
+  if (x$cte) {
+    cte <- "Use CTE"
+  } else {
+    cte <- "Use subqueries"
+  }
+
+  if (x$use_star) {
+    star <- "Use {.val SELECT *} where possible"
+  } else {
+    star <- "Explicitly select all columns"
+  }
+
+  if (x$qualify_all_columns) {
+    join_table_name <- "Qualify all columns"
+  } else {
+    join_table_name <- "Qualify only ambigous columns"
+  }
+
+  msg <- c(cte, star, join_table_name)
+  msg <- set_names(msg, "*")
+  cli::cli_inform(msg)
 }
 
 #' @rdname db-misc

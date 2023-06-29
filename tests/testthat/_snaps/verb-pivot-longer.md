@@ -4,15 +4,13 @@
       lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y)
     Output
       <SQL>
-      (
-        SELECT 'x' AS `name`, `x` AS `value`
-        FROM `df`
-      )
+      SELECT 'x' AS `name`, `x` AS `value`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT 'y' AS `name`, `y` AS `value`
-        FROM `df`
-      )
+      
+      SELECT 'y' AS `name`, `y` AS `value`
+      FROM `df`
 
 # can add multiple columns from spec
 
@@ -20,15 +18,13 @@
       pv
     Output
       <SQL>
-      (
-        SELECT 11 AS `a`, 13 AS `b`, `x` AS `v`
-        FROM `df`
-      )
+      SELECT 11 AS `a`, 13 AS `b`, `x` AS `v`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT 12 AS `a`, 14 AS `b`, `y` AS `v`
-        FROM `df`
-      )
+      
+      SELECT 12 AS `a`, 14 AS `b`, `y` AS `v`
+      FROM `df`
 
 # preserves original keys
 
@@ -36,15 +32,13 @@
       pv
     Output
       <SQL>
-      (
-        SELECT `x`, 'y' AS `name`, `y` AS `value`
-        FROM `df`
-      )
+      SELECT `x`, 'y' AS `name`, `y` AS `value`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `x`, 'z' AS `name`, `z` AS `value`
-        FROM `df`
-      )
+      
+      SELECT `x`, 'z' AS `name`, `z` AS `value`
+      FROM `df`
 
 # can drop missing values
 
@@ -53,18 +47,16 @@
       values_drop_na = TRUE)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        (
-          SELECT 'x' AS `name`, `x` AS `value`
-          FROM `df`
-        )
+        SELECT 'x' AS `name`, `x` AS `value`
+        FROM `df`
+      
         UNION ALL
-        (
-          SELECT 'y' AS `name`, `y` AS `value`
-          FROM `df`
-        )
-      ) `q01`
+      
+        SELECT 'y' AS `name`, `y` AS `value`
+        FROM `df`
+      ) AS `q01`
       WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
@@ -73,18 +65,16 @@
       sql
     Output
       <SQL>
-      (
-        SELECT *, NULL AS `y`
-        FROM (
-          SELECT `id`, '1' AS `n`, `x_1` AS `x`
-          FROM `df`
-        ) `q01`
-      )
-      UNION ALL
-      (
-        SELECT `id`, '2' AS `n`, `x_2` AS `x`, `y_2` AS `y`
+      SELECT `q01`.*, NULL AS `y`
+      FROM (
+        SELECT `id`, '1' AS `n`, `x_1` AS `x`
         FROM `df`
-      )
+      ) AS `q01`
+      
+      UNION ALL
+      
+      SELECT `id`, '2' AS `n`, `x_2` AS `x`, `y_2` AS `y`
+      FROM `df`
 
 # can override default output column type
 
@@ -110,14 +100,9 @@
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
-      <error/purrr_error_indexed>
-      Error in `purrr::map()`:
-      i In index: 1.
-      Caused by error in `map2()`:
-      i In index: 1.
-      i With name: value.
-      Caused by error in `dbplyr_pivot_longer_spec()`:
-      ! Can't convert to a function.
+      <error/rlang_error>
+      Error in `dbplyr_pivot_longer_spec()`:
+      ! `values_transform` must be `NULL`, a function, or a named list of functions.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
@@ -140,15 +125,13 @@
       value_first
     Output
       <SQL>
-      (
-        SELECT `i`, 't1' AS `time`, `y_t1` AS `y`, `z_t1` AS `z`
-        FROM `df`
-      )
+      SELECT `i`, 't1' AS `time`, `y_t1` AS `y`, `z_t1` AS `z`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `i`, 't2' AS `time`, `y_t2` AS `y`, `z_t2` AS `z`
-        FROM `df`
-      )
+      
+      SELECT `i`, 't2' AS `time`, `y_t2` AS `y`, `z_t2` AS `z`
+      FROM `df`
 
 ---
 
@@ -156,15 +139,13 @@
       value_second
     Output
       <SQL>
-      (
-        SELECT `i`, 't1' AS `time`, `t1_y` AS `y`, `t1_z` AS `z`
-        FROM `df`
-      )
+      SELECT `i`, 't1' AS `time`, `t1_y` AS `y`, `t1_z` AS `z`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
-        FROM `df`
-      )
+      
+      SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
+      FROM `df`
 
 # can repair names
 

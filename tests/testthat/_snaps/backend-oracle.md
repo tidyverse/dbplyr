@@ -4,28 +4,28 @@
       mf %>% head()
     Output
       <SQL>
-      SELECT *
-      FROM (`df`) 
-      FETCH FIRST 6 ROWS ONLY
+      SELECT `df`.*
+      FROM `df`
+      WHERE (ROWNUM <= 6)
 
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_oracle(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
-      method = "merge")
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"), method = "merge")
     Output
       <SQL> MERGE INTO `df_x`
       USING (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM (`df_y`) 
+        FROM `df_y`
       ) `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        ON (`...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`)
       WHEN MATCHED THEN
-        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
       WHEN NOT MATCHED THEN
-        INSERT (`c`, `d`)
-        VALUES (`...y`.`c`, `...y`.`d`)
+        INSERT (`a`, `b`, `c`, `d`)
+        VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
       ;
 
@@ -51,8 +51,8 @@
     Output
       <SQL>
       SELECT `df_LHS`.`x` AS `x`
-      FROM (`df`) `df_LHS`
-      LEFT JOIN (`df`) `df_RHS`
+      FROM `df` `df_LHS`
+      LEFT JOIN `df` `df_RHS`
         ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---
@@ -60,8 +60,7 @@
     Code
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"))
     Output
-      <SQL> CREATE GLOBAL TEMPORARY TABLE 
-      `schema`.`tbl` AS
+      <SQL> CREATE GLOBAL TEMPORARY TABLE `schema`.`tbl` AS
       SELECT * FROM foo
 
 ---
@@ -70,8 +69,7 @@
       sql_query_save(con, sql("SELECT * FROM foo"), in_schema("schema", "tbl"),
       temporary = FALSE)
     Output
-      <SQL> CREATE TABLE 
-      `schema`.`tbl` AS
+      <SQL> CREATE TABLE `schema`.`tbl` AS
       SELECT * FROM foo
 
 ---
@@ -82,10 +80,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `x`, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.RANDOM()) AS `q01`
-        FROM (`df`) 
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
+        FROM `df`
       ) `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 # copy_inline uses UNION ALL
 
@@ -93,38 +91,38 @@
       copy_inline(con, y %>% slice(0)) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS INT) AS `id`, CAST(NULL AS VARCHAR2(255)) AS `arr`
-      FROM (`DUAL`) 
+      FROM `DUAL`
       WHERE (0 = 1)
     Code
       copy_inline(con, y) %>% remote_query()
     Output
       <SQL> SELECT CAST(`id` AS INT) AS `id`, CAST(`arr` AS VARCHAR2(255)) AS `arr`
       FROM (
-        (
-          SELECT NULL AS `id`, NULL AS `arr`
-          FROM (`DUAL`) 
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `id`, NULL AS `arr`
+        FROM `DUAL`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (SELECT 1, '{1,2,3}' FROM DUAL)
+      
+        SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
     Code
       copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
     Output
       <SQL> SELECT CAST(NULL AS bigint) AS `id`, CAST(NULL AS integer[]) AS `arr`
-      FROM (`DUAL`) 
+      FROM `DUAL`
       WHERE (0 = 1)
     Code
       copy_inline(con, y, types = types) %>% remote_query()
     Output
       <SQL> SELECT CAST(`id` AS bigint) AS `id`, CAST(`arr` AS integer[]) AS `arr`
       FROM (
-        (
-          SELECT NULL AS `id`, NULL AS `arr`
-          FROM (`DUAL`) 
-          WHERE (0 = 1)
-        )
+        SELECT NULL AS `id`, NULL AS `arr`
+        FROM `DUAL`
+        WHERE (0 = 1)
+      
         UNION ALL
-        (SELECT 1, '{1,2,3}' FROM DUAL)
+      
+        SELECT 1, '{1,2,3}' FROM DUAL
       ) `values_table`
 

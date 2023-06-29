@@ -12,8 +12,7 @@ test_that("escaped as needed", {
 })
 
 test_that("can copy and collect with schema or Id", {
-  con <- sqlite_con_with_aux()
-  on.exit(dbDisconnect(con))
+  con <- local_sqlite_con_with_aux()
   df <- tibble(x = 1:10)
 
   db <- copy_to(con, df, in_schema("aux", "db1"), temporary = FALSE)

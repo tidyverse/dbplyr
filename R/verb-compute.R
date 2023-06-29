@@ -32,16 +32,27 @@ collapse.tbl_sql <- function(x, ...) {
 #' @export
 #' @importFrom dplyr compute
 compute.tbl_sql <- function(x,
-                            name = unique_table_name(),
+                            name = NULL,
                             temporary = TRUE,
                             unique_indexes = list(),
                             indexes = list(),
                             analyze = TRUE,
                             ...,
                             cte = FALSE) {
-  if (is_bare_character(x) || is.ident(x) || is.sql(x)) {
-    name <- unname(name)
+  check_bool(temporary)
+
+  if (is.null(name)) {
+    if (!temporary) {
+      lifecycle::deprecate_warn(
+        "2.3.3",
+        # what = I(cli::format_inline("Not providing a name when {.code temporary = FALSE}"))
+        what = "compute(name = 'must be provided when `temporary = FALSE`')"
+      )
+    }
+    name <- unique_table_name()
   }
+
+  name <- as_table_ident(name)
   vars <- op_vars(x)
 
   compute_check_indexes(x, indexes)
@@ -58,7 +69,7 @@ compute.tbl_sql <- function(x,
     ...
   )
 
-  tbl_src_dbi(x$src, as.sql(name, x$src$con), colnames(x)) %>%
+  tbl_src_dbi(x$src, name, colnames(x)) %>%
     group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
 }

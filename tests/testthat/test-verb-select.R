@@ -166,8 +166,8 @@ test_that("select() after left_join() is inlined", {
       relocate(b))
   )
   expect_equal(op_vars(out), c("b", "x", "a"))
-  expect_equal(out$lazy_query$vars$var, list("b", "x", "a"))
-  expect_equal(out$lazy_query$vars$table, list(2L, 1L, 1L))
+  expect_equal(out$lazy_query$vars$var, c("b", "x", "a"))
+  expect_equal(out$lazy_query$vars$table, c(2L, 1L, 1L))
 
   out <- left_join(lf1, lf2, by = "x") %>%
       transmute(b, x = x + 1)
@@ -227,8 +227,8 @@ test_that("select() after join handles previous select", {
 
   expect_equal(op_vars(lf2), c("x2", "y3", "z"))
   vars2 <- lf2$lazy_query$vars
-  expect_equal(vars2$var, list("x", "y", "z"))
-  expect_equal(vars2$table, list(1L, 1L, 1L))
+  expect_equal(vars2$var, c("x", "y", "z"))
+  expect_equal(vars2$table, c(1L, 1L, 1L))
 
   expect_equal(op_grps(lf2), c("x2", "y3", "z"))
   expect_snapshot(print(lf2))
@@ -277,6 +277,13 @@ test_that("select() produces nice error messages", {
   })
 })
 
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    lf %>% select(where(is.integer))
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
@@ -305,7 +312,7 @@ test_that("output is styled", {
     filter(z == 1) %>%
     left_join(lf, by = "x")
 
-  expect_snapshot(show_query(out, cte = TRUE))
+  expect_snapshot(show_query(out, sql_options = sql_options(cte = TRUE)))
 })
 
 # sql_build -------------------------------------------------------------
@@ -365,6 +372,13 @@ test_that("mutate preserves grouping vars (#396)", {
   df <- lazy_frame(a = 1, b = 2, c = 3) %>% group_by(a, b)
   expect_equal(df %>% mutate(a = 1) %>% op_grps(), c("a", "b"))
   expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
+})
+
+test_that("select after arrange(desc()) works (#1206)", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    arrange(desc(x)) %>%
+    select(x)
+  expect_equal(op_vars(out), "x")
 })
 
 

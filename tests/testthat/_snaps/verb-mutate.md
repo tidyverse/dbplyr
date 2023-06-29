@@ -6,9 +6,9 @@
       <SQL>
       SELECT 0.0 AS `x`
       FROM (
-        SELECT DISTINCT *
+        SELECT DISTINCT `df`.*
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # can use window function after summarise and pure projection #1104
 
@@ -16,12 +16,12 @@
       (expect_no_error(lf %>% mutate(r = row_number())))
     Output
       <SQL>
-      SELECT *, ROW_NUMBER() OVER () AS `r`
+      SELECT `q01`.*, ROW_NUMBER() OVER () AS `r`
       FROM (
         SELECT `g`
         FROM `df`
         GROUP BY `g`
-      ) `q01`
+      ) AS `q01`
 
 # can refer to fresly created values
 
@@ -35,8 +35,8 @@
         FROM (
           SELECT `x` + 1.0 AS `x`
           FROM `multi_mutate`
-        )
-      )
+        ) AS `q01`
+      ) AS `q01`
 
 # transmute includes all needed variables
 
@@ -48,7 +48,7 @@
       FROM (
         SELECT `x` / 2.0 AS `x`, `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # across() does not select grouping variables
 
@@ -75,9 +75,9 @@
     Output
       <SQL> SELECT `x`, SQRT(`y`) AS `y`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # across() uses original column rather than overriden one
 
@@ -91,19 +91,19 @@
         FROM (
           SELECT -`x` AS `x`, `y`, `z`
           FROM `df`
-        ) `q01`
-      ) `q02`
+        ) AS `q01`
+      ) AS `q01`
 
 # new columns take precedence over global variables
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT *, `y` + 1.0 AS `z`
+      <SQL> SELECT `q01`.*, `y` + 1.0 AS `z`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # mutate() produces nice error messages
 
@@ -141,7 +141,7 @@
       FROM (
         SELECT `x` + 1.0 AS `x`
         FROM `df`
-      )
+      ) AS `q01`
 
 ---
 
@@ -149,11 +149,11 @@
       lf %>% mutate(x1 = x + 1, x2 = x1 + 1)
     Output
       <SQL>
-      SELECT *, `x1` + 1.0 AS `x2`
+      SELECT `q01`.*, `x1` + 1.0 AS `x2`
       FROM (
-        SELECT *, `x` + 1.0 AS `x1`
+        SELECT `df`.*, `x` + 1.0 AS `x1`
         FROM `df`
-      )
+      ) AS `q01`
 
 # mutate collapses over nested select
 
@@ -182,14 +182,14 @@
       FROM (
         SELECT 2.0 AS `x`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # var = NULL when var is in final output
 
     Code
       remote_query(lf)
     Output
-      <SQL> SELECT *, 3.0 AS `y`
+      <SQL> SELECT `df`.*, 3.0 AS `y`
       FROM `df`
 
 # temp var with nested arguments
@@ -199,7 +199,7 @@
     Output
       <SQL> SELECT `x`, `y` * 2.0 AS `z`
       FROM (
-        SELECT *, 2.0 AS `y`
+        SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 

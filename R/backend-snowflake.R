@@ -156,25 +156,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        build_sql("INTERVAL '", x, " second'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} second'")
       },
       minutes = function(x) {
-        build_sql("INTERVAL '", x, " minute'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} minute'")
       },
       hours = function(x) {
-        build_sql("INTERVAL '", x, " hour'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} hour'")
       },
       days = function(x) {
-        build_sql("INTERVAL '", x, " day'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} day'")
       },
       weeks = function(x) {
-        build_sql("INTERVAL '", x, " week'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} week'")
       },
       months = function(x) {
-        build_sql("INTERVAL '", x, " month'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} month'")
       },
       years = function(x) {
-        build_sql("INTERVAL '", x, " year'")
+        glue_sql2(sql_current_con(), "INTERVAL '{x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
@@ -224,7 +224,12 @@ simulate_snowflake <- function() simulate_dbi("Snowflake")
 #' @export
 sql_table_analyze.Snowflake <- function(con, table, ...) {}
 
-snowflake_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+snowflake_grepl <- function(pattern,
+                            x,
+                            ignore.case = FALSE,
+                            perl = FALSE,
+                            fixed = FALSE,
+                            useBytes = FALSE) {
   # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
   check_unsupported_arg(ignore.case, FALSE, backend = "Snowflake")
   check_unsupported_arg(perl, FALSE, backend = "Snowflake")

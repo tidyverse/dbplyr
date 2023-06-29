@@ -6,9 +6,27 @@
 \alias{slice_sample.tbl_lazy}
 \title{Subset rows using their positions}
 \usage{
-\method{slice_min}{tbl_lazy}(.data, order_by, ..., n, prop, by = NULL, with_ties = TRUE)
+\method{slice_min}{tbl_lazy}(
+  .data,
+  order_by,
+  ...,
+  n,
+  prop,
+  by = NULL,
+  with_ties = TRUE,
+  na_rm = TRUE
+)
 
-\method{slice_max}{tbl_lazy}(.data, order_by, ..., n, by = NULL, prop, with_ties = TRUE)
+\method{slice_max}{tbl_lazy}(
+  .data,
+  order_by,
+  ...,
+  n,
+  by = NULL,
+  prop,
+  with_ties = TRUE,
+  na_rm = TRUE
+)
 
 \method{slice_sample}{tbl_lazy}(.data, ..., n, prop, by = NULL, weight_by = NULL, replace = FALSE)
 }
@@ -36,6 +54,11 @@ details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 \item{with_ties}{Should ties be kept together? The default, \code{TRUE}, may
 return more rows than you request. Use FALSE to ignore ties, and return
 the first n rows.}
+
+\item{na_rm}{Should missing values in \code{order_by} be removed from the result?
+If \code{FALSE}, \code{NA} values are sorted to the end (like in \code{\link[dplyr:arrange]{arrange()}}), so
+they will only be included if there are insufficient non-missing values to
+reach \code{n}/\code{prop}.}
 
 \item{weight_by, replace}{Not supported for database backends.}
 }

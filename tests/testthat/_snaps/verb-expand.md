@@ -8,11 +8,11 @@
       FROM (
         SELECT DISTINCT `x`
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       CROSS JOIN (
         SELECT DISTINCT `y`
         FROM `df`
-      ) `RHS`
+      ) AS `RHS`
 
 # nesting doesn't expand values
 
@@ -20,7 +20,7 @@
       df_lazy %>% tidyr::expand(nesting(x, y))
     Output
       <SQL>
-      SELECT DISTINCT *
+      SELECT DISTINCT `df`.*
       FROM `df`
 
 # expand accepts expressions
@@ -47,7 +47,7 @@
       df_lazy %>% tidyr::expand(tidyr::nesting(x, y))
     Output
       <SQL>
-      SELECT DISTINCT *
+      SELECT DISTINCT `df`.*
       FROM `df`
 
 # expand respects groups
@@ -60,11 +60,11 @@
       FROM (
         SELECT DISTINCT `a`, `b`
         FROM `df`
-      ) `LHS`
+      ) AS `LHS`
       LEFT JOIN (
         SELECT DISTINCT `a`, `c`
         FROM `df`
-      ) `RHS`
+      ) AS `RHS`
         ON (`LHS`.`a` = `RHS`.`a`)
 
 # NULL inputs
@@ -73,7 +73,7 @@
       tidyr::expand(lazy_frame(x = 1), x, y = NULL)
     Output
       <SQL>
-      SELECT DISTINCT *
+      SELECT DISTINCT `df`.*
       FROM `df`
 
 # expand() errors when expected
@@ -97,9 +97,9 @@
     Code
       tidyr::expand(memdb_frame(x = 1, y = 1), nesting(x, x = x + 1))
     Condition
-      Error in `purrr::map()`:
-      i In index: 1.
-      Caused by error in `tidyr::expand()`:
+      Error in `tidyr::expand()`:
+      ! In expression `nesting(x, x = x + 1)`:
+      Caused by error:
       ! Names must be unique.
       x These names are duplicated:
         * "x" at locations 1 and 2.
@@ -139,13 +139,13 @@
           FROM (
             SELECT DISTINCT `x`
             FROM `df`
-          ) `LHS`
+          ) AS `LHS`
           CROSS JOIN (
             SELECT DISTINCT `y`
             FROM `df`
-          ) `RHS`
-        ) `LHS`
+          ) AS `RHS`
+        ) AS `LHS`
         FULL JOIN `df`
           ON (`LHS`.`x` = `df`.`x` AND `LHS`.`y` = `df`.`y`)
-      ) `q01`
+      ) AS `q01`
 

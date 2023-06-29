@@ -21,7 +21,7 @@
       df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
     Condition
       Error in `db_save_query.DBIConnection()`:
-      ! Can't save query to "`main`.`db1`".
+      ! Can't save query to table `main`.`db1`.
       Caused by error:
       ! table `db1` already exists
 
@@ -35,4 +35,8 @@
       ! Failed to collect lazy table.
       Caused by error:
       ! dummy DBI error
+
+# compute(temporary = FALSE) without a name is deprecated
+
+    The `name` argument of `compute()` must be provided when `temporary = FALSE` as of dbplyr 2.3.3.
 

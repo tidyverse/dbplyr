@@ -33,13 +33,13 @@ dbplyr_edition.SQLiteConnection <- function(con) {
 }
 
 #' @export
-db_connection_describe.SQLiteConnection <- function(con) {
+db_connection_describe.SQLiteConnection <- function(con, ...) {
   paste0("sqlite ", sqlite_version(), " [", con@dbname, "]")
 }
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  build_sql("EXPLAIN QUERY PLAN ", sql, con = con)
+  glue_sql2(con, "EXPLAIN QUERY PLAN {.sql sql}")
 }
 
 #' @export
@@ -72,6 +72,16 @@ sql_translation.SQLiteConnection <- function(con) {
       # https://www.sqlite.org/lang_corefunc.html#maxoreunc
       pmin = sql_aggregate_n("MIN", "pmin"),
       pmax = sql_aggregate_n("MAX", "pmax"),
+
+      runif = function(n = n(), min = 0, max = 1) {
+        # https://stackoverflow.com/a/23785593/7529482
+        sql_runif(
+          (0.5 + RANDOM() / 18446744073709551616.0),
+          n = {{ n }},
+          min = min,
+          max = max
+        )
+      },
 
       # lubridate,
       today = function() {
@@ -115,28 +125,14 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  if (is.ident(from)) {
-    setNames(from, name)
-  } else {
-
-    if (is.null(name)) {
-      build_sql(sql_indent_subquery(from, con, lvl), con = con)
-    } else {
-      build_sql(sql_indent_subquery(from, con, lvl), " AS ", as_subquery_name(name), con = con)
-    }
-  }
-}
-
-#' @export
-sql_expr_matches.SQLiteConnection <- function(con, x, y) {
+sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
-  build_sql(x, " IS ", y, con = con)
+  glue_sql2(con, "{x} IS {y}")
 }
 
 #' @export
 values_prepare.SQLiteConnection <- function(con, df) {
-  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  needs_escape <- purrr::map_lgl(df, ~ methods::is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
 }
 
@@ -145,4 +141,9 @@ supports_window_clause.SQLiteConnection <- function(con) {
   TRUE
 }
 
-globalVariables(c("datetime", "NUMERIC", "REAL"))
+#' @export
+db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
+  TRUE
+}
+
+utils::globalVariables(c("datetime", "NUMERIC", "REAL"))

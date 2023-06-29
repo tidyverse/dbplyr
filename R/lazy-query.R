@@ -21,11 +21,3 @@ lazy_query <- function(query_type,
     class = c(paste0("lazy_", query_type, "_query"), "lazy_query")
   )
 }
-
-is_expression_list <- function(x) {
-  if (!is.list(x)) {
-    return(FALSE)
-  }
-
-  purrr::every(x, is_expression)
-}

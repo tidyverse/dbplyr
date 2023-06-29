@@ -1,37 +1,59 @@
-test_that("remote_name returns name when it makes sense", {
+test_that("remote_table returns name when it makes sense", {
   mf <- copy_to_test("sqlite", tibble(x = 5), name = "refxiudlph")
 
   # produces name after `group_by()`
   expect_equal(
-    mf %>% group_by(x) %>% remote_name(),
-    ident("refxiudlph")
+    mf %>% group_by(x) %>% remote_table(),
+    as_table_ident(ident("refxiudlph"))
   )
 
   # produces name after unarranging
   expect_equal(
-    mf %>% arrange(x) %>% arrange() %>% remote_name(),
-    ident("refxiudlph")
+    mf %>% arrange(x) %>% arrange() %>% remote_table(),
+    as_table_ident(ident("refxiudlph"))
   )
 
   # produces name after compute()
-  expect_false(is_null(mf %>% mutate(x = x + 1) %>% compute() %>% remote_name()))
+  expect_false(is_null(mf %>% mutate(x = x + 1) %>% compute() %>% remote_table()))
 })
 
-test_that("remote_name returns null for computed tables", {
+test_that("remote_table returns null for computed tables", {
   mf <- copy_to_test("sqlite", tibble(x = 5, y = 1), name = "refxiudlph")
-  expect_equal(remote_name(mf), ident("refxiudlph"))
+  expect_equal(remote_table(mf), as_table_ident(ident("refxiudlph")))
 
-  expect_null(mf %>% filter(x == 3) %>% remote_name())
-  expect_null(mf %>% distinct(x) %>% remote_name())
-  expect_null(mf %>% mutate(x = x + 1) %>% remote_name())
-  expect_null(mf %>% select(x) %>% remote_name())
-  expect_null(mf %>% relocate(y, x) %>% remote_name())
-  expect_null(mf %>% head(3) %>% remote_name())
+  expect_null(mf %>% filter(x == 3) %>% remote_table())
+  expect_null(mf %>% distinct(x) %>% remote_table())
+  expect_null(mf %>% mutate(x = x + 1) %>% remote_table())
+  expect_null(mf %>% select(x) %>% remote_table())
+  expect_null(mf %>% relocate(y, x) %>% remote_table())
+  expect_null(mf %>% head(3) %>% remote_table())
 
-  expect_null(left_join(mf, mf, by = "x") %>% remote_name())
+  expect_null(left_join(mf, mf, by = "x") %>% remote_table())
   lf <- lazy_frame(x = 1)
-  expect_null(lf %>% remote_name())
-  expect_null(lf %>% group_by(x) %>% remote_name())
+  expect_null(lf %>% remote_table())
+  expect_null(lf %>% group_by(x) %>% remote_table())
+
+  lf <- lazy_frame(x = 1)
+  expect_equal(lf %>% remote_table(null_if_local = FALSE), as_table_ident(ident("df")))
+  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), as_table_ident(ident("df")))
+})
+
+test_that("remote_name and remote_table can handle different table identifiers", {
+  test_remote_table <- function(x, exp_tbl = as_table_ident(x), exp_name = "tbl") {
+    lf <- lazy_frame(x = 1, .name = x)
+    expect_equal(remote_table(lf, null_if_local = FALSE), exp_tbl)
+    expect_equal(remote_name(lf, null_if_local = FALSE), exp_name)
+  }
+
+  test_remote_table("tbl")
+  test_remote_table(ident("tbl"))
+  test_remote_table(in_schema("schema", "tbl"))
+  test_remote_table(in_catalog("catalog", "schema", "tbl"))
+  test_remote_table(DBI::Id(catalog = "catalog", schema = "schema", table = "tbl"))
+
+  withr::local_options(rlib_message_verbosity = "quiet")
+  test_remote_table(ident_q("schema.tbl"), exp_name = NULL)
+  test_remote_table(sql("schema.tbl"), exp_name = NULL)
 })
 
 test_that("can retrieve query, src and con metadata", {

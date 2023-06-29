@@ -30,15 +30,57 @@ dbplyr_edition.Teradata <- function(con) {
 }
 
 #' @export
-sql_query_select.Teradata <- function(con, select, from, where = NULL,
-                                             group_by = NULL, having = NULL,
-                                             window = NULL,
-                                             order_by = NULL,
-                                             limit = NULL,
-                                             distinct = FALSE,
-                                             ...,
-                                             subquery = FALSE,
-                                             lvl = 0) {
+sql_query_select.Teradata <- function(con,
+                                      select,
+                                      from,
+                                      where = NULL,
+                                      group_by = NULL,
+                                      having = NULL,
+                                      window = NULL,
+                                      order_by = NULL,
+                                      limit = NULL,
+                                      distinct = FALSE,
+                                      ...,
+                                      subquery = FALSE,
+                                      lvl = 0) {
+  # #685
+  # https://docs.teradata.com/r/2_MC9vCtAJRlKle2Rpb0mA/frQm7Rn09FJZZLQAuaUvJA
+  # You cannot specify these options in a SELECT statement that specifies the TOP n operator:
+  # * DISTINCT option
+  # * QUALIFY clause
+  # * SAMPLE clause
+  # * WITH clause
+
+  limit_needs_subquery <- is_true(distinct)
+
+  if (!is_null(limit) && limit_needs_subquery) {
+    unlimited_query <- sql_select_clauses(con,
+      select    = sql_clause_select(con, select, distinct, top = NULL),
+      from      = sql_clause_from(from),
+      where     = sql_clause_where(where),
+      group_by  = sql_clause_group_by(group_by),
+      having    = sql_clause_having(having),
+      window    = sql_clause_window(window),
+      order_by  = sql_clause_order_by(order_by, subquery, limit = NULL),
+      lvl       = lvl + 1
+    )
+
+    alias <- unique_subquery_name()
+    from <- sql_query_wrap(con, unlimited_query, name = alias)
+    select_outer <- sql_star(con, alias)
+    out <- sql_select_clauses(con,
+      select   = sql_clause_select(con, select_outer, distinct = FALSE, top = limit),
+      from     = sql_clause_from(from),
+      where    = NULL,
+      group_by = NULL,
+      having   = NULL,
+      window   = NULL,
+      order_by = NULL,
+      lvl = lvl
+    )
+
+    return(out)
+  }
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct, top = limit),
@@ -69,9 +111,7 @@ sql_translation.Teradata <- function(con) {
                       },
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
-      as.Date       = function(x) {
-                        build_sql("DATE ",x)
-                      },
+      as.Date       = teradata_as_date,
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
       cot           = sql_cot(),
@@ -88,18 +128,20 @@ sql_translation.Teradata <- function(con) {
                         sql_expr(SUBSTR(!!x, !!start, !!len))
                       },
       startsWith    = function(string, pattern) {
-                        build_sql('CAST(CASE WHEN INSTR(',
-                        string, ', ', pattern,
-                        ") = 1 THEN 1 ELSE 0 END AS INTEGER)")
+                        glue_sql2(sql_current_con(), "CAST(CASE WHEN INSTR({.val string}, {.val pattern}) = 1 THEN 1 ELSE 0 END AS INTEGER)")
                       },
       paste         = sql_paste_infix(" ", "||", function(x) sql_expr(!!x)),
       paste0        = sql_paste_infix("", "||", function(x) sql_expr(!!x)),
       row_number    = win_rank_tdata("ROW_NUMBER"),
+
+      # lubridate ---------------------------------------------------------------
+      # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
+      as_date       = teradata_as_date,
       week          = function(x){
                         sql_expr(WEEKNUMBER_OF_YEAR(!!x, 'iso'))
                       },
       quarter       = function(x) {
-                        build_sql('to_char(',x,",'q')")
+                        glue_sql2(sql_current_con(), "to_char({.val x}, 'q')")
                       }
     ),
     sql_translator(.parent = base_odbc_agg,
@@ -155,18 +197,23 @@ sql_translation.Teradata <- function(con) {
 
                       }
     )
+  )
+}
 
-  )}
+teradata_as_date <- function(x) {
+  xq <- enquo(x)
+  x_expr <- quo_get_expr(xq)
+  if (is.character(x_expr) && !is.sql(x_expr)) {
+    glue_sql2(sql_current_con(), "DATE {.val x}")
+  } else {
+    sql_cast("DATE")(x)
+  }
+}
 
 #' @export
 sql_table_analyze.Teradata <- function(con, table, ...) {
   # https://www.tutorialspoint.com/teradata/teradata_statistics.htm
-  build_sql("COLLECT STATISTICS ", as.sql(table, con = con) , con = con)
-}
-
-#' @export
-supports_star_without_alias.Teradata <- function(con) {
-  FALSE
+  glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SUM"))
@@ -177,10 +224,10 @@ win_rank_tdata <- function(f) {
   force(f)
   function(order_by = NULL) {
     order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) order_by <- build_sql("(SELECT NULL)")
+    if (is_empty(order_by)) order_by <- sql("(SELECT NULL)")
 
     win_over(
-      build_sql(dplyr::sql(f), list()),
+      sql(glue("{f}()")),
       partition = win_current_group(),
       order = order_by,
       frame = win_current_frame()

@@ -1,101 +1,96 @@
-# dcmodifydb
+# BiocOncoTK
 
 <details>
 
-* Version: 0.3.1
-* GitHub: https://github.com/data-cleaning/dcmodifydb
-* Source code: https://github.com/cran/dcmodifydb
-* Date/Publication: 2022-06-17 15:10:02 UTC
-* Number of recursive dependencies: 73
+* Version: 1.18.0
+* GitHub: NA
+* Source code: https://github.com/cran/BiocOncoTK
+* Date/Publication: 2022-11-01
+* Number of recursive dependencies: 214
 
-Run `revdepcheck::cloud_details(, "dcmodifydb")` for more info
+Run `revdep_details(, "BiocOncoTK")` for more info
 
 </details>
 
 ## Newly broken
 
-*   checking examples ... ERROR
+*   checking tests ...
     ```
-    Running examples in ‘dcmodifydb-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: is_working_db
-    > ### Title: Rule check on the database
-    > ### Aliases: is_working_db
-    > 
-    > ### ** Examples
-    > 
-    > person <- dbplyr::memdb_frame(age = 12, salary = 3000)
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+      file.exists("BLCA_CD8A.csv") is not TRUE
+      
+      `actual`:   FALSE
+      `expected`: TRUE 
+      ── Error ('test_dockstore_scripts.R:11'): exprByMSI_csv produces expected CSV ──
+      Error in `file(file, "rt")`: cannot open the connection
+      Backtrace:
+          ▆
+       1. └─utils::read.csv("BLCA_CD8A.csv") at test_dockstore_scripts.R:11:1
+       2.   └─utils::read.table(...)
+       3.     └─base::file(file, "rt")
+      
+      [ FAIL 2 | WARN 1 | SKIP 0 | PASS 2 ]
+      Error: Test failures
+      Execution halted
+    ```
+
+## In both
+
+*   checking whether package ‘BiocOncoTK’ can be installed ... WARNING
+    ```
+    Found the following significant warnings:
+      Warning: replacing previous import ‘GenomicRanges::subtract’ by ‘magrittr::subtract’ when loading ‘BiocOncoTK’
+    See ‘/Users/mgirlich/GitHub/dbplyr/revdep/checks.noindex/BiocOncoTK/new/BiocOncoTK.Rcheck/00install.out’ for details.
+    ```
+
+*   checking package dependencies ... NOTE
+    ```
+    Package suggested but not available for checking: ‘FDb.InfiniumMethylation.hg19’
+    ```
+
+*   checking installed package size ... NOTE
+    ```
+      installed size is 11.6Mb
+      sub-directories of 1Mb or more:
+        data        3.1Mb
+        doc         3.6Mb
+        pamphlets   4.5Mb
+    ```
+
+*   checking R code for possible problems ... NOTE
+    ```
+    ggscat_av: warning in png(file = tempfile()): partial argument match of
+      'file' to 'filename'
+    .flexbi: no visible binding for global variable ‘v1’
+    .flexbi: no visible binding for global variable ‘v2’
+    .rainfall.bq.df: no visible global function definition for ‘seqlengths’
+    .rainfall.maeGRL.df: no visible global function definition for ‘genome’
+    .rainfall.maeGRL.df: no visible global function definition for
+      ‘seqlengths’
+    acronym_to_system: no visible binding for global variable
+      ‘map_tcga_ncit’
     ...
-     15.               │ │     └─base (local) doTryCatch(return(expr), name, parentenv, handler)
-     16.               │ └─base::withCallingHandlers(...)
-     17.               └─dbplyr::partial_eval(get_expr(x), data, get_env(x), error_call = error_call)
-     18.                 └─dbplyr:::partial_eval_call(call, data, env)
-     19.                   └─base::lapply(call[-1], partial_eval, data = data, env = env)
-     20.                     └─dbplyr (local) FUN(X[[i]], ...)
-     21.                       └─dbplyr:::partial_eval_sym(call, data, env)
-     22.                         └─cli::cli_abort("Object {.var {name}} not found.", call = NULL)
-     23.                           └─rlang::abort(...)
-    Execution halted
+    tumNorSet : <anonymous>: no visible global function definition for
+      ‘pancan_SE’
+    Undefined global functions or variables:
+      BiocFileCache Consequence acronym genome log2ex log2exa mapIds
+      map_tcga_ncit msicode msival new pancan_SE project_short_name
+      right_join seqlengths symbol tfstart tmsi v1 v2
+    Consider adding
+      importFrom("methods", "new")
+    to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+    contains 'methods').
     ```
 
-*   checking tests ... ERROR
+*   checking data for non-ASCII characters ... NOTE
     ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-        5. │       └─purrr::map_chr(enexprs(...), escape_expr, con = con)
-        6. │         └─purrr:::map_("character", .x, .f, ..., .progress = .progress)
-        7. │           ├─purrr:::with_indexed_errors(...)
-        8. │           │ └─base::withCallingHandlers(...)
-        9. │           ├─purrr:::call_with_cleanup(...)
-       10. │           └─dbplyr (local) .f(.x[[i]], ...)
-       11. │             └─dbplyr::escape(val, con = con)
-       12. └─base::.handleSimpleError(...)
-       13.   └─purrr (local) h(simpleError(msg, call))
-       14.     └─cli::cli_abort(...)
-       15.       └─rlang::abort(...)
+      Error loading dataset 'brcaMAE':
+       Error in get_Nindex_lengths(x@index, dim(x@seed)) : 
+        length(Nindex) == length(dim) is not TRUE
       
-      [ FAIL 3 | WARN 0 | SKIP 5 | PASS 34 ]
-      Error: Test failures
-      Execution halted
-    ```
-
-# validatedb
-
-<details>
-
-* Version: 0.1.4
-* GitHub: https://github.com/data-cleaning/validatedb
-* Source code: https://github.com/cran/validatedb
-* Date/Publication: 2021-10-06 10:20:02 UTC
-* Number of recursive dependencies: 59
-
-Run `revdepcheck::cloud_details(, "validatedb")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      ! Object `y` not found.
-      ── Error ('test-summary.R:32'): summary: works with failing rules ──────────────
-      Error in `dplyr::transmute(tbl, row = row_number(), rule = "V5", fail = !y > 
-          0)`: ℹ In argument: `fail = !y > 0`
-      Caused by error:
-      ! Object `y` not found.
-      ── Error ('test-summary.R:73'): summary: works with failing rules (sparse) ─────
-      Error in `dplyr::transmute(tbl, row = row_number(), rule = "V5", fail = !y > 
-          0)`: ℹ In argument: `fail = !y > 0`
-      Caused by error:
-      ! Object `y` not found.
-      
-      [ FAIL 3 | WARN 0 | SKIP 2 | PASS 26 ]
-      Error: Test failures
-      Execution halted
+      Note: found 46 marked UTF-8 strings
     ```
 

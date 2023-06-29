@@ -26,8 +26,8 @@
       left_join(df1, df2, by = "x") %>% remote_query()
     Output
       <SQL> SELECT `df`.*, `z`
-      FROM `foo`.`df` AS `df`
-      LEFT JOIN `foo`.`df2` AS `df2`
+      FROM `foo`.`df`
+      LEFT JOIN `foo`.`df2`
         ON (`df`.`x` = `df2`.`x`)
 
 ---
@@ -39,6 +39,47 @@
       FROM `foo`.`df` AS `df_LHS`
       LEFT JOIN `foo2`.`df` AS `df_RHS`
         ON (`df_LHS`.`x` = `df_RHS`.`x`)
+
+---
+
+    Code
+      left_join(df4, df5, by = "x") %>% remote_query()
+    Output
+      <SQL> SELECT `LHS`.*, `z`
+      FROM `foo`.`df` AS `LHS`
+      LEFT JOIN `foo2`.`df` AS `RHS`
+        ON (`LHS`.`x` = `RHS`.`x`)
+
+# alias truncates long table names at database limit
+
+    Code
+      self_join2 %>% remote_query()
+    Output
+      <SQL> SELECT "a01234567890123456789012345678901234567890123456789012345678901".*
+      FROM "a01234567890123456789012345678901234567890123456789012345678901"
+      LEFT JOIN "a01234567890123456789012345678901234567890123456789012345678901" AS "34567890123456789012345678901234567890123456789012345678901_RHS"
+        ON (
+          "a01234567890123456789012345678901234567890123456789012345678901"."x" = "34567890123456789012345678901234567890123456789012345678901_RHS"."x" AND
+          "a01234567890123456789012345678901234567890123456789012345678901"."y" = "34567890123456789012345678901234567890123456789012345678901_RHS"."y"
+        )
+
+---
+
+    Code
+      self_join3 %>% remote_query()
+    Output
+      <SQL> SELECT
+        "a01234567890123456789012345678901234567890123456789012345678901"."x" AS "x",
+        "a01234567890123456789012345678901234567890123456789012345678901"."y" AS "y.x",
+        "b01234567890123456789012345678901234567890123456789012345678901"."y" AS "y.y"
+      FROM "a01234567890123456789012345678901234567890123456789012345678901"
+      LEFT JOIN "a01234567890123456789012345678901234567890123456789012345678901" AS "34567890123456789012345678901234567890123456789012345678901...2"
+        ON (
+          "a01234567890123456789012345678901234567890123456789012345678901"."x" = "34567890123456789012345678901234567890123456789012345678901...2"."x" AND
+          "a01234567890123456789012345678901234567890123456789012345678901"."y" = "34567890123456789012345678901234567890123456789012345678901...2"."y"
+        )
+      INNER JOIN "b01234567890123456789012345678901234567890123456789012345678901"
+        ON ("a01234567890123456789012345678901234567890123456789012345678901"."x" = "b01234567890123456789012345678901234567890123456789012345678901"."x")
 
 # cross join via by = character() is deprecated
 
@@ -91,11 +132,72 @@
       SELECT `a` AS `a2`, `x1` AS `x`
       FROM `lf1`
       WHERE EXISTS (
-        SELECT 1 FROM (
-        SELECT `x2` AS `x`, `b`
-        FROM `lf2`
-      ) `RHS`
-        WHERE (`lf1`.`x1` = `RHS`.`x`)
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x1` = `lf2`.`x2`)
+      )
+
+# can combine full_join with other joins #1178
+
+    Code
+      full_join(lf1, lf2, by = "x") %>% left_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT `LHS`.*, `z`
+      FROM (
+        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        FULL JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) AS `LHS`
+      LEFT JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
+---
+
+    Code
+      left_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      FROM (
+        SELECT `df_LHS`.`x` AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        LEFT JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) AS `LHS`
+      FULL JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
+---
+
+    Code
+      full_join(lf1, lf2, by = "x") %>% full_join(lf3, by = "x")
+    Output
+      <SQL>
+      SELECT COALESCE(`LHS`.`x`, `df`.`x`) AS `x`, `y`, `z`
+      FROM (
+        SELECT COALESCE(`df_LHS`.`x`, `df_RHS`.`x`) AS `x`, `y`
+        FROM `df` AS `df_LHS`
+        FULL JOIN `df` AS `df_RHS`
+          ON (`df_LHS`.`x` = `df_RHS`.`x`)
+      ) AS `LHS`
+      FULL JOIN `df`
+        ON (`LHS`.`x` = `df`.`x`)
+
+# filter() before semi join is inlined
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df_LHS`.*
+      FROM `df` AS `df_LHS`
+      WHERE EXISTS (
+        SELECT 1 FROM `df` AS `df_RHS`
+        WHERE
+          (`df_LHS`.`x` = `df_RHS`.`x2`) AND
+          (`df_RHS`.`a` = 1) AND
+          (`df_RHS`.`b` = 2)
       )
 
 # multiple joins create a single query
@@ -136,7 +238,7 @@
         FROM `df1`
         LEFT JOIN `df2`
           ON (`df1`.`x` = `df2`.`x`)
-      ) `LHS`
+      ) AS `LHS`
       RIGHT JOIN `df3`
         ON (`LHS`.`x` = `df3`.`x`)
 
@@ -198,7 +300,7 @@
       left_join(df, df, by = "x", na_matches = 1)
     Condition
       Error in `left_join()`:
-      ! `na_matches` must be a character vector, not a number.
+      ! `na_matches` must be a character vector, not the number 1.
 
 ---
 
@@ -214,7 +316,7 @@
       semi_join(df, df, by = "x", na_matches = 1)
     Condition
       Error in `semi_join()`:
-      ! `na_matches` must be a character vector, not a number.
+      ! `na_matches` must be a character vector, not the number 1.
 
 ---
 
@@ -222,7 +324,35 @@
       semi_join(df, df, by = "x", na_matches = "foo")
     Condition
       Error in `semi_join()`:
-      ! `na_matches` must be one of "never" or "na", not "foo".
+      ! `na_matches` must be one of "na" or "never", not "foo".
+
+# using multiple gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", multiple = "first")
+    Condition
+      Error in `left_join()`:
+      ! Argument `multiple` isn't supported on database backends.
+      For equi joins you can instead add a unique index for the join columns in `y`.
+      `db_create_index( con = remote_con(y), table = remote_name(y), columns = "x", unique = TRUE )`
+
+# using unmatched gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", unmatched = "error")
+    Condition
+      Error in `left_join()`:
+      ! Argument `unmatched` isn't supported on database backends.
+      i For equi joins you can instead add a foreign key from `x` to `y` for the join columns.
+
+# using relationship gives an informative error
+
+    Code
+      left_join(lf, lf, by = "x", relationship = "one-to-one")
+    Condition
+      Error in `left_join()`:
+      ! `relationship = "one-to-one"` isn't supported on database backends.
+      i It must be "many-to-many" or `NULL` instead.
 
 # can optionally match NA values
 
@@ -234,6 +364,19 @@
       FROM `lf1`
       LEFT JOIN `lf2`
         ON (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+
+---
+
+    Code
+      semi_join(lf1, lf2, by = "x", na_matches = "na")
+    Output
+      <SQL>
+      SELECT `lf1`.*
+      FROM `lf1`
+      WHERE EXISTS (
+        SELECT 1 FROM `lf2`
+        WHERE (`lf1`.`x` IS NOT DISTINCT FROM `lf2`.`x`)
+      )
 
 # suffix arg is checked
 
@@ -253,7 +396,7 @@
 # joins reuse queries in cte mode
 
     Code
-      left_join(lf, lf) %>% remote_query(cte = TRUE)
+      left_join(lf, lf) %>% remote_query(sql_options = sql_options(cte = TRUE))
     Message
       Joining with `by = join_by(x)`
     Output

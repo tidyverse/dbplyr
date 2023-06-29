@@ -1,7 +1,7 @@
 # frame is checked
 
     Code
-      translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+      test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
     Condition
       Warning:
       Windowed expression `SUM(`x`)` does not have explicit order.
@@ -12,7 +12,7 @@
 # win_rank(c()) gives an informative error
 
     Code
-      translate_sql(row_number(c(x)))
+      test_translate_sql(row_number(c(x)))
     Condition
       Error in `prepare_win_rank_over()`:
       ! Can't use `c()` in `ROW_NUMBER()`
@@ -25,7 +25,7 @@
         show_query()
     Output
       <SQL>
-      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
 ---
@@ -36,7 +36,7 @@
     Output
       <SQL>
       SELECT
-        *,
+        `df`.*,
         SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 

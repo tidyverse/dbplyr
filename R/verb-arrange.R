@@ -56,7 +56,7 @@ add_arrange <- function(.data, dots, .by_group) {
     order_vars = dots
   )
 
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(new_lazy_query)
   }
 

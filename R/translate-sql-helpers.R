@@ -118,7 +118,8 @@ names.sql_variant <- function(x) {
 
 #' @export
 #' @rdname sql_variant
-sql_translator <- function(..., .funs = list(),
+sql_translator <- function(...,
+                           .funs = list(),
                            .parent = new.env(parent = emptyenv())) {
   funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
@@ -144,32 +145,33 @@ sql_infix <- function(f, pad = TRUE) {
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   check_string(f)
+  f <- sql(f)
 
   if (pad) {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, " ", sql(f), " ", y)
+      glue_sql2(sql_current_con(), "{.val x} {f} {.val y}")
     }
   } else {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, sql(f), y)
+      glue_sql2(sql_current_con(), "{.val x}{f}{.val y}")
     }
   }
 }
 
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (is_call(xq, infix_calls, n = 2)) {
-    return(build_sql("(", x, ")"))
-  }
+  is_infix <- is_call(xq, infix_calls, n = 2)
+  is_unary_minus <- escape_unary_minus && is_call(xq, "-", n = 1)
 
-  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
-    return(build_sql("(", x, ")"))
+  if (is_infix || is_unary_minus) {
+    enpared <- glue_sql2(sql_current_con(), "({x})")
+    return(enpared)
   }
 
   x
@@ -191,7 +193,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    build_sql(sql(f), args)
+    glue_sql2(sql_current_con(), "{f}({.val args*})")
   }
 }
 
@@ -202,7 +204,7 @@ sql_aggregate <- function(f, f_r = f) {
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(x))
+    glue_sql2(sql_current_con(), "{f}({.val x})")
   }
 }
 
@@ -212,7 +214,7 @@ sql_aggregate_2 <- function(f) {
   check_string(f)
 
   function(x, y) {
-    build_sql(sql(f), list(x, y))
+    glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})")
   }
 }
 
@@ -223,7 +225,8 @@ sql_aggregate_n <- function(f, f_r = f) {
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(...))
+    dots <- list(...)
+    glue_sql2(sql_current_con(), "{f}({.val dots*})")
   }
 }
 
@@ -346,4 +349,25 @@ sql_cot <- function(){
   }
 }
 
-globalVariables(c("%as%", "cast", "ln", "try_cast"))
+#' @rdname sql_variant
+#' @export
+sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
+  n_expr <- quo_get_expr(enquo(n))
+  if (!is_call(n_expr, "n", n = 0)) {
+    cli_abort("Only {.code n = n()} is supported.")
+  }
+
+  rand_expr <- enexpr(rand_expr)
+  range <- max - min
+  if (range != 1) {
+    rand_expr <- expr(!!rand_expr * !!range)
+  }
+
+  if (min != 0) {
+    rand_expr <- expr(!!rand_expr + !!min)
+  }
+
+  sql_expr(!!rand_expr)
+}
+
+utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))

@@ -5,17 +5,20 @@
     Output
       <SQL JOINS>
       X:
-        <IDENT> lf1
+        <dbplyr_table_ident[1]>
+        [1] `lf1`
       Type: left
       By:
         x-x
       Y:
-        <IDENT> lf2
+        <dbplyr_table_ident[1]>
+        [1] `lf2`
       Type: left
       By:
         x-x
       Y:
-        <IDENT> lf3
+        <dbplyr_table_ident[1]>
+        [1] `lf3`
 
 # generated sql doesn't change unexpectedly
 
@@ -106,6 +109,20 @@
       LEFT JOIN `df` AS `df_RHS`
         ON (`df_LHS`.`y` = `df_RHS`.`y`)
 
+---
+
+    Code
+      full_join(lf1, lf2, by = "y")
+    Output
+      <SQL>
+      SELECT
+        `df_LHS`.`x` AS `x`,
+        COALESCE(`df_LHS`.`y`, `df_RHS`.`y`) AS `y`,
+        `df_RHS`.`X` AS `X`
+      FROM `df` AS `df_LHS`
+      FULL JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`y` = `df_RHS`.`y`)
+
 # sql_on query doesn't change unexpectedly
 
     Code
@@ -156,7 +173,7 @@
       semi_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       WHERE EXISTS (
         SELECT 1 FROM `df` AS `RHS`
@@ -169,7 +186,7 @@
       anti_join(lf1, lf2, sql_on = "LHS.y < RHS.z")
     Output
       <SQL>
-      SELECT *
+      SELECT `LHS`.*
       FROM `df` AS `LHS`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df` AS `RHS`

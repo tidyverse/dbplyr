@@ -2,65 +2,92 @@
 
 test_that("custom scalar translated correctly", {
   local_con(simulate_mysql())
-  expect_equal(translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
+  expect_equal(test_translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
 
-  expect_equal(translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
-  expect_equal(translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
+  expect_equal(test_translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
+  expect_equal(test_translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
 })
 
 test_that("custom aggregators translated correctly", {
   local_con(simulate_mysql())
 
-  expect_equal(translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
+  expect_equal(test_translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
 })
 
 test_that("use CHAR type for as.character", {
   local_con(simulate_mysql())
-  expect_equal(translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
+  expect_equal(test_translate_sql(as.character(x)), sql("CAST(`x` AS CHAR)"))
+})
+
+test_that("custom date escaping works as expected", {
+  con <- simulate_mysql()
+
+  expect_equal(escape(as.Date("2020-01-01"), con = con), sql("'2020-01-01'"))
+  expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
+
+  expect_equal(escape(as.POSIXct("2020-01-01"), con = con), sql("'2020-01-01 00:00:00'"))
+  expect_equal(escape(as.POSIXct(NA), con = con), sql("NULL"))
 })
 
 
 test_that("custom stringr functions translated correctly", {
   local_con(simulate_mysql())
 
-  expect_equal(translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
-  expect_equal(translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
-  expect_equal(translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
-  expect_equal(translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
-  expect_equal(translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
+  expect_equal(test_translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
+  expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
+  expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
+  expect_equal(test_translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
+  expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
 })
 
 # verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
-  con <- simulate_mysql()
+  con_maria <- simulate_mysql()
 
-  expect_snapshot(sql_table_analyze(con, in_schema("schema", "tbl")))
-  expect_snapshot(sql_query_explain(con, sql("SELECT * FROM table")))
+  expect_snapshot(sql_table_analyze(con_maria, in_schema("schema", "tbl")))
+  expect_snapshot(sql_query_explain(con_maria, sql("SELECT * FROM table")))
 
-  lf <- lazy_frame(x = 1, con = con)
+  lf <- lazy_frame(x = 1, con = con_maria)
   expect_snapshot(left_join(lf, lf, by = "x", na_matches = "na"))
   expect_snapshot(error = TRUE, full_join(lf, lf, by = "x"))
 
   expect_snapshot(slice_sample(lf, n = 1))
 
-  expect_snapshot(copy_inline(con, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+
+  con_mysql <- simulate_dbi("MySQLConnection")
+  expect_snapshot(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
 
 test_that("`sql_query_update_from()` is correct", {
+  con <- simulate_mysql()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_mysql(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_update_from(
-      con = simulate_mysql(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      by = c("a", "b"),
+      update_values = sql(
+        c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+        d = "`...y`.`d`"
+      )
+    )
+  )
+
+  expect_snapshot_error(
+    sql_query_update_from(
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(
         c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
@@ -98,9 +125,9 @@ test_that("can update", {
   con <- src_test("MariaDB")
 
   df_x <- tibble(a = 1:3, b = 11:13, c = 1:3, d = c("a", "b", "c"))
-  x <- copy_to(con, df_x, "df_x", temporary = TRUE, overwrite = TRUE)
+  x <- local_db_table(con, df_x, "df_x")
   df_y <- tibble(a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"))
-  y <- copy_to(con, df_y, "df_y", temporary = TRUE, overwrite = TRUE) %>%
+  y <- local_db_table(con, df_y, "df_y") %>%
     mutate(c = c + 1)
 
   # `RETURNING` in an `UPDATE` clause is not (yet) supported for MariaDB

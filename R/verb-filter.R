@@ -89,7 +89,7 @@ add_filter <- function(.data, dots) {
 }
 
 filter_needs_new_query <- function(dots, lazy_query, con) {
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(TRUE)
   }
 
@@ -126,7 +126,7 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
     return(FALSE)
   }
 
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 

@@ -45,11 +45,15 @@ sql_clause_select <- function(con,
     cli_abort("Query contains no columns")
   }
 
-  clause <- build_sql(
+  if (!is.null(top)) {
+    top <- as.integer(top)
+  }
+
+  clause <- glue_sql2(
+    con,
     "SELECT",
-    if (distinct) sql(" DISTINCT"),
-    if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
-    con = con
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) " TOP {top}"
   )
 
   sql_clause(clause, select)
@@ -121,8 +125,8 @@ sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
   }
 }
 
-sql_clause_on <- function(on, lvl = 0) {
-  sql_clause("ON", on, sep = " AND", lvl = lvl)
+sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
+  sql_clause("ON", on, sep = " AND", parens = parens, lvl = lvl)
 }
 
 sql_clause_where_exists <- function(table, where, not) {

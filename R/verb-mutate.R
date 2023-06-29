@@ -42,14 +42,14 @@ mutate.tbl_lazy <- function(.data,
   # They are removed in `add_mutate()`.
   out <- .data
   for (layer in layers) {
-    out$lazy_query <- add_mutate(out, layer)
+    out$lazy_query <- add_mutate(out$lazy_query, layer)
   }
 
   if (by$from_by) {
     out$lazy_query$group_vars <- character()
   }
 
-  names_original <- names(.data)
+  names_original <- colnames(.data)
 
   out <- mutate_relocate(
     out = out,
@@ -78,7 +78,7 @@ transmute.tbl_lazy <- function(.data, ...) {
   layer_info <- get_mutate_layers(.data, ...)
 
   for (layer in layer_info$layers) {
-    .data$lazy_query <- add_mutate(.data, layer)
+    .data$lazy_query <- add_mutate(.data$lazy_query, layer)
   }
 
   # Retain expression columns in order of their appearance
@@ -95,20 +95,18 @@ transmute.tbl_lazy <- function(.data, ...) {
 
 # helpers -----------------------------------------------------------------
 
-add_mutate <- function(.data, vars) {
-  lazy_query <- .data$lazy_query
-
+add_mutate <- function(lazy_query, vars) {
   # drop NULLs
   vars <- purrr::discard(vars, ~ (is_quosure(.x) && quo_is_null(.x)) || is.null(.x))
 
   if (is_projection(vars)) {
     sel_vars <- purrr::map_chr(vars, as_string)
-    out <- add_select(.data, sel_vars)
+    out <- add_select(lazy_query, sel_vars)
 
     return(out)
   }
 
-  if (inherits(lazy_query, "lazy_select_query")) {
+  if (is_lazy_select_query(lazy_query)) {
     # Special optimisation when applied to pure projection() - this is
     # conservative and we could expand to any op_select() if combined with
     # the logic in get_mutate_layers()
@@ -186,10 +184,13 @@ get_mutate_layers <- function(.data, ..., error_call = caller_env()) {
 
     cols <- set_names(syms(names(cur_layer)))
     cols <- purrr::list_assign(cur_layer, !!!cols_result$cols)
-    cur_data$lazy_query <- add_mutate(cur_data, cols)
+    cur_data$lazy_query <- add_mutate(cur_data$lazy_query, cols)
 
     removed_cols <- cols_result$removed_cols
-    cur_data$lazy_query <- add_select(cur_data, set_names(setdiff(all_vars, removed_cols)))
+    cur_data$lazy_query <- add_select(
+      cur_data$lazy_query,
+      set_names(setdiff(all_vars, removed_cols))
+    )
   }
 
   list(
@@ -247,7 +248,7 @@ mutate_relocate <- function(out, before, after, names_original) {
 
   # Only change the order of completely new columns that
   # didn't exist in the original data
-  names <- names(out)
+  names <- colnames(out)
   names <- setdiff(names, names_original)
 
   relocate(
@@ -259,7 +260,7 @@ mutate_relocate <- function(out, before, after, names_original) {
 }
 
 mutate_keep <- function(out, keep, used, names_new, names_groups) {
-  names <- names(out)
+  names <- colnames(out)
 
   if (keep == "all") {
     names_out <- names

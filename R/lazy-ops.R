@@ -32,6 +32,7 @@ lazy_base_query <- function(x, vars, class = character(), ...) {
 }
 
 lazy_query_local <- function(df, name) {
+  name <- as_table_ident(name)
   lazy_base_query(df, names(df), class = "local", name = name)
 }
 
@@ -39,30 +40,62 @@ lazy_query_remote <- function(x, vars) {
   lazy_base_query(x, vars, class = "remote")
 }
 
+base_query <- function(from) {
+  from <- as_from(from)
+  structure(
+    list(from = from),
+    class = c("base_query", "query")
+  )
+}
+
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
-  if (inherits(x$x, "ident")) {
-    cat("From: ", x$x, "\n", sep = "")
+  if (is_table_ident(x$x)) {
+    cat_line("From: ", format(x$x))
   } else {
-    cat("From: <derived table>\n")
+    cat_line("From: <derived table>")
   }
-
-  cat("<Table: ", x$x, ">\n", sep = "")
 }
 
 #' @export
 print.lazy_base_local_query <- function(x, ...) {
-  cat("<Local data frame> ", dplyr::dim_desc(x$x), "\n", sep = "")
+  cat_line("<Local data frame> ", dplyr::dim_desc(x$x))
+}
+
+#' @export
+print.base_query <- function(x, ...) {
+  print(x$from)
 }
 
 #' @export
 sql_build.lazy_base_remote_query <- function(op, con, ...) {
-  as.sql(op$x, con = con)
+  base_query(op$x)
 }
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
-  ident(op$name)
+  base_query(op$name)
+}
+
+#' @export
+sql_render.base_query <- function(query,
+                                  con = NULL,
+                                  ...,
+                                  sql_options = NULL,
+                                  subquery = FALSE,
+                                  lvl = 0) {
+  from <- query$from
+  if (subquery || is.sql(from)) {
+    from
+  } else {
+    from <- escape(from, con = con)
+    dbplyr_query_select(con, sql("*"), from, lvl = lvl)
+  }
+}
+
+#' @export
+flatten_query.base_query <- function(qry, query_list) {
+  query_list
 }
 
 # op_grps -----------------------------------------------------------------
@@ -124,12 +157,17 @@ op_cols <- function(op) {
 }
 
 op_desc <- function(op) UseMethod("op_desc")
+#' @export
+op_desc.lazy_query <- function(op) {
+  "SQL"
+}
 
 #' @export
 op_desc.lazy_base_remote_query <- function(op) {
-  if (is.ident(op$x)) {
-    paste0("table<", op$x, ">")
-  } else {
+  table <- remote_name(op)
+  if (is.null(table)) {
     "SQL"
+  } else {
+    paste0("table<", table, ">")
   }
 }

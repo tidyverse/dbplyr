@@ -5,9 +5,9 @@
 \alias{lazy_frame}
 \title{Create a local lazy tibble}
 \usage{
-tbl_lazy(df, con = NULL, src = NULL, name = "df")
+tbl_lazy(df, con = NULL, ..., name = "df")
 
-lazy_frame(..., con = NULL, src = NULL, .name = "df")
+lazy_frame(..., con = NULL, .name = "df")
 }
 \description{
 These functions are useful for testing SQL generation without having to

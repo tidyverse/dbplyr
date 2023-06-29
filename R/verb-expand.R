@@ -31,7 +31,13 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
     cli_abort("Must supply variables in `...`")
   }
 
-  distinct_tbl_vars <- purrr::map(dots, extract_expand_dot_vars, call = current_env())
+  distinct_tbl_vars <- with_indexed_errors(
+    purrr::map(dots, extract_expand_dot_vars, call = NULL),
+    message = function(cnd) {
+      dot <- as_label(dots[[cnd$location]])
+      cli::format_inline("In expression {.code {dot}}:")
+    }
+  )
 
   # now that `nesting()` has been unpacked resolve name conflicts
   out_names <- names(exprs_auto_name(purrr::flatten(distinct_tbl_vars)))
@@ -51,9 +57,7 @@ expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
 
   by <- group_vars(data)
   if (is_empty(by)) {
-    # We want a cross join if `by` is empty which is done with
-    # a `full_join()` and `by = character()`
-    purrr::reduce(distinct_tables, full_join, by = character())
+    purrr::reduce(distinct_tables, cross_join)
   } else {
     # In this case a `full_join()` and a `left_join()` produce the same result
     # but a `left_join()` produces much nicer SQL for SQLite
@@ -142,4 +146,4 @@ replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   mutate(data, !!!coalesce_expr)
 }
 
-globalVariables(c("coalesce", "expand", "replace_na"))
+utils::globalVariables(c("coalesce", "expand", "replace_na"))

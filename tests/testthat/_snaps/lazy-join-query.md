@@ -4,12 +4,12 @@
       (my_lazy_semi_join_query(x = lazy_frame(x = 1)))
     Condition
       Error in `my_lazy_semi_join_query()`:
-      ! `x` must be a lazy query, not a <tbl_TestConnection/tbl_lazy/tbl> object.
+      ! `x` must be a lazy query, not a <tbl_TestConnection> object.
     Code
       (my_lazy_semi_join_query(y = lazy_frame(x = 1)))
     Condition
       Error in `my_lazy_semi_join_query()`:
-      ! `y` must be a lazy query, not a <tbl_TestConnection/tbl_lazy/tbl> object.
+      ! `y` must be a lazy query, not a <tbl_TestConnection> object.
 
 ---
 
@@ -26,9 +26,4 @@
     Condition
       Error in `my_lazy_semi_join_query()`:
       ! `anti` must be `TRUE` or `FALSE`, not `NA`.
-    Code
-      (my_lazy_semi_join_query(na_matches = "sometimes"))
-    Condition
-      Error in `my_lazy_semi_join_query()`:
-      ! `na_matches` must be one of "never" or "na", not "sometimes".
 

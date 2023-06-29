@@ -1,12 +1,14 @@
 test_that("RPostgreSQL backend", {
   skip_if_not(identical(Sys.getenv("GITHUB_POSTGRES"), "true"))
 
-  src <- DBI::dbConnect(
-    RPostgreSQL::PostgreSQL(),
-    dbname = "test",
-    user = "postgres",
-    password = "password",
-    host = "127.0.0.1"
+  src <- withr::local_db_connection(
+    DBI::dbConnect(
+      RPostgreSQL::PostgreSQL(),
+      dbname = "test",
+      user = "postgres",
+      password = "password",
+      host = "127.0.0.1"
+    )
   )
 
   copy_to(src, mtcars, "mtcars", overwrite = TRUE, temporary = FALSE)

@@ -12,12 +12,8 @@
 #'
 #' df_sqlite <- tbl_lazy(df, con = simulate_sqlite())
 #' df_sqlite %>% summarise(x = sd(x, na.rm = TRUE)) %>% show_query()
-tbl_lazy <- function(df, con = NULL, src = NULL, name = "df") {
-
-  if (!is.null(src)) {
-    warn("`src` is deprecated; please use `con` instead")
-    con <- src
-  }
+tbl_lazy <- function(df, con = NULL, ..., name = "df") {
+  check_dots_empty0(...)
   con <- con %||% sql_current_con() %||% simulate_dbi()
   subclass <- class(con)[[1]]
 
@@ -31,9 +27,9 @@ methods::setOldClass(c("tbl_lazy", "tbl"))
 
 #' @export
 #' @rdname tbl_lazy
-lazy_frame <- function(..., con = NULL, src = NULL, .name = "df") {
+lazy_frame <- function(..., con = NULL, .name = "df") {
   con <- con %||% sql_current_con() %||% simulate_dbi()
-  tbl_lazy(tibble(...), con = con, src = src, name = .name)
+  tbl_lazy(tibble(...), con = con, name = .name)
 }
 
 #' @export
@@ -104,7 +100,12 @@ tidyselect_data_has_predicates.tbl_lazy <- function(x) {
   FALSE
 }
 
+the <- new_environment()
+the$warned_on_tbl_lazy_names <- FALSE
+
 #' @export
 names.tbl_lazy <- function(x) {
-  colnames(x)
+  # FIXME find a way to nudge users away from using `names()` without RStudio
+  # getting on your nerves
+  NextMethod("names")
 }

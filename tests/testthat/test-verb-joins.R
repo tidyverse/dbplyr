@@ -55,11 +55,11 @@ test_that("complete semi join works with SQLite and table alias", {
 })
 
 test_that("join works with in_schema", {
-  withr::local_db_connection(con <- dbConnect(RSQLite::SQLite(), ":memory:"))
+  con <- local_sqlite_connection()
 
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df"), tibble(x = 1:3, y = "a"))
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo", table = "df2"), tibble(x = 2:3, z = "b"))
+  local_db_table(con, tibble(x = 1:3, y = "a"), DBI::Id(schema = "foo", table = "df"), temporary = FALSE)
+  local_db_table(con, tibble(x = 2:3, z = "b"), DBI::Id(schema = "foo", table = "df2"), temporary = FALSE)
 
   # same schema, different name
   df1 <- tbl(con, in_schema("foo", "df"))
@@ -74,7 +74,7 @@ test_that("join works with in_schema", {
 
   # different schema, same name
   DBI::dbExecute(con, "ATTACH ':memory:' AS foo2")
-  DBI::dbWriteTable(con, DBI::Id(schema = "foo2", table = "df"), tibble(x = 2:3, z = "c"))
+  local_db_table(con, tibble(x = 2:3, z = "c"), DBI::Id(schema = "foo2", table = "df"), temporary = FALSE)
   df3 <- tbl(con, in_schema("foo2", "df"))
   expect_equal(
     left_join(df1, df3, by = "x") %>% collect(),
@@ -83,9 +83,87 @@ test_that("join works with in_schema", {
   expect_snapshot(
     left_join(df1, df3, by = "x") %>% remote_query()
   )
+
+  # use auto name for `ident_q`
+  # suppress info about <ident_q> only meant as a workaround
+  withr::local_options(rlib_message_verbosity = "quiet")
+  df4 <- tbl(con, ident_q("`foo`.`df`"))
+  df5 <- tbl(con, ident_q("`foo2`.`df`"))
+  expect_snapshot(
+    left_join(df4, df5, by = "x") %>% remote_query()
+  )
+  out <- left_join(df4, df5, by = "x")
+  expect_equal(out$lazy_query$table_names, tibble(name = c("", ""), from = ""))
+})
+
+test_that("alias truncates long table names at database limit", {
+  # Postgres has max identifier length of 63; ensure it's not exceeded when generating table alias
+  # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+  con <- src_test("postgres")
+
+  nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
+  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), nm1)
+
+  nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
+  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), nm2)
+
+  # 2 tables
+  # aliased names are as expected
+  self_join2_names <- generate_join_table_names(
+    tibble::tibble(
+      name = c(nm1, nm1),
+      from = "name"
+    )
+  )
+
+  expect_equal(max(nchar(self_join2_names)), 63)
+  expect_equal(
+    length(self_join2_names),
+    length(unique(self_join2_names))
+  )
+
+  # joins correctly work
+  self_join2 <- left_join(mf1, mf1, by = c("x", "y"))
+
+  expect_equal(
+    self_join2 %>% collect(),
+    tibble(x = 1:3, y = "a")
+  )
+
+  expect_snapshot(
+    self_join2 %>% remote_query()
+  )
+
+  # 3 tables
+  # aliased names are as expected
+  self_join3_names <- generate_join_table_names(
+    tibble::tibble(
+      name = c(nm1, nm1, nm2),
+      from = "name"
+    )
+  )
+
+  expect_equal(max(nchar(self_join3_names)), 63)
+  expect_equal(
+    length(self_join3_names),
+    length(unique(self_join3_names))
+  )
+
+  # joins correctly work
+  self_join3 <- left_join(mf1, mf1, by = c("x", "y")) %>%
+    inner_join(mf2, by = "x")
+
+  expect_equal(
+    self_join3 %>% collect(),
+    tibble(x = 2:3, y.x = "a", y.y = "b")
+  )
+  expect_snapshot(
+    self_join3 %>% remote_query()
+  )
 })
 
 test_that("cross join via by = character() is deprecated", {
+
   df1 <- memdb_frame(x = 1:5)
   df2 <- memdb_frame(y = 1:5)
 
@@ -210,57 +288,57 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   # self joins
-  table_vars <- sql_build(left_join(x, x, by = "a"))$table_vars
-  expect_named(table_vars, c("x_LHS", "x_RHS"))
+  table_names <- sql_build(left_join(x, x, by = "a"))$table_names
+  expect_equal(table_names, c("x_LHS", "x_RHS"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_vars
-  expect_named(table_vars, c("my_x", "x"))
+  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_names, c("my_x", "x"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("x", "my_y"))
+  table_names <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("x", "my_y"))
 
-  table_vars <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("my_x", "my_y"))
+  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("my_x", "my_y"))
 
   # x-y joins
-  table_vars <- sql_build(left_join(x, y, by = "a"))$table_vars
-  expect_named(table_vars, c("x", "y"))
+  table_names <- sql_build(left_join(x, y, by = "a"))$table_names
+  expect_equal(table_names, c("x", "y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_vars
-  expect_named(table_vars, c("my_x", "y"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_names, c("my_x", "y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("x", "my_y"))
+  table_names <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("x", "my_y"))
 
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_vars
-  expect_named(table_vars, c("my_x", "my_y"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_names, c("my_x", "my_y"))
 
   # x_as same name as `y`
-  table_vars <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_vars
-  expect_named(table_vars, c("y", "y...2"))
+  table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
+  expect_equal(table_names, c("y", "y...2"))
 
-  table_vars <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_vars
-  expect_named(table_vars, c("LHS...1", "LHS"))
+  table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
+  expect_equal(table_names, c("LHS...1", "LHS"))
 
   # sql_on -> use alias or LHS/RHS
-  table_vars <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_vars
-  expect_named(table_vars, c("LHS", "RHS"))
+  table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
+  expect_equal(table_names, c("LHS", "RHS"))
 
-  table_vars <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_vars
-  expect_named(table_vars, c("my_x", "RHS"))
+  table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
+  expect_equal(table_names, c("my_x", "RHS"))
 
   # triple join
   z <- lazy_frame(a = 1, z = 1, .name = "z")
   out <- left_join(x, y, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_named(out$table_vars, c("x", "y", "z"))
+  expect_equal(out$table_names, c("x", "y", "z"))
 
   # triple join where names need to be repaired
   out <- left_join(x, x, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_named(out$table_vars, c("x...1", "x...2", "z"))
+  expect_equal(out$table_names, c("x...1", "x...2", "z"))
 })
 
 test_that("select() before join is inlined", {
@@ -272,8 +350,8 @@ test_that("select() before join is inlined", {
     expect_equal(lq$vars$var, var)
     expect_equal(lq$vars$table, table)
 
-    expect_equal(lq$joins$by[[1]]$x, ident("x1"))
-    expect_equal(lq$joins$by[[1]]$y, ident("x2"))
+    expect_equal(lq$joins$by[[1]]$x, "x1")
+    expect_equal(lq$joins$by[[1]]$y, "x2")
   }
 
   out_left <- left_join(
@@ -281,7 +359,7 @@ test_that("select() before join is inlined", {
     lf2 %>% select(x = x2, b),
     by = "x"
   )
-  test_vars(out_left$lazy_query, list("a", "x1", "b"), list(1, 1, 2))
+  test_vars(out_left$lazy_query, c("a", "x1", "b"), c(1, 1, 2))
   expect_equal(op_vars(out_left), c("a2", "x", "b"))
   expect_snapshot(out_left)
 
@@ -290,14 +368,19 @@ test_that("select() before join is inlined", {
     lf2 %>% select(x = x2, b),
     by = "x"
   )
-  test_vars(out_inner$lazy_query, list("a", "x1", "b"), list(1, 1, 2))
+  test_vars(out_inner$lazy_query, c("a", "x1", "b"), c(1, 1, 2))
 
   out_right <- right_join(
     lf %>% select(a2 = a, x = x1),
     lf2 %>% select(x = x2, b),
     by = "x"
-  )
-  test_vars(out_right$lazy_query, list("a", "x2", "b"), list(1, 2, 2))
+  )$lazy_query
+
+  expect_equal(out_right$vars$name, c("a2", "x", "b"))
+  expect_equal(out_right$vars$x, c("a", NA, NA))
+  expect_equal(out_right$vars$y, c(NA, "x2", "b"))
+  expect_equal(out_right$by$x, "x1")
+  expect_equal(out_right$by$y, "x2")
 
   out_full <- full_join(
     lf %>% select(a2 = a, x = x1),
@@ -306,8 +389,8 @@ test_that("select() before join is inlined", {
   )
   vars <- out_full$lazy_query$vars
   expect_equal(vars$name, c("a2", "x", "b"))
-  expect_equal(vars$var, list("a", c("x1", "x2"), "b"))
-  expect_equal(vars$table, list(1, c(1, 2), 2))
+  expect_equal(vars$x, c("a", "x1", NA))
+  expect_equal(vars$y, c(NA, "x2", "b"))
 
   out_cross <- cross_join(
     lf %>% select(a2 = a, x = x1),
@@ -315,8 +398,8 @@ test_that("select() before join is inlined", {
   )
   vars <- out_cross$lazy_query$vars
   expect_equal(vars$name, c("a2", "x.x", "x.y", "b"))
-  expect_equal(vars$var, list("a", "x1", "x2", "b"))
-  expect_equal(vars$table, list(1, 1, 2, 2))
+  expect_equal(vars$var, c("a", "x1", "x2", "b"))
+  expect_equal(vars$table, c(1, 1, 2, 2))
 
   # attributes like `group`, `sort`, `frame` is kept
   lf <- lazy_frame(x = 10, a = 1, b = 1, .name = "lf1")
@@ -347,8 +430,8 @@ test_that("select() before join works for tables with same column name", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id1", "x", "id2"))
-  expect_equal(lq$vars$var, list("id", "x", "id"))
-  expect_equal(lq$vars$table, list(1, 1, 2))
+  expect_equal(lq$vars$var, c("id", "x", "id"))
+  expect_equal(lq$vars$table, c(1, 1, 2))
 })
 
 test_that("named by works in combination with inlined select", {
@@ -363,10 +446,10 @@ test_that("named by works in combination with inlined select", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id_x", "x.x"))
-  expect_equal(lq$vars$var, list("id_x", "x"))
-  expect_equal(lq$vars$table, list(1, 1))
-  expect_equal(lq$joins$by[[1]]$x, ident(c("id_x", "x")))
-  expect_equal(lq$joins$by[[1]]$y, ident(c("id_y", "x")))
+  expect_equal(lq$vars$var, c("id_x", "x"))
+  expect_equal(lq$vars$table, c(1, 1))
+  expect_equal(lq$joins$by[[1]]$x, c("id_x", "x"))
+  expect_equal(lq$joins$by[[1]]$y, c("id_y", "x"))
 })
 
 test_that("suffix works in combination with inlined select", {
@@ -381,8 +464,8 @@ test_that("suffix works in combination with inlined select", {
 
   lq <- out$lazy_query
   expect_equal(op_vars(lq), c("id", "x2.x", "x2.y"))
-  expect_equal(lq$vars$var, list("id", "x", "x"))
-  expect_equal(lq$vars$table, list(1L, 1L, 2L))
+  expect_equal(lq$vars$var, c("id", "x", "x"))
+  expect_equal(lq$vars$table, c(1L, 1L, 2L))
 })
 
 test_that("select() before join is not inlined when using `sql_on`", {
@@ -398,8 +481,8 @@ test_that("select() before join is not inlined when using `sql_on`", {
   lq <- out$lazy_query
   expect_s3_class(lq$x, "lazy_select_query")
   expect_s3_class(lq$joins$table[[1]], "lazy_select_query")
-  expect_equal(lq$vars$var, list("a2", "x", "x", "b"))
-  expect_equal(lq$vars$table, list(1L, 1L, 2L, 2L))
+  expect_equal(lq$vars$var, c("a2", "x", "x", "b"))
+  expect_equal(lq$vars$table, c(1L, 1L, 2L, 2L))
 })
 
 test_that("select() before semi_join is inlined", {
@@ -443,6 +526,28 @@ test_that("select() before semi_join is inlined", {
   expect_equal(op_frame(out_semi), list(range = c(0, 1)))
 })
 
+test_that("can combine full_join with other joins #1178", {
+  lf1 <- lazy_frame(x = 1)
+  lf2 <- lazy_frame(x = 1, y = 1)
+  lf3 <- lazy_frame(x = 1, z = 1)
+
+  # left join after full join
+  expect_snapshot(
+    full_join(lf1, lf2, by = "x") %>%
+      left_join(lf3, by = "x")
+  )
+  # full join after left join
+  expect_snapshot(
+    left_join(lf1, lf2, by = "x") %>%
+      full_join(lf3, by = "x")
+  )
+  # full join after full join
+  expect_snapshot(
+    full_join(lf1, lf2, by = "x") %>%
+      full_join(lf3, by = "x")
+  )
+})
+
 test_that("select() before join is not inlined when using `sql_on`", {
   lf <- lazy_frame(x1 = 10, a = 1, y = 3, .name = "lf1")
   lf2 <- lazy_frame(x2 = 10, b = 2, z = 4, .name = "lf2")
@@ -458,6 +563,57 @@ test_that("select() before join is not inlined when using `sql_on`", {
   expect_equal(lq$vars, tibble(name = c("a2", "x"), var = c("a2", "x")))
 })
 
+test_that("filter() before semi join is inlined", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x2 = 1, a = 2, b = 3, c = 4)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      select(x = x2, a2 = a, b) %>%
+      filter(a2 == 1L, b == 2L),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_equal(lq$where, list(quo(a == 1L), quo(b == 2L)), ignore_formula_env = TRUE)
+  expect_snapshot(out)
+})
+
+test_that("filter() before semi join is not when y has other operations", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x = 1, a = 2, b = 3)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      mutate(a = a + 1),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      distinct(),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      filter(a == 1L, b == 2L) %>%
+      head(10),
+    by = "x"
+  )
+  lq <- out$lazy_query
+  expect_null(lq$where)
+})
+
 test_that("multiple joins create a single query", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
@@ -469,8 +625,8 @@ test_that("multiple joins create a single query", {
   expect_s3_class(lq, "lazy_multi_join_query")
   expect_equal(lq$table_names, tibble(name = c("df1", "df2", "df3"), from = "name"))
   expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
-  expect_equal(lq$vars$table, list(1L, 1L, 2L, 3L))
-  expect_equal(lq$vars$var, list("x", "a", "b", "b"))
+  expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
+  expect_equal(lq$vars$var, c("x", "a", "b", "b"))
 
   expect_snapshot(out)
 })
@@ -496,8 +652,8 @@ test_that("can join 4 tables with same column #1101", {
 
   join_vars <- out$lazy_query$vars
   expect_equal(join_vars$name, c("x", "a", "b", "c", "a4"))
-  expect_equal(join_vars$table, list(1L, 1L, 2L, 3L, 4L))
-  expect_equal(join_vars$var, list("x", "a", "b", "c", "a"))
+  expect_equal(join_vars$table, c(1L, 1L, 2L, 3L, 4L))
+  expect_equal(join_vars$var, c("x", "a", "b", "c", "a"))
   # `lf4`.`a` AS `a4`
   expect_snapshot(remote_query(out))
 })
@@ -532,10 +688,10 @@ test_that("multiple joins can use by column from any table", {
   out <- left_join(lf, lf2, by = "x") %>%
     left_join(lf3, by = c("x", "y"))
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
@@ -550,10 +706,10 @@ test_that("multiple joins can use by column from any table", {
     left_join(lf3, by = c("x", "y"))
 
   joins_metadata <- out$lazy_query$joins
-  expect_equal(joins_metadata$by[[1]]$x, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$x, ident(c("x", "y2")))
-  expect_equal(joins_metadata$by[[1]]$y, ident("x"))
-  expect_equal(joins_metadata$by[[2]]$y, ident(c("x", "y")))
+  expect_equal(joins_metadata$by[[1]]$x, "x")
+  expect_equal(joins_metadata$by[[2]]$x, c("x", "y2"))
+  expect_equal(joins_metadata$by[[1]]$y, "x")
+  expect_equal(joins_metadata$by[[2]]$y, c("x", "y"))
   expect_equal(joins_metadata$by_x_table_id, list(1, c(1, 2)))
 })
 
@@ -701,8 +857,8 @@ test_that("by default, `by` columns omitted from `y` with equi-conditions, but n
   )
   vars <- out$lazy_query$vars
   expect_equal(vars$name, c("x", "y", "z.x", "x.y", "z.y"))
-  expect_equal(vars$table, list(2L, 1L, 1L, 2L, 2L))
-  expect_equal(vars$var, list("y", "y", "z", "x", "z"))
+  expect_equal(vars$x, c(NA, "y", "z", NA, NA))
+  expect_equal(vars$y, c("y", NA, NA, "x", "z"))
 
   # unless specifically requested with `keep = TRUE`
   lf <- lazy_frame(x = 1, y = 1, z = 1)
@@ -715,8 +871,8 @@ test_that("by default, `by` columns omitted from `y` with equi-conditions, but n
   )
   vars <- out$lazy_query$vars
   expect_equal(vars$name, c("x.x", "y.x", "z.x", "x.y", "y.y", "z.y"))
-  expect_equal(vars$table, list(1L, 1L, 1L, 2L, 2L, 2L))
-  expect_equal(vars$var, list("x", "y", "z", "x", "y", "z"))
+  expect_equal(vars$x, c("x", "y", "z", NA, NA, NA))
+  expect_equal(vars$y, c(NA, NA, NA, "x", "y", "z"))
 })
 
 test_that("can translate join conditions", {
@@ -817,6 +973,36 @@ test_that("`na_matches` is validated", {
   })
 })
 
+test_that("using multiple gives an informative error", {
+  lf <- lazy_frame(x = 1)
+
+  expect_no_error(left_join(lf, lf, by = "x", multiple = NULL))
+  expect_no_error(left_join(lf, lf, by = "x", multiple = "all"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", multiple = "first")
+  })
+})
+
+test_that("using unmatched gives an informative error", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(left_join(lf, lf, by = "x", unmatched = "drop"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", unmatched = "error")
+  })
+})
+
+test_that("using relationship gives an informative error", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(left_join(lf, lf, by = "x", relationship = NULL))
+  expect_no_error(left_join(lf, lf, by = "x", relationship = "many-to-many"))
+
+  expect_snapshot(error = TRUE, {
+    left_join(lf, lf, by = "x", relationship = "one-to-one")
+  })
+})
+
 # sql_build ---------------------------------------------------------------
 
 test_that("join verbs generate expected ops", {
@@ -832,12 +1018,12 @@ test_that("join verbs generate expected ops", {
   expect_equal(jl$lazy_query$joins$type, "left")
 
   jr <- right_join(lf1, lf2, by = "x")
-  expect_s3_class(jr$lazy_query, "lazy_multi_join_query")
-  expect_equal(jr$lazy_query$joins$type, "right")
+  expect_s3_class(jr$lazy_query, "lazy_rf_join_query")
+  expect_equal(jr$lazy_query$type, "right")
 
   jf <- full_join(lf1, lf2, by = "x")
-  expect_s3_class(jf$lazy_query, "lazy_multi_join_query")
-  expect_equal(jf$lazy_query$joins$type, "full")
+  expect_s3_class(jf$lazy_query, "lazy_rf_join_query")
+  expect_equal(jf$lazy_query$type, "full")
 
   js <- semi_join(lf1, lf2, by = "x")
   expect_s3_class(js$lazy_query, "lazy_semi_join_query")
@@ -853,6 +1039,7 @@ test_that("can optionally match NA values", {
   lf1 <- lazy_frame(x = 1, .name = "lf1", con = con)
   lf2 <- lazy_frame(x = 1, .name = "lf2", con = con)
   expect_snapshot(left_join(lf1, lf2, by = "x", na_matches = "na"))
+  expect_snapshot(semi_join(lf1, lf2, by = "x", na_matches = "na"))
 })
 
 test_that("join captures both tables", {
@@ -879,7 +1066,7 @@ test_that("set ops captures both tables", {
   lf2 <- lazy_frame(x = 1, z = 2)
 
   out <- union(lf1, lf2) %>% sql_build()
-  expect_equal(out$type, "UNION")
+  expect_s3_class(out, "union_query")
 })
 
 test_that("extra args generates error", {
@@ -922,9 +1109,20 @@ test_that("left_join/inner_join uses *", {
     left_join(lf2, by = c("a", "b")) %>%
     sql_build()
 
+  expect_equal(out$select, sql("`df_LHS`.*", z = "`z`"))
+
+  out <- lf1 %>%
+    left_join(lf2, by = c("a", "b")) %>%
+    sql_build(sql_options = sql_options(use_star = FALSE))
+
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql("`df_LHS`.*", z = "`z`")
+    out$select,
+    sql(
+      a = "`df_LHS`.`a`",
+      b = "`df_LHS`.`b`",
+      c = "`c`",
+      z = "`z`"
+    )
   )
 
   # also works after relocate
@@ -933,10 +1131,7 @@ test_that("left_join/inner_join uses *", {
     relocate(z) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(z = "`z`", "`df_LHS`.*")
-  )
+  expect_equal(out$select, sql(z = "`z`", "`df_LHS`.*"))
 
   # does not use * if variable are missing
   out <- lf1 %>%
@@ -944,10 +1139,7 @@ test_that("left_join/inner_join uses *", {
     select(a, c) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", c = "`c`")
-  )
+  expect_equal(out$select, sql(a = "`df_LHS`.`a`", c = "`c`"))
 
   # does not use * if variable names changed
   lf1 <- lazy_frame(a = 1, b = 2)
@@ -956,10 +1148,7 @@ test_that("left_join/inner_join uses *", {
     left_join(lf2, by = c("a")) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
-  )
+  expect_equal(out$select, sql(a = "`df_LHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`"))
 })
 
 test_that("right_join uses *", {
@@ -973,7 +1162,7 @@ test_that("right_join uses *", {
 
   # cannot use * without relocate or select
   expect_equal(
-    sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", b = "`df_RHS`.`b`", c = "`c`", z = "`z`")
   )
 
@@ -984,8 +1173,24 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql("`df_RHS`.*", c = "`c`")
+  )
+
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    right_join(lf2, by = c("a", "b")) %>%
+    select(a, b, z, c) %>%
+    sql_build(sql_options = sql_options(use_star = FALSE))
+
+  expect_equal(
+    out$select,
+    sql(
+      a = "`df_RHS`.`a`",
+      b = "`df_RHS`.`b`",
+      z = "`z`",
+      c = "`c`"
+    )
   )
 
   # does not use * if variable are missing
@@ -995,7 +1200,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", z = "`z`")
   )
 
@@ -1007,7 +1212,7 @@ test_that("right_join uses *", {
     sql_build()
 
   expect_equal(
-    sql_join_vars(con, out$vars, type = "right", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(a = "`df_RHS`.`a`", `b.x` = "`df_LHS`.`b`", `b.y` = "`df_RHS`.`b`")
   )
 })
@@ -1021,9 +1226,21 @@ test_that("cross_join uses *", {
     cross_join(lf2) %>%
     sql_build()
 
+  expect_equal(out$select, set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", "")))
+
+  # does not use * if `use_star = FALSE`
+  out <- lf1 %>%
+    cross_join(lf2) %>%
+    sql_build(sql_options = sql_options(use_star = FALSE))
+
   expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_LHS`.*", "`df_RHS`.*"), c("", ""))
+    out$select,
+    sql(
+      a = "`a`",
+      b = "`b`",
+      x = "`x`",
+      y = "`y`"
+    )
   )
 
   # also works after relocate
@@ -1032,30 +1249,21 @@ test_that("cross_join uses *", {
     select(x, y, a, b) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", ""))
-  )
+  expect_equal(out$select, set_names(sql("`df_RHS`.*", "`df_LHS`.*"), c("", "")))
 
   out <- lf1 %>%
     cross_join(lf2) %>%
     select(x, a, b, y) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(x = "`x`", "`df_LHS`.*", y = "`y`")
-  )
+  expect_equal(out$select, sql(x = "`x`", "`df_LHS`.*", y = "`y`"))
 
   out <- lf1 %>%
     cross_join(lf2) %>%
     select(a, x, y, b) %>%
     sql_build()
 
-  expect_equal(
-    sql_multi_join_vars(con, out$vars, out$table_vars),
-    sql(a = "`a`", "`df_RHS`.*", b = "`b`")
-  )
+  expect_equal(out$select, sql(a = "`a`", "`df_RHS`.*", b = "`b`"))
 })
 
 test_that("full_join() does not use *", {
@@ -1068,7 +1276,7 @@ test_that("full_join() does not use *", {
     sql_build()
 
   expect_equal(
-    sql_join_vars(con, out$vars, type = "full", x_as = out$by$x_as, y_as = out$by$y_as),
+    out$select,
     sql(
       a = "COALESCE(`df_LHS`.`a`, `df_RHS`.`a`)",
       b = "COALESCE(`df_LHS`.`b`, `df_RHS`.`b`)"
@@ -1086,8 +1294,20 @@ test_that("joins reuse queries in cte mode", {
       lf,
       lf
     ) %>%
-      remote_query(cte = TRUE)
+      remote_query(sql_options = sql_options(cte = TRUE))
   )
+})
+
+test_that("can force to qualify all columns", {
+  lf1 <- lazy_frame(x = 1, a = 2, y = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, a = 2, z = 1, .name = "lf2")
+
+  unforced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = sql_options(qualify_all_columns = FALSE))
+  expect_equal(unforced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`y`", a.y = "`lf2`.`a`", z = "`z`"))
+  forced <- left_join(lf1, lf2, by = "x") %>%
+    sql_build(sql_options = sql_options(qualify_all_columns = TRUE))
+  expect_equal(forced$select, sql(x = "`lf1`.`x`", a.x = "`lf1`.`a`", y = "`lf1`.`y`", a.y = "`lf2`.`a`", z = "`lf2`.`z`"))
 })
 
 # ops ---------------------------------------------------------------------

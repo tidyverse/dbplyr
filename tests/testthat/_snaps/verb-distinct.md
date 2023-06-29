@@ -4,12 +4,12 @@
       (out <- lf %>% head(2) %>% distinct(x, y))
     Output
       <SQL>
-      SELECT DISTINCT *
+      SELECT DISTINCT `q01`.*
       FROM (
-        SELECT *
+        SELECT `df`.*
         FROM `df`
         LIMIT 2
-      ) `q01`
+      ) AS `q01`
 
 # distinct respects window_order when .keep_all is TRUE
 
@@ -19,8 +19,10 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `q01`
+        SELECT
+          `df`.*,
+          ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `y` DESC) AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`q01` = 1)
+      ) AS `q01`
+      WHERE (`col01` = 1)
 
