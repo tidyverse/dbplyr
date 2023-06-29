@@ -4,13 +4,13 @@ test_that("adds src class", {
 })
 
 test_that("argument src is deprecated", {
-  expect_snapshot(dummy <- tbl_lazy(mtcars, src = simulate_sqlite()))
+  expect_snapshot(error = TRUE, tbl_lazy(mtcars, src = simulate_sqlite()))
 })
 
 test_that("cannot convert tbl_lazy to data.frame", {
   expect_snapshot(
     error = TRUE,
-    as.data.frame(tbl_lazy(mtcars, src = simulate_sqlite()))
+    as.data.frame(tbl_lazy(mtcars, con = simulate_sqlite()))
   )
 })
 
@@ -30,13 +30,18 @@ test_that("support colwise variants", {
     mf1 <- dplyr::mutate_if(mf, is.factor, as.character),
     "on the first 100 rows"
   )
-  expect_equal_tbl(mf1, exp)
+  compare_tbl(mf1, exp)
 
   mf2 <- dplyr::mutate_at(mf, "y", as.character)
-  expect_equal_tbl(mf2, exp)
+  compare_tbl(mf2, exp)
 })
 
 test_that("base source of tbl_lazy is always 'df'", {
   out <- lazy_frame(x = 1, y = 5) %>% sql_build()
-  expect_equal(out, ident("df"))
+  expect_equal(out, base_query(ident("df")))
+})
+
+test_that("names() inform that they aren't meant to be used", {
+  skip("Don't know how to not inform during assignment")
+  expect_snapshot(names(lazy_frame(x = 1)))
 })

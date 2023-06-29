@@ -32,27 +32,33 @@
 #'     n_squirrels,
 #'     n_squirrels2,
 #'   )
-fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
-  sim_data <- simulate_vars(.data)
-  cols_to_fill <- syms(names(tidyselect::eval_select(expr(c(...)), sim_data)))
+fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "downup")) {
+  cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
+  cols_to_fill <- syms(names(cols_to_fill))
   order_by_cols <- op_sort(.data)
-  .direction <- arg_match0(.direction, c("down", "up"))
+  .direction <- arg_match0(.direction, c("down", "up", "updown", "downup"))
 
   if (is_empty(order_by_cols)) {
     cli_abort(
       c(
         x = "{.arg .data} does not have explicit order.",
-        i = "Please use {.fun arrange} or {.fun window_order} to make determinstic."
+        i = "Please use {.fun dbplyr::window_order} to make order explicit."
       )
     )
   }
 
+  if (.direction == "updown") {
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "up")
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "down")
+    return(.data)
+  } else if (.direction == "downup") {
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "down")
+    .data <- tidyr::fill(.data, !!!cols_to_fill, .direction = "up")
+    return(.data)
+  }
+
   if (.direction == "up") {
-    # `desc()` cannot be used here because one gets invalid SQL if a variable
-    # is already wrapped in `desc()`
-    # i.e. `desc(desc(x))` produces `x DESC DESC`
-    # but this implies that "up" does not work for sorting non-numeric columns!
-    order_by_cols <- purrr::map(order_by_cols, ~ quo(-!!.x))
+    order_by_cols <- purrr::map(order_by_cols, swap_order_direction)
   }
 
   dbplyr_fill0(
@@ -62,6 +68,18 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up")) {
     order_by_cols = order_by_cols,
     .direction = .direction
   )
+}
+
+swap_order_direction <- function(x) {
+  if (is_quosure(x)) {
+    x <- quo_get_expr(x)
+  }
+
+  if (is_call(x, "desc", n = 1)) {
+    call_args(x)[[1]]
+  } else {
+    expr(desc(!!x))
+  }
 }
 
 dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
@@ -76,10 +94,10 @@ dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
 # * teradata: https://docs.teradata.com/r/756LNiPSFdY~4JcCCcR5Cw/V~t1FC7orR6KCff~6EUeDQ
 #' @export
 dbplyr_fill0.DBIConnection <- function(.con,
-                                          .data,
-                                          cols_to_fill,
-                                          order_by_cols,
-                                          .direction) {
+                                       .data,
+                                       cols_to_fill,
+                                       order_by_cols,
+                                       .direction) {
   # strategy:
   # 1. construct a window
   # * from the first row to the current row
@@ -93,10 +111,11 @@ dbplyr_fill0.DBIConnection <- function(.con,
 
   fill_sql <- purrr::map(
     cols_to_fill,
-    ~ win_over(
-      last_value_sql(.con, .x),
-      partition = if (!is_empty(grps)) escape(ident(op_grps(.data)), con = .con),
-      order = translate_sql(!!!order_by_cols, con = .con),
+    ~ translate_sql(
+      last(!!.x, na_rm = TRUE),
+      vars_group = op_grps(.data),
+      vars_order = translate_sql(!!!order_by_cols, con = .con),
+      vars_frame = c(-Inf, 0),
       con = .con
     )
   ) %>%
@@ -120,10 +139,10 @@ dbplyr_fill0.DBIConnection <- function(.con,
 #   -> `IGNORE NULLS` only in Azure SQL Edge
 #' @export
 dbplyr_fill0.SQLiteConnection <- function(.con,
-                                             .data,
-                                             cols_to_fill,
-                                             order_by_cols,
-                                             .direction) {
+                                          .data,
+                                          cols_to_fill,
+                                          order_by_cols,
+                                          .direction) {
   # this strategy is used for databases that don't support `IGNORE NULLS` in
   # `LAST_VALUE()`.
   #
@@ -188,20 +207,3 @@ dbplyr_fill0.MariaDBConnection <- dbplyr_fill0.SQLiteConnection
 dbplyr_fill0.MySQLConnection <- dbplyr_fill0.SQLiteConnection
 #' @export
 dbplyr_fill0.MySQL <- dbplyr_fill0.SQLiteConnection
-
-
-last_value_sql <- function(con, x) {
-  UseMethod("last_value_sql")
-}
-
-#' @export
-last_value_sql.DBIConnection <- function(con, x) {
-  build_sql("LAST_VALUE(", ident(as.character(x)), " IGNORE NULLS)", con = con)
-}
-
-#' @export
-`last_value_sql.Microsoft SQL Server` <- function(con, x) {
-  build_sql("LAST_VALUE(", ident(as.character(x)), ") IGNORE NULLS", con = con)
-}
-
-globalVariables("last_value")

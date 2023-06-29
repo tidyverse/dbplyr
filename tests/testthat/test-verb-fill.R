@@ -54,6 +54,19 @@ test_that("up-direction works", {
   )
 })
 
+test_that("up-direction works", {
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "updown")
+  )
+  expect_snapshot(
+    df_lazy_std %>%
+      window_order(id) %>%
+      tidyr::fill(n1, .direction = "downup")
+  )
+})
+
 test_that("up-direction works with descending", {
   expect_snapshot(
     df_lazy_ns %>%
@@ -83,6 +96,12 @@ test_that("groups are respected", {
 
 test_that("fill errors on unsorted data", {
   expect_snapshot({
-    expect_error(df_db %>% tidyr::fill(n1))
+    (expect_error(df_db %>% tidyr::fill(n1)))
+  })
+})
+
+test_that("fill() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% tidyr::fill(non_existent)
   })
 })

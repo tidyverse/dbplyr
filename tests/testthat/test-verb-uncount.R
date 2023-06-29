@@ -14,6 +14,18 @@ test_that("symbols weights are dropped in output", {
       lines
     }
   )
+
+  expect_equal(
+    df %>% mutate(w = w + 1) %>% dbplyr_uncount(w) %>% collect(),
+    tibble(x = c(1L, 1L))
+  )
+
+  expect_snapshot(
+    df %>%
+      mutate(w = w + 1) %>%
+      dbplyr_uncount(w) %>%
+      show_query()
+  )
 })
 
 test_that("can request to preserve symbols", {

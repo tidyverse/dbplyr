@@ -1,11 +1,46 @@
 # can't refer to freshly created variables
 
     Code
-      summarise(mf1, y = sum(x), z = sum(y))
-    Condition
+      (expect_error(summarise(lf1, a_sum = sum(a), issue_col = sum(a_sum))))
+    Output
+      <error/rlang_error>
       Error in `summarise()`:
+      i In argument: `issue_col = sum(a_sum)`
+      Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
-      x `z` refers to `y` which was created earlier in this `summarise()`.
+      x `a_sum` was created earlier in this `summarise()`.
+      i You need an extra `mutate()` step to use it.
+    Code
+      (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(
+        a_sum))))
+    Output
+      <error/rlang_error>
+      Error in `summarise()`:
+      i In argument: `issue_col = sum(a_sum)`
+      Caused by error:
+      ! In dbplyr you cannot use a variable created in the same `summarise()`.
+      x `a_sum` was created earlier in this `summarise()`.
+      i You need an extra `mutate()` step to use it.
+    Code
+      (expect_error(summarise(lf1, across(c(a, b), list(sum = sum)), issue_col = sum(
+        b_sum))))
+    Output
+      <error/rlang_error>
+      Error in `summarise()`:
+      i In argument: `issue_col = sum(b_sum)`
+      Caused by error:
+      ! In dbplyr you cannot use a variable created in the same `summarise()`.
+      x `b_sum` was created earlier in this `summarise()`.
+      i You need an extra `mutate()` step to use it.
+    Code
+      (expect_error(summarise(lf1, a_sum = sum(a), issue_col = across(a_sum, sum))))
+    Output
+      <error/rlang_error>
+      Error in `summarise()`:
+      i In argument: `issue_col = across(a_sum, sum)`
+      Caused by error:
+      ! In dbplyr you cannot use a variable created in the same `summarise()`.
+      x `a_sum` was created earlier in this `summarise()`.
       i You need an extra `mutate()` step to use it.
 
 # summarise(.groups=)
@@ -58,6 +93,22 @@
       SELECT `g`, 0.0 AS `x`
       FROM `df`
       GROUP BY `g`
+
+# can't use `.by` with `.groups`
+
+    Code
+      summarise(df, .by = x, .groups = "drop")
+    Condition
+      Error in `summarise()`:
+      ! Can't supply both `.by` and `.groups`.
+
+# catches `.by` with grouped-df
+
+    Code
+      summarise(gdf, .by = x)
+    Condition
+      Error:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
 
 # quoting for rendering summarized grouped table
 

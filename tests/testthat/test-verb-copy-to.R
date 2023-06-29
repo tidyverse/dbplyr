@@ -1,7 +1,6 @@
 test_that("can copy to from remote sources", {
   df <- tibble(x = 1:10)
-  con1 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con1), add = TRUE)
+  con1 <- local_sqlite_connection()
   df_1 <- copy_to(con1, df, "df1")
 
   # Create from tbl in same database
@@ -9,8 +8,7 @@ test_that("can copy to from remote sources", {
   expect_equal(collect(df_2), df)
 
   # Create from tbl in another data
-  con2 <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con2), add = TRUE)
+  con2 <- local_sqlite_connection()
   df_3 <- copy_to(con2, df_1, "df3")
   expect_equal(collect(df_3), df)
 })
@@ -30,17 +28,15 @@ test_that("NAs in character fields handled by db sources (#2256)", {
 })
 
 test_that("only overwrite existing table if explicitly requested", {
-  con <- DBI::dbConnect(RSQLite::SQLite())
-  on.exit(DBI::dbDisconnect(con))
-  DBI::dbWriteTable(con, "df", data.frame(x = 1:5))
+  con <- local_sqlite_connection()
+  local_db_table(con, data.frame(x = 1:5), "df")
 
   expect_error(copy_to(con, data.frame(x = 1), name = "df"), "exists")
   expect_silent(copy_to(con, data.frame(x = 1), name = "df", overwrite = TRUE))
 })
 
 test_that("can create a new table in non-default schema", {
-  con <- sqlite_con_with_aux()
-  on.exit(DBI::dbDisconnect(con))
+  con <- local_sqlite_con_with_aux()
 
   df1 <- tibble(x = 1)
   df2 <- tibble(x = 2)
@@ -54,8 +50,7 @@ test_that("can create a new table in non-default schema", {
 })
 
 test_that("df must be a local or remote table", {
-  con <- DBI::dbConnect(RSQLite::SQLite())
-  on.exit(DBI::dbDisconnect(con))
+  con <- local_sqlite_connection()
 
   expect_snapshot(error = TRUE, copy_to(con, list(x = 1), name = "df"))
 })
@@ -63,8 +58,7 @@ test_that("df must be a local or remote table", {
 # copy_inline() -----------------------------------------------------------
 
 test_that("can translate a table", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  con <- local_sqlite_connection()
   df <- tibble(
     lgl = TRUE,
     int = 1L,
@@ -96,8 +90,7 @@ test_that("can translate a table", {
 })
 
 test_that("can translate 1-column tables", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  con <- local_sqlite_connection()
   expect_snapshot(
     copy_inline(con, tibble(dbl = 1.5)) %>%
       remote_query()
@@ -105,8 +98,7 @@ test_that("can translate 1-column tables", {
 })
 
 test_that("zero row table works", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  con <- local_sqlite_connection()
   expect_snapshot(
     copy_inline(con, tibble(dbl = numeric(), chr = character())) %>%
       remote_query()
@@ -118,9 +110,26 @@ test_that("zero row table works", {
   )
 })
 
+test_that("types argument works", {
+  con <- local_sqlite_connection()
+
+  df <- tibble(x = "1", y = 2L)
+  expect_equal(copy_inline(con, df) %>% collect(), df)
+
+  expect_equal(
+    copy_inline(con, df, types = c(x = "INTEGER", y = "TEXT")) %>% collect(),
+    tibble(x = 1L, y = "2")
+  )
+})
+
 test_that("checks inputs", {
+  con <- simulate_dbi()
+
   expect_snapshot({
-    (expect_error(copy_inline(simulate_dbi(), tibble())))
-    (expect_error(copy_inline(simulate_dbi(), lazy_frame(a = 1))))
+    (expect_error(copy_inline(con, tibble())))
+    (expect_error(copy_inline(con, lazy_frame(a = 1))))
+
+    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = "bigint"))))
+    (expect_error(copy_inline(con, tibble(a = 1), types = c(b = 1))))
   })
 })

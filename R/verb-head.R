@@ -37,30 +37,20 @@ head.tbl_lazy <- function(x, n = 6L, ...) {
 
 add_head <- function(x, n) {
   lazy_query <- x$lazy_query
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     lazy_query <- lazy_select_query(
       x = lazy_query,
-      last_op = "head",
       limit = n
     )
 
     return(lazy_query)
   }
 
-  if (identical(lazy_query$last_op, "head")) {
-    lazy_query$limit <- min(lazy_query$limit, n)
-  } else {
-    lazy_query <- lazy_select_query(
-      x = lazy_query,
-      last_op = "head",
-      limit = n
-    )
-  }
-
+  lazy_query$limit <- min(lazy_query$limit, n)
   lazy_query
 }
 
 #' @export
 tail.tbl_lazy <- function(x, n = 6L, ...) {
-  cli_abort("{.fun tail} is not supported by sql sources")
+  stop_unsupported_function("tail")
 }

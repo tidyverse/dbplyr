@@ -55,7 +55,8 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
   } else {
     row_id_col <- .id
   }
-  sql_on_expr <- expr(RHS[[!!row_id_col]] <= LHS[[!!weights_col]])
+  tbl_name <- unclass(remote_name(data, null_if_local = FALSE)) %||% "LHS"
+  sql_on_expr <- expr(RHS[[!!row_id_col]] <= (!!sym(tbl_name))[[!!weights_col]])
 
   con <- remote_con(data)
   # FIXME: Use generate_series() if available on database
@@ -65,7 +66,9 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     data,
     helper_table,
     by = character(),
-    sql_on = translate_sql(!!sql_on_expr, con = con)
+    sql_on = translate_sql(!!sql_on_expr, con = con),
+    x_as = tbl_name,
+    y_as = "RHS"
   )
 
   cols_to_remove <- character()
@@ -87,4 +90,4 @@ dbplyr_uncount <- function(data, weights, .remove = TRUE, .id = NULL) {
     group_by(!!!syms(grps))
 }
 
-globalVariables(c("RHS", "LHS", "all_of"))
+utils::globalVariables(c("RHS", "LHS", "all_of"))

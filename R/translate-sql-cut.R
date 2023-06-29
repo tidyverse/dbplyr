@@ -56,7 +56,7 @@ sql_cut <- function(x, breaks, labels = NULL, include.lowest = FALSE, right = TR
     }
   }
 
-  translate_sql(case_when(!!!cases, !!!last_cases))
+  translate_sql(case_when(!!!cases, !!!last_cases), con = sql_current_con())
 }
 
 check_cut_labels <- function(labels, breaks, include.lowest, right, call = caller_env()) {
@@ -94,4 +94,4 @@ check_cut_labels <- function(labels, breaks, include.lowest, right, call = calle
   labels
 }
 
-globalVariables(c("case_when"))
+utils::globalVariables(c("case_when"))

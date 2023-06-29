@@ -12,6 +12,7 @@
 #' value of `x` in each group.
 #'
 #' @inheritParams arrange.tbl_lazy
+#' @inheritParams dplyr::slice
 #' @param ... Not used.
 #' @param n,prop Provide either `n`, the number of rows, or `prop`, the
 #'   proportion of rows to select. If neither are supplied, `n = 1` will be
@@ -49,54 +50,75 @@ NULL
 #' @importFrom dplyr slice
 #' @export
 slice.tbl_lazy <- function(.data, ...) {
-  cli_abort("{.fun slice} is not supported on database backends")
+  stop_unsupported_function("slice")
 }
 
 #' @importFrom dplyr slice_head
 #' @export
-slice_head.tbl_lazy <- function(.data, ..., n, prop) {
-  cli_abort(c(
-    "{.fun slice_head} is not supported on database backends",
-    i = "Please use {.fun slice_min} instead"
-  ))
+slice_head.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
+  stop_unsupported_function("slice_head", with = "slice_min")
 }
 
 #' @importFrom dplyr slice_tail
 #' @export
-slice_tail.tbl_lazy <- function(.data, ..., n, prop) {
-  cli_abort(c(
-    "{.fun slice_tail} is not supported on database backends",
-    i = "Please use {.fun slice_max} instead"
-  ))
+slice_tail.tbl_lazy <- function(.data, ..., n, prop, by = NULL) {
+  stop_unsupported_function("slice_tail", with = "slice_max")
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_min
 #' @export
-slice_min.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) {
-  if (missing(order_by)) {
-    cli_abort("Argument {.arg order_by} is missing, with no default.")
-  }
+slice_min.tbl_lazy <- function(.data,
+                               order_by,
+                               ...,
+                               n,
+                               prop,
+                               by = NULL,
+                               with_ties = TRUE,
+                               na_rm = TRUE) {
   size <- check_slice_size(n, prop)
-  slice_by(.data, {{order_by}}, size, with_ties = with_ties)
+  check_unsupported_arg(na_rm, allowed = TRUE)
+  slice_by(
+    .data,
+    {{order_by}},
+    size,
+    {{ by }},
+    with_ties = with_ties
+  )
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_max
 #' @export
-slice_max.tbl_lazy <- function(.data, order_by, ..., n, prop, with_ties = TRUE) {
-  if (missing(order_by)) {
-    cli_abort("Argument {.arg order_by} is missing, with no default.")
-  }
+slice_max.tbl_lazy <- function(.data,
+                               order_by,
+                               ...,
+                               n,
+                               by = NULL,
+                               prop,
+                               with_ties = TRUE,
+                               na_rm = TRUE) {
   size <- check_slice_size(n, prop)
-
-  slice_by(.data, desc({{order_by}}), size, with_ties = with_ties)
+  check_unsupported_arg(na_rm, allowed = TRUE)
+  slice_by(
+    .data,
+    desc({{order_by}}),
+    size,
+    {{ by }},
+    with_ties = with_ties
+  )
 }
 
 #' @rdname dbplyr-slice
 #' @importFrom dplyr slice_sample
 #' @export
-slice_sample.tbl_lazy <- function(.data, ..., n, prop, weight_by = NULL, replace = FALSE) {
+slice_sample.tbl_lazy <- function(.data,
+                                  ...,
+                                  n,
+                                  prop,
+                                  by = NULL,
+                                  weight_by = NULL,
+                                  replace = FALSE) {
   size <- check_slice_size(n, prop)
   weight_by <- enquo(weight_by)
   if (size$type == "prop") {
@@ -110,10 +132,21 @@ slice_sample.tbl_lazy <- function(.data, ..., n, prop, weight_by = NULL, replace
     cli_abort("Sampling with replacement is not supported on database backends")
   }
 
-  slice_by(.data, !!sql_random(remote_con(.data)), size, with_ties = FALSE)
+  slice_by(.data, runif(n()), size, {{ by }}, with_ties = FALSE)
 }
 
-slice_by <- function(.data, order_by, size, with_ties = FALSE) {
+slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = "by",
+    data_arg = "data",
+    error_call = caller_env()
+  )
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
+
   old_frame <- op_sort(.data)
 
   if (with_ties) {
@@ -128,10 +161,19 @@ slice_by <- function(.data, order_by, size, with_ties = FALSE) {
     )
   }
 
-  .data %>%
-    window_order({{order_by}}) %>%
-    filter(!!window_fun) %>%
+  # must use `add_order()` as `window_order()` only allows variables
+  # this is only okay to do because the previous, legal window order is restored
+  dots <- partial_eval_dots(.data, !!!quos({{order_by}}), .named = FALSE)
+  .data$lazy_query <- add_order(.data, dots)
+
+  out <- filter(.data, !!window_fun) %>%
     window_order(!!!old_frame)
+
+  if (by$from_by) {
+    out$lazy_query$group_vars <- character()
+  }
+
+  out
 }
 
 
@@ -162,4 +204,4 @@ check_slice_size <- function(n, prop) {
   }
 }
 
-globalVariables(c("min_rank", "cume_dist", "row_number", "desc"))
+utils::globalVariables(c("min_rank", "cume_dist", "row_number", "desc", "runif"))

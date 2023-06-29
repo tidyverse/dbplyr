@@ -37,11 +37,22 @@ if (test_srcs$length() == 0) {
   }
 }
 
-sqlite_con_with_aux <- function() {
+local_sqlite_con_with_aux <- function(envir = parent.frame()) {
   tmp <- tempfile()
 
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  con <- withr::local_db_connection(
+    DBI::dbConnect(RSQLite::SQLite(), ":memory:"),
+    .local_envir = envir
+  )
   DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
 
   con
+}
+
+snap_transform_dbi <- function(x) {
+  # use the last line matching this in case of multiple chained errors
+  dbi_line_id <- max(which(x == "Caused by error:"))
+  n <- length(x)
+  x <- x[-seq2(dbi_line_id + 1, n)]
+  c(x, "! dummy DBI error")
 }

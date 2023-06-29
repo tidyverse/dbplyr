@@ -29,6 +29,11 @@ dbplyr_edition.RedshiftConnection <- function(con) {
 #' @export
 dbplyr_edition.Redshift <- dbplyr_edition.RedshiftConnection
 
+redshift_round <- function(x, digits = 0L) {
+  digits <- as.integer(digits)
+  sql_expr(round(((!!x)) %::% float, !!digits))
+}
+
 #' @export
 sql_translation.RedshiftConnection <- function(con) {
   postgres <- sql_translation.PostgreSQL(con)
@@ -39,6 +44,7 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/r_Numeric_types201.html#r_Numeric_types201-floating-point-types
       as.numeric = sql_cast("FLOAT"),
       as.double = sql_cast("FLOAT"),
+      round = redshift_round,
 
       # https://stackoverflow.com/questions/56708136
       paste  = sql_paste_redshift(" "),
@@ -58,7 +64,7 @@ sql_translation.RedshiftConnection <- function(con) {
     ),
     sql_translator(.parent = postgres$aggregate,
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
-      str_flatten = function(x, collapse){
+      str_flatten = function(x, collapse = "") {
         sql_expr(LISTAGG(!!x, !!collapse))
       }
     ),
@@ -82,13 +88,17 @@ sql_translation.RedshiftConnection <- function(con) {
         )
       },
       # https://docs.aws.amazon.com/redshift/latest/dg/r_LISTAGG.html
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         order <- win_current_order()
+        listagg_sql <- sql_expr(LISTAGG(!!x, !!collapse))
+
         if(length(order) > 0){
-          sql <- build_sql(sql_expr(LISTAGG(!!x, !!collapse)),
-                           " WITHIN GROUP (ORDER BY ", order, ")")
+          sql <- glue_sql2(
+            sql_current_con(),
+            "{listagg_sql} WITHIN GROUP (ORDER BY {order})"
+          )
         } else {
-          sql <- sql_expr(LISTAGG(!!x, !!collapse))
+          sql <- listagg_sql
         }
 
         win_over(
@@ -112,11 +122,26 @@ sql_paste_redshift <- function(sep) {
 # https://docs.aws.amazon.com/redshift/latest/dg/r_EXPLAIN.html
 #' @export
 sql_query_explain.Redshift <- function(con, sql, ...) {
-
-  build_sql("EXPLAIN ", sql, con = con)
+  glue_sql2(con, "EXPLAIN {sql}")
 }
 
 #' @export
 sql_query_explain.RedshiftConnection <- sql_query_explain.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG"))
+#' @export
+sql_values_subquery.Redshift <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl)
+}
+
+#' @export
+sql_values_subquery.RedshiftConnection <- sql_values_subquery.Redshift
+
+#' @export
+supports_window_clause.Redshift <- function(con) {
+  FALSE
+}
+
+#' @export
+supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
+
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float", "text"))

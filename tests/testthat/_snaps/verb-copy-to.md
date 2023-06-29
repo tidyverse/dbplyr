@@ -27,7 +27,9 @@
           NULL AS `date`,
           NULL AS `dtt`
         WHERE (0 = 1)
+      
         UNION ALL
+      
         VALUES (1, 1, 1.5, 'a', '2020-01-01', '2020-01-01T01:23:45Z')
       ) AS `values_table`
 
@@ -40,7 +42,9 @@
       FROM (
         SELECT NULL AS `dbl`
         WHERE (0 = 1)
+      
         UNION ALL
+      
         VALUES (1.5)
       ) AS `values_table`
 
@@ -63,15 +67,27 @@
 # checks inputs
 
     Code
-      (expect_error(copy_inline(simulate_dbi(), tibble())))
+      (expect_error(copy_inline(con, tibble())))
     Output
       <error/rlang_error>
       Error in `copy_inline()`:
       ! `df` needs at least one column.
     Code
-      (expect_error(copy_inline(simulate_dbi(), lazy_frame(a = 1))))
+      (expect_error(copy_inline(con, lazy_frame(a = 1))))
     Output
       <error/rlang_error>
       Error in `copy_inline()`:
       ! `df` needs to be a data.frame.
+    Code
+      (expect_error(copy_inline(con, tibble(a = 1), types = c(b = "bigint"))))
+    Output
+      <error/rlang_error>
+      Error in `copy_inline()`:
+      ! Names of `df` and `types` must be the same.
+    Code
+      (expect_error(copy_inline(con, tibble(a = 1), types = c(b = 1))))
+    Output
+      <error/rlang_error>
+      Error in `copy_inline()`:
+      ! `types` must be a character vector, not the number 1.
 

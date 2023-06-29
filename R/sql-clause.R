@@ -34,17 +34,26 @@ sql_clause <- function(kw, parts, sep = ",", parens = FALSE, lvl = 0) {
   clause
 }
 
-sql_clause_select <- function(con, select, distinct = FALSE, top = NULL, lvl = 0) {
-  assert_that(is.character(select))
+sql_clause_select <- function(con,
+                              select,
+                              distinct = FALSE,
+                              top = NULL,
+                              lvl = 0,
+                              call = caller_env()) {
+  check_character(select, call = call)
   if (is_empty(select)) {
     cli_abort("Query contains no columns")
   }
 
-  clause <- build_sql(
+  if (!is.null(top)) {
+    top <- as.integer(top)
+  }
+
+  clause <- glue_sql2(
+    con,
     "SELECT",
-    if (distinct) sql(" DISTINCT"),
-    if (!is.null(top)) build_sql(" TOP ", as.integer(top), con = con),
-    con = con
+    if (distinct) " DISTINCT",
+    if (!is.null(top)) " TOP {top}"
   )
 
   sql_clause(clause, select)
@@ -54,12 +63,12 @@ sql_clause_from  <- function(from, lvl = 0) {
   sql_clause("FROM", from, lvl = lvl)
 }
 
-sql_clause_where <- function(where, lvl = 0) {
+sql_clause_where <- function(where, lvl = 0, call = caller_env()) {
   if (length(where) == 0L) {
     return()
   }
 
-  assert_that(is.character(where))
+  check_character(where, call = call)
   where_paren <- sql(paste0("(", where, ")"))
   sql_clause("WHERE", where_paren, sep = " AND", lvl = lvl)
 }
@@ -68,8 +77,14 @@ sql_clause_group_by <- function(group_by, lvl = 0) {
   sql_clause("GROUP BY", group_by)
 }
 
-sql_clause_having <- function(having, lvl = 0) {
-  sql_clause("HAVING", having)
+sql_clause_having <- function(having, lvl = 0, call = caller_env()) {
+  if (length(having) == 0L) {
+    return()
+  }
+
+  check_character(having, call = call)
+  having_paren <- sql(paste0("(", having, ")"))
+  sql_clause("HAVING", having_paren, sep = " AND")
 }
 
 sql_clause_window <- function(window) {
@@ -110,8 +125,8 @@ sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
   }
 }
 
-sql_clause_on <- function(on, lvl = 0) {
-  sql_clause("ON", on, sep = " AND", lvl = lvl)
+sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
+  sql_clause("ON", on, sep = " AND", parens = parens, lvl = lvl)
 }
 
 sql_clause_where_exists <- function(table, where, not) {

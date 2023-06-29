@@ -58,7 +58,14 @@ sql_escape_raw <- function(con, x) {
 }
 #' @export
 sql_escape_raw.DBIConnection <- function(con, x) {
-  # SQL-99 standard for BLOB literals
-  # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
-  paste0(c("X'", format(x), "'"), collapse = "")
+  # Unlike the other escape functions, this is not vectorised because
+  # raw "vectors" are scalars in this content
+
+  if (is.null(x)) {
+    "NULL"
+  } else {
+    # SQL-99 standard for BLOB literals
+    # https://crate.io/docs/sql-99/en/latest/chapters/05.html#blob-literal-s
+    paste0(c("X'", format(x), "'"), collapse = "")
+  }
 }

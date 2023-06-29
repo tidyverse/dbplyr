@@ -37,7 +37,7 @@ dbplyr_edition.PostgreSQL <- function(con) {
 dbplyr_edition.PqConnection <- dbplyr_edition.PostgreSQL
 
 #' @export
-db_connection_describe.PqConnection <- function(con) {
+db_connection_describe.PqConnection <- function(con, ...) {
   info <- dbGetInfo(con)
   host <- if (info$host == "") "localhost" else info$host
 
@@ -47,11 +47,16 @@ db_connection_describe.PqConnection <- function(con) {
 #' @export
 db_connection_describe.PostgreSQL <- db_connection_describe.PqConnection
 
-postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE) {
+postgres_grepl <- function(pattern,
+                           x,
+                           ignore.case = FALSE,
+                           perl = FALSE,
+                           fixed = FALSE,
+                           useBytes = FALSE) {
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-TABLE
-  if (any(c(perl, fixed, useBytes))) {
-    cli_abort("{.arg {c('perl', 'fixed', 'useBytes')}} parameters are unsupported.")
-  }
+  check_unsupported_arg(perl, FALSE, backend = "PostgreSQL")
+  check_unsupported_arg(fixed, FALSE, backend = "PostgreSQL")
+  check_unsupported_arg(useBytes, FALSE, backend = "PostgreSQL")
 
   if (ignore.case) {
     sql_expr(((!!x)) %~*% ((!!pattern)))
@@ -62,6 +67,12 @@ postgres_grepl <- function(pattern, x, ignore.case = FALSE, perl = FALSE, fixed 
 postgres_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
   sql_expr(round(((!!x)) %::% numeric, !!digits))
+}
+
+postgres_period <- function(x, unit) {
+  x <- escape(x, con = sql_current_con())
+  interval <- paste0(x, " ", unit)
+  sql_expr(CAST(!!interval %AS% INTERVAL))
 }
 
 #' @export
@@ -91,6 +102,14 @@ sql_translation.PqConnection <- function(con) {
           sql_expr(!(!!string ~ !!pattern))
         } else {
           sql_expr(!!string ~ !!pattern)
+        }
+      },
+      # https://www.postgresql.org/docs/current/functions-matching.html
+      str_like = function(string, pattern, ignore_case = TRUE) {
+        if (isTRUE(ignore_case)) {
+          sql_expr(!!string %ILIKE% !!pattern)
+        } else {
+          sql_expr(!!string %LIKE% !!pattern)
         }
       },
       str_replace = function(string, pattern, replacement){
@@ -149,9 +168,7 @@ sql_translation.PqConnection <- function(con) {
         }
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
-        if (fiscal_start != 1) {
-          cli_abort("{.arg fiscal_start} is not supported in PostgreSQL translation. Must be 1.")
-        }
+        check_unsupported_arg(fiscal_start, 1, backend = "PostgreSQL")
 
         if (with_year) {
           sql_expr((EXTRACT(YEAR %FROM% !!x) || '.' || EXTRACT(QUARTER %FROM% !!x)))
@@ -165,32 +182,25 @@ sql_translation.PqConnection <- function(con) {
 
       # https://www.postgresql.org/docs/13/datatype-datetime.html#DATATYPE-INTERVAL-INPUT
       seconds = function(x) {
-        interval <- paste(x, "seconds")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "seconds")
       },
       minutes = function(x) {
-        interval <- paste(x, "minutes")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "minutes")
       },
       hours = function(x) {
-        interval <- paste(x, "hours")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "hours")
       },
       days = function(x) {
-        interval <- paste(x, "days")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "days")
       },
       weeks = function(x) {
-        interval <- paste(x, "weeks")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "weeks")
       },
       months = function(x) {
-        interval <- paste(x, "months")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "months")
       },
       years = function(x) {
-        interval <- paste(x, "years")
-        sql_expr(CAST(!!interval %AS% INTERVAL))
+        postgres_period(x, "years")
       },
 
       # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
@@ -208,7 +218,9 @@ sql_translation.PqConnection <- function(con) {
       var = sql_aggregate("VAR_SAMP", "var"),
       all = sql_aggregate("BOOL_AND", "all"),
       any = sql_aggregate("BOOL_OR", "any"),
-      str_flatten = function(x, collapse) sql_expr(string_agg(!!x, !!collapse))
+      str_flatten = function(x, collapse = "") {
+        sql_expr(string_agg(!!x, !!collapse))
+      }
     ),
     sql_translator(.parent = base_win,
       cor = win_aggregate_2("CORR"),
@@ -217,13 +229,15 @@ sql_translation.PqConnection <- function(con) {
       var = win_aggregate("VAR_SAMP"),
       all = win_aggregate("BOOL_AND"),
       any = win_aggregate("BOOL_OR"),
-      str_flatten = function(x, collapse) {
+      str_flatten = function(x, collapse = "") {
         win_over(
           sql_expr(string_agg(!!x, !!collapse)),
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+      median = sql_win_not_supported("median", "PostgreSQL"),
+      quantile = sql_win_not_supported("quantile", "PostgreSQL")
     )
   )
 }
@@ -231,9 +245,9 @@ sql_translation.PqConnection <- function(con) {
 sql_translation.PostgreSQL <- sql_translation.PqConnection
 
 #' @export
-sql_expr_matches.PqConnection <- function(con, x, y) {
+sql_expr_matches.PqConnection <- function(con, x, y, ...) {
   # https://www.postgresql.org/docs/current/functions-comparison.html
-  build_sql(x, " IS NOT DISTINCT FROM ", y, con = con)
+  glue_sql2(con, "{x} IS NOT DISTINCT FROM {y}")
 }
 #' @export
 sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
@@ -243,20 +257,16 @@ sql_expr_matches.PostgreSQL <- sql_expr_matches.PqConnection
 sql_query_explain.PqConnection <- function(con, sql, format = "text", ...) {
   format <- match.arg(format, c("text", "json", "yaml", "xml"))
 
-  build_sql(
-    "EXPLAIN ",
-    if (!is.null(format)) sql(paste0("(FORMAT ", format, ") ")),
-    sql,
-    con = con
-  )
+  glue_sql2(con, "EXPLAIN ", if (!is.null(format)) "(FORMAT {format}) ", sql)
 }
 #' @export
 sql_query_explain.PostgreSQL <- sql_query_explain.PqConnection
 
 #' @export
 sql_query_insert.PqConnection <- function(con,
-                                          x_name,
-                                          y,
+                                          table,
+                                          from,
+                                          insert_cols,
                                           by,
                                           conflict = c("error", "ignore"),
                                           ...,
@@ -272,7 +282,7 @@ sql_query_insert.PqConnection <- function(con,
   # https://www.sqlite.org/lang_UPSERT.html
   conflict <- rows_check_conflict(conflict)
 
-  parts <- rows_insert_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
 
   clauses <- list(
@@ -281,7 +291,7 @@ sql_query_insert.PqConnection <- function(con,
     sql_clause_from(parts$from),
     sql_clause("ON CONFLICT", by_sql),
     {if (conflict == "ignore") sql("DO NOTHING")},
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -290,8 +300,8 @@ sql_query_insert.PostgreSQL <- sql_query_insert.PqConnection
 
 #' @export
 sql_query_upsert.PqConnection <- function(con,
-                                          x_name,
-                                          y,
+                                          table,
+                                          from,
                                           by,
                                           update_cols,
                                           ...,
@@ -306,18 +316,20 @@ sql_query_upsert.PqConnection <- function(con,
 
   # https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
   # https://www.sqlite.org/lang_UPSERT.html
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
+
+  insert_cols <- c(by, update_cols)
+  insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, ident("excluded")),
+    sql_table_prefix(con, update_cols, "excluded"),
     update_cols
   )
   update_cols <- sql_escape_ident(con, update_cols)
 
-  insert_cols <- escape(ident(colnames(y)), collapse = ", ", parens = TRUE, con = con)
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
-    sql_clause_insert(con, insert_cols, x_name),
+    sql_clause_insert(con, insert_cols, table),
     sql_clause_select(con, sql("*")),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
@@ -325,7 +337,7 @@ sql_query_upsert.PqConnection <- function(con,
     sql_clause("ON CONFLICT ", by_sql),
     sql("DO UPDATE"),
     sql_clause_set(update_cols, update_values),
-    sql_returning_cols(con, returning_cols, x_name)
+    sql_returning_cols(con, returning_cols, table)
   )
   sql_format_clauses(clauses, lvl = 0, con)
 }
@@ -340,6 +352,14 @@ sql_values_subquery.PqConnection <- sql_values_subquery_column_alias
 sql_values_subquery.PostgreSQL <- sql_values_subquery.PqConnection
 
 #' @export
+sql_escape_date.PostgreSQL <- function(con, x) {
+  DBI::dbQuoteLiteral(con, x)
+}
+#' @export
+sql_escape_date.PqConnection <- sql_escape_date.PostgreSQL
+
+
+#' @export
 supports_window_clause.PqConnection <- function(con) {
   TRUE
 }
@@ -349,4 +369,14 @@ supports_window_clause.PostgreSQL <- function(con) {
   TRUE
 }
 
-globalVariables(c("strpos", "%::%", "%FROM%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
+#' @export
+db_supports_table_alias_with_as.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+db_supports_table_alias_with_as.PostgreSQL <- function(con) {
+  TRUE
+}
+
+utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))

@@ -3,30 +3,30 @@
     Code
       substr("test")
     Condition
-      Error in `check_integer()`:
-      ! argument "start" is missing, with no default
+      Error in `substr()`:
+      ! `start` must be a whole number, not absent.
 
 ---
 
     Code
       substr("test", 0)
     Condition
-      Error in `check_integer()`:
-      ! argument "stop" is missing, with no default
+      Error in `substr()`:
+      ! `stop` must be a whole number, not absent.
 
 ---
 
     Code
       substr("test", "x", 1)
     Condition
-      Error in `check_integer()`:
-      ! `start` must be a single number
+      Error in `substr()`:
+      ! `start` must be a whole number, not the string "x".
 
 ---
 
     Code
       substr("test", 1, "x")
     Condition
-      Error in `check_integer()`:
-      ! `stop` must be a single number
+      Error in `substr()`:
+      ! `stop` must be a whole number, not the string "x".
 

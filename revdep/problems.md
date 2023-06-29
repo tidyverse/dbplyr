@@ -1,95 +1,96 @@
-# msPurity
+# BiocOncoTK
 
 <details>
 
-* Version: 1.22.0
-* GitHub: https://github.com/computational-metabolomics/msPurity
-* Source code: https://github.com/cran/msPurity
-* Date/Publication: 2022-04-26
-* Number of recursive dependencies: 160
+* Version: 1.18.0
+* GitHub: NA
+* Source code: https://github.com/cran/BiocOncoTK
+* Date/Publication: 2022-11-01
+* Number of recursive dependencies: 214
 
-Run `revdep_details(, "msPurity")` for more info
+Run `revdep_details(, "BiocOncoTK")` for more info
 
 </details>
 
 ## Newly broken
 
-*   checking examples ... ERROR
+*   checking tests ...
     ```
-    Running examples in ‘msPurity-Ex.R’ failed
-    The error most likely occurred in:
-    
-    > ### Name: purityX
-    > ### Title: Assessing anticipated purity of XCMS features from an LC-MS run
-    > ### Aliases: purityX
-    > 
-    > ### ** Examples
-    > 
-    > msPths <- list.files(system.file("extdata", "lcms", "mzML",
-    ...
-    > xset <- xcms::retcor(xset)
-    Performing retention time correction using 763 peak groups.
-    > xset <- xcms::group(xset)
-    Processing 3179 mz slices ... OK
-    > ppLCMS <- purityX(xset, cores = 1, xgroups = c(1, 2))
-    Sizes of mz and intensity arrays don't match.
-    Error in object@backend$getPeakList(scans) : 
-      dims [product 4516] do not match the length of object [2258]
-    Calls: purityX ... <Anonymous> -> .local -> .peaks -> <Anonymous> -> .External
-    Execution halted
+      Running ‘testthat.R’
+     ERROR
+    Running the tests in ‘tests/testthat.R’ failed.
+    Last 13 lines of output:
+      file.exists("BLCA_CD8A.csv") is not TRUE
+      
+      `actual`:   FALSE
+      `expected`: TRUE 
+      ── Error ('test_dockstore_scripts.R:11'): exprByMSI_csv produces expected CSV ──
+      Error in `file(file, "rt")`: cannot open the connection
+      Backtrace:
+          ▆
+       1. └─utils::read.csv("BLCA_CD8A.csv") at test_dockstore_scripts.R:11:1
+       2.   └─utils::read.table(...)
+       3.     └─base::file(file, "rt")
+      
+      [ FAIL 2 | WARN 1 | SKIP 0 | PASS 2 ]
+      Error: Test failures
+      Execution halted
     ```
 
 ## In both
 
-*   R CMD check timed out
-    
-
-*   checking for hidden files and directories ... NOTE
+*   checking whether package ‘BiocOncoTK’ can be installed ... WARNING
     ```
-    Found the following hidden files and directories:
-      .travis.yml
-    These were most likely included in error. See section ‘Package
-    structure’ in the ‘Writing R Extensions’ manual.
+    Found the following significant warnings:
+      Warning: replacing previous import ‘GenomicRanges::subtract’ by ‘magrittr::subtract’ when loading ‘BiocOncoTK’
+    See ‘/Users/mgirlich/GitHub/dbplyr/revdep/checks.noindex/BiocOncoTK/new/BiocOncoTK.Rcheck/00install.out’ for details.
+    ```
+
+*   checking package dependencies ... NOTE
+    ```
+    Package suggested but not available for checking: ‘FDb.InfiniumMethylation.hg19’
     ```
 
 *   checking installed package size ... NOTE
     ```
-      installed size is 23.0Mb
+      installed size is 11.6Mb
       sub-directories of 1Mb or more:
-        doc       3.5Mb
-        extdata  18.8Mb
-    ```
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Package in Depends field not imported from: ‘Rcpp’
-      These packages need to be imported from (in the NAMESPACE file)
-      for when this namespace is loaded but not attached.
-    package 'methods' is used but not declared
+        data        3.1Mb
+        doc         3.6Mb
+        pamphlets   4.5Mb
     ```
 
 *   checking R code for possible problems ... NOTE
     ```
-    addGenericMS1LookupResults: no visible global function definition for
-      ‘count.fields’
-    addMetFragResults: no visible global function definition for
-      ‘count.fields’
-    addSiriusResults: no visible global function definition for
-      ‘count.fields’
-    assessPuritySingle: no visible binding for global variable ‘parallel’
-    combineAnnotations: no visible binding for global variable
-      ‘compoundDbname’
-    createDatabase: no visible global function definition for
+    ggscat_av: warning in png(file = tempfile()): partial argument match of
+      'file' to 'filename'
+    .flexbi: no visible binding for global variable ‘v1’
+    .flexbi: no visible binding for global variable ‘v2’
+    .rainfall.bq.df: no visible global function definition for ‘seqlengths’
+    .rainfall.maeGRL.df: no visible global function definition for ‘genome’
+    .rainfall.maeGRL.df: no visible global function definition for
+      ‘seqlengths’
+    acronym_to_system: no visible binding for global variable
+      ‘map_tcga_ncit’
     ...
-      PeakDensityParam accession alli chromPeaks chromPeaks<-
-      compoundDbname count.fields featureValues grpid i idx inPurity
-      instrument instrument_type l_speakmetaFiltered
-      library_spectra_meta_id lower match_factor mtch mtchi name.y parallel
-      pass_flag phenoData pid polarity precursor_mz purity ra
-      retention_time sampclass<- spectraType spectrum_type topn type
-      variable
+    tumNorSet : <anonymous>: no visible global function definition for
+      ‘pancan_SE’
+    Undefined global functions or variables:
+      BiocFileCache Consequence acronym genome log2ex log2exa mapIds
+      map_tcga_ncit msicode msival new pancan_SE project_short_name
+      right_join seqlengths symbol tfstart tmsi v1 v2
     Consider adding
-      importFrom("utils", "count.fields")
-    to your NAMESPACE file.
+      importFrom("methods", "new")
+    to your NAMESPACE file (and ensure that your DESCRIPTION Imports field
+    contains 'methods').
+    ```
+
+*   checking data for non-ASCII characters ... NOTE
+    ```
+      Error loading dataset 'brcaMAE':
+       Error in get_Nindex_lengths(x@index, dim(x@seed)) : 
+        length(Nindex) == length(dim) is not TRUE
+      
+      Note: found 46 marked UTF-8 strings
     ```
 

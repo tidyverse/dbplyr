@@ -4,15 +4,13 @@
       lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y)
     Output
       <SQL>
-      (
-        SELECT 'x' AS `name`, `x` AS `value`
-        FROM `df`
-      )
+      SELECT 'x' AS `name`, `x` AS `value`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT 'y' AS `name`, `y` AS `value`
-        FROM `df`
-      )
+      
+      SELECT 'y' AS `name`, `y` AS `value`
+      FROM `df`
 
 # can add multiple columns from spec
 
@@ -20,15 +18,13 @@
       pv
     Output
       <SQL>
-      (
-        SELECT 11 AS `a`, 13 AS `b`, `x` AS `v`
-        FROM `df`
-      )
+      SELECT 11 AS `a`, 13 AS `b`, `x` AS `v`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT 12 AS `a`, 14 AS `b`, `y` AS `v`
-        FROM `df`
-      )
+      
+      SELECT 12 AS `a`, 14 AS `b`, `y` AS `v`
+      FROM `df`
 
 # preserves original keys
 
@@ -36,15 +32,13 @@
       pv
     Output
       <SQL>
-      (
-        SELECT `x`, 'y' AS `name`, `y` AS `value`
-        FROM `df`
-      )
+      SELECT `x`, 'y' AS `name`, `y` AS `value`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `x`, 'z' AS `name`, `z` AS `value`
-        FROM `df`
-      )
+      
+      SELECT `x`, 'z' AS `name`, `z` AS `value`
+      FROM `df`
 
 # can drop missing values
 
@@ -53,18 +47,16 @@
       values_drop_na = TRUE)
     Output
       <SQL>
-      SELECT *
+      SELECT `q01`.*
       FROM (
-        (
-          SELECT 'x' AS `name`, `x` AS `value`
-          FROM `df`
-        )
+        SELECT 'x' AS `name`, `x` AS `value`
+        FROM `df`
+      
         UNION ALL
-        (
-          SELECT 'y' AS `name`, `y` AS `value`
-          FROM `df`
-        )
-      ) `q01`
+      
+        SELECT 'y' AS `name`, `y` AS `value`
+        FROM `df`
+      ) AS `q01`
       WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
@@ -73,18 +65,16 @@
       sql
     Output
       <SQL>
-      (
-        SELECT *, NULL AS `y`
-        FROM (
-          SELECT `id`, '1' AS `n`, `x_1` AS `x`
-          FROM `df`
-        ) `q01`
-      )
-      UNION ALL
-      (
-        SELECT `id`, '2' AS `n`, `x_2` AS `x`, `y_2` AS `y`
+      SELECT `q01`.*, NULL AS `y`
+      FROM (
+        SELECT `id`, '1' AS `n`, `x_1` AS `x`
         FROM `df`
-      )
+      ) AS `q01`
+      
+      UNION ALL
+      
+      SELECT `id`, '2' AS `n`, `x_2` AS `x`, `y_2` AS `y`
+      FROM `df`
 
 # can override default output column type
 
@@ -112,7 +102,7 @@
     Output
       <error/rlang_error>
       Error in `dbplyr_pivot_longer_spec()`:
-      ! Can't convert to a function.
+      ! `values_transform` must be `NULL`, a function, or a named list of functions.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output
@@ -135,15 +125,13 @@
       value_first
     Output
       <SQL>
-      (
-        SELECT `i`, 't1' AS `time`, `y_t1` AS `y`, `z_t1` AS `z`
-        FROM `df`
-      )
+      SELECT `i`, 't1' AS `time`, `y_t1` AS `y`, `z_t1` AS `z`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `i`, 't2' AS `time`, `y_t2` AS `y`, `z_t2` AS `z`
-        FROM `df`
-      )
+      
+      SELECT `i`, 't2' AS `time`, `y_t2` AS `y`, `z_t2` AS `z`
+      FROM `df`
 
 ---
 
@@ -151,15 +139,13 @@
       value_second
     Output
       <SQL>
-      (
-        SELECT `i`, 't1' AS `time`, `t1_y` AS `y`, `t1_z` AS `z`
-        FROM `df`
-      )
+      SELECT `i`, 't1' AS `time`, `t1_y` AS `y`, `t1_z` AS `z`
+      FROM `df`
+      
       UNION ALL
-      (
-        SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
-        FROM `df`
-      )
+      
+      SELECT `i`, 't2' AS `time`, `t2_y` AS `y`, `t2_z` AS `z`
+      FROM `df`
 
 # can repair names
 
@@ -178,5 +164,13 @@
       lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, values_ptypes = character())
     Condition
       Error in `tidyr::pivot_longer()`:
-      ! The `values_ptypes` argument is not supported for remote back-ends
+      ! Argument `values_ptypes` isn't supported on database backends.
+
+# cols_vary is not supported
+
+    Code
+      lazy_frame(x = 1:2, y = 3:4) %>% tidyr::pivot_longer(x:y, cols_vary = "fastest")
+    Condition
+      Error in `tidyr::pivot_longer()`:
+      ! Argument `cols_vary` isn't supported on database backends.
 

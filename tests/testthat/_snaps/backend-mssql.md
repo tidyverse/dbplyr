@@ -1,10 +1,28 @@
+# custom aggregators translated correctly
+
+    Code
+      test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+    Condition
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct(<col>)`
+    Code
+      test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
+    Condition
+      Error in `median()`:
+      ! Translation of `median()` in `summarise()` is not supported for SQL Server.
+      i Use a combination of `distinct()` and `mutate()` for the same result:
+        `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct(<col>)`
+
 # custom lubridate functions translated correctly
 
     Code
-      translate_sql(month(x, label = TRUE, abbr = TRUE))
+      test_translate_sql(month(x, label = TRUE, abbr = TRUE))
     Condition
       Error in `month()`:
-      ! `abbr` is not supported in SQL Server translation
+      ! `abbr = TRUE` isn't supported in SQL Server translation.
+      i It must be FALSE instead.
 
 # convert between bit and boolean as needed
 
@@ -12,7 +30,7 @@
       mf %>% filter(is.na(x))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE ((`x` IS NULL))
 
@@ -22,7 +40,7 @@
       mf %>% filter(!is.na(x))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (NOT((`x` IS NULL)))
 
@@ -32,7 +50,7 @@
       mf %>% filter(x == 1L || x == 2L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = 1 OR `x` = 2)
 
@@ -42,7 +60,7 @@
       mf %>% mutate(z = ifelse(x == 1L, 1L, 2L))
     Output
       <SQL>
-      SELECT *, IIF(`x` = 1, 1, 2) AS `z`
+      SELECT `df`.*, IIF(`x` = 1, 1, 2) AS `z`
       FROM `df`
 
 ---
@@ -51,7 +69,7 @@
       mf %>% mutate(z = case_when(x == 1L ~ 1L))
     Output
       <SQL>
-      SELECT *, CASE WHEN (`x` = 1) THEN 1 END AS `z`
+      SELECT `df`.*, CASE WHEN (`x` = 1) THEN 1 END AS `z`
       FROM `df`
 
 ---
@@ -60,7 +78,7 @@
       mf %>% mutate(z = !is.na(x))
     Output
       <SQL>
-      SELECT *, CAST(IIF(~(`x` IS NULL), 1, 0) AS BIT) AS `z`
+      SELECT `df`.*, ~CAST(IIF((`x` IS NULL), 1, 0) AS BIT) AS `z`
       FROM `df`
 
 ---
@@ -96,7 +114,7 @@
       mf %>% mutate(x = !(x == 1L || x == 2L || x == 3L))
     Output
       <SQL>
-      SELECT CAST(IIF(~(`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
+      SELECT ~CAST(IIF((`x` = 1 OR `x` = 2 OR `x` = 3), 1, 0) AS BIT) AS `x`
       FROM `df`
 
 # handles ORDER BY in subqueries
@@ -128,7 +146,7 @@
       mf %>% filter(x == a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = 0x616263)
 
@@ -138,7 +156,7 @@
       mf %>% filter(x %in% L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
@@ -148,19 +166,19 @@
       qry
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (0x616263, 0x0102))
 
-# logical escaping depends on context
+# logical escaping to 0/1 for both filter() and mutate()
 
     Code
       mf %>% filter(x == TRUE)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`x` = TRUE)
+      WHERE (`x` = 1)
 
 ---
 
@@ -200,15 +218,15 @@
 ---
 
     Code
-      lf %>% slice_sample(x)
+      lf %>% slice_sample(n = 1)
     Output
       <SQL>
       SELECT `x`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`q01` <= 1)
+      ) AS `q01`
+      WHERE (`col01` <= 1)
 
 ---
 
@@ -267,25 +285,8 @@
 # `sql_query_insert()` is correct
 
     Code
-      sql_query_insert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
-    Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
-      SELECT *
-      FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
-      WHERE NOT EXISTS (
-        SELECT 1 FROM `df_x`
-        WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
-      )
-
-# `sql_query_append()` is correct
-
-    Code
-      sql_query_append(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
       returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
@@ -294,13 +295,31 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_x`
+        WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
+      )
+
+# `sql_query_append()` is correct
+
+    Code
+      sql_query_append(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), returning_cols = c("a", b2 = "b"))
+    Output
+      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
+      OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
+      SELECT *
+      FROM (
+        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+        FROM `df_y`
+      ) AS `...y`
 
 # `sql_query_update_from()` is correct
 
     Code
-      sql_query_update_from(con = simulate_mssql(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
+      sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
+        con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
         d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
     Output
       <SQL> UPDATE `df_x`
@@ -310,36 +329,38 @@
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
 
 # `sql_query_delete()` is correct
 
     Code
-      sql_query_delete(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), returning_cols = c("a", b2 = "b"))
+      sql_query_delete(con = simulate_mssql(), table = ident("df_x"), from = sql_render(
+        df_y, simulate_mssql(), lvl = 2), by = c("a", "b"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> DELETE FROM `df_x`
       OUTPUT `DELETED`.`a`, `DELETED`.`b` AS `b2`
       WHERE EXISTS (
         SELECT 1 FROM (
-        SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
-        FROM `df_y`
-      ) `...y`
+          SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
+          FROM `df_y`
+      ) AS `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
 
 # `sql_query_upsert()` is correct
 
     Code
-      sql_query_upsert(con = simulate_mssql(), x_name = ident("df_x"), y = df_y, by = c(
-        "a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"))
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a",
+        b2 = "b"))
     Output
       <SQL> MERGE INTO `df_x`
       USING (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
         UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`

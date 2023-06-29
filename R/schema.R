@@ -51,13 +51,21 @@ in_catalog <- function(catalog, schema, table) {
 }
 
 #' @export
+format.dbplyr_schema <- function(x, ...) {
+  paste0(escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+#' @export
 print.dbplyr_schema <- function(x, ...) {
-  cat_line("<SCHEMA> ", escape_ansi(x$schema), ".", escape_ansi(x$table))
+  cat_line("<SCHEMA> ", format(x))
 }
 
 #' @export
+format.dbplyr_catalog <- function(x, ...) {
+  paste0(escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+}
+#' @export
 print.dbplyr_catalog <- function(x, ...) {
-  cat_line("<CATALOG> ", escape_ansi(x$catalog), ".", escape_ansi(x$schema), ".", escape_ansi(x$table))
+  cat_line("<CATALOG> ", format(x))
 }
 
 #' @export
@@ -98,6 +106,3 @@ ident_q <- function(...) {
 escape.ident_q <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   sql_vector(names_to_as(x, names2(x), con = con), parens, collapse, con = con)
 }
-
-#' @export
-dbi_quote.ident_q <- function(x, con) DBI::SQL(as.character(x))
