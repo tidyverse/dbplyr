@@ -59,7 +59,7 @@ NULL
 NULL
 
 #' @export
-#' @rdname simulate_dbi
+#' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
   simulate_dbi("Microsoft SQL Server",
     version = numeric_version(version)

@@ -23,7 +23,7 @@
 NULL
 
 #' @export
-#' @rdname simulate_dbi
+#' @rdname backend-hive
 simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
