@@ -103,3 +103,24 @@ sql_render.union_query <- function(query,
 
 #' @export
 flatten_query.set_op_query <- flatten_query_2_tables
+
+#' @export
+flatten_query.union_query <- function(qry, query_list) {
+  x <- qry$x
+  query_list_new <- flatten_query(x, query_list)
+  qry$x <- get_subquery_name(x, query_list_new)
+
+  for (i in vctrs::vec_seq_along(qry$unions)) {
+    y <- qry$unions$table[[i]]
+    query_list_new <- flatten_query(y, query_list_new)
+    qry$unions$table[[i]] <- get_subquery_name(y, query_list_new)
+  }
+
+  # TODO reuse query
+  name <- unique_subquery_name()
+  wrapped_query <- set_names(list(qry), name)
+
+  query_list$queries <- c(query_list_new$queries, wrapped_query)
+  query_list$name <- name
+  query_list
+}
