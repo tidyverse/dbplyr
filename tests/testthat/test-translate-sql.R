@@ -81,6 +81,9 @@ test_that("magrittr pipe is translated", {
 test_that("user infix functions are translated", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(x %like% y), sql("`x` like `y`"))
+
+  # keep case and also works with vectors of length > 1 #1299
+  expect_equal(test_translate_sql(x %LIKE% 1:2), sql("`x` LIKE (1, 2)"))
 })
 
 test_that("sql() evaluates input locally", {

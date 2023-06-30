@@ -38,12 +38,6 @@ test_that("glue_sql() interpolates .name correctly", {
   expect_equal(glue_sql2("{.name ident_q('ta ble')}", .con = con), sql("ta ble"))
 })
 
-test_that("glue_sql() interpolates .sql correctly", {
-  con <- simulate_dbi()
-  expect_equal(glue_sql2("{.sql 'ta ble'}", .con = con), sql("ta ble"))
-  expect_equal(glue_sql2("{.sql sql('ta ble')}", .con = con), sql("ta ble"))
-})
-
 test_that("glue_sql() interpolates .col correctly", {
   con <- simulate_dbi()
   expect_equal(glue_sql2("{.col 'x'}", .con = con), sql("`x`"))
@@ -76,7 +70,6 @@ test_that("glue_sql() can collapse", {
   expect_snapshot(error = TRUE, {
     glue_sql2("{.tbl x*}", .con = con)
     glue_sql2("{.name x*}", .con = con)
-    glue_sql2("{.sql x*}", .con = con)
     glue_sql2("{.from x*}", .con = con)
   })
 })

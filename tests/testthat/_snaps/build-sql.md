@@ -32,11 +32,6 @@
       Error in `glue_check_collapse()`:
       ! Collapsing is only allowed for "col" and "val", not for "name".
     Code
-      glue_sql2("{.sql x*}", .con = con)
-    Condition
-      Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col" and "val", not for "sql".
-    Code
       glue_sql2("{.from x*}", .con = con)
     Condition
       Error in `glue_check_collapse()`:
