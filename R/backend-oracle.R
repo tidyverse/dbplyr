@@ -50,9 +50,9 @@ sql_query_select.Oracle <- function(con,
 
   if (!is.null(limit)) {
     limit <- as.integer(limit)
-    where = c(glue_sql2(con, "ROWNUM <= {limit}"), where)
+    where = c(paste0("ROWNUM <= ", limit), where)
   }
-  
+
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),

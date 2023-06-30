@@ -183,7 +183,8 @@ sql_switch <- function(x, ...) {
   if (n_unnamed == 0) {
     # do nothing
   } else if (n_unnamed == 1) {
-    clauses <- c(clauses, glue_sql2(con, "ELSE ({.val input[!named]})"))
+    idx <- which(!named)
+    clauses <- c(clauses, glue_sql2(con, "ELSE ({.val input[[idx]]})"))
   } else {
     cli_abort("Can only have one unnamed (ELSE) input")
   }

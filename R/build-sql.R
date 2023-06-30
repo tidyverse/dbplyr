@@ -73,6 +73,22 @@ glue_sql2 <- function(.con,
   ))
 }
 
+#' The following types are supported:
+#'
+#' * .tbl A table identifier, e.g. `DBI::Id()`. Converted via `as_table_ident()`.
+#' * .from A subquery or a table identifier. Converted via `as_from()`.
+#' * .name A name, e.g. for an index or a subquery. Can be a string or a scalar (quoted) ident.
+#' * .col A column or multiple columns if expression ends with `*`.
+#' * .sql
+#' * .kw An SQL keyword - e.g. `SELECT` or `WHERE` - that should be highlighted.
+#' * .val
+#'
+#' If no type is specified the value isn't escaped or collapsed.
+#'
+#' @param connection
+#' @noRd
+#'
+#' @examples
 sql_quote_transformer <- function(connection) {
   function(text, envir) {
     collapse_regex <- "[*][[:space:]]*$"
@@ -105,6 +121,7 @@ sql_quote_transformer <- function(connection) {
         value <- ident(value)
       }
     } else if (type == "name") {
+      # allowed should be `ident`, `ident_q` (maybe), string
       if (is_bare_character(value)) {
         value <- ident(value)
       }
@@ -112,14 +129,26 @@ sql_quote_transformer <- function(connection) {
       value <- sql(style_kw(value))
     } else if (type == "val") {
       # keep as is
+    } else if (type == "raw") {
+      if (!is.sql(value) && !is_string(value)) {
+        stop_input_type(
+          value,
+          what = c("a string", "scalar SQL")
+        )
+      }
     }
 
-    if (!type %in% c("sql", "raw")) {
+    if (type == "val") {
+      if (should_collapse) {
+        value <- escape(value, collapse = ", ", parens = FALSE, con = connection)
+      } else {
+        value <- escape(value, con = connection)
+      }
+    } else if (type %in% c("tbl", "from", "col", "name")) {
       value <- escape(value, collapse = NULL, parens = FALSE, con = connection)
-    }
-
-    if (should_collapse) {
-      value <- paste0(unclass(value), collapse = ", ")
+      if (should_collapse) {
+        value <- paste0(unclass(value), collapse = ", ")
+      }
     }
 
     # TODO use `vctrs::vec_check_size(value, size = 1L)`

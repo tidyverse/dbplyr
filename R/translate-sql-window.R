@@ -261,7 +261,7 @@ sql_nth <- function(x,
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
-    args <- glue_sql2(con, "{.sql args}, {n}")
+    args <- glue_sql2(con, "{.sql args}, {.val n}")
   }
 
   if (na_rm) {

@@ -69,7 +69,7 @@ base_scalar <- sql_translator(
       glue_sql2(sql_current_con(), "{x}.{.col i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      glue_sql2(sql_current_con(), "{x}[{i}]")
+      glue_sql2(sql_current_con(), "{x}[{.val i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
