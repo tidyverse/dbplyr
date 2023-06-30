@@ -118,7 +118,7 @@ rows <- function(from = -Inf, to = 0) {
   if (to == 0) {
     sql(bound(from))
   } else {
-    glue_sql2(sql_current_con(), "BETWEEN {.sql bound(from)} AND {.sql bound(to)}")
+    glue_sql2(sql_current_con(), "BETWEEN {bound(from)} AND {bound(to)}")
   }
 }
 
@@ -261,19 +261,19 @@ sql_nth <- function(x,
     if (is.numeric(n)) {
       n <- as.integer(n)
     }
-    args <- glue_sql2(con, "{.sql args}, {.val n}")
+    args <- glue_sql2(con, "{args}, {.val n}")
   }
 
   if (na_rm) {
     if (ignore_nulls == "inside") {
-      sql_expr <- "{.sql sql_f}({.sql args} IGNORE NULLS)"
+      sql_expr <- "{sql_f}({args} IGNORE NULLS)"
     } else if (ignore_nulls == "outside") {
-      sql_expr <- "{.sql sql_f}({.sql args}) IGNORE NULLS"
+      sql_expr <- "{sql_f}({args}) IGNORE NULLS"
     } else {
-      sql_expr <- "{.sql sql_f}({.sql args}, TRUE)"
+      sql_expr <- "{sql_f}({args}, TRUE)"
     }
   } else {
-    sql_expr <- "{.sql sql_f}({.sql args})"
+    sql_expr <- "{sql_f}({args})"
   }
 
   win_over(

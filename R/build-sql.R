@@ -47,6 +47,37 @@ build_sql <- function(..., .env = parent.frame(), con = sql_current_con()) {
   sql(paste0(pieces, collapse = ""))
 }
 
+#' A dbplyr specific version of glue
+#'
+#' Similar to the inline markup of cli this function makes SQL generation easier
+#' and safer by providing a couple of types. For example
+#'
+#' ```
+#'   glue_sql2(
+#'      con,
+#'      "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
+#'      " ON {.tbl table} ({.col columns*})"
+#'    )
+#' ```
+#'
+#' The following types are supported:
+#'
+#' * .tbl A table identifier, e.g. `DBI::Id()`. Converted via `as_table_ident()`.
+#' * .from A subquery or a table identifier. Converted via `as_from()`.
+#' * .name A name, e.g. for an index or a subquery. Can be a string or a scalar (quoted) ident.
+#' * .col A column or multiple columns if expression ends with `*`.
+#' * .kw An SQL keyword - e.g. `SELECT` or `WHERE` - that should be highlighted.
+#' * .val Any value - e.g. an integer vector, a Date, SQL - which is escaped as
+#'   usual via `escape()`.
+#'
+#' If no type is specified the value must be a string or scalar SQL and it isn't
+#' escaped or collapsed.
+#'
+#' @noRd
+#'
+#' @examples
+#' glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
+#' glue_sql2(con, "{f}({.val x}, {.val y})")
 glue_sql2 <- function(.con,
                       ...,
                       .sep = "",
@@ -73,22 +104,6 @@ glue_sql2 <- function(.con,
   ))
 }
 
-#' The following types are supported:
-#'
-#' * .tbl A table identifier, e.g. `DBI::Id()`. Converted via `as_table_ident()`.
-#' * .from A subquery or a table identifier. Converted via `as_from()`.
-#' * .name A name, e.g. for an index or a subquery. Can be a string or a scalar (quoted) ident.
-#' * .col A column or multiple columns if expression ends with `*`.
-#' * .sql
-#' * .kw An SQL keyword - e.g. `SELECT` or `WHERE` - that should be highlighted.
-#' * .val
-#'
-#' If no type is specified the value isn't escaped or collapsed.
-#'
-#' @param connection
-#' @noRd
-#'
-#' @examples
 sql_quote_transformer <- function(connection) {
   function(text, envir) {
     collapse_regex <- "[*][[:space:]]*$"
@@ -97,7 +112,7 @@ sql_quote_transformer <- function(connection) {
       text <- sub(collapse_regex, "", text)
     }
 
-    type_regex <- "^\\.(tbl|sql|col|name|from|kw|val) (.*)"
+    type_regex <- "^\\.(tbl|col|name|from|kw|val) (.*)"
     m <- regexec(type_regex, text)
     is_quoted <- any(m[[1]] != -1)
     if (is_quoted) {

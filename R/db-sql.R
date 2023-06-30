@@ -257,7 +257,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
-    out <- glue_sql2(con, "{.sql from}", as_sql, "{.name name}")
+    out <- glue_sql2(con, "{from}", as_sql, "{.name name}")
     return(out)
   }
 

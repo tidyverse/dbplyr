@@ -490,7 +490,7 @@ mssql_version <- function(con) {
                                                   ...) {
 
   # https://stackoverflow.com/q/16683758/946850
-  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {.sql sql}\n) AS temp")
+  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
 }
 
 #' @export
@@ -532,7 +532,7 @@ mssql_infix_comparison <- function(f) {
   check_string(f)
   f <- toupper(f)
   function(x, y) {
-    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {.sql f} {.val y}"))
+    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {f} {.val y}"))
   }
 }
 

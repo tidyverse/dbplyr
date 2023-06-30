@@ -146,7 +146,7 @@ sql_translation.Oracle <- function(con) {
 sql_query_explain.Oracle <- function(con, sql, ...) {
   glue_sql2(
     con,
-    "EXPLAIN PLAN FOR {.sql sql};\n",
+    "EXPLAIN PLAN FOR {sql};\n",
     "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
   )
 }
@@ -160,7 +160,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
-  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
+  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
 }
 
 #' @export

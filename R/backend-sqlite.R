@@ -39,7 +39,7 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN QUERY PLAN {.sql sql}")
+  glue_sql2(con, "EXPLAIN QUERY PLAN {sql}")
 }
 
 #' @export

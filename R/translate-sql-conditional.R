@@ -190,7 +190,7 @@ sql_switch <- function(x, ...) {
   }
 
   clauses_collapsed <- paste0(clauses, collapse = " ")
-  glue_sql2(con, "CASE {.val x} {.sql clauses_collapsed} END")
+  glue_sql2(con, "CASE {.val x} {clauses_collapsed} END")
 }
 
 sql_is_null <- function(x) {
