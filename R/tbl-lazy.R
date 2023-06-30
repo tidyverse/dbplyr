@@ -118,7 +118,7 @@ names.tbl_lazy <- function(x) {
 `$.tbl_lazy` <- function(x, name) {
   unexpected_name <- !name %in% c("lazy_query", "src")
 
-  if (unexpected_name && is_direct(rlang::caller_env())) {
+  if (unexpected_name) {
     cli::cli_abort(c(
       "The {.fn $} method of {.cls tbl_lazy} is not intended to be called.",
       i = "Use {.fn dplyr::pull} to get the values in a column."
