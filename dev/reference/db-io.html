@@ -148,10 +148,12 @@ temporary tables to start with <code>#</code>)</p></li>
 <span>  <span class="va">table</span>,</span>
 <span>  <span class="va">sql</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  temporary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unique_indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  analyze <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  analyze <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  in_transaction <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">db_collect</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, warn_incomplete <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
