@@ -129,13 +129,13 @@ win_rank <- function(f) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
-    order <- prepare_win_rank_over(enexpr(order), f = f)
+    order <- unwrap_order_expr({{ order }}, f = f)
     con <- sql_current_con()
 
     if (!is_null(order)) {
       order_over <- translate_sql_(order, con = con)
 
-      order_symbols <- purrr::map_if(order, ~ is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
+      order_symbols <- purrr::map_if(order, ~ quo_is_call(.x, "desc", n = 1L), ~ call_args(.x)[[1L]])
 
       is_na_exprs <- purrr::map(order_symbols, ~ expr(is.na(!!.x)))
       any_na_expr <- purrr::reduce(is_na_exprs, ~ call2("|", .x, .y))
@@ -162,28 +162,6 @@ win_rank <- function(f) {
       translate_sql(case_when(!!no_na_expr ~ !!rank_sql), con = con)
     }
   }
-}
-
-prepare_win_rank_over <- function(order, f, error_call = caller_env()) {
-  if (is.null(order)) {
-    return()
-  }
-
-  if (is_call(order, "c")) {
-    args <- call_args(order)
-    tibble_expr <- expr_text(expr(tibble(!!!args)))
-    cli_abort(c(
-      "Can't use `c()` in {.fun {f}}",
-      i = "Did you mean to use `{tibble_expr}` instead?"
-    ))
-  }
-
-  if (is_call(order, "tibble")) {
-    tibble_args <- call_args(order)
-    return(tibble_args)
-  }
-
-  list(order)
 }
 
 #' @rdname win_over

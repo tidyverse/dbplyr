@@ -96,3 +96,26 @@ test_that("slice_sample() works with `by`", {
     c(1, 2, 2)
   )
 })
+
+test_that("slice_min/max can order by multiple columns", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot({
+    lf %>% slice_min(tibble(x))
+    lf %>% slice_min(tibble::tibble(x, y))
+    lf %>% slice_min(data.frame(y, x))
+  })
+  expect_snapshot({
+    lf %>% slice_max(tibble(x))
+    lf %>% slice_max(tibble::tibble(x, y))
+    lf %>% slice_max(data.frame(y, x))
+  })
+})
+
+test_that("slice_min/max informs if order_by uses c()", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot_error(
+    lf %>% slice_min(c(x, y))
+  )
+})

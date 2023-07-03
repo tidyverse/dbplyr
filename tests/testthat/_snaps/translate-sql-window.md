@@ -14,7 +14,7 @@
     Code
       test_translate_sql(row_number(c(x)))
     Condition
-      Error in `prepare_win_rank_over()`:
+      Error in `row_number()`:
       ! Can't use `c()` in `ROW_NUMBER()`
       i Did you mean to use `tibble(x)` instead?
 

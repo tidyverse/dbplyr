@@ -93,14 +93,22 @@ capture_dot <- function(.data, x) {
   partial_eval(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env()) {
+partial_eval_dots <- function(.data,
+                              ...,
+                              # .env = NULL,
+                              .named = TRUE,
+                              error_call = caller_env()) {
   # corresponds to `capture_dots()`
+  # browser()
   dots <- as.list(enquos(..., .named = .named))
   dot_names <- names2(exprs(...))
   was_named <- have_name(exprs(...))
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
+    # if (!is_null(.env)) {
+    #   dot <- quo_set_env(dot, .env)
+    # }
     dot_name <- dot_names[[i]]
     dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
   }

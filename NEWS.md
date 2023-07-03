@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `slice_min/max()` can now order by multiple variables like dplyr, e.g. use
+  `slice_min(lf, tibble(x, y))` (@mgirlich, #1167).
+
 * The functions `simulate_vars()` and `simulate_vars_is_typed()` were removed
   as they weren't used anymore and tidyselect now offers `tidyselect_data_proxy()`
   and `tidyselect_data_has_predicates()` (@mgirllich, #1199).
