@@ -34,8 +34,8 @@
       <SQL>
       SELECT `x`, `y`
       FROM (
-        SELECT *, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `x`) AS `q02`
+        SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `x`) AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`q02` = 1)
+      ) AS `q01`
+      WHERE (`col01` = 1)
 
