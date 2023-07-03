@@ -10,20 +10,14 @@ lazy_multi_join_query <- function(x,
                                   call = caller_env()) {
   check_lazy_query(x, call = call)
 
-  if (!identical(colnames(joins), c("table", "type", "by_x_table_id", "by"))) {
-    cli_abort("`joins` must have fields `table`, `type`, `by_x_table_id`, `by`", .internal = TRUE)
-  }
+  check_has_names(joins, c("table", "type", "by_x_table_id", "by"))
   check_character(joins$type, call = call)
 
-  if (!identical(colnames(table_names), c("name", "from"))) {
-    cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
-  }
+  check_has_names(table_names, c("name", "from"), call = call)
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  if (!identical(colnames(vars), c("name", "table", "var"))) {
-    cli_abort("`vars` must have fields `name`, `table`, `var`", .internal = TRUE)
-  }
+  check_has_names(vars, c("name", "table", "var"), call = call)
   check_character(vars$name, call = call)
   check_integer(vars$table, call = call)
   check_character(vars$var, call = call)
@@ -57,15 +51,11 @@ lazy_rf_join_query <- function(x,
 
   check_character(type, call = call)
 
-  if (!identical(colnames(table_names), c("name", "from"))) {
-    cli_abort("`table_names` must have fields `name`, `from`", .internal = TRUE)
-  }
+  check_has_names(table_names, c("name", "from"), call = call)
   check_character(table_names$name, call = call)
   check_character(table_names$from, call = call)
 
-  if (!identical(colnames(vars), c("name", "x", "y"))) {
-    cli_abort("`vars` must have fields `name`, `x`, `y`", .internal = TRUE)
-  }
+  check_has_names(vars, c("name", "x", "y"), call = call)
   check_character(vars$name, call = call)
   check_character(vars$x, call = call)
   check_character(vars$y, call = call)
@@ -84,29 +74,6 @@ lazy_rf_join_query <- function(x,
   )
 }
 
-join_check_vars <- function(vars, call) {
-  if (!vctrs::vec_is_list(vars)) {
-    cli_abort("{.arg vars} must be a list", .internal = TRUE)
-  }
-
-  if (!identical(names(vars), c("alias", "x", "y", "all_x", "all_y"))) {
-    cli_abort(
-      "{.arg vars} must have fields `alias`, `x`, `y`, `all_x`, and `all_y`",
-      .internal = TRUE
-    )
-  }
-
-  check_character(vars$alias, call = call)
-  check_character(vars$x, call = call)
-  check_character(vars$y, call = call)
-  check_character(vars$all_x, call = call)
-  check_character(vars$all_y, call = call)
-
-  n <- vctrs::vec_size(vars$alias)
-  vctrs::vec_assert(vars$x, size = n, arg = "vars$x", call = call)
-  vctrs::vec_assert(vars$y, size = n, arg = "vars$y", call = call)
-}
-
 join_check_by <- function(by, call) {
   if (!vctrs::vec_is_list(by) && !inherits(by, "dplyr_join_by")) {
     cli_abort("{.arg by} must be a list", .internal = TRUE)
@@ -116,8 +83,8 @@ join_check_by <- function(by, call) {
   if (vctrs::vec_size(by$x) != vctrs::vec_size(by$y)) {
     cli_abort("{.arg by$x} and {.arg by$y} must have the same size", .internal = TRUE)
   }
-  vctrs::vec_assert(by$x_as, ident(), size = 1L, arg = "by$x_as", call = call)
-  vctrs::vec_assert(by$y_as, ident(), size = 1L, arg = "by$y_as", call = call)
+  check_string(by$x_as, arg = "by$x_as", call = call)
+  check_string(by$y_as, arg = "by$y_as", call = call)
 }
 
 #' @export
@@ -127,6 +94,7 @@ lazy_semi_join_query <- function(x,
                                  vars,
                                  anti,
                                  by,
+                                 where,
                                  group_vars = op_grps(x),
                                  order_vars = op_sort(x),
                                  frame = op_frame(x),
@@ -143,6 +111,7 @@ lazy_semi_join_query <- function(x,
     anti = anti,
     by = by,
     vars = vars,
+    where = where,
     group_vars = group_vars,
     order_vars = order_vars,
     frame = frame
@@ -155,6 +124,12 @@ print.lazy_semi_join_query <- function(x, ...) {
 
   cat_line("By:")
   cat_line(indent(paste0(x$by$x, "-", x$by$y)))
+
+  if (length(x$where)) {
+    cat_line("Where:")
+    where <- purrr::map_chr(x$where, as_label)
+    cat_line(indent(paste0(where)))
+  }
 
   cat_line("X:")
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
@@ -177,29 +152,33 @@ op_vars.lazy_semi_join_query <- function(op) {
 }
 
 #' @export
-sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names)
-  table_vars <- purrr::map(
-    set_names(c(list(op$x), op$joins$table), table_names_out),
-    op_vars
+  tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
+  table_vars <- purrr::map(tables, op_vars)
+  select_sql <- sql_multi_join_vars(
+    con,
+    op$vars,
+    table_vars,
+    use_star = sql_options$use_star,
+    qualify_all_columns = sql_options$qualify_all_columns
   )
-  select_sql <- sql_multi_join_vars(con, op$vars, table_vars, use_star = use_star)
 
   op$joins$table <- purrr::map(
     op$joins$table,
-    ~ sql_optimise(sql_build(.x, con, use_star = use_star), con)
+    ~ sql_optimise(sql_build(.x, con, sql_options = sql_options), con)
   )
   op$joins$by <- purrr::map2(
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
-      by$x_as <- ident(table_names_out[op$joins$by_x_table_id[[i]]])
-      by$y_as <- ident(table_names_out[i + 1L])
+      by$x_as <- table_names_out[op$joins$by_x_table_id[[i]]]
+      by$y_as <- table_names_out[i + 1L]
       by
     }
   )
 
   multi_join_query(
-    x = sql_optimise(sql_build(op$x, con, use_star = use_star), con),
+    x = sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
     joins = op$joins,
     table_names = table_names_out,
     select = select_sql
@@ -207,12 +186,12 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., use_star = TRUE) {
 }
 
 generate_join_table_names <- function(table_names) {
-  table_name_length_max <- dplyr::coalesce(max(nchar(table_names$name)), 0)
+  table_name_length_max <- max(nchar(table_names$name))
 
   if (length(table_names$name) != 2) {
     table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
-    auto_name <- table_names$from != "as"
-    table_names$name[auto_name] <- table_names_repaired[auto_name]
+    may_repair_name <- table_names$from != "as"
+    table_names$name[may_repair_name] <- table_names_repaired[may_repair_name]
     table_names_prepared <- table_names$name
   } else{
     table_names_prepared <- join_two_table_alias(table_names$name, table_names$from)
@@ -237,7 +216,7 @@ generate_join_table_names <- function(table_names) {
 }
 
 #' @export
-sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names)
 
   vars_classic <- as.list(op$vars)
@@ -245,8 +224,8 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
   vars_classic$all_y <- op_vars(op$y)
 
   by <- op$by
-  by$x_as <- ident(table_names_out[[1]])
-  by$y_as <- ident(table_names_out[[2]])
+  by$x_as <- table_names_out[[1]]
+  by$y_as <- table_names_out[[2]]
 
   select <- sql_rf_join_vars(
     con,
@@ -254,12 +233,13 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
     vars = vars_classic,
     x_as = by$x_as,
     y_as = by$y_as,
-    use_star = use_star
+    use_star = sql_options$use_star,
+    qualify_all_columns = sql_options$qualify_all_columns
   )
 
   join_query(
-    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
-    sql_optimise(sql_build(op$y, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
+    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
     select = select,
     type = op$type,
     by = by,
@@ -269,9 +249,9 @@ sql_build.lazy_rf_join_query <- function(op, con, ..., use_star = TRUE) {
 }
 
 #' @export
-sql_build.lazy_semi_join_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   vars_prev <- op_vars(op$x)
-  if (use_star &&
+  if (sql_options$use_star &&
       identical(op$vars$var, op$vars$name) &&
       identical(op$vars$var, vars_prev)) {
     vars <- sql_star(con, op$by$x_as)
@@ -279,12 +259,22 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., use_star = TRUE) {
     vars <- ident(set_names(op$vars$var, op$vars$name))
   }
 
+  y_vars <- op_vars(op$y)
+  replacements <- purrr::map(y_vars, ~ call2("$", sym(op$by$y_as), sym(.x)))
+  where <- purrr::map(
+    op$where,
+    ~ replace_sym(.x, y_vars, replacements)
+  )
+
+  where_sql <- translate_sql_(where, con = con, context = list(clause = "WHERE"))
+
   semi_join_query(
-    sql_optimise(sql_build(op$x, con, use_star = use_star), con),
-    sql_optimise(sql_build(op$y, con, use_star = use_star), con),
+    sql_optimise(sql_build(op$x, con, sql_options = sql_options), con),
+    sql_optimise(sql_build(op$y, con, sql_options = sql_options), con),
     vars = vars,
     anti = op$anti,
     by = op$by,
+    where = where_sql,
     na_matches = op$by$na_matches
   )
 }

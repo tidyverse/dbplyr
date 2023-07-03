@@ -48,6 +48,11 @@ sql_query_select.Oracle <- function(con,
                                     subquery = FALSE,
                                     lvl = 0) {
 
+  if (!is.null(limit)) {
+    limit <- as.integer(limit)
+    where = c(paste0("ROWNUM <= ", limit), where)
+  }
+
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),
@@ -56,11 +61,6 @@ sql_query_select.Oracle <- function(con,
     having    = sql_clause_having(having),
     window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
-    # Requires Oracle 12c, released in 2013
-    limit =   if (!is.null(limit)) {
-      limit <- as.integer(limit)
-      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
-    },
     lvl = lvl
   )
 }
@@ -88,7 +88,7 @@ sql_query_upsert.Oracle <- function(con,
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_values <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
@@ -146,7 +146,7 @@ sql_translation.Oracle <- function(con) {
 sql_query_explain.Oracle <- function(con, sql, ...) {
   glue_sql2(
     con,
-    "EXPLAIN PLAN FOR {.sql sql};\n",
+    "EXPLAIN PLAN FOR {sql};\n",
     "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
   )
 }
@@ -160,7 +160,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
-  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
+  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
 }
 
 #' @export
@@ -182,6 +182,10 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
+#' @export
+db_supports_table_alias_with_as.Oracle <- function(con) {
+  FALSE
+}
 
 # roacle package ----------------------------------------------------------
 
@@ -215,4 +219,7 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
+#' @export
+db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
+
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

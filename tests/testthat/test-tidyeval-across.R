@@ -515,12 +515,11 @@ test_that("if_all() cannot rename variables", {
 })
 
 test_that("if_all() can handle empty selection", {
-  skip("tidyselect issue #221")
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>% mutate(if_all(character(), c)) %>% show_query(),
-    expr(lf)
+    capture_if_all(lf, if_all(character(), c)),
+    TRUE
   )
 })
 

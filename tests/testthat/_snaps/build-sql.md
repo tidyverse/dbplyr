@@ -25,20 +25,15 @@
       glue_sql2("{.tbl x*}", .con = con)
     Condition
       Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col", not for "tbl".
+      ! Collapsing is only allowed for "col" and "val", not for "tbl".
     Code
       glue_sql2("{.name x*}", .con = con)
     Condition
       Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col", not for "name".
-    Code
-      glue_sql2("{.sql x*}", .con = con)
-    Condition
-      Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col", not for "sql".
+      ! Collapsing is only allowed for "col" and "val", not for "name".
     Code
       glue_sql2("{.from x*}", .con = con)
     Condition
       Error in `glue_check_collapse()`:
-      ! Collapsing is only allowed for "col", not for "from".
+      ! Collapsing is only allowed for "col" and "val", not for "from".
 

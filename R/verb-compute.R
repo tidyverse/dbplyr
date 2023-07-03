@@ -52,9 +52,7 @@ compute.tbl_sql <- function(x,
     name <- unique_table_name()
   }
 
-  if (is_bare_character(name) || is.ident(name) || is.sql(name)) {
-    name <- unname(name)
-  }
+  name <- as_table_ident(name)
   vars <- op_vars(x)
 
   compute_check_indexes(x, indexes)
@@ -71,7 +69,7 @@ compute.tbl_sql <- function(x,
     ...
   )
 
-  tbl_src_dbi(x$src, as.sql(name, x$src$con), colnames(x)) %>%
+  tbl_src_dbi(x$src, name, colnames(x)) %>%
     group_by(!!!syms(op_grps(x))) %>%
     window_order(!!!op_sort(x))
 }
@@ -132,7 +130,7 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE
 
   sql <- db_sql_render(x$src$con, x, cte = cte)
   tryCatch(
-    out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete),
+    out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete, ...),
     error = function(cnd) {
       cli_abort("Failed to collect lazy table.", parent = cnd)
     }

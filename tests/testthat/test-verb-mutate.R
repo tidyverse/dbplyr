@@ -443,7 +443,7 @@ test_that("mutate() uses star", {
 
   # does not use * if `use_star = FALSE`
   expect_equal(
-    lf %>% mutate(z = 1L) %>% remote_query(use_star = FALSE),
+    lf %>% mutate(z = 1L) %>% remote_query(sql_options = sql_options(use_star = FALSE)),
     sql("SELECT `x`, `y`, 1 AS `z`\nFROM `df`")
   )
 })

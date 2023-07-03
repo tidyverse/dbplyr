@@ -35,7 +35,7 @@
 # runif is translated
 
     Code
-      translate_sql(runif(2))
+      test_translate_sql(runif(2))
     Condition
       Error in `sql_runif()`:
       ! Only `n = n()` is supported.

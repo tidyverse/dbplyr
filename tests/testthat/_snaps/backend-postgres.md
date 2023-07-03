@@ -1,7 +1,8 @@
 # custom window functions translated correctly
 
     Code
-      (expect_error(translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)))
+      (expect_error(test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE))
+      )
     Output
       <error/rlang_error>
       Error in `quantile()`:
@@ -9,7 +10,7 @@
       i Use a combination of `summarise()` and `left_join()` instead:
         `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
     Code
-      (expect_error(translate_sql(median(x, na.rm = TRUE), window = TRUE)))
+      (expect_error(test_translate_sql(median(x, na.rm = TRUE), window = TRUE)))
     Output
       <error/rlang_error>
       Error in `median()`:
@@ -67,7 +68,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       ON CONFLICT (`a`, `b`)
       DO NOTHING
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
@@ -84,7 +85,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE true
       ON CONFLICT  (`a`, `b`)
       DO UPDATE

@@ -56,7 +56,7 @@
       
         SELECT 'y' AS `name`, `y` AS `value`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       WHERE (NOT((`value` IS NULL)))
 
 # can handle missing combinations
@@ -69,7 +69,7 @@
       FROM (
         SELECT `id`, '1' AS `n`, `x_1` AS `x`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
       
       UNION ALL
       
@@ -100,14 +100,9 @@
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = 1)))
     Output
-      <error/purrr_error_indexed>
-      Error in `purrr::map()`:
-      i In index: 1.
-      Caused by error in `map2()`:
-      i In index: 1.
-      i With name: value.
-      Caused by error in `dbplyr_pivot_longer_spec()`:
-      ! Can't convert to a function.
+      <error/rlang_error>
+      Error in `dbplyr_pivot_longer_spec()`:
+      ! `values_transform` must be `NULL`, a function, or a named list of functions.
     Code
       (expect_error(tidyr::pivot_longer(df, x, values_transform = list(~.x))))
     Output

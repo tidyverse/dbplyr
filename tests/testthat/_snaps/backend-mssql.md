@@ -1,14 +1,14 @@
 # custom aggregators translated correctly
 
     Code
-      translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
+      test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)
     Condition
       Error in `quantile()`:
       ! Translation of `quantile()` in `summarise()` is not supported for SQL Server.
       i Use a combination of `distinct()` and `mutate()` for the same result:
         `mutate(<col> = quantile(x, 0.5, na.rm = TRUE)) %>% distinct(<col>)`
     Code
-      translate_sql(median(x, na.rm = TRUE), window = FALSE)
+      test_translate_sql(median(x, na.rm = TRUE), window = FALSE)
     Condition
       Error in `median()`:
       ! Translation of `median()` in `summarise()` is not supported for SQL Server.
@@ -18,7 +18,7 @@
 # custom lubridate functions translated correctly
 
     Code
-      translate_sql(month(x, label = TRUE, abbr = TRUE))
+      test_translate_sql(month(x, label = TRUE, abbr = TRUE))
     Condition
       Error in `month()`:
       ! `abbr = TRUE` isn't supported in SQL Server translation.
@@ -223,10 +223,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`q01` <= 1)
+      ) AS `q01`
+      WHERE (`col01` <= 1)
 
 ---
 
@@ -295,7 +295,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE NOT EXISTS (
         SELECT 1 FROM `df_x`
         WHERE (`df_x`.`a` = `...y`.`a`) AND (`df_x`.`b` = `...y`.`b`)
@@ -313,7 +313,7 @@
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
 
 # `sql_query_update_from()` is correct
 
@@ -329,7 +329,7 @@
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
 
 # `sql_query_delete()` is correct
@@ -345,7 +345,7 @@
         SELECT 1 FROM (
           SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
           FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         WHERE (`...y`.`a` = `df_x`.`a`) AND (`...y`.`b` = `df_x`.`b`)
       )
 
@@ -360,7 +360,7 @@
       USING (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       WHEN MATCHED THEN
         UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`

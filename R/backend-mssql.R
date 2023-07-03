@@ -59,7 +59,7 @@ NULL
 NULL
 
 #' @export
-#' @rdname simulate_dbi
+#' @rdname backend-mssql
 simulate_mssql <- function(version = "15.0") {
   simulate_dbi("Microsoft SQL Server",
     version = numeric_version(version)
@@ -183,12 +183,12 @@ simulate_mssql <- function(version = "15.0") {
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
+  update_values <- sql_table_prefix(con, update_cols, "...y")
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- sql(sql_escape_ident(con, insert_cols))
-  insert_cols_qual <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_cols_qual <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
@@ -266,6 +266,14 @@ simulate_mssql <- function(version = "15.0") {
         mssql_sql_if(enquo(test), enquo(yes), enquo(no))
       },
       case_when      = mssql_case_when,
+      between        = function(x, left, right) {
+        context <- sql_current_context()
+        if (context$clause == "WHERE") {
+          sql_expr(!!x %BETWEEN% !!left %AND% !!right)
+        } else {
+          sql_expr(IIF(!!x %BETWEEN% !!left %AND% !!right, 1L, 0L))
+        }
+      },
 
       as.logical    = sql_cast("BIT"),
 
@@ -460,8 +468,12 @@ mssql_version <- function(con) {
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
 `db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
-  if (temporary && substr(table, 1, 1) != "#") {
-    table <- hash_temp(table)
+  table <- as_table_ident(table)
+  table_name <- vctrs::field(table, "table")
+
+  if (temporary && substr(table_name, 1, 1) != "#") {
+    table_name <- hash_temp(table_name)
+    vctrs::field(table, "table") <- table_name
   }
 
   list(
@@ -478,7 +490,7 @@ mssql_version <- function(con) {
                                                   ...) {
 
   # https://stackoverflow.com/q/16683758/946850
-  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {.sql sql}\n) AS temp")
+  glue_sql2(con, "SELECT * INTO {.tbl name} FROM (\n  {sql}\n) AS temp")
 }
 
 #' @export
@@ -487,7 +499,7 @@ mssql_version <- function(con) {
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
   stopifnot(table %in% c("DELETED", "INSERTED"))
-  returning_cols <- sql_named_cols(con, cols, table = ident(table))
+  returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("OUTPUT", returning_cols)
 }
@@ -520,7 +532,7 @@ mssql_infix_comparison <- function(f) {
   check_string(f)
   f <- toupper(f)
   function(x, y) {
-    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {.sql f} {.val y}"))
+    mssql_as_bit(glue_sql2(sql_current_con(), "{.val x} {f} {.val y}"))
   }
 }
 
@@ -542,11 +554,11 @@ mssql_infix_boolean <- function(if_bit, if_bool) {
 mssql_sql_if <- function(cond, if_true, if_false = NULL, missing = NULL) {
   cond_sql <- with_mssql_bool(eval_tidy(cond))
   if (is_null(missing) || quo_is_null(missing)) {
-    if_true_sql <- build_sql(eval_tidy(if_true))
+    if_true_sql <- escape(eval_tidy(if_true), con = sql_current_con())
     if (is_null(if_false) || quo_is_null(if_false)) {
       if_false_sql <- NULL
     } else {
-      if_false_sql <- build_sql(eval_tidy(if_false))
+      if_false_sql <- escape(eval_tidy(if_false), con = sql_current_con())
     }
     sql_expr(IIF(!!cond_sql, !!if_true_sql, !!if_false_sql))
   } else {
@@ -576,4 +588,4 @@ mssql_bit_int_bit <- function(f) {
   dplyr::if_else(x, "1", "0", "NULL")
 }
 
-globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT"))
+utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%"))

@@ -8,7 +8,7 @@
       FROM (
         SELECT DISTINCT `df`.*
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # rename/relocate after distinct is inlined #1141
 
@@ -229,7 +229,7 @@
 # output is styled
 
     Code
-      show_query(out, cte = TRUE)
+      show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
       [34mWITH[39m `q01` [34mAS[39m (

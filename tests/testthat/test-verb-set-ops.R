@@ -66,6 +66,15 @@ test_that("can combine multiple union in one query", {
       union(lf3)
   )
 
+  # cte works
+  expect_snapshot(
+    lf1 %>%
+      union_all(lf2) %>%
+      union(lf3) %>%
+      left_join(lf1, by = "x") %>%
+      show_query(sql_options = sql_options(cte = TRUE))
+  )
+
   lf_union <- lf1 %>%
     union_all(lf2) %>%
     union(lf3)

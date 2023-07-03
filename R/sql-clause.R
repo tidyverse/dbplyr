@@ -53,7 +53,7 @@ sql_clause_select <- function(con,
     con,
     "SELECT",
     if (distinct) " DISTINCT",
-    if (!is.null(top)) " TOP {top}"
+    if (!is.null(top)) " TOP {.val top}"
   )
 
   sql_clause(clause, select)

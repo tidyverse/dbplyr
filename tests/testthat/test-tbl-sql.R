@@ -21,14 +21,14 @@ test_that("same_src distinguishes srcs", {
 
 test_that("can generate sql tbls with raw sql", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_equal(collect(mf1), collect(mf2))
 })
 
 test_that("sql tbl can be printed", {
   mf1 <- memdb_frame(x = 1:3, y = 3:1)
-  mf2 <- tbl(mf1$src, build_sql("SELECT * FROM ", mf1$lazy_query$x, con = simulate_dbi()))
+  mf2 <- tbl(mf1$src, sql(glue("SELECT * FROM {remote_name(mf1)}")))
 
   expect_snapshot(mf2, transform = function(x) {
     gsub("sqlite .* \\[:memory:\\]", "sqlite ?.?.? [:memory:]", x)
@@ -43,13 +43,27 @@ test_that("can refer to default schema explicitly", {
   expect_equal(as.character(tbl_vars(tbl(con, in_schema("main", "t1")))), "x")
 })
 
+
+test_that("checks for incorrectly specified SQL or schema", {
+  con <- local_sqlite_connection()
+  DBI::dbExecute(con, "CREATE TABLE 'table.with_dot' (a, b, c)")
+
+  expect_message(tbl(con, ident("table.with_dot")), "in a schema")
+  expect_no_message(tbl(con, ident("table.with_dot"), check_from = FALSE))
+
+  expect_error(
+    expect_message(tbl(con, ident("SELECT * FROM table.with_dot")), "an SQL query as source")
+  )
+})
+
 test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   con <- local_sqlite_con_with_aux()
   DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
   DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
 
   expect_equal(as.character(tbl_vars(tbl(con, in_schema("aux", "t1")))), c("x", "y", "z"))
-  expect_equal(as.character(tbl_vars(tbl(con, ident("aux.t1")))), c("a", "b", "c"))
+  df <- tbl(con, ident("aux.t1"), check_from = FALSE)
+  expect_equal(as.character(tbl_vars(df)), c("a", "b", "c"))
 })
 
 # n_groups ----------------------------------------------------------------

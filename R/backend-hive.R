@@ -23,7 +23,7 @@
 NULL
 
 #' @export
-#' @rdname simulate_dbi
+#' @rdname backend-hive
 simulate_hive <- function() simulate_dbi("Hive")
 
 #' @export
@@ -110,4 +110,4 @@ supports_window_clause.Hive <- function(con) {
   TRUE
 }
 
-globalVariables("regexp_replace")
+utils::globalVariables("regexp_replace")

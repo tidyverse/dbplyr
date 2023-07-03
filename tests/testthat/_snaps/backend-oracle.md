@@ -6,7 +6,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      FETCH FIRST 6 ROWS ONLY
+      WHERE (ROWNUM <= 6)
 
 # `sql_query_upsert()` is correct
 
@@ -51,8 +51,8 @@
     Output
       <SQL>
       SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
+      FROM `df` `df_LHS`
+      LEFT JOIN `df` `df_RHS`
         ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---
@@ -80,10 +80,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
         FROM `df`
       ) `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 # copy_inline uses UNION ALL
 

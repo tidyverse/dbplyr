@@ -93,14 +93,22 @@ capture_dot <- function(.data, x) {
   partial_eval(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE, error_call = caller_env()) {
+partial_eval_dots <- function(.data,
+                              ...,
+                              # .env = NULL,
+                              .named = TRUE,
+                              error_call = caller_env()) {
   # corresponds to `capture_dots()`
+  # browser()
   dots <- as.list(enquos(..., .named = .named))
   dot_names <- names2(exprs(...))
   was_named <- have_name(exprs(...))
 
   for (i in seq_along(dots)) {
     dot <- dots[[i]]
+    # if (!is_null(.env)) {
+    #   dot <- quo_set_env(dot, .env)
+    # }
     dot_name <- dot_names[[i]]
     dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
   }
@@ -164,12 +172,6 @@ is_mask_pronoun <- function(call) {
 }
 
 partial_eval_call <- function(call, data, env) {
-  # TODO which of
-  # * `cur_data()`, `cur_data_all()`
-  # * `cur_group()`, `cur_group_id()`, and
-  # * `cur_group_rows()`
-  # are possible?
-
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
@@ -177,7 +179,6 @@ partial_eval_call <- function(call, data, env) {
     vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
-    # TODO what about environment in `dtplyr`?
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)

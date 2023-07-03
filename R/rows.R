@@ -228,7 +228,7 @@ rows_update.tbl_lazy <- function(x,
     con <- remote_con(x)
     update_cols <- setdiff(colnames(y), by)
     update_values <- set_names(
-      sql_table_prefix(con, update_cols, ident("...y")),
+      sql_table_prefix(con, update_cols, "...y"),
       update_cols
     )
 
@@ -309,7 +309,7 @@ rows_patch.tbl_lazy <- function(x,
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
       sql_table_prefix(con, update_cols, name),
-      sql_table_prefix(con, update_cols, ident("...y"))
+      sql_table_prefix(con, update_cols, "...y")
     )
     update_values <- set_names(update_values, update_cols)
 
@@ -719,7 +719,7 @@ target_table_name <- function(x, in_place) {
 }
 
 rows_prep <- function(con, table, from, by, lvl = 0) {
-  y_name <- ident("...y")
+  y_name <- "...y"
   join_by <- list(x = by, y = by, x_as = y_name, y_as = table, condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
 
@@ -732,7 +732,7 @@ rows_prep <- function(con, table, from, by, lvl = 0) {
 rows_insert_prep <- function(con, table, from, cols, by, lvl = 0) {
   out <- rows_prep(con, table, from, by, lvl = lvl)
 
-  join_by <- list(x = by, y = by, x_as = table, y_as = ident("...y"), condition = "=")
+  join_by <- list(x = by, y = by, x_as = table, y_as = "...y", condition = "=")
   where <- sql_join_tbls(con, by = join_by, na_matches = "never")
   out$conflict_clauses <- sql_clause_where_exists(table, where, not = TRUE)
 
@@ -778,7 +778,7 @@ get_col_types.DBIConnection <- function(con, name, call) {
 
 #' @export
 get_col_types.PqConnection <- function(con, name, call) {
-  name <- as.sql(name, con)
+  name <- as_table_ident(name, error_call = call)
   res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl name} LIMIT 0"))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)

@@ -8,8 +8,10 @@
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
-#' @include compat-obj-type.R
-#' @include compat-types-check.R
+#' @include import-standalone-obj-type.R
+#' @include import-standalone-types-check.R
+#' @include utils-check.R
+#' @include db-sql.R
 NULL
 
 #' @export
@@ -67,7 +69,7 @@ base_scalar <- sql_translator(
       glue_sql2(sql_current_con(), "{x}.{.col i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      glue_sql2(sql_current_con(), "{x}[{i}]")
+      glue_sql2(sql_current_con(), "{x}[{.val i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
@@ -247,10 +249,10 @@ base_scalar <- sql_translator(
   nzchar = function(x, keepNA = FALSE) {
     if (keepNA) {
       exp <- expr(!!x != "")
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     } else {
       exp <- expr((is.na(!!x) | !!x != ""))
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     }
   },
   tolower = sql_prefix("LOWER", 1),

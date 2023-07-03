@@ -87,7 +87,7 @@ escape.character <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  out <- ifelse(is.wholenumber(x), sprintf("%.1f", x), as.character(x))
+  out <- ifelse(is_whole_number(x), sprintf("%.1f", x), as.character(x))
 
   # Special values
   out[is.na(x)] <- "NULL"
@@ -96,6 +96,10 @@ escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   out[inf & x < 0] <- "'-Infinity'"
 
   sql_vector(out, parens, collapse, con = con)
+}
+
+is_whole_number <- function(x) {
+  trunc(x) == x
 }
 
 #' @export
