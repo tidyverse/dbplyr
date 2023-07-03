@@ -42,6 +42,12 @@ test_that("base source of tbl_lazy is always 'df'", {
 })
 
 test_that("names() inform that they aren't meant to be used", {
-  skip("Don't know how to not inform during assignment")
   expect_snapshot(names(lazy_frame(x = 1)))
+})
+
+test_that("$ aborts when not used with src or lazy_query", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(lf$src)
+  expect_no_error(lf$lazy_query)
+  expect_snapshot_error(lf$x)
 })

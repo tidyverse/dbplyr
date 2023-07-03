@@ -105,7 +105,25 @@ the$warned_on_tbl_lazy_names <- FALSE
 
 #' @export
 names.tbl_lazy <- function(x) {
-  # FIXME find a way to nudge users away from using `names()` without RStudio
-  # getting on your nerves
+  should_inform <- rlang::env_is_user_facing(rlang::caller_env())
+  if (should_inform) {
+    cli::cli_inform(c(
+      `!` = "The {.fn names} method of {.cls tbl_lazy} is for internal use only.",
+      i = "Did you mean {.fn colnames}?"
+    ))
+  }
   NextMethod("names")
+}
+
+#' @export
+`$.tbl_lazy` <- function(x, name) {
+  unexpected_name <- !name %in% c("lazy_query", "src")
+
+  if (unexpected_name) {
+    cli::cli_abort(c(
+      "The `$` method of {.cls tbl_lazy} is for internal use only.",
+      i = "Use {.fn dplyr::pull} to get the values in a column."
+    ))
+  }
+  NextMethod("$")
 }
