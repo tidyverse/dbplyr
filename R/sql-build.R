@@ -115,9 +115,8 @@ sql_render.lazy_query <- function(query,
                                   sql_options = NULL,
                                   subquery = FALSE,
                                   lvl = 0) {
-  # FIXME the handling of `...` seems wrong overall.
-  qry <- sql_build(query, con = con, ..., sql_options = sql_options)
-  qry <- sql_optimise(qry, con = con, ..., subquery = subquery)
+  qry <- sql_build(query, con = con, sql_options = sql_options)
+  qry <- sql_optimise(qry, con = con, subquery = subquery)
 
   if (sql_options$cte) {
     query_list <- flatten_query(qry, list(queries = list(), name = NULL))
