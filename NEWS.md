@@ -2,7 +2,7 @@
 
 * The `overwrite` argument of `db_copy_to()` now actually works.
 
-* `db_write_table()` gains the `overwrite` argument.
+* `db_write_table()` and `db_save_query()` gain the `overwrite` argument.
 
 * `distinct(.keep_all = TRUE)` now works for SQL Server (@mgirlich, #1053).
 
