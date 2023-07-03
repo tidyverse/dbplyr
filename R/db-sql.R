@@ -1137,11 +1137,25 @@ dbplyr_save_query <- function(con, ...) {
 }
 #' @export
 #' @importFrom dplyr db_save_query
-db_save_query.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
+db_save_query.DBIConnection <- function(con,
+                                        sql,
+                                        name,
+                                        temporary = TRUE,
+                                        ...,
+                                        overwrite = FALSE) {
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
   tryCatch(
-    DBI::dbExecute(con, sql, immediate = TRUE),
-    error = function(cnd) {
+    {
+      if (overwrite) {
+        name <- as_table_ident(name)
+        name_id <- table_ident_to_id(name)
+        found <- DBI::dbExistsTable(con, name_id)
+        if (found) {
+          DBI::dbRemoveTable(con, name_id)
+        }
+      }
+      DBI::dbExecute(con, sql, immediate = TRUE)
+    }, error = function(cnd) {
       cli_abort("Can't save query to table {.table {format(name, con = con)}}.", parent = cnd)
     }
   )

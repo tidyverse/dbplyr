@@ -100,13 +100,17 @@ db_compute <- function(con,
                        table,
                        sql,
                        ...,
+                       overwrite = FALSE,
                        temporary = TRUE,
                        unique_indexes = list(),
                        indexes = list(),
-                       analyze = TRUE) {
+                       analyze = TRUE,
+                       in_transaction = TRUE) {
   as_table_ident(table)
   check_scalar_sql(sql)
+  check_bool(overwrite)
   check_bool(temporary)
+  check_bool(in_transaction)
   check_dots_used()
 
   UseMethod("db_compute")
@@ -116,19 +120,29 @@ db_compute.DBIConnection <- function(con,
                                      table,
                                      sql,
                                      ...,
+                                     overwrite = FALSE,
                                      temporary = TRUE,
                                      unique_indexes = list(),
                                      indexes = list(),
-                                     analyze = TRUE) {
+                                     analyze = TRUE,
+                                     in_transaction = FALSE) {
   table <- as_table_ident(table)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
 
-  table <- dbplyr_save_query(con, sql, table, temporary = temporary)
-  create_indexes(con, table, unique_indexes, unique = TRUE)
-  create_indexes(con, table, indexes)
-  if (analyze) dbplyr_analyze(con, table)
+  with_transaction(con, in_transaction, {
+    table <- dbplyr_save_query(
+      con,
+      sql,
+      table,
+      temporary = temporary,
+      overwrite = overwrite
+    )
+    create_indexes(con, table, unique_indexes, unique = TRUE)
+    create_indexes(con, table, indexes)
+    if (analyze) dbplyr_analyze(con, table)
+  })
 
   table
 }
@@ -162,11 +176,13 @@ db_write_table.DBIConnection <- function(con,
                                          types,
                                          values,
                                          temporary = TRUE,
-                                         ...) {
+                                         ...,
+                                         overwrite = FALSE) {
   table <- as_table_ident(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)
+  check_bool(overwrite)
 
   tryCatch(
     dbWriteTable(
@@ -175,6 +191,7 @@ db_write_table.DBIConnection <- function(con,
       value = values,
       field.types = types,
       temporary = temporary,
+      overwrite = overwrite,
       ...,
       row.names = FALSE
     ),

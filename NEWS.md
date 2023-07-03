@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* The `overwrite` argument of `db_copy_to()` now actually works.
+
+* `db_write_table()` and `db_save_query()` gain the `overwrite` argument.
+
 * `distinct(.keep_all = TRUE)` now works for SQL Server (@mgirlich, #1053).
 
 * `slice_min/max()` can now order by multiple variables like dplyr, e.g. use
