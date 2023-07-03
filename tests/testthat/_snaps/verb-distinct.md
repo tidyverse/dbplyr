@@ -26,3 +26,16 @@
       ) AS `q01`
       WHERE (`col01` = 1)
 
+# distinct uses dummy window order when .keep_all is TRUE and no order is used
+
+    Code
+      lf %>% distinct(x, .keep_all = TRUE)
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `x` ORDER BY `x`) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` = 1)
+

@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `distinct(.keep_all = TRUE)` now works for SQL Server (@mgirlich, #1053).
+
 * `slice_min/max()` can now order by multiple variables like dplyr, e.g. use
   `slice_min(lf, tibble(x, y))` (@mgirlich, #1167).
 
