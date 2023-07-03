@@ -105,7 +105,8 @@ the$warned_on_tbl_lazy_names <- FALSE
 
 #' @export
 names.tbl_lazy <- function(x) {
-  if (is_direct(rlang::caller_env())) {
+  should_inform <- rlang::env_is_user_facing(rlang::caller_env())
+  if (should_inform) {
     cli::cli_inform(c(
       `!` = "The {.fn names} method of {.cls tbl_lazy} is not intended to be called.",
       i = "Did you mean {.fn colnames}?"
@@ -125,40 +126,4 @@ names.tbl_lazy <- function(x) {
     ))
   }
   NextMethod("$")
-}
-
-# COPIED FROM lifecycle
-# https://github.com/r-lib/lifecycle/blob/9417eca8f5091f95b4569fb6c388e4394e2b2157/R/deprecate.R#L358
-is_direct <- function(env) {
-  env_inherits_global(env) || from_testthat(env)
-}
-
-env_inherits_global <- function(env) {
-  # `topenv(emptyenv())` returns the global env. Return `FALSE` in
-  # that case to allow passing the empty env when the
-  # soft-deprecation should not be promoted to deprecation based on
-  # the caller environment.
-  if (is_reference(env, empty_env())) {
-    return(FALSE)
-  }
-
-  is_reference(topenv(env), global_env())
-}
-
-# TRUE if we are in unit tests and the package being tested is the
-# same as the package that called
-from_testthat <- function(env) {
-  tested_package <- Sys.getenv("TESTTHAT_PKG")
-  if (!nzchar(tested_package)) {
-    return(FALSE)
-  }
-
-  top <- topenv(env)
-  if (!is_namespace(top)) {
-    return(FALSE)
-  }
-
-  # Test for environment names rather than reference/contents because
-  # testthat clones the namespace
-  identical(ns_env_name(top), tested_package)
 }
