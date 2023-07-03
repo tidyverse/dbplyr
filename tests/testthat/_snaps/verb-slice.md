@@ -181,3 +181,74 @@
       Error in `slice_sample()`:
       ! Can't supply `by` when `data` is a grouped data frame.
 
+# slice_min/max can order by multiple columns
+
+    Code
+      lf %>% slice_min(tibble(x))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `x`) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+    Code
+      lf %>% slice_min(tibble::tibble(x, y))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `x`, `y`) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+    Code
+      lf %>% slice_min(data.frame(y, x))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `y`, `x`) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+
+---
+
+    Code
+      lf %>% slice_max(tibble(x))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+    Code
+      lf %>% slice_max(tibble::tibble(x, y))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `x` DESC, `y` DESC) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+    Code
+      lf %>% slice_max(data.frame(y, x))
+    Output
+      <SQL>
+      SELECT `x`, `y`
+      FROM (
+        SELECT `df`.*, RANK() OVER (ORDER BY `y` DESC, `x` DESC) AS `col01`
+        FROM `df`
+      ) AS `q01`
+      WHERE (`col01` <= 1)
+
+# slice_min/max informs if order_by uses c()
+
+    Can't use `c()` in `slice_min()`
+    i Did you mean to use `tibble(x, y)` instead?
+

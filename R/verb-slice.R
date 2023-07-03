@@ -78,9 +78,10 @@ slice_min.tbl_lazy <- function(.data,
                                na_rm = TRUE) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
+  order_by <- unwrap_order_expr({{ order_by }}, f = "slice_min")
   slice_by(
     .data,
-    {{order_by}},
+    order_by,
     size,
     {{ by }},
     with_ties = with_ties
@@ -100,9 +101,11 @@ slice_max.tbl_lazy <- function(.data,
                                na_rm = TRUE) {
   size <- check_slice_size(n, prop)
   check_unsupported_arg(na_rm, allowed = TRUE)
+  order_by <- unwrap_order_expr({{ order_by }}, f = "slice_max")
+  order_by <- purrr::map(order_by, swap_order_direction)
   slice_by(
     .data,
-    desc({{order_by}}),
+    order_by,
     size,
     {{ by }},
     with_ties = with_ties
@@ -132,7 +135,8 @@ slice_sample.tbl_lazy <- function(.data,
     cli_abort("Sampling with replacement is not supported on database backends")
   }
 
-  slice_by(.data, runif(n()), size, {{ by }}, with_ties = FALSE)
+  order_by <- exprs(runif(n()))
+  slice_by(.data, order_by, size, {{ by }}, with_ties = FALSE)
 }
 
 slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
@@ -163,7 +167,7 @@ slice_by <- function(.data, order_by, size, .by, with_ties = FALSE) {
 
   # must use `add_order()` as `window_order()` only allows variables
   # this is only okay to do because the previous, legal window order is restored
-  dots <- partial_eval_dots(.data, !!!quos({{order_by}}), .named = FALSE)
+  dots <- partial_eval_dots(.data, !!!order_by, .named = FALSE)
   .data$lazy_query <- add_order(.data, dots)
 
   out <- filter(.data, !!window_fun) %>%
