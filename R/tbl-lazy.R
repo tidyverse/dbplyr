@@ -108,7 +108,7 @@ names.tbl_lazy <- function(x) {
   should_inform <- rlang::env_is_user_facing(rlang::caller_env())
   if (should_inform) {
     cli::cli_inform(c(
-      `!` = "The {.fn names} method of {.cls tbl_lazy} is not intended to be called.",
+      `!` = "The {.fn names} method of {.cls tbl_lazy} is for internal use only.",
       i = "Did you mean {.fn colnames}?"
     ))
   }
@@ -121,7 +121,7 @@ names.tbl_lazy <- function(x) {
 
   if (unexpected_name) {
     cli::cli_abort(c(
-      "The {.fn $} method of {.cls tbl_lazy} is not intended to be called.",
+      "The `$` method of {.cls tbl_lazy} is for internal use only.",
       i = "Use {.fn dplyr::pull} to get the values in a column."
     ))
   }
