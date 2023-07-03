@@ -162,11 +162,13 @@ db_write_table.DBIConnection <- function(con,
                                          types,
                                          values,
                                          temporary = TRUE,
-                                         ...) {
+                                         ...,
+                                         overwrite = FALSE) {
   table <- as_table_ident(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)
+  check_bool(overwrite)
 
   tryCatch(
     dbWriteTable(
@@ -175,6 +177,7 @@ db_write_table.DBIConnection <- function(con,
       value = values,
       field.types = types,
       temporary = temporary,
+      overwrite = overwrite,
       ...,
       row.names = FALSE
     ),
