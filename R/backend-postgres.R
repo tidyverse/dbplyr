@@ -97,12 +97,29 @@ sql_translation.PqConnection <- function(con) {
       str_locate  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
+      # https://www.postgresql.org/docs/9.1/functions-string.html
       str_detect = function(string, pattern, negate = FALSE) {
-        if (isTRUE(negate)) {
-          sql_expr(!(!!string ~ !!pattern))
-        } else {
-          sql_expr(!!string ~ !!pattern)
-        }
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("detect"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            if (isTRUE(negate)) {
+              sql_expr(!(!!string ~ !!pattern))
+            } else {
+              sql_expr(!!string ~ !!pattern)
+            }
+          }
+        )
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("end")
+        )
       },
       # https://www.postgresql.org/docs/current/functions-matching.html
       str_like = function(string, pattern, ignore_case = TRUE) {
@@ -126,6 +143,14 @@ sql_translation.PqConnection <- function(con) {
       },
       str_remove_all = function(string, pattern){
         sql_expr(regexp_replace(!!string, !!pattern, '', 'g'))
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("start")
+        )
       },
 
       # lubridate functions

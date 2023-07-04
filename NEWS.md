@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Added translation for `str_detect()`, `str_starts()` and `str_ends()` with
+  fixed patterns (@mgirlich, #1009).
+
 * The `overwrite` argument of `db_copy_to()` now actually works.
 
 * `db_write_table()` and `db_save_query()` gain the `overwrite` argument.

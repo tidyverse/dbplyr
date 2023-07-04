@@ -67,3 +67,39 @@ test_that("str_sub() returns consistent results", {
   expect_equal(mf %>% transmute(str_sub(t, 0, 1)) %>% pull(1), "a")
   expect_equal(mf %>% transmute(str_sub(t, 1, 3)) %>% pull(1), "abc")
 })
+
+test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
+  mf <- memdb_frame(x = c("%0 start", "end %0", "detect %0 detect", "no", NA))
+
+  # detects fixed pattern
+  expect_equal(
+    mf %>% transmute(str_starts(x, fixed("%0"))) %>% pull(1),
+    c(1, 0, 0, 0, NA)
+  )
+  expect_equal(
+    mf %>% transmute(str_starts(x, stringr::fixed("%0"))) %>% pull(1),
+    c(1, 0, 0, 0, NA)
+  )
+  expect_equal(
+    mf %>% transmute(str_starts(x, !!stringr::fixed("%0"))) %>% pull(1),
+    c(1, 0, 0, 0, NA)
+  )
+
+  # also works with ends and detect
+  expect_equal(
+    mf %>% transmute(str_ends(x, fixed("%0"))) %>% pull(1),
+    c(0, 1, 0, 0, NA)
+  )
+  expect_equal(
+    mf %>% transmute(str_detect(x, fixed("%0"))) %>% pull(1),
+    c(1, 1, 1, 0, NA)
+  )
+
+  # negate works
+  expect_equal(
+    mf %>% transmute(str_detect(x, fixed("%0"), negate = TRUE)) %>% pull(1),
+    c(0, 0, 0, 1, NA)
+  )
+
+  expect_error(translate_sql(str_detect(x, "a"), con = simulate_dbi()))
+})
