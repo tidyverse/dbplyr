@@ -42,11 +42,19 @@ sql_translation.Snowflake <- function(con) {
       # str_detect does not.  Left- and right-pad `pattern` with .* to get
       # str_detect-like behavior
       str_detect = function(string, pattern, negate = FALSE) {
-        if (isTRUE(negate)) {
-          sql_expr(!(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*")))
-        } else {
-          sql_expr(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*"))
-        }
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_instr("detect"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            if (isTRUE(negate)) {
+              sql_expr(!(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*")))
+            } else {
+              sql_expr(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*"))
+            }
+          }
+        )
       },
       # On Snowflake, REGEXP_REPLACE is used like this:
       # REGEXP_REPLACE( <subject> , <pattern> [ , <replacement> ,

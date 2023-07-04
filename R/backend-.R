@@ -285,8 +285,28 @@ base_scalar <- sql_translator(
 
   str_conv = sql_not_supported("str_conv"),
   str_count = sql_not_supported("str_count"),
-  str_detect = sql_not_supported("str_detect"),
+
+  fixed = function(pattern, ignore_case = FALSE) {
+    check_unsupported_arg(ignore_case, allowed = FALSE)
+    pattern
+  },
+  str_detect = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("detect")
+    )
+  },
   str_dup = sql_not_supported("str_dup"),
+  str_ends = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("end")
+    )
+  },
   str_extract = sql_not_supported("str_extract"),
   str_extract_all = sql_not_supported("str_extract_all"),
   str_flatten = sql_not_supported("str_flatten"),
@@ -308,6 +328,14 @@ base_scalar <- sql_translator(
   str_split = sql_not_supported("str_split"),
   str_split_fixed = sql_not_supported("str_split_fixed"),
   str_squish = sql_not_supported("str_squish"),
+  str_starts = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("start")
+    )
+  },
   str_subset = sql_not_supported("str_subset"),
   str_trunc = sql_not_supported("str_trunc"),
   str_view = sql_not_supported("str_view"),
