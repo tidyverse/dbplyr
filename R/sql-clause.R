@@ -139,6 +139,12 @@ sql_clause_where_exists <- function(table, where, not) {
   )
 }
 
+#' @export
+print.sql_clause <- function(x, ...) {
+  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
+  cat("<sql clause>", out)
+}
+
 # helpers -----------------------------------------------------------------
 
 sql_format_clauses <- function(clauses, lvl, con) {
