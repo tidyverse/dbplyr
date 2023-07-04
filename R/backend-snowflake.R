@@ -45,14 +45,15 @@ sql_translation.Snowflake <- function(con) {
         sql_str_pattern_switch(
           string = string,
           pattern = {{ pattern }},
-          negate = function(string, pattern, negate = FALSE) {
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_instr("detect"),
+          f_regex = function(string, pattern, negate = FALSE) {
             if (isTRUE(negate)) {
               sql_expr(!(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*")))
             } else {
               sql_expr(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*"))
             }
-          },
-          f_fixed = sql_str_detect_fixed_instr("detect")
+          }
         )
       },
       # On Snowflake, REGEXP_REPLACE is used like this:
