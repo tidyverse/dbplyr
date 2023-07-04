@@ -288,7 +288,7 @@ base_scalar <- sql_translator(
 
   fixed = function(pattern, ignore_case = FALSE) {
     check_unsupported_arg(ignore_case, allowed = FALSE)
-    stringr::fixed(pattern)
+    pattern
   },
   str_detect = function(string, pattern, negate = FALSE) {
     sql_str_pattern_switch(
