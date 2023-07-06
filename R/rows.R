@@ -786,6 +786,13 @@ get_col_types.PqConnection <- function(con, name, call) {
   set_names(col_info_df[[".typname"]], col_info_df[["name"]])
 }
 
+#' @export
+get_col_types.MariaDBConnection <- function(con, name, call) {
+  name <- as_table_ident(name, error_call = call)
+  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl name};"))
+  set_names(col_info_df[["Type"]], col_info_df[["Field"]])
+}
+
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
   con <- remote_con(x)
   msg <- "Can't modify database table {.val {remote_name(x)}}."

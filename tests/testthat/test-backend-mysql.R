@@ -148,3 +148,50 @@ test_that("can update", {
     )
   )
 })
+
+test_that("casts `y` column for local df", {
+  con <- src_test("MariaDB")
+
+  DBI::dbExecute(con, "CREATE SCHEMA dbplyr_test_schema")
+  withr::defer(DBI::dbExecute(con, "DROP SCHEMA dbplyr_test_schema"))
+  df <- tibble(id = 1L, val = 10L, ltext = strrep("a", times = 65535 + 2))
+  types <- c(id = "bigint", val = "bigint", ltext = "longtext")
+  local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")
+  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x")
+  local_db_table(con, value = df, types = types, temporary = FALSE, table2)
+
+  y <- tibble(
+    id = "2",
+    val = 20,
+    ltext = strrep("b", times = 65535 + 2)
+  )
+
+  out <- tibble(
+    id = bit64::as.integer64(1:2),
+    val = bit64::as.integer64(10L, 20L),
+    ltext = c(strrep("a", times = 65535 + 2), strrep("b", times = 65535 + 2))
+  )
+  expect_equal(
+    rows_append(
+      tbl(con, "df_x"),
+      y,
+      copy = TRUE,
+      in_place = FALSE
+    ) %>%
+      collect(),
+    out
+  )
+
+  rows_append(
+    tbl(con, "df_x"),
+    y,
+    copy = TRUE,
+    in_place = TRUE
+  )
+
+  expect_equal(tbl(con, "df_x") %>% collect(), out)
+
+  types_expected <- c(id = "bigint(20)", val = "bigint(20)", ltext = "longtext")
+  expect_equal(get_col_types(con, table2), types_expected)
+  expect_equal(get_col_types(con, in_schema("test", "df_x")), types_expected)
+})
