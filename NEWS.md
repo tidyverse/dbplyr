@@ -41,6 +41,7 @@
     unsupported `returning` is used (@mgirlich, #1279).
   * `rows_upsert()` now gives an informative error that it isn't supported
     (@mgirlich, #1279).
+  * `rows_*()` use the column types of `x` when auto copying (@mgirlich, #1327).
 
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
