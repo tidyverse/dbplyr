@@ -93,6 +93,8 @@
 <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_patch()</a></code> now give an informative error when the unsupported <code>returning</code> is used (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
 <li>
 <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
+<li>
+<code>rows_*()</code> use the column types of <code>x</code> when auto copying (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1327" class="external-link">#1327</a>).</li>
 </ul></li>
 <li>
 <p>Oracle:</p>
