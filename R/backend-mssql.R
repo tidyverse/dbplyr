@@ -39,7 +39,6 @@
 #' @param version Version of MS SQL to simulate. Currently only, difference is
 #'   that 15.0 and above will use `TRY_CAST()` instead of `CAST()`.
 #' @name backend-mssql
-#' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'

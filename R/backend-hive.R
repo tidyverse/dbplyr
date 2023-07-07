@@ -9,7 +9,6 @@
 #' converting to live access database.
 #'
 #' @name backend-hive
-#' @aliases NULL
 #' @examples
 #' library(dplyr, warn.conflicts = FALSE)
 #'
