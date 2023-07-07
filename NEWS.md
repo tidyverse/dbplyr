@@ -1,3 +1,7 @@
+# dbplyr 2.3.3
+
+* Hot patch release to resolve R CMD check failures.
+
 # dbplyr 2.3.2
 
 * Hot patch release to resolve R CMD check failures.
