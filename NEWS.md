@@ -53,7 +53,7 @@
     string (@mgirlich, #1285).
     
 * Snowflake: 
-  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead (@fh-mthomson, #1329)
+  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead of being silently ignored (@fh-mthomson, #1329)
 
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1329).
