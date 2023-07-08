@@ -10,6 +10,7 @@
 #' @param parition Variables to partition over
 #' @param order Variables to order by
 #' @param frame A numeric vector of length two defining the frame.
+#' @param method Optional. The method to use.
 #' @param f The name of an sql function as a string
 #' @export
 #' @keywords internal
@@ -122,10 +123,9 @@ rows <- function(from = -Inf, to = 0) {
   }
 }
 
-
 #' @rdname win_over
 #' @export
-win_rank <- function(f) {
+win_rank <- function(f, use_default_order_null = FALSE) {
   force(f)
   function(order = NULL) {
     group <- win_current_group()
@@ -146,8 +146,10 @@ win_rank <- function(f) {
       not_is_na_exprs <- purrr::map(order_symbols, ~ expr(!is.na(!!.x)))
       no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
     } else {
+      # browser()
       order_over <- win_current_order()
-      if (is_empty(order_over)) order_over <- sql("(SELECT NULL)")
+      # browser()
+      if (use_default_order_null & is_empty(order_over)) order_over <- sql("(SELECT NULL)")
     }
 
     rank_sql <- win_over(

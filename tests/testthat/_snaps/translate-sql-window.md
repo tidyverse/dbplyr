@@ -18,6 +18,44 @@
       ! Can't use `c()` in `ROW_NUMBER()`
       i Did you mean to use `tibble(x)` instead?
 
+# row_number() with and without group_by() and arrange()
+
+    Code
+      mf %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
+
+---
+
+    Code
+      mf %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
+
 # window_frame()
 
     Code

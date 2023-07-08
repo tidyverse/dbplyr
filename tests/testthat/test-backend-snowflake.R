@@ -97,3 +97,10 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
   expect_equal(test_translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
 })
+
+test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per use_default_order_null)", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_snowflake())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})

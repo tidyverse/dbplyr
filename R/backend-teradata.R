@@ -132,7 +132,7 @@ sql_translation.Teradata <- function(con) {
                       },
       paste         = sql_paste_infix(" ", "||", function(x) sql_expr(!!x)),
       paste0        = sql_paste_infix("", "||", function(x) sql_expr(!!x)),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", use_default_order_null = TRUE),
 
       # lubridate ---------------------------------------------------------------
       # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
@@ -146,7 +146,7 @@ sql_translation.Teradata <- function(con) {
     ),
     sql_translator(.parent = base_odbc_agg,
       var           = sql_aggregate("VAR_SAMP", "var"),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", use_default_order_null = TRUE),
       weighted.mean = function(x, w, na.rm = T) {
                         # nocov start
                         win_over(
@@ -160,7 +160,7 @@ sql_translation.Teradata <- function(con) {
     ),
     sql_translator(.parent = base_odbc_win,
       var           = win_recycled("VAR_SAMP"),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", use_default_order_null = TRUE),
       lead          = function(x, n = 1L, default = NA, order_by = NULL) {
                         win_over(
                           sql_expr(LEAD(!!x, !!n, !!default)),
@@ -217,20 +217,3 @@ sql_table_analyze.Teradata <- function(con, table, ...) {
 }
 
 utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SUM"))
-
-#' @export
-#' @rdname win_over
-win_rank_tdata <- function(f) {
-  force(f)
-  function(order_by = NULL) {
-    order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) order_by <- sql("(SELECT NULL)")
-
-    win_over(
-      sql(glue("{f}()")),
-      partition = win_current_group(),
-      order = order_by,
-      frame = win_current_frame()
-    )
-  }
-}

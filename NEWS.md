@@ -35,6 +35,8 @@
 
 * The translation of `between()` now also works for MS SQL when used in `mutate()`
   (@mgirlich, #1241).
+  
+* The translation of an unordered `row_number()` now works for MS SQL (@ejneer, #1233) and Snowflake (@fh-mthomson, #TBD)
 
 * MariaDB:
   * `rows_update()` and `rows_patch()` now give an informative error when the
@@ -51,6 +53,7 @@
 * Teradata:
   * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
     string (@mgirlich, #1285).
+  * `row_number()` no longer defaults to partitioning by the set groups (now aligned with other databases where underordered `ROW_NUMBER()` calls require a default `ORDER BY (SELECT NULL)`) (@fh-mthomson, #TBD)
 
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).

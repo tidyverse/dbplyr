@@ -217,7 +217,8 @@ sql_translation.Snowflake <- function(con) {
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+      row_number = win_rank("ROW_NUMBER", use_default_order_null = TRUE)
     )
   )
 }

@@ -322,6 +322,13 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per use_default_order_null)", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})
+
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#272)", {
