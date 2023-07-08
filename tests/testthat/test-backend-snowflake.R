@@ -127,8 +127,8 @@ test_that("pmin() and pmax() respect na.rm", {
   # https://docs.snowflake.com/en/sql-reference/functions/greatest
 
   # na.rm = TRUE: override default behavior for Snowflake
-  expect_equal(test_translate_sql(pmin(x, y, z, na.rm = TRUE)), sql('-(GREATEST([-`x`], [-`y`], [-`z`])[0]::INT)'))
-  expect_equal(test_translate_sql(pmax(x, y, z, na.rm = TRUE)), sql('GREATEST([`x`], [`y`], [`z`])[0]::INT'))
+  expect_equal(test_translate_sql(pmin(x, y, z, na.rm = TRUE)), sql('-(GREATEST([-`x`], [-`y`], [-`z`])[0]::FLOAT)'))
+  expect_equal(test_translate_sql(pmax(x, y, z, na.rm = TRUE)), sql('GREATEST([`x`], [`y`], [`z`])[0]::FLOAT'))
 
   # na.rm = FALSE: leverage default behavior for Snowflake
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql('LEAST(`x`, `y`, `z`)'))
