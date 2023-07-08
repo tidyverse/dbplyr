@@ -98,14 +98,39 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
 })
 
-test_that("pmin and max become MIN and MAX", {
+test_that("min() and max()", {
   local_con(simulate_snowflake())
 
-  # na.rm = TRUE: override LEAST / GREATEST behavior for Snowflake
+  expect_equal(test_translate_sql(min(x, na.rm = TRUE)), sql('MIN(`x`) OVER ()'))
+  expect_equal(test_translate_sql(max(x, na.rm = TRUE)), sql('MAX(`x`) OVER ()'))
+
+  # na.rm = FALSE is ignored
+  # https://docs.snowflake.com/en/sql-reference/functions/min
+  # https://docs.snowflake.com/en/sql-reference/functions/max
+  # NULL values are ignored unless all the records are NULL, in which case a NULL value is returned.
+  expect_equal(
+    test_translate_sql(min(x, na.rm = TRUE)),
+    test_translate_sql(min(x, na.rm = FALSE))
+  )
+
+  expect_equal(
+    test_translate_sql(max(x, na.rm = TRUE)),
+    test_translate_sql(max(x, na.rm = FALSE))
+  )
+})
+
+test_that("pmin() and pmax() respect na.rm", {
+  local_con(simulate_snowflake())
+
+  # Snowflake default for LEAST/GREATEST: If any of the argument values is NULL, the result is NULL.
+  # https://docs.snowflake.com/en/sql-reference/functions/least
+  # https://docs.snowflake.com/en/sql-reference/functions/greatest
+
+  # na.rm = TRUE: override default behavior for Snowflake
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = TRUE)), sql('-(GREATEST([-`x`], [-`y`], [-`z`])[0]::INT)'))
   expect_equal(test_translate_sql(pmax(x, y, z, na.rm = TRUE)), sql('GREATEST([`x`], [`y`], [`z`])[0]::INT'))
 
-  # na.rm = FALSE: leverage default Snowflake behavior for LEAST / GREATEST
+  # na.rm = FALSE: leverage default behavior for Snowflake
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql('LEAST(`x`, `y`, `z`)'))
   expect_equal(test_translate_sql(pmax(x, y, z, na.rm = FALSE)), sql('GREATEST(`x`, `y`, `z`)'))
 })
