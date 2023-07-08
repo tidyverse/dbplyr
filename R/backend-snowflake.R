@@ -201,18 +201,21 @@ sql_translation.Snowflake <- function(con) {
       # * https://community.snowflake.com/s/question/0D50Z00009LHFw1SAH/greatest-and-null-values
       # * https://stackoverflow.com/questions/74527418/how-to-use-greatest-in-snowflake-with-null-values?newreg=1d65af9409e5443b85843be173894863
       # * https://github.com/tidyverse/dbplyr/issues/118
-      pmin = function(x, y, na.rm = FALSE) {
+      pmin = function(..., na.rm = FALSE) {
         if (identical(na.rm, TRUE)) {
-          glue_sql2(sql_current_con(), "-(GREATEST([-{x}], [-{y}])[0]::INT)")
+          dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm, negate = TRUE)
+          glue_sql2(sql_current_con(), "-(GREATEST({dots})[0]::INT)")
         } else {
-          glue_sql2(sql_current_con(), "LEAST({x}, {y})")
+          dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm)
+          glue_sql2(sql_current_con(), "LEAST({dots})")
         }
       },
-      pmax = function(x, y, na.rm = FALSE) {
+      pmax = function(..., na.rm = FALSE) {
+        dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm)
         if (identical(na.rm, TRUE)) {
-          glue_sql2(sql_current_con(), "GREATEST([{x}], [{y}])[0]::INT")
+          glue_sql2(sql_current_con(), "GREATEST({dots})[0]::INT")
         } else {
-          glue_sql2(sql_current_con(), "GREATEST({x}, {y})")
+          glue_sql2(sql_current_con(), "GREATEST({dots})")
         }
       }
     ),
@@ -287,6 +290,21 @@ snowflake_paste <- function(default_sep) {
       sql_call2("ARRAY_CONSTRUCT_COMPACT", ...), sep
     )
   }
+}
+
+snowflake_pmin_pmax_concat_dots <- function(..., na.rm = FALSE, negate = FALSE){
+  dots <- list(...)
+  if(isTRUE(negate)) {
+    dots <- dots %>%
+      purrr::map(~glue('-{.x}'))
+  }
+  if (isTRUE(na.rm)){
+    dots <- dots %>%
+      purrr::map(~glue('[{.x}]'))
+  }
+
+  dots %>%
+    paste(collapse = ", ")
 }
 
 utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))
