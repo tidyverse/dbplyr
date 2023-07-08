@@ -186,31 +186,33 @@ sql_translation.Snowflake <- function(con) {
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
-        unit <- arg_match(unit,
-          c("second", "minute", "hour", "day", "week", "month", "quarter", "year",
-            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years")
+        unit <- arg_match(
+          unit,
+          c(
+            "second", "minute", "hour", "day", "week", "month", "quarter", "year",
+            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years"
+          )
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       },
       # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
       # https://docs.snowflake.com/en/sql-reference/functions/greatest
-      # Solution source: https://stackoverflow.com/a/74529349/22193215
+      # Support two columns only with na.rm = TRUE (mirrors Access)
       pmin = function(..., na.rm = FALSE) {
+        dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
         if (identical(na.rm, TRUE)) {
-          dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm, negate = TRUE)
-          glue_sql2(sql_current_con(), "-(GREATEST({dots})[0]::FLOAT)")
+          sql_expr(IFF(!!dots$x <= !!dots$y, !!dots$x, !!dots$y))
         } else {
-          dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm)
-          glue_sql2(sql_current_con(), "LEAST({dots})")
+          glue_sql2(sql_current_con(), "LEAST({.val dots*})")
         }
       },
       pmax = function(..., na.rm = FALSE) {
-        dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm)
+        dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
         if (identical(na.rm, TRUE)) {
-          glue_sql2(sql_current_con(), "GREATEST({dots})[0]::FLOAT")
+          sql_expr(IFF(!!dots$x <= !!dots$y, !!dots$y, !!dots$x))
         } else {
-          glue_sql2(sql_current_con(), "GREATEST({dots})")
+          glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
         }
       }
     ),
@@ -267,7 +269,7 @@ snowflake_grepl <- function(pattern,
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
   # behavior
-  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0('(', pattern, ')') || ".*"))
+  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0("(", pattern, ")") || ".*"))
 }
 
 snowflake_round <- function(x, digits = 0L) {
@@ -287,19 +289,17 @@ snowflake_paste <- function(default_sep) {
   }
 }
 
-snowflake_pmin_pmax_concat_dots <- function(..., na.rm = FALSE, negate = FALSE){
+snowflake_pmin_pmax_na_rm <- function(..., na.rm = FALSE) {
   dots <- list(...)
-  if(isTRUE(negate)) {
-    dots <- dots %>%
-      purrr::map(~glue('-{.x}'))
+  if (identical(na.rm, TRUE)) {
+    if (length(dots) > 2) cli::cli_abort("pmin()/pmax() with na.rm = TRUE currently only supports two columns for Snowflake")
+    list(
+      x = dots[[1]],
+      y = dots[[2]]
+    )
+  } else {
+    dots
   }
-  if (isTRUE(na.rm)){
-    dots <- dots %>%
-      purrr::map(~glue('[{.x}]'))
-  }
-
-  dots %>%
-    paste(collapse = ", ")
 }
 
 utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))
