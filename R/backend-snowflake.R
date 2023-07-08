@@ -202,7 +202,7 @@ sql_translation.Snowflake <- function(con) {
       pmin = function(..., na.rm = FALSE) {
         dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
         if (identical(na.rm, TRUE)) {
-          sql_expr(IFF(!!dots$x <= !!dots$y, !!dots$x, !!dots$y))
+          sql_expr(COALESCE(IFF(!!dots$x <= !!dots$y, !!dots$x, !!dots$y), !!dots$x, !!dots$y))
         } else {
           glue_sql2(sql_current_con(), "LEAST({.val dots*})")
         }
@@ -210,7 +210,7 @@ sql_translation.Snowflake <- function(con) {
       pmax = function(..., na.rm = FALSE) {
         dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
         if (identical(na.rm, TRUE)) {
-          sql_expr(IFF(!!dots$x <= !!dots$y, !!dots$y, !!dots$x))
+          sql_expr(COALESCE(IFF(!!dots$x <= !!dots$y, !!dots$y, !!dots$x), !!dots$y, !!dots$x))
         } else {
           glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
         }

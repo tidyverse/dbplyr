@@ -121,15 +121,14 @@ test_that("min() and max()", {
 
 test_that("pmin() and pmax() respect na.rm", {
   local_con(simulate_snowflake())
-  test_translate_sql(pmin(x, y, na.rm = TRUE))
 
   # Snowflake default for LEAST/GREATEST: If any of the argument values is NULL, the result is NULL.
   # https://docs.snowflake.com/en/sql-reference/functions/least
   # https://docs.snowflake.com/en/sql-reference/functions/greatest
 
   # na.rm = TRUE: override default behavior for Snowflake (only supports pairs)
-  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql("IFF(`x` <= `y`, `x`, `y`)"))
-  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("IFF(`x` <= `y`, `y`, `x`)"))
+  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`)"))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` <= `y`, `y`, `x`), `y`, `x`)"))
 
   expect_error(test_translate_sql(pmax(x, y, z, na.rm = TRUE)))
 
