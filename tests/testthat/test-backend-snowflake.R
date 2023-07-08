@@ -97,3 +97,15 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
   expect_equal(test_translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
 })
+
+test_that("pmin and max become MIN and MAX", {
+  local_con(simulate_snowflake())
+
+  # na.rm = TRUE: override LEAST / GREATEST behavior for Snowflake
+  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql('-(GREATEST([-`x`], [-`y`])[0]::INT)'))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql('GREATEST([`x`], [`y`])[0]::INT'))
+
+  # na.rm = FALSE: leverage default Snowflake behavior for LEAST / GREATEST
+  expect_equal(test_translate_sql(pmin(x, y, na.rm = FALSE)), sql('LEAST(`x`, `y`)'))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = FALSE)), sql('GREATEST(`x`, `y`)'))
+})

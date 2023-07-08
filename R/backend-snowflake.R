@@ -191,6 +191,29 @@ sql_translation.Snowflake <- function(con) {
             "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years")
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
+      },
+      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE (similar )
+      # https://docs.snowflake.com/en/sql-reference/functions/least
+      # https://docs.snowflake.com/en/sql-reference/functions/greatest
+      # "If any of the argument values is NULL, the result is NULL."
+      # Source: https://stackoverflow.com/a/74529349/22193215
+      # [move to PR context] References:
+      # * https://community.snowflake.com/s/question/0D50Z00009LHFw1SAH/greatest-and-null-values
+      # * https://stackoverflow.com/questions/74527418/how-to-use-greatest-in-snowflake-with-null-values?newreg=1d65af9409e5443b85843be173894863
+      # * https://github.com/tidyverse/dbplyr/issues/118
+      pmin = function(x, y, na.rm = FALSE) {
+        if (identical(na.rm, TRUE)) {
+          glue_sql2(sql_current_con(), "-(GREATEST([-{x}], [-{y}])[0]::INT)")
+        } else {
+          glue_sql2(sql_current_con(), "LEAST({x}, {y})")
+        }
+      },
+      pmax = function(x, y, na.rm = FALSE) {
+        if (identical(na.rm, TRUE)) {
+          glue_sql2(sql_current_con(), "GREATEST([{x}], [{y}])[0]::INT")
+        } else {
+          glue_sql2(sql_current_con(), "GREATEST({x}, {y})")
+        }
       }
     ),
     sql_translator(
@@ -248,6 +271,7 @@ snowflake_grepl <- function(pattern,
   # behavior
   sql_expr(((!!x)) %REGEXP% (".*" || !!paste0('(', pattern, ')') || ".*"))
 }
+
 snowflake_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
   sql_expr(round(((!!x)) %::% FLOAT, !!digits))
