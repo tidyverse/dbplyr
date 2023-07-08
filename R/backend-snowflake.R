@@ -192,15 +192,10 @@ sql_translation.Snowflake <- function(con) {
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       },
-      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE (similar )
+      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
       # https://docs.snowflake.com/en/sql-reference/functions/greatest
-      # "If any of the argument values is NULL, the result is NULL."
-      # Source: https://stackoverflow.com/a/74529349/22193215
-      # [move to PR context] References:
-      # * https://community.snowflake.com/s/question/0D50Z00009LHFw1SAH/greatest-and-null-values
-      # * https://stackoverflow.com/questions/74527418/how-to-use-greatest-in-snowflake-with-null-values?newreg=1d65af9409e5443b85843be173894863
-      # * https://github.com/tidyverse/dbplyr/issues/118
+      # Solution source: https://stackoverflow.com/a/74529349/22193215
       pmin = function(..., na.rm = FALSE) {
         if (identical(na.rm, TRUE)) {
           dots <- snowflake_pmin_pmax_concat_dots(..., na.rm = na.rm, negate = TRUE)
