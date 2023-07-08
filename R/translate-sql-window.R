@@ -147,6 +147,7 @@ win_rank <- function(f) {
       no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
     } else {
       order_over <- win_current_order()
+      if (is_empty(order_over)) order_over <- sql("(SELECT NULL)")
     }
 
     rank_sql <- win_over(
