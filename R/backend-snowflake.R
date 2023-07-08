@@ -198,19 +198,18 @@ sql_translation.Snowflake <- function(con) {
       # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
       # https://docs.snowflake.com/en/sql-reference/functions/greatest
-      # Support two columns only with na.rm = TRUE (mirrors Access)
       pmin = function(..., na.rm = FALSE) {
-        dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
+        dots <- list(...)
         if (identical(na.rm, TRUE)) {
-          sql_expr(COALESCE(IFF(!!dots$x <= !!dots$y, !!dots$x, !!dots$y), !!dots$x, !!dots$y))
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
         } else {
           glue_sql2(sql_current_con(), "LEAST({.val dots*})")
         }
       },
       pmax = function(..., na.rm = FALSE) {
-        dots <- snowflake_pmin_pmax_na_rm(..., na.rm = na.rm)
+        dots <- list(...)
         if (identical(na.rm, TRUE)) {
-          sql_expr(COALESCE(IFF(!!dots$x <= !!dots$y, !!dots$y, !!dots$x), !!dots$y, !!dots$x))
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
         } else {
           glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
         }
@@ -289,17 +288,16 @@ snowflake_paste <- function(default_sep) {
   }
 }
 
-snowflake_pmin_pmax_na_rm <- function(..., na.rm = FALSE) {
-  dots <- list(...)
-  if (identical(na.rm, TRUE)) {
-    if (length(dots) > 2) cli::cli_abort("pmin()/pmax() with na.rm = TRUE currently only supports two columns for Snowflake")
-    list(
-      x = dots[[1]],
-      y = dots[[2]]
-    )
-  } else {
-    dots
+snowflake_pmin_pmax_sql_expression <- function(dots, comparison){
+  dot_combined <- dots[[1]]
+  for (i in 2:length(dots)){
+    dot_combined <- snowflake_pmin_pmax_builder(dots[i], dot_combined, comparison)
   }
+  glue_sql2(sql_current_con(), "{dot_combined}")
+}
+
+snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
+  glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})")
 }
 
 utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))

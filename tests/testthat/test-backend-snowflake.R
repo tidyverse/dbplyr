@@ -128,9 +128,10 @@ test_that("pmin() and pmax() respect na.rm", {
 
   # na.rm = TRUE: override default behavior for Snowflake (only supports pairs)
   expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`)"))
-  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` <= `y`, `y`, `x`), `y`, `x`)"))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`)"))
 
-  expect_error(test_translate_sql(pmax(x, y, z, na.rm = TRUE)))
+  expect_snapshot(test_translate_sql(pmin(x, y, z, na.rm = TRUE)))
+  expect_snapshot(test_translate_sql(pmax(x, y, z, na.rm = TRUE)))
 
   # na.rm = FALSE: leverage default behavior for Snowflake
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql("LEAST(`x`, `y`, `z`)"))
