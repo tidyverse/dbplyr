@@ -8,6 +8,13 @@
 #'
 #' Note that `pivot_wider()` is not and cannot be lazy because we need to look
 #' at the data to figure out what the new column names will be.
+#' If you have a long running query you have two options:
+#'
+#' * (temporarily) store the result of the query via `compute()`.
+#' * Create a spec before and use `dbplyr_pivot_wider_spec()` - dbplyr's version
+#'   of `tidyr::pivot_wider_spec()`. Note that this function is only a temporary
+#'   solution until `pivot_wider_spec()` becomes a generic. It will then be
+#'   removed soon afterwards.
 #'
 #' @details
 #' The big difference to `pivot_wider()` for local data frames is that
@@ -143,11 +150,14 @@ pivot_wider.tbl_lazy <- function(data,
   dbplyr_pivot_wider_spec(
     data = data,
     spec = spec,
-    id_cols = !!id_cols,
+    ...,
     names_repair = names_repair,
+    id_cols = !!id_cols,
+    id_expand = FALSE,
     values_fill = values_fill,
     values_fn = values_fn,
-    unused_fn = unused_fn
+    unused_fn = unused_fn,
+    error_call = current_env()
   )
 }
 
@@ -201,14 +211,20 @@ dbplyr_build_wider_spec <- function(data,
   )
 }
 
+#' @inheritParams rlang::args_error_context
+#' @export
+#' @rdname pivot_wider.tbl_lazy
 dbplyr_pivot_wider_spec <- function(data,
                                     spec,
+                                    ...,
                                     names_repair = "check_unique",
                                     id_cols = NULL,
+                                    id_expand = FALSE,
                                     values_fill = NULL,
                                     values_fn = ~ max(.x, na.rm = TRUE),
                                     unused_fn = NULL,
                                     error_call = current_env()) {
+  check_unsupported_arg(id_expand, FALSE)
   spec <- tidyr::check_pivot_spec(spec)
 
   names_from_cols <- names(spec)[-(1:2)]

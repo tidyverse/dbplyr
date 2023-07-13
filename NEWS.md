@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
+  be lazy. Note that this will be removed soon after `pivot_wider_spec()`
+  becomes a generic (@mgirlich).
+
 * Added translation for `str_detect()`, `str_starts()` and `str_ends()` with
   fixed patterns (@mgirlich, #1009).
 
