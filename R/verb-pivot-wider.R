@@ -212,6 +212,7 @@ dbplyr_build_wider_spec <- function(data,
 }
 
 #' @inheritParams rlang::args_error_context
+#' @inheritParams tidyr::pivot_wider_spec
 #' @export
 #' @rdname pivot_wider.tbl_lazy
 dbplyr_pivot_wider_spec <- function(data,

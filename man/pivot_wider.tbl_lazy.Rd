@@ -107,6 +107,17 @@ all unspecified columns will be considered \code{id_cols}.
 This is similar to grouping by the \code{id_cols} then summarizing the
 unused columns using \code{unused_fn}.}
 
+\item{spec}{A specification data frame. This is useful for more complex
+pivots because it gives you greater control on how metadata stored in the
+columns become column names in the result.
+
+Must be a data frame containing character \code{.name} and \code{.value} columns.
+Additional columns in \code{spec} should be named to match columns in the
+long format of the dataset and contain values corresponding to columns
+pivoted from the wide format.
+The special \code{.seq} variable is used to disambiguate rows internally;
+it is automatically removed after pivoting.}
+
 \item{error_call}{The execution environment of a currently
 running function, e.g. \code{caller_env()}. The function will be
 mentioned in error messages as the source of the error. See the
