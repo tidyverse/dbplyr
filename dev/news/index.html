@@ -73,7 +73,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>Added translation for <code>str_detect()</code>, <code>str_starts()</code> and <code>str_ends()</code> with fixed patterns (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1009" class="external-link">#1009</a>).</p></li>
+<ul><li><p><code><a href="../reference/pivot_wider.tbl_lazy.html">dbplyr_pivot_wider_spec()</a></code> is now exported. Unlike <code>pivot_wider()</code> this can be lazy. Note that this will be removed soon after <code>pivot_wider_spec()</code> becomes a generic (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p>Added translation for <code>str_detect()</code>, <code>str_starts()</code> and <code>str_ends()</code> with fixed patterns (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1009" class="external-link">#1009</a>).</p></li>
 <li><p>The <code>overwrite</code> argument of <code><a href="../reference/db-io.html">db_copy_to()</a></code> now actually works.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_save_query()</a></code> gain the <code>overwrite</code> argument.</p></li>
 <li><p><code>distinct(.keep_all = TRUE)</code> now works for SQL Server (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1053" class="external-link">#1053</a>).</p></li>
@@ -161,7 +162,7 @@
 <li><p>Added translation for <code>!=</code> to <code>&lt;&gt;</code> for Microsoft Access (<a href="https://github.com/erikvona" class="external-link">@erikvona</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1219" class="external-link">#1219</a>).</p></li>
 </ul></div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.3.3" id="dbplyr-233">dbplyr 2.3.3<a class="anchor" aria-label="anchor" href="#dbplyr-233"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.3.3" id="dbplyr-233">dbplyr 2.3.3<a class="anchor" aria-label="anchor" href="#dbplyr-233"></a></h2><p class="text-muted">CRAN release: 2023-07-07</p>
 <ul><li>Hot patch to fix R CMD check issues</li>
 </ul></div>
     <div class="section level2">
