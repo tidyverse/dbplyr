@@ -4,18 +4,18 @@
 
   * `*_join()` after `full_join()` works again (@mgirlich, #1178).
 
-  * `*_join()` now allows using specifying the relationship argument. It must be
+  * `*_join()` now allows specifying the relationship argument. It must be
     `NULL` or `"many-to-many"` (@bairdj, #1305).
 
   * Queries now qualify `*` with the table alias for better compatibility (@mgirlich, #1003).
 
-  * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
-  
   * `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
   
   * The `na_matches` argument of `semi_join()` and `anti_join()` works again
     (@mgirlich, #1211).
 
+  * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
+  
 * `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
   be lazy. Note that this will be removed soon after `pivot_wider_spec()`
   becomes a generic (@mgirlich).
@@ -126,13 +126,13 @@
 
 * MySQL/MariaDB:
   * `rows_update()` and `rows_patch()` now give an informative error when the
-    unsupported `returning` is used (@mgirlich, #1279).
+    unsupported `returning` argument is used (@mgirlich, #1279).
   * `rows_upsert()` now gives an informative error that it isn't supported
     (@mgirlich, #1279).
-  * `rows_*()` use the column types of `x` when auto copying (@mgirlich, #1327).
+  * `rows_*()` use the column types of `x` when auto copying `y` (@mgirlich, #1327).
+  * `copy_inline()` now works (@mgirlich, #1188).
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
     `as.integer64()` (@avsdev-cw, #1189).
-  * `copy_inline()` now works (@mgirlich, #1188).
 
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
