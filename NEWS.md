@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
+  be lazy. Note that this will be removed soon after `pivot_wider_spec()`
+  becomes a generic (@mgirlich).
+
 * Added translation for `str_detect()`, `str_starts()` and `str_ends()` with
   fixed patterns (@mgirlich, #1009).
 
@@ -54,6 +58,9 @@
   * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
     string (@mgirlich, #1285).
   * `row_number()` no longer defaults to partitioning by the set groups (now aligned with other databases where underordered `ROW_NUMBER()` calls require a default `ORDER BY (SELECT NULL)`) (@fh-mthomson, #1331)
+    
+* Snowflake: 
+  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead of being silently ignored (@fh-mthomson, #1329)
 
 * `remote_name()` now returns a string with the name of the table. To get the
   qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
