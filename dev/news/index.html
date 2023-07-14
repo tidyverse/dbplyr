@@ -108,6 +108,11 @@
 <ul><li>
 <code>as.Date(x)</code> is now translate to <code>CAST(x AS DATE)</code> again unless <code>x</code> is a string (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1285" class="external-link">#1285</a>).</li>
 </ul></li>
+<li>
+<p>Snowflake:</p>
+<ul><li>
+<code>na.rm = TRUE</code> is now respected in <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax()</a></code> instead of being silently ignored (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1329" class="external-link">#1329</a>)</li>
+</ul></li>
 <li><p><code><a href="../reference/remote_name.html">remote_name()</a></code> now returns a string with the name of the table. To get the qualified identifier use the newly added <code><a href="../reference/remote_name.html">remote_table()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1280" class="external-link">#1280</a>).</p></li>
 <li><p>Queries now qualify <code>*</code> with the table alias for better compatibility (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1003" class="external-link">#1003</a>).</p></li>
 <li><p>Joins now work again for Pool and Oracle connections (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1177" class="external-link">#1177</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1181" class="external-link">#1181</a>).</p></li>
