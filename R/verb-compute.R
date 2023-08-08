@@ -45,7 +45,6 @@ compute.tbl_sql <- function(x,
     if (!temporary) {
       lifecycle::deprecate_warn(
         "2.3.3",
-        # what = I(cli::format_inline("Not providing a name when {.code temporary = FALSE}"))
         what = "compute(name = 'must be provided when `temporary = FALSE`')"
       )
     }
