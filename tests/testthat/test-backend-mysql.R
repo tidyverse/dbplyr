@@ -26,7 +26,7 @@ test_that("custom date escaping works as expected", {
   expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
 
   expect_equal(escape(as.POSIXct("2020-01-01", tz = "UTC"), con = con), sql("'2020-01-01 00:00:00'"))
-  expect_equal(escape(as.POSIXct(NA), con = con), sql("NULL"))
+  expect_equal(escape(as.POSIXct(NA, tz = "UTC"), con = con), sql("NULL"))
 })
 
 
@@ -192,6 +192,6 @@ test_that("casts `y` column for local df", {
   expect_equal(tbl(con, "df_x") %>% collect(), out)
 
   types_expected <- c(id = "bigint(20)", val = "bigint(20)", ltext = "longtext")
-  expect_equal(get_col_types(con, table2), types_expected)
-  expect_equal(get_col_types(con, in_schema("test", "df_x")), types_expected)
+  expect_equal(db_col_types(con, table2), types_expected)
+  expect_equal(db_col_types(con, in_schema("test", "df_x")), types_expected)
 })

@@ -70,6 +70,12 @@
   instead of subqueries (@mgirlich, #1269).
 
 ## Minor improvements and bug fixes
+* Teradata:
+  * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
+    string (@mgirlich, #1285).
+    
+* Snowflake: 
+  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead of being silently ignored (@fh-mthomson, #1329)
 
 * The `overwrite` argument of `db_copy_to()` now actually works.
 

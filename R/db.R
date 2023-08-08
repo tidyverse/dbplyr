@@ -7,6 +7,8 @@
 #' * `dbplyr_edition()` declares which version of the dbplyr API you want.
 #'    See below for more details.
 #'
+#' * `db_col_types()` returns the column types of a table.
+#'
 #' @section dbplyr 2.0.0:
 #' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
 #' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
@@ -80,6 +82,26 @@ db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
 #' @export
 db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   sql_render(sql, con = con, ..., sql_options = sql_options)
+}
+
+#' @rdname db-misc
+#' @export
+db_col_types <- function(con, table, call) {
+  if (is_null(table)) {
+    return(NULL)
+  }
+
+  UseMethod("db_col_types")
+}
+
+#' @export
+db_col_types.TestConnection <- function(con, table, call) {
+  NULL
+}
+
+#' @export
+db_col_types.DBIConnection <- function(con, table, call) {
+  NULL
 }
 
 #' Options for generating SQL
