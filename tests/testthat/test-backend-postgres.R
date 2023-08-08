@@ -278,7 +278,7 @@ test_that("casts `y` column for local df", {
   df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
   types <- c(id = "bigint", val = "bigint", arr = "integer[]")
   local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")
-  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x")
+  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x2")
   local_db_table(con, value = df, types = types, temporary = FALSE, table2)
 
   y <- tibble(
@@ -305,6 +305,14 @@ test_that("casts `y` column for local df", {
 
   rows_append(
     tbl(con, "df_x"),
+    y,
+    copy = TRUE,
+    in_place = TRUE
+  )
+
+  # also works with schema
+  rows_append(
+    tbl(con, table2),
     y,
     copy = TRUE,
     in_place = TRUE

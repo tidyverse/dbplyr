@@ -95,7 +95,7 @@ rows_insert.tbl_lazy <- function(x,
                                  method = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   conflict <- rows_check_conflict(conflict)
 
@@ -111,10 +111,10 @@ rows_insert.tbl_lazy <- function(x,
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     sql <- sql_query_insert(
       con = remote_con(x),
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(x), lvl = 1),
       insert_cols = colnames(y),
       by = by,
@@ -154,17 +154,17 @@ rows_append.tbl_lazy <- function(x,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   rows_check_containment(x, y)
   y <- rows_auto_copy(x, y, copy = copy)
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     sql <- sql_query_append(
       con = remote_con(x),
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(x), lvl = 1),
       insert_cols = colnames(y),
       ...,
@@ -202,7 +202,7 @@ rows_update.tbl_lazy <- function(x,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   rows_check_containment(x, y)
   y <- rows_auto_copy(x, y, copy = copy)
@@ -219,7 +219,7 @@ rows_update.tbl_lazy <- function(x,
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     # TODO handle `returning_cols` here
     if (is_empty(new_columns)) {
       return(invisible(x))
@@ -234,7 +234,7 @@ rows_update.tbl_lazy <- function(x,
 
     sql <- sql_query_update_from(
       con = con,
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
@@ -282,7 +282,7 @@ rows_patch.tbl_lazy <- function(x,
                                 returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   rows_check_containment(x, y)
   y <- rows_auto_copy(x, y, copy = copy)
@@ -298,7 +298,7 @@ rows_patch.tbl_lazy <- function(x,
 
   returning_cols <- rows_check_returning(x, returning, enexpr(returning))
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     # TODO handle `returning_cols` here
     if (is_empty(new_columns)) {
       return(invisible(x))
@@ -308,14 +308,14 @@ rows_patch.tbl_lazy <- function(x,
 
     update_cols <- setdiff(colnames(y), by)
     update_values <- sql_coalesce(
-      sql_table_prefix(con, update_cols, name),
+      sql_table_prefix(con, update_cols, table),
       sql_table_prefix(con, update_cols, "...y")
     )
     update_values <- set_names(update_values, update_cols)
 
     sql <- sql_query_update_from(
       con = con,
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(y), lvl = 1),
       by = by,
       update_values = update_values,
@@ -371,7 +371,7 @@ rows_upsert.tbl_lazy <- function(x,
                                  method = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   rows_check_containment(x, y)
   y <- rows_auto_copy(x, y, copy = copy)
@@ -385,7 +385,7 @@ rows_upsert.tbl_lazy <- function(x,
 
   new_columns <- setdiff(colnames(y), by)
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     # TODO use `rows_insert()` here
     if (is_empty(new_columns)) {
       return(invisible(x))
@@ -393,7 +393,7 @@ rows_upsert.tbl_lazy <- function(x,
 
     sql <- sql_query_upsert(
       con = remote_con(x),
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(x), lvl = 1),
       by = by,
       update_cols = setdiff(colnames(y), by),
@@ -446,7 +446,7 @@ rows_delete.tbl_lazy <- function(x,
                                  returning = NULL) {
   check_dots_empty()
   rows_check_in_place(x, in_place)
-  name <- target_table_name(x, in_place)
+  table <- target_table(x, in_place)
 
   rows_check_containment(x, y)
   y <- rows_auto_copy(x, y, copy = copy)
@@ -466,10 +466,10 @@ rows_delete.tbl_lazy <- function(x,
     inform(message, class = c("dplyr_message_delete_extra_cols", "dplyr_message"))
   }
 
-  if (!is_null(name)) {
+  if (!is_null(table)) {
     sql <- sql_query_delete(
       con = remote_con(x),
-      table = name,
+      table = table,
       from = sql_render(y, remote_con(x), lvl = 2),
       by = by,
       ...,
@@ -704,18 +704,18 @@ tick <- function(x) {
 
 # other helpers -----------------------------------------------------------
 
-target_table_name <- function(x, in_place) {
+target_table <- function(x, in_place) {
   # Never touch target table with `in_place = FALSE`
   if (!is_true(in_place)) {
     return(NULL)
   }
 
-  name <- remote_name(x)
-  if (is_null(name)) {
+  table <- remote_table(x)
+  if (is_null(table)) {
     cli_abort("Can't determine name for target table. Set {.code in_place = FALSE} to return a lazy table.")
   }
 
-  ident(name)
+  table
 }
 
 rows_prep <- function(con, table, from, by, lvl = 0) {
