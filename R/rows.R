@@ -758,42 +758,6 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
   auto_copy(x, y, copy = copy, types = x_types)
 }
 
-#' @export
-db_col_types <- function(con, table, call) {
-  if (is_null(table)) {
-    return(NULL)
-  }
-
-  UseMethod("db_col_types")
-}
-
-#' @export
-db_col_types.TestConnection <- function(con, table, call) {
-  NULL
-}
-
-#' @export
-db_col_types.DBIConnection <- function(con, table, call) {
-  NULL
-}
-
-#' @export
-db_col_types.PqConnection <- function(con, table, call) {
-  table <- as_table_ident(table, error_call = call)
-  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
-  on.exit(DBI::dbClearResult(res))
-  DBI::dbFetch(res, n = 0)
-  col_info_df <- DBI::dbColumnInfo(res)
-  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
-}
-
-#' @export
-db_col_types.MariaDBConnection <- function(con, table, call) {
-  table <- as_table_ident(table, error_call = call)
-  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};"))
-  set_names(col_info_df[["Type"]], col_info_df[["Field"]])
-}
-
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
   con <- remote_con(x)
   msg <- "Can't modify database table {.val {remote_name(x)}}."

@@ -51,6 +51,17 @@ db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
 
 #' @export
+db_col_types.MariaDBConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};"))
+  set_names(col_info_df[["Type"]], col_info_df[["Field"]])
+}
+#' @export
+db_col_types.MySQL <- db_col_types.MariaDBConnection
+#' @export
+db_col_types.MySQLConnection <- db_col_types.MariaDBConnection
+
+#' @export
 sql_translation.MariaDBConnection <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
