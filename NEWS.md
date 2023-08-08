@@ -62,6 +62,8 @@
 * The `vars` argument of `translate_sql()` has been removed after it threw an
   error for the last 7 years (@mgirlich).
 
+* `sql_not_supported()` now expects a function name without parentheses.
+
 ## Improved SQL
 
 * A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
