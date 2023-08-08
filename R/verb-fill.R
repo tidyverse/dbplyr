@@ -136,7 +136,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
   #
   # strategy:
   # for each column to fill:
-  # 1. generate a helper column `....dbplyr_partion_x`. It creates one partition
+  # 1. generate a helper column `....dbplyr_partition_x`. It creates one partition
   #    per non-NA value and all following NA (in the order of `order_by_cols`),
   #    i.e. each partition has exactly one non-NA value and any number of NA.
   # 2. use the non-NA value in each partition (`max()` is just the simplest
@@ -151,7 +151,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
       vars_group = op_grps(.data),
     )
   ) %>%
-    set_names(paste0("..dbplyr_partion_", seq_along(cols_to_fill)))
+    set_names(paste0("..dbplyr_partition_", seq_along(cols_to_fill)))
 
   dp <- .data %>%
     mutate(!!!partition_sql)

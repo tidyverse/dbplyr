@@ -228,7 +228,7 @@ test_that("known bug - building a wider spec with a zero row data frame loses `v
   )
 })
 
-# non-unqiue keys ---------------------------------------------------------
+# non-unique keys ---------------------------------------------------------
 
 test_that("values_fn can be a single function", {
   df <- lazy_frame(a = c(1, 1, 2), key = c("x", "x", "x"), val = c(1, 10, 100))

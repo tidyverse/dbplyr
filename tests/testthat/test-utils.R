@@ -1,4 +1,4 @@
-test_that("Succesful and not-sucessful commands are identified", {
+test_that("Successful and not-successful commands are identified", {
   expect_true(succeeds("success"))
   expect_false(succeeds(x - 1, quiet = TRUE))
 })

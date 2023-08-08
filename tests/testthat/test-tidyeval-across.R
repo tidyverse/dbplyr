@@ -433,7 +433,7 @@ test_that("if_all() gives informative errors", {
   })
 })
 
-test_that("if_all collapses multiple expresions", {
+test_that("if_all collapses multiple expressions", {
   lf <- lazy_frame(a = 1,  b = 2)
   expect_equal(
     capture_if_all(lf, if_all(everything(), is.na)),
@@ -448,7 +448,7 @@ test_that("if_all/any works in filter()", {
   expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
 })
 
-test_that("if_all/any is wrapped in parantheses #1153", {
+test_that("if_all/any is wrapped in parentheses #1153", {
   lf <- lazy_frame(a = 1,  b = 2, c = 3)
 
   expect_equal(
@@ -464,7 +464,7 @@ test_that("if_all/any works in mutate()", {
   expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
 })
 
-test_that("if_all/any uses every colum as default", {
+test_that("if_all/any uses every column as default", {
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% filter(if_all(.fns = ~ . > 0)))

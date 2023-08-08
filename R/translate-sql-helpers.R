@@ -136,7 +136,7 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   # Unquoting involving infix operators easily create abstract syntax trees
-  # without parantheses where they are needed for printing and translation.
+  # without parentheses where they are needed for printing and translation.
   # For example `expr(!!expr(2 - 1) * x))`
   #
   # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast

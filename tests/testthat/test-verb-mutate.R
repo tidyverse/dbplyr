@@ -129,7 +129,7 @@ test_that("across() can access previously created variables", {
   expect_snapshot(remote_query(lf))
 })
 
-test_that("across() uses original column rather than overriden one", {
+test_that("across() uses original column rather than overridden one", {
   db <- memdb_frame(x = 2, y = 4, z = 6)
   expect_equal(
     db %>% mutate(across(everything(), ~ .x / x)) %>% collect(),

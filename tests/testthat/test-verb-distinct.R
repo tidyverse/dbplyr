@@ -21,7 +21,7 @@ test_that("distinct for single column equivalent to local unique (#1937)", {
     expect_equal_tbls(unique(df["y"]))
 })
 
-test_that("distinct doesn't duplicate colum names if grouped (#354)", {
+test_that("distinct doesn't duplicate column names if grouped (#354)", {
   df <- lazy_frame(a = 1)
   expect_equal(df %>% group_by(a) %>% distinct() %>% op_vars(), "a")
 })

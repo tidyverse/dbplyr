@@ -47,7 +47,7 @@ test_that("win_rank() is accepted by the sql_translator", {
   )
 })
 
-test_that("can translate infix expression without parantheses", {
+test_that("can translate infix expression without parentheses", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(!!expr(2 - 1) * x), sql("(2.0 - 1.0) * `x`"))
   expect_equal(test_translate_sql(!!expr(2 / 1) * x), sql("(2.0 / 1.0) * `x`"))

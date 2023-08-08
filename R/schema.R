@@ -17,7 +17,7 @@
 #' # Example using schemas with SQLite
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 #'
-#' # Add auxilary schema
+#' # Add auxiliary schema
 #' tmp <- tempfile()
 #' DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
 #'
@@ -91,7 +91,7 @@ as.sql.Id <- function(x, con) ident_q(dbQuoteIdentifier(con, x))
 
 # Old dbplyr approach -----------------------------------------------------
 
-#' Declare a identifer as being pre-quoted.
+#' Declare a identifier as being pre-quoted.
 #'
 #' No longer needed; please use [sql()] instead.
 #'

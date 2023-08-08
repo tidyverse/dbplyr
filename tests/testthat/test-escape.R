@@ -33,7 +33,7 @@ test_that("zero length inputs yield length-1 output when collapsed", {
 
 # Numeric ------------------------------------------------------------------
 
-test_that("missing vaues become null", {
+test_that("missing values become null", {
   con <- simulate_dbi()
 
   expect_equal(escape(NA, con = con), sql("NULL"))

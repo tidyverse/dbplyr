@@ -153,7 +153,7 @@ print.dbplyr_sql_options <- function(x, ...) {
   if (x$qualify_all_columns) {
     join_table_name <- "Qualify all columns"
   } else {
-    join_table_name <- "Qualify only ambigous columns"
+    join_table_name <- "Qualify only ambiguous columns"
   }
 
   msg <- c(cte, star, join_table_name)
