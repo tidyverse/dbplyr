@@ -103,6 +103,12 @@ db_col_types.TestConnection <- function(con, table, call) {
 db_col_types.DBIConnection <- function(con, table, call) {
   NULL
 }
+# add a default method so that packages that haven't implemented `db_col_types()`
+# keep working, e.g. {Pool}
+#' @export
+db_col_types.default <- function(con, table, call) {
+  NULL
+}
 
 #' Options for generating SQL
 #'
