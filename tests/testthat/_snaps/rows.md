@@ -37,7 +37,7 @@
       (df %>% mutate(x = x + 1) %>% rows_insert(df, by = "x", conflict = "ignore",
         in_place = TRUE))
     Condition
-      Error in `target_table_name()`:
+      Error in `target_table()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
 ---
@@ -275,7 +275,7 @@
       (df %>% mutate(x = x + 1) %>% rows_update(df, by = "x", unmatched = "ignore",
         in_place = TRUE))
     Condition
-      Error in `target_table_name()`:
+      Error in `target_table()`:
       ! Can't determine name for target table. Set `in_place = FALSE` to return a lazy table.
 
 # `rows_update()` works with `in_place = FALSE`
