@@ -263,7 +263,7 @@ test_that("can use `rows_*()` inside a transaction #1183", {
   expect_no_error(
     DBI::dbWithTransaction(
       con, {
-        dbplyr:::get_col_types(con, "df_x", rlang::current_env())
+        dbplyr:::db_col_types(con, "df_x", rlang::current_env())
         DBI::dbGetQuery(con, "SELECT * FROM df_x LIMIT 1")
       }
     )
@@ -313,8 +313,8 @@ test_that("casts `y` column for local df", {
   expect_equal(tbl(con, "df_x") %>% collect(), out)
 
   types_expected <- c(id = "int8", val = "int8", arr = "_int4")
-  expect_equal(get_col_types(con, table2), types_expected)
-  expect_equal(get_col_types(con, in_schema("public", "df_x")), types_expected)
+  expect_equal(db_col_types(con, table2), types_expected)
+  expect_equal(db_col_types(con, in_schema("public", "df_x")), types_expected)
 })
 
 test_that("can upsert with returning", {

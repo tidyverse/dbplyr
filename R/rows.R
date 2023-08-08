@@ -758,28 +758,29 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
   auto_copy(x, y, copy = copy, types = x_types)
 }
 
-get_col_types <- function(con, name, call) {
-  if (is_null(name)) {
+#' @export
+db_col_types <- function(con, table, call) {
+  if (is_null(table)) {
     return(NULL)
   }
 
-  UseMethod("get_col_types")
+  UseMethod("db_col_types")
 }
 
 #' @export
-get_col_types.TestConnection <- function(con, name, call) {
+db_col_types.TestConnection <- function(con, table, call) {
   NULL
 }
 
 #' @export
-get_col_types.DBIConnection <- function(con, name, call) {
+db_col_types.DBIConnection <- function(con, table, call) {
   NULL
 }
 
 #' @export
-get_col_types.PqConnection <- function(con, name, call) {
-  name <- as_table_ident(name, error_call = call)
-  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl name} LIMIT 0"))
+db_col_types.PqConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)
   col_info_df <- DBI::dbColumnInfo(res)
@@ -787,9 +788,9 @@ get_col_types.PqConnection <- function(con, name, call) {
 }
 
 #' @export
-get_col_types.MariaDBConnection <- function(con, name, call) {
-  name <- as_table_ident(name, error_call = call)
-  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl name};"))
+db_col_types.MariaDBConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};"))
   set_names(col_info_df[["Type"]], col_info_df[["Field"]])
 }
 
