@@ -747,8 +747,8 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
     return(y)
   }
 
-  name <- remote_name(x)
-  x_types <- get_col_types(remote_con(x), name, call)
+  table <- remote_table(x)
+  x_types <- db_col_types(remote_con(x), table, call)
 
   if (!is_null(x_types)) {
     rows_check_containment(x, y, error_call = call)
