@@ -4,11 +4,11 @@
       df_lazy_ns %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
-      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
+      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
       FROM (
         SELECT
           `df`.*,
-          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
+          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` DESC ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partition_1`
         FROM `df`
       ) AS `q01`
 
@@ -66,11 +66,11 @@
       df_lazy_ns %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
-      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partion_1`) AS `n1`
+      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
       FROM (
         SELECT
           `df`.*,
-          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
+          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partition_1`
         FROM `df`
       ) AS `q01`
 
@@ -95,11 +95,11 @@
       SELECT
         `id`,
         `group`,
-        MAX(`n1`) OVER (PARTITION BY `group`, `..dbplyr_partion_1`) AS `n1`
+        MAX(`n1`) OVER (PARTITION BY `group`, `..dbplyr_partition_1`) AS `n1`
       FROM (
         SELECT
           `df`.*,
-          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (PARTITION BY `group` ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partion_1`
+          SUM(CASE WHEN ((`n1` IS NULL)) THEN 0 ELSE 1 END) OVER (PARTITION BY `group` ORDER BY `id` ROWS UNBOUNDED PRECEDING) AS `..dbplyr_partition_1`
         FROM `df`
       ) AS `q01`
 
