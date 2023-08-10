@@ -370,7 +370,7 @@
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       ;
 
-# row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per use_default_order_null)
+# row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
 
     Code
       mf %>% mutate(rown = row_number())

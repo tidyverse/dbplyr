@@ -240,7 +240,7 @@ sql_translation.Snowflake <- function(con) {
           order = win_current_order()
         )
       },
-      row_number = win_rank("ROW_NUMBER", use_default_order_null = TRUE)
+      row_number = win_rank("ROW_NUMBER", empty_order = TRUE)
     )
   )
 }

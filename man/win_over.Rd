@@ -21,7 +21,7 @@ win_over(
   con = sql_current_con()
 )
 
-win_rank(f, use_default_order_null = FALSE)
+win_rank(f, empty_order = FALSE)
 
 win_aggregate(f)
 
@@ -45,6 +45,8 @@ win_current_frame()
 \item{frame}{A numeric vector of length two defining the frame.}
 
 \item{f}{The name of an sql function as a string}
+
+\item{empty_order}{A logical value indicating whether to order by NULL if \code{order} is not specified}
 
 \item{parition}{Variables to partition over}
 }
