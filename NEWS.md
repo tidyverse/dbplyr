@@ -72,12 +72,6 @@
   instead of subqueries (@mgirlich, #1269).
 
 ## Minor improvements and bug fixes
-* Teradata:
-  * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
-    string (@mgirlich, #1285).
-    
-* Snowflake: 
-  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead of being silently ignored (@fh-mthomson, #1329)
 
 * The `overwrite` argument of `db_copy_to()` now actually works.
 
@@ -142,6 +136,9 @@
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
     `as.integer64()` (@avsdev-cw, #1189).
 
+* MS SQL:
+  * `row_number()` now works when no order is specified (@ejneer, @fh-mthomson, #1332)
+
 * Oracle:
   * Fix translation of `rows_upsert()` (@mgirlich, @TBlackmore, #1286)
   * `head(n)` is now translated to `WHERE ROWNUM <= n` to also support old
@@ -161,10 +158,15 @@
   * `any()` and `all()` now work (@ejneer, #1273).
   * Fixed negation of bit (boolean) fields (@ejneer, #1239)
 
+* Snowflake: 
+  * `na.rm = TRUE` is now respected in `pmin()` and `pmax()` instead of being silently ignored (@fh-mthomson, #1329)
+  * `row_number()` now works when no order is specified (@fh-mthomson, #1332)
+
 * Teradata
   * `distinct()` + `head()` now work (@mgirlich, #685).
   * `as.Date(x)` is now translate to `CAST(x AS DATE)` again unless `x` is a
     string (@mgirlich, #1285).
+  * `row_number()` no longer defaults to partitioning by groups (now aligned with other databases when no order is specified: `ROW_NUMBER()` defaults to `ORDER BY (SELECT NULL)`) (@fh-mthomson, #1331)
 
 # dbplyr 2.3.3
 
