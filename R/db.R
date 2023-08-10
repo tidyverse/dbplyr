@@ -7,6 +7,8 @@
 #' * `dbplyr_edition()` declares which version of the dbplyr API you want.
 #'    See below for more details.
 #'
+#' * `db_col_types()` returns the column types of a table.
+#'
 #' @section dbplyr 2.0.0:
 #' dbplyr 2.0.0 renamed a number of generics so that they could be cleanly moved
 #' from dplyr to dbplyr. If you have an existing backend, you'll need to rename
@@ -58,12 +60,14 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   check_bool(cte)
   if (cte) {
-    lifecycle::deprecate_soft(
+  lifecycle::deprecate_soft(
       when = "2.4.0",
       what = "db_sql_render(cte)",
       with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
     )
-    sql_options <- sql_options(cte = TRUE)
+    sql_options <- sql_options %||% sql_options(cte = TRUE)
+    out <- db_sql_render(con, sql, sql_options = sql_options)
+    return(out)
   }
 
   if (is.null(sql_options)) {
@@ -78,6 +82,32 @@ db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
 #' @export
 db_sql_render.DBIConnection <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   sql_render(sql, con = con, ..., sql_options = sql_options)
+}
+
+#' @rdname db-misc
+#' @export
+db_col_types <- function(con, table, call) {
+  if (is_null(table)) {
+    return(NULL)
+  }
+
+  UseMethod("db_col_types")
+}
+
+#' @export
+db_col_types.TestConnection <- function(con, table, call) {
+  NULL
+}
+
+#' @export
+db_col_types.DBIConnection <- function(con, table, call) {
+  NULL
+}
+# add a default method so that packages that haven't implemented `db_col_types()`
+# keep working, e.g. {Pool}
+#' @export
+db_col_types.default <- function(con, table, call) {
+  NULL
 }
 
 #' Options for generating SQL

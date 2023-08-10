@@ -2,17 +2,17 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_snowflake())
   expect_equal(test_translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(test_translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
-  expect_equal(test_translate_sql(grepl("exp", x)),        sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
+  expect_equal(test_translate_sql(grepl("exp", x)), sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
   expect_snapshot((expect_error(test_translate_sql(grepl("exp", x, ignore.case = TRUE)))))
 })
 
 test_that("pasting translated correctly", {
   local_con(simulate_snowflake())
 
-  expect_equal(test_translate_sql(paste(x, y)),  sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), ' ')"))
+  expect_equal(test_translate_sql(paste(x, y)), sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), ' ')"))
   expect_equal(test_translate_sql(paste0(x, y)), sql("ARRAY_TO_STRING(ARRAY_CONSTRUCT_COMPACT(`x`, `y`), '')"))
   expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
-  expect_equal(test_translate_sql(str_c(x, y, sep = '|')), sql("CONCAT_WS('|', `x`, `y`)"))
+  expect_equal(test_translate_sql(str_c(x, y, sep = "|")), sql("CONCAT_WS('|', `x`, `y`)"))
 
   expect_error(test_translate_sql(paste0(x, collapse = "")), "`collapse` not supported")
 
@@ -40,33 +40,33 @@ test_that("aggregates are translated correctly", {
   local_con(simulate_snowflake())
 
   expect_equal(test_translate_sql(cor(x, y), window = FALSE), sql("CORR(`x`, `y`)"))
-  expect_equal(test_translate_sql(cor(x, y), window = TRUE),  sql("CORR(`x`, `y`) OVER ()"))
+  expect_equal(test_translate_sql(cor(x, y), window = TRUE), sql("CORR(`x`, `y`) OVER ()"))
 
   expect_equal(test_translate_sql(cov(x, y), window = FALSE), sql("COVAR_SAMP(`x`, `y`)"))
-  expect_equal(test_translate_sql(cov(x, y), window = TRUE),  sql("COVAR_SAMP(`x`, `y`) OVER ()"))
+  expect_equal(test_translate_sql(cov(x, y), window = TRUE), sql("COVAR_SAMP(`x`, `y`) OVER ()"))
 
   expect_equal(test_translate_sql(all(x, na.rm = TRUE), window = FALSE), sql("BOOLAND_AGG(`x`)"))
-  expect_equal(test_translate_sql(all(x, na.rm = TRUE), window = TRUE),  sql("BOOLAND_AGG(`x`) OVER ()"))
+  expect_equal(test_translate_sql(all(x, na.rm = TRUE), window = TRUE), sql("BOOLAND_AGG(`x`) OVER ()"))
 
   expect_equal(test_translate_sql(any(x, na.rm = TRUE), window = FALSE), sql("BOOLOR_AGG(`x`)"))
-  expect_equal(test_translate_sql(any(x, na.rm = TRUE), window = TRUE),  sql("BOOLOR_AGG(`x`) OVER ()"))
+  expect_equal(test_translate_sql(any(x, na.rm = TRUE), window = TRUE), sql("BOOLOR_AGG(`x`) OVER ()"))
 
   expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql("STDDEV(`x`)"))
-  expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = TRUE),  sql("STDDEV(`x`) OVER ()"))
+  expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = TRUE), sql("STDDEV(`x`) OVER ()"))
 })
 
 test_that("snowflake mimics two argument log", {
   local_con(simulate_snowflake())
 
-  expect_equal(test_translate_sql(log(x)), sql('LN(`x`)'))
-  expect_equal(test_translate_sql(log(x, 10)), sql('LOG(10.0, `x`)'))
-  expect_equal(test_translate_sql(log(x, 10L)), sql('LOG(10, `x`)'))
+  expect_equal(test_translate_sql(log(x)), sql("LN(`x`)"))
+  expect_equal(test_translate_sql(log(x, 10)), sql("LOG(10.0, `x`)"))
+  expect_equal(test_translate_sql(log(x, 10L)), sql("LOG(10, `x`)"))
 })
 
 test_that("custom lubridate functions translated correctly", {
   local_con(simulate_snowflake())
 
-  expect_equal(test_translate_sql(day(x)),  sql("EXTRACT(DAY FROM `x`)"))
+  expect_equal(test_translate_sql(day(x)), sql("EXTRACT(DAY FROM `x`)"))
   expect_equal(test_translate_sql(mday(x)), sql("EXTRACT(DAY FROM `x`)"))
   expect_equal(test_translate_sql(yday(x)), sql("EXTRACT('dayofyear', `x`)"))
   expect_equal(test_translate_sql(wday(x)), sql("EXTRACT('dayofweek', DATE(`x`) + 0) + 1.0"))
@@ -88,11 +88,11 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_equal(test_translate_sql(seconds(x)), sql("INTERVAL '`x` second'"))
   expect_equal(test_translate_sql(minutes(x)), sql("INTERVAL '`x` minute'"))
-  expect_equal(test_translate_sql(hours(x)),   sql("INTERVAL '`x` hour'"))
-  expect_equal(test_translate_sql(days(x)),    sql("INTERVAL '`x` day'"))
-  expect_equal(test_translate_sql(weeks(x)),   sql("INTERVAL '`x` week'"))
-  expect_equal(test_translate_sql(months(x)),  sql("INTERVAL '`x` month'"))
-  expect_equal(test_translate_sql(years(x)),   sql("INTERVAL '`x` year'"))
+  expect_equal(test_translate_sql(hours(x)), sql("INTERVAL '`x` hour'"))
+  expect_equal(test_translate_sql(days(x)), sql("INTERVAL '`x` day'"))
+  expect_equal(test_translate_sql(weeks(x)), sql("INTERVAL '`x` week'"))
+  expect_equal(test_translate_sql(months(x)), sql("INTERVAL '`x` month'"))
+  expect_equal(test_translate_sql(years(x)), sql("INTERVAL '`x` year'"))
 
   # numeric arguments are correctly escaped in translation to SQL
   expect_equal(test_translate_sql(seconds(1)), sql("INTERVAL '1.0 second'"))
@@ -103,6 +103,47 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(months(1)),  sql("INTERVAL '1.0 month'"))
   expect_equal(test_translate_sql(years(1)),   sql("INTERVAL '1.0 year'"))
 
-  expect_equal(test_translate_sql(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
-  expect_equal(test_translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
+  expect_equal(test_translate_sql(floor_date(x, "month")), sql("DATE_TRUNC('month', `x`)"))
+  expect_equal(test_translate_sql(floor_date(x, "week")), sql("DATE_TRUNC('week', `x`)"))
+})
+
+test_that("min() and max()", {
+  local_con(simulate_snowflake())
+
+  expect_equal(test_translate_sql(min(x, na.rm = TRUE)), sql("MIN(`x`) OVER ()"))
+  expect_equal(test_translate_sql(max(x, na.rm = TRUE)), sql("MAX(`x`) OVER ()"))
+
+  # na.rm = FALSE is ignored
+  # https://docs.snowflake.com/en/sql-reference/functions/min
+  # https://docs.snowflake.com/en/sql-reference/functions/max
+  # NULL values are ignored unless all the records are NULL, in which case a NULL value is returned.
+  expect_equal(
+    test_translate_sql(min(x, na.rm = TRUE)),
+    sql("MIN(`x`) OVER ()")
+  )
+
+  expect_equal(
+    test_translate_sql(max(x, na.rm = TRUE)),
+    sql("MAX(`x`) OVER ()")
+  )
+})
+
+test_that("pmin() and pmax() respect na.rm", {
+  local_con(simulate_snowflake())
+
+  # Snowflake default for LEAST/GREATEST: If any of the argument values is NULL, the result is NULL.
+  # https://docs.snowflake.com/en/sql-reference/functions/least
+  # https://docs.snowflake.com/en/sql-reference/functions/greatest
+
+  # na.rm = TRUE: override default behavior for Snowflake (only supports pairs)
+  expect_equal(test_translate_sql(pmin(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` <= `y`, `x`, `y`), `x`, `y`)"))
+  expect_equal(test_translate_sql(pmax(x, y, na.rm = TRUE)), sql("COALESCE(IFF(`x` >= `y`, `x`, `y`), `x`, `y`)"))
+
+  expect_snapshot(test_translate_sql(pmin(x, y, z, na.rm = TRUE)))
+  expect_snapshot(test_translate_sql(pmax(x, y, z, na.rm = TRUE)))
+
+  # na.rm = FALSE: leverage default behavior for Snowflake
+  expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql("LEAST(`x`, `y`, `z`)"))
+  expect_equal(test_translate_sql(pmax(x, y, z, na.rm = FALSE)), sql("GREATEST(`x`, `y`, `z`)"))
+>>>>>>> origin/main
 })

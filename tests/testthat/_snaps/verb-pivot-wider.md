@@ -78,7 +78,7 @@
       (expect_error(tidyr::pivot_wider(df, id_cols = id, unused_fn = 1)))
     Output
       <error/rlang_error>
-      Error in `dbplyr_pivot_wider_spec()`:
+      Error in `tidyr::pivot_wider()`:
       ! `unused_fn` must be `NULL`, a function, or a named list of functions.
 
 # can fill in missing cells

@@ -186,11 +186,33 @@ sql_translation.Snowflake <- function(con) {
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
-        unit <- arg_match(unit,
-          c("second", "minute", "hour", "day", "week", "month", "quarter", "year",
-            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years")
+        unit <- arg_match(
+          unit,
+          c(
+            "second", "minute", "hour", "day", "week", "month", "quarter", "year",
+            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years"
+          )
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
+      },
+      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
+      # https://docs.snowflake.com/en/sql-reference/functions/least
+      # https://docs.snowflake.com/en/sql-reference/functions/greatest
+      pmin = function(..., na.rm = FALSE) {
+        dots <- list(...)
+        if (identical(na.rm, TRUE)) {
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
+        } else {
+          glue_sql2(sql_current_con(), "LEAST({.val dots*})")
+        }
+      },
+      pmax = function(..., na.rm = FALSE) {
+        dots <- list(...)
+        if (identical(na.rm, TRUE)) {
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
+        } else {
+          glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
+        }
       }
     ),
     sql_translator(
@@ -246,8 +268,9 @@ snowflake_grepl <- function(pattern,
   # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
   # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
   # behavior
-  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0('(', pattern, ')') || ".*"))
+  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0("(", pattern, ")") || ".*"))
 }
+
 snowflake_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
   sql_expr(round(((!!x)) %::% FLOAT, !!digits))
@@ -263,6 +286,18 @@ snowflake_paste <- function(default_sep) {
       sql_call2("ARRAY_CONSTRUCT_COMPACT", ...), sep
     )
   }
+}
+
+snowflake_pmin_pmax_sql_expression <- function(dots, comparison){
+  dot_combined <- dots[[1]]
+  for (i in 2:length(dots)){
+    dot_combined <- snowflake_pmin_pmax_builder(dots[i], dot_combined, comparison)
+  }
+  dot_combined
+}
+
+snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
+  glue_sql2(sql_current_con(), glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"))
 }
 
 snowflake_interval_sql <- function(x, interval_pd, con = sql_current_con()){
