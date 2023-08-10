@@ -145,5 +145,4 @@ test_that("pmin() and pmax() respect na.rm", {
   # na.rm = FALSE: leverage default behavior for Snowflake
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql("LEAST(`x`, `y`, `z`)"))
   expect_equal(test_translate_sql(pmax(x, y, z, na.rm = FALSE)), sql("GREATEST(`x`, `y`, `z`)"))
->>>>>>> origin/main
 })
