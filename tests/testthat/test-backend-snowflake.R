@@ -110,12 +110,12 @@ test_that("min() and max()", {
   # NULL values are ignored unless all the records are NULL, in which case a NULL value is returned.
   expect_equal(
     test_translate_sql(min(x, na.rm = TRUE)),
-    test_translate_sql(min(x, na.rm = FALSE))
+    sql("MIN(`x`) OVER ()")
   )
 
   expect_equal(
     test_translate_sql(max(x, na.rm = TRUE)),
-    test_translate_sql(max(x, na.rm = FALSE))
+    sql("MAX(`x`) OVER ()")
   )
 })
 

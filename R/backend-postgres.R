@@ -404,4 +404,17 @@ db_supports_table_alias_with_as.PostgreSQL <- function(con) {
   TRUE
 }
 
+#' @export
+db_col_types.PqConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
+  on.exit(DBI::dbClearResult(res))
+  DBI::dbFetch(res, n = 0)
+  col_info_df <- DBI::dbColumnInfo(res)
+  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
+}
+
+#' @export
+db_col_types.PostgreSQL <- db_col_types.PqConnection
+
 utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
