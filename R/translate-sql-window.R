@@ -148,7 +148,8 @@ win_rank <- function(f, empty_order = FALSE) {
     } else {
       order_over <- win_current_order()
       if (empty_order & is_empty(order_over)) {
-        # For certain backends (e.g., Snowflake), need to specify by dummy order
+        # For certain backends (e.g., Snowflake), need a subquery that returns
+        # a constant to work if no ordering is specified
         # https://stackoverflow.com/questions/44105691/row-number-without-order-by
         order_over <- sql("(SELECT NULL)")
       }
