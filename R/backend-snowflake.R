@@ -164,25 +164,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} second'")
+        snowflake_interval_sql(x, "second")
       },
       minutes = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} minute'")
+        snowflake_interval_sql(x, "minute")
       },
       hours = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} hour'")
+        snowflake_interval_sql(x, "hour")
       },
       days = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} day'")
+        snowflake_interval_sql(x, "day")
       },
       weeks = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} week'")
+        snowflake_interval_sql(x, "week")
       },
       months = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} month'")
+        snowflake_interval_sql(x, "month")
       },
       years = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} year'")
+        snowflake_interval_sql(x, "year")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
@@ -263,6 +263,10 @@ snowflake_paste <- function(default_sep) {
       sql_call2("ARRAY_CONSTRUCT_COMPACT", ...), sep
     )
   }
+}
+
+snowflake_interval_sql <- function(x, interval_pd, con = sql_current_con()){
+  glue_sql2(con, "INTERVAL '{escape(x, con = con)} {interval_pd}'")
 }
 
 utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))

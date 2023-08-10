@@ -94,6 +94,15 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(months(x)),  sql("INTERVAL '`x` month'"))
   expect_equal(test_translate_sql(years(x)),   sql("INTERVAL '`x` year'"))
 
+  # numeric arguments are correctly escaped in translation to SQL
+  expect_equal(test_translate_sql(seconds(1)), sql("INTERVAL '1.0 second'"))
+  expect_equal(test_translate_sql(minutes(1)), sql("INTERVAL '1.0 minute'"))
+  expect_equal(test_translate_sql(hours(1)),   sql("INTERVAL '1.0 hour'"))
+  expect_equal(test_translate_sql(days(1)),    sql("INTERVAL '1.0 day'"))
+  expect_equal(test_translate_sql(weeks(1)),   sql("INTERVAL '1.0 week'"))
+  expect_equal(test_translate_sql(months(1)),  sql("INTERVAL '1.0 month'"))
+  expect_equal(test_translate_sql(years(1)),   sql("INTERVAL '1.0 year'"))
+
   expect_equal(test_translate_sql(floor_date(x, 'month')), sql("DATE_TRUNC('month', `x`)"))
   expect_equal(test_translate_sql(floor_date(x, 'week')),  sql("DATE_TRUNC('week', `x`)"))
 })
