@@ -144,11 +144,8 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  glue_sql2(
-    con,
-    "EXPLAIN PLAN FOR {sql};\n",
-    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
-  )
+  DBI::dbExecute(con, glue_sql2(con, "EXPLAIN PLAN FOR {.sql sql};"))
+  glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());")
 }
 
 #' @export
