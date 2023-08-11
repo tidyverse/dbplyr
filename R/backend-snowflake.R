@@ -164,25 +164,25 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} second'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} second'")
       },
       minutes = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} minute'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} minute'")
       },
       hours = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} hour'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} hour'")
       },
       days = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} day'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} day'")
       },
       weeks = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} week'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} week'")
       },
       months = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} month'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} month'")
       },
       years = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} year'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
