@@ -209,7 +209,7 @@ enpar <- function(x, tidy = TRUE, env = NULL) {
     x_sql <- eval_bare(x, env = env)
   }
   if (quo_is_call(x)) {
-    glue_sql2(sql_current_con(), "({x_sql})")
+    glue_sql2(sql_current_con(), "({.val x_sql})")
   } else {
     x_sql
   }
