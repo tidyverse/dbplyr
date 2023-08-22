@@ -154,8 +154,8 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
       con = con,
       table = ident("df_x"),
       from = sql_render(df_y, con, lvl = 1),
-      by = c("a", "b"),
-      update_cols = c("c", "d"),
+      by = c("c", "d"),
+      update_cols = c("a", "b"),
       returning_cols = c("a", b2 = "b"),
       method = "on_conflict"
     )
@@ -263,7 +263,7 @@ test_that("can use `rows_*()` inside a transaction #1183", {
   expect_no_error(
     DBI::dbWithTransaction(
       con, {
-        dbplyr:::get_col_types(con, "df_x", rlang::current_env())
+        dbplyr:::db_col_types(con, "df_x", rlang::current_env())
         DBI::dbGetQuery(con, "SELECT * FROM df_x LIMIT 1")
       }
     )
@@ -278,7 +278,7 @@ test_that("casts `y` column for local df", {
   df <- tibble(id = 1L, val = 10L, arr = "{1,2}")
   types <- c(id = "bigint", val = "bigint", arr = "integer[]")
   local_db_table(con, value = df, types = types, temporary = FALSE, "df_x")
-  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x")
+  table2 <- DBI::Id(schema = "dbplyr_test_schema", table = "df_x2")
   local_db_table(con, value = df, types = types, temporary = FALSE, table2)
 
   y <- tibble(
@@ -310,11 +310,19 @@ test_that("casts `y` column for local df", {
     in_place = TRUE
   )
 
+  # also works with schema
+  rows_append(
+    tbl(con, table2),
+    y,
+    copy = TRUE,
+    in_place = TRUE
+  )
+
   expect_equal(tbl(con, "df_x") %>% collect(), out)
 
   types_expected <- c(id = "int8", val = "int8", arr = "_int4")
-  expect_equal(get_col_types(con, table2), types_expected)
-  expect_equal(get_col_types(con, in_schema("public", "df_x")), types_expected)
+  expect_equal(db_col_types(con, table2), types_expected)
+  expect_equal(db_col_types(con, in_schema("public", "df_x")), types_expected)
 })
 
 test_that("can upsert with returning", {

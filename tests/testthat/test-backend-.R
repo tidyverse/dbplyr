@@ -68,8 +68,13 @@ test_that("can translate subsetting", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(a$b), sql("`a`.`b`"))
   expect_equal(test_translate_sql(a[["b"]]), sql("`a`.`b`"))
+  expect_equal(test_translate_sql(f(a)[["b"]]), sql("f(`a`).`b`"))
 
   expect_equal(test_translate_sql(a[["b"]][[1]]), sql('`a`.`b`[1]'))
+  expect_snapshot(error = TRUE, {
+    test_translate_sql(a[[x]])
+    test_translate_sql(a[[TRUE]])
+  })
 })
 
 

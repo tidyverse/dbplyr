@@ -344,6 +344,7 @@ sql_query_upsert.PqConnection <- function(con,
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
+  select_cols <- ident(insert_cols)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
@@ -355,7 +356,7 @@ sql_query_upsert.PqConnection <- function(con,
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(con, select_cols),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
@@ -403,5 +404,18 @@ db_supports_table_alias_with_as.PqConnection <- function(con) {
 db_supports_table_alias_with_as.PostgreSQL <- function(con) {
   TRUE
 }
+
+#' @export
+db_col_types.PqConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
+  on.exit(DBI::dbClearResult(res))
+  DBI::dbFetch(res, n = 0)
+  col_info_df <- DBI::dbColumnInfo(res)
+  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
+}
+
+#' @export
+db_col_types.PostgreSQL <- db_col_types.PqConnection
 
 utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
