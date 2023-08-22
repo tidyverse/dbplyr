@@ -32,7 +32,7 @@ install.packages("tidyverse")
 # Alternatively, install just dbplyr:
 install.packages("dbplyr")
 
-# Or the the development version from GitHub:
+# Or the development version from GitHub:
 # install.packages("devtools")
 devtools::install_github("tidyverse/dbplyr")
 ```

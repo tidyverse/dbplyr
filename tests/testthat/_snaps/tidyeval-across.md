@@ -174,7 +174,7 @@
       SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
       FROM `df`
 
-# if_all/any uses every colum as default
+# if_all/any uses every column as default
 
     Code
       lf %>% filter(if_all(.fns = ~ . > 0))

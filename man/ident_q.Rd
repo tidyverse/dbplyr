@@ -2,7 +2,7 @@
 % Please edit documentation in R/schema.R
 \name{ident_q}
 \alias{ident_q}
-\title{Declare a identifer as being pre-quoted.}
+\title{Declare a identifier as being pre-quoted.}
 \usage{
 ident_q(...)
 }

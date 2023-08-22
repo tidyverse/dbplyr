@@ -79,7 +79,7 @@
         FROM `df`
       ) AS `q01`
 
-# across() uses original column rather than overriden one
+# across() uses original column rather than overridden one
 
     Code
       lf %>% mutate(x = -x, across(everything(), ~ .x / x), y = y + x)

@@ -1,4 +1,4 @@
-test_that("base_no_win inclues all aggregates and window funcitons", {
+test_that("base_no_win includes all aggregates and window functions", {
   # All aggregates must be included in window functions
   expect_equal(setdiff(names(base_agg), names(base_win)), character())
 

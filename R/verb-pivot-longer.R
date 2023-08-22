@@ -21,7 +21,7 @@
 #'
 #' 1. split the specification by its key columns i.e. by variables crammed
 #' into the column names.
-#' 2. for each part in the splitted specification `transmute()` `data` into the
+#' 2. for each part in the split specification `transmute()` `data` into the
 #' following columns
 #'   * id columns i.e. columns that are not pivotted
 #'   * key columns

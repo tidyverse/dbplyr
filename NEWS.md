@@ -246,7 +246,7 @@
 
 * Removed dependency on assertthat (@mgirlich, #1112).
 
-* `across()` now uses the original value when a column is overriden to match
+* `across()` now uses the original value when a column is overridden to match
   the behaviour of dplyr. For example `mutate(df, across(c(x, y), ~ .x / x))`
   now produces
   
@@ -1512,7 +1512,7 @@ generating reprexes.
 * `copy_to()` now succeeds for MySQL if a character column contains `NA` 
    (#1975, #2256, #2263, #2381, @demorenoc, @eduardgrebe).
 
-* `copy_to()` now returns it's output invisibly (since you're often just
+* `copy_to()` now returns its output invisibly (since you're often just
    calling for the side-effect).
 
 * `distinct()` reports improved variable information for SQL backends. This
