@@ -40,6 +40,8 @@ win_current_frame()
 \arguments{
 \item{expr}{The window expression}
 
+\item{partition}{Variables to partition over}
+
 \item{order}{Variables to order by}
 
 \item{frame}{A numeric vector of length two defining the frame.}
@@ -47,8 +49,6 @@ win_current_frame()
 \item{f}{The name of an sql function as a string}
 
 \item{empty_order}{A logical value indicating whether to order by NULL if \code{order} is not specified}
-
-\item{parition}{Variables to partition over}
 }
 \description{
 \code{win_over()} makes it easy to generate the window function specification.

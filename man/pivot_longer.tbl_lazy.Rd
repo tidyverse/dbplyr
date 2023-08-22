@@ -80,7 +80,7 @@ The SQL translation basically works as follows:
 \enumerate{
 \item split the specification by its key columns i.e. by variables crammed
 into the column names.
-\item for each part in the splitted specification \code{transmute()} \code{data} into the
+\item for each part in the split specification \code{transmute()} \code{data} into the
 following columns
 }
 \itemize{
