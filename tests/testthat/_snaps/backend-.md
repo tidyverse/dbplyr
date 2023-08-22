@@ -1,3 +1,16 @@
+# can translate subsetting
+
+    Code
+      test_translate_sql(a[[x]])
+    Condition
+      Error in `a[[x]]`:
+      ! Can only index with strings and numbers
+    Code
+      test_translate_sql(a[[TRUE]])
+    Condition
+      Error in `a[[TRUE]]`:
+      ! Can only index with strings and numbers
+
 # can translate case insensitive like
 
     Code

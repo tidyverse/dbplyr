@@ -344,6 +344,7 @@ sql_query_upsert.PqConnection <- function(con,
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
+  select_cols <- ident(insert_cols)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
@@ -355,7 +356,7 @@ sql_query_upsert.PqConnection <- function(con,
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(con, select_cols),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
