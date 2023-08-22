@@ -127,6 +127,8 @@ rows <- function(from = -Inf, to = 0) {
 #' @export
 win_rank <- function(f, empty_order = FALSE) {
   force(f)
+  check_bool(empty_order)
+
   function(order = NULL) {
     group <- win_current_group()
     order <- unwrap_order_expr({{ order }}, f = f)
