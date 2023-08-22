@@ -4,7 +4,10 @@
       df_lazy_ns %>% window_order(id) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
-      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
+      SELECT
+        `id`,
+        `group`,
+        MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
       FROM (
         SELECT
           `df`.*,
@@ -66,7 +69,10 @@
       df_lazy_ns %>% window_order(desc(id)) %>% tidyr::fill(n1, .direction = "up")
     Output
       <SQL>
-      SELECT `id`, `group`, MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
+      SELECT
+        `id`,
+        `group`,
+        MAX(`n1`) OVER (PARTITION BY `..dbplyr_partition_1`) AS `n1`
       FROM (
         SELECT
           `df`.*,
