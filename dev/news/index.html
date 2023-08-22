@@ -120,17 +120,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
-<ul><li>
-<p>Teradata:</p>
-<ul><li>
-<code>as.Date(x)</code> is now translate to <code>CAST(x AS DATE)</code> again unless <code>x</code> is a string (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1285" class="external-link">#1285</a>).</li>
-</ul></li>
-<li>
-<p>Snowflake:</p>
-<ul><li>
-<code>na.rm = TRUE</code> is now respected in <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax()</a></code> instead of being silently ignored (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1329" class="external-link">#1329</a>)</li>
-</ul></li>
-<li><p>The <code>overwrite</code> argument of <code><a href="../reference/db-io.html">db_copy_to()</a></code> now actually works.</p></li>
+<ul><li><p>The <code>overwrite</code> argument of <code><a href="../reference/db-io.html">db_copy_to()</a></code> now actually works.</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_save_query()</a></code> gain the <code>overwrite</code> argument.</p></li>
 <li><p>The dots in <code><a href="../reference/db-io.html">db_copy_to()</a></code> are now passed to <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1237" class="external-link">#1237</a>).</p></li>
 <li><p>Added translation for <code>str_detect()</code>, <code>str_starts()</code> and <code>str_ends()</code> with fixed patterns (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1009" class="external-link">#1009</a>).</p></li>
@@ -168,6 +158,10 @@
 <code><a href="../reference/copy_inline.html">copy_inline()</a></code> now works (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1188" class="external-link">#1188</a>).</li>
 <li>Fix translation of <code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric()</a></code>, <code><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct()</a></code>, <code>as_datetime()</code>, and <code>as.integer64()</code> (<a href="https://github.com/avsdev-cw" class="external-link">@avsdev-cw</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1189" class="external-link">#1189</a>).</li>
 </ul></li>
+<li>MS SQL:
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> now works when no order is specified (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1332" class="external-link">#1332</a>)</li>
+</ul></li>
 <li>Oracle:
 <ul><li>Fix translation of <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/TBlackmore" class="external-link">@TBlackmore</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1286" class="external-link">#1286</a>)</li>
 <li>
@@ -187,11 +181,19 @@
 <code><a href="https://rdrr.io/r/base/any.html" class="external-link">any()</a></code> and <code><a href="https://rdrr.io/r/base/all.html" class="external-link">all()</a></code> now work (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1273" class="external-link">#1273</a>).</li>
 <li>Fixed negation of bit (boolean) fields (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1239" class="external-link">#1239</a>)</li>
 </ul></li>
+<li>Snowflake:
+<ul><li>
+<code>na.rm = TRUE</code> is now respected in <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax()</a></code> instead of being silently ignored (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1329" class="external-link">#1329</a>)</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> now works when no order is specified (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1332" class="external-link">#1332</a>)</li>
+</ul></li>
 <li>Teradata
 <ul><li>
 <code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> + <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code> now work (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/685" class="external-link">#685</a>).</li>
 <li>
 <code>as.Date(x)</code> is now translate to <code>CAST(x AS DATE)</code> again unless <code>x</code> is a string (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1285" class="external-link">#1285</a>).</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> no longer defaults to partitioning by groups (now aligned with other databases when no order is specified: <code>ROW_NUMBER()</code> defaults to <code>ORDER BY (SELECT NULL)</code>) (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1331" class="external-link">#1331</a>)</li>
 </ul></li>
 </ul></div>
 </div>
