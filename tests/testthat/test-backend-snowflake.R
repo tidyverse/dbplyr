@@ -137,3 +137,10 @@ test_that("pmin() and pmax() respect na.rm", {
   expect_equal(test_translate_sql(pmin(x, y, z, na.rm = FALSE)), sql("LEAST(`x`, `y`, `z`)"))
   expect_equal(test_translate_sql(pmax(x, y, z, na.rm = FALSE)), sql("GREATEST(`x`, `y`, `z`)"))
 })
+
+test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_snowflake())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})

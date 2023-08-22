@@ -11,6 +11,7 @@
 #' @param order Variables to order by
 #' @param frame A numeric vector of length two defining the frame.
 #' @param f The name of an sql function as a string
+#' @param empty_order A logical value indicating whether to order by NULL if `order` is not specified
 #' @export
 #' @keywords internal
 #' @examples
@@ -122,11 +123,12 @@ rows <- function(from = -Inf, to = 0) {
   }
 }
 
-
 #' @rdname win_over
 #' @export
-win_rank <- function(f) {
+win_rank <- function(f, empty_order = FALSE) {
   force(f)
+  check_bool(empty_order)
+
   function(order = NULL) {
     group <- win_current_group()
     order <- unwrap_order_expr({{ order }}, f = f)
@@ -147,6 +149,12 @@ win_rank <- function(f) {
       no_na_expr <- purrr::reduce(not_is_na_exprs, ~ call2("&", .x, .y))
     } else {
       order_over <- win_current_order()
+      if (empty_order & is_empty(order_over)) {
+        # For certain backends (e.g., Snowflake), need a subquery that returns
+        # a constant to work if no ordering is specified
+        # https://stackoverflow.com/questions/44105691/row-number-without-order-by
+        order_over <- sql("(SELECT NULL)")
+      }
     }
 
     rank_sql <- win_over(

@@ -153,6 +153,14 @@ test_that("win_rank(c()) gives an informative error", {
   })
 })
 
+test_that("row_number() with and without group_by() and arrange()", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_dbi())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})
+
 test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")
