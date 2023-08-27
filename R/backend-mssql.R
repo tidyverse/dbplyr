@@ -350,6 +350,16 @@ simulate_mssql <- function(version = "15.0") {
           sql_expr(DATEPART(QUARTER, !!x))
         }
       },
+
+      # clock ---------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        rlang::check_dots_empty(...)
+        sql_expr(DATEADD(DAY, !!n, !!x))
+      },
+      add_years = function(x, n, ...) {
+        rlang::check_dots_empty(...)
+        sql_expr(DATEADD(YEAR, !!n, !!x))
+      }
     )
 
   if (mssql_version(con) >= "11.0") { # MSSQL 2012

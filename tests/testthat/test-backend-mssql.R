@@ -124,6 +124,19 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(test_translate_sql(quarter(x, fiscal_start = 5)))
 })
 
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_mssql())
+  expect_equal(test_translate_sql(add_years(x, 1L)), sql("DATEADD(YEAR, 1, `x`)"))
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1L)), sql("DATEADD(DAY, 1, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+
+  expect_equal(test_translate_sql(clock::add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(clock::add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+
+  expect_error(test_translate_sql(add_days(x, 1, "dots must be empty")))
+})
+
 test_that("last_value_sql() translated correctly", {
   con <- simulate_mssql()
   expect_equal(
