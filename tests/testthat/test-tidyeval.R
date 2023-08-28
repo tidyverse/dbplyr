@@ -44,6 +44,7 @@ test_that("namespaced calls to dplyr functions are stripped", {
   # hack to avoid check complaining about not declared imports
   expect_equal(partial_eval(rlang::parse_expr("stringr::str_to_lower(x)"), lf), expr(str_to_lower(x)))
   expect_equal(partial_eval(rlang::parse_expr("lubridate::today()"), lf), expr(today()))
+  expect_equal(partial_eval(rlang::parse_expr("clock::add_years(x, 1)"), lf), expr(add_years(x, 1)))
 })
 
 test_that("use quosure environment for unevaluted formulas", {
