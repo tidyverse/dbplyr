@@ -454,7 +454,7 @@ translate_window_where_all <- function(x, window_funs = common_window_funs()) {
 }
 
 window_where <- function(expr, comp) {
-  stopifnot(is.call(expr) || is.name(expr) || is.atomic(expr))
+  stopifnot(is.call(expr) || is.name(expr) || is.atomic(expr) || is.null(expr))
   check_list(comp)
 
   list(
