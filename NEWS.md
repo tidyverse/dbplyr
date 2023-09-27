@@ -168,6 +168,10 @@
     string (@mgirlich, #1285).
   * `row_number()` no longer defaults to partitioning by groups (now aligned with other databases when no order is specified: `ROW_NUMBER()` defaults to `ORDER BY (SELECT NULL)`) (@fh-mthomson, #1331)
 
+# dbplyr 2.3.4
+
+* Hot patch release to resolve R CMD check failures.
+
 # dbplyr 2.3.3
 
 * Hot patch to fix R CMD check issues
