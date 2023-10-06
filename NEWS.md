@@ -134,7 +134,8 @@
   * `rows_*()` use the column types of `x` when auto copying `y` (@mgirlich, #1327).
   * `copy_inline()` now works (@mgirlich, #1188).
   * Fix translation of `as.numeric()`, `as.POSIXct()`, `as_datetime()`, and
-    `as.integer64()` (@avsdev-cw, #1189).
+    `as.integer64()` (@avsdev-cw, #1189), and `as.integer()` for MySQL (@krlmlr, #1375).
+  * New `simulate_mariadb()` (@krlmlr, #1375).
 
 * MS SQL:
   * `row_number()` now works when no order is specified (@ejneer, @fh-mthomson, #1332)
