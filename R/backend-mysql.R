@@ -24,7 +24,11 @@ NULL
 
 #' @export
 #' @rdname backend-mysql
-simulate_mysql <- function() simulate_dbi("MariaDBConnection")
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
+
+#' @export
+#' @rdname backend-mysql
+simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 dbplyr_edition.MariaDBConnection <- function(con) {
