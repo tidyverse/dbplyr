@@ -204,6 +204,40 @@ db_write_table.DBIConnection <- function(con,
   table
 }
 
+#' @export
+db_write_table.MySQLConnection <- function(con,
+                                         table,
+                                         types,
+                                         values,
+                                         temporary = TRUE,
+                                         ...,
+                                         overwrite = FALSE) {
+  table <- as_table_ident(table)
+  check_character(types, allow_null = TRUE)
+  check_named(types)
+  check_bool(temporary)
+  check_bool(overwrite)
+
+  name <- vctrs::field(table, "table")
+  tryCatch(
+    dbWriteTable(
+      con,
+      name = name, #table_ident_to_id(table),
+      value = values,
+      field.types = types,
+      temporary = temporary,
+      overwrite = overwrite,
+      ...,
+      row.names = FALSE
+    ),
+    error = function(cnd) {
+      msg <- "Can't write table table {.field {format(table, con = con)}}."
+      cli_abort(msg, parent = cnd)
+    }
+  )
+  table
+}
+
 # Utility functions ------------------------------------------------------------
 
 create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
