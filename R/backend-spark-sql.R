@@ -46,6 +46,15 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
       var = win_aggregate("VARIANCE"),
       quantile = sql_quantile("PERCENTILE", window = TRUE),
       median = win_aggregate("MEDIAN"),
+      first = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(x, 1L, order_by = order_by, na_rm = na_rm, ignore_nulls = "bool")
+      },
+      last = function(x, order_by = NULL, na_rm = FALSE) {
+        sql_nth(x, Inf, order_by = order_by, na_rm = na_rm, ignore_nulls = "bool")
+      },
+      nth = function(x, n, order_by = NULL, na_rm = FALSE) {
+        sql_nth(x, n, order_by = order_by, na_rm = na_rm, ignore_nulls = "bool")
+      },
     )
   )
 }
@@ -101,11 +110,11 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
   table <- as_table_ident(table)
   sql <- glue_sql2(
     con,
-    "CREATE ", if (overwrite) "OR REPLACE",
+    "CREATE ", if (overwrite) "OR REPLACE ",
     "TEMPORARY VIEW {.tbl {table}} AS \n",
     "{.from {sql}}"
   )
-  DBI::dbExecute(con)
+  DBI::dbExecute(con, sql)
 
   table
 }
