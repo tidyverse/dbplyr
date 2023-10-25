@@ -15,6 +15,8 @@
     (@mgirlich, #1211).
 
   * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
+
+* Preliminary databricks Sqark SQL backend (#1377).
   
 * `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
   be lazy. Note that this will be removed soon after `pivot_wider_spec()`
