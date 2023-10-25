@@ -85,6 +85,9 @@
     <loc>https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.html</loc>
   </url>
   <url>
