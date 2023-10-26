@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -72,16 +73,148 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.4.0" id="dbplyr-240">dbplyr 2.4.0<a class="anchor" aria-label="anchor" href="#dbplyr-240"></a></h2><p class="text-muted">CRAN release: 2023-10-26</p>
+<div class="section level3">
+<h3 id="breaking-changes-2-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-4-0"></a></h3>
+<ul><li><p>Using <code>compute(temporary = FALSE)</code> without providing a name is now deprecated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1154" class="external-link">#1154</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">ntile()</a></code>’s first argument has been renamed from <code>order_by</code> to <code>x</code> to match the interface of <code><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">dplyr::ntile()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1242" class="external-link">#1242</a>).</p></li>
+<li><p><code>simulate_vars()</code> and <code>simulate_vars_is_typed()</code> were removed as they weren’t used and tidyselect now offers <code>tidyselect_data_proxy()</code> and <code>tidyselect_data_has_predicates()</code> (<a href="https://github.com/mgirllich" class="external-link">@mgirllich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1199" class="external-link">#1199</a>).</p></li>
+<li><p><code><a href="../reference/sql_variant.html">sql_not_supported()</a></code> now expects a function name without parentheses.</p></li>
+<li>
+<p><code><a href="../reference/sql_query_insert.html">sql_query_append()</a></code>, <code><a href="../reference/sql_query_insert.html">sql_query_insert()</a></code>, <code>sql_query_update()</code>, <code><a href="../reference/sql_query_insert.html">sql_query_upsert()</a></code>, and <code><a href="../reference/sql_query_insert.html">sql_query_delete()</a></code> changed their arguments to make them more consistent to the other <code>sql_query_*()</code> functions:</p>
+<ul><li>
+<code>x_name</code> was renamed to <code>table</code>.</li>
+<li>
+<code>y</code> was renamed to <code>from</code> and must now be a table identifier or SQL instead of a lazy table.</li>
+<li>
+<code><a href="../reference/sql_query_insert.html">sql_query_append()</a></code> and <code><a href="../reference/sql_query_insert.html">sql_query_insert()</a></code> have gained the argument <code>cols</code>.</li>
+</ul></li>
+<li><p><code><a href="../reference/remote_name.html">remote_name()</a></code> now returns a string with the name of the table. To get the qualified identifier use the newly added <code><a href="../reference/remote_name.html">remote_table()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1280" class="external-link">#1280</a>).</p></li>
+<li><p><code><a href="../reference/tbl_lazy.html">tbl_lazy()</a></code> loses <code>src</code> argument after it has been deprecated for years (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1208" class="external-link">#1208</a>).</p></li>
+<li><p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> now requires the <code>con</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1311" class="external-link">#1311</a>). The <code>vars</code> argument has been removed after it threw an error for the last 7 years (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="improved-sql-2-4-0">Improved SQL<a class="anchor" aria-label="anchor" href="#improved-sql-2-4-0"></a></h3>
+<ul><li><p>Preliminary databricks Spark SQL backend (<a href="https://github.com/tidyverse/dbplyr/issues/1377" class="external-link">#1377</a>).</p></li>
+<li>
+<p>Joins</p>
+<ul><li><p><code>*_join()</code> after <code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join()</a></code> works again (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1178" class="external-link">#1178</a>).</p></li>
+<li><p><code>*_join()</code> now allows specifying the relationship argument. It must be <code>NULL</code> or <code>"many-to-many"</code> (<a href="https://github.com/bairdj" class="external-link">@bairdj</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1305" class="external-link">#1305</a>).</p></li>
+<li><p>Queries now qualify <code>*</code> with the table alias for better compatibility (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1003" class="external-link">#1003</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join()</a></code> can now handle column names that only differ in case (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1255" class="external-link">#1255</a>).</p></li>
+<li><p>The <code>na_matches</code> argument of <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">anti_join()</a></code> works again (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1211" class="external-link">#1211</a>).</p></li>
+<li><p>A <code>semi/anti_join()</code> on fitlered <code>y</code> is inlined when possible (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/884" class="external-link">#884</a>).</p></li>
+<li><p>Joins now work again for Pool and Oracle connections (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1177" class="external-link">#1177</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1181" class="external-link">#1181</a>).</p></li>
+</ul></li>
+<li><p>A sequence of <code><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">union()</a></code> resp. <code><a href="https://dplyr.tidyverse.org/reference/setops.html" class="external-link">union_all()</a></code> now produces a flat query instead of subqueries (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1269" class="external-link">#1269</a>).</p></li>
+<li>
+<p>Added translations for:</p>
+<ul><li>
+<code><a href="https://rdrr.io/r/base/nchar.html" class="external-link">nzchar()</a></code> (<a href="https://github.com/MichaelChirico" class="external-link">@MichaelChirico</a>, <a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1094" class="external-link">#1094</a>).</li>
+<li>
+<code>str_detect()</code>, <code>str_starts()</code> and <code>str_ends()</code> with fixed patterns (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1009" class="external-link">#1009</a>).</li>
+<li>
+<code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1200" class="external-link">#1200</a>).</li>
+</ul></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">if_any()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">if_all()</a></code> translations are now wrapped in parentheses. This makes sure it can be combined via <code>&amp;</code> with other conditions (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1153" class="external-link">#1153</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">nth()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">last()</a></code> now support the <code>na_rm</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1193" class="external-link">#1193</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-2-4-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-4-0"></a></h3>
+<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now supports namespaced functions, e.g.  <code>across(x, dplyr::dense_rank)</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1231" class="external-link">#1231</a>).</p></li>
+<li><p><code>db_copy_to(overwrite = TRUE)</code> now actually works.</p></li>
+<li><p><code><a href="../reference/db-io.html">db_copy_to()</a></code>’s <code>...</code> are now passed to <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1237" class="external-link">#1237</a>).</p></li>
+<li><p>Added <code><a href="../reference/db-sql.html">db_supports_table_alias_with_as()</a></code> to customise whether a backend supports specifying a table alias with <code>AS</code> or not (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_save_query()</a></code> gain the <code>overwrite</code> argument.</p></li>
+<li><p><code><a href="../reference/pivot_wider.tbl_lazy.html">dbplyr_pivot_wider_spec()</a></code> is now exported. Unlike <code>pivot_wider()</code> this can be lazy. Note that this will be removed soon after <code>pivot_wider_spec()</code> becomes a generic (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>ing with window functions now generates columns called <code>col01</code> rather than <code>q01</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1258" class="external-link">#1258</a>).</p></li>
+<li><p><code>pivot_wider()</code> now matches tidyr <code>NA</code> column handling (<a href="https://github.com/ejneer" class="external-link">@ejneer</a> <a href="https://github.com/tidyverse/dbplyr/issues/1238" class="external-link">#1238</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> can once again be used after <code>arrange(desc(x))</code> (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1240" class="external-link">#1240</a>).</p></li>
+<li>
+<p><code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code> and <code><a href="../reference/remote_name.html">remote_query()</a></code> gain the argument <code>sql_options</code> that allows to control how the SQL is generated. It can be created via <code><a href="../reference/sql_options.html">sql_options()</a></code> which has the following arguments:</p>
+<ul><li>
+<code>cte</code>: use common table expressions?</li>
+<li>
+<code>use_star</code>: use <code>SELECT *</code> or explicitly select every column?</li>
+<li>
+<code>qualify_all_columns</code>: qualify all columns in a join or only the ambiguous ones? (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1146" class="external-link">#1146</a>).</li>
+</ul><p>Consequently the <code>cte</code> argument of <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code> and <code><a href="../reference/remote_name.html">remote_query()</a></code> has been deprecated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1146" class="external-link">#1146</a>).</p>
+</li>
+<li><p><code>slice_min/max()</code> can now order by multiple variables like dplyr, e.g. use <code>slice_min(lf, tibble(x, y))</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1167" class="external-link">#1167</a>).</p></li>
+<li><p><code>slice_*()</code> now supports the data masking pronouns <code>.env</code> and <code>.data</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1294" class="external-link">#1294</a>).</p></li>
+<li><p><code><a href="../reference/db-misc.html">sql_join_suffix()</a></code> gains the argument <code>suffix</code> so that methods can check whether the suffix is valid for the backend (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
+<li><p><code><a href="../reference/db-sql.html">sql_random()</a></code> is now deprecated. It was used to power <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code> which is now done via the translation for <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1200" class="external-link">#1200</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl()</a></code> now informs when the user probably forgot to wrap the table identifier with <code><a href="../reference/in_schema.html">in_schema()</a></code> or <code><a href="../reference/sql.html">sql()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1287" class="external-link">#1287</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="backend-specific-improvements-2-4-0">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-2-4-0"></a></h3>
+<ul><li>Access
+<ul><li>Added translation for <code>!=</code> to <code>&lt;&gt;</code> (<a href="https://github.com/erikvona" class="external-link">@erikvona</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1219" class="external-link">#1219</a>).</li>
+</ul></li>
+<li>DuckDB
+<ul><li>now supports the <code>returning</code> argument of <code>rows_*()</code>.</li>
+</ul></li>
+<li>MySQL/MariaDB:
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update()</a></code> and <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_patch()</a></code> now give an informative error when the unsupported <code>returning</code> argument is used (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1279" class="external-link">#1279</a>).</li>
+<li>
+<code>rows_*()</code> use the column types of <code>x</code> when auto copying <code>y</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1327" class="external-link">#1327</a>).</li>
+<li>
+<code><a href="../reference/copy_inline.html">copy_inline()</a></code> now works (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1188" class="external-link">#1188</a>).</li>
+<li>Fix translation of <code><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric()</a></code>, <code><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct()</a></code>, <code>as_datetime()</code>, and <code>as.integer64()</code> (<a href="https://github.com/avsdev-cw" class="external-link">@avsdev-cw</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1189" class="external-link">#1189</a>).</li>
+</ul></li>
+<li>MS SQL:
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> now works when no order is specified (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1332" class="external-link">#1332</a>)</li>
+</ul></li>
+<li>Oracle:
+<ul><li>Fix translation of <code><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_upsert()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/TBlackmore" class="external-link">@TBlackmore</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1286" class="external-link">#1286</a>)</li>
+<li>
+<code>head(n)</code> is now translated to <code>WHERE ROWNUM &lt;= n</code> to also support old versions &lt;= 11.2 (<a href="https://github.com/JeremyPasco" class="external-link">@JeremyPasco</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1292" class="external-link">#1292</a>).</li>
+</ul></li>
+<li>Postgres
+<ul><li>The <code>rows_*()</code> functions now also work inside a transaction (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1183" class="external-link">#1183</a>).</li>
+</ul></li>
+<li>SQLite
+<ul><li>Subqueries now also get an alias. This makes it consistent with other backends and simplifies the implementation.</li>
+</ul></li>
+<li>SQL Server
+<ul><li>
+<code>distinct(.keep_all = TRUE)</code> now works (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1053" class="external-link">#1053</a>).</li>
+<li>The translation of <code><a href="https://dplyr.tidyverse.org/reference/between.html" class="external-link">between()</a></code> now also works when used in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1241" class="external-link">#1241</a>).</li>
+<li>
+<code><a href="https://rdrr.io/r/base/any.html" class="external-link">any()</a></code> and <code><a href="https://rdrr.io/r/base/all.html" class="external-link">all()</a></code> now work (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1273" class="external-link">#1273</a>).</li>
+<li>Fixed negation of bit (boolean) fields (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1239" class="external-link">#1239</a>)</li>
+</ul></li>
+<li>Snowflake:
+<ul><li>
+<code>na.rm = TRUE</code> is now respected in <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmin()</a></code> and <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax()</a></code> instead of being silently ignored (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1329" class="external-link">#1329</a>)</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> now works when no order is specified (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1332" class="external-link">#1332</a>)</li>
+</ul></li>
+<li>Teradata
+<ul><li>
+<code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> + <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code> now work (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/685" class="external-link">#685</a>).</li>
+<li>
+<code>as.Date(x)</code> is now translate to <code>CAST(x AS DATE)</code> again unless <code>x</code> is a string (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1285" class="external-link">#1285</a>).</li>
+<li>
+<code><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number()</a></code> no longer defaults to partitioning by groups (now aligned with other databases when no order is specified: <code>ROW_NUMBER()</code> defaults to <code>ORDER BY (SELECT NULL)</code>) (<a href="https://github.com/fh-mthomson" class="external-link">@fh-mthomson</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1331" class="external-link">#1331</a>)</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.4" id="dbplyr-234">dbplyr 2.3.4<a class="anchor" aria-label="anchor" href="#dbplyr-234"></a></h2><p class="text-muted">CRAN release: 2023-09-26</p>
 <ul><li>Hot patch release to resolve R CMD check failures.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.3" id="dbplyr-233">dbplyr 2.3.3<a class="anchor" aria-label="anchor" href="#dbplyr-233"></a></h2><p class="text-muted">CRAN release: 2023-07-07</p>
-<ul><li>Hot patch release to resolve R CMD check failures.</li>
+<ul><li>Hot patch to fix R CMD check issues</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.2" id="dbplyr-232">dbplyr 2.3.2<a class="anchor" aria-label="anchor" href="#dbplyr-232"></a></h2><p class="text-muted">CRAN release: 2023-03-21</p>
-<ul><li>Hot patch release to resolve R CMD check failures.</li>
+<ul><li>Hot patch to fix R CMD check issues</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.3.1" id="dbplyr-231">dbplyr 2.3.1<a class="anchor" aria-label="anchor" href="#dbplyr-231"></a></h2><p class="text-muted">CRAN release: 2023-02-24</p>
@@ -120,7 +253,7 @@
 <li><p>Moved argument <code>auto_index</code> after <code>...</code> in <code>*_join()</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1115" class="external-link">#1115</a>).</p></li>
 <li><p>Removed dependency on assertthat (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1112" class="external-link">#1112</a>).</p></li>
 <li>
-<p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now uses the original value when a column is overriden to match the behaviour of dplyr. For example <code>mutate(df, across(c(x, y), ~ .x / x))</code> now produces</p>
+<p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now uses the original value when a column is overridden to match the behaviour of dplyr. For example <code>mutate(df, across(c(x, y), ~ .x / x))</code> now produces</p>
 <pre><code>SELECT `x` / `x` AS `x`, `y` / `x` AS `y`
 FROM `df`</code></pre>
 <p>instead of</p>
@@ -842,7 +975,7 @@ FROM (
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/common_by.html" class="external-link">common_by()</a></code> gets a better error message for unexpected inputs (<a href="https://github.com/tidyverse/dbplyr/issues/2091" class="external-link">#2091</a>)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> no longer checks that the table doesn’t exist before creation, instead preferring to fall back on the database for error messages. This should reduce both false positives and false negative (<a href="https://github.com/tidyverse/dbplyr/issues/1470" class="external-link">#1470</a>)</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> now succeeds for MySQL if a character column contains <code>NA</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1975" class="external-link">#1975</a>, <a href="https://github.com/tidyverse/dbplyr/issues/2256" class="external-link">#2256</a>, <a href="https://github.com/tidyverse/dbplyr/issues/2263" class="external-link">#2263</a>, <a href="https://github.com/tidyverse/dbplyr/issues/2381" class="external-link">#2381</a>, <a href="https://github.com/demorenoc" class="external-link">@demorenoc</a>, <a href="https://github.com/eduardgrebe" class="external-link">@eduardgrebe</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> now returns it’s output invisibly (since you’re often just calling for the side-effect).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> now returns its output invisibly (since you’re often just calling for the side-effect).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct()</a></code> reports improved variable information for SQL backends. This means that it is more likely to work in the middle of a pipeline (<a href="https://github.com/tidyverse/dbplyr/issues/2359" class="external-link">#2359</a>).</p></li>
 <li><p>Ungrouped <code><a href="https://dplyr.tidyverse.org/reference/do.html" class="external-link">do()</a></code> on database backends now collects all data locally first (<a href="https://github.com/tidyverse/dbplyr/issues/2392" class="external-link">#2392</a>).</p></li>
 <li><p>Call <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">dbFetch()</a></code> instead of the deprecated <code><a href="https://dbi.r-dbi.org/reference/dbFetch.html" class="external-link">fetch()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/2134" class="external-link">#2134</a>). Use <code><a href="https://dbi.r-dbi.org/reference/dbExecute.html" class="external-link">DBI::dbExecute()</a></code> for non-query SQL commands (<a href="https://github.com/tidyverse/dbplyr/issues/1912" class="external-link">#1912</a>)</p></li>

@@ -43,7 +43,7 @@
     
     <a class="navbar-brand me-2" href="index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,6 +73,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -128,7 +129,7 @@
 <span><span class="co"># Alternatively, install just dbplyr:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"dbplyr"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Or the the development version from GitHub:</span></span>
+<span><span class="co"># Or the development version from GitHub:</span></span>
 <span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"tidyverse/dbplyr"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -147,7 +148,7 @@
 <code class="sourceCode R"><span><span class="va">mtcars2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"mtcars"</span><span class="op">)</span></span>
 <span><span class="va">mtcars2</span></span>
 <span><span class="co">#&gt; # Source:   table&lt;mtcars&gt; [?? x 11]</span></span>
-<span><span class="co">#&gt; # Database: sqlite 3.40.1 [:memory:]</span></span>
+<span><span class="co">#&gt; # Database: sqlite 3.41.2 [:memory:]</span></span>
 <span><span class="co">#&gt;      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt;  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4</span></span>
@@ -160,7 +161,7 @@
 <span><span class="co">#&gt;  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2</span></span>
 <span><span class="co">#&gt;  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2</span></span>
 <span><span class="co">#&gt; 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4</span></span>
-<span><span class="co">#&gt; # … with more rows</span></span></code></pre></div>
+<span><span class="co">#&gt; # ℹ more rows</span></span></code></pre></div>
 <p>All dplyr calls are evaluated lazily, generating SQL that is only sent to the database when you request the data.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># lazily generates query</span></span>

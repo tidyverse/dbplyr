@@ -18,7 +18,7 @@ the grouping and order context set up by group_by() and arrange()."><meta proper
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@ the grouping and order context set up by group_by() and arrange()."><meta proper
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -98,7 +99,7 @@ the grouping and order context set up by <code><a href="https://dplyr.tidyverse.
 <span>  con <span class="op">=</span> <span class="fu">sql_current_con</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">win_rank</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
+<span><span class="fu">win_rank</span><span class="op">(</span><span class="va">f</span>, empty_order <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">win_aggregate</span><span class="op">(</span><span class="va">f</span><span class="op">)</span></span>
 <span></span>
@@ -137,6 +138,10 @@ the grouping and order context set up by <code><a href="https://dplyr.tidyverse.
 
 <dt>f</dt>
 <dd><p>The name of an sql function as a string</p></dd>
+
+
+<dt>empty_order</dt>
+<dd><p>A logical value indicating whether to order by NULL if <code>order</code> is not specified</p></dd>
 
 </dl></div>
 

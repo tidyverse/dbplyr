@@ -46,7 +46,7 @@ temporary tables to start with #)
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,6 +75,7 @@ temporary tables to start with #)
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -133,13 +134,13 @@ temporary tables to start with <code>#</code>)</p></li>
 <span>  <span class="va">con</span>,</span>
 <span>  <span class="va">table</span>,</span>
 <span>  <span class="va">values</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  types <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  temporary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unique_indexes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  indexes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  analyze <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span>,</span>
 <span>  in_transaction <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -147,16 +148,18 @@ temporary tables to start with <code>#</code>)</p></li>
 <span>  <span class="va">con</span>,</span>
 <span>  <span class="va">table</span>,</span>
 <span>  <span class="va">sql</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  temporary <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  unique_indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  indexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  analyze <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  in_transaction <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">db_collect</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, n <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>, warn_incomplete <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">db_table_temporary</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">temporary</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">db_table_temporary</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">temporary</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">

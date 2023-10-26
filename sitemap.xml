@@ -88,6 +88,9 @@
     <loc>https://dbplyr.tidyverse.org/reference/backend-snowflake.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/reference/backend-spark-sql.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/reference/backend-sqlite.html</loc>
   </url>
   <url>
@@ -226,9 +229,6 @@
     <loc>https://dbplyr.tidyverse.org/reference/simulate_dbi.html</loc>
   </url>
   <url>
-    <loc>https://dbplyr.tidyverse.org/reference/simulate_vars.html</loc>
-  </url>
-  <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql.html</loc>
   </url>
   <url>
@@ -236,6 +236,9 @@
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_expr.html</loc>
+  </url>
+  <url>
+    <loc>https://dbplyr.tidyverse.org/reference/sql_options.html</loc>
   </url>
   <url>
     <loc>https://dbplyr.tidyverse.org/reference/sql_query_insert.html</loc>

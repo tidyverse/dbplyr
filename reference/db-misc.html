@@ -22,7 +22,7 @@ from. It should be a single line, and ideally less than 60 characters wide.
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,6 +51,7 @@ from. It should be a single line, and ideally less than 60 characters wide.
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -93,11 +94,13 @@ from. It should be a single line, and ideally less than 60 characters wide.</p><
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">db_connection_describe</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">db_connection_describe</span><span class="op">(</span><span class="va">con</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_join_suffix</span><span class="op">(</span><span class="va">con</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sql_join_suffix</span><span class="op">(</span><span class="va">con</span>, <span class="va">suffix</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">db_sql_render</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span>, cte <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">db_sql_render</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span>, cte <span class="op">=</span> <span class="cn">FALSE</span>, sql_options <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">db_col_types</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">call</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">dbplyr_edition</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,6 +110,7 @@ from. It should be a single line, and ideally less than 60 characters wide.</p><
     
 <ul><li><p><code>dbplyr_edition()</code> declares which version of the dbplyr API you want.
 See below for more details.</p></li>
+<li><p><code>db_col_types()</code> returns the column types of a table.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="dbplyr-">dbplyr 2.0.0<a class="anchor" aria-label="anchor" href="#dbplyr-"></a></h2>

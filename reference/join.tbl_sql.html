@@ -28,7 +28,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@ anti_join(x, y):  SELECT * FROM x WHERE NOT EXISTS (SELECT 1 FROM y WHERE x.a = 
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -114,6 +115,7 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
 <span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -132,6 +134,7 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
 <span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -150,6 +153,7 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
 <span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  unmatched <span class="op">=</span> <span class="st">"drop"</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -167,6 +171,7 @@ to the following SQL queries:</p><ul><li><p><code>inner_join(x, y)</code>: <code
 <span>  keep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"never"</span>, <span class="st">"na"</span><span class="op">)</span>,</span>
 <span>  multiple <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  relationship <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sql_on <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  auto_index <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  x_as <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -287,6 +292,10 @@ and <code>%in%</code>.</p></dd>
 <dt>multiple, unmatched</dt>
 <dd><p>Unsupported in database backends. As a workaround
 for multiple use a unique key and for unmatched a foreign key constraint.</p></dd>
+
+
+<dt>relationship</dt>
+<dd><p>Unsupported in database backends.</p></dd>
 
 
 <dt>sql_on</dt>

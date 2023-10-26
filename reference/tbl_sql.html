@@ -14,7 +14,7 @@ The default tbl.DBIConnect method should work in most cases."><meta property="og
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,7 @@ The default tbl.DBIConnect method should work in most cases."><meta property="og
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -84,7 +85,7 @@ The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tbl_sql</span><span class="op">(</span><span class="va">subclass</span>, <span class="va">src</span>, <span class="va">from</span>, <span class="va">...</span>, vars <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tbl_sql</span><span class="op">(</span><span class="va">subclass</span>, <span class="va">src</span>, <span class="va">from</span>, <span class="va">...</span>, vars <span class="op">=</span> <span class="cn">NULL</span>, check_from <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -102,6 +103,10 @@ The default <code>tbl.DBIConnect</code> method should work in most cases.</p>
 to avoid retrieving them from the database.
 Mainly useful for better performance when creating
 multiple <code>tbl</code> objects.</p></dd>
+
+
+<dt>check_from</dt>
+<dd><p>Check if <code>from</code> is likely misspecified SQL or a table in a schema.</p></dd>
 
 </dl></div>
 

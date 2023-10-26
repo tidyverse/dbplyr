@@ -4,11 +4,11 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
-sql_random(con) generates SQL to get a random number which can be used
-to select random rows in slice_sample().
+Deprecated: sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample(). This is now replaced by adding
+a translation for runif(n()).
 supports_window_clause(con) does the backend support named windows?
-supports_star_without_alias(con) does the backend support using *
-in a SELECT query without prefixing by a table alias?
+db_supports_table_alias_with_as(con) does the backend support using AS when using a table alias?
 
 
 Tables:
@@ -54,11 +54,11 @@ sql_expr_matches(con, x, y) generates an alternative to x = y when a
 pair of NULLs should match. The default translation uses a CASE WHEN
 as described in https://modern-sql.com/feature/is-distinct-from.
 sql_translation(con) generates a SQL translation environment.
-sql_random(con) generates SQL to get a random number which can be used
-to select random rows in slice_sample().
+Deprecated: sql_random(con) generates SQL to get a random number which can be used
+to select random rows in slice_sample(). This is now replaced by adding
+a translation for runif(n()).
 supports_window_clause(con) does the backend support named windows?
-supports_star_without_alias(con) does the backend support using *
-in a SELECT query without prefixing by a table alias?
+db_supports_table_alias_with_as(con) does the backend support using AS when using a table alias?
 
 
 Tables:
@@ -110,7 +110,7 @@ sql_returning_cols() generates SQL for a RETURNING clause
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.3.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,6 +139,7 @@ sql_returning_cols() generates SQL for a RETURNING clause
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -177,11 +178,11 @@ sql_returning_cols() generates SQL for a RETURNING clause
 pair of <code>NULL</code>s should match. The default translation uses a <code>CASE WHEN</code>
 as described in <a href="https://modern-sql.com/feature/is-distinct-from" class="external-link">https://modern-sql.com/feature/is-distinct-from</a>.</p></li>
 <li><p><code>sql_translation(con)</code> generates a SQL translation environment.</p></li>
-<li><p><code>sql_random(con)</code> generates SQL to get a random number which can be used
-to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>.</p></li>
+<li><p>Deprecated: <code>sql_random(con)</code> generates SQL to get a random number which can be used
+to select random rows in <code><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample()</a></code>. This is now replaced by adding
+a translation for <code>runif(n())</code>.</p></li>
 <li><p><code>supports_window_clause(con)</code> does the backend support named windows?</p></li>
-<li><p><code>supports_star_without_alias(con)</code> does the backend support using <code>*</code>
-in a <code>SELECT</code> query without prefixing by a table alias?</p></li>
+<li><p><code>db_supports_table_alias_with_as(con)</code> does the backend support using <code>AS</code> when using a table alias?</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
@@ -210,7 +211,7 @@ queries.</p></li>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sql_expr_matches</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sql_expr_matches</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_translation</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
 <span></span>
@@ -218,7 +219,15 @@ queries.</p></li>
 <span></span>
 <span><span class="fu">sql_table_analyze</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_table_index</span><span class="op">(</span><span class="va">con</span>, <span class="va">table</span>, <span class="va">columns</span>, name <span class="op">=</span> <span class="cn">NULL</span>, unique <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">sql_table_index</span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  <span class="va">table</span>,</span>
+<span>  <span class="va">columns</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unique <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  call <span class="op">=</span> <span class="fu">caller_env</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_query_explain</span><span class="op">(</span><span class="va">con</span>, <span class="va">sql</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
@@ -234,7 +243,7 @@ queries.</p></li>
 <span></span>
 <span><span class="fu">supports_window_clause</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">supports_star_without_alias</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="fu">db_supports_table_alias_with_as</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_query_select</span><span class="op">(</span></span>
 <span>  <span class="va">con</span>,</span>
@@ -256,7 +265,7 @@ queries.</p></li>
 <span>  <span class="va">con</span>,</span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
-<span>  <span class="va">vars</span>,</span>
+<span>  <span class="va">select</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"inner"</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na_matches <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -264,11 +273,13 @@ queries.</p></li>
 <span>  lvl <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_query_multi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">joins</span>, <span class="va">table_vars</span>, <span class="va">vars</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu">sql_query_multi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">joins</span>, <span class="va">table_names</span>, <span class="va">by_list</span>, <span class="va">select</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">anti</span>, <span class="va">by</span>, <span class="va">vars</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="fu">sql_query_semi_join</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">anti</span>, <span class="va">by</span>, <span class="va">where</span>, <span class="va">vars</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_query_set_op</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">method</span>, <span class="va">...</span>, all <span class="op">=</span> <span class="cn">FALSE</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">sql_query_union</span><span class="op">(</span><span class="va">con</span>, <span class="va">x</span>, <span class="va">unions</span>, <span class="va">...</span>, lvl <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">sql_returning_cols</span><span class="op">(</span><span class="va">con</span>, <span class="va">cols</span>, <span class="va">table</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
