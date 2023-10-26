@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.3.4.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.4.0.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-news">
     <h6 class="dropdown-header" data-toc-skip>Releases</h6>
+    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
     <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
@@ -73,8 +74,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.4.0" id="dbplyr-240">dbplyr 2.4.0<a class="anchor" aria-label="anchor" href="#dbplyr-240"></a></h2><p class="text-muted">CRAN release: 2023-10-26</p>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-2-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-4-0"></a></h3>
 <ul><li><p>Using <code>compute(temporary = FALSE)</code> without providing a name is now deprecated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1154" class="external-link">#1154</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">ntile()</a></code>’s first argument has been renamed from <code>order_by</code> to <code>x</code> to match the interface of <code><a href="https://dplyr.tidyverse.org/reference/ntile.html" class="external-link">dplyr::ntile()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1242" class="external-link">#1242</a>).</p></li>
 <li><p><code>simulate_vars()</code> and <code>simulate_vars_is_typed()</code> were removed as they weren’t used and tidyselect now offers <code>tidyselect_data_proxy()</code> and <code>tidyselect_data_has_predicates()</code> (<a href="https://github.com/mgirllich" class="external-link">@mgirllich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1199" class="external-link">#1199</a>).</p></li>
@@ -93,7 +97,7 @@
 <li><p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> now requires the <code>con</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1311" class="external-link">#1311</a>). The <code>vars</code> argument has been removed after it threw an error for the last 7 years (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="improved-sql-development-version">Improved SQL<a class="anchor" aria-label="anchor" href="#improved-sql-development-version"></a></h3>
+<h3 id="improved-sql-2-4-0">Improved SQL<a class="anchor" aria-label="anchor" href="#improved-sql-2-4-0"></a></h3>
 <ul><li><p>Preliminary databricks Spark SQL backend (<a href="https://github.com/tidyverse/dbplyr/issues/1377" class="external-link">#1377</a>).</p></li>
 <li>
 <p>Joins</p>
@@ -119,7 +123,7 @@
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">nth()</a></code>, <code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first()</a></code>, and <code><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">last()</a></code> now support the <code>na_rm</code> argument (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1193" class="external-link">#1193</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<h3 id="minor-improvements-and-bug-fixes-2-4-0">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-2-4-0"></a></h3>
 <ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across()</a></code> now supports namespaced functions, e.g.  <code>across(x, dplyr::dense_rank)</code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1231" class="external-link">#1231</a>).</p></li>
 <li><p><code>db_copy_to(overwrite = TRUE)</code> now actually works.</p></li>
 <li><p><code><a href="../reference/db-io.html">db_copy_to()</a></code>’s <code>...</code> are now passed to <code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_write_table()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1237" class="external-link">#1237</a>).</p></li>
@@ -146,7 +150,7 @@
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl()</a></code> now informs when the user probably forgot to wrap the table identifier with <code><a href="../reference/in_schema.html">in_schema()</a></code> or <code><a href="../reference/sql.html">sql()</a></code> (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1287" class="external-link">#1287</a>).</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="backend-specific-improvements-development-version">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-development-version"></a></h3>
+<h3 id="backend-specific-improvements-2-4-0">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-2-4-0"></a></h3>
 <ul><li>Access
 <ul><li>Added translation for <code>!=</code> to <code>&lt;&gt;</code> (<a href="https://github.com/erikvona" class="external-link">@erikvona</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1219" class="external-link">#1219</a>).</li>
 </ul></li>
