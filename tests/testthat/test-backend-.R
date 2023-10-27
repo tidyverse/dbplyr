@@ -78,6 +78,15 @@ test_that("can translate subsetting", {
 })
 
 
+# window ------------------------------------------------------------------
+
+test_that("lead and lag translate n to integers", {
+  local_con(simulate_dbi())
+
+  expect_equal(test_translate_sql(lead(x, 1)), sql("LEAD(`x`, 1, NULL) OVER ()"))
+  expect_equal(test_translate_sql(lag(x, 1)), sql("LAG(`x`, 1, NULL) OVER ()"))
+})
+
 # strings -----------------------------------------------------------------
 
 test_that("can translate case insensitive like", {

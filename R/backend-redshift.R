@@ -81,7 +81,7 @@ sql_translation.RedshiftConnection <- function(con) {
       # https://docs.aws.amazon.com/redshift/latest/dg/r_WF_LEAD.html
       lead = function(x, n = 1L, order_by = NULL) {
         win_over(
-          sql_expr(LEAD(!!x, !!n)),
+          sql_expr(LEAD(!!x, !!as.integer(n))),
           win_current_group(),
           order_by %||% win_current_order(),
           win_current_frame()

@@ -1,12 +1,10 @@
 # dbplyr (development version)
 
-## Minor improvements and bug fixes
+* `lead()` translation coerces `n` to an integer.
 
 * `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
 
 * `reframe()` now gives an informative error that it isn't supported (#1148).
-
-## Backend specific improvements
 
 * MySQL/MariaDB:
   * Fix translation of `as.integer()` for MySQL (@krlmlr, #1375).
