@@ -74,9 +74,19 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
 <ul><li>
 <code><a href="../reference/sql_variant.html">sql_translator()</a></code> now checks for duplicated definitions (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1374" class="external-link">#1374</a>).</li>
 </ul></div>
+<div class="section level3">
+<h3 id="backend-specific-improvements-development-version">Backend specific improvements<a class="anchor" aria-label="anchor" href="#backend-specific-improvements-development-version"></a></h3>
+<ul><li>MySQL/MariaDB:
+<ul><li>Fix translation of <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> for MySQL (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</li>
+<li>New <code><a href="../reference/backend-mysql.html">simulate_mariadb()</a></code> (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</li>
+</ul></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.4.0" id="dbplyr-240">dbplyr 2.4.0<a class="anchor" aria-label="anchor" href="#dbplyr-240"></a></h2><p class="text-muted">CRAN release: 2023-10-26</p>
 <div class="section level3">
