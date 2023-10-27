@@ -1,45 +1,22 @@
 # dbplyr (development version)
 
-* Joins
+* `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
 
-  * `*_join()` after `full_join()` works again (@mgirlich, #1178).
-
-  * `*_join()` now allows specifying the relationship argument. It must be
-    `NULL` or `"many-to-many"` (@bairdj, #1305).
-
-  * Queries now qualify `*` with the table alias for better compatibility (@mgirlich, #1003).
-
-  * `full_join()` can now handle column names that only differ in case (@ejneer, #1255).
-  
-  * The `na_matches` argument of `semi_join()` and `anti_join()` works again
-    (@mgirlich, #1211).
-
-  * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
-  
-* `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
-  be lazy. Note that this will be removed soon after `pivot_wider_spec()`
-  becomes a generic (@mgirlich).
-
-* `show_query()` and `remote_query()` gain the argument `sql_options` that allows
-  to control how the SQL is generated. It can be created via `sql_options()`
-  which has the following arguments:
-  * `cte`: use common table expressions?
-  * `use_star`: use `SELECT *` or explicitly select every column?
-  * `qualify_all_columns`: qualify all columns in a join or only the ambiguous ones?
-  (@mgirlich, #1146).
-  
-* The `cte` argument of `show_query()` and `remote_query()` is deprecated (@mgirlich, #1146).
+# dbplyr 2.4.0
 
 ## Breaking changes
 
-* `remote_name()` now returns a string with the name of the table. To get the
-  qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
+* Using `compute(temporary = FALSE)` without providing a name is now
+  deprecated (@mgirlich, #1154).
 
-* The functions `simulate_vars()` and `simulate_vars_is_typed()` were removed
-  as they weren't used anymore and tidyselect now offers `tidyselect_data_proxy()`
-  and `tidyselect_data_has_predicates()` (@mgirllich, #1199).
+* `ntile()`'s first argument has been renamed from `order_by` to `x` to
+  match the interface of `dplyr::ntile()` (@mgirlich, #1242).
 
-* `translate_sql()` now requires the `con` argument (@mgirlich, #1311).
+* `simulate_vars()` and `simulate_vars_is_typed()` were removed as they weren't
+  used and tidyselect now offers `tidyselect_data_proxy()` and
+  `tidyselect_data_has_predicates()` (@mgirllich, #1199).
+
+* `sql_not_supported()` now expects a function name without parentheses.
 
 * `sql_query_append()`, `sql_query_insert()`, `sql_query_update()`,
   `sql_query_upsert()`, and `sql_query_delete()` changed their arguments to
@@ -50,73 +27,107 @@
     of a lazy table.
   * `sql_query_append()` and `sql_query_insert()` have gained the argument `cols`.
 
-* The first argument of `ntile()` has been renamed from `order_by` to `x` to
-  match the interface of `dplyr::ntile()` (@mgirlich, #1242).
+* `remote_name()` now returns a string with the name of the table. To get the
+  qualified identifier use the newly added `remote_table()` (@mgirlich, #1280).
 
-* Removed argument `src` of `tbl_lazy()` after it has been deprecated for years
+* `tbl_lazy()` loses `src` argument after it has been deprecated for years
   (@mgirlich, #1208).
 
-* Using `compute(temporary = FALSE)` without providing a name is now
-  deprecated (@mgirlich, #1154).
-
-* The `vars` argument of `translate_sql()` has been removed after it threw an
-  error for the last 7 years (@mgirlich).
-
-* `sql_not_supported()` now expects a function name without parentheses.
+* `translate_sql()` now requires the `con` argument (@mgirlich, #1311).
+  The `vars` argument has been removed after it threw an error for the last 7
+  years (@mgirlich).
 
 ## Improved SQL
 
-* A `semi/anti_join()` where `y` is filtered is now inlined when possible (@mgirlich, #884).
+* Preliminary databricks Spark SQL backend (#1377).
+  
+* Joins
+
+  * `*_join()` after `full_join()` works again (@mgirlich, #1178).
+
+  * `*_join()` now allows specifying the relationship argument. It must be
+    `NULL` or `"many-to-many"` (@bairdj, #1305).
+
+  * Queries now qualify `*` with the table alias for better compatibility 
+    (@mgirlich, #1003).
+
+  * `full_join()` can now handle column names that only differ in case 
+    (@ejneer, #1255).
+  
+  * The `na_matches` argument of `semi_join()` and `anti_join()` works again
+    (@mgirlich, #1211).
+    
+  * A `semi/anti_join()` on fitlered `y` is inlined when possible (@mgirlich, #884).
+
+  * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 
 * A sequence of `union()` resp. `union_all()` now produces a flat query
   instead of subqueries (@mgirlich, #1269).
 
+* Added translations for:
+
+  * `nzchar()` (@MichaelChirico, @mgirlich, #1094).
+  * `str_detect()`, `str_starts()` and `str_ends()` with fixed patterns 
+     (@mgirlich, #1009).
+  * `runif()` (@mgirlich, #1200).
+
+* `if_any()` and `if_all()` translations are now wrapped in parentheses.
+  This makes sure it can be combined via `&` with other conditions 
+  (@mgirlich, #1153).
+
+* `nth()`, `first()`, and `last()` now support the `na_rm` argument 
+  (@mgirlich, #1193).
+
 ## Minor improvements and bug fixes
 
-* The `overwrite` argument of `db_copy_to()` now actually works.
+* `across()` now supports namespaced functions, e.g. 
+  `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
+
+* `db_copy_to(overwrite = TRUE)` now actually works.
+
+* `db_copy_to()`'s `...` are now passed to `db_write_table()` (@mgirlich, #1237).
+
+* Added `db_supports_table_alias_with_as()` to customise whether a backend 
+  supports specifying a table alias with `AS` or not (@mgirlich).
 
 * `db_write_table()` and `db_save_query()` gain the `overwrite` argument.
 
-* The dots in `db_copy_to()` are now passed to `db_write_table()` (@mgirlich, #1237).
+* `dbplyr_pivot_wider_spec()` is now exported. Unlike `pivot_wider()` this can
+  be lazy. Note that this will be removed soon after `pivot_wider_spec()`
+  becomes a generic (@mgirlich).
 
-* Added translation for `str_detect()`, `str_starts()` and `str_ends()` with
-  fixed patterns (@mgirlich, #1009).
+* `filter()`ing with window functions now generates columns called `col01` 
+  rather than `q01` (@mgirlich, #1258).
 
-* Added translation for `nzchar()` (@MichaelChirico, @mgirlich, #1094).
+* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
 
-* Added translation for `runif()` (@mgirlich, #1200).
+* `select()` can once again be used after `arrange(desc(x))` (@ejneer, #1240).
 
-* `sql_random()` is now deprecated. It was used to power `slice_sample()` which
-  is now done via the translation for `runif()` (@mgirlich, #1200).
+* `show_query()` and `remote_query()` gain the argument `sql_options` that allows
+  to control how the SQL is generated. It can be created via `sql_options()`
+  which has the following arguments:
   
-* `nth()`, `first()`, and `last()` now support the `na_rm` argument (@mgirlich, #1193).
-
-* The translation of `if_any()` and `if_all()` is now wrapped in parentheses.
-  This makes sure it can be combined via `&` with other conditions (@mgirlich, #1153).
+    * `cte`: use common table expressions?
+    * `use_star`: use `SELECT *` or explicitly select every column?
+    * `qualify_all_columns`: qualify all columns in a join or only the ambiguous ones?
+  (@mgirlich, #1146).
+  
+  Consequently the `cte` argument of `show_query()` and `remote_query()` has 
+  been deprecated (@mgirlich, #1146).
 
 * `slice_min/max()` can now order by multiple variables like dplyr, e.g. use
   `slice_min(lf, tibble(x, y))` (@mgirlich, #1167).
 
 * `slice_*()` now supports the data masking pronouns `.env` and `.data` (@mgirlich, #1294).
 
-* Can now use `select()` again after using `arrange(desc(x))` (@ejneer, #1240).
-
-* The columns generated when using a window function in `filter()` are now named
-  `col01` etc. instead of `q01()` (@mgirlich, #1258).
-
-* `tbl()` now informs when the user probably forgot to wrap the table identifier
-  with `in_schema()` or `sql()` (@mgirlich, #1287).
-
-* `pivot_wider()` now matches tidyr `NA` column handling (@ejneer #1238).
-
-* Using a function with a namespace in `across()` now works, e.g.
-  `across(x, dplyr::dense_rank)` (@mgirlich, #1231).
-
 * `sql_join_suffix()` gains the argument `suffix` so that methods can check
   whether the suffix is valid for the backend (@mgirlich).
 
-* Added `db_supports_table_alias_with_as()` to customise whether a backend supports
-  specifying a table alias with `AS` or not (@mgirlich).
+* `sql_random()` is now deprecated. It was used to power `slice_sample()` which
+  is now done via the translation for `runif()` (@mgirlich, #1200).
+  
+* `tbl()` now informs when the user probably forgot to wrap the table identifier
+  with `in_schema()` or `sql()` (@mgirlich, #1287).
 
 ## Backend specific improvements
 
