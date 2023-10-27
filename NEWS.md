@@ -4,6 +4,8 @@
 
 * `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
 
+* `reframe()` now gives an informative error that it isn't supported (#1148).
+
 ## Backend specific improvements
 
 * MySQL/MariaDB:
