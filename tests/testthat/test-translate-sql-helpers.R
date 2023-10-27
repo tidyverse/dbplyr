@@ -22,6 +22,12 @@ test_that("missing window functions create a warning", {
   )
 })
 
+test_that("duplicates throw an error", {
+  expect_snapshot(error = TRUE, {
+    sql_translator(round = function(x) x, round = function(y) y)
+  })
+})
+
 test_that("missing aggregate functions filled in", {
   local_con(simulate_dbi())
   sim_scalar <- sql_translator()
