@@ -446,7 +446,7 @@ base_win <- sql_translator(
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
-      sql_expr(LEAD(!!x, !!n, !!default)),
+      sql_expr(LEAD(!!x, !!as.integer(n), !!default)),
       win_current_group(),
       order_by %||% win_current_order(),
       win_current_frame()
