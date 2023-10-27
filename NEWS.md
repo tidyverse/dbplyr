@@ -1,6 +1,14 @@
 # dbplyr (development version)
 
+## Minor improvements and bug fixes
+
 * `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
+
+## Backend specific improvements
+
+* MySQL/MariaDB:
+  * Fix translation of `as.integer()` for MySQL (@krlmlr, #1375).
+  * New `simulate_mariadb()` (@krlmlr, #1375).
 
 # dbplyr 2.4.0
 
