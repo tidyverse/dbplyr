@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
+
 # dbplyr 2.4.0
 
 ## Breaking changes
