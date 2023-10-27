@@ -1,7 +1,7 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.3.4.9000
+Version: 2.4.0.9000
 Authors@R: c(
     person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
@@ -87,6 +87,7 @@ Collate:
     'backend-postgres-old.R'
     'backend-redshift.R'
     'backend-snowflake.R'
+    'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'

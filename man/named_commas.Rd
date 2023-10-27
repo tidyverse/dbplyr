@@ -6,9 +6,6 @@
 \usage{
 named_commas(x)
 }
-\arguments{
-\item{...}{Arguments to be constructed into the string}
-}
 \description{
 Provides comma-separated string out of the parameters
 }

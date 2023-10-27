@@ -6,7 +6,6 @@ deparse_all <- function(x) {
 #' Provides comma-separated string out of the parameters
 #' @export
 #' @keywords internal
-#' @param ... Arguments to be constructed into the string
 named_commas <- function(x) {
   if (is.list(x)) {
     x <- purrr::map_chr(x, as_label)
