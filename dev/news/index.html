@@ -74,7 +74,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lead()</a></code> translation coerces <code>n</code> to an integer.</p></li>
+<ul><li><p>Functions qualified with the base namespace are now also translated, e.g. <code>base::paste0(x, "_1")</code> is now translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1022" class="external-link">#1022</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lead()</a></code> translation coerces <code>n</code> to an integer.</p></li>
 <li><p><code><a href="../reference/sql_variant.html">sql_translator()</a></code> now checks for duplicated definitions (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1374" class="external-link">#1374</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/tidyverse/dbplyr/issues/1148" class="external-link">#1148</a>).</p></li>
 <li>
