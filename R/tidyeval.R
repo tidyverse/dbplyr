@@ -163,7 +163,7 @@ partial_eval_sym <- function(sym, data, env) {
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  packages <- c("dplyr", "stringr", "lubridate")
+  packages <- c("base", "dplyr", "stringr", "lubridate")
   is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 
