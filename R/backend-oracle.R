@@ -144,8 +144,7 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  DBI::dbExecute(con, glue_sql2(con, "EXPLAIN PLAN FOR {.sql sql};"))
-  glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());")
+  glue_sql2(con, "EXPLAIN PLAN FOR {sql};")
 }
 
 #' @export
@@ -177,6 +176,30 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
+}
+
+#' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  sql <- sql_query_explain(con, sql, ...)
+  call <- current_call()
+  tryCatch(
+    {
+      DBI::dbExecute(con, sql)
+      expl <- DBI::dbGetQuery(
+        con,
+        glue_sql2(
+          con,
+          "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());"
+        )
+      )
+    },
+    error = function(cnd) {
+      cli_abort("Can't explain query.", parent = cnd)
+    }
+  )
+
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
 }
 
 #' @export
@@ -215,6 +238,9 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
+
+#' @export
+db_explain.OraConnection <- db_explain.Oracle
 
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
