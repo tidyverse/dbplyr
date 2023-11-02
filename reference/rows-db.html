@@ -281,14 +281,14 @@ in the table behind <code>x</code>.</p>
 <span class="r-in"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_insert</a></span><span class="op">(</span><span class="va">ponies</span>, <span class="va">applejack</span>, conflict <span class="op">=</span> <span class="st">"ignore"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Matching, by = "name"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   SQL [1 x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.41.2 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.42.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   id    name       cutie_mark  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>    Apple Jack three apples</span>
 <span class="r-in"><span><span class="co"># And the original table is left unchanged:</span></span></span>
 <span class="r-in"><span><span class="va">ponies</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;Ponies&gt; [0 x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.41.2 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.42.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 variables: id &lt;int&gt;, name &lt;chr&gt;, cutie_mark &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># You can also choose to modify the table with in_place = TRUE:</span></span></span>
@@ -298,7 +298,7 @@ in the table behind <code>x</code>.</p>
 <span class="r-in"><span><span class="co"># data is modified</span></span></span>
 <span class="r-in"><span><span class="va">ponies</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Source:   table&lt;Ponies&gt; [1 x 3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.41.2 [:memory:]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Database: sqlite 3.42.0 [:memory:]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      id name       cutie_mark  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1 Apple Jack three apples</span>
@@ -311,7 +311,7 @@ in the table behind <code>x</code>.</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p></p><p>Developed by <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
+  <p></p><p>Developed by <a href="http://hadley.nz" class="external-link">Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
