@@ -33,8 +33,8 @@ install.packages("tidyverse")
 install.packages("dbplyr")
 
 # Or the development version from GitHub:
-# install.packages("devtools")
-devtools::install_github("tidyverse/dbplyr")
+# install.packages("pak")
+pak::pak("tidyverse/dbplyr")
 ```
 
 ## Usage
