@@ -7,7 +7,7 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/dbplyr)](https://cran.r-project.org/package=dbplyr)
-[![R-CMD-check](https://github.com/tidyverse/dbplyr/workflows/R-CMD-check/badge.svg)](https://github.com/tidyverse/dbplyr/actions)
+[![R-CMD-check](https://github.com/tidyverse/dbplyr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidyverse/dbplyr/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/tidyverse/dbplyr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidyverse/dbplyr?branch=main)
 <!-- badges: end -->
