@@ -13,6 +13,9 @@
   * Fix translation of `as.integer()` for MySQL (@krlmlr, #1375).
   * New `simulate_mariadb()` (@krlmlr, #1375).
 
+* Oracle
+  * Fix translation of `as.Date()` applied to a string (#1389).
+
 # dbplyr 2.4.0
 
 ## Breaking changes
