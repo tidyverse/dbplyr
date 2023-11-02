@@ -7,14 +7,17 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r}
+#| label = "setup",
+#| include = FALSE
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translation-verb")` describes how entire verbs are translated.
 
-```{r, message = FALSE}
+```{r}
+#| message = FALSE
 library(dbplyr)
 library(dplyr)
 
@@ -189,7 +192,8 @@ mf %>%
 
 If needed, you can also force dbplyr to error if it doesn't know how to translate a function with the `dplyr.strict_sql` option:
 
-```{r, error = TRUE}
+```{r}
+#| error = TRUE
 options(dplyr.strict_sql = TRUE)
 translate_sql(glob(x, y), con = con)
 ```
@@ -226,7 +230,18 @@ Things get a little trickier with window functions, because SQL's window functio
   following"). The complete set of options is comprehensive, but fairly 
   confusing, and is summarised visually below.
 
-    ```{r echo = FALSE, out.width = "100%"}
+    ```{r}
+    #| echo: false
+    #| out-width: 100%
+    #| fig-alt: >
+    #|   A visual summary of the frame clause using the real line labelled
+    #|   with negative infinity, -3, -2, -1, 0, 1, 2, 3, infinity. The most
+    #|   important clauses are rolling, cumulative, and recycling. 
+    #|   Rolling, e.g. between 1 preceding and 1, following, run from 
+    #|   -1 to -1. Cumulative, between unbounded preceding and 
+    #|   current row, runs from negative infinity to 0. Recycled, 
+    #|   between unbound preceeding and unbound following, runs from 
+    #|   negative infinity to positive infinity.
     knitr::include_graphics("windows.png", dpi = 300)
     ```
 
@@ -273,7 +288,8 @@ There are some challenges when translating window functions between R and SQL, b
 
 The three options are illustrated in the snippet below:
 
-```{r, eval = FALSE}
+```{r}
+#| eval = FALSE
 mutate(players,
   min_rank(yearID),
   order_by(yearID, cumsum(G)),
