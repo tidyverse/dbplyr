@@ -407,7 +407,7 @@ db_supports_table_alias_with_as.PostgreSQL <- function(con) {
 
 #' @export
 db_col_types.PqConnection <- function(con, table, call) {
-  table <- as_table_ident(table, error_call = call)
+  table <- as_table_name(table, con, error_call = call)
   res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
   on.exit(DBI::dbClearResult(res))
   DBI::dbFetch(res, n = 0)

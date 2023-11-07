@@ -128,9 +128,9 @@ sql_quote_transformer <- function(connection) {
     glue_check_collapse(type, should_collapse)
 
     if (type == "tbl") {
-      value <- as_table_ident(value)
+      value <- as_table_name(value, connection)
     } else if (type == "from") {
-      value <- as_from(value)
+      value <- as_table_source(value, connection)
     } else if (type == "col") {
       if (is_bare_character(value)) {
         value <- ident(value)

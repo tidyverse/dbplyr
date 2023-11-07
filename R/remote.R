@@ -33,11 +33,11 @@
 remote_name <- function(x, null_if_local = TRUE) {
   table <- remote_table(x, null_if_local = null_if_local)
 
-  if (is.null(table) || is.sql(table)) {
-    return(NULL)
+  if (is.sql(table)) {
+    NULL
+  } else {
+    table
   }
-
-  table_ident_name(table)
 }
 
 #' @export

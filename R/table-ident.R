@@ -231,14 +231,6 @@ set_table_ident_alias <- function(x, alias) {
   vctrs::`field<-`(x, "alias", alias)
 }
 
-as_from <- function(x, ..., arg = caller_arg(x), error_call = caller_env()) {
-  if (is.sql(x)) {
-    return(x)
-  }
-
-  as_table_ident(x, error_call = error_call)
-}
-
 table_ident_to_id <- function(x) {
   vctrs::vec_check_size(x, 1)
 

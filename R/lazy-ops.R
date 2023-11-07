@@ -32,7 +32,7 @@ lazy_base_query <- function(x, vars, class = character(), ...) {
 }
 
 lazy_query_local <- function(df, name) {
-  name <- as_table_ident(name)
+  name <- as_table_name(I(name))
   lazy_base_query(df, names(df), class = "local", name = name)
 }
 
@@ -41,7 +41,7 @@ lazy_query_remote <- function(x, vars) {
 }
 
 base_query <- function(from) {
-  from <- as_from(from)
+  check_table_source(from)
   structure(
     list(from = from),
     class = c("base_query", "query")

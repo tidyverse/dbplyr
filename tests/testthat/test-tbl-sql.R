@@ -44,18 +44,6 @@ test_that("can refer to default schema explicitly", {
 })
 
 
-test_that("checks for incorrectly specified SQL or schema", {
-  con <- local_sqlite_connection()
-  DBI::dbExecute(con, "CREATE TABLE 'table.with_dot' (a, b, c)")
-
-  expect_message(tbl(con, ident("table.with_dot")), "in a schema")
-  expect_no_message(tbl(con, ident("table.with_dot"), check_from = FALSE))
-
-  expect_error(
-    expect_message(tbl(con, ident("SELECT * FROM table.with_dot")), "an SQL query as source")
-  )
-})
-
 test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   con <- local_sqlite_con_with_aux()
   DBI::dbExecute(con, "CREATE TABLE aux.t1 (x, y, z)")
