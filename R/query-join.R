@@ -348,7 +348,7 @@ sql_table_prefix <- function(con, var, table = NULL) {
 sql_star <- function(con, table = NULL) {
   var <- sql("*")
   if (!is.null(table)) {
-    stopifnot(is_table_name(table))
+    table <- as_table_name(table, con)
     sql(paste0(table, ".", var))
   } else {
     var
