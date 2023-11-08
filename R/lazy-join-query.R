@@ -153,7 +153,7 @@ op_vars.lazy_semi_join_query <- function(op) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
-  table_names_out <- generate_join_table_names(op$table_names)
+  table_names_out <- generate_join_table_names(op$table_names, con)
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
   select_sql <- sql_multi_join_vars(
@@ -171,7 +171,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   op$joins$by <- purrr::map2(
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
-      by$x_as <- table_names_out[op$joins$by_x_table_id[[i]]]
+      # FIXME: why is unique now needed?
+      by$x_as <- table_names_out[unique(op$joins$by_x_table_id[[i]])]
       by$y_as <- table_names_out[i + 1L]
       by
     }
@@ -185,7 +186,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   )
 }
 
-generate_join_table_names <- function(table_names) {
+generate_join_table_names <- function(table_names, con) {
   table_name_length_max <- max(nchar(table_names$name))
 
   if (length(table_names$name) != 2) {
@@ -194,7 +195,7 @@ generate_join_table_names <- function(table_names) {
     table_names$name[may_repair_name] <- table_names_repaired[may_repair_name]
     table_names_prepared <- table_names$name
   } else{
-    table_names_prepared <- join_two_table_alias(table_names$name, table_names$from)
+    table_names_prepared <- join_two_table_alias(table_names$name, table_names$from, con)
   }
 
   # avoid database aliases exceeding the database-specific maximum length
@@ -217,7 +218,7 @@ generate_join_table_names <- function(table_names) {
 
 #' @export
 sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
-  table_names_out <- generate_join_table_names(op$table_names)
+  table_names_out <- generate_join_table_names(op$table_names, con)
 
   vars_classic <- as.list(op$vars)
   vars_classic$all_x <- op_vars(op$x)

@@ -349,6 +349,9 @@ sql_star <- function(con, table = NULL) {
   var <- sql("*")
   if (!is.null(table)) {
     table <- as_table_name(table, con)
+    table <- db_table_name_extract(con, table)
+    table <- as_table_name(table, con)
+
     sql(paste0(table, ".", var))
   } else {
     var

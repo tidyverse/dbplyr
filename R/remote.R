@@ -36,7 +36,12 @@ remote_name <- function(x, null_if_local = TRUE) {
   if (is.sql(table)) {
     NULL
   } else {
-    table
+    con <- remote_con(x)
+    if (is.null(con)) {
+      table
+    } else {
+      db_table_name_extract(con, table)
+    }
   }
 }
 

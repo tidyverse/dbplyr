@@ -5,24 +5,21 @@
     Output
         <SQL SELECT>
         From:
-          <dbplyr_table_ident[1]>
-          [1] `lf1`
+          <table_name> `lf1`
         Select:   `lf1`.*, NULL
       
         UNION
       
         <SQL SELECT>
         From:
-          <dbplyr_table_ident[1]>
-          [1] `lf2`
+          <table_name> `lf2`
         Select:   `x`, NULL, `z`
       
         UNION ALL
       
         <SQL SELECT>
         From:
-          <dbplyr_table_ident[1]>
-          [1] `lf3`
+          <table_name> `lf3`
         Select:   `x`, NULL, `z`
 
 # generated sql doesn't change unexpectedly

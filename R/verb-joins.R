@@ -687,7 +687,8 @@ add_semi_join <- function(x,
   y_alias <- make_table_names(join_alias$y, y_lq)
   by[c("x_as", "y_as")] <- join_two_table_alias(
     c(x_alias$name, y_alias$name),
-    c(x_alias$from, y_alias$from)
+    c(x_alias$from, y_alias$from),
+    remote_con(x)
   )
 
   lazy_semi_join_query(
@@ -805,7 +806,7 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   )
 }
 
-join_two_table_alias <- function(names, from) {
+join_two_table_alias <- function(names, from, con) {
   check_character(names)
   check_character(from)
   vctrs::vec_assert(names, size = 2L)
