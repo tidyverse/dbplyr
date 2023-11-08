@@ -769,7 +769,7 @@ sql_query_insert <- function(con,
                              returning_cols = NULL,
                              method = NULL) {
   check_table_id(table)
-  check_table_source(sql)
+  check_table_source(from)
   check_character(insert_cols)
   check_character(by)
   check_character(returning_cols, allow_null = TRUE)
