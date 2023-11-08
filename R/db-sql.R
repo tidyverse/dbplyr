@@ -174,8 +174,8 @@ sql_table_index.DBIConnection <- function(con,
                                           ...,
                                           call = caller_env()) {
   table <- as_table_name(table, con, error_call = call)
-  hash <- substr(hash(table), 1, 6)
-  name <- name %||% paste0(c("dbplyr", hash, columns), collapse = "_")
+  table <- db_table_name_extract(con, table)
+  name <- name %||% paste0(c(table, columns), collapse = "_")
   glue_sql2(
     con,
     "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",

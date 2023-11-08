@@ -89,14 +89,14 @@
     Code
       sql_table_index(con, in_schema("schema", "tbl"), c("a", "b"))
     Output
-      <SQL> CREATE INDEX `dbplyr_119f50_a_b` ON `schema`.`tbl` (`a`, `b`)
+      <SQL> CREATE INDEX `tbl_a_b` ON `tbl` (`a`, `b`)
 
 ---
 
     Code
       sql_table_index(con, in_schema("schema", "tbl"), "c", unique = TRUE)
     Output
-      <SQL> CREATE UNIQUE INDEX `dbplyr_119f50_c` ON `schema`.`tbl` (`c`)
+      <SQL> CREATE UNIQUE INDEX `tbl_c` ON `tbl` (`c`)
 
 ---
 

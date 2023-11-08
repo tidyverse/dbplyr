@@ -821,8 +821,8 @@ join_two_table_alias <- function(names, from) {
   tables_have_same_name <- from[1] == "name" && from[2] == "name" && identical(names[1], names[2])
   if (tables_have_same_name) {
     out <- c(
-      paste0(names[1], "_LHS"),
-      paste0(names[2], "_RHS")
+      paste0(db_table_name_extract(con, names[1]), "_LHS"),
+      paste0(db_table_name_extract(con, names[2]), "_RHS")
     )
     return(out)
   }

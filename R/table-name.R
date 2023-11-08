@@ -89,6 +89,23 @@ is_table_name <- function(x) {
   inherits(x, "dbplyr_table_name")
 }
 
+# TODO: make this generic
+db_parse_table_name <- function(con, x) {
+  quote_char <- substr(as_table_name("", con = con), 1, 1)
+  scan(
+    text = x,
+    what = character(),
+    quote = quote_char,
+    quiet = TRUE,
+    na.strings = character(),
+    sep = "."
+  )
+}
+db_table_name_extract <- function(con, x) {
+  out <- db_parse_table_name(con, x)
+  out[[length(out)]]
+}
+
 #' @export
 escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   alias <- names2(x) # assume alias is already escaped
