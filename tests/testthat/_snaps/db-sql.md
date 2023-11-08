@@ -47,7 +47,7 @@
     Output
       <error/rlang_error>
       Error in `db_save_query()`:
-      ! Can't save query to table tbl.
+      ! Can't save query to table `tbl`.
       Caused by error:
       ! dummy DBI error
 

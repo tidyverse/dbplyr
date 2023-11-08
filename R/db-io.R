@@ -184,7 +184,7 @@ db_write_table.DBIConnection <- function(con,
   check_bool(temporary)
   check_bool(overwrite)
 
-  tryCatch(
+  withCallingHandlers(
     dbWriteTable(
       con,
       name = SQL(unclass(table)),

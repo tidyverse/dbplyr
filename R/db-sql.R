@@ -1060,7 +1060,7 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  tryCatch(
+  withCallingHandlers(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
       msg <- "Can't analyze table {.field {format(table, con = con)}}."
@@ -1081,7 +1081,7 @@ db_create_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  tryCatch(
+  withCallingHandlers(
     DBI::dbExecute(con, sql),
     error = function(cnd) {
       msg <- "Can't create index on table {.field {format(table, con = con)}}."
@@ -1098,10 +1098,9 @@ dbplyr_explain <- function(con, ...) {
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
   call <- current_call()
-  tryCatch(
-    {
-      expl <- DBI::dbGetQuery(con, sql)
-    }, error = function(cnd) {
+  expl <- withCallingHandlers(
+    DBI::dbGetQuery(con, sql),
+    error = function(cnd) {
       cli_abort("Can't explain query.", parent = cnd)
     }
   )
@@ -1117,10 +1116,9 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  tryCatch(
-    {
-      df <- DBI::dbGetQuery(con, sql)
-    }, error = function(cnd) {
+  df <- withCallingHandlers(
+    DBI::dbGetQuery(con, sql),
+    error = function(cnd) {
       cli_abort("Can't query fields.", parent = cnd)
     }
   )
@@ -1149,8 +1147,12 @@ db_save_query.DBIConnection <- function(con,
         }
       }
       DBI::dbExecute(con, sql, immediate = TRUE)
-    }, error = function(cnd) {
-      cli_abort("Can't save query to table {.table {format(name, con = con)}}.", parent = cnd)
+    },
+    error = function(cnd) {
+      cli_abort(
+        "Can't save query to table {.table {format(name, con = con)}}.",
+        parent = cnd
+      )
     }
   )
   name
