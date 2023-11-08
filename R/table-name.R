@@ -63,7 +63,7 @@ as_table_name <- function(x,
     make_table_name(x, con)
   } else {
     cli::cli_abort(
-      "{.arg {error_arg}} uses specification for table name",
+      "{.arg {error_arg}} uses unknown specification for table name",
       error_call = error_call
     )
   }
@@ -91,8 +91,7 @@ is_table_name <- function(x) {
 
 #' @export
 escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-
-  alias <- names2(x)
+  alias <- names2(x) # assume alias is already escaped
   x <- unname(x)
 
   if (db_supports_table_alias_with_as(con)) {
@@ -100,9 +99,6 @@ escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = N
   } else {
     as_sql <- " "
   }
-
-  # TODO: Why is this getting double escaped?
-  # alias_esc <- sql_escape_ident(con, alias)
 
   out <- ifelse(alias == "" | alias == x, x, paste0(x, as_sql, alias))
   sql_vector(out, parens, collapse, con = con)

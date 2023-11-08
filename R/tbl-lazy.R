@@ -17,9 +17,11 @@ tbl_lazy <- function(df, con = NULL, ..., name = "df") {
   con <- con %||% sql_current_con() %||% simulate_dbi()
   subclass <- class(con)[[1]]
 
+  name <- as_table_name(name, con)
+
   dplyr::make_tbl(
     purrr::compact(c(subclass, "lazy")),
-    lazy_query = lazy_query_local(df, name),
+    lazy_query = lazy_base_query(df, names(df), class = "local", name = name),
     src = src_dbi(con)
   )
 }

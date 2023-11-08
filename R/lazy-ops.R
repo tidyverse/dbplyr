@@ -31,11 +31,6 @@ lazy_base_query <- function(x, vars, class = character(), ...) {
   )
 }
 
-lazy_query_local <- function(df, name) {
-  name <- as_table_name(I(name))
-  lazy_base_query(df, names(df), class = "local", name = name)
-}
-
 lazy_query_remote <- function(x, vars) {
   lazy_base_query(x, vars, class = "remote")
 }

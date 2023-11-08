@@ -174,7 +174,8 @@ sql_table_index.DBIConnection <- function(con,
                                           ...,
                                           call = caller_env()) {
   table <- as_table_name(table, con, error_call = call)
-  name <- name %||% paste0(c(table, columns), collapse = "_")
+  hash <- substr(hash(table), 1, 6)
+  name <- name %||% paste0(c("dbplyr", hash, columns), collapse = "_")
   glue_sql2(
     con,
     "CREATE ", if (unique) "UNIQUE ", "INDEX {.name name}",
@@ -254,8 +255,10 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
     name <- name %||% unique_subquery_name()
     glue_sql2(con, "{from}", as_sql, "{.name name}")
   } else { # must be a table_name
-    name <- sql_escape_ident(con, name)
-    setNames(from, name)
+    if (!is.null(name)) {
+      names(from) <- as_table_name(name, con)
+    }
+    from
   }
 }
 

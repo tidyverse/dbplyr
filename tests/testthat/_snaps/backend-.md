@@ -68,16 +68,14 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <dbplyr_table_ident[1]>
-      [1] `table`
+      <table_name> `table`
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <dbplyr_table_ident[1]>
-      [1] `schema`.`tbl`
+      <table_name> `schema`.`tbl`
 
 ---
 
@@ -91,14 +89,14 @@
     Code
       sql_table_index(con, in_schema("schema", "tbl"), c("a", "b"))
     Output
-      <SQL> CREATE INDEX `schema_tbl_a_b` ON `schema`.`tbl` (`a`, `b`)
+      <SQL> CREATE INDEX `dbplyr_119f50_a_b` ON `schema`.`tbl` (`a`, `b`)
 
 ---
 
     Code
       sql_table_index(con, in_schema("schema", "tbl"), "c", unique = TRUE)
     Output
-      <SQL> CREATE UNIQUE INDEX `schema_tbl_c` ON `schema`.`tbl` (`c`)
+      <SQL> CREATE UNIQUE INDEX `dbplyr_119f50_c` ON `schema`.`tbl` (`c`)
 
 ---
 
