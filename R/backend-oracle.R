@@ -133,6 +133,16 @@ sql_translation.Oracle <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
+      # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
+      # 4th argument is starting position (default: 1 => first char of string)
+      # 5th argument is occurrence (default: 0 => match all occurrences)
+      str_replace = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1L, 1L))
+      },
+      str_replace_all = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+      },
+
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
       now = function() sql_expr(CURRENT_TIMESTAMP)
