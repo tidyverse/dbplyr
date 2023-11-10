@@ -25,8 +25,8 @@ test_that("custom stringr functions translated correctly", {
   local_con(simulate_snowflake())
 
   expect_equal(test_translate_sql(str_locate(x, y)), sql("POSITION(`y`, `x`)"))
-  expect_equal(test_translate_sql(str_detect(x, y)), sql("(`x`) REGEXP ('.*' || `y` || '.*')"))
-  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("!((`x`) REGEXP ('.*' || `y` || '.*'))"))
+  expect_equal(test_translate_sql(str_detect(x, y)), sql("CONTAINS(`x`, `y`)"))
+  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("NOT(CONTAINS(`x`, `y`))"))
   expect_equal(test_translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace(x, "\\d", z)), sql("REGEXP_REPLACE(`x`, '\\\\d', `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
@@ -34,6 +34,10 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(test_translate_sql(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`)"))
   expect_equal(test_translate_sql(str_trim(x)), sql("TRIM(`x`)"))
+  expect_equal(test_translate_sql(str_starts(x, y)), sql("REGEXP_INSTR(`x`, `y`) = 1"))
+  expect_equal(test_translate_sql(str_starts(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`) != 1"))
+  expect_equal(test_translate_sql(str_ends(x, y)), sql("REGEXP_INSTR(`x`, `y`, 1, 1, 1) = (LENGTH(`x`) + 1)"))
+  expect_equal(test_translate_sql(str_ends(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`, 1, 1, 1) != (LENGTH(`x`) + 1)"))
 })
 
 test_that("aggregates are translated correctly", {

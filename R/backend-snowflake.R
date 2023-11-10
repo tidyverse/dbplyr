@@ -38,23 +38,32 @@ sql_translation.Snowflake <- function(con) {
       str_locate = function(string, pattern) {
         sql_expr(POSITION(!!pattern, !!string))
       },
-      # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
-      # str_detect does not.  Left- and right-pad `pattern` with .* to get
-      # str_detect-like behavior
       str_detect = function(string, pattern, negate = FALSE) {
-        sql_str_pattern_switch(
-          string = string,
-          pattern = {{ pattern }},
-          negate = negate,
-          f_fixed = sql_str_detect_fixed_instr("detect"),
-          f_regex = function(string, pattern, negate = FALSE) {
-            if (isTRUE(negate)) {
-              sql_expr(!(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*")))
-            } else {
-              sql_expr(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*"))
-            }
-          }
-        )
+        con <- sql_current_con()
+
+        if (negate) {
+          translate_sql(!CONTAINS(!!string, !!pattern), con = con)
+        } else {
+          translate_sql(CONTAINS(!!string, !!pattern), con = con)
+        }
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        con <- sql_current_con()
+
+        if (negate) {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 1L, con = con)
+        } else {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 1L, con = con)
+        }
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        con <- sql_current_con()
+
+        if (negate) {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) != LENGTH(!!string) + 1L, con = con)
+        } else {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) == LENGTH(!!string) + 1L, con = con)
+        }
       },
       # On Snowflake, REGEXP_REPLACE is used like this:
       # REGEXP_REPLACE( <subject> , <pattern> [ , <replacement> ,
