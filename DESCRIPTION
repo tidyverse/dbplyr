@@ -1,12 +1,12 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.3.3.9000
+Version: 2.4.0.9000
 Authors@R: c(
-    person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
+    person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
     person("Edgar", "Ruiz", role = "aut"),
-    person("RStudio", role = c("cph", "fnd"))
+    person("Posit Software, PBC", role = c("cph", "fnd"))
   )
 Description: A 'dplyr' back end for databases that allows you to work with
     remote database tables as if they are in-memory data frames.  Basic
@@ -87,6 +87,7 @@ Collate:
     'backend-postgres-old.R'
     'backend-redshift.R'
     'backend-snowflake.R'
+    'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'

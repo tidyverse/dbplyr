@@ -24,7 +24,11 @@ NULL
 
 #' @export
 #' @rdname backend-mysql
-simulate_mysql <- function() simulate_dbi("MariaDBConnection")
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
+
+#' @export
+#' @rdname backend-mysql
+simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 dbplyr_edition.MariaDBConnection <- function(con) {
@@ -129,9 +133,24 @@ sql_translation.MariaDBConnection <- function(con) {
 }
 
 #' @export
-sql_translation.MySQL <- sql_translation.MariaDBConnection
+sql_translation.MySQL <- function(con) {
+  maria <- unclass(sql_translation.MariaDBConnection())
+  sql_variant(
+    sql_translator(.parent = maria$scalar,
+      # MySQL doesn't support casting to INTEGER or BIGINT.
+      as.integer = function(x) {
+        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
+      },
+      as.integer64 = function(x) {
+        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
+      },
+    ),
+    maria$aggregate,
+    maria$window
+  )
+}
 #' @export
-sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
+sql_translation.MySQLConnection <- sql_translation.MySQL
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
@@ -253,4 +272,4 @@ supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnecti
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
 
-utils::globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%"))
+utils::globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%", "TRUNCATE", "DOUBLE"))

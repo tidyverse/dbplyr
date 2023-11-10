@@ -124,6 +124,14 @@ sql_translator <- function(...,
   funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
 
+  if (anyDuplicated(names(funs))) {
+    bullets <- unique(names(funs)[duplicated(names(funs))])
+    cli_abort(c(
+      "Duplicate names in {.fun sql_translator}",
+      set_names(bullets, "*")
+    ))
+  }
+
   list2env(funs, copy_env(.parent))
 }
 

@@ -30,17 +30,11 @@ test_that("using environment of inlined quosures", {
   expect_equal(capture_dot(lf, f(!!quo)), quote(f(x + 20)))
 })
 
-test_that("namespace operators always evaluated locally", {
-  lf <- lazy_frame(x = 1, y = 2)
-
-  expect_equal(partial_eval(quote(base::sum(1, 2)), lf), 3)
-  expect_equal(partial_eval(quote(base:::sum(1, 2)), lf), 3)
-})
-
 test_that("namespaced calls to dplyr functions are stripped", {
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(partial_eval(quote(dplyr::n()), lf), expr(n()))
+  expect_equal(partial_eval(quote(base::paste(x, "a")), lf), expr(paste(x, "a")))
   # hack to avoid check complaining about not declared imports
   expect_equal(partial_eval(rlang::parse_expr("stringr::str_to_lower(x)"), lf), expr(str_to_lower(x)))
   expect_equal(partial_eval(rlang::parse_expr("lubridate::today()"), lf), expr(today()))

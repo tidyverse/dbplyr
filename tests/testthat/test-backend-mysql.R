@@ -44,7 +44,7 @@ test_that("custom stringr functions translated correctly", {
 # verbs -------------------------------------------------------------------
 
 test_that("generates custom sql", {
-  con_maria <- simulate_mysql()
+  con_maria <- simulate_mariadb()
 
   expect_snapshot(sql_table_analyze(con_maria, in_schema("schema", "tbl")))
   expect_snapshot(sql_query_explain(con_maria, sql("SELECT * FROM table")))
@@ -57,7 +57,7 @@ test_that("generates custom sql", {
 
   expect_snapshot(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 
-  con_mysql <- simulate_dbi("MySQLConnection")
+  con_mysql <- simulate_mysql()
   expect_snapshot(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
 })
 

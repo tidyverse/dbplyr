@@ -1,3 +1,9 @@
+test_that("reframe is not supported", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% reframe()
+  })
+})
+
 test_that("summarise peels off a single layer of grouping", {
   mf1 <- memdb_frame(x = 1, y = 1, z = 2) %>% group_by(x, y)
   mf2 <- mf1 %>% summarise(n = n())
@@ -92,7 +98,7 @@ test_that("summarise() after select() works #985", {
 test_that("can group transiently using `.by`", {
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
-  out <- summarise(df, x = mean(x), .by = g) %>%
+  out <- summarise(df, x = mean(x, na.rm = TRUE), .by = g) %>%
     arrange(g) %>%
     collect()
 
