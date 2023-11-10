@@ -36,7 +36,30 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
 #' @export
 `sql_translation.Spark SQL` <- function(con) {
   sql_variant(
-    base_odbc_scalar,
+    sql_translator(.parent = base_odbc_scalar,
+       # clock ---------------------------------------------------------------
+       add_days = function(x, n, ...) {
+         check_dots_empty()
+         sql_expr(date_add(!!x, !!n))
+       },
+       add_years = function(x, n, ...) {
+         check_dots_empty()
+         sql_expr(add_months(!!!x, !!n*12))
+       },
+
+       difftime = function(time1, time2, tz, units = "days") {
+
+         if (!missing(tz)) {
+           cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+         }
+
+         if (units[1] != "days") {
+           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+         }
+
+         sql_expr(datediff(!!time2, !!time1))
+       }
+    ),
     sql_translator(.parent = base_odbc_agg,
       var = sql_aggregate("VARIANCE", "var"),
       quantile = sql_quantile("PERCENTILE"),
