@@ -353,12 +353,33 @@ simulate_mssql <- function(version = "15.0") {
 
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
-        rlang::check_dots_empty(...)
+        check_dots_empty()
         sql_expr(DATEADD(DAY, !!n, !!x))
       },
       add_years = function(x, n, ...) {
-        rlang::check_dots_empty(...)
+        check_dots_empty()
         sql_expr(DATEADD(YEAR, !!n, !!x))
+      },
+
+      difftime = function(time1, time2, tz, units) {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The `tz` argument is not supported for SQL backends.")
+        }
+
+        if (!(units[1] %in%  c("secs", "mins", "hours", "days", "weeks", "years"))) {
+          cli::cli_abort('The units argument must be one of "secs", "mins", "hours", "days", "weeks".')
+        }
+
+        datepart <- switch(units[1],
+                           years = expr(year),
+                           weeks = expr(week),
+                           days  = expr(day),
+                           hours = expr(hour),
+                           mins  = expr(minute),
+                           secs  = expr(second))
+
+        sql_expr(DATEDIFF(!!datepart, !!time1, !!time2))
       }
     )
 
