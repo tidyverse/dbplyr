@@ -72,3 +72,19 @@ test_that("copy_inline uses UNION ALL", {
     copy_inline(con, y, types = types) %>% remote_query()
   })
 })
+
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_oracle())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0, 'day'))"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_oracle())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+})
