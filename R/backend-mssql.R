@@ -361,25 +361,17 @@ simulate_mssql <- function(version = "15.0") {
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
 
-      difftime = function(time1, time2, tz, units) {
+      difftime = function(time1, time2, tz, units = "days") {
 
         if (!missing(tz)) {
-          cli::cli_abort("The `tz` argument is not supported for SQL backends.")
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
         }
 
-        if (!(units[1] %in%  c("secs", "mins", "hours", "days", "weeks", "years"))) {
-          cli::cli_abort('The units argument must be one of "secs", "mins", "hours", "days", "weeks".')
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        datepart <- switch(units[1],
-                           years = expr(year),
-                           weeks = expr(week),
-                           days  = expr(day),
-                           hours = expr(hour),
-                           mins  = expr(minute),
-                           secs  = expr(second))
-
-        sql_expr(DATEDIFF(!!datepart, !!time1, !!time2))
+        sql_expr(DATEDIFF(day, !!time1, !!time2))
       }
     )
 

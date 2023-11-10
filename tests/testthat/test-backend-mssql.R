@@ -133,19 +133,10 @@ test_that("custom clock functions translated correctly", {
 
 test_that("difftime is translated correctly", {
   local_con(simulate_mssql())
-  # years is not supported by base::difftime version but seems useful for SQL
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "years")), sql("DATEDIFF(year, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "weeks")), sql("DATEDIFF(week, `start_date`, `end_date`)"))
   expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "mins")), sql("DATEDIFF(minute, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "hours")), sql("DATEDIFF(hour, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "secs")), sql("DATEDIFF(second, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
 
-  # auto units is not supported
   expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  # units must be specified
-  expect_error(test_translate_sql(difftime(start_date, end_date)))
-  # tz is not supported
   expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
 })
 
