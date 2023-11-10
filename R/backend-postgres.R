@@ -235,6 +235,29 @@ sql_translation.PqConnection <- function(con) {
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       },
+
+      # clock ---------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + !!n%*INTERVAL%'1 day'))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + !!n%*INTERVAL%'1 year'))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr((CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+      },
     ),
     sql_translator(.parent = base_agg,
       cor = sql_aggregate_2("CORR"),

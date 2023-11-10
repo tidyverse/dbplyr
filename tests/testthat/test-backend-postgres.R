@@ -88,6 +88,22 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(floor_date(x, 'week')),        sql("DATE_TRUNC('week', `x`)"))
 })
 
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_postgres())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + 1.0 *INTERVAL '1 year')"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + 1.0 *INTERVAL '1 day')"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_postgres())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+})
+
 test_that("custom window functions translated correctly", {
   local_con(simulate_postgres())
 
