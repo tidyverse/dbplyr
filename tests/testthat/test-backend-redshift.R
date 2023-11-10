@@ -57,3 +57,19 @@ test_that("copy_inline uses UNION ALL", {
     copy_inline(con, y, types = types) %>% remote_query()
   })
 })
+
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_redshift())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_redshift())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+})
