@@ -42,9 +42,9 @@ sql_translation.Snowflake <- function(con) {
         con <- sql_current_con()
 
         if (negate) {
-          translate_sql(!CONTAINS(!!string, !!pattern), con = con)
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 0L, con = con)
         } else {
-          translate_sql(CONTAINS(!!string, !!pattern), con = con)
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 0L, con = con)
         }
       },
       str_starts = function(string, pattern, negate = FALSE) {

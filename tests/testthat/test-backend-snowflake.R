@@ -25,8 +25,8 @@ test_that("custom stringr functions translated correctly", {
   local_con(simulate_snowflake())
 
   expect_equal(test_translate_sql(str_locate(x, y)), sql("POSITION(`y`, `x`)"))
-  expect_equal(test_translate_sql(str_detect(x, y)), sql("CONTAINS(`x`, `y`)"))
-  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("NOT(CONTAINS(`x`, `y`))"))
+  expect_equal(test_translate_sql(str_detect(x, y)), sql("REGEXP_INSTR(`x`, `y`) != 0"))
+  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`) = 0"))
   expect_equal(test_translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace(x, "\\d", z)), sql("REGEXP_REPLACE(`x`, '\\\\d', `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
