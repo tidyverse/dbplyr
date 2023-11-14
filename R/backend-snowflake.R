@@ -270,15 +270,17 @@ snowflake_grepl <- function(pattern,
                             perl = FALSE,
                             fixed = FALSE,
                             useBytes = FALSE) {
-  # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
-  check_unsupported_arg(ignore.case, FALSE, backend = "Snowflake")
+  con <- sql_current_con()
+
   check_unsupported_arg(perl, FALSE, backend = "Snowflake")
   check_unsupported_arg(fixed, FALSE, backend = "Snowflake")
   check_unsupported_arg(useBytes, FALSE, backend = "Snowflake")
-  # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
-  # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
-  # behavior
-  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0("(", pattern, ")") || ".*"))
+
+  # https://docs.snowflake.com/en/sql-reference/functions/regexp_instr.html
+  # REGEXP_INSTR optional parameters: position, occurrance, option, regex_parameters
+  regexp_parameters <- "c"
+  if(ignore.case) { regexp_parameters <- "i" }
+  translate_sql(REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L, con = con)
 }
 
 snowflake_round <- function(x, digits = 0L) {

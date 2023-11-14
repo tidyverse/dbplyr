@@ -2,8 +2,8 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_snowflake())
   expect_equal(test_translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(test_translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
-  expect_equal(test_translate_sql(grepl("exp", x)), sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
-  expect_snapshot((expect_error(test_translate_sql(grepl("exp", x, ignore.case = TRUE)))))
+  expect_equal(test_translate_sql(grepl("exp", x)), sql("REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'c') != 0"))
+  expect_equal(test_translate_sql(grepl("exp", x, ignore.case = TRUE)), sql("REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'i') != 0"))
 })
 
 test_that("pasting translated correctly", {
