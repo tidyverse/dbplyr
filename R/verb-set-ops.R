@@ -7,7 +7,7 @@
 #' @inheritParams left_join.tbl_lazy
 #' @param ... Not currently used; provided for future extensions.
 #' @param all If `TRUE`, includes all matches in output, not just unique rows.
-# registered onLoad
+#' @exportS3Method dplyr::intersect
 #' @importFrom dplyr intersect
 intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   lazy_query <- add_set_op(x, y, "INTERSECT", copy = copy, ..., all = all)
@@ -15,7 +15,6 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   x$lazy_query <- lazy_query
   x
 }
-# registered onLoad
 #' @importFrom dplyr union
 #' @exportS3Method dplyr::union
 #' @rdname intersect.tbl_lazy
@@ -35,7 +34,6 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   x$lazy_query <- lazy_query
   x
 }
-# registered onLoad
 #' @importFrom dplyr setdiff
 #' @exportS3Method dplyr::setdiff
 #' @rdname intersect.tbl_lazy
