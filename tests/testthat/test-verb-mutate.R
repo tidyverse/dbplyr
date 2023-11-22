@@ -212,6 +212,7 @@ test_that("empty mutate returns input", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
+  suppressWarnings(check_na_rm(FALSE))
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
   out <- mutate(df, x = mean(x), .by = g) %>%
