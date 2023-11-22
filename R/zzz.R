@@ -1,5 +1,8 @@
 # nocov start
 .onLoad <- function(...) {
+  # lazy S3method() directive for this case only works in 4.3 and later
+  s3_register("dplyr::filter", "tbl_lazy")
+
   methods::setOldClass(c("ident_q", "ident", "character"), ident_q())
   methods::setOldClass(c("ident", "character"), ident())
   methods::setOldClass(c("sql", "character"), sql())

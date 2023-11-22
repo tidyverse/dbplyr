@@ -14,7 +14,7 @@
 #' db %>% filter(x < 5) %>% show_query()
 #' db %>% filter(is.na(x)) %>% show_query()
 #' @importFrom dplyr filter
-#' @exportS3Method dplyr::filter
+# Registered onLoad
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
   check_filter(...)

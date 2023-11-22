@@ -101,6 +101,7 @@ Collate:
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'import-standalone-s3-register.R'
     'join-by-compat.R'
     'join-cols-compat.R'
     'lazy-join-query.R'
