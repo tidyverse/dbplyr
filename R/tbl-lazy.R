@@ -71,7 +71,7 @@ groups.tbl_lazy <- function(x) {
 }
 
 # nocov start
-# Manually registered in zzz.R
+#' @exportS3Method dplyr::group_by_drop_default
 group_by_drop_default.tbl_lazy <- function(x) {
   TRUE
 }

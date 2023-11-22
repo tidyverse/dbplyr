@@ -17,6 +17,7 @@ intersect.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 }
 # registered onLoad
 #' @importFrom dplyr union
+#' @exportS3Method dplyr::union
 #' @rdname intersect.tbl_lazy
 union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   lazy_query <- add_union(x, y, all = all, copy = copy, ...)
@@ -26,6 +27,7 @@ union.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
 }
 #' @export
 #' @importFrom dplyr union_all
+#' @exportS3Method dplyr::union_all
 #' @rdname intersect.tbl_lazy
 union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
   lazy_query <- add_union(x, y, all = TRUE, copy = copy, ...)
@@ -35,6 +37,7 @@ union_all.tbl_lazy <- function(x, y, copy = FALSE, ...) {
 }
 # registered onLoad
 #' @importFrom dplyr setdiff
+#' @exportS3Method dplyr::setdiff
 #' @rdname intersect.tbl_lazy
 setdiff.tbl_lazy <- function(x, y, copy = FALSE, ..., all = FALSE) {
   lazy_query <- add_set_op(x, y, "EXCEPT", copy = copy, ..., all = all)

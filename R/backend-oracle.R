@@ -168,7 +168,7 @@ sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
   sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 
-# registered onLoad located in the zzz.R script
+#' @exportS3Method dplyr::setdiff
 setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
   # Oracle uses MINUS instead of EXCEPT for this operation:
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries004.htm
@@ -213,7 +213,7 @@ sql_query_save.OraConnection <- sql_query_save.Oracle
 #' @export
 sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
 
-# registered onLoad located in the zzz.R script
+#' @exportS3Method dplyr::setdiff
 setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export

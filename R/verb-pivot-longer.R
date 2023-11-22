@@ -59,6 +59,7 @@
 #'   y = 3:4
 #' ) %>%
 #'   tidyr::pivot_longer(-id)
+#' @exportS3Method tidyr::pivot_longer
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
                                   ...,
