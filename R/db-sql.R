@@ -1013,7 +1013,7 @@ sql_query_delete.DBIConnection <- function(con,
                                            by,
                                            ...,
                                            returning_cols = NULL) {
-  table <- as_table_name(table)
+  table <- as_table_name(table, con)
   from <- as_table_source(from, con)
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
