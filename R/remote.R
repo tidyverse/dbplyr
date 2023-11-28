@@ -33,7 +33,7 @@
 remote_name <- function(x, null_if_local = TRUE) {
   table <- remote_table(x, null_if_local = null_if_local)
 
-  if (is.sql(table)) {
+  if (is.sql(table) || is.null(table)) {
     NULL
   } else {
     con <- remote_con(x)

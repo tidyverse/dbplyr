@@ -63,7 +63,7 @@ as_table_name <- function(x,
     check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
     new_table_name(unclass(x))
   } else if (is.character(x)) {
-    make_table_name(x, con)
+    make_table_name(x, con, collapse = FALSE)
   } else {
     cli::cli_abort(
       "{.arg {error_arg}} uses unknown specification for table name",
@@ -72,9 +72,12 @@ as_table_name <- function(x,
   }
 }
 
-make_table_name <- function(x, con) {
+make_table_name <- function(x, con, collapse = TRUE) {
   needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
   x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
+  if (collapse) {
+    x <- paste0(x, collapse = ".")
+  }
 
   new_table_name(x)
 }
