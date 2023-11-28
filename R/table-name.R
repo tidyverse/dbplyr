@@ -97,6 +97,12 @@ print.dbplyr_table_name <- function(x) {
   new_table_name(NextMethod())
 }
 
+#' @export
+`c.dbplyr_table_name` <- function(x, ...) {
+  new_table_name(NextMethod())
+}
+
+
 is_table_name <- function(x) {
   inherits(x, "dbplyr_table_name")
 }
