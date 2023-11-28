@@ -264,7 +264,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   }
 
   y_vars <- op_vars(op$y)
-  replacements <- purrr::map(y_vars, ~ call2("$", sym(op$by$y_as), sym(.x)))
+  replacements <- purrr::map(y_vars, ~ call2("$", call2("sql", op$by$y_as), sym(.x)))
   where <- purrr::map(
     op$where,
     ~ replace_sym(.x, y_vars, replacements)
