@@ -126,7 +126,6 @@ Collate:
     'sql-expr.R'
     'src-sql.R'
     'src_dbi.R'
-    'table-ident.R'
     'table-name.R'
     'tbl-lazy.R'
     'tbl-sql.R'
