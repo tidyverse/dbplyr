@@ -252,7 +252,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
 
     from <- sql_indent_subquery(from, con, lvl)
     # some backends, e.g. Postgres, require an alias for a subquery
-    name <- name %||% unique_subquery_name()
+    name <- name %||% unique_subquery_name(con)
     glue_sql2(con, "{from}", as_sql, "{.name name}")
   } else { # must be a table_name
     if (!is.null(name)) {
@@ -1169,7 +1169,7 @@ dbplyr_sql_subquery <- function(con, ...) {
 #' @importFrom dplyr sql_subquery
 sql_subquery.DBIConnection <- function(con,
                                        from,
-                                       name = unique_subquery_name(),
+                                       name = unique_subquery_name(con),
                                        ...,
                                        lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)

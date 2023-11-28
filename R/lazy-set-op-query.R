@@ -79,6 +79,7 @@ op_vars.lazy_union_query <- function(op) {
 #' @export
 sql_build.lazy_union_query <- function(op, con, ..., sql_options = NULL) {
   # add_union() ensures that both have same variables
+
   unions <- list(
     table = purrr::map(
       op$unions$table,

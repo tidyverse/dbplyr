@@ -65,7 +65,7 @@ sql_query_select.Teradata <- function(con,
       lvl       = lvl + 1
     )
 
-    alias <- unique_subquery_name()
+    alias <- unique_subquery_name(con)
     from <- sql_query_wrap(con, unlimited_query, name = alias)
     select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(con,

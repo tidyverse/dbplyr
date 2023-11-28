@@ -115,19 +115,19 @@ sql_render.multi_join_query <- function(query,
 flatten_query.join_query <- flatten_query_2_tables
 
 #' @export
-flatten_query.multi_join_query <- function(qry, query_list) {
+flatten_query.multi_join_query <- function(qry, query_list, con) {
   x <- qry$x
-  query_list_new <- flatten_query(x, query_list)
+  query_list_new <- flatten_query(x, query_list, con)
   qry$x <- get_subquery_name(x, query_list_new)
 
   for (i in vctrs::vec_seq_along(qry$joins)) {
     y <- qry$joins$table[[i]]
-    query_list_new <- flatten_query(y, query_list_new)
+    query_list_new <- flatten_query(y, query_list_new, con)
     qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
   }
 
   # TODO reuse query
-  name <- unique_subquery_name()
+  name <- unique_subquery_name(con)
   wrapped_query <- set_names(list(qry), name)
 
   query_list$queries <- c(query_list_new$queries, wrapped_query)

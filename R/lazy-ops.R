@@ -89,7 +89,7 @@ sql_render.base_query <- function(query,
 }
 
 #' @export
-flatten_query.base_query <- function(qry, query_list) {
+flatten_query.base_query <- function(qry, query_list, con) {
   query_list
 }
 

@@ -181,8 +181,8 @@ sql_render.values_query <- function(query,
 }
 
 #' @export
-flatten_query.values_query <- function(qry, query_list) {
-  querylist_reuse_query(qry, query_list)
+flatten_query.values_query <- function(qry, query_list, con) {
+  querylist_reuse_query(qry, query_list, con)
 }
 
 #' @export
