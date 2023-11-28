@@ -17,10 +17,10 @@ test_that("missing columns filled with NULL", {
 test_that("first edition works", {
   con <- structure(list(), class = c("Test", "DBIConnection"))
 
-  lf <- lazy_frame(x = 1, con = con)
   local_methods(
     sql_escape_ident.Test = function(con, x) sql_quote(x, "`")
   )
+  lf <- lazy_frame(x = 1, con = con)
 
   local_options(rlib_warning_verbosity = "quiet")
 
