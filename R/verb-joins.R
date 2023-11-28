@@ -760,7 +760,7 @@ make_table_names <- function(as, lq) {
   } else if (!is.null(name)) {
     tibble(name = name, from = "name")
   } else {
-    tibble(name = new_table_name(""), from = "")
+    tibble(name = table_name(""), from = "")
   }
 }
 

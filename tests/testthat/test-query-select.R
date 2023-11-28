@@ -26,7 +26,7 @@ test_that("optimisation is turned on by default", {
   lf <- lazy_frame(x = 1, y = 2) %>% arrange(x) %>% head(5)
   qry <- lf %>% sql_build()
 
-  expect_equal(qry$from, base_query(new_table_name("`df`")))
+  expect_equal(qry$from, base_query(table_name("`df`")))
 })
 
 test_that("group by then limit is collapsed", {

@@ -144,7 +144,7 @@ cte_render <- function(query_list, con) {
   ctes <- purrr::imap(
     query_list[-n],
     function(query, name) {
-      name <- new_table_name(name)
+      name <- table_name(name)
       glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
     }
   )

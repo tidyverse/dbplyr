@@ -173,8 +173,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
       # FIXME: why is unique now needed?
-      by$x_as <- new_table_name(table_names_out[unique(op$joins$by_x_table_id[[i]])])
-      by$y_as <- new_table_name(table_names_out[i + 1L])
+      by$x_as <- table_name(table_names_out[unique(op$joins$by_x_table_id[[i]])])
+      by$y_as <- table_name(table_names_out[i + 1L])
       by
     }
   )

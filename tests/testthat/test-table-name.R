@@ -4,24 +4,24 @@
 test_that("can coerce all user facing inputs", {
   con <- simulate_dbi()
 
-  expect_equal(new_table_name("`x`"), new_table_name("`x`"))
-  expect_equal(as_table_name("x", con), new_table_name("`x`"))
-  expect_equal(as_table_name(I("x"), con), new_table_name("x"))
-  expect_equal(as_table_name(ident("x"), con), new_table_name("`x`"))
-  expect_equal(as_table_name(ident_q("x"), con), new_table_name("x"))
+  expect_equal(table_name("`x`"), table_name("`x`"))
+  expect_equal(as_table_name("x", con), table_name("`x`"))
+  expect_equal(as_table_name(I("x"), con), table_name("x"))
+  expect_equal(as_table_name(ident("x"), con), table_name("`x`"))
+  expect_equal(as_table_name(ident_q("x"), con), table_name("x"))
 
   id <- DBI::Id(schema = "foo", table = "bar")
-  expect_equal(as_table_name(id, con), new_table_name("`foo`.`bar`"))
+  expect_equal(as_table_name(id, con), table_name("`foo`.`bar`"))
   names(id@name) <- NULL
-  expect_equal(as_table_name(id, con), new_table_name("`foo`.`bar`"))
+  expect_equal(as_table_name(id, con), table_name("`foo`.`bar`"))
 
   expect_equal(
     as_table_name(in_schema("foo", "bar"), con),
-    new_table_name("`foo`.`bar`")
+    table_name("`foo`.`bar`")
   )
   expect_equal(
     as_table_name(in_catalog("foo", "bar", "baz"), con),
-    new_table_name("`foo`.`bar`.`baz`")
+    table_name("`foo`.`bar`.`baz`")
   )
 })
 

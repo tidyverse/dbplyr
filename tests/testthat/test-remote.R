@@ -4,13 +4,13 @@ test_that("remote_table returns name when it makes sense", {
   # produces name after `group_by()`
   expect_equal(
     mf %>% group_by(x) %>% remote_table(),
-    new_table_name("`refxiudlph`")
+    table_name("`refxiudlph`")
   )
 
   # produces name after unarranging
   expect_equal(
     mf %>% arrange(x) %>% arrange() %>% remote_table(),
-    new_table_name("`refxiudlph`")
+    table_name("`refxiudlph`")
   )
 
   # produces name after compute()
@@ -19,7 +19,7 @@ test_that("remote_table returns name when it makes sense", {
 
 test_that("remote_table returns null for computed tables", {
   mf <- copy_to_test("sqlite", tibble(x = 5, y = 1), name = "refxiudlph")
-  expect_equal(remote_table(mf), new_table_name("`refxiudlph`"))
+  expect_equal(remote_table(mf), table_name("`refxiudlph`"))
 
   expect_null(mf %>% filter(x == 3) %>% remote_table())
   expect_null(mf %>% distinct(x) %>% remote_table())
@@ -34,8 +34,8 @@ test_that("remote_table returns null for computed tables", {
   expect_null(lf %>% group_by(x) %>% remote_table())
 
   lf <- lazy_frame(x = 1)
-  expect_equal(lf %>% remote_table(null_if_local = FALSE), new_table_name("`df`"))
-  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), new_table_name("`df`"))
+  expect_equal(lf %>% remote_table(null_if_local = FALSE), table_name("`df`"))
+  expect_equal(lf %>% group_by(x) %>% remote_table(null_if_local = FALSE), table_name("`df`"))
 })
 
 test_that("remote_name and remote_table can handle different table identifiers", {

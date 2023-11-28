@@ -50,9 +50,9 @@ as_table_name <- function(x,
         i = "If you want to use a literal (unquoted) identifier use {.fn I} instead."
       )
     )
-    new_table_name(unclass(x))
+    table_name(unclass(x))
   } else if (inherits(x, "ident_q")) {
-    new_table_name(paste0(x, collapse = "."))
+    table_name(paste0(x, collapse = "."))
   } else if (is.ident(x)) {
     make_table_name(unclass(x), con)
   } else if (is(x, "Id")) {
@@ -63,7 +63,7 @@ as_table_name <- function(x,
     make_table_name(c(unclass(x$schema), unclass(x$table)), con)
   } else if (inherits(x, "AsIs")) {
     check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
-    new_table_name(unclass(x))
+    table_name(unclass(x))
   } else if (is.character(x)) {
     make_table_name(x, con, collapse = FALSE)
   } else {
@@ -81,10 +81,10 @@ make_table_name <- function(x, con, collapse = TRUE) {
     x <- paste0(x, collapse = ".")
   }
 
-  new_table_name(x)
+  table_name(x)
 }
 
-new_table_name <- function(x) {
+table_name <- function(x) {
   structure(x, class = "dbplyr_table_name")
 }
 
@@ -95,16 +95,16 @@ print.dbplyr_table_name <- function(x) {
 
 #' @export
 `[.dbplyr_table_name` <- function(x, ...) {
-  new_table_name(NextMethod())
+  table_name(NextMethod())
 }
 #' @export
 `[[.dbplyr_table_name` <- function(x, ...) {
-  new_table_name(NextMethod())
+  table_name(NextMethod())
 }
 
 #' @export
 `c.dbplyr_table_name` <- function(x, ...) {
-  new_table_name(NextMethod())
+  table_name(NextMethod())
 }
 
 

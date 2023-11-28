@@ -182,7 +182,7 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
     duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
     duplicated_vars <- unique(duplicated_vars)
   }
-  table_names <- new_table_name(names(table_vars))
+  table_names <- table_name(names(table_vars))
 
   # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
   out <- rep_named(vars$name, list())
@@ -250,7 +250,7 @@ sql_rf_join_vars <- function(con,
                              use_star,
                              qualify_all_columns) {
   type <- arg_match0(type, c("right", "full"))
-  table_names <- new_table_name(c(x_as, y_as))
+  table_names <- table_name(c(x_as, y_as))
 
   if (type == "full") {
     duplicated_vars <- intersect(tolower(vars$all_x), tolower(vars$all_y))
