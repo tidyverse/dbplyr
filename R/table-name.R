@@ -39,13 +39,15 @@ as_table_name <- function(x,
                           con,
                           error_arg = caller_arg(x),
                           error_call = caller_env()) {
+  check_con(con)
+
   if (is_table_name(x)) {
     x
   } else if (is.sql(x)) {
     cli::cli_warn(
       c(
-        "{.arg {error_arg}} uses SQL where a table identifier is expected",
-        i = "If you want to use a literal string without escaping using {.fn I} instead"
+        "{.arg {error_arg}} uses SQL where a table identifier is expected.",
+        i = "If you want to use a literal (unquoted) identifier use {.fn I} instead."
       )
     )
     new_table_name(unclass(x))
