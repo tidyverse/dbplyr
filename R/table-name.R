@@ -76,7 +76,7 @@ make_table_name <- function(x, con) {
   needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
   x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
 
-  new_table_name(paste0(x, collapse = "."))
+  new_table_name(x)
 }
 
 new_table_name <- function(x) {

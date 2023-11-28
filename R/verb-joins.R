@@ -817,7 +817,7 @@ join_two_table_alias <- function(names, from, con) {
   vctrs::vec_assert(names, size = 2L)
 
   out <- names
-  out[from == ""] <- c("LHS", "RHS")[from == ""]
+  out[from == ""] <- as_table_name(c("LHS", "RHS"), con)[from == ""]
 
   if (!identical(out[1], out[2])) {
     return(out)
