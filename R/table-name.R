@@ -85,7 +85,16 @@ new_table_name <- function(x) {
 
 #' @export
 print.dbplyr_table_name <- function(x) {
-  cat("<table_name> ", style_kw(x), "\n", sep = "")
+  cat("<table_name> ", paste0(style_kw(x), collapse = ", "), "\n", sep = "")
+}
+
+#' @export
+`[.dbplyr_table_name` <- function(x, ...) {
+  new_table_name(NextMethod())
+}
+#' @export
+`[[.dbplyr_table_name` <- function(x, ...) {
+  new_table_name(NextMethod())
 }
 
 is_table_name <- function(x) {
@@ -105,8 +114,10 @@ db_parse_table_name <- function(con, x) {
   )
 }
 db_table_name_extract <- function(con, x) {
-  out <- db_parse_table_name(con, x)
-  out[[length(out)]]
+  vapply(x, FUN.VALUE = character(1), function(x) {
+    out <- db_parse_table_name(con, x)
+    out[[length(out)]]
+  })
 }
 
 #' @export

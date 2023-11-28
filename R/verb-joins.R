@@ -374,7 +374,7 @@ add_join <- function(x,
   # the table alias can only be determined after `select()` was inlined.
   # This works even though `by` is used in `join_inline_select()` and updated
   # because this does not touch `by$x_as` and `by$y_as`.
-  join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
 
   inline_result <- join_inline_select(x$lazy_query, by$x, by$on)
   x_lq <- inline_result$lq
@@ -681,15 +681,17 @@ add_semi_join <- function(x,
   by$na_matches <- na_matches
 
   # the table alias can only be determined after `select()` was inlined
-  join_alias <- make_join_aliases(x_as, y_as, sql_on, call)
+  join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
 
   x_alias <- make_table_names(join_alias$x, x_lq)
   y_alias <- make_table_names(join_alias$y, y_lq)
-  by[c("x_as", "y_as")] <- join_two_table_alias(
-    c(x_alias$name, y_alias$name),
+  aliases <- join_two_table_alias(
+    new_table_name(c(x_alias$name, y_alias$name)),
     c(x_alias$from, y_alias$from),
     remote_con(x)
   )
+  by$x_as <- aliases[1]
+  by$y_as <- aliases[2]
 
   lazy_semi_join_query(
     x_lq,
@@ -738,7 +740,7 @@ semi_join_inline_select <- function(lq, by, on) {
   )
 }
 
-make_join_aliases <- function(x_as, y_as, sql_on, call) {
+make_join_aliases <- function(con, x_as, y_as, sql_on, call) {
   x_as <- check_join_as1(x_as, arg = "x_as", sql_on, default = "LHS", call)
   y_as <- check_join_as1(y_as, arg = "y_as", sql_on, default = "RHS", call)
 
@@ -746,18 +748,21 @@ make_join_aliases <- function(x_as, y_as, sql_on, call) {
     cli_abort("{.arg y_as} must be different from {.arg x_as}.", call = call)
   }
 
-  list(x = x_as, y = y_as)
+  list(
+    x = if (!is.null(x_as)) as_table_name(x_as, con),
+    y = if (!is.null(y_as)) as_table_name(y_as, con)
+  )
 }
 
 make_table_names <- function(as, lq) {
-  name <- unclass(remote_name(lq, null_if_local = FALSE))
+  name <- remote_name(lq, null_if_local = FALSE)
 
   if (!is.null(as)) {
     tibble(name = as, from = "as")
   } else if (!is.null(name)) {
     tibble(name = name, from = "name")
   } else {
-    tibble(name = "", from = "")
+    tibble(name = new_table_name(""), from = "")
   }
 }
 
@@ -822,8 +827,8 @@ join_two_table_alias <- function(names, from, con) {
   tables_have_same_name <- from[1] == "name" && from[2] == "name" && identical(names[1], names[2])
   if (tables_have_same_name) {
     out <- c(
-      paste0(db_table_name_extract(con, names[1]), "_LHS"),
-      paste0(db_table_name_extract(con, names[2]), "_RHS")
+      as_table_name(paste0(db_table_name_extract(con, names[1]), "_LHS"), con),
+      as_table_name(paste0(db_table_name_extract(con, names[2]), "_RHS"), con)
     )
     return(out)
   }

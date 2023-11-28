@@ -289,56 +289,56 @@ test_that("join uses correct table alias", {
 
   # self joins
   table_names <- sql_build(left_join(x, x, by = "a"))$table_names
-  expect_equal(table_names, c("x_LHS", "x_RHS"))
+  expect_equal(table_names, new_table_name(c("`x_LHS`", "`x_RHS`")))
 
   table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "x"))
+  expect_equal(table_names, new_table_name(c("`my_x`", "`x`")))
 
   table_names <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  expect_equal(table_names, new_table_name(c("`x`", "`my_y`")))
 
   table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  expect_equal(table_names, new_table_name(c("`my_x`", "`my_y`")))
 
   # x-y joins
   table_names <- sql_build(left_join(x, y, by = "a"))$table_names
-  expect_equal(table_names, c("x", "y"))
+  expect_equal(table_names, new_table_name(c("`x`", "`y`")))
 
   table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "y"))
+  expect_equal(table_names, new_table_name(c("`my_x`", "`y`")))
 
   table_names <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  expect_equal(table_names, new_table_name(c("`x`", "`my_y`")))
 
   table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  expect_equal(table_names, new_table_name(c("`my_x`", "`my_y`")))
 
   # x_as same name as `y`
   table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
-  expect_equal(table_names, c("y", "y...2"))
+  expect_equal(table_names, new_table_name(c("`y`", "`y...2`")))
 
   table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
-  expect_equal(table_names, c("LHS...1", "LHS"))
+  expect_equal(table_names, new_table_name(c("`LHS...1`", "`LHS`")))
 
   # sql_on -> use alias or LHS/RHS
   table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
-  expect_equal(table_names, c("LHS", "RHS"))
+  expect_equal(table_names, new_table_name(c("`LHS`", "`RHS`")))
 
   table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
-  expect_equal(table_names, c("my_x", "RHS"))
+  expect_equal(table_names, new_table_name(c("`my_x`", "`RHS`")))
 
   # triple join
   z <- lazy_frame(a = 1, z = 1, .name = "z")
   out <- left_join(x, y, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x", "y", "z"))
+  expect_equal(out$table_names, new_table_name(c("`x`", "`y`", "`z`")))
 
   # triple join where names need to be repaired
   out <- left_join(x, x, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x...1", "x...2", "z"))
+  expect_equal(out$table_names, new_table_name(c("`x...1`", "`x...2`", "`z`")))
 })
 
 test_that("select() before join is inlined", {
@@ -623,7 +623,10 @@ test_that("multiple joins create a single query", {
     inner_join(lf3, by = "x")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(name = c("df1", "df2", "df3"), from = "name"))
+  expect_equal(lq$table_names, tibble(
+    name = new_table_name(c("`df1`", "`df2`", "`df3`")),
+    from = "name"
+  ))
   expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
   expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
   expect_equal(lq$vars$var, c("x", "a", "b", "b"))
@@ -722,7 +725,10 @@ test_that("multi joins work with x_as", {
     inner_join(lf3, by = "x", y_as = "lf3")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(name = c("lf1", "lf2", "lf3"), from = "as"))
+  expect_equal(
+    lq$table_names,
+    tibble(name = new_table_name(c("`lf1`", "`lf2`", "`lf3`")), from = "as")
+  )
 
   # `x_as` provided twice with the same name -> one query
   out2 <- left_join(lf, lf2, by = "x", x_as = "lf1", y_as = "lf2") %>%

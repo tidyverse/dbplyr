@@ -154,6 +154,7 @@ op_vars.lazy_semi_join_query <- function(op) {
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   table_names_out <- generate_join_table_names(op$table_names, con)
+
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
   select_sql <- sql_multi_join_vars(
@@ -172,8 +173,8 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
       # FIXME: why is unique now needed?
-      by$x_as <- table_names_out[unique(op$joins$by_x_table_id[[i]])]
-      by$y_as <- table_names_out[i + 1L]
+      by$x_as <- new_table_name(table_names_out[unique(op$joins$by_x_table_id[[i]])])
+      by$y_as <- new_table_name(table_names_out[i + 1L])
       by
     }
   )
@@ -199,7 +200,9 @@ generate_join_table_names <- function(table_names, con) {
   }
 
   # avoid database aliases exceeding the database-specific maximum length
-  abbreviate(
+
+  # TODO: unescape then escape
+  new_table_name(abbreviate(
     table_names_prepared,
     # arbitrarily floor at identifier limit for Postgres backend to avoid unnecessarily truncating reasonable lengths
     # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -213,7 +216,7 @@ generate_join_table_names <- function(table_names, con) {
     # don't over anchor to the start of the string,
     # since we opt to add qualifiers (...1, _{R/L}HS, etc.) to end of table name
     method = "both.sides"
-  )
+  ))
 }
 
 #' @export
