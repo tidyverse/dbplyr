@@ -121,6 +121,8 @@ db_parse_table_name <- function(con, x) {
 }
 db_table_name_extract <- function(con, x) {
   vapply(x, FUN.VALUE = character(1), function(x) {
+    if (x == "") return("")
+
     out <- db_parse_table_name(con, x)
     out[[length(out)]]
   })

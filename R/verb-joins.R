@@ -683,15 +683,13 @@ add_semi_join <- function(x,
   # the table alias can only be determined after `select()` was inlined
   join_alias <- make_join_aliases(x$src$con, x_as, y_as, sql_on, call)
 
-  x_alias <- make_table_names(join_alias$x, x_lq)
-  y_alias <- make_table_names(join_alias$y, y_lq)
-  aliases <- join_two_table_alias(
-    new_table_name(c(x_alias$name, y_alias$name)),
-    c(x_alias$from, y_alias$from),
-    remote_con(x)
+  aliases <- vctrs::vec_rbind(
+    make_table_names(join_alias$x, x_lq),
+    make_table_names(join_alias$y, y_lq)
   )
-  by$x_as <- aliases[1]
-  by$y_as <- aliases[2]
+  names <- generate_join_table_names(aliases, remote_con(x))
+  by$x_as <- names[1]
+  by$y_as <- names[2]
 
   lazy_semi_join_query(
     x_lq,
@@ -811,13 +809,15 @@ join_vars <- function(x_names, y_names, type, by, suffix = c(".x", ".y"), call =
   )
 }
 
-join_two_table_alias <- function(names, from, con) {
+# names are bare table names without qualifiers
+# only called from generate_join_table_names
+join_two_table_alias <- function(names, from) {
   check_character(names)
   check_character(from)
   vctrs::vec_assert(names, size = 2L)
 
   out <- names
-  out[from == ""] <- as_table_name(c("LHS", "RHS"), con)[from == ""]
+  out[from == ""] <- c("LHS", "RHS")[from == ""]
 
   if (!identical(out[1], out[2])) {
     return(out)
@@ -826,11 +826,7 @@ join_two_table_alias <- function(names, from, con) {
 
   tables_have_same_name <- from[1] == "name" && from[2] == "name" && identical(names[1], names[2])
   if (tables_have_same_name) {
-    out <- c(
-      as_table_name(paste0(db_table_name_extract(con, names[1]), "_LHS"), con),
-      as_table_name(paste0(db_table_name_extract(con, names[2]), "_RHS"), con)
-    )
-    return(out)
+    return(paste0(names, c("_LHS", "_RHS")))
   }
 
   out_repaired <- vctrs::vec_as_names(out, repair = "unique", quiet = TRUE)
