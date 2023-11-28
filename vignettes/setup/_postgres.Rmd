@@ -6,13 +6,12 @@ First install PostgreSQL, create a data directory, and create a default database
 
 ```
 brew install postgresql
-export PGDATA=~/db/postgres-9.5 # set this globally somewhere
-initdb -E utf8
-createdb
-createdb hadley
+export PGDATA=~/db/postgres # set this globally somewhere
+initdb
 createdb test
-createdb lahman
-createdb nycflights13
+
+psql -c "CREATE USER postgres WITH PASSWORD 'password';"
+psql -c "ALTER USER postgres WITH SUPERUSER;"
 ```
 
 ## Start
@@ -24,8 +23,14 @@ pg_ctl start
 ## Connect
 
 ```{r, eval = FALSE}
-install.packages("RPostgreSQL")
 library(DBI)
-con <- dbConnect(RPostgreSQL::PostgreSQL(), dbname = "hadley")
+con <- dbConnect(RPostgres::Postgres(), dbname = "hadley")
 dbListTables(con)
+
+con <- dbConnect(
+  RPostgres::Postgres(), 
+  dbname = "test", 
+  user = "postgres", 
+  password = "passowrd"
+)
 ```
