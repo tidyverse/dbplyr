@@ -1,3 +1,14 @@
+test_that("table_name possess key methods", {
+  expect_snapshot({
+    name <- table_name(c("x", "y", "z"))
+    name
+  })
+
+  expect_equal(name[c(1, 3)], table_name(c("x", "z")))
+  expect_equal(name[[2]], table_name("y"))
+  expect_equal(c(name[[1]], name[[2]]), table_name(c("x", "y")))
+})
+
 
 # as_table_name -----------------------------------------------------------
 
@@ -9,7 +20,7 @@ test_that("can coerce all user facing inputs", {
 
   id <- table_name("x")
   expect_true(is_table_id(id))
-  expect_equal(id, x_raw)
+  expect_equal(as_table_name(id, con), x_raw)
 
   id <- "x"
   expect_true(is_table_id(id))

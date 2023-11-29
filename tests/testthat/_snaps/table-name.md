@@ -1,3 +1,11 @@
+# table_name possess key methods
+
+    Code
+      name <- table_name(c("x", "y", "z"))
+      name
+    Output
+      <table_name> x, y, z
+
 # as_table_name validates its inputs
 
     Code
