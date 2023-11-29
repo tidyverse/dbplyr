@@ -1,6 +1,15 @@
 # table source = table id or sql
-# table id = interface to outside world; many ways to specify
-# table name = escaped string
+
+# table id =
+# * interface to outside world; many ways to specify
+# * always refers to exactly one table
+# * but all converted to table name ASAP
+
+# table name
+# * escaped string
+# * internal (and backend) use only; not user facing
+# * can be vector of multiple names
+# * object names are always assumed to be table names
 
 # table_name --------------------------------------------------------------
 
@@ -9,16 +18,9 @@ table_name <- function(x) {
   structure(x, class = "dbplyr_table_name")
 }
 
-make_table_name <- function(x, con, collapse = TRUE) {
-  needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
-  x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
-  if (collapse) {
-    x <- paste0(x, collapse = ".")
-  }
-
-  table_name(x)
+is_table_name <- function(x) {
+  inherits(x, "dbplyr_table_name")
 }
-
 
 #' @export
 print.dbplyr_table_name <- function(x, ...) {
@@ -39,9 +41,14 @@ print.dbplyr_table_name <- function(x, ...) {
   table_name(NextMethod())
 }
 
+make_table_name <- function(x, con, collapse = TRUE) {
+  needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
+  x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
+  if (collapse) {
+    x <- paste0(x, collapse = ".")
+  }
 
-is_table_name <- function(x) {
-  inherits(x, "dbplyr_table_name")
+  table_name(x)
 }
 
 # TODO: make this generic
