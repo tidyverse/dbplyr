@@ -2,37 +2,11 @@
 # table id = interface to outside world; many ways to specify
 # table name = escaped string
 
-# Returns either SQL (representing a custom query) or a table name
-as_table_source <- function(x, con, ..., error_arg = caller_arg(x), error_call = caller_env()) {
-  if (is.sql(x)) {
-    x
-  } else if (is_table_id(x)) {
-    as_table_name(x, con = con, error_arg = error_arg, error_call = error_call)
-  } else {
-    check_table_source(x, arg = error_arg, call = error_call)
-  }
-}
+# table_name --------------------------------------------------------------
 
-check_table_source <- function(x, arg = caller_arg(x), call = caller_env()) {
-  if (!is.sql(x) && !is_table_id(x)) {
-    stop_input_type(x, "a table source (SQL or a table identifier)")
-  }
-}
-
-check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
-  if (!is_table_id(x)) {
-    stop_input_type(x, "a table identifier")
-  }
-}
-
-
-is_table_id <- function(x) {
-  is_table_name(x) ||
-    is.ident(x) ||
-    is(x, "Id") ||
-    is_catalog(x) ||
-    is_schema(x) ||
-    is.character(x)
+table_name <- function(x) {
+  check_character(x)
+  structure(x, class = "dbplyr_table_name")
 }
 
 as_table_name <- function(x,
@@ -84,9 +58,6 @@ make_table_name <- function(x, con, collapse = TRUE) {
   table_name(x)
 }
 
-table_name <- function(x) {
-  structure(x, class = "dbplyr_table_name")
-}
 
 #' @export
 print.dbplyr_table_name <- function(x) {
@@ -149,3 +120,41 @@ escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = N
   out <- ifelse(alias == "" | alias == table_name, x, paste0(x, as_sql, alias))
   sql_vector(out, parens, collapse, con = con)
 }
+
+# table id ----------------------------------------------------------------
+
+check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
+  if (!is_table_id(x)) {
+    stop_input_type(x, "a table identifier")
+  }
+}
+
+is_table_id <- function(x) {
+  is_table_name(x) ||
+    is.ident(x) ||
+    is(x, "Id") ||
+    is_catalog(x) ||
+    is_schema(x) ||
+    is.character(x)
+}
+
+
+# table source ------------------------------------------------------------
+
+# Returns either SQL (representing a custom query) or a table name
+as_table_source <- function(x, con, ..., error_arg = caller_arg(x), error_call = caller_env()) {
+  if (is.sql(x)) {
+    x
+  } else if (is_table_id(x)) {
+    as_table_name(x, con = con, error_arg = error_arg, error_call = error_call)
+  } else {
+    check_table_source(x, arg = error_arg, call = error_call)
+  }
+}
+
+check_table_source <- function(x, arg = caller_arg(x), call = caller_env()) {
+  if (!is.sql(x) && !is_table_id(x)) {
+    stop_input_type(x, "a table source (SQL or a table identifier)")
+  }
+}
+
