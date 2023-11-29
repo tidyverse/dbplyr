@@ -29,7 +29,7 @@ as_table_name <- function(x,
     table_name(paste0(x, collapse = "."))
   } else if (is.ident(x)) {
     make_table_name(unclass(x), con)
-  } else if (is(x, "Id")) {
+  } else if (methods::is(x, "Id")) {
     make_table_name(x@name, con)
   } else if (inherits(x, "dbplyr_catalog")) {
     make_table_name(c(unclass(x$catalog), unclass(x$schema), unclass(x$table)), con)
@@ -60,7 +60,7 @@ make_table_name <- function(x, con, collapse = TRUE) {
 
 
 #' @export
-print.dbplyr_table_name <- function(x) {
+print.dbplyr_table_name <- function(x, ...) {
   cat("<table_name> ", paste0(style_kw(x), collapse = ", "), "\n", sep = "")
 }
 
@@ -132,7 +132,7 @@ check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
 is_table_id <- function(x) {
   is_table_name(x) ||
     is.ident(x) ||
-    is(x, "Id") ||
+    methods::is(x, "Id") ||
     is_catalog(x) ||
     is_schema(x) ||
     is.character(x)
