@@ -48,6 +48,7 @@ test_that("as_table_name validates its inputs", {
   con <- simulate_dbi()
   expect_snapshot(error = TRUE, {
     as_table_name("x")
+    as_table_name(c("x", "y"), con)
     as_table_name(1, con)
     as_table_name(I(1), con)
   })

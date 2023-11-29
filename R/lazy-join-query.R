@@ -216,7 +216,7 @@ generate_join_table_names <- function(table_names, con) {
     method = "both.sides"
   )
 
-  as_table_name(abbr_names, con)
+  as_table_names(abbr_names, con)
 }
 
 #' @export

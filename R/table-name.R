@@ -51,9 +51,13 @@ make_table_name <- function(x, con, collapse = TRUE) {
   table_name(x)
 }
 
+as_table_names <- function(x, con) {
+  make_table_name(x, con, collapse = FALSE)
+}
+
 # TODO: make this generic
 db_parse_table_name <- function(con, x) {
-  quote_char <- substr(as_table_name("", con = con), 1, 1)
+  quote_char <- substr( sql_escape_ident(con, ""), 1, 1)
   scan(
     text = x,
     what = character(),
@@ -136,6 +140,7 @@ as_table_name <- function(x,
     check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
     table_name(unclass(x))
   } else if (is.character(x)) {
+    check_string(x, allow_empty = FALSE, arg = error_arg, call = error_call)
     make_table_name(x, con, collapse = FALSE)
   } else {
     cli::cli_abort(
