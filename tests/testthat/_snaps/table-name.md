@@ -10,6 +10,11 @@
     Condition
       Error in `as_table_name()`:
       ! `1` uses unknown specification for table name
+    Code
+      as_table_name(I(1), con)
+    Condition
+      Error:
+      ! `I(1)` must be a single string, not the number 1.
 
 # as_table_name warns when using sql
 

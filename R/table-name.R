@@ -9,45 +9,6 @@ table_name <- function(x) {
   structure(x, class = "dbplyr_table_name")
 }
 
-as_table_name <- function(x,
-                          con,
-                          error_arg = caller_arg(x),
-                          error_call = caller_env()) {
-  check_con(con)
-
-  if (is_table_name(x)) {
-    x
-  } else if (is.sql(x)) {
-    cli::cli_warn(
-      c(
-        "{.arg {error_arg}} uses SQL where a table identifier is expected.",
-        i = "If you want to use a literal (unquoted) identifier use {.fn I} instead."
-      )
-    )
-    table_name(unclass(x))
-  } else if (inherits(x, "ident_q")) {
-    table_name(paste0(x, collapse = "."))
-  } else if (is.ident(x)) {
-    make_table_name(unclass(x), con)
-  } else if (methods::is(x, "Id")) {
-    make_table_name(x@name, con)
-  } else if (inherits(x, "dbplyr_catalog")) {
-    make_table_name(c(unclass(x$catalog), unclass(x$schema), unclass(x$table)), con)
-  } else if (inherits(x, "dbplyr_schema")) {
-    make_table_name(c(unclass(x$schema), unclass(x$table)), con)
-  } else if (inherits(x, "AsIs")) {
-    check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
-    table_name(unclass(x))
-  } else if (is.character(x)) {
-    make_table_name(x, con, collapse = FALSE)
-  } else {
-    cli::cli_abort(
-      "{.arg {error_arg}} uses unknown specification for table name",
-      error_call = error_call
-    )
-  }
-}
-
 make_table_name <- function(x, con, collapse = TRUE) {
   needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
   x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
@@ -138,6 +99,44 @@ is_table_id <- function(x) {
     is.character(x)
 }
 
+as_table_name <- function(x,
+                          con,
+                          error_arg = caller_arg(x),
+                          error_call = caller_env()) {
+  check_con(con)
+
+  if (is_table_name(x)) {
+    x
+  } else if (is.sql(x)) {
+    cli::cli_warn(
+      c(
+        "{.arg {error_arg}} uses SQL where a table identifier is expected.",
+        i = "If you want to use a literal (unquoted) identifier use {.fn I} instead."
+      )
+    )
+    table_name(unclass(x))
+  } else if (inherits(x, "ident_q")) {
+    table_name(paste0(x, collapse = "."))
+  } else if (is.ident(x)) {
+    make_table_name(unclass(x), con)
+  } else if (methods::is(x, "Id")) {
+    make_table_name(x@name, con)
+  } else if (inherits(x, "dbplyr_catalog")) {
+    make_table_name(c(unclass(x$catalog), unclass(x$schema), unclass(x$table)), con)
+  } else if (inherits(x, "dbplyr_schema")) {
+    make_table_name(c(unclass(x$schema), unclass(x$table)), con)
+  } else if (inherits(x, "AsIs")) {
+    check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
+    table_name(unclass(x))
+  } else if (is.character(x)) {
+    make_table_name(x, con, collapse = FALSE)
+  } else {
+    cli::cli_abort(
+      "{.arg {error_arg}} uses unknown specification for table name",
+      error_call = error_call
+    )
+  }
+}
 
 # table source ------------------------------------------------------------
 
