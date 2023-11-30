@@ -114,7 +114,7 @@ as_table_name <- function(x,
                           con,
                           error_arg = caller_arg(x),
                           error_call = caller_env()) {
-  check_con(con)
+  check_required(con)
 
   if (is_table_name(x)) {
     x

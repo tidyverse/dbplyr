@@ -12,7 +12,7 @@
       as_table_name("x")
     Condition
       Error in `as_table_name()`:
-      ! argument "con" is missing, with no default
+      ! `con` is absent but must be supplied.
     Code
       as_table_name(c("x", "y"), con)
     Condition
