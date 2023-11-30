@@ -172,9 +172,9 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   op$joins$by <- purrr::map2(
     op$joins$by, seq_along(op$joins$by),
     function(by, i) {
-      # FIXME: why is unique now needed?
-      by$x_as <- table_name(table_names_out[unique(op$joins$by_x_table_id[[i]])])
-      by$y_as <- table_name(table_names_out[i + 1L])
+      # @mgrlich: x_as should be a single value, right?
+      by$x_as <- table_names_out[unique(op$joins$by_x_table_id[[i]])]
+      by$y_as <- table_names_out[i + 1L]
       by
     }
   )
