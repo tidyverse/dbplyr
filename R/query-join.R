@@ -127,7 +127,7 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
   }
 
   # TODO reuse query
-  name <- unique_subquery_name(con)
+  name <- as_table_name(unique_subquery_name(), con)
   wrapped_query <- set_names(list(qry), name)
 
   query_list$queries <- c(query_list_new$queries, wrapped_query)

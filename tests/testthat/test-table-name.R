@@ -59,6 +59,11 @@ test_that("can coerce all user facing inputs", {
   expect_equal(as_table_name(id, con), table_name("`foo`.`bar`.`baz`"))
 })
 
+test_that("strips names", {
+  con <- simulate_dbi()
+  expect_equal(as_table_name(c(x = "x"), con), table_name("`x`"))
+})
+
 test_that("as_table_name validates its inputs", {
   con <- simulate_dbi()
   expect_snapshot(error = TRUE, {

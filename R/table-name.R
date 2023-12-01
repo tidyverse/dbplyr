@@ -153,7 +153,7 @@ as_table_name <- function(x,
     table_name(unclass(x))
   } else if (is.character(x)) {
     check_string(x, allow_empty = FALSE, arg = error_arg, call = error_call)
-    make_table_name(x, con, collapse = FALSE)
+    make_table_name(unname(x), con, collapse = FALSE)
   } else {
     cli::cli_abort(
       "{.arg {error_arg}} uses unknown specification for table name",
