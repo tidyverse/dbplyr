@@ -469,22 +469,12 @@ mssql_version <- function(con) {
 # <https://docs.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms177399%28v%3dsql.105%29#temporary-tables>
 #' @export
 `db_table_temporary.Microsoft SQL Server` <- function(con, table, temporary, ...) {
-  table <- as_table_name(table, con)
-
-  # TODO: FIX ME
-
-  table_name <- vctrs::field(table, "table")
-
-  if (temporary && substr(table_name, 1, 1) != "#") {
-    table_name <- hash_temp(table_name)
-    vctrs::field(table, "table") <- table_name
-  }
-
   list(
-    table = table,
+    table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
   )
 }
+
 
 #' @export
 `sql_query_save.Microsoft SQL Server` <- function(con,

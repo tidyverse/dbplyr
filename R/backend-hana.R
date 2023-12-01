@@ -58,12 +58,8 @@ sql_translation.HDB <- function(con) {
 # nocov start
 #' @export
 db_table_temporary.HDB <- function(con, table, temporary, ...) {
-  if (temporary && substr(table, 1, 1) != "#") {
-    table <- hash_temp(table)
-  }
-
   list(
-    table = table,
+    table = add_temporary_prefix(con, table, temporary = temporary),
     temporary = FALSE
   )
 }
