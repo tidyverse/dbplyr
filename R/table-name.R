@@ -110,6 +110,18 @@ is_table_id <- function(x) {
     is.character(x)
 }
 
+check_table_name <- function(x,
+                             error_arg = caller_arg(x),
+                             error_call = caller_env()) {
+  if (!is_table_name(x)) {
+    cli::cli_abort(
+      "{.arg {error_arg}} must be a <table_name>, not {.obj_type_friendly x}.",
+      call = error_call,
+      .internal = TRUE
+    )
+  }
+}
+
 as_table_name <- function(x,
                           con,
                           error_arg = caller_arg(x),

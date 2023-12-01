@@ -6,6 +6,16 @@
     Output
       <table_name> x, y, z
 
+# can check for table name
+
+    Code
+      foo(1)
+    Condition
+      Error in `foo()`:
+      ! `y` must be a <table_name>, not a string.
+      i This is an internal error that was detected in the dbplyr package.
+        Please report it at <https://github.com/tidyverse/dbplyr/issues> with a reprex (<https://tidyverse.org/help/>) and the full backtrace.
+
 # as_table_name validates its inputs
 
     Code

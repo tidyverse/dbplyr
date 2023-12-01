@@ -9,6 +9,10 @@ test_that("table_name possess key methods", {
   expect_equal(c(name[[1]], name[[2]]), table_name(c("x", "y")))
 })
 
+test_that("can check for table name", {
+  foo <- function(y) check_table_name(y)
+  expect_snapshot(foo(1), error = TRUE)
+})
 
 # as_table_name -----------------------------------------------------------
 
