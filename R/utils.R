@@ -83,11 +83,12 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 }
 
 add_temporary_prefix <- function(con, table, temporary = TRUE) {
+  check_table_name(table)
+
   if (!temporary) {
     return(table)
   }
 
-  table <- as_table_name(table, con)
   pieces <- db_parse_table_name(con, table)
   table_name <- pieces[length(pieces)]
 

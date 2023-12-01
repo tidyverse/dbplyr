@@ -115,7 +115,6 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
     cli::cli_abort("Spark SQL only support temporary tables")
   }
 
-  table <- as_table_name(table, con)
   sql <- glue_sql2(
     con,
     "CREATE ", if (overwrite) "OR REPLACE ",

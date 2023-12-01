@@ -178,7 +178,7 @@ db_write_table.DBIConnection <- function(con,
                                          temporary = TRUE,
                                          ...,
                                          overwrite = FALSE) {
-  table <- as_table_name(table, con)
+  check_table_name(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)

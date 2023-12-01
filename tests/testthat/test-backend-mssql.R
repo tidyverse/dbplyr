@@ -349,10 +349,14 @@ test_that("can copy_to() and compute() with temporary tables (#272)", {
 
 test_that("add prefix to temporary table", {
   con <- simulate_mssql()
-  expect_snapshot(out <- db_table_temporary(con, I("foo.bar"), temporary = TRUE))
+  expect_snapshot(
+    out <- db_table_temporary(con, table_name("foo.bar"), temporary = TRUE)
+  )
   expect_equal(out, list(table = table_name("`foo`.`#bar`"), temporary = FALSE))
 
-  expect_silent(out <- db_table_temporary(con, I("foo.#bar"), temporary = TRUE))
+  expect_silent(
+    out <- db_table_temporary(con, table_name("foo.#bar"), temporary = TRUE)
+  )
   expect_equal(out, list(table = table_name("foo.#bar"), temporary = FALSE))
 })
 

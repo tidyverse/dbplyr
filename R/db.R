@@ -91,6 +91,7 @@ db_col_types <- function(con, table, call) {
     return(NULL)
   }
 
+  check_table_name(table)
   UseMethod("db_col_types")
 }
 

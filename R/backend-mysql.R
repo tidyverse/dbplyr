@@ -56,7 +56,6 @@ db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnecti
 
 #' @export
 db_col_types.MariaDBConnection <- function(con, table, call) {
-  table <- as_table_name(table, con, error_call = call)
   col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};"))
   set_names(col_info_df[["Type"]], col_info_df[["Field"]])
 }
