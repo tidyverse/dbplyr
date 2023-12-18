@@ -27,7 +27,7 @@ db_write_table.PostgreSQLConnection <- function(con,
   # the bare table name
   dbWriteTable(
     con,
-    name = db_parse_table_name(con, table),
+    name = db_table_name_extract(con, table),
     value = values,
     field.types = types,
     ...,
