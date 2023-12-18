@@ -89,7 +89,7 @@ add_temporary_prefix <- function(con, table, temporary = TRUE) {
     return(table)
   }
 
-  pieces <- db_parse_table_name(con, table)
+  pieces <- table_name_components(table, con)
   table_name <- pieces[length(pieces)]
 
   if (substr(table_name, 1, 1) != "#") {

@@ -102,11 +102,11 @@ test_that("alias truncates long table names at database limit", {
   # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
   con <- src_test("postgres")
 
-  nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
-  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), nm1)
+  nm1 <- table_name(paste0("a", paste0(0:61 %% 10, collapse = "")))
+  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), unclass(nm1))
 
-  nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
-  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), nm2)
+  nm2 <- table_name(paste0("b", paste0(0:61 %% 10, collapse = "")))
+  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), unclass(nm2))
 
   # 2 tables
   # aliased names are as expected

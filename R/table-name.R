@@ -55,9 +55,20 @@ as_table_names <- function(x, con) {
   make_table_name(x, con, collapse = FALSE)
 }
 
-# TODO: make this generic
-db_parse_table_name <- function(con, x) {
-  quote_char <- substr( sql_escape_ident(con, ""), 1, 1)
+# Extract just the table name from a full identifier
+table_name_table <- function(x, con) {
+  x <- as_table_name(x, con)
+
+  vapply(x, FUN.VALUE = character(1), function(x) {
+    if (x == "") return("")
+
+    out <- table_name_components(x, con)
+    out[[length(out)]]
+  })
+}
+table_name_components <- function(x, con) {
+  quote_char <- substr(sql_escape_ident(con, ""), 1, 1)
+
   scan(
     text = x,
     what = character(),
@@ -67,21 +78,13 @@ db_parse_table_name <- function(con, x) {
     sep = "."
   )
 }
-db_table_name_extract <- function(con, x) {
-  vapply(x, FUN.VALUE = character(1), function(x) {
-    if (x == "") return("")
-
-    out <- db_parse_table_name(con, x)
-    out[[length(out)]]
-  })
-}
 
 #' @export
 escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
-  alias <- names2(x) # assume alias is already escaped
-  x <- unname(x)
-
-  table_name <- as_table_name(db_table_name_extract(con, x), con)
+  # names are always already escaped
+  alias <- names2(x)
+  table_name <- as_table_name(table_name_table(x, con), con)
+  has_alias <- alias == "" | alias == table_name
 
   if (db_supports_table_alias_with_as(con)) {
     as_sql <- style_kw(" AS ")
@@ -89,7 +92,7 @@ escape.dbplyr_table_name <- function(x, parens = FALSE, collapse = ", ", con = N
     as_sql <- " "
   }
 
-  out <- ifelse(alias == "" | alias == table_name, x, paste0(x, as_sql, alias))
+  out <- ifelse(has_alias, unname(x), paste0(x, as_sql, alias))
   sql_vector(out, parens, collapse, con = con)
 }
 

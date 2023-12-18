@@ -331,29 +331,20 @@ sql_join_tbls <- function(con, by, na_matches) {
 }
 
 sql_table_prefix <- function(con, var, table = NULL) {
-
   if (!is_bare_character(var)) {
     cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
   }
   var <- sql_escape_ident(con, var)
-
-  if (!is.null(table)) {
-    table <- as_table_name(table, con)
-    table <- db_table_name_extract(con, table)
-    table <- as_table_name(table, con)
-
-    sql(paste0(table, ".", var))
-  } else {
-    var
-  }
+  sql_table_name_prefix(con, table, var)
 }
 
 sql_star <- function(con, table = NULL) {
-  # TODO: sql_table_prefix(con, "*", table) ?
-  var <- sql("*")
+  sql_table_name_prefix(con, table, sql("*"))
+}
+
+sql_table_name_prefix <- function(con, table, var) {
   if (!is.null(table)) {
-    table <- as_table_name(table, con)
-    table <- db_table_name_extract(con, table)
+    table <- table_name_table(table, con)
     table <- as_table_name(table, con)
 
     sql(paste0(table, ".", var))

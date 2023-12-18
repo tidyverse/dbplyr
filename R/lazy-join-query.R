@@ -153,6 +153,7 @@ op_vars.lazy_semi_join_query <- function(op) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
+
   table_names_out <- generate_join_table_names(op$table_names, con)
 
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
@@ -188,7 +189,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
 }
 
 generate_join_table_names <- function(table_names, con) {
-  names <- db_table_name_extract(con, table_names$name)
+  names <- table_name_table(table_names$name, con)
   table_name_length_max <- max(nchar(names))
 
   if (length(table_names$name) != 2) {

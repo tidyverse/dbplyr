@@ -40,7 +40,7 @@ remote_name <- function(x, null_if_local = TRUE) {
     if (is.null(con)) {
       table
     } else {
-      db_table_name_extract(con, table)
+      table_name_table(table, con)
     }
   }
 }
