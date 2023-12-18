@@ -1148,9 +1148,9 @@ db_save_query.DBIConnection <- function(con,
   withCallingHandlers(
     {
       if (overwrite) {
-        found <- DBI::dbExistsTable(con, SQL(unclass(name)))
+        found <- DBI::dbExistsTable(con, SQL(name))
         if (found) {
-          DBI::dbRemoveTable(con, SQL(unclass(name)))
+          DBI::dbRemoveTable(con, SQL(name))
         }
       }
       DBI::dbExecute(con, sql, immediate = TRUE)

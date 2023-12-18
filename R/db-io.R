@@ -187,7 +187,7 @@ db_write_table.DBIConnection <- function(con,
   withCallingHandlers(
     dbWriteTable(
       con,
-      name = SQL(unclass(table)),
+      name = SQL(table),
       value = values,
       field.types = types,
       temporary = temporary,

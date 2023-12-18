@@ -15,8 +15,11 @@
 
 table_name <- function(x) {
   check_character(x)
-  structure(x, class = "dbplyr_table_name")
+  structure(x, class = c("dbplyr_table_name", "character"))
 }
+
+# So you can do SQL(table_name("foo"))
+setOldClass(c("dbplyr_table_name", "character"))
 
 is_table_name <- function(x) {
   inherits(x, "dbplyr_table_name")
