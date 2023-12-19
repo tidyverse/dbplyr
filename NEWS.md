@@ -1,5 +1,12 @@
 # dbplyr (development version)
 
+* Snowflake (@nathanhaigh, #1406)
+  * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
+  * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports
+    regular expressions.
+  * Refactored `grepl()` to use `REGEXP_INSTR()` so now supports
+    case-insensitive matching through `grepl(..., ignore.case = TRUE)`
+
 * Functions qualified with the base namespace are now also translated, e.g.
   `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
 
