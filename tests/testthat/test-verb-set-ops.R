@@ -116,8 +116,8 @@ test_that("other backends can combine with a limit", {
 
   tbls_full %>%
     purrr::map2(tbls_head, union) %>%
-    expect_equal_tbls()
+    expect_equal_tbls(head(df, 1))
   tbls_full %>%
     purrr::map2(tbls_head, union_all) %>%
-    expect_equal_tbls()
+    expect_equal_tbls(head(df, 1))
 })
