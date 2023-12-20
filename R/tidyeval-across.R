@@ -213,9 +213,9 @@ across_setup <- function(data,
   dots <- call$...
   for (i in seq_along(call$...)) {
     dot <- call$...[[i]]
-    try_fetch({
-      dots[[i]] <- partial_eval(dot, data = data, env = env, error_call = error_call)
-    }, error = function(cnd) {
+    withCallingHandlers(
+      dots[[i]] <- partial_eval(dot, data = data, env = env, error_call = error_call),
+      error = function(cnd) {
       label <- expr_as_label(dot, names2(call$...)[[i]])
       msg <- "Problem while evaluating {.code {label}}."
       cli_abort(msg, call = call(fn), parent = cnd)
