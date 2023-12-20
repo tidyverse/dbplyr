@@ -69,12 +69,11 @@ db_copy_to.DBIConnection <- function(con,
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
-  call <- current_env()
 
   with_transaction(
-    con,
-    in_transaction,
-    "Can't copy data to table {.field {format(table, con = con)}}.",
+    con = con, 
+    in_transaction = in_transaction, 
+    error = "Can't copy data to table {.field {format(table, con = con)}}.",
     {
       table <- dplyr::db_write_table(con, table,
         types = types,
@@ -130,7 +129,7 @@ db_compute.DBIConnection <- function(con,
   temporary <- new$temporary
 
   with_transaction(
-    con,
+    con, 
     in_transaction,
     "Can't copy query to table {.field {format(table, con = con)}}.",
     {
@@ -165,7 +164,7 @@ db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, .
   if (warn_incomplete) {
     res_warn_incomplete(res, "n = Inf")
   }
-
+ 
   out
 }
 
@@ -218,7 +217,7 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   }
 }
 
-with_transaction <- function(con, in_transaction, msg, code, call = caller_env(), env = caller_env()) {
+with_transaction <- function(con, in_transaction, msg, code, msg, call = caller_env(), env = caller_env()) {
   if (in_transaction) {
     dbBegin(con)
     on.exit(dbRollback(con))
