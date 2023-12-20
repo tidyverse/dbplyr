@@ -1102,9 +1102,9 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  call <- current_call()
-  expl <- withCallingHandlers(
-    DBI::dbGetQuery(con, sql),
+  
+  withCallingHandlers(
+    expl <- DBI::dbGetQuery(con, sql),
     error = function(cnd) {
       cli_abort("Can't explain query.", parent = cnd)
     }
@@ -1121,8 +1121,8 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  df <- withCallingHandlers(
-    DBI::dbGetQuery(con, sql),
+  withCallingHandlers(
+    df <- DBI::dbGetQuery(con, sql),
     error = function(cnd) {
       cli_abort("Can't query fields.", parent = cnd)
     }
@@ -1141,19 +1141,18 @@ db_save_query.DBIConnection <- function(con,
                                         temporary = TRUE,
                                         ...,
                                         overwrite = FALSE) {
+  if (overwrite) {
+    name <- as_table_ident(name)
+    name_id <- table_ident_to_id(name)
+    found <- DBI::dbExistsTable(con, name_id)
+    if (found) {
+      DBI::dbRemoveTable(con, name_id)
+    }
+  }
+
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
   withCallingHandlers(
-    {
-      if (overwrite) {
-        name <- as_table_ident(name)
-        name_id <- table_ident_to_id(name)
-        found <- DBI::dbExistsTable(con, name_id)
-        if (found) {
-          DBI::dbRemoveTable(con, name_id)
-        }
-      }
-      DBI::dbExecute(con, sql, immediate = TRUE)
-    },
+    DBI::dbExecute(con, sql, immediate = TRUE),
     error = function(cnd) {
       cli_abort(
         "Can't save query to table {.table {format(name, con = con)}}.",
