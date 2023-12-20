@@ -72,7 +72,7 @@ db_copy_to.DBIConnection <- function(con,
   call <- current_env()
 
   with_transaction(con, in_transaction, {
-    tryCatch(
+    withCallingHandlers(
       {
         table <- dplyr::db_write_table(con, table,
           types = types,
