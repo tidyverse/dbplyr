@@ -51,7 +51,13 @@ local_sqlite_con_with_aux <- function(envir = parent.frame()) {
 
 snap_transform_dbi <- function(x) {
   # use the last line matching this in case of multiple chained errors
-  dbi_line_id <- max(which(x == "Caused by error:"))
+  caused_by <- which(x == "Caused by error:")
+  if (length(caused_by) == 0) {
+    return(x)
+  }
+
+  dbi_line_id <- max(caused_by)
+
   n <- length(x)
   x <- x[-seq2(dbi_line_id + 1, n)]
   c(x, "! dummy DBI error")
