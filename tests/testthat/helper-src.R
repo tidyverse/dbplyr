@@ -50,6 +50,8 @@ local_sqlite_con_with_aux <- function(envir = parent.frame()) {
 }
 
 snap_transform_dbi <- function(x) {
+  x <- gsub("dbplyr_[a-zA-Z0-9]+", "dbplyr_{tmp}", x)
+
   # use the last line matching this in case of multiple chained errors
   caused_by <- which(x == "Caused by error:")
   if (length(caused_by) == 0) {

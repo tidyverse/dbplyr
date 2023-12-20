@@ -97,7 +97,7 @@
       <error/rlang_error>
       Error in `rows_append()`:
       ! Can't modify database table "mtcars".
-      i Using SQL: INSERT INTO `mtcars` (`x`) SELECT * FROM ( SELECT * FROM `dbplyr_t2ne2IDfDW` ) AS `...y`
+      i Using SQL: INSERT INTO `mtcars` (`x`) SELECT * FROM ( SELECT * FROM `dbplyr_{tmp}` ) AS `...y`
       Caused by error:
       ! dummy DBI error
     Code
@@ -107,7 +107,7 @@
       <error/rlang_error>
       Error in `rows_append()`:
       ! Can't modify database table "mtcars".
-      i Using SQL: INSERT INTO `mtcars` (`x`) SELECT * FROM ( SELECT * FROM `dbplyr_QTqCFZRWtc` ) AS `...y` RETURNING `mtcars`.`x`
+      i Using SQL: INSERT INTO `mtcars` (`x`) SELECT * FROM ( SELECT * FROM `dbplyr_{tmp}` ) AS `...y` RETURNING `mtcars`.`x`
       Caused by error:
       ! dummy DBI error
 
