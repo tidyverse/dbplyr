@@ -411,7 +411,7 @@
         SELECT `df`.*
         FROM `df`
         WHERE (cast(`x` AS `BIT`) = 1)
-      ) `LHS`
+      ) AS `LHS`
       INNER JOIN `df`
         ON (`LHS`.`x` = `df`.`x`)
 
