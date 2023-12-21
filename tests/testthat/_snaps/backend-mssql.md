@@ -400,3 +400,17 @@
       FROM `df`
       ORDER BY `y`
 
+# can copy_to() and compute() with temporary tables (#438)
+
+    Code
+      db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE)
+    Message
+      Created a temporary table named #dbplyr_{tmp}
+
+---
+
+    Code
+      db2 <- db %>% mutate(y = x + 1) %>% compute()
+    Message
+      Created a temporary table named #dbplyr_{tmp}
+
