@@ -1091,8 +1091,8 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-
   expl <- db_get_query(con, sql, "Can't explain query.")
+
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
 }
