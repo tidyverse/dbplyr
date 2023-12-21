@@ -370,3 +370,47 @@
       OUTPUT `INSERTED`.`a`, `INSERTED`.`b` AS `b2`
       ;
 
+# row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)
+
+    Code
+      mf %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT
+        `df`.*,
+        ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY (SELECT NULL)) AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
+
+# can copy_to() and compute() with temporary tables (#438)
+
+    Code
+      db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE)
+    Message
+      Created a temporary table named #dbplyr_{tmp}
+
+---
+
+    Code
+      db2 <- db %>% mutate(y = x + 1) %>% compute()
+    Message
+      Created a temporary table named #dbplyr_{tmp}
+

@@ -1,4 +1,4 @@
-test_that("base_no_win inclues all aggregates and window funcitons", {
+test_that("base_no_win includes all aggregates and window functions", {
   # All aggregates must be included in window functions
   expect_equal(setdiff(names(base_agg), names(base_win)), character())
 
@@ -68,10 +68,24 @@ test_that("can translate subsetting", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(a$b), sql("`a`.`b`"))
   expect_equal(test_translate_sql(a[["b"]]), sql("`a`.`b`"))
+  expect_equal(test_translate_sql(f(a)[["b"]]), sql("f(`a`).`b`"))
 
   expect_equal(test_translate_sql(a[["b"]][[1]]), sql('`a`.`b`[1]'))
+  expect_snapshot(error = TRUE, {
+    test_translate_sql(a[[x]])
+    test_translate_sql(a[[TRUE]])
+  })
 })
 
+
+# window ------------------------------------------------------------------
+
+test_that("lead and lag translate n to integers", {
+  local_con(simulate_dbi())
+
+  expect_equal(test_translate_sql(lead(x, 1)), sql("LEAD(`x`, 1, NULL) OVER ()"))
+  expect_equal(test_translate_sql(lag(x, 1)), sql("LAG(`x`, 1, NULL) OVER ()"))
+})
 
 # strings -----------------------------------------------------------------
 

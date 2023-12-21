@@ -434,6 +434,7 @@ simulate_mssql <- function(version = "15.0") {
       },
       all = mssql_bit_int_bit(win_aggregate("MIN")),
       any = mssql_bit_int_bit(win_aggregate("MAX")),
+      row_number = win_rank("ROW_NUMBER", empty_order = TRUE)
     )
 
   )}

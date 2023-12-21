@@ -6,9 +6,10 @@
     Output
       <error/rlang_error>
       Error in `db_copy_to()`:
-      ! Can't copy to table `tmp2`.
+      ! Can't copy data to table `tmp2`.
       Caused by error in `db_create_index.DBIConnection()`:
       ! Can't create index on table `tmp2`.
+      i Using SQL: CREATE UNIQUE INDEX `tmp2_x` ON `tmp2` (`x`)
       Caused by error:
       ! dummy DBI error
 
@@ -20,7 +21,7 @@
     Output
       <error/rlang_error>
       Error in `db_copy_to()`:
-      ! Can't copy to table `tmp`.
+      ! Can't copy data to table `tmp`.
       Caused by error in `dplyr::db_write_table()`:
       ! Can't write table table `tmp`.
       Caused by error:
@@ -35,6 +36,7 @@
       <error/rlang_error>
       Error in `db_save_query()`:
       ! Can't save query to table tmp.
+      i Using SQL: CREATE TEMPORARY TABLE `tmp` AS `SELECT 2 FROM tmp`
       Caused by error:
       ! dummy DBI error
 

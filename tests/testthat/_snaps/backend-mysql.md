@@ -64,7 +64,7 @@
     Code
       copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
-      <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
+      <SQL> SELECT TRUNCATE(CAST(`x` AS DOUBLE), 0) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
         SELECT NULL AS `x`, NULL AS `y`
         WHERE (0 = 1)

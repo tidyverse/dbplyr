@@ -42,7 +42,7 @@ test_that("sql_str_sub works as expected", {
   expect_equal(str_sub(x, -3, -3), sql("SUBSTR(`x`, LENGTH(`x`) - 2, 1)"))
 })
 
-test_that("sql_str_sub can require length paramter", {
+test_that("sql_str_sub can require length parameter", {
   local_con(simulate_dbi())
   x <- ident("x")
   str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE)

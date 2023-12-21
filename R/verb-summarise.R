@@ -61,6 +61,12 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   .data
 }
 
+#' @export
+#' @importFrom dplyr reframe
+reframe.tbl_lazy <- function(.data, ..., .by = NULL) {
+  stop_unsupported_function("reframe")
+}
+
 summarise_eval_dots <- function(.data, ..., error_call = caller_env()) {
   dots <- as.list(enquos(..., .named = TRUE))
   dot_names <- names2(exprs(...))

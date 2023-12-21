@@ -22,6 +22,12 @@ test_that("missing window functions create a warning", {
   )
 })
 
+test_that("duplicates throw an error", {
+  expect_snapshot(error = TRUE, {
+    sql_translator(round = function(x) x, round = function(y) y)
+  })
+})
+
 test_that("missing aggregate functions filled in", {
   local_con(simulate_dbi())
   sim_scalar <- sql_translator()
@@ -47,7 +53,7 @@ test_that("win_rank() is accepted by the sql_translator", {
   )
 })
 
-test_that("can translate infix expression without parantheses", {
+test_that("can translate infix expression without parentheses", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(!!expr(2 - 1) * x), sql("(2.0 - 1.0) * `x`"))
   expect_equal(test_translate_sql(!!expr(2 / 1) * x), sql("(2.0 / 1.0) * `x`"))

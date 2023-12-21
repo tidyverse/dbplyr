@@ -11,7 +11,9 @@ test_that("RPostgreSQL backend", {
     )
   )
 
-  copy_to(src, mtcars, "mtcars", overwrite = TRUE, temporary = FALSE)
+  suppressWarnings(
+    copy_to(src, mtcars, "mtcars", overwrite = TRUE, temporary = FALSE)
+  )
   withr::defer(DBI::dbRemoveTable(src, "mtcars"))
 
   expect_identical(colnames(tbl(src, "mtcars")), colnames(mtcars))

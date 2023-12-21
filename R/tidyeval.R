@@ -124,7 +124,7 @@ partial_eval_dots <- function(.data,
 
 partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  try_fetch(
+  withCallingHandlers(
     expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
     error = function(cnd) {
       label <- expr_as_label(x, dot_name)
@@ -163,7 +163,7 @@ partial_eval_sym <- function(sym, data, env) {
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  packages <- c("dplyr", "stringr", "lubridate")
+  packages <- c("base", "dplyr", "stringr", "lubridate")
   is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 

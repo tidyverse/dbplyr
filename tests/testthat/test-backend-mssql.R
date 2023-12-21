@@ -322,32 +322,41 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})
+
 # Live database -----------------------------------------------------------
 
-test_that("can copy_to() and compute() with temporary tables (#272)", {
+test_that("can copy_to() and compute() with temporary tables (#438)", {
   con <- src_test("mssql")
   df <- tibble(x = 1:3)
-  expect_message(
-    db <- copy_to(con, df, name = "temp", temporary = TRUE),
-    "Created a temporary table",
+
+  # converts to name automatically with message
+  expect_snapshot(
+    db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE),
+    transform = snap_transform_dbi
   )
   expect_equal(db %>% pull(), 1:3)
 
-  expect_message(
+  expect_snapshot(
     db2 <- db %>% mutate(y = x + 1) %>% compute(),
-    "Created a temporary table"
+    transform = snap_transform_dbi
   )
   expect_equal(db2 %>% pull(), 2:4)
 })
 
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
   expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
   expect_equal(db %>% filter(x == y) %>% pull(), 2)
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
   expect_equal(db %>% filter(x == 1) %>% pull(), TRUE)
   expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(1, 1, 1))
 
@@ -361,7 +370,7 @@ test_that("bit conversion works for important cases", {
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
   df <- data.frame(x = c("1.3", "2x"))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
 
   out <- db %>%
     mutate(

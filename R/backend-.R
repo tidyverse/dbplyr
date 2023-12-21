@@ -140,7 +140,9 @@ base_scalar <- sql_translator(
     }
   },
   log10   = sql_prefix("LOG10", 1),
-  round   = sql_prefix("ROUND", 2),
+  round = function(x, digits = 0L) {
+    sql_expr(ROUND(!!x, !!as.integer(digits)))
+  },
   sign    = sql_prefix("SIGN", 1),
   sin     = sql_prefix("SIN", 1),
   sqrt    = sql_prefix("SQRT", 1),
@@ -151,10 +153,6 @@ base_scalar <- sql_translator(
   sinh     = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
   tanh     = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
   coth     = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
-
-  round = function(x, digits = 0L) {
-    sql_expr(ROUND(!!x, !!as.integer(digits)))
-  },
 
   `if` = function(cond, if_true, if_false = NULL) {
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
@@ -448,7 +446,7 @@ base_win <- sql_translator(
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
-      sql_expr(LEAD(!!x, !!n, !!default)),
+      sql_expr(LEAD(!!x, !!as.integer(n), !!default)),
       win_current_group(),
       order_by %||% win_current_order(),
       win_current_frame()

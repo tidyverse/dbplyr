@@ -129,7 +129,7 @@ test_that("across() can access previously created variables", {
   expect_snapshot(remote_query(lf))
 })
 
-test_that("across() uses original column rather than overriden one", {
+test_that("across() uses original column rather than overridden one", {
   db <- memdb_frame(x = 2, y = 4, z = 6)
   expect_equal(
     db %>% mutate(across(everything(), ~ .x / x)) %>% collect(),
@@ -212,6 +212,7 @@ test_that("empty mutate returns input", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
+  suppressWarnings(check_na_rm(FALSE))
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
 
   out <- mutate(df, x = mean(x), .by = g) %>%

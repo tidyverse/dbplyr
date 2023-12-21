@@ -154,8 +154,8 @@ test_that("`sql_query_upsert()` with method = 'on_conflict' is correct", {
       con = con,
       table = ident("df_x"),
       from = sql_render(df_y, con, lvl = 1),
-      by = c("a", "b"),
-      update_cols = c("c", "d"),
+      by = c("c", "d"),
+      update_cols = c("a", "b"),
       returning_cols = c("a", b2 = "b"),
       method = "on_conflict"
     )

@@ -124,6 +124,14 @@ sql_translator <- function(...,
   funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
 
+  if (anyDuplicated(names(funs))) {
+    bullets <- unique(names(funs)[duplicated(names(funs))])
+    cli_abort(c(
+      "Duplicate names in {.fun sql_translator}",
+      set_names(bullets, "*")
+    ))
+  }
+
   list2env(funs, copy_env(.parent))
 }
 
@@ -136,7 +144,7 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   # Unquoting involving infix operators easily create abstract syntax trees
-  # without parantheses where they are needed for printing and translation.
+  # without parentheses where they are needed for printing and translation.
   # For example `expr(!!expr(2 - 1) * x))`
   #
   # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast

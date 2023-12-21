@@ -1,3 +1,12 @@
+# duplicates throw an error
+
+    Code
+      sql_translator(round = function(x) x, round = function(y) y)
+    Condition
+      Error in `sql_translator()`:
+      ! Duplicate names in `sql_translator()`
+      * round
+
 # output of print method for sql_variant is correct
 
     Code

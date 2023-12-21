@@ -1065,13 +1065,8 @@ db_analyze.DBIConnection <- function(con, table, ...) {
   if (is.null(sql)) {
     return() # nocov
   }
-  tryCatch(
-    DBI::dbExecute(con, sql),
-    error = function(cnd) {
-      msg <- "Can't analyze table {.field {format(table, con = con)}}."
-      cli_abort(msg, parent = cnd)
-    }
-  )
+
+  db_execute(con, sql, "Can't analyze table {.field {format(table, con = con)}}.")
 }
 
 dbplyr_create_index <- function(con, ...) {
@@ -1086,13 +1081,7 @@ db_create_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...) {
   sql <- sql_table_index(con, table, columns, name = name, unique = unique, ...)
-  tryCatch(
-    DBI::dbExecute(con, sql),
-    error = function(cnd) {
-      msg <- "Can't create index on table {.field {format(table, con = con)}}."
-      cli_abort(msg, parent = cnd)
-    }
-  )
+  db_execute(con, sql, "Can't create index on table {.field {format(table, con = con)}}.")
 }
 
 dbplyr_explain <- function(con, ...) {
@@ -1102,14 +1091,7 @@ dbplyr_explain <- function(con, ...) {
 #' @importFrom dplyr db_explain
 db_explain.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  call <- current_call()
-  tryCatch(
-    {
-      expl <- DBI::dbGetQuery(con, sql)
-    }, error = function(cnd) {
-      cli_abort("Can't explain query.", parent = cnd)
-    }
-  )
+  expl <- db_get_query(con, sql, "Can't explain query.")
 
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
@@ -1122,13 +1104,7 @@ dbplyr_query_fields <- function(con, ...) {
 #' @importFrom dplyr db_query_fields
 db_query_fields.DBIConnection <- function(con, sql, ...) {
   sql <- sql_query_fields(con, sql, ...)
-  tryCatch(
-    {
-      df <- DBI::dbGetQuery(con, sql)
-    }, error = function(cnd) {
-      cli_abort("Can't query fields.", parent = cnd)
-    }
-  )
+  df <- db_get_query(con, sql, "Can't query fields.")
   names(df)
 }
 
@@ -1143,22 +1119,18 @@ db_save_query.DBIConnection <- function(con,
                                         temporary = TRUE,
                                         ...,
                                         overwrite = FALSE) {
-  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
-  tryCatch(
-    {
-      if (overwrite) {
-        name <- as_table_ident(name)
-        name_id <- table_ident_to_id(name)
-        found <- DBI::dbExistsTable(con, name_id)
-        if (found) {
-          DBI::dbRemoveTable(con, name_id)
-        }
-      }
-      DBI::dbExecute(con, sql, immediate = TRUE)
-    }, error = function(cnd) {
-      cli_abort("Can't save query to table {.table {format(name, con = con)}}.", parent = cnd)
+  if (overwrite) {
+    name <- as_table_ident(name)
+    name_id <- table_ident_to_id(name)
+    found <- DBI::dbExistsTable(con, name_id)
+    if (found) {
+      DBI::dbRemoveTable(con, name_id)
     }
-  )
+  }
+
+  sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
+  db_execute(con, sql, "Can't save query to table {.table {format(name, con = con)}}.")
+
   name
 }
 
@@ -1173,4 +1145,31 @@ sql_subquery.DBIConnection <- function(con,
                                        ...,
                                        lvl = 0) {
   sql_query_wrap(con, from = from, name = name, ..., lvl = lvl)
+}
+
+# Helpers -------------------------------------------------------------------
+
+db_execute <- function(con, sql, msg, call = caller_env(), env = caller_env()) {
+  dbi_wrap(
+    dbExecute(con, sql, immediate = TRUE),
+    sql = sql,
+    msg = msg,
+    call = call,
+    env = env
+  )
+  invisible()
+}
+
+db_get_query <- function(con, sql, msg, call = caller_env(), env = caller_env()) {
+  dbi_wrap(dbGetQuery(con, sql), sql, msg, call = call, env = env)
+}
+
+dbi_wrap <- function(code, sql, msg, call = caller_env(), env = caller_env()) {
+  withCallingHandlers(
+    code,
+    error = function(cnd) {
+      msg <- c(msg, i = paste0("Using SQL: ", sql))
+      cli_abort(msg, parent = cnd, call = call, .envir = env)
+    }
+  )
 }

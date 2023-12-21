@@ -2,9 +2,12 @@
 % Please edit documentation in R/backend-mysql.R
 \name{backend-mysql}
 \alias{simulate_mysql}
+\alias{simulate_mariadb}
 \title{Backend: MySQL/MariaDB}
 \usage{
 simulate_mysql()
+
+simulate_mariadb()
 }
 \description{
 See \code{vignette("translation-function")} and \code{vignette("translation-verb")} for
