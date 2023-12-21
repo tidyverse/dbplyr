@@ -156,15 +156,13 @@ db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
 #' @export
 db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
   res <- dbSendQuery(con, sql)
-  tryCatch({
-    out <- dbFetch(res, n = n)
-    if (warn_incomplete) {
-      res_warn_incomplete(res, "n = Inf")
-    }
-  }, finally = {
-    dbClearResult(res)
-  })
+  on.exit(dbClearResult(res), add = TRUE)
 
+  out <- dbFetch(res, n = n)
+  if (warn_incomplete) {
+    res_warn_incomplete(res, "n = Inf")
+  }
+ 
   out
 }
 
