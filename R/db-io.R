@@ -137,6 +137,7 @@ db_compute.DBIConnection <- function(con,
         con,
         sql,
         table,
+        ...,
         temporary = temporary,
         overwrite = overwrite
       )
