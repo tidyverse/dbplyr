@@ -5,13 +5,13 @@
 #' details of overall translation technology. Key differences for this backend
 #' are:
 #'
-#' * `SELECT` uses `TOP` not `LIMIT`
-#' * Automatically prefixes `#` to create temporary tables. Add the prefix
+#' - `SELECT` uses `TOP` not `LIMIT`
+#' - Automatically prefixes `#` to create temporary tables. Add the prefix
 #'   yourself to avoid the message.
-#' * String basics: `paste()`, `substr()`, `nchar()`
-#' * Custom types for `as.*` functions
-#' * Lubridate extraction functions, `year()`, `month()`, `day()` etc
-#' * Semi-automated bit <-> boolean translation (see below)
+#' - String basics: `paste()`, `substr()`, `nchar()`
+#' - Custom types for `as.*` functions
+#' - Lubridate extraction functions, `year()`, `month()`, `day()` etc
+#' - Semi-automated bit <-> boolean translation (see below)
 #'
 #' Use `simulate_mssql()` with `lazy_frame()` to see simulated SQL without
 #' converting to live access database.

@@ -320,4 +320,4 @@ snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
   glue_sql2(sql_current_con(), glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"))
 }
 
-utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))
+utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim", "LENGTH"))
