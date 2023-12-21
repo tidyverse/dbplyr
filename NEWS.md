@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* The class of remote sources now includes all S4 class names, not just
+  the first (#918).
+
 * `db_explain()` now works for Oracle (@thomashulst, #1353).
 
 * Database errors now show the generated SQL, which hopefully will make it
