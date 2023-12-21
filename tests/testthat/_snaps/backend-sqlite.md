@@ -1,59 +1,45 @@
+# custom aggregates translated
+
+    Code
+      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE))
+      )
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! `quantile()` is not available in this SQL variant.
+    Code
+      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE))
+      )
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! `quantile()` is not available in this SQL variant.
+
 # custom SQL translation
 
     Code
       left_join(lf, lf, by = "x", na_matches = "na")
     Output
       <SQL>
-      SELECT `LHS`.`x` AS `x`
-      FROM `df` AS `LHS`
-      LEFT JOIN `df` AS `RHS`
-        ON (`LHS`.`x` IS `RHS`.`x`)
-
-# case_when translates correctly to ELSE when TRUE ~ is used
-
-    Code
-      translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~ "undefined"),
-      con = simulate_sqlite())
-    Output
-      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
-
-# full and right join
-
-    Code
-      full_join(df1, df2, by = "x")
-    Output
-      <SQL>
-      SELECT `x`, `y.x`, `y.y`, `z`
-      FROM (
-        SELECT
-          COALESCE(`LHS`.`x`, `RHS`.`x`) AS `x`,
-          `LHS`.`y` AS `y.x`,
-          `RHS`.`y` AS `y.y`,
-          `z`
-        FROM `df` AS `LHS`
-        LEFT JOIN `df` AS `RHS`
-          ON (`LHS`.`x` = `RHS`.`x`)
-        UNION
-        SELECT
-          COALESCE(`RHS`.`x`, `LHS`.`x`) AS `x`,
-          `LHS`.`y` AS `y.x`,
-          `RHS`.`y` AS `y.y`,
-          `z`
-        FROM `df` AS `RHS`
-        LEFT JOIN `df` AS `LHS`
-          ON (`RHS`.`x` = `LHS`.`x`)
-      ) AS `q01`
+      SELECT `df_LHS`.`x` AS `x`
+      FROM `df` AS `df_LHS`
+      LEFT JOIN `df` AS `df_RHS`
+        ON (`df_LHS`.`x` IS `df_RHS`.`x`)
 
 ---
 
     Code
-      right_join(df2, df1, by = "x")
+      test_translate_sql(runif(n()))
     Output
-      <SQL>
-      SELECT `RHS`.`x` AS `x`, `LHS`.`y` AS `y.x`, `z`, `RHS`.`y` AS `y.y`
-      FROM `df` AS `RHS`
-      LEFT JOIN `df` AS `LHS`
-        ON (`RHS`.`x` = `LHS`.`x`)
+      <SQL> (0.5 + RANDOM() / 18446744073709551616.0)
+
+# case_when translates correctly to ELSE when TRUE ~ is used
+
+    Code
+      test_translate_sql(case_when(x == 1L ~ "yes", x == 0L ~ "no", TRUE ~
+      "undefined"), con = simulate_sqlite())
+    Output
+      <SQL> CASE WHEN (`x` = 1) THEN 'yes' WHEN (`x` = 0) THEN 'no' ELSE 'undefined' END
 
 # can explain a query
 
@@ -61,7 +47,7 @@
       db %>% filter(x > 2) %>% explain()
     Output
       <SQL>
-      SELECT *
+      SELECT `test`.*
       FROM `test`
       WHERE (`x` > 2.0)
       

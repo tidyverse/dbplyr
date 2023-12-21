@@ -4,9 +4,11 @@
 \alias{pivot_longer.tbl_lazy}
 \title{Pivot data from wide to long}
 \usage{
-pivot_longer.tbl_lazy(
+\method{pivot_longer}{tbl_lazy}(
   data,
   cols,
+  ...,
+  cols_vary,
   names_to = "name",
   names_prefix = NULL,
   names_sep = NULL,
@@ -17,14 +19,17 @@ pivot_longer.tbl_lazy(
   values_to = "value",
   values_drop_na = FALSE,
   values_ptypes,
-  values_transform = NULL,
-  ...
+  values_transform = NULL
 )
 }
 \arguments{
 \item{data}{A data frame to pivot.}
 
 \item{cols}{Columns to pivot into longer format.}
+
+\item{...}{Additional arguments passed on to methods.}
+
+\item{cols_vary}{Unsupported; included for compatibility with the generic.}
 
 \item{names_to}{A string specifying the name of the column to create
 from the data stored in the column names of \code{data}.}
@@ -51,13 +56,11 @@ existing column names.}
 in the \code{value_to} column.}
 
 \item{values_ptypes}{Not supported.}
-
-\item{...}{Additional arguments passed on to methods.}
 }
 \description{
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and
 decreasing the number of columns. The inverse transformation is
-`tidyr::pivot_wider()]
+\code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}}.
 
 Learn more in \code{vignette("pivot", "tidyr")}.
 
@@ -77,7 +80,7 @@ The SQL translation basically works as follows:
 \enumerate{
 \item split the specification by its key columns i.e. by variables crammed
 into the column names.
-\item for each part in the splitted specification \code{transmute()} \code{data} into the
+\item for each part in the split specification \code{transmute()} \code{data} into the
 following columns
 }
 \itemize{

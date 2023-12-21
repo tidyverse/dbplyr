@@ -1,83 +1,107 @@
 test_that("window functions without group have empty over", {
-  expect_equal(translate_sql(n()), sql("COUNT(*) OVER ()"))
-  expect_equal(translate_sql(sum(x, na.rm = TRUE)), sql("SUM(`x`) OVER ()"))
+  local_con(simulate_dbi())
+  expect_equal(test_translate_sql(n()), sql("COUNT(*) OVER ()"))
+  expect_equal(test_translate_sql(sum(x, na.rm = TRUE)), sql("SUM(`x`) OVER ()"))
 })
 
 test_that("aggregating window functions ignore order_by", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(n(), vars_order = "x"),
+    test_translate_sql(n(), vars_order = "x"),
     sql("COUNT(*) OVER ()")
   )
   expect_equal(
-    translate_sql(sum(x, na.rm = TRUE), vars_order = "x"),
+    test_translate_sql(sum(x, na.rm = TRUE), vars_order = "x"),
     sql("SUM(`x`) OVER ()")
   )
 })
 
 test_that("count uses order_by if frame is used", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(n(), vars_order = "x", vars_frame = c(-2, 1)),
+    test_translate_sql(n(), vars_order = "x", vars_frame = c(-2, 1)),
     sql("COUNT(*) OVER (ORDER BY `x` ROWS BETWEEN 2 PRECEDING AND 1 FOLLOWING)")
   )
 })
 
 test_that("order_by overrides default ordering", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
+    test_translate_sql(order_by(y, cumsum(x)), vars_order = "x"),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
-    translate_sql(order_by(y, cummean(x)), vars_order = "x"),
+    test_translate_sql(order_by(y, cummean(x)), vars_order = "x"),
     sql("AVG(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
-    translate_sql(order_by(y, cummin(x)), vars_order = "x"),
+    test_translate_sql(order_by(y, cummin(x)), vars_order = "x"),
     sql("MIN(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
   expect_equal(
-    translate_sql(order_by(y, cummax(x)), vars_order = "x"),
+    test_translate_sql(order_by(y, cummax(x)), vars_order = "x"),
     sql("MAX(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
   )
 })
 
 test_that("cumulative windows warn if no order", {
-  expect_warning(translate_sql(cumsum(x)), "does not have explicit order")
-  expect_warning(translate_sql(cumsum(x), vars_order = "x"), NA)
+  local_con(simulate_dbi())
+  expect_warning(test_translate_sql(cumsum(x)), "does not have explicit order")
+  expect_warning(test_translate_sql(cumsum(x), vars_order = "x"), NA)
 })
 
 test_that("ntile always casts to integer", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(ntile(x, 10.5)),
+    test_translate_sql(ntile(x, 10.5)),
     sql("NTILE(10) OVER (ORDER BY `x`)")
   )
 })
 
 test_that("first, last, and nth translated to _value", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(first(x)),
+    test_translate_sql(first(x)),
     sql("FIRST_VALUE(`x`) OVER ()")
   )
   expect_equal(
-    translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
+    test_translate_sql(first(x, na_rm = TRUE)),
+    sql("FIRST_VALUE(`x` IGNORE NULLS) OVER ()")
+  )
+  # `last()` must default to unbounded preceding and following
+  expect_equal(
+    test_translate_sql(last(x), vars_order = "a"),
+    sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)")
+  )
+  expect_equal(
+    test_translate_sql(last(x), vars_order = "a", vars_frame = c(0, Inf)),
     sql("LAST_VALUE(`x`) OVER (ORDER BY `a` ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)")
   )
   expect_equal(
-    translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
+    test_translate_sql(nth(x, 3), vars_order = "a", vars_frame = c(-Inf, 0)),
     sql("NTH_VALUE(`x`, 3) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
+  )
+
+  # can also use a column #1236
+  expect_equal(
+    test_translate_sql(nth(x, n), vars_order = "a", vars_frame = c(-Inf, 0)),
+    sql("NTH_VALUE(`x`, `n`) OVER (ORDER BY `a` ROWS UNBOUNDED PRECEDING)")
   )
 })
 
 test_that("can override frame of recycled functions", {
+  local_con(simulate_dbi())
   expect_equal(
-    translate_sql(sum(x, na.rm = TRUE), vars_frame = c(-1, 0), vars_order = "y"),
+    test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(-1, 0), vars_order = "y"),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS 1 PRECEDING)")
   )
 })
 
 test_that("frame is checked", {
+  local_con(simulate_dbi())
   expect_snapshot(
     error = TRUE,
-    translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+    test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
   )
 })
 
@@ -85,18 +109,72 @@ test_that("win_rank works", {
   local_con(simulate_dbi())
   sql_row_number <- win_rank("ROW_NUMBER")
   expect_equal(
-    sql_row_number("x"),
-    sql("ROW_NUMBER() OVER (ORDER BY `x`)")
+    test_translate_sql(row_number(x)),
+    sql("CASE
+WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`)
+END")
   )
 })
 
-test_that("win_rank works", {
+test_that("win_rank(desc(x)) works", {
+  local_con(simulate_dbi())
+  expect_equal(
+    test_translate_sql(row_number(desc(x))),
+    sql("CASE
+WHEN (NOT((`x` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x` DESC)
+END")
+  )
+})
+
+test_that("win_rank(tibble()) works", {
+  local_con(simulate_dbi())
+
+  expect_equal(
+    test_translate_sql(row_number(tibble(x))),
+    test_translate_sql(row_number(x))
+  )
+  expect_equal(
+    test_translate_sql(row_number(tibble(desc(x)))),
+    test_translate_sql(row_number(desc(x)))
+  )
+
+  expect_equal(
+    test_translate_sql(row_number(tibble(x, desc(y)))),
+    sql("CASE
+WHEN (NOT((`x` IS NULL)) AND NOT((`y` IS NULL))) THEN ROW_NUMBER() OVER (PARTITION BY (CASE WHEN ((`x` IS NULL) OR (`y` IS NULL)) THEN 1 ELSE 0 END) ORDER BY `x`, `y` DESC)
+END")
+  )
+})
+
+test_that("win_rank(c()) gives an informative error", {
+  local_con(simulate_dbi())
+  expect_snapshot(error = TRUE, {
+    test_translate_sql(row_number(c(x)))
+  })
+})
+
+test_that("row_number() with and without group_by() and arrange()", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_dbi())
+  expect_snapshot(mf %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number()))
+  expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
+})
+
+test_that("win_cumulative works", {
   local_con(simulate_dbi())
   sql_cumsum <- win_cumulative("SUM")
 
   expect_equal(
     sql_cumsum(ident("x"), "y"),
     sql("SUM(`x`) OVER (ORDER BY `y` ROWS UNBOUNDED PRECEDING)")
+  )
+
+  # NA values results in NA rank
+  db <- memdb_frame(x = c(1, 2, NA, 3))
+  expect_equal(
+    db %>% mutate(rank = dense_rank(x)) %>% collect() %>% arrange(x),
+    tibble(x = c(1:3, NA), rank = c(1:3, NA))
   )
 })
 
@@ -174,11 +252,18 @@ test_that("names windows automatically", {
 
   lf1 <- lf %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3, col4), ~ order_by(desc(ord), cumsum(.x)))
     )
 
-  sql_list <- get_select_sql(lf1$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf1$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(
     sql_list$window_sql,
     sql(
@@ -206,7 +291,14 @@ test_that("names windows automatically", {
       col4 = order_by(desc(ord), cumsum(col4))
     )
 
-  sql_list <- get_select_sql(lf2$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf2$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(
     sql_list$window_sql,
     sql(
@@ -238,11 +330,18 @@ test_that("only name windows if they appear multiple times", {
     group_by(part) %>%
     window_order(ord) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE),
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE)),
       across(c(col3), ~ order_by(desc(ord), cumsum(.x)))
     )
 
-  sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_sqlite())
+  sql_list <- get_select_sql(
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_sqlite(),
+    use_star = TRUE
+  )
   expect_equal(sql_list$window_sql, sql("`win1` AS (PARTITION BY `part`)"))
   expect_equal(
     sql_list$select_sql,
@@ -264,10 +363,17 @@ test_that("name windows only if supported", {
   ) %>%
     group_by(part) %>%
     transmute(
-      across(c(col1, col2), sum, na.rm = TRUE)
+      across(c(col1, col2), ~ sum(.x, na.rm = TRUE))
     )
 
-  sql_list <- get_select_sql(lf$lazy_query$select, "mutate", op_vars(lf), simulate_hana())
+  sql_list <- get_select_sql(
+    select = lf$lazy_query$select,
+    select_operation = "mutate",
+    in_vars = op_vars(lf),
+    table_alias = "df",
+    con = simulate_hana(),
+    use_star = TRUE
+  )
   expect_equal(sql_list$window_sql, character())
   expect_equal(
     sql_list$select_sql,

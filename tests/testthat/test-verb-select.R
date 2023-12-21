@@ -23,6 +23,34 @@ test_that("two selects equivalent to one", {
   expect_named(out, c("b", "c"))
 })
 
+test_that("select after distinct produces subquery", {
+  lf <- lazy_frame(x = 1, y = 1:2)
+  expect_snapshot(
+    lf %>% distinct() %>% select(x)
+  )
+
+  out <- lf %>% distinct() %>% select(x)
+  lq <- out$lazy_query
+  expect_false(lq$distinct)
+  expect_true(lq$x$distinct)
+})
+
+test_that("rename/relocate after distinct is inlined #1141", {
+  lf <- lazy_frame(x = 1, y = 1:2)
+  expect_snapshot({
+    lf %>% distinct() %>% rename(z = y)
+    lf %>% distinct() %>% relocate(y)
+  })
+
+  out <- lf %>% distinct() %>% rename(z = y)
+  lq <- out$lazy_query
+  expect_true(lq$distinct)
+
+  out <- lf %>% distinct() %>% relocate(y)
+  lq <- out$lazy_query
+  expect_true(lq$distinct)
+})
+
 test_that("select operates on mutated vars", {
   mf <- memdb_frame(x = c(1, 2, 3), y = c(3, 2, 1))
 
@@ -36,25 +64,25 @@ test_that("select operates on mutated vars", {
     mutate(x, z = x + y) %>%
     select(z)
 
-  expect_equal_tbl(df1, df2)
+  compare_tbl(df1, df2)
 })
 
 test_that("select renames variables (#317)", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% select(A = x), tibble(A = 1))
+  compare_tbl(mf %>% select(A = x), tibble(A = 1))
 })
 
 test_that("rename renames variables", {
   mf <- memdb_frame(x = 1, y = 2)
-  expect_equal_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
+  compare_tbl(mf %>% rename(A = x), tibble(A = 1, y = 2))
 })
 
 test_that("can rename multiple vars", {
   mf <- memdb_frame(a = 1, b = 2)
   exp <- tibble(c = 1, d = 2)
 
-  expect_equal_tbl(mf %>% rename(c = a, d = b), exp)
-  expect_equal_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% rename(c = a, d = b), exp)
+  compare_tbl(mf %>% group_by(a) %>% rename(c = a, d = b), exp %>% group_by(c))
 })
 
 test_that("can rename with a function", {
@@ -69,6 +97,24 @@ test_that("select preserves grouping vars", {
   expect_snapshot(out <- mf %>% select(a) %>% collect())
 
   expect_named(out, c("b", "a"))
+})
+
+test_that("select handles order vars", {
+  lf <- lazy_frame(x = 1, y = 1, z = 1)
+  # can drop order vars
+  expect_equal(lf %>% window_order(y) %>% select(-y) %>% op_sort(), list())
+  expect_equal(lf %>% window_order(desc(y)) %>% select(-y) %>% op_sort(), list())
+  # can rename order vars
+  expect_equal(lf %>% window_order(y) %>% select(y2 = y) %>% op_sort(), list(expr(y2)))
+  expect_equal(
+    lf %>% window_order(desc(y)) %>% select(y2 = y) %>% op_sort(),
+    list(expr(desc(y2)))
+  )
+  # keeps sort order
+  expect_equal(
+    lf %>% window_order(x, y) %>% select(y2 = y, x) %>% op_sort(),
+    list(expr(x), expr(y2))
+  )
 })
 
 test_that("select doesn't relocate grouping vars to the front", {
@@ -105,6 +151,139 @@ test_that("only add step if necessary", {
   expect_equal(lf %>% relocate(), lf)
 })
 
+test_that("select() after left_join() is inlined", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
+
+  expect_snapshot(
+    (out <- left_join(lf1, lf2, by = "x") %>%
+      select(b, x))
+  )
+  expect_equal(op_vars(out), c("b", "x"))
+
+  expect_snapshot(
+    (out <- left_join(lf1, lf2, by = "x") %>%
+      relocate(b))
+  )
+  expect_equal(op_vars(out), c("b", "x", "a"))
+  expect_equal(out$lazy_query$vars$var, c("b", "x", "a"))
+  expect_equal(out$lazy_query$vars$table, c(2L, 1L, 1L))
+
+  out <- left_join(lf1, lf2, by = "x") %>%
+      transmute(b, x = x + 1)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+})
+
+test_that("select() after semi_join() is inlined", {
+  lf1 <- lazy_frame(x = 1, a = 1, .name = "lf1")
+  lf2 <- lazy_frame(x = 1, b = 2, .name = "lf2")
+
+  expect_snapshot(
+    (out <- semi_join(lf1, lf2, by = "x") %>%
+      select(x, a2 = a))
+  )
+  expect_equal(op_vars(out), c("x", "a2"))
+
+  expect_snapshot(
+    (out <- anti_join(lf1, lf2, by = "x") %>%
+      relocate(a))
+  )
+  expect_equal(op_vars(out), c("a", "x"))
+
+  out <- semi_join(lf1, lf2, by = "x") %>%
+      transmute(a, x = x + 1)
+  expect_s3_class(out$lazy_query, "lazy_select_query")
+})
+
+test_that("select() after join handles previous select", {
+  lf <- lazy_frame(x = 1, y = 1, z = 1) %>%
+    group_by(x, y, z) %>%
+    select(x, y2 = y, z) %>%
+    semi_join(
+      lazy_frame(x = 1),
+      by = "x"
+    ) %>%
+    select(x2 = x, y3 = y2, z)
+
+  expect_equal(op_vars(lf), c("x2", "y3", "z"))
+  expect_equal(
+    lf$lazy_query$vars,
+    tibble(
+      name = c("x2", "y3", "z"),
+      var = c("x", "y", "z")
+    )
+  )
+  expect_equal(op_grps(lf), c("x2", "y3", "z"))
+  expect_snapshot(print(lf))
+
+  lf2 <- lazy_frame(x = 1, y = 1, z = 1) %>%
+    group_by(x, y, z) %>%
+    select(x, y2 = y, z) %>%
+    left_join(
+      lazy_frame(x = 1, y = 1),
+      by = "x"
+    ) %>%
+    select(x2 = x, y3 = y2, z)
+
+  expect_equal(op_vars(lf2), c("x2", "y3", "z"))
+  vars2 <- lf2$lazy_query$vars
+  expect_equal(vars2$var, c("x", "y", "z"))
+  expect_equal(vars2$table, c(1L, 1L, 1L))
+
+  expect_equal(op_grps(lf2), c("x2", "y3", "z"))
+  expect_snapshot(print(lf2))
+})
+
+test_that("select() afer join keeps grouping", {
+  lf1 <- lazy_frame(x = 1, y = 1) %>% group_by(y)
+  lf2 <- lazy_frame(x = 1, z = 1) %>% group_by(z)
+
+  # just to be sure check without select/renaming
+  expect_equal(left_join(lf1, lf2, by = "x") %>% op_grps(), "y")
+
+  # rename grouping variable
+  expect_equal(
+    left_join(lf1, lf2, by = "x") %>%
+      select(y2 = y) %>%
+      op_grps(),
+    "y2"
+  )
+})
+
+test_that("select() produces nice error messages", {
+  lf <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    lf %>% select(non_existent)
+    lf %>% select(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% relocate(non_existent)
+    lf %>% relocate(non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    # no name
+    lf %>% rename(x)
+    # non-existing column
+    lf %>% rename(y = non_existent)
+    lf %>% rename(y = non_existent + 1)
+  })
+
+  expect_snapshot(error = TRUE, {
+    lf %>% rename_with(toupper, .cols = non_existent)
+    lf %>% rename_with(toupper, .cols = non_existent + 1)
+  })
+})
+
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    lf %>% select(where(is.integer))
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {
@@ -124,6 +303,7 @@ test_that("mutate collapses over nested select", {
 
 test_that("output is styled", {
   local_reproducible_output(crayon = TRUE)
+  withr::local_options(dbplyr_highlight = cli::combine_ansi_styles("blue"))
 
   lf <- lazy_frame(x = 1, y = 1, z = 1)
   out <- lf %>%
@@ -132,7 +312,7 @@ test_that("output is styled", {
     filter(z == 1) %>%
     left_join(lf, by = "x")
 
-  expect_snapshot(show_query(out, cte = TRUE))
+  expect_snapshot(show_query(out, sql_options = sql_options(cte = TRUE)))
 })
 
 # sql_build -------------------------------------------------------------
@@ -194,6 +374,13 @@ test_that("mutate preserves grouping vars (#396)", {
   expect_equal(df %>% mutate(b = 1) %>% op_grps(), c("a", "b"))
 })
 
+test_that("select after arrange(desc()) works (#1206)", {
+  out <- lazy_frame(x = 1, y = 1) %>%
+    arrange(desc(x)) %>%
+    select(x)
+  expect_equal(op_vars(out), "x")
+})
+
 
 # lazy_select_query -------------------------------------------------------
 
@@ -236,7 +423,7 @@ test_that("renaming handles groups correctly", {
     new_lazy_select(exprs(ax = x, y = y))
   )
 
-  expect_equal(result$group_vars, "x")
+  expect_equal(result$group_vars, "ax")
   expect_equal(op_grps(result), "ax")
 
   result <- lf %>%
@@ -250,4 +437,10 @@ test_that("renaming handles groups correctly", {
 
   expect_equal(result$group_vars, "x")
   expect_equal(op_grps(result), "x")
+
+  # https://github.com/tidyverse/dbplyr/issues/928
+  result <- lazy_frame(cyl = 1, vs = 1) %>%
+    rename(vs = cyl, new_vs = vs) %>%
+    group_by(vs)
+  expect_equal(op_grps(result), "vs")
 })

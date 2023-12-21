@@ -1,12 +1,12 @@
 Type: Package
 Package: dbplyr
 Title: A 'dplyr' Back End for Databases
-Version: 2.2.0.9000
+Version: 2.4.0.9000
 Authors@R: c(
-    person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")),
+    person("Hadley", "Wickham", , "hadley@posit.co", role = c("aut", "cre")),
     person("Maximilian", "Girlich", role = "aut"),
     person("Edgar", "Ruiz", role = "aut"),
-    person("RStudio", role = c("cph", "fnd"))
+    person("Posit Software, PBC", role = c("cph", "fnd"))
   )
 Description: A 'dplyr' back end for databases that allows you to work with
     remote database tables as if they are in-memory data frames.  Basic
@@ -17,26 +17,26 @@ License: MIT + file LICENSE
 URL: https://dbplyr.tidyverse.org/, https://github.com/tidyverse/dbplyr
 BugReports: https://github.com/tidyverse/dbplyr/issues
 Depends: 
-    R (>= 3.1)
+    R (>= 3.6)
 Imports: 
-    assertthat (>= 0.2.0),
     blob (>= 1.2.0),
-    cli (>= 3.3.0),
-    DBI (>= 1.0.0),
-    dplyr (>= 1.0.9),
-    glue (>= 1.2.0),
-    lifecycle (>= 1.0.0),
+    cli (>= 3.6.1),
+    DBI (>= 1.1.3),
+    dplyr (>= 1.1.2),
+    glue (>= 1.6.2),
+    lifecycle (>= 1.0.3),
     magrittr,
     methods,
-    pillar (>= 1.5.0),
-    purrr (>= 0.2.5),
+    pillar (>= 1.9.0),
+    purrr (>= 1.0.1),
     R6 (>= 2.2.2),
-    rlang (>= 1.0.0),
-    tibble (>= 1.4.2),
-    tidyselect (>= 0.2.4),
+    rlang (>= 1.1.1),
+    tibble (>= 3.2.1),
+    tidyr (>= 1.3.0),
+    tidyselect (>= 1.2.0),
     utils,
-    vctrs (>= 0.4.1),
-    withr
+    vctrs (>= 0.6.3),
+    withr (>= 2.5.0)
 Suggests:
     bit64,
     covr,
@@ -44,22 +44,26 @@ Suggests:
     Lahman,
     nycflights13,
     odbc,
-    RMariaDB (>= 1.0.2),
+    RMariaDB (>= 1.2.2),
     rmarkdown,
-    RPostgres (>= 1.1.3),
+    RPostgres (>= 1.4.5),
     RPostgreSQL,
-    RSQLite (>= 2.1.0),
-    testthat (>= 3.0.2),
-    tidyr (>= 1.2.0)
+    RSQLite (>= 2.3.1),
+    testthat (>= 3.1.10)
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
+Config/testthat/parallel: TRUE 
 Encoding: UTF-8
 Language: en-gb
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+Roxygen: {library(tidyr); list(markdown = TRUE)}
+RoxygenNote: 7.2.3
 Collate: 
+    'db-sql.R'
+    'utils-check.R'
+    'import-standalone-types-check.R'
+    'import-standalone-obj-type.R'
     'utils.R'
     'sql.R'
     'escape.R'
@@ -84,6 +88,7 @@ Collate:
     'backend-postgres-old.R'
     'backend-redshift.R'
     'backend-snowflake.R'
+    'backend-spark-sql.R'
     'backend-sqlite.R'
     'backend-teradata.R'
     'build-sql.R'
@@ -92,19 +97,22 @@ Collate:
     'data-nycflights13.R'
     'db-escape.R'
     'db-io.R'
-    'db-sql.R'
     'db.R'
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'join-by-compat.R'
+    'join-cols-compat.R'
     'lazy-join-query.R'
     'lazy-ops.R'
     'lazy-query.R'
     'lazy-select-query.R'
     'lazy-set-op-query.R'
     'memdb.R'
+    'optimise-utils.R'
     'pillar.R'
     'progress.R'
+    'sql-build.R'
     'query-join.R'
     'query-select.R'
     'query-semi-join.R'
@@ -115,11 +123,11 @@ Collate:
     'rows.R'
     'schema.R'
     'simulate.R'
-    'sql-build.R'
     'sql-clause.R'
     'sql-expr.R'
     'src-sql.R'
     'src_dbi.R'
+    'table-ident.R'
     'tbl-lazy.R'
     'tbl-sql.R'
     'test-frame.R'

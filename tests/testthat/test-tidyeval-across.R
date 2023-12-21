@@ -22,6 +22,7 @@ test_that("across() drops groups", {
   )
 })
 
+
 test_that("across() translates functions", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -31,13 +32,17 @@ test_that("across() translates functions", {
   )
 
   expect_equal(
-    capture_across(lf, across(a:b, log, base = 2)),
-    exprs(a = log(a, base = 2), b = log(b, base = 2))
-  )
-
-  expect_equal(
     capture_across(lf, across(a, list(log, exp))),
     exprs(a_1 = log(a), a_2 = exp(a))
+  )
+})
+
+test_that("across() translates functions in namespace #1231", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, dplyr::dense_rank)),
+    exprs(a = dense_rank(a), b = dense_rank(b))
   )
 })
 
@@ -58,16 +63,6 @@ test_that("across() captures anonymous functions", {
   )
 })
 
-test_that("dots are translated too", {
-  fun <- function() {
-    lf <- lazy_frame(a = 1, b = 2)
-    z <- TRUE
-    capture_across(lf, across(a, mean, na.rm = z))
-  }
-
-  expect_equal(fun(), exprs(a = mean(a, na.rm = TRUE)))
-})
-
 test_that("across() translates formulas", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -85,15 +80,6 @@ test_that("across() translates formulas", {
     capture_across(lf, across(a:b, list(~log(.x)))),
     exprs(a_1 = log(a), b_1 = log(b))
   )
-})
-
-test_that("across() does not support formulas with dots", {
-  lf <- lazy_frame(a = 1,  b = 2)
-
-  expect_snapshot({
-    (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
-    (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
-  })
 })
 
 test_that("across() translates evaluated functions", {
@@ -245,6 +231,7 @@ test_that("untranslatable functions are preserved", {
 
 test_that("old _at functions continue to work", {
   withr::local_options(lifecycle_verbosity = "quiet")
+  reset_warning_verbosity("dbplyr_check_na_rm")
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% dplyr::summarise_at(dplyr::vars(a:b), "sum"))
@@ -265,7 +252,7 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
 
   expect_equal(
     partial_eval_dots(lf, if_all(all_of(y), ~ .x < 2)),
-    list(quo(x < 2)),
+    list(quo((x < 2))),
     ignore_attr = "names"
   )
 })
@@ -364,6 +351,44 @@ test_that("across() searches for list in environment", {
   )
 })
 
+test_that("across() handles cur_column()", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, ~ paste0(.x, cur_column()))),
+    exprs(a = paste0(a, "a"), b = paste0(b, "b"))
+  )
+
+  expect_equal(
+    capture_across(lf, across(a:b, function(x) paste0(x, cur_column()))),
+    exprs(a = paste0(a, "a"), b = paste0(b, "b"))
+  )
+})
+
+test_that("across() errors if named", {
+  lf <- lazy_frame(a = 1, b = 2)
+
+  expect_snapshot({
+    (expect_error(mutate(lf, x = across())))
+    (expect_error(group_by(lf, x = across())))
+  })
+})
+
+test_that("across() throws error if unpack = TRUE", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot(
+    (expect_error(lf %>% mutate(across(x, .unpack = TRUE))))
+  )
+})
+
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    capture_across(lf, across(where(is.integer), as.character))
+  })
+})
+
 
 # if_all ------------------------------------------------------------------
 
@@ -376,24 +401,9 @@ test_that("if_all() translates functions", {
   )
 
   expect_equal(
-    capture_if_all(lf, if_all(a:b, log, base = 2)),
-    expr(log(a, base = 2) & log(b, base = 2))
-  )
-
-  expect_equal(
     capture_if_all(lf, if_all(a, list(log, exp))),
     expr(log(a) & exp(a))
   )
-})
-
-test_that("if_all() translates dots", {
-  fun <- function() {
-    lf <- lazy_frame(a = 1, b = 2)
-    z <- TRUE
-    capture_if_all(lf, if_all(a, mean, na.rm = z))
-  }
-
-  expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
 })
 
 test_that("if_all() translates formulas", {
@@ -423,7 +433,7 @@ test_that("if_all() gives informative errors", {
   })
 })
 
-test_that("if_all collapses multiple expresions", {
+test_that("if_all collapses multiple expressions", {
   lf <- lazy_frame(a = 1,  b = 2)
   expect_equal(
     capture_if_all(lf, if_all(everything(), is.na)),
@@ -438,6 +448,15 @@ test_that("if_all/any works in filter()", {
   expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
 })
 
+test_that("if_all/any is wrapped in parentheses #1153", {
+  lf <- lazy_frame(a = 1,  b = 2, c = 3)
+
+  expect_equal(
+    lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
+  )
+})
+
 test_that("if_all/any works in mutate()", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -445,7 +464,7 @@ test_that("if_all/any works in mutate()", {
   expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
 })
 
-test_that("if_all/any uses every colum as default", {
+test_that("if_all/any uses every column as default", {
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% filter(if_all(.fns = ~ . > 0)))
@@ -478,11 +497,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
   # Single inputs
   expect_equal(
     filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
     filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
 })
 
@@ -496,12 +515,11 @@ test_that("if_all() cannot rename variables", {
 })
 
 test_that("if_all() can handle empty selection", {
-  skip("tidyselect issue #221")
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>% mutate(if_all(character(), c)) %>% show_query(),
-    expr(lf)
+    capture_if_all(lf, if_all(character(), c)),
+    TRUE
   )
 })
 
@@ -513,3 +531,138 @@ test_that("across() .cols is evaluated in across()'s calling environment", {
     expr(y)
   )
 })
+
+
+# dots --------------------------------------------------------------------
+
+test_that("across(...) is deprecated", {
+  lf <- lazy_frame(x = c(1, NA))
+  expect_snapshot(summarise(lf, across(everything(), mean, na.rm = TRUE)))
+
+})
+
+test_that("across() does not support formulas with dots", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_snapshot({
+    (expect_error(capture_across(lf, across(a:b, ~log(.x, base = .y), base = 2))))
+    (expect_error(capture_across(lf, across(a:b, list(~log(.x, base = .y)), base = 2))))
+  })
+})
+
+test_that("across() translates functions", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, log, base = 2)),
+    exprs(a = log(a, base = 2), b = log(b, base = 2))
+  )
+})
+
+test_that("dots are translated too", {
+  options(lifecycle_verbosity = "quiet")
+  fun <- function() {
+    lf <- lazy_frame(a = 1, b = 2)
+    z <- TRUE
+    capture_across(lf, across(a, mean, na.rm = z))
+  }
+
+  expect_equal(fun(), exprs(a = mean(a, na.rm = TRUE)))
+})
+
+test_that("if_all() translates functions", {
+  options(lifecycle_verbosity = "quiet")
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_if_all(lf, if_all(a:b, log)),
+    expr(log(a) & log(b))
+  )
+
+  expect_equal(
+    capture_if_all(lf, if_all(a:b, log, base = 2)),
+    expr(log(a, base = 2) & log(b, base = 2))
+  )
+
+  expect_equal(
+    capture_if_all(lf, if_all(a, list(log, exp))),
+    expr(log(a) & exp(a))
+  )
+})
+
+test_that("if_all() translates dots", {
+  options(lifecycle_verbosity = "quiet")
+  fun <- function() {
+    lf <- lazy_frame(a = 1, b = 2)
+    z <- TRUE
+    capture_if_all(lf, if_all(a, mean, na.rm = z))
+  }
+
+  expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
+})
+
+
+# pick --------------------------------------------------------------------
+
+# pick() + arrange()
+
+test_that("can `arrange()` with `pick()` selection", {
+  df <- lazy_frame(x = c(2, 2, 1), y = c(3, 1, 3))
+
+  expect_identical(
+    arrange(df, pick(x, y)) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
+  )
+
+  expect_identical(
+    arrange(df, pick(x), y) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
+  )
+})
+
+test_that("`pick()` errors in `arrange()` are useful", {
+  df <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    arrange(df, pick(y))
+  })
+})
+
+test_that("doesn't allow renaming", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick(y = x))
+  })
+})
+
+test_that("requires at least one input", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick())
+  })
+})
+
+# pick() + filter()
+
+test_that("`filter()` with `pick()` that uses invalid tidy-selection errors", {
+  df <- lazy_frame(x = c(1, 2, NA, 3), y = c(2, NA, 5, 3))
+
+  expect_snapshot(error = TRUE, {
+    filter(df, pick(x, a))
+  })
+})
+
+# pick() + group_by()
+
+test_that("`pick()` can be used inside `group_by()` wrappers", {
+  df <- lazy_frame(a = 1:3, b = 2:4, c = 3:5)
+
+  tidyselect_group_by <- function(data, groups) {
+    group_by(data, pick({{ groups }}))
+  }
+  expect_identical(
+    tidyselect_group_by(df, c(a, c)),
+    group_by(df, a, c)
+  )
+})
+

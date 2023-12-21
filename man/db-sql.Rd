@@ -14,14 +14,17 @@
 \alias{sql_indent_subquery}
 \alias{sql_query_rows}
 \alias{supports_window_clause}
+\alias{db_supports_table_alias_with_as}
 \alias{sql_query_select}
 \alias{sql_query_join}
+\alias{sql_query_multi_join}
 \alias{sql_query_semi_join}
 \alias{sql_query_set_op}
+\alias{sql_query_union}
 \alias{sql_returning_cols}
 \title{SQL generation generics}
 \usage{
-sql_expr_matches(con, x, y)
+sql_expr_matches(con, x, y, ...)
 
 sql_translation(con)
 
@@ -29,7 +32,15 @@ sql_random(con)
 
 sql_table_analyze(con, table, ...)
 
-sql_table_index(con, table, columns, name = NULL, unique = FALSE, ...)
+sql_table_index(
+  con,
+  table,
+  columns,
+  name = NULL,
+  unique = FALSE,
+  ...,
+  call = caller_env()
+)
 
 sql_query_explain(con, sql, ...)
 
@@ -44,6 +55,8 @@ sql_indent_subquery(from, con, lvl = 0)
 sql_query_rows(con, sql, ...)
 
 supports_window_clause(con)
+
+db_supports_table_alias_with_as(con)
 
 sql_query_select(
   con,
@@ -65,7 +78,7 @@ sql_query_join(
   con,
   x,
   y,
-  vars,
+  select,
   type = "inner",
   by = NULL,
   na_matches = FALSE,
@@ -73,9 +86,13 @@ sql_query_join(
   lvl = 0
 )
 
-sql_query_semi_join(con, x, y, anti = FALSE, by = NULL, ..., lvl = 0)
+sql_query_multi_join(con, x, joins, table_names, by_list, select, ..., lvl = 0)
+
+sql_query_semi_join(con, x, y, anti, by, where, vars, ..., lvl = 0)
 
 sql_query_set_op(con, x, y, method, ..., all = FALSE, lvl = 0)
+
+sql_query_union(con, x, unions, ..., lvl = 0)
 
 sql_returning_cols(con, cols, table, ...)
 }
@@ -86,9 +103,11 @@ SQL translation:
 pair of \code{NULL}s should match. The default translation uses a \verb{CASE WHEN}
 as described in \url{https://modern-sql.com/feature/is-distinct-from}.
 \item \code{sql_translation(con)} generates a SQL translation environment.
-\item \code{sql_random(con)} generates SQL to get a random number which can be used
-to select random rows in \code{slice_sample()}.
+\item Deprecated: \code{sql_random(con)} generates SQL to get a random number which can be used
+to select random rows in \code{slice_sample()}. This is now replaced by adding
+a translation for \code{runif(n())}.
 \item \code{supports_window_clause(con)} does the backend support named windows?
+\item \code{db_supports_table_alias_with_as(con)} does the backend support using \code{AS} when using a table alias?
 }
 
 Tables:
@@ -96,7 +115,7 @@ Tables:
 \item \code{sql_table_analyze(con, table)} generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
 planner. It called from \code{\link[=copy_to]{copy_to()}} when \code{analyze = TRUE}.
-\item \code{sql_table_index()} generates SQL for adding an index to table. The
+\item \code{sql_table_index()} generates SQL for adding an index to table.
 }
 
 Query manipulation:

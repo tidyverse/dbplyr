@@ -33,7 +33,7 @@ test_that("zero length inputs yield length-1 output when collapsed", {
 
 # Numeric ------------------------------------------------------------------
 
-test_that("missing vaues become null", {
+test_that("missing values become null", {
   con <- simulate_dbi()
 
   expect_equal(escape(NA, con = con), sql("NULL"))
@@ -62,6 +62,15 @@ test_that("can escape integer64 values", {
   )
 })
 
+test_that("recognises integerish numerics", {
+  expect_equal(is_whole_number(c(1.1, 1.0, 1.000001)), c(FALSE, TRUE, FALSE))
+  con <- simulate_dbi()
+  expect_equal(
+    escape(c(1.1, 1, 1.000001), con = con),
+    sql("(1.1, 1.0, 1.000001)")
+  )
+})
+
 # Logical -----------------------------------------------------------------
 
 test_that("logical is SQL-99 compatible (by default)", {
@@ -75,9 +84,9 @@ test_that("logical is SQL-99 compatible (by default)", {
 
 test_that("date and date-times are converted to ISO 8601", {
   con <- simulate_dbi()
-  x1 <- ISOdatetime(2000, 1, 2, 3, 4, 5, tz = "US/Central")
+  x1 <- ISOdatetime(2000, 1, 2, 3, 4, 5, tz = "America/New_York")
   x2 <- as.Date(x1)
-  expect_equal(escape(x1, con = con), sql("'2000-01-02T09:04:05Z'"))
+  expect_equal(escape(x1, con = con), sql("'2000-01-02T08:04:05Z'"))
   expect_equal(escape(x2, con = con), sql("'2000-01-02'"))
 })
 

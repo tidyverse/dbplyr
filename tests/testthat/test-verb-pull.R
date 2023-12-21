@@ -1,12 +1,17 @@
-test_that("can extract default, by name, or positive/negative position", {
-  x <- 1:10
-  y <- runif(10)
-  mf <- memdb_frame(x = x, y = y)
+test_that("default extracts last var from data frame", {
+  df <- memdb_frame(x = 1:3, z = 4:6)
+  expect_equal(pull(df), 4:6)
+})
 
-  expect_equal(pull(mf), y)
-  expect_equal(pull(mf, x), x)
-  expect_equal(pull(mf, 1L), x)
-  expect_equal(pull(mf, -1), y)
+test_that("can extract by name, or positive/negative position", {
+  x <- 1:3
+  df <- memdb_frame(x = x, y = 4:6)
+
+  expect_equal(pull(df, x), x)
+  expect_equal(pull(df, 1L), x)
+  expect_equal(pull(df, 1), x)
+  expect_equal(pull(df, -2), x)
+  expect_equal(pull(df, -2L), x)
 })
 
 test_that("extracts correct column from grouped tbl", {
@@ -22,3 +27,27 @@ test_that("doesn't unnecessarily select", {
   expect_warning(out <- mf %>% arrange(x) %>% pull(), NA)
   expect_equal(out, 1:3)
 })
+
+test_that("can extract named vectors", {
+  x <- 1:3
+  y <- letters[x]
+  df <- memdb_frame(x = x, y = y)
+  xn <- set_names(x, y)
+
+  expect_equal(pull(df, x), x)
+  expect_equal(pull(df, x, y), xn)
+  expect_equal(pull(df, 1, 2), xn)
+  expect_equal(names(pull(df, x, y)), y)
+})
+
+
+test_that("ungroup() produces nice error messages", {
+  expect_snapshot(error = TRUE, {
+    memdb_frame(x = 1) %>% pull(non_existent)
+    memdb_frame(x = 1) %>% pull("non_existent")
+    memdb_frame(x = 1) %>% pull(1000)
+
+    memdb_frame(x = 1) %>% pull(x, "name_non_existent")
+  })
+})
+

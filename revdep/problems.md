@@ -1,14 +1,14 @@
-# dcmodifydb
+# CDMConnector
 
 <details>
 
-* Version: 0.2.0
-* GitHub: https://github.com/data-cleaning/dcmodifydb
-* Source code: https://github.com/cran/dcmodifydb
-* Date/Publication: 2022-01-21 12:42:41 UTC
-* Number of recursive dependencies: 60
+* Version: 1.1.4
+* GitHub: https://github.com/darwin-eu/CDMConnector
+* Source code: https://github.com/cran/CDMConnector
+* Date/Publication: 2023-10-20 21:50:02 UTC
+* Number of recursive dependencies: 115
 
-Run `cloud_details(, "dcmodifydb")` for more info
+Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
 
 </details>
 
@@ -18,68 +18,47 @@ Run `cloud_details(, "dcmodifydb")` for more info
     ```
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      > library(dcmodifydb)
-      > 
-      > test_check("dcmodifydb")
-      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 33 ]
+    Complete output:
+      > # This file is part of the standard setup for testthat.
+      > # It is recommended that you do not modify it.
+      > #
+      > # Where should you do additional test configuration?
+      > # Learn more about the roles of various files in:
+      > # * https://r-pkgs.org/tests.html
+      > # * https://testthat.r-lib.org/reference/test_package.html#special-files
+    ...
+       20.     │   └─base (local) doWithOneRestart(return(expr), restart)
+       21.     └─vctrs::stop_incompatible_cast(...)
+       22.       └─vctrs::stop_incompatible_type(...)
+       23.         └─vctrs:::stop_incompatible(...)
+       24.           └─vctrs:::stop_vctrs(...)
+       25.             └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
       
-      ══ Failed tests ════════════════════════════════════════════════════════════════
-      ── Failure (test-update.R:44:5): update: generates update statements ───────────
-      sql[[1]] not equal to sql("UPDATE `mtcars`\nSET `gear` = 0\nWHERE ((`gear`) IS NULL);").
-      1/1 mismatches
-      x[1]: "UPDATE `mtcars`\nSET `gear` = 0\nWHERE (`gear` IS NULL);"
-      y[1]: "UPDATE `mtcars`\nSET `gear` = 0\nWHERE ((`gear`) IS NULL);"
-      
-      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 33 ]
+      [ FAIL 5 | WARN 0 | SKIP 15 | PASS 167 ]
       Error: Test failures
       Execution halted
     ```
 
-## In both
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘methods’
-      All declared Imports should be used.
-    ```
-
-# dittodb
-
-<details>
-
-* Version: 0.1.3
-* GitHub: https://github.com/ropensci/dittodb
-* Source code: https://github.com/cran/dittodb
-* Date/Publication: 2020-10-10 06:20:02 UTC
-* Number of recursive dependencies: 88
-
-Run `cloud_details(, "dittodb")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking re-building of vignette outputs ... WARNING
+*   checking re-building of vignette outputs ... ERROR
     ```
     Error(s) in re-building vignettes:
-    --- re-building ‘developing-dittodb.Rmd’ using rmarkdown
-    --- finished re-building ‘developing-dittodb.Rmd’
+    --- re-building ‘a01_getting-started.Rmd’ using rmarkdown
+    trying URL 'https://example-data.ohdsi.dev/GiBleed.zip'
+    Content type 'application/zip' length 6754786 bytes (6.4 MB)
+    ==================================================
+    downloaded 6.4 MB
     
-    --- re-building ‘dittodb.Rmd’ using rmarkdown
-    --- finished re-building ‘dittodb.Rmd’
-    
-    --- re-building ‘nycflights.Rmd’ using rmarkdown
-    --- finished re-building ‘nycflights.Rmd’
-    
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    --- finished re-building ‘a01_getting-started.Rmd’
     ...
-    Quitting from lines 166-191 (travelling.Rmd) 
-    Error: processing vignette 'travelling.Rmd' failed with diagnostics:
-    Couldn't find the file travelling/SELECT-a92ba3.R in any of the mock directories.
-    --- failed re-building ‘travelling.Rmd’
+    Can't convert `x` <dbplyr_table_ident> to <character>.
+    --- failed re-building ‘a06_using_cdm_attributes.Rmd’
     
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
     SUMMARY: processing the following file failed:
-      ‘travelling.Rmd’
+      ‘a06_using_cdm_attributes.Rmd’
     
     Error: Vignette re-building failed.
     Execution halted
@@ -87,63 +66,23 @@ Run `cloud_details(, "dittodb")` for more info
 
 ## In both
 
-*   checking LazyData ... NOTE
+*   checking package dependencies ... NOTE
     ```
-      'LazyData' is specified without a 'data' directory
+    Packages which this enhances but not available for checking:
+      'CirceR', 'Capr'
     ```
 
-# dlookr
+# DrugUtilisation
 
 <details>
 
-* Version: 0.5.6
-* GitHub: https://github.com/choonghyunryu/dlookr
-* Source code: https://github.com/cran/dlookr
-* Date/Publication: 2022-04-11 15:12:29 UTC
-* Number of recursive dependencies: 170
+* Version: 0.4.0
+* GitHub: NA
+* Source code: https://github.com/cran/DrugUtilisation
+* Date/Publication: 2023-10-20 04:40:06 UTC
+* Number of recursive dependencies: 144
 
-Run `cloud_details(, "dlookr")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error(s) in re-building vignettes:
-    --- re-building ‘EDA.Rmd’ using rmarkdown
-    
-    Attaching package: 'dlookr'
-    
-    The following object is masked from 'package:base':
-    
-        transform
-    
-    
-    ...
-    
-        intersect, setdiff, setequal, union
-    
-    --- finished re-building ‘transformation.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘EDA.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
-
-# dplyr.teradata
-
-<details>
-
-* Version: 0.4.1
-* GitHub: https://github.com/hoxo-m/dplyr.teradata
-* Source code: https://github.com/cran/dplyr.teradata
-* Date/Publication: 2020-11-12 11:30:06 UTC
-* Number of recursive dependencies: 69
-
-Run `cloud_details(, "dplyr.teradata")` for more info
+Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
 
 </details>
 
@@ -153,136 +92,428 @@ Run `cloud_details(, "dplyr.teradata")` for more info
     ```
       Running ‘testthat.R’
     Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      Loading required package: odbc
-      > 
-      > test_check("dplyr.teradata")
-      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 7 ]
+    Complete output:
+      > # This file is part of the standard setup for testthat.
+      > # It is recommended that you do not modify it.
+      > #
+      > # Where should you do additional test configuration?
+      > # Learn more about the roles of various files in:
+      > # * https://r-pkgs.org/tests.html
+      > # * https://testthat.r-lib.org/reference/test_package.html#special-files
+    ...
+       20.     │   └─base (local) doWithOneRestart(return(expr), restart)
+       21.     └─vctrs::stop_incompatible_cast(...)
+       22.       └─vctrs::stop_incompatible_type(...)
+       23.         └─vctrs:::stop_incompatible(...)
+       24.           └─vctrs:::stop_vctrs(...)
+       25.             └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
       
-      ══ Failed tests ════════════════════════════════════════════════════════════════
-      ── Failure (test-translate-teradata.R:9:3): custom scalar translated correctly ──
-      trans(case_when(x == 1L ~ 1L, x == 2L ~ 2L, TRUE ~ 3L)) not equal to sql("CASE\nWHEN (`x` = 1) THEN (1)\nWHEN (`x` = 2) THEN (2)\nELSE (3)\nEND").
-      1/1 mismatches
-      x[1]: "CASE WHEN (`x` = 1) THEN 1 WHEN (`x` = 2) THEN 2 ELSE 3 END"
-      y[1]: "CASE\nWHEN (`x` = 1) THEN (1)\nWHEN (`x` = 2) THEN (2)\nELSE (3)\nEND"
-      
-      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 7 ]
+      [ FAIL 8 | WARN 0 | SKIP 18 | PASS 0 ]
       Error: Test failures
       Execution halted
     ```
 
-*   checking R code for possible problems ... NOTE
+*   checking re-building of vignette outputs ... ERROR
     ```
-    sample_n.tbl_Teradata: no visible global function definition for
-      ‘op_single’
-    Undefined global functions or variables:
-      op_single
+    Error(s) in re-building vignettes:
+    --- re-building ‘Intro_create_cohort.Rmd’ using rmarkdown
+    
+    Quitting from lines 23-38 [setup] (Intro_create_cohort.Rmd)
+    Error: processing vignette 'Intro_create_cohort.Rmd' failed with diagnostics:
+    Can't convert `x` <dbplyr_table_ident> to <character>.
+    --- failed re-building ‘Intro_create_cohort.Rmd’
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    ...
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    --- re-building ‘my-vignette.Rmd’ using rmarkdown
+    --- finished re-building ‘my-vignette.Rmd’
+    
+    SUMMARY: processing the following files failed:
+      ‘Intro_create_cohort.Rmd’ ‘addIndications-example.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
     ```
 
-## In both
-
-*   checking LazyData ... NOTE
-    ```
-      'LazyData' is specified without a 'data' directory
-    ```
-
-# RClickhouse
+# editbl
 
 <details>
 
-* Version: 0.6.3
-* GitHub: https://github.com/IMSMWU/RClickhouse
-* Source code: https://github.com/cran/RClickhouse
-* Date/Publication: 2022-03-08 13:40:08 UTC
-* Number of recursive dependencies: 42
+* Version: 1.0.1
+* GitHub: https://github.com/openanalytics/editbl
+* Source code: https://github.com/cran/editbl
+* Date/Publication: 2023-10-13 15:20:02 UTC
+* Number of recursive dependencies: 81
 
-Run `cloud_details(, "RClickhouse")` for more info
+Run `revdepcheck::cloud_details(, "editbl")` for more info
 
 </details>
 
 ## Newly broken
 
-*   checking dependencies in R code ... WARNING
+*   checking examples ... ERROR
     ```
-    '::' or ':::' import not declared from: ‘cli’
+    Running examples in ‘editbl-Ex.R’ failed
+    The error most likely occurred in:
+    
+    > ### Name: e_rows_insert.tbl_dbi
+    > ### Title: rows_insert implementation for DBI backends.
+    > ### Aliases: e_rows_insert.tbl_dbi
+    > 
+    > ### ** Examples
+    > 
+    > library(dplyr)
+    ...
+    > # Insert new row
+    > artists <- tbl(conn, "Artist")
+    > DBI::dbBegin(conn)
+    > e_rows_insert(artists,
+    +  data.frame(ArtistId = 999, Name = "testArtist"),
+    +  in_place = TRUE)
+    Error in initialize(value, ...) : 
+      cannot use object of class “dbplyr_table_ident” in new():  class “SQL” does not extend that class
+    Calls: e_rows_insert ... get_db_table_name -> <Anonymous> -> new -> initialize -> initialize
+    Execution halted
     ```
 
-## In both
-
-*   checking installed package size ... NOTE
+*   checking tests ... ERROR
     ```
-      installed size is 18.5Mb
-      sub-directories of 1Mb or more:
-        libs  18.2Mb
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > library(testthat)
+      > library(editbl)
+      > 
+      > test_check("editbl")
+      [ FAIL 2 | WARN 0 | SKIP 0 | PASS 55 ]
+      
+      ══ Failed tests ════════════════════════════════════════════════════════════════
+    ...
+       16.   ├─.transformer(expr, env) %||% .null
+       17.   └─glue (local) .transformer(expr, env)
+       18.     └─base::eval(parse(text = text, keep.source = FALSE), envir)
+       19.       └─base::eval(parse(text = text, keep.source = FALSE), envir)
+      
+      [ FAIL 2 | WARN 0 | SKIP 0 | PASS 55 ]
+      Error: Test failures
+      In addition: Warning message:
+      call dbDisconnect() when finished working with a connection 
+      Execution halted
+    ```
+
+# IncidencePrevalence
+
+<details>
+
+* Version: 0.5.1
+* GitHub: NA
+* Source code: https://github.com/cran/IncidencePrevalence
+* Date/Publication: 2023-10-18 20:30:02 UTC
+* Number of recursive dependencies: 134
+
+Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking examples ... ERROR
+    ```
+    Running examples in ‘IncidencePrevalence-Ex.R’ failed
+    The error most likely occurred in:
+    
+    > ### Name: mockIncidencePrevalenceRef
+    > ### Title: Generate example subset of the OMOP CDM for estimating incidence
+    > ###   and prevalence
+    > ### Aliases: mockIncidencePrevalenceRef
+    > 
+    > ### ** Examples
+    > 
+    ...
+     19.     │ └─base (local) withOneRestart(expr, restarts[[1L]])
+     20.     │   └─base (local) doWithOneRestart(return(expr), restart)
+     21.     └─vctrs::stop_incompatible_cast(...)
+     22.       └─vctrs::stop_incompatible_type(...)
+     23.         └─vctrs:::stop_incompatible(...)
+     24.           └─vctrs:::stop_vctrs(...)
+     25.             └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
+    Execution halted
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    ```
+
+*   checking tests ... ERROR
+    ```
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > library(testthat)
+      > library(IncidencePrevalence)
+      > 
+      > test_check("IncidencePrevalence")
+      Starting 2 test processes
+      [ FAIL 17 | WARN 0 | SKIP 76 | PASS 81 ]
+      
+    ...
+       20.     │   └─base (local) doWithOneRestart(return(expr), restart)
+       21.     └─vctrs::stop_incompatible_cast(...)
+       22.       └─vctrs::stop_incompatible_type(...)
+       23.         └─vctrs:::stop_incompatible(...)
+       24.           └─vctrs:::stop_vctrs(...)
+       25.             └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
+      
+      [ FAIL 17 | WARN 0 | SKIP 76 | PASS 81 ]
+      Error: Test failures
+      Execution halted
+    ```
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+    --- re-building ‘a01_Introduction_to_IncidencePrevalence.Rmd’ using rmarkdown
+    
+    Quitting from lines 54-58 [unnamed-chunk-4] (a01_Introduction_to_IncidencePrevalence.Rmd)
+    Error: processing vignette 'a01_Introduction_to_IncidencePrevalence.Rmd' failed with diagnostics:
+    Can't convert `x` <dbplyr_table_ident> to <character>.
+    --- failed re-building ‘a01_Introduction_to_IncidencePrevalence.Rmd’
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    ...
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    SUMMARY: processing the following files failed:
+      ‘a01_Introduction_to_IncidencePrevalence.Rmd’
+      ‘a02_Creating_denominator_populations.Rmd’
+      ‘a04_Calculating_prevalence.Rmd’ ‘a05_Calculating_incidence.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
+# mlr3db
+
+<details>
+
+* Version: 0.5.1
+* GitHub: https://github.com/mlr-org/mlr3db
+* Source code: https://github.com/cran/mlr3db
+* Date/Publication: 2023-10-17 08:40:02 UTC
+* Number of recursive dependencies: 71
+
+Run `revdepcheck::cloud_details(, "mlr3db")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking tests ... ERROR
+    ```
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > if (requireNamespace("testthat", quietly = TRUE)) {
+      +   library("testthat")
+      +   library("mlr3db")
+      +   test_check("mlr3db")
+      + }
+      Loading required package: mlr3
+      [ FAIL 9 | WARN 0 | SKIP 0 | PASS 1021 ]
+    ...
+       25.         │ └─base::lapply(...)
+       26.         ├─private$.data$ops
+       27.         └─dbplyr:::`$.tbl_lazy`(private$.data, "ops")
+       28.           └─cli::cli_abort(...)
+       29.             └─rlang::abort(...)
+      
+      [ FAIL 9 | WARN 0 | SKIP 0 | PASS 1021 ]
+      Error: Test failures
+      In addition: There were 27 warnings (use warnings() to see them)
+      Execution halted
+    ```
+
+# modeldb
+
+<details>
+
+* Version: 0.2.3
+* GitHub: https://github.com/tidymodels/modeldb
+* Source code: https://github.com/cran/modeldb
+* Date/Publication: 2022-08-16 20:30:15 UTC
+* Number of recursive dependencies: 92
+
+Run `revdepcheck::cloud_details(, "modeldb")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+      ...
+    --- re-building ‘kmeans.Rmd’ using rmarkdown
+    
+    Quitting from lines 55-56 [unnamed-chunk-3] (kmeans.Rmd)
+    Error: processing vignette 'kmeans.Rmd' failed with diagnostics:
+    The `$` method of <tbl_lazy> is for internal use only.
+    ℹ Use `dplyr::pull()` to get the values in a column.
+    --- failed re-building ‘kmeans.Rmd’
+    
+    --- re-building ‘linear-regression.Rmd’ using rmarkdown
+    --- finished re-building ‘linear-regression.Rmd’
+    
+    SUMMARY: processing the following file failed:
+      ‘kmeans.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
+# PatientProfiles
+
+<details>
+
+* Version: 0.4.0
+* GitHub: NA
+* Source code: https://github.com/cran/PatientProfiles
+* Date/Publication: 2023-10-06 15:00:05 UTC
+* Number of recursive dependencies: 155
+
+Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking tests ... ERROR
+    ```
+      Running ‘spelling.R’
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > # This file is part of the standard setup for testthat.
+      > # It is recommended that you do not modify it.
+      > #
+      > # Where should you do additional test configuration?
+      > # Learn more about the roles of various files in:
+      > # * https://r-pkgs.org/tests.html
+    ...
+       20.     │   └─base (local) doWithOneRestart(return(expr), restart)
+       21.     └─vctrs::stop_incompatible_cast(...)
+       22.       └─vctrs::stop_incompatible_type(...)
+       23.         └─vctrs:::stop_incompatible(...)
+       24.           └─vctrs:::stop_vctrs(...)
+       25.             └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
+      
+      [ FAIL 81 | WARN 16 | SKIP 0 | PASS 91 ]
+      Error: Test failures
+      Execution halted
+    ```
+
+*   checking re-building of vignette outputs ... ERROR
+    ```
+    Error(s) in re-building vignettes:
+      ...
+    --- re-building ‘addCohortIntersections.Rmd’ using rmarkdown
+    
+    Quitting from lines 47-55 [unnamed-chunk-2] (addCohortIntersections.Rmd)
+    Error: processing vignette 'addCohortIntersections.Rmd' failed with diagnostics:
+    Can't convert `x` <dbplyr_table_ident> to <character>.
+    --- failed re-building ‘addCohortIntersections.Rmd’
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    ...
+    Can't convert `x` <dbplyr_table_ident> to <character>.
+    --- failed re-building ‘addPatientCharacteristics.rmd’
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    SUMMARY: processing the following files failed:
+      ‘addCohortIntersections.Rmd’ ‘addPatientCharacteristics.rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
+# RPresto
+
+<details>
+
+* Version: 1.4.5
+* GitHub: https://github.com/prestodb/RPresto
+* Source code: https://github.com/cran/RPresto
+* Date/Publication: 2023-05-05 08:20:19 UTC
+* Number of recursive dependencies: 72
+
+Run `revdepcheck::cloud_details(, "RPresto")` for more info
+
+</details>
+
+## Newly broken
+
+*   checking tests ... ERROR
+    ```
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > # Copyright (c) Meta Platforms, Inc. and affiliates.
+      > # All rights reserved.
+      > #
+      > # This source code is licensed under the BSD-style license found in the
+      > # LICENSE file in the root directory of this source tree.
+      > 
+      > library("testthat")
+    ...
+        6.   └─base::tryCatch(...)
+        7.     └─base (local) tryCatchList(expr, classes, parentenv, handlers)
+        8.       └─base (local) tryCatchOne(expr, names, parentenv, handlers[[1L]])
+        9.         └─value[[3L]](cond)
+       10.           └─cli::cli_abort("Can't query fields.", parent = cnd)
+       11.             └─rlang::abort(...)
+      
+      [ FAIL 1 | WARN 0 | SKIP 79 | PASS 210 ]
+      Error: Test failures
+      Execution halted
     ```
 
 # sparklyr
 
 <details>
 
-* Version: 1.7.6
+* Version: 1.8.3
 * GitHub: https://github.com/sparklyr/sparklyr
 * Source code: https://github.com/cran/sparklyr
-* Date/Publication: 2022-05-26 15:20:02 UTC
-* Number of recursive dependencies: 110
+* Date/Publication: 2023-09-02 05:10:02 UTC
+* Number of recursive dependencies: 116
 
-Run `cloud_details(, "sparklyr")` for more info
+Run `revdepcheck::cloud_details(, "sparklyr")` for more info
 
 </details>
 
 ## Newly broken
 
-*   checking dependencies in R code ... WARNING
+*   checking S3 generic/method consistency ... WARNING
     ```
-    Missing or unexported objects:
-      ‘dbplyr::add_op_single’ ‘dbplyr::op_single’
+    db_connection_describe:
+      function(con, ...)
+    db_connection_describe.src_spark:
+      function(con)
+    See section ‘Generic functions and methods’ in the ‘Writing R
+    Extensions’ manual.
     ```
 
 ## In both
 
 *   checking installed package size ... NOTE
     ```
-      installed size is  6.3Mb
+      installed size is  7.2Mb
       sub-directories of 1Mb or more:
-        R      1.6Mb
-        java   3.4Mb
-    ```
-
-# VicmapR
-
-<details>
-
-* Version: 0.1.8
-* GitHub: https://github.com/justincally/VicmapR
-* Source code: https://github.com/cran/VicmapR
-* Date/Publication: 2021-11-10 07:50:19 UTC
-* Number of recursive dependencies: 105
-
-Run `cloud_details(, "VicmapR")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Last 13 lines of output:
-      Error in `dbplyr::partial_eval(x)`: argument "data" is missing, with no default
-      Backtrace:
-          ▆
-       1. ├─testthat::expect_is(...) at test-cql-predicates.R:90:2
-       2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
-       3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
-       4. └─VicmapR:::cql_translate(CQL(INTERSECTS(the_geom)))
-       5.   └─base::lapply(...)
-       6.     └─VicmapR FUN(X[[i]], ...)
-       7.       ├─rlang::new_quosure(dbplyr::partial_eval(x), rlang::get_env(x))
-       8.       └─dbplyr::partial_eval(x)
-      
-      [ FAIL 1 | WARN 0 | SKIP 12 | PASS 34 ]
-      Error: Test failures
-      Execution halted
+        R      2.0Mb
+        java   3.8Mb
     ```
 

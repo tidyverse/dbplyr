@@ -59,14 +59,7 @@ do.tbl_sql <- function(.data, ..., .chunk_size = 1e4L) {
     # Create an id for each group
     grouped <- chunk %>% dplyr::group_by(!!! syms(names(chunk)[gvars]))
 
-    if (utils::packageVersion("dplyr") < "0.7.9") {
-      index <- attr(grouped, "indices") # nocov
-      # convert from 0-index
-      index <- lapply(index, `+`, 1L) # nocov
-    } else {
-      index <- dplyr::group_rows(grouped)
-    }
-
+    index <- dplyr::group_rows(grouped)
     n <- length(index)
 
     last_group <<- chunk[index[[length(index)]], , drop = FALSE]

@@ -18,8 +18,9 @@
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}
 
-\item{...}{<\code{\link[dplyr:dplyr_data_masking]{data-masking}}> Variables, or functions of
-variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending order.}
+\item{...}{<\code{\link[rlang:args_data_masking]{data-masking}}> Variables, or
+functions of variables. Use \code{\link[dplyr:desc]{desc()}} to sort a variable in descending
+order.}
 
 \item{.fn}{A function used to transform the selected \code{.cols}. Should
 return a character vector the same length as the input.}

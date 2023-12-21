@@ -34,15 +34,24 @@ dbplyr_edition.Oracle <- function(con) {
 }
 
 #' @export
-sql_query_select.Oracle <- function(con, select, from, where = NULL,
-                             group_by = NULL, having = NULL,
-                             window = NULL,
-                             order_by = NULL,
-                             limit = NULL,
-                             distinct = FALSE,
-                             ...,
-                             subquery = FALSE,
-                             lvl = 0) {
+sql_query_select.Oracle <- function(con,
+                                    select,
+                                    from,
+                                    where = NULL,
+                                    group_by = NULL,
+                                    having = NULL,
+                                    window = NULL,
+                                    order_by = NULL,
+                                    limit = NULL,
+                                    distinct = FALSE,
+                                    ...,
+                                    subquery = FALSE,
+                                    lvl = 0) {
+
+  if (!is.null(limit)) {
+    limit <- as.integer(limit)
+    where = c(paste0("ROWNUM <= ", limit), where)
+  }
 
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
@@ -52,18 +61,14 @@ sql_query_select.Oracle <- function(con, select, from, where = NULL,
     having    = sql_clause_having(having),
     window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
-    # Requires Oracle 12c, released in 2013
-    limit =   if (!is.null(limit)) {
-      build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY", con = con)
-    },
     lvl = lvl
   )
 }
 
 #' @export
 sql_query_upsert.Oracle <- function(con,
-                                    x_name,
-                                    y,
+                                    table,
+                                    from,
                                     by,
                                     update_cols,
                                     ...,
@@ -76,22 +81,25 @@ sql_query_upsert.Oracle <- function(con,
   }
 
   # https://oracle-base.com/articles/9i/merge-statement
-  parts <- rows_prep(con, x_name, y, by, lvl = 0)
+  parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
-  update_cols_qual <- sql_table_prefix(con, update_cols, ident("...y"))
+
+  insert_cols <- c(by, update_cols)
+  insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
+  insert_values <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
-    sql_clause("MERGE INTO", x_name),
+    sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
-    sql_clause_on(parts$where, lvl = 1),
+    sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
-    sql_clause_insert(con, update_cols_esc, lvl = 1),
-    sql_clause("VALUES", update_cols_qual, parens = TRUE, lvl = 1),
-    sql_returning_cols(con, returning_cols, x_name),
+    sql_clause_insert(con, insert_cols_esc, lvl = 1),
+    sql_clause("VALUES", insert_values, parens = TRUE, lvl = 1),
+    sql_returning_cols(con, returning_cols, table),
     sql(";")
   )
   sql_format_clauses(clauses, lvl = 0, con)
@@ -107,7 +115,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = function(x) build_sql("DATE ", x),
+      as.Date = function(x) glue_sql2(sql_current_con(), "DATE {.val x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -115,11 +123,15 @@ sql_translation.Oracle <- function(con) {
       as.numeric    = sql_cast("NUMBER"),
       as.double     = sql_cast("NUMBER"),
 
+      runif = function(n = n(), min = 0, max = 1) {
+        sql_runif(dbms_random.VALUE(), n = {{ n }}, min = min, max = max)
+      },
 
       # string -----------------------------------------------------------------
       # https://docs.oracle.com/cd/B19306_01/server.102/b14200/operators003.htm#i997789
       paste = sql_paste_infix(" ", "||", function(x) sql_expr(cast(!!x %as% text))),
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
+      str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
@@ -132,36 +144,29 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  build_sql(
-    "EXPLAIN PLAN FOR ", sql, ";\n",
-    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
-    con = con
+
+  # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
+  c(
+    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
+    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
 #' @export
 sql_table_analyze.Oracle <- function(con, table, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/statements_4005.htm
-  build_sql("ANALYZE TABLE ", as.sql(table, con = con), " COMPUTE STATISTICS", con = con)
-}
-
-#' @export
-sql_query_wrap.Oracle <- function(con, from, name = NULL, ..., lvl = 0) {
-  # Table aliases in Oracle should not have an "AS": https://www.techonthenet.com/oracle/alias.php
-  if (is.ident(from)) {
-    build_sql("(", from, ") ", as_subquery_name(name, default = NULL), con = con)
-  } else {
-    build_sql(sql_indent_subquery(from, con, lvl), " ", as_subquery_name(name), con = con)
-  }
+  glue_sql2(con, "ANALYZE TABLE {.tbl table} COMPUTE STATISTICS")
 }
 
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
-  build_sql(
-    "CREATE ", if (temporary) sql("GLOBAL TEMPORARY "), "TABLE \n",
-    as.sql(name, con), " AS\n", sql,
-    con = con
-  )
+  type <- if (temporary)  "GLOBAL TEMPORARY " else ""
+  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
+}
+
+#' @export
+sql_values_subquery.Oracle <- function(con, df, types, lvl = 0, ...) {
+  sql_values_subquery_union(con, df, types = types, lvl = lvl, from = "DUAL")
 }
 
 # registered onLoad located in the zzz.R script
@@ -173,11 +178,27 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 }
 
 #' @export
-sql_expr_matches.Oracle <- function(con, x, y) {
+sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
-  build_sql("decode(", x, ", ", y, ", 0, 1) = 0", con = con)
+  glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
+#' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  sql <- sql_query_explain(con, sql, ...)
+
+  msg <- "Can't explain query."
+  db_execute(con, sql[[1]], msg) # EXPLAIN PLAN
+  expl <- db_get_query(con, sql[[2]], msg) # DBMS_XPLAN.DISPLAY
+
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
+}
+
+#' @export
+db_supports_table_alias_with_as.Oracle <- function(con) {
+  FALSE
+}
 
 # roacle package ----------------------------------------------------------
 
@@ -200,10 +221,10 @@ sql_query_explain.OraConnection <- sql_query_explain.Oracle
 sql_table_analyze.OraConnection <- sql_table_analyze.Oracle
 
 #' @export
-sql_query_wrap.OraConnection <- sql_query_wrap.Oracle
+sql_query_save.OraConnection <- sql_query_save.Oracle
 
 #' @export
-sql_query_save.OraConnection <- sql_query_save.Oracle
+sql_values_subquery.OraConnection <- sql_values_subquery.Oracle
 
 # registered onLoad located in the zzz.R script
 setdiff.OraConnection <- setdiff.tbl_Oracle
@@ -211,4 +232,10 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC"))
+#' @export
+db_explain.OraConnection <- db_explain.Oracle
+
+#' @export
+db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
+
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

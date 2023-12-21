@@ -9,9 +9,13 @@ dbplyr_edition.PostgreSQLConnection <- function(con) {
 }
 
 #' @export
-db_write_table.PostgreSQLConnection <- function(con, table, types, values,
-                                                temporary = TRUE, overwrite = FALSE, ....) {
-
+db_write_table.PostgreSQLConnection <- function(con,
+                                                table,
+                                                types,
+                                                values,
+                                                temporary = TRUE,
+                                                ...) {
+  table <- as_table_ident(table)
   if (!isFALSE(temporary)) {
     cli_abort(c(
       "RPostgreSQL backend does not support creation of temporary tables",
@@ -19,12 +23,14 @@ db_write_table.PostgreSQLConnection <- function(con, table, types, values,
     ))
   }
 
+  # RPostgreSQL doesn't handle `Id()` or `SQL()` correctly, so we can only pass
+  # the bare table name
   dbWriteTable(
     con,
-    name = table,
+    name = vctrs::field(table, "table"),
     value = values,
     field.types = types,
-    overwrite = overwrite,
+    ...,
     row.names = FALSE
   )
 
@@ -33,10 +39,8 @@ db_write_table.PostgreSQLConnection <- function(con, table, types, values,
 
 #' @export
 db_query_fields.PostgreSQLConnection <- function(con, sql, ...) {
-  fields <- build_sql(
-    "SELECT * FROM ", sql_subquery(con, sql), " WHERE 0=1",
-    con = con
-  )
+  sql <- sql_subquery(con, sql)
+  fields <- glue_sql2(con, "SELECT * FROM {.from sql} WHERE 0=1")
 
   qry <- dbSendQuery(con, fields)
   on.exit(dbClearResult(qry))

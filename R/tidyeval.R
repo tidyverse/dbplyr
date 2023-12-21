@@ -51,14 +51,18 @@
 #' f <- function(x) x + 1
 #' partial_eval(quote(year > f(1980)), lf)
 #' partial_eval(quote(year > local(f(1980))), lf)
-partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
+partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call) {
   if (!is_null(vars)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)")
+    lifecycle::deprecate_warn("2.1.2", "partial_eval(vars)", always = TRUE)
     data <- lazy_frame(!!!rep_named(vars, list(logical())))
   }
 
   if (is.character(data)) {
-    lifecycle::deprecate_warn("2.1.2", "partial_eval(data = 'must be a lazy frame')")
+    lifecycle::deprecate_warn(
+      "2.1.2",
+      "partial_eval(data = 'must be a lazy frame')",
+      always = TRUE
+    )
     data <- lazy_frame(!!!rep_named(data, list(logical())))
   }
 
@@ -67,13 +71,17 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL) {
   } else if (is_symbol(call)) {
     partial_eval_sym(call, data, env)
   } else if (is_quosure(call)) {
-    partial_eval(get_expr(call), data, get_env(call))
+    partial_eval(get_expr(call), data, get_env(call), error_call = error_call)
   } else if (is_call(call, "if_any")) {
-    partial_eval_if(call, data, env, reduce = "|")
+    out <- partial_eval_if(call, data, env, reduce = "|", error_call = error_call)
+    expr(((!!out)))
   } else if (is_call(call, "if_all")) {
-    partial_eval_if(call, data, env, reduce = "&")
+    out <- partial_eval_if(call, data, env, reduce = "&", error_call = error_call)
+    expr(((!!out)))
   } else if (is_call(call, "across")) {
-    partial_eval_across(call, data, env)
+    partial_eval_across(call, data, env, error_call)
+  } else if (is_call(call, "pick")) {
+    partial_eval_pick(call, data, env, error_call)
   } else if (is_call(call)) {
     partial_eval_call(call, data, env)
   } else {
@@ -85,24 +93,54 @@ capture_dot <- function(.data, x) {
   partial_eval(enquo(x), data = .data)
 }
 
-partial_eval_dots <- function(.data, ..., .named = TRUE) {
+partial_eval_dots <- function(.data,
+                              ...,
+                              # .env = NULL,
+                              .named = TRUE,
+                              error_call = caller_env()) {
   # corresponds to `capture_dots()`
-  dots <- enquos(..., .named = .named)
-  dots <- lapply(dots, partial_eval_quo, data = .data)
+  # browser()
+  dots <- as.list(enquos(..., .named = .named))
+  dot_names <- names2(exprs(...))
+  was_named <- have_name(exprs(...))
+
+  for (i in seq_along(dots)) {
+    dot <- dots[[i]]
+    # if (!is_null(.env)) {
+    #   dot <- quo_set_env(dot, .env)
+    # }
+    dot_name <- dot_names[[i]]
+    dots[[i]] <- partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
+  }
 
   # Remove names from any list elements
   is_list <- purrr::map_lgl(dots, is.list)
-  names(dots)[is_list] <- ""
+  names2(dots)[is_list] <- ""
 
   # Auto-splice list results from partial_eval_quo()
   dots[!is_list] <- lapply(dots[!is_list], list)
   unlist(dots, recursive = FALSE)
 }
 
-partial_eval_quo <- function(x, data) {
+partial_eval_quo <- function(x, data, error_call, dot_name, was_named) {
   # no direct equivalent in `dtplyr`, mostly handled in `dt_squash()`
-  expr <- partial_eval(get_expr(x), data, get_env(x))
+  withCallingHandlers(
+    expr <- partial_eval(get_expr(x), data, get_env(x), error_call = error_call),
+    error = function(cnd) {
+      label <- expr_as_label(x, dot_name)
+      msg <- c(i = "In argument: {.code {label}}")
+      cli_abort(msg, call = error_call, parent = cnd)
+    }
+  )
+
   if (is.list(expr)) {
+    if (was_named) {
+      msg <- c(
+        "In dbplyr, the result of `across()` must be unnamed.",
+        i = "`{dot_name} = {as_label(x)}` is named."
+      )
+      cli_abort(msg, call = error_call)
+    }
     lapply(expr, new_quosure, env = get_env(x))
   } else {
     new_quosure(expr, get_env(x))
@@ -117,12 +155,15 @@ partial_eval_sym <- function(sym, data, env) {
   } else if (env_has(env, name, inherit = TRUE)) {
     eval_bare(sym, env)
   } else {
-    sym
+    cli::cli_abort(
+      "Object {.var {name}} not found.",
+      call = NULL
+    )
   }
 }
 
 is_namespaced_dplyr_call <- function(call) {
-  packages <- c("dplyr", "stringr", "lubridate")
+  packages <- c("base", "dplyr", "stringr", "lubridate")
   is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 
@@ -131,20 +172,13 @@ is_mask_pronoun <- function(call) {
 }
 
 partial_eval_call <- function(call, data, env) {
-  # TODO which of
-  # * `cur_data()`, `cur_data_all()`
-  # * `cur_group()`, `cur_group_id()`, and
-  # * `cur_group_rows()`
-  # are possible?
-
   fun <- call[[1]]
 
   # Try to find the name of inlined functions
   if (inherits(fun, "inline_colwise_function")) {
-    vars <- colnames(simulate_vars(data, drop_groups = FALSE))
+    vars <- colnames(tidyselect_data_proxy(data))
     dot_var <- vars[[attr(call, "position")]]
     call <- replace_sym(attr(fun, "formula")[[2]], c(".", ".x"), sym(dot_var))
-    # TODO what about environment in `dtplyr`?
     env <- get_env(attr(fun, "formula"))
   } else if (is.function(fun)) {
     fun_name <- find_fun(fun)
@@ -231,7 +265,11 @@ fun_name <- function(fun) {
 
 replace_sym <- function(call, sym, replace) {
   if (is_symbol(call, sym)) {
-    replace
+    if (is_list(replace)) {
+      replace[[match(as_string(call), sym)]]
+    } else {
+      replace
+    }
   } else if (is_call(call)) {
     call[] <- lapply(call, replace_sym, sym = sym, replace = replace)
     call

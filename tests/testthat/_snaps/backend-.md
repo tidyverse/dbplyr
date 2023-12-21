@@ -1,10 +1,31 @@
+# can translate subsetting
+
+    Code
+      test_translate_sql(a[[x]])
+    Condition
+      Error in `a[[x]]`:
+      ! Can only index with strings and numbers
+    Code
+      test_translate_sql(a[[TRUE]])
+    Condition
+      Error in `a[[TRUE]]`:
+      ! Can only index with strings and numbers
+
+# can translate case insensitive like
+
+    Code
+      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+    Condition
+      Error in `str_like()`:
+      ! Backend only supports case insensitve `str_like()`.
+
 # default raw escapes translated correctly
 
     Code
       mf %>% filter(x == a)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` = X'616263')
 
@@ -14,7 +35,7 @@
       mf %>% filter(x %in% L)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 
@@ -24,7 +45,7 @@
       qry
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
       WHERE (`x` IN (X'616263', X'0102'))
 
@@ -47,21 +68,23 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <IDENT> table
+      <dbplyr_table_ident[1]>
+      [1] `table`
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <IDENT> `schema`.`tbl`
+      <dbplyr_table_ident[1]>
+      [1] `schema`.`tbl`
 
 ---
 
     Code
       sql_query_wrap(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> (SELECT * FROM foo) `q01`
+      <SQL> (SELECT * FROM foo) AS `q01`
 
 ---
 

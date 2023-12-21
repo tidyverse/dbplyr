@@ -28,14 +28,16 @@ group_by.tbl_lazy <- function(.data, ..., .add = FALSE, add = NULL, .drop = TRUE
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
   if (!missing(add)) {
-    lifecycle::deprecate_warn("1.0.0", "dplyr::group_by(add = )", "group_by(.add = )")
+    lifecycle::deprecate_warn(
+      "1.0.0",
+      "dplyr::group_by(add = )",
+      "group_by(.add = )",
+      always = TRUE
+    )
     .add <- add
   }
 
-  if (!identical(.drop, TRUE)) {
-    cli_abort("{.arg .drop} is not supported with database backends")
-  }
-
+  check_unsupported_arg(.drop, TRUE)
   groups <- dplyr::group_by_prepare(.data, !!!dots, .add = .add, error_call = current_call())
   names <- purrr::map_chr(groups$groups, as_string)
 
@@ -64,6 +66,6 @@ ungroup.tbl_lazy <- function(x, ...) {
 }
 
 add_group_by <- function(.data, group_vars) {
-  .data$lazy_query$group_vars <- group_vars
+  .data$lazy_query$group_vars <- unname(group_vars)
   .data$lazy_query
 }

@@ -4,7 +4,7 @@
 \alias{fill.tbl_lazy}
 \title{Fill in missing values with previous or next value}
 \usage{
-fill.tbl_lazy(.data, ..., .direction = c("down", "up"))
+\method{fill}{tbl_lazy}(.data, ..., .direction = c("down", "up", "updown", "downup"))
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}

@@ -47,12 +47,12 @@ sql_call2 <- function(.fn, ..., con = sql_current_con()) {
 
 
 replace_expr <- function(x, con) {
-  if (is.atomic(x) || blob::is_blob(x)) {
+  if (is.null(x)) {
+    "NULL"
+  } else if (is.atomic(x) || blob::is_blob(x)) {
     as.character(escape(unname(x), con = con))
   } else if (is.name(x)) {
     as.character(x)
-  # } else if (is.call(x) && identical(x[[1]], quote(I))) {
-  #   escape(ident(as.character(x[[2]])))
   } else if (is.call(x)) {
     fun <- toupper(as.character(x[[1]]))
     args <- lapply(x[-1], replace_expr, con = con)

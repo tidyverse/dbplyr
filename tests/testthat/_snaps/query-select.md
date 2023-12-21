@@ -5,10 +5,10 @@
     Output
       <SQL SELECT>
       From:
-        <IDENT> df
-      Select:   *
+        <dbplyr_table_ident[1]>
+        [1] `df`
+      Select:   `df`.*
       Where:    `x` > 1
-      Group by: `x`
       Order by: `x`
       Limit:    10
 
