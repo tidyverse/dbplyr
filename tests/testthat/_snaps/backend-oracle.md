@@ -41,8 +41,8 @@
     Code
       sql_query_explain(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo;
-      SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));
+      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo
+      <SQL> SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())
 
 ---
 
