@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Database errors now show the generated SQL, which hopefully will make it
+  faster to track down problems (#1401).
+
 * Snowflake (@nathanhaigh, #1406)
   * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
   * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports

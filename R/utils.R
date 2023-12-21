@@ -20,10 +20,10 @@ named_commas <- function(x) {
 
 commas <- function(...) paste0(..., collapse = ", ")
 
-unique_table_name <- function() {
+unique_table_name <- function(prefix = "") {
   vals <- c(letters, LETTERS, 0:9)
   name <- paste0(sample(vals, 10, replace = TRUE), collapse = "")
-  paste0("dbplyr_", name)
+  paste0(prefix, "dbplyr_", name)
 }
 
 unique_subquery_name <- function() {
@@ -85,7 +85,7 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 hash_temp <- function(name) {
   name <- paste0("#", name)
   cli::cli_inform(
-    paste0("Created a temporary table named ", name),
+    "Created a temporary table named {name}",
     class = c("dbplyr_message_temp_table", "dbplyr_message")
   )
   name
