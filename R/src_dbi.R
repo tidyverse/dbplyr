@@ -133,7 +133,7 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
 }
 
 connection_s3_class <- function(con) {
-  subclass <- setdiff(is(con), extends("DBIConnection"))
+  subclass <- setdiff(methods::is(con), methods::extends("DBIConnection"))
   c(paste0("src_", subclass), "src_dbi", "src_sql", "src")
 }
 
