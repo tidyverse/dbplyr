@@ -73,6 +73,14 @@ test_that("group_by handles empty dots", {
   expect_equal(lf %>% group_by(.add = TRUE) %>% group_vars(), c("x"))
 })
 
+test_that("can select variables via pick()", {
+  lf <- lazy_frame(x_1 = 1, x_2 = 1, y = 1)
+  expect_equal(
+    lf %>% group_by(pick(starts_with("x_"))) %>% op_grps(),
+    c("x_1", "x_2")
+  )
+})
+
 test_that("only adds step if necessary", {
   lf <- lazy_frame(x = 1, y = 1)
   expect_equal(lf %>% group_by(), lf)
@@ -102,12 +110,14 @@ test_that("group_by mutate is not optimised away", {
 # sql_build ---------------------------------------------------------------
 
 test_that("ungroup drops PARTITION BY", {
+  suppressWarnings(check_na_rm(FALSE))
+
   out <- lazy_frame(x = 1) %>%
     group_by(x) %>%
     ungroup() %>%
-    mutate(x = rank(x)) %>%
+    mutate(x = sum(x)) %>%
     sql_build()
-  expect_equal(out$select, sql(x = 'RANK() OVER (ORDER BY `x`)'))
+  expect_equal(out$select, sql(x = 'SUM(`x`) OVER ()'))
 })
 
 # ops ---------------------------------------------------------------------

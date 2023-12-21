@@ -254,3 +254,11 @@ test_that("values_ptype is not supported", {
       tidyr::pivot_longer(x:y, values_ptypes = character())
   )
 })
+
+test_that("cols_vary is not supported", {
+  expect_snapshot(
+    error = TRUE,
+    lazy_frame(x = 1:2, y = 3:4) %>%
+      tidyr::pivot_longer(x:y, cols_vary = "fastest")
+  )
+})

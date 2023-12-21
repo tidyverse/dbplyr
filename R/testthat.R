@@ -1,15 +1,15 @@
 
 compare_tbl <- function(x, y, label = NULL, expected.label = NULL) {
   testthat::expect_equal(
-    arrange(collect(x), dplyr::across()),
-    arrange(collect(y), dplyr::across()),
+    arrange(collect(x), dplyr::across(everything())),
+    arrange(collect(y), dplyr::across(everything())),
     label = label,
     expected.label = expected.label
   )
 }
 
 expect_equal_tbls <- function(results, ref = NULL, ...) {
-  stopifnot(is.list(results))
+  check_list(results)
 
   if (!is_named(results)) {
     result_name <- expr_name(substitute(results)) # nocov

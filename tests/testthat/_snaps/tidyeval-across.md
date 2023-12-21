@@ -16,7 +16,7 @@
       capture_across(lf, across(a, 1))
     Condition
       Error in `across()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(a, list(1)))
     Condition
@@ -27,7 +27,7 @@
       capture_across(lf, across(a:b, "log"))
     Condition
       Error in `across()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_across(lf, across(c, mean))
     Condition
@@ -109,9 +109,18 @@
     Output
       <error/rlang_error>
       Error in `mutate()`:
-      ! Problem while computing `..1 = across(x, .unpack = TRUE)`
+      i In argument: `across(x, .unpack = TRUE)`
       Caused by error in `mutate()`:
-      ! `.unpack = TRUE` is not supported in SQL translations.
+      ! `.unpack = TRUE` isn't supported on database backends.
+      i It must be FALSE instead.
+
+# where() isn't suppored
+
+    Code
+      capture_across(lf, across(where(is.integer), as.character))
+    Condition
+      Error in `across()`:
+      ! This tidyselect interface doesn't support predicates.
 
 # if_all() gives informative errors
 
@@ -119,7 +128,7 @@
       capture_if_all(lf, if_all(a, 1))
     Condition
       Error in `if_all()`:
-      ! `.fns` must be a NULL, a function, formula, or list
+      ! `.fns` must be a function, a formula, or list of functions/formulas.
     Code
       capture_if_all(lf, if_all(a, list(1)))
     Condition
@@ -133,9 +142,9 @@
       lf %>% filter(if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 AND `b` > 0.0)
+      WHERE ((`a` > 0.0 AND `b` > 0.0))
 
 ---
 
@@ -143,9 +152,9 @@
       lf %>% filter(if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 OR `b` > 0.0)
+      WHERE ((`a` > 0.0 OR `b` > 0.0))
 
 # if_all/any works in mutate()
 
@@ -153,7 +162,7 @@
       lf %>% mutate(c = if_all(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *, `a` > 0.0 AND `b` > 0.0 AS `c`
+      SELECT `df`.*, (`a` > 0.0 AND `b` > 0.0) AS `c`
       FROM `df`
 
 ---
@@ -162,18 +171,18 @@
       lf %>% mutate(c = if_any(a:b, ~ . > 0))
     Output
       <SQL>
-      SELECT *, `a` > 0.0 OR `b` > 0.0 AS `c`
+      SELECT `df`.*, (`a` > 0.0 OR `b` > 0.0) AS `c`
       FROM `df`
 
-# if_all/any uses every colum as default
+# if_all/any uses every column as default
 
     Code
       lf %>% filter(if_all(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 AND `b` > 0.0)
+      WHERE ((`a` > 0.0 AND `b` > 0.0))
 
 ---
 
@@ -181,9 +190,9 @@
       lf %>% filter(if_any(.fns = ~ . > 0))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` > 0.0 OR `b` > 0.0)
+      WHERE ((`a` > 0.0 OR `b` > 0.0))
 
 # if_all/any works without `.fns` argument
 
@@ -191,9 +200,9 @@
       lf %>% filter(if_all(a:b))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` AND `b`)
+      WHERE ((`a` AND `b`))
 
 ---
 
@@ -201,9 +210,9 @@
       lf %>% filter(if_any(a:b))
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
-      WHERE (`a` OR `b`)
+      WHERE ((`a` OR `b`))
 
 # if_all() cannot rename variables
 
@@ -250,4 +259,46 @@
       ! Can't use `...` when a purrr-style lambda is used in `.fns`.
       i Use a lambda instead.
       i Or inline them via a purrr-style lambda.
+
+# `pick()` errors in `arrange()` are useful
+
+    Code
+      arrange(df, pick(y))
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick(y)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `y` doesn't exist.
+
+# doesn't allow renaming
+
+    Code
+      arrange(lazy_frame(x = 1), pick(y = x))
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick(y = x)`
+      Caused by error in `pick()`:
+      ! Can't rename variables in this context.
+
+# requires at least one input
+
+    Code
+      arrange(lazy_frame(x = 1), pick())
+    Condition
+      Error in `arrange()`:
+      i In argument: `pick()`
+      Caused by error in `partial_eval_pick()`:
+      ! Must supply at least one input to `pick()`.
+
+# `filter()` with `pick()` that uses invalid tidy-selection errors
+
+    Code
+      filter(df, pick(x, a))
+    Condition
+      Error in `filter()`:
+      i In argument: `pick(x, a)`
+      Caused by error in `pick()`:
+      ! Can't subset columns that don't exist.
+      x Column `a` doesn't exist.
 

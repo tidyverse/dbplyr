@@ -32,9 +32,7 @@
 #' escape_ansi(escape_ansi("X"))
 #' escape_ansi(escape_ansi(escape_ansi("X")))
 escape <- function(x, parens = NA, collapse = " ", con = NULL) {
-  if (is.null(con)) {
-    cli_abort("{.arg con} must not be NULL")
-  }
+  check_con(con)
 
   UseMethod("escape")
 }
@@ -49,6 +47,16 @@ escape_ansi <- function(x, parens = NA, collapse = "") {
 escape.ident <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   y <- sql_escape_ident(con, x)
   sql_vector(names_to_as(y, names2(x), con = con), parens, collapse, con = con)
+}
+
+#' @export
+escape.dbplyr_schema <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
+}
+
+#' @export
+escape.dbplyr_catalog <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
+  sql_vector(as.sql(x, con = con), parens, collapse, con = con)
 }
 
 #' @export
@@ -79,7 +87,7 @@ escape.character <- function(x, parens = NA, collapse = ", ", con = NULL) {
 
 #' @export
 escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
-  out <- ifelse(is.wholenumber(x), sprintf("%.1f", x), as.character(x))
+  out <- ifelse(is_whole_number(x), sprintf("%.1f", x), as.character(x))
 
   # Special values
   out[is.na(x)] <- "NULL"
@@ -88,6 +96,10 @@ escape.double <- function(x, parens = NA, collapse = ", ", con = NULL) {
   out[inf & x < 0] <- "'-Infinity'"
 
   sql_vector(out, parens, collapse, con = con)
+}
+
+is_whole_number <- function(x) {
+  trunc(x) == x
 }
 
 #' @export
@@ -137,7 +149,6 @@ escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL)
 
 # Also used in default_ops() for reactives
 error_embed <- function(type, expr) {
-  # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
   cli_abort(c(
     "Cannot translate {type} to SQL.",
     `i` = "Do you want to force evaluation in R with (e.g.) `!!{expr}` or `local({expr})`?"
@@ -147,9 +158,7 @@ error_embed <- function(type, expr) {
 #' @export
 #' @rdname escape
 sql_vector <- function(x, parens = NA, collapse = " ", con = NULL) {
-  if (is.null(con)) {
-    cli_abort("{.arg con} must not be NULL")
-  }
+  check_con(con)
 
   if (length(x) == 0) {
     if (!is.null(collapse)) {

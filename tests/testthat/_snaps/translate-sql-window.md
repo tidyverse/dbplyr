@@ -1,13 +1,60 @@
 # frame is checked
 
     Code
-      translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+      test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
     Condition
       Warning:
       Windowed expression `SUM(`x`)` does not have explicit order.
       i Please use `arrange()` or `window_order()` to make deterministic.
       Error in `rows()`:
       ! `from` (1) must be less than `to` (0)
+
+# win_rank(c()) gives an informative error
+
+    Code
+      test_translate_sql(row_number(c(x)))
+    Condition
+      Error in `row_number()`:
+      ! Can't use `c()` in `ROW_NUMBER()`
+      i Did you mean to use `tibble(x)` instead?
+
+# row_number() with and without group_by() and arrange()
+
+    Code
+      mf %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
+
+---
+
+    Code
+      mf %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
 
 # window_frame()
 
@@ -16,7 +63,7 @@
         show_query()
     Output
       <SQL>
-      SELECT *, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
+      SELECT `df`.*, SUM(`y`) OVER (ORDER BY `x` ROWS 3 PRECEDING) AS `z`
       FROM `df`
 
 ---
@@ -27,7 +74,7 @@
     Output
       <SQL>
       SELECT
-        *,
+        `df`.*,
         SUM(`y`) OVER (ORDER BY `x` ROWS BETWEEN 3 PRECEDING AND UNBOUNDED FOLLOWING) AS `z`
       FROM `df`
 
@@ -37,7 +84,7 @@
       window_frame(lf, "a")
     Condition
       Error in `window_frame()`:
-      ! is.numeric(from) is not TRUE
+      ! `from` must be a whole number, not the string "a".
 
 ---
 
@@ -45,7 +92,7 @@
       window_frame(lf, 1:2)
     Condition
       Error in `window_frame()`:
-      ! length(from) == 1 is not TRUE
+      ! `from` must be a whole number, not an integer vector.
 
 ---
 
@@ -53,7 +100,7 @@
       window_frame(lf, 1, "a")
     Condition
       Error in `window_frame()`:
-      ! is.numeric(to) is not TRUE
+      ! `to` must be a whole number, not the string "a".
 
 ---
 
@@ -61,5 +108,5 @@
       window_frame(lf, 1, 1:2)
     Condition
       Error in `window_frame()`:
-      ! length(to) == 1 is not TRUE
+      ! `to` must be a whole number, not an integer vector.
 

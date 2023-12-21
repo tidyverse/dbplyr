@@ -21,7 +21,8 @@ test_that("sql_substr works as expected", {
 })
 
 test_that("substring is also translated", {
-  expect_equal(translate_sql(substring(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
+  local_con(simulate_dbi())
+  expect_equal(test_translate_sql(substring(x, 3, 4)), sql("SUBSTR(`x`, 3, 2)"))
 })
 
 test_that("sql_str_sub works as expected", {
@@ -41,7 +42,7 @@ test_that("sql_str_sub works as expected", {
   expect_equal(str_sub(x, -3, -3), sql("SUBSTR(`x`, LENGTH(`x`) - 2, 1)"))
 })
 
-test_that("sql_str_sub can require length paramter", {
+test_that("sql_str_sub can require length parameter", {
   local_con(simulate_dbi())
   x <- ident("x")
   str_sub <- sql_str_sub("SUBSTR", optional_length = FALSE)
@@ -65,4 +66,38 @@ test_that("str_sub() returns consistent results", {
   expect_equal(mf %>% transmute(str_sub(t, -3, 5)) %>% pull(1), "cde")
   expect_equal(mf %>% transmute(str_sub(t, 0, 1)) %>% pull(1), "a")
   expect_equal(mf %>% transmute(str_sub(t, 1, 3)) %>% pull(1), "abc")
+})
+
+test_that("str_detect(), str_starts(), str_ends() support fixed patterns", {
+  mf <- memdb_frame(x = c("%0 start", "end %0", "detect %0 detect", "no", NA))
+
+  # detects fixed pattern
+  expect_equal(
+    mf %>% transmute(str_starts(x, fixed("%0"))) %>% pull(1),
+    c(1, 0, 0, 0, NA)
+  )
+  # hack to avoid check complaining about not declared imports
+  pattern <- rlang::parse_expr("stringr::fixed('%0')")
+  expect_equal(
+    mf %>% transmute(str_starts(x, !!pattern)) %>% pull(1),
+    c(1, 0, 0, 0, NA)
+  )
+
+  # also works with ends and detect
+  expect_equal(
+    mf %>% transmute(str_ends(x, fixed("%0"))) %>% pull(1),
+    c(0, 1, 0, 0, NA)
+  )
+  expect_equal(
+    mf %>% transmute(str_detect(x, fixed("%0"))) %>% pull(1),
+    c(1, 1, 1, 0, NA)
+  )
+
+  # negate works
+  expect_equal(
+    mf %>% transmute(str_detect(x, fixed("%0"), negate = TRUE)) %>% pull(1),
+    c(0, 0, 0, 1, NA)
+  )
+
+  expect_error(translate_sql(str_detect(x, "a"), con = simulate_dbi()))
 })

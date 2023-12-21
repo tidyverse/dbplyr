@@ -1,11 +1,9 @@
 test_that("select_query() print method output is as expected", {
-  mf <- select_query(
-    lazy_frame(x = 1, con = simulate_dbi()),
-    where = sql("`x` > 1"),
-    group_by = sql("`x`"),
-    order_by = sql("`x`"),
-    limit = 10
-  )
+  mf <- lazy_frame(x = 1, con = simulate_dbi()) %>%
+    filter(x > 1L) %>%
+    arrange(x) %>%
+    head(10) %>%
+    sql_build()
   expect_snapshot(mf)
 })
 
@@ -28,7 +26,7 @@ test_that("optimisation is turned on by default", {
   lf <- lazy_frame(x = 1, y = 2) %>% arrange(x) %>% head(5)
   qry <- lf %>% sql_build()
 
-  expect_equal(qry$from, ident("df"))
+  expect_equal(qry$from, base_query(ident("df")))
 })
 
 test_that("group by then limit is collapsed", {
@@ -65,7 +63,7 @@ test_that("trivial subqueries are collapsed", {
     arrange()
 
   qry <- lf %>% sql_build()
-  expect_s3_class(qry$from, "ident")
+  expect_s3_class(qry$from, "base_query")
   expect_true(qry$distinct)
 
   # And check that it returns the correct value

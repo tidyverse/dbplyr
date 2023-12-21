@@ -1,29 +1,45 @@
 ## revdepcheck results
 
-We checked 85 reverse dependencies (76 from CRAN + 9 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 101 reverse dependencies (92 from CRAN + 9 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 4 new problems
- * We failed to check 2 packages
+ * We saw 9 new problems
+ * We failed to check 0 packages
 
 Issues with CRAN packages are summarised below.
 
 ### New problems
 (This reports the first line of each new failure)
 
-* bcdata
-  checking tests ...
+* CDMConnector
+  checking tests ... ERROR
+  checking re-building of vignette outputs ... ERROR
 
-* dcmodifydb
+* DrugUtilisation
+  checking tests ... ERROR
+  checking re-building of vignette outputs ... ERROR
+
+* editbl
   checking examples ... ERROR
-  checking tests ...
+  checking tests ... ERROR
 
-* tidyhydat
-  checking tests ...
+* IncidencePrevalence
+  checking examples ... ERROR
+  checking tests ... ERROR
+  checking re-building of vignette outputs ... ERROR
 
-* validatedb
-  checking tests ...
+* mlr3db
+  checking tests ... ERROR
 
-### Failed to check
+* modeldb
+  checking re-building of vignette outputs ... ERROR
 
-* bigsnpr (NA)
-* duckdb  (NA)
+* PatientProfiles
+  checking tests ... ERROR
+  checking re-building of vignette outputs ... ERROR
+
+* RPresto
+  checking tests ... ERROR
+
+* sparklyr
+  checking S3 generic/method consistency ... WARNING
+

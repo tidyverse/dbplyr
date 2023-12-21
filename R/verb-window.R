@@ -23,7 +23,7 @@
 #'   show_query()
 window_order <- function(.data, ...) {
   if (!is_tbl_lazy(.data)) {
-    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not a {.cls {class(.data)}}."
+    msg <- "{.arg .data} must be a {.cls tbl_lazy}, not {.obj_type_friendly {(.data)}}."
     if (is.data.frame(.data)) {
       msg <- c(msg, i = "Did you mean to use {.fn arrange} instead?")
     }
@@ -31,6 +31,7 @@ window_order <- function(.data, ...) {
   }
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
   names(dots) <- NULL
+  dots <- check_window_order_dots(dots)
 
   .data$lazy_query <- add_order(.data, dots)
   .data
@@ -39,8 +40,35 @@ window_order <- function(.data, ...) {
 # We want to preserve this ordering (for window functions) without
 # imposing an additional arrange, so we have a special op_order
 add_order <- function(.data, dots) {
-  .data$lazy_query$order_vars <- dots
+  .data$lazy_query$order_vars <- unname(dots)
   .data$lazy_query
+}
+
+check_window_order_dots <- function(dots, call = caller_env()) {
+  for (i in seq_along(dots)) {
+    x <- dots[[i]]
+    if (is_quosure(x)) {
+      x <- quo_get_expr(x)
+    }
+
+    if (is_call(x, "desc", n = 1)) {
+      x <- call_args(x)[[1]]
+    }
+
+    dot <- dots[[i]]
+    if (!is_symbol(x)) {
+      dot <- as_label(dot)
+      msg <- c(
+        `!` = "Each element of {.code ...} must be a single column name or a column wrapped in {.fn desc}.",
+        x = "Element {i} is {.code {dot}}."
+      )
+      cli_abort(msg, call = call)
+    }
+
+    dots[[i]] <- quo_get_expr(dot)
+  }
+
+  dots
 }
 
 
@@ -56,9 +84,27 @@ window_frame <- function(.data, from = -Inf, to = Inf) {
     )
   }
 
-  stopifnot(is.numeric(from), length(from) == 1)
-  stopifnot(is.numeric(to), length(to) == 1)
+  check_number_whole(from, allow_infinite = TRUE)
+  check_number_whole(to, allow_infinite = TRUE)
 
   .data$lazy_query$frame <- list(range = c(from, to))
   .data
+}
+
+check_frame <- function(frame, call = caller_env()) {
+  if (is.null(frame)) {
+    return()
+  }
+
+  check_frame_range(frame$range)
+}
+
+check_frame_range <- function(range, call = caller_env()) {
+  if (is.null(range)) {
+    return()
+  }
+
+  vctrs::vec_assert(range, size = 2L, arg = "frame", call = call)
+  check_number_whole(range[1], allow_infinite = TRUE, arg = "frame", call = call)
+  check_number_whole(range[2], allow_infinite = TRUE, arg = "frame", call = call)
 }

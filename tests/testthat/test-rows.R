@@ -155,9 +155,8 @@ test_that("`rows_insert()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("rows_get_or_execute() gives error context", {
-  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-  on.exit(DBI::dbDisconnect(con))
-  DBI::dbWriteTable(con, "mtcars", tibble(x = 1, y = 1), overwrite = TRUE, temporary = TRUE)
+  con <- local_sqlite_connection()
+  local_db_table(con, tibble(x = 1, y = 1), "mtcars", overwrite = TRUE)
   DBI::dbExecute(con, "CREATE UNIQUE INDEX `mtcars_x` ON `mtcars` (`x`)")
 
   expect_snapshot({
@@ -183,18 +182,20 @@ test_that("rows_get_or_execute() gives error context", {
 })
 
 test_that("`sql_query_insert()` works", {
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_dbi(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(error = TRUE,
     (sql_query_insert(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "error",
       returning_cols = c("a", b2 = "b")
@@ -203,9 +204,10 @@ test_that("`sql_query_insert()` works", {
 
   expect_snapshot(
     sql_query_insert(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
       by = c("a", "b"),
       conflict = "ignore",
       returning_cols = c("a", b2 = "b")
@@ -304,18 +306,39 @@ test_that("`rows_append()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("`sql_query_append()` works", {
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_dbi(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_append(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
+      insert_cols = colnames(df_y),
+      returning_cols = c("a", b2 = "b")
+    )
+  )
+})
+
+test_that("sql_query_append supports old interface works", {
+  con <- simulate_dbi()
+  df_y <- lazy_frame(
+    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    con = con,
+    .name = "df_y"
+  ) %>%
+    mutate(c = c + 1)
+
+  expect_snapshot(
+    sql_query_append(
+      con = con,
+      table = ident("df_x"),
+      from = df_y,
       returning_cols = c("a", b2 = "b")
     )
   )
@@ -490,18 +513,19 @@ test_that("`rows_update()` with `in_place = TRUE` and `returning`", {
 })
 
 test_that("`sql_query_update_from()` works", {
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_dbi(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_update_from(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_values = sql(
         c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
@@ -764,24 +788,29 @@ test_that("`rows_upsert()` works with `in_place = TRUE` and `returning`", {
     returning = everything()
   )
 
-  expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
+  if (packageVersion("RSQLite") >= "2.3.0") {
+    expect_equal(get_returned_rows(df_upserted), tibble(x = 2:4, y = 22:24))
+  } else {
+    expect_equal(get_returned_rows(df_upserted), tibble(x = 4, y = 24))
+  }
 
   expect_equal(df_upserted %>% collect(), tibble(x = 1:4, y = c(11L, 22:24)))
 })
 
 test_that("`sql_query_upsert()` is correct", {
+  con <- simulate_dbi()
   df_y <- lazy_frame(
     a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
-    con = simulate_dbi(),
+    con = con,
     .name = "df_y"
   ) %>%
     mutate(c = c + 1)
 
   expect_snapshot(
     sql_query_upsert(
-      con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      con = con,
+      table = ident("df_x"),
+      from = sql_render(df_y, con, lvl = 1),
       by = c("a", "b"),
       update_cols = c("c", "d"),
       returning_cols = c("a", b2 = "b")
@@ -907,8 +936,8 @@ test_that("`sql_query_delete()` is correct", {
   expect_snapshot(
     sql_query_delete(
       con = simulate_dbi(),
-      x_name = ident("df_x"),
-      y = df_y,
+      table = ident("df_x"),
+      from = sql_render(df_y, simulate_dbi(), lvl = 2),
       by = c("a", "b"),
       returning_cols = c("a", b2 = "b")
     )

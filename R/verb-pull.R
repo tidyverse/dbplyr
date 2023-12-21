@@ -15,15 +15,22 @@
 #' db %>%
 #'   mutate(z = x + y * 2) %>%
 #'   pull()
-pull.tbl_sql <- function(.data, var = -1) {
+pull.tbl_sql <- function(.data, var = -1, name = NULL, ...) {
   vars <- tbl_vars(.data)
-  if (length(vars) > 1 || !missing(var)) {
-    var <- tidyselect::vars_pull(vars, {{ var }})
-    .data <- ungroup(.data)
-    .data <- select(.data, !! sym(var))
+  var <- tidyselect::vars_pull(vars, !!enquo(var), error_arg = "var")
+  name_quo <- enquo(name)
+  if (!quo_is_null(name_quo)) {
+    name <- tidyselect::vars_pull(vars, !!name_quo, error_arg = "name")
   }
 
-  .data <- collect(.data)
-  .data[[1]]
-}
+  .data <- ungroup(.data)
+  .data <- select(.data, all_of(c(var, name)))
 
+  .data <- collect(.data)
+  out <- .data[[var]]
+  if (!is.null(name)) {
+    out <- set_names(out, nm = .data[[name]])
+  }
+
+  out
+}

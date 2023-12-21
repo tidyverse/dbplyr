@@ -15,11 +15,19 @@
 #' db %>% filter(is.na(x)) %>% show_query()
 # registered onLoad
 #' @importFrom dplyr filter
-filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
-  if (!identical(.preserve, FALSE)) {
-    cli_abort("{.arg .preserve} is not supported on database backends")
-  }
+filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
+  check_unsupported_arg(.preserve, FALSE)
   check_filter(...)
+  by <- compute_by(
+    {{ .by }},
+    .data,
+    by_arg = ".by",
+    data_arg = ".data",
+    error_call = caller_env()
+  )
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- by$names
+  }
 
   dots <- partial_eval_dots(.data, ..., .named = FALSE)
 
@@ -28,6 +36,9 @@ filter.tbl_lazy <- function(.data, ..., .preserve = FALSE) {
   }
 
   .data$lazy_query <- add_filter(.data, dots)
+  if (by$from_by) {
+    .data$lazy_query$group_vars <- character()
+  }
   .data
 }
 
@@ -42,11 +53,10 @@ add_filter <- function(.data, dots) {
     return(filter_via_having(lazy_query, dots))
   }
 
-  if (!uses_window_fun(dots, con)) {
-    if (uses_mutated_vars(dots, lazy_query$select)) {
+  if (!dots_use_window_fun) {
+    if (filter_needs_new_query(dots, lazy_query, con)) {
       lazy_select_query(
         x = lazy_query,
-        last_op = "filter",
         where = dots
       )
     } else {
@@ -72,11 +82,30 @@ add_filter <- function(.data, dots) {
     original_vars <- op_vars(.data)
     lazy_select_query(
       x = mutated$lazy_query,
-      last_op = "filter",
       select = syms(set_names(original_vars)),
       where = where$expr
     )
   }
+}
+
+filter_needs_new_query <- function(dots, lazy_query, con) {
+  if (!is_lazy_select_query(lazy_query)) {
+    return(TRUE)
+  }
+
+  if (uses_mutated_vars(dots, lazy_query$select)) {
+    return(TRUE)
+  }
+
+  if (uses_window_fun(lazy_query$select$expr, con)) {
+    return(TRUE)
+  }
+
+  if (any_expr_uses_sql(lazy_query$select$expr)) {
+    return(TRUE)
+  }
+
+  FALSE
 }
 
 filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
@@ -97,7 +126,7 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
     return(FALSE)
   }
 
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(FALSE)
   }
 
@@ -106,7 +135,7 @@ filter_can_use_having <- function(lazy_query, dots_use_window_fun) {
 
 filter_via_having <- function(lazy_query, dots) {
   names <- lazy_query$select$name
-  exprs <- lazy_query$select$expr
+  exprs <- purrr::map_if(lazy_query$select$expr, is_quosure, quo_get_expr)
   dots <- purrr::map(dots, replace_sym, names, exprs)
 
   lazy_query$having <- c(lazy_query$having, dots)

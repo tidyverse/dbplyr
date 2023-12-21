@@ -22,7 +22,7 @@
       escape("a")
     Condition
       Error in `escape()`:
-      ! `con` must not be NULL
+      ! `con` must not be NULL.
 
 ---
 
@@ -30,7 +30,7 @@
       sql_vector("a")
     Condition
       Error in `sql_vector()`:
-      ! `con` must not be NULL
+      ! `con` must not be NULL.
 
 # data frames give useful errors
 

@@ -4,14 +4,17 @@
 \alias{db_connection_describe}
 \alias{sql_join_suffix}
 \alias{db_sql_render}
+\alias{db_col_types}
 \alias{dbplyr_edition}
 \title{Miscellaneous database generics}
 \usage{
-db_connection_describe(con)
+db_connection_describe(con, ...)
 
-sql_join_suffix(con, ...)
+sql_join_suffix(con, suffix, ...)
 
-db_sql_render(con, sql, ..., cte = FALSE)
+db_sql_render(con, sql, ..., cte = FALSE, sql_options = NULL)
+
+db_col_types(con, table, call)
 
 dbplyr_edition(con)
 }
@@ -26,6 +29,7 @@ from. It should be a single line, and ideally less than 60 characters wide.
 \itemize{
 \item \code{dbplyr_edition()} declares which version of the dbplyr API you want.
 See below for more details.
+\item \code{db_col_types()} returns the column types of a table.
 }
 }
 \section{dbplyr 2.0.0}{

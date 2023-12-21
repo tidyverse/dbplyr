@@ -27,7 +27,9 @@
           NULL AS `date`,
           NULL AS `dtt`
         WHERE (0 = 1)
+      
         UNION ALL
+      
         VALUES (1, 1, 1.5, 'a', '2020-01-01', '2020-01-01T01:23:45Z')
       ) AS `values_table`
 
@@ -40,7 +42,9 @@
       FROM (
         SELECT NULL AS `dbl`
         WHERE (0 = 1)
+      
         UNION ALL
+      
         VALUES (1.5)
       ) AS `values_table`
 
@@ -83,8 +87,7 @@
     Code
       (expect_error(copy_inline(con, tibble(a = 1), types = c(b = 1))))
     Output
-      <error/vctrs_error_assert_ptype>
+      <error/rlang_error>
       Error in `copy_inline()`:
-      ! `types` must be a vector with type <character>.
-      Instead, it has type <double>.
+      ! `types` must be a character vector, not the number 1.
 

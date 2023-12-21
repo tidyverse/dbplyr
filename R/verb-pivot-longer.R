@@ -3,7 +3,7 @@
 #' @description
 #' `pivot_longer()` "lengthens" data, increasing the number of rows and
 #' decreasing the number of columns. The inverse transformation is
-#' `tidyr::pivot_wider()]
+#' [tidyr::pivot_wider()].
 #'
 #' Learn more in `vignette("pivot", "tidyr")`.
 #'
@@ -21,7 +21,7 @@
 #'
 #' 1. split the specification by its key columns i.e. by variables crammed
 #' into the column names.
-#' 2. for each part in the splitted specification `transmute()` `data` into the
+#' 2. for each part in the split specification `transmute()` `data` into the
 #' following columns
 #'   * id columns i.e. columns that are not pivotted
 #'   * key columns
@@ -30,6 +30,8 @@
 #'
 #' @param data A data frame to pivot.
 #' @param cols Columns to pivot into longer format.
+#' @param ... Additional arguments passed on to methods.
+#' @param cols_vary Unsupported; included for compatibility with the generic.
 #' @param names_to A string specifying the name of the column to create
 #'   from the data stored in the column names of `data`.
 #' @param names_prefix A regular expression used to remove matching text
@@ -47,7 +49,6 @@
 #' @param names_transform,values_transform A list of column name-function pairs.
 #' @param names_ptypes A list of column name-prototype pairs.
 #' @param values_ptypes Not supported.
-#' @param ... Additional arguments passed on to methods.
 #' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' # See vignette("pivot") for examples and explanation
 #'
@@ -60,6 +61,8 @@
 #'   tidyr::pivot_longer(-id)
 pivot_longer.tbl_lazy <- function(data,
                                   cols,
+                                  ...,
+                                  cols_vary,
                                   names_to = "name",
                                   names_prefix = NULL,
                                   names_sep = NULL,
@@ -70,11 +73,9 @@ pivot_longer.tbl_lazy <- function(data,
                                   values_to = "value",
                                   values_drop_na = FALSE,
                                   values_ptypes,
-                                  values_transform = NULL,
-                                  ...) {
-  if (!is_missing(values_ptypes)) {
-    cli_abort("The {.arg values_ptypes} argument is not supported for remote back-ends")
-  }
+                                  values_transform = NULL) {
+  check_unsupported_arg(cols_vary)
+  check_unsupported_arg(values_ptypes)
 
   rlang::check_dots_empty()
 
@@ -86,7 +87,8 @@ pivot_longer.tbl_lazy <- function(data,
     names_sep = names_sep,
     names_pattern = names_pattern,
     names_ptypes = names_ptypes,
-    names_transform = names_transform
+    names_transform = names_transform,
+    error_call = current_env()
   )
 
   dbplyr_pivot_longer_spec(data, spec,
@@ -115,7 +117,7 @@ dbplyr_pivot_longer_spec <- function(data,
 
   call <- current_env()
   value_names <- unique(spec$.value)
-  values_transform <- check_list_of_functions(values_transform, value_names, "values_transform", call)
+  values_transform <- check_list_of_functions(values_transform, value_names, call = call)
 
   nms_map <- tibble(
     name = colnames(spec_split$key),
@@ -138,7 +140,6 @@ dbplyr_pivot_longer_spec <- function(data,
         row[[".name"]],
         row[[".value"]],
         values_transform,
-        data = data,
         call = call
       )
 
@@ -168,7 +169,7 @@ dbplyr_pivot_longer_spec <- function(data,
     rename(!!!tibble::deframe(nms_map))
 }
 
-get_measure_column_exprs <- function(name, value, values_transform, data, call) {
+get_measure_column_exprs <- function(name, value, values_transform, call) {
   measure_cols <- set_names(syms(name), value)
   purrr::imap(
     measure_cols,
@@ -178,7 +179,7 @@ get_measure_column_exprs <- function(name, value, values_transform, data, call) 
       if (is_null(f_trans)) {
         .x
       } else {
-        resolve_fun(f_trans, .x, data, call)
+        resolve_fun(f_trans, .x, call)
       }
     }
   )
@@ -232,7 +233,7 @@ deduplicate_spec <- function(spec, df) {
   }
 
   # Match spec to data, handling duplicated column names
-  col_id <- vctrs::vec_match(names(df), spec$.name)
+  col_id <- vctrs::vec_match(colnames(df), spec$.name)
   has_match <- !is.na(col_id)
 
   if (!vctrs::vec_duplicate_any(col_id[has_match])) {
@@ -254,29 +255,39 @@ deduplicate_spec <- function(spec, df) {
   spec
 }
 
-check_list_of_functions <- function(x, names, arg, call = caller_env()) {
+check_unique_names <- function(x, arg = caller_arg(x), call = caller_env()) {
+  # COPIED FROM tidyr
+
+  if (length(x) > 0L && !is_named(x)) {
+    cli::cli_abort("All elements of {.arg {arg}} must be named.", call = call)
+  }
+  if (vctrs::vec_duplicate_any(names(x))) {
+    cli::cli_abort("The names of {.arg {arg}} must be unique.", call = call)
+  }
+}
+
+check_list_of_functions <- function(x, names, arg = caller_arg(x), call = caller_env()) {
   # mostly COPIED FROM tidyr
   if (is.null(x)) {
     x <- set_names(list(), character())
-  }
-
-  if (!vctrs::vec_is_list(x)) {
+  } else if (is.function(x) || is_formula(x)) {
     x <- rep_named(names, list(x))
+  } else if (!vctrs::vec_is_list(x)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be `NULL`, a function, or a named list of functions.",
+      call = call
+    )
   }
 
-  if (length(x) > 0L && !is_named(x)) {
-    cli_abort("All elements of {.arg {arg}} must be named.", call = call)
-  }
-
-  if (vctrs::vec_duplicate_any(names(x))) {
-    cli_abort("The names of {.arg {arg}} must be unique.", call = call)
-  }
+  check_unique_names(x, arg = arg, call = call)
+  x_names <- names(x)
 
   # Silently drop user supplied names not found in the data
-  x <- x[intersect(names(x), names)]
+  x <- x[intersect(x_names, names)]
 
   x
+
 }
 # nocov end
 
-globalVariables(".")
+utils::globalVariables(".")

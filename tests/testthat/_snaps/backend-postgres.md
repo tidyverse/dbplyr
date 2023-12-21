@@ -1,3 +1,23 @@
+# custom window functions translated correctly
+
+    Code
+      (expect_error(test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE))
+      )
+    Output
+      <error/rlang_error>
+      Error in `quantile()`:
+      ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
+    Code
+      (expect_error(test_translate_sql(median(x, na.rm = TRUE), window = TRUE)))
+    Output
+      <error/rlang_error>
+      Error in `median()`:
+      ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
+      i Use a combination of `summarise()` and `left_join()` instead:
+        `df %>% left_join(summarise(<col> = median(x, na.rm = TRUE)))`.
+
 # custom SQL translation
 
     Code
@@ -28,25 +48,27 @@
 # `sql_query_insert()` works
 
     Code
-      (sql_query_insert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), conflict = "error", returning_cols = c("a", b2 = "b")))
+      (sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "error",
+      returning_cols = c("a", b2 = "b")))
     Condition
       Error in `sql_query_insert()`:
-      ! `conflict = "error"` is not supported for database tables.
-      i Please use `conflict = "ignore"` instead.
+      ! `conflict = "error"` isn't supported on database backends.
+      i It must be "ignore" instead.
 
 ---
 
     Code
-      sql_query_insert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), conflict = "ignore", returning_cols = c("a", b2 = "b"))
+      sql_query_insert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), insert_cols = colnames(df_y), by = c("a", "b"), conflict = "ignore",
+      returning_cols = c("a", b2 = "b"))
     Output
       <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
       SELECT *
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       ON CONFLICT (`a`, `b`)
       DO NOTHING
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
@@ -54,20 +76,20 @@
 # `sql_query_upsert()` with method = 'on_conflict' is correct
 
     Code
-      sql_query_upsert(con = simulate_postgres(), x_name = ident("df_x"), y = df_y,
-      by = c("a", "b"), update_cols = c("c", "d"), returning_cols = c("a", b2 = "b"),
-      method = "on_conflict")
+      sql_query_upsert(con = con, table = ident("df_x"), from = sql_render(df_y, con,
+        lvl = 1), by = c("c", "d"), update_cols = c("a", "b"), returning_cols = c("a",
+        b2 = "b"), method = "on_conflict")
     Output
-      <SQL> INSERT INTO `df_x` (`a`, `b`, `c`, `d`)
-      SELECT *
+      <SQL> INSERT INTO `df_x` (`c`, `d`, `a`, `b`)
+      SELECT `c`, `d`, `a`, `b`
       FROM (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
       WHERE true
-      ON CONFLICT  (`a`, `b`)
+      ON CONFLICT  (`c`, `d`)
       DO UPDATE
-      SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+      SET `a` = `excluded`.`a`, `b` = `excluded`.`b`
       RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
 
 # can explain
@@ -76,7 +98,7 @@
       db %>% mutate(y = x + 1) %>% explain()
     Output
       <SQL>
-      SELECT *, "x" + 1.0 AS "y"
+      SELECT "test".*, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>
@@ -89,12 +111,12 @@
       db %>% mutate(y = x + 1) %>% explain(format = "json")
     Output
       <SQL>
-      SELECT *, "x" + 1.0 AS "y"
+      SELECT "test".*, "x" + 1.0 AS "y"
       FROM "test"
       
       <PLAN>
-                                                                                                                                                                                                                                                                 QUERY PLAN
-      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
+                                                                                                                                                                                                                                                                                                QUERY PLAN
+      1 [\n  {\n    "Plan": {\n      "Node Type": "Seq Scan",\n      "Parallel Aware": false,\n      "Async Capable": false,\n      "Relation Name": "test",\n      "Alias": "test",\n      "Startup Cost": 0.00,\n      "Total Cost": 1.04,\n      "Plan Rows": 3,\n      "Plan Width": 36\n    }\n  }\n]
 
 # can insert with returning
 
@@ -104,6 +126,7 @@
     Condition
       Error in `rows_insert()`:
       ! Can't modify database table "df_x".
+      i Using SQL: INSERT INTO "df_x" ("a", "b", "c", "d") SELECT * FROM ( SELECT "a", "b", "c" + 1.0 AS "c", "d" FROM "df_y" ) AS "...y" ON CONFLICT ("a", "b") DO NOTHING RETURNING "df_x"."a", "df_x"."b", "df_x"."c", "df_x"."d"
       Caused by error:
       ! dummy DBI error
 
@@ -115,6 +138,7 @@
     Condition
       Error in `rows_upsert()`:
       ! Can't modify database table "df_x".
+      i Using SQL: INSERT INTO "df_x" ("a", "b", "c", "d") SELECT "a", "b", "c", "d" FROM ( SELECT "a", "b", "c" + 1.0 AS "c", "d" FROM "df_y" ) AS "...y" WHERE true ON CONFLICT ("a", "b") DO UPDATE SET "c" = "excluded"."c", "d" = "excluded"."d" RETURNING "df_x"."a", "df_x"."b", "df_x"."c", "df_x"."d"
       Caused by error:
       ! dummy DBI error
 

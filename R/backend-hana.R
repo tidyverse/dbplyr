@@ -36,7 +36,7 @@ dbplyr_edition.HDB <- function(con) {
 sql_translation.HDB <- function(con) {
   sql_variant(
     sql_translator(.parent = base_scalar,
-      as.character = sql_cast("SHORTTEXT"),
+      as.character = sql_cast("VARCHAR"),
       as.numeric = sql_cast("DOUBLE"),
       as.double = sql_cast("DOUBLE"),
 
@@ -57,7 +57,7 @@ sql_translation.HDB <- function(con) {
 
 # nocov start
 #' @export
-db_table_temporary.HDB <- function(con, table, temporary) {
+db_table_temporary.HDB <- function(con, table, temporary, ...) {
   if (temporary && substr(table, 1, 1) != "#") {
     table <- hash_temp(table)
   }

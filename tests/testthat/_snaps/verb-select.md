@@ -1,3 +1,30 @@
+# select after distinct produces subquery
+
+    Code
+      lf %>% distinct() %>% select(x)
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT DISTINCT `df`.*
+        FROM `df`
+      ) AS `q01`
+
+# rename/relocate after distinct is inlined #1141
+
+    Code
+      lf %>% distinct() %>% rename(z = y)
+    Output
+      <SQL>
+      SELECT DISTINCT `x`, `y` AS `z`
+      FROM `df`
+    Code
+      lf %>% distinct() %>% relocate(y)
+    Output
+      <SQL>
+      SELECT DISTINCT `y`, `x`
+      FROM `df`
+
 # select preserves grouping vars
 
     Code
@@ -146,13 +173,21 @@
       Caused by error:
       ! object 'non_existent' not found
 
+# where() isn't suppored
+
+    Code
+      lf %>% select(where(is.integer))
+    Condition
+      Error in `select()`:
+      ! This tidyselect interface doesn't support predicates.
+
 # multiple selects are collapsed
 
     Code
       lf %>% select(2:1) %>% select(2:1)
     Output
       <SQL>
-      SELECT *
+      SELECT `df`.*
       FROM `df`
 
 ---
@@ -194,15 +229,15 @@
 # output is styled
 
     Code
-      show_query(out, cte = TRUE)
+      show_query(out, sql_options = sql_options(cte = TRUE))
     Output
       <SQL>
-      [34mWITH [39m`q01`[34m AS[39m (
+      [34mWITH[39m `q01` [34mAS[39m (
         [34mSELECT[39m `x`, AVG(`y`) OVER (PARTITION BY `x`)[34m AS [39m`y`, `z` + 1.0[34m AS [39m`z`
         [34mFROM[39m `df`
       ),
-      `q02`[34m AS[39m (
-        [34mSELECT[39m *
+      `q02` [34mAS[39m (
+        [34mSELECT[39m `q01`.*
         [34mFROM[39m `q01`
         [34mWHERE[39m (`z` = 1.0)
       )

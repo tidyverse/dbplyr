@@ -52,12 +52,11 @@ add_arrange <- function(.data, dots, .by_group) {
 
   new_lazy_query <- lazy_select_query(
     x = lazy_query,
-    last_op = "arrange",
     order_by = dots,
     order_vars = dots
   )
 
-  if (!inherits(lazy_query, "lazy_select_query")) {
+  if (!is_lazy_select_query(lazy_query)) {
     return(new_lazy_query)
   }
 
@@ -69,4 +68,52 @@ add_arrange <- function(.data, dots, .by_group) {
   lazy_query$order_vars <- dots
   lazy_query$order_by <- dots
   lazy_query
+}
+
+unwrap_order_expr <- function(order_by, f, error_call = caller_env()) {
+  order_by_quo <- quo({{ order_by }})
+  order_by_env <- quo_get_env(order_by_quo)
+  order_by_expr <- quo_get_expr(order_by_quo)
+
+  if (is.null(order_by_expr)) {
+    return()
+  }
+
+  if (is_call(order_by_expr, "c")) {
+    args <- call_args(order_by_expr)
+    tibble_expr <- expr_text(expr(tibble(!!!args)))
+    cli_abort(c(
+      "Can't use `c()` in {.fun {f}}",
+      i = "Did you mean to use `{tibble_expr}` instead?"
+    ), call = error_call)
+  }
+
+  if (is_call(order_by_expr, c("tibble", "data.frame"))) {
+    tibble_args <- call_args(order_by_expr)
+    # browser()
+    out <- as_quosures(tibble_args, env = order_by_env)
+    return(out)
+  }
+
+  list(order_by_quo)
+}
+
+swap_order_direction <- function(x) {
+  is_quo <- is_quosure(x)
+  if (is_quo) {
+    env <- quo_get_env(x)
+    x <- quo_get_expr(x)
+  }
+
+  if (is_call(x, "desc", n = 1)) {
+    out <- call_args(x)[[1]]
+  } else {
+    out <- expr(desc(!!x))
+  }
+
+  if (is_quo) {
+    out <- as_quosure(out, env)
+  }
+
+  out
 }

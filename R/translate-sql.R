@@ -14,7 +14,6 @@
 #'   a list of already quoted objects.
 #' @param con An optional database connection to control the details of
 #'   the translation. The default, `NULL`, generates ANSI SQL.
-#' @param vars Deprecated. Now call [partial_eval()] directly.
 #' @param vars_group,vars_order,vars_frame Parameters used in the `OVER`
 #'   expression of windowed functions.
 #' @param window Use `FALSE` to suppress generation of the `OVER`
@@ -23,30 +22,32 @@
 #' @param context Use to carry information for special translation cases. For example, MS SQL needs a different conversion for is.na() in WHERE vs. SELECT clauses.  Expects a list.
 #' @export
 #' @examples
+#' con <- simulate_dbi()
+#'
 #' # Regular maths is translated in a very straightforward way
-#' translate_sql(x + 1)
-#' translate_sql(sin(x) + tan(y))
+#' translate_sql(x + 1, con = con)
+#' translate_sql(sin(x) + tan(y), con = con)
 #'
 #' # Note that all variable names are escaped
-#' translate_sql(like == "x")
+#' translate_sql(like == "x", con = con)
 #' # In ANSI SQL: "" quotes variable _names_, '' quotes strings
 #'
 #' # Logical operators are converted to their sql equivalents
-#' translate_sql(x < 5 & !(y >= 5))
+#' translate_sql(x < 5 & !(y >= 5), con = con)
 #' # xor() doesn't have a direct SQL equivalent
-#' translate_sql(xor(x, y))
+#' translate_sql(xor(x, y), con = con)
 #'
 #' # If is translated into case when
-#' translate_sql(if (x > 5) "big" else "small")
+#' translate_sql(if (x > 5) "big" else "small", con = con)
 #'
 #' # Infix functions are passed onto SQL with % removed
-#' translate_sql(first %like% "Had%")
-#' translate_sql(first %is% NA)
-#' translate_sql(first %in% c("John", "Roger", "Robert"))
+#' translate_sql(first %like% "Had%", con = con)
+#' translate_sql(first %is% NA, con = con)
+#' translate_sql(first %in% c("John", "Roger", "Robert"), con = con)
 #'
 #' # And be careful if you really want integers
-#' translate_sql(x == 1)
-#' translate_sql(x == 1L)
+#' translate_sql(x == 1, con = con)
+#' translate_sql(x == 1L, con = con)
 #'
 #' # If you have an already quoted object, use translate_sql_:
 #' x <- quote(y + 1 / sin(t))
@@ -54,31 +55,23 @@
 #'
 #' # Windowed translation --------------------------------------------
 #' # Known window functions automatically get OVER()
-#' translate_sql(mpg > mean(mpg))
+#' translate_sql(mpg > mean(mpg), con = con)
 #'
 #' # Suppress this with window = FALSE
-#' translate_sql(mpg > mean(mpg), window = FALSE)
+#' translate_sql(mpg > mean(mpg), window = FALSE, con = con)
 #'
 #' # vars_group controls partition:
-#' translate_sql(mpg > mean(mpg), vars_group = "cyl")
+#' translate_sql(mpg > mean(mpg), vars_group = "cyl", con = con)
 #'
 #' # and vars_order controls ordering for those functions that need it
-#' translate_sql(cumsum(mpg))
-#' translate_sql(cumsum(mpg), vars_order = "mpg")
+#' translate_sql(cumsum(mpg), con = con)
+#' translate_sql(cumsum(mpg), vars_order = "mpg", con = con)
 translate_sql <- function(...,
-                          con = NULL,
-                          vars = character(),
+                          con,
                           vars_group = NULL,
                           vars_order = NULL,
                           vars_frame = NULL,
                           window = TRUE) {
-
-  if (!missing(vars)) {
-    cli_abort("{.arg vars} is deprecated. Please use {.fun partial_eval} directly.")
-  }
-
-  con <- con %||% sql_current_con() %||% simulate_dbi()
-
   translate_sql_(
     quos(...),
     con = con,
@@ -89,21 +82,38 @@ translate_sql <- function(...,
   )
 }
 
+test_translate_sql <- function(...,
+                          con = NULL,
+                          vars_group = NULL,
+                          vars_order = NULL,
+                          vars_frame = NULL,
+                          window = TRUE) {
+  translate_sql(
+    ...,
+    con = con %||% sql_current_con(),
+    vars_group = vars_group,
+    vars_order = vars_order,
+    vars_frame = vars_frame,
+    window = window
+  )
+}
+
 #' @export
 #' @rdname translate_sql
 translate_sql_ <- function(dots,
-                           con = NULL,
+                           con,
                            vars_group = NULL,
                            vars_order = NULL,
                            vars_frame = NULL,
                            window = TRUE,
                            context = list()) {
+  check_con(con)
 
   if (length(dots) == 0) {
     return(sql())
   }
 
-  stopifnot(is.list(dots))
+  check_list(dots)
 
   if (!any(have_name(dots))) {
     names(dots) <- NULL
@@ -143,7 +153,10 @@ translate_sql_ <- function(dots,
   sql(unlist(pieces))
 }
 
-sql_data_mask <- function(expr, variant, con, window = FALSE,
+sql_data_mask <- function(expr,
+                          variant,
+                          con,
+                          window = FALSE,
                           strict = getOption("dplyr.strict_sql", FALSE)) {
   stopifnot(is.sql_variant(variant))
 
@@ -172,14 +185,16 @@ sql_data_mask <- function(expr, variant, con, window = FALSE,
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-      cli_abort("No known translation for `{pkg}::{name}()`")
+      cli_abort("No known translation for {.fun {pkg}::{name}}")
     }
   }
 
   special_calls2$sql <- function(...) {
     dots <- exprs(...)
-    dots <- purrr::map(dots, eval_tidy, env = top_env)
+
+    env <- get_env(expr)
+    dots <- purrr::map(dots, eval_tidy, env = env)
+
     exec(sql, !!!dots)
   }
 
@@ -203,7 +218,7 @@ is_infix_user <- function(x) {
 }
 
 default_op <- function(x, env) {
-  assert_that(is_string(x))
+  check_string(x)
 
   # Check for shiny reactives; these are zero-arg functions
   # so need special handling to give a useful error

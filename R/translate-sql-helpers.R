@@ -59,9 +59,9 @@
 sql_variant <- function(scalar = sql_translator(),
                         aggregate = sql_translator(),
                         window = sql_translator()) {
-  stopifnot(is.environment(scalar))
-  stopifnot(is.environment(aggregate))
-  stopifnot(is.environment(window))
+  check_environment(scalar)
+  check_environment(aggregate)
+  check_environment(window)
 
   # Need to check that every function in aggregate also occurs in window
   missing <- setdiff(ls(aggregate), ls(window))
@@ -118,10 +118,19 @@ names.sql_variant <- function(x) {
 
 #' @export
 #' @rdname sql_variant
-sql_translator <- function(..., .funs = list(),
+sql_translator <- function(...,
+                           .funs = list(),
                            .parent = new.env(parent = emptyenv())) {
   funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
+
+  if (anyDuplicated(names(funs))) {
+    bullets <- unique(names(funs)[duplicated(names(funs))])
+    cli_abort(c(
+      "Duplicate names in {.fun sql_translator}",
+      set_names(bullets, "*")
+    ))
+  }
 
   list2env(funs, copy_env(.parent))
 }
@@ -135,7 +144,7 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   # Unquoting involving infix operators easily create abstract syntax trees
-  # without parantheses where they are needed for printing and translation.
+  # without parentheses where they are needed for printing and translation.
   # For example `expr(!!expr(2 - 1) * x))`
   #
   # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast
@@ -143,33 +152,34 @@ sql_infix <- function(f, pad = TRUE) {
   #
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
-  assert_that(is_string(f))
+  check_string(f)
+  f <- sql(f)
 
   if (pad) {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, " ", sql(f), " ", y)
+      glue_sql2(sql_current_con(), "{.val x} {f} {.val y}")
     }
   } else {
     function(x, y) {
       x <- escape_infix_expr(enexpr(x), x)
       y <- escape_infix_expr(enexpr(y), y)
 
-      build_sql(x, sql(f), y)
+      glue_sql2(sql_current_con(), "{.val x}{f}{.val y}")
     }
   }
 }
 
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (is_call(xq, infix_calls, n = 2)) {
-    return(build_sql("(", x, ")"))
-  }
+  is_infix <- is_call(xq, infix_calls, n = 2)
+  is_unary_minus <- escape_unary_minus && is_call(xq, "-", n = 1)
 
-  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
-    return(build_sql("(", x, ")"))
+  if (is_infix || is_unary_minus) {
+    enpared <- glue_sql2(sql_current_con(), "({x})")
+    return(enpared)
   }
 
   x
@@ -178,7 +188,7 @@ escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
 #' @rdname sql_variant
 #' @export
 sql_prefix <- function(f, n = NULL) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
     args <- list(...)
@@ -191,39 +201,40 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    build_sql(sql(f), args)
+    glue_sql2(sql_current_con(), "{f}({.val args*})")
   }
 }
 
 #' @rdname sql_variant
 #' @export
 sql_aggregate <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(x))
+    glue_sql2(sql_current_con(), "{f}({.val x})")
   }
 }
 
 #' @rdname sql_variant
 #' @export
 sql_aggregate_2 <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(x, y) {
-    build_sql(sql(f), list(x, y))
+    glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})")
   }
 }
 
 #' @rdname sql_variant
 #' @export
 sql_aggregate_n <- function(f, f_r = f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(...))
+    dots <- list(...)
+    glue_sql2(sql_current_con(), "{f}({.val dots*})")
   }
 }
 
@@ -231,8 +242,7 @@ sql_aggregate_win <- function(f) {
   force(f)
 
   function(...) {
-    # TODO use {.fun {f}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("`{f}()`` is only available in a windowed ({.fun mutate}) context")
+    cli_abort("{.fun {f}} is only available in a windowed ({.fun mutate}) context")
   }
 }
 
@@ -254,11 +264,56 @@ check_na_rm <- function(na.rm) {
 #' @rdname sql_variant
 #' @export
 sql_not_supported <- function(f) {
-  assert_that(is_string(f))
+  check_string(f)
 
   function(...) {
-    # TODO use {.fun dbplyr::{fn}} after https://github.com/r-lib/cli/issues/422 is fixed
-    cli_abort("{f} is not available in this SQL variant")
+    cli_abort("{.fun {f}} is not available in this SQL variant.")
+  }
+}
+
+sql_agg_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun summarise} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun distinct} and {.fun mutate} for the same result:",
+      " " = "{.code mutate(<col> = {f_call_str}) %>% distinct(<col>)}"
+    )
+    cli_abort(msg)
+  }
+}
+
+sql_win_not_supported <- function(f, backend) {
+  check_string(f)
+
+  msg <- "Translation of {.fun {f}} in {.fun mutate} is not supported"
+
+  if (is.null(backend)) {
+    msg <- paste0(msg, " on database backends.")
+  } else {
+    msg <- paste0(msg, " for {backend}.")
+  }
+
+  function(...) {
+    dots <- enexprs(...)
+    f_call_str <- as_label(call2(f, !!!dots))
+    msg <- c(
+      msg,
+      i = "Use a combination of {.fun summarise} and {.fun left_join} instead:",
+      " " = "{.code df %>% left_join(summarise(<col> = {f_call_str}))}."
+    )
+    cli_abort(msg)
   }
 }
 
@@ -302,4 +357,25 @@ sql_cot <- function(){
   }
 }
 
-globalVariables(c("%as%", "cast", "ln", "try_cast"))
+#' @rdname sql_variant
+#' @export
+sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
+  n_expr <- quo_get_expr(enquo(n))
+  if (!is_call(n_expr, "n", n = 0)) {
+    cli_abort("Only {.code n = n()} is supported.")
+  }
+
+  rand_expr <- enexpr(rand_expr)
+  range <- max - min
+  if (range != 1) {
+    rand_expr <- expr(!!rand_expr * !!range)
+  }
+
+  if (min != 0) {
+    rand_expr <- expr(!!rand_expr + !!min)
+  }
+
+  sql_expr(!!rand_expr)
+}
+
+utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))

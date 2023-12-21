@@ -1,3 +1,11 @@
+# reframe is not supported
+
+    Code
+      lazy_frame(x = 1) %>% reframe()
+    Condition
+      Error in `reframe()`:
+      ! `reframe()` is not supported on database backends.
+
 # can't refer to freshly created variables
 
     Code
@@ -5,7 +13,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(a_sum)`
+      i In argument: `issue_col = sum(a_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
@@ -16,7 +24,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(a_sum)`
+      i In argument: `issue_col = sum(a_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
@@ -27,7 +35,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = sum(b_sum)`
+      i In argument: `issue_col = sum(b_sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `b_sum` was created earlier in this `summarise()`.
@@ -37,7 +45,7 @@
     Output
       <error/rlang_error>
       Error in `summarise()`:
-      ! Problem while computing `issue_col = across(a_sum, sum)`
+      i In argument: `issue_col = across(a_sum, sum)`
       Caused by error:
       ! In dbplyr you cannot use a variable created in the same `summarise()`.
       x `a_sum` was created earlier in this `summarise()`.
@@ -93,6 +101,22 @@
       SELECT `g`, 0.0 AS `x`
       FROM `df`
       GROUP BY `g`
+
+# can't use `.by` with `.groups`
+
+    Code
+      summarise(df, .by = x, .groups = "drop")
+    Condition
+      Error in `summarise()`:
+      ! Can't supply both `.by` and `.groups`.
+
+# catches `.by` with grouped-df
+
+    Code
+      summarise(gdf, .by = x)
+    Condition
+      Error:
+      ! Can't supply `.by` when `.data` is a grouped data frame.
 
 # quoting for rendering summarized grouped table
 

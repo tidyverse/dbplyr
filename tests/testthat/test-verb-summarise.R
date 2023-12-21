@@ -1,3 +1,9 @@
+test_that("reframe is not supported", {
+  expect_snapshot(error = TRUE, {
+    lazy_frame(x = 1) %>% reframe()
+  })
+})
+
 test_that("summarise peels off a single layer of grouping", {
   mf1 <- memdb_frame(x = 1, y = 1, z = 2) %>% group_by(x, y)
   mf2 <- mf1 %>% summarise(n = n())
@@ -87,6 +93,37 @@ test_that("summarise() after select() works #985", {
   )
 })
 
+# .by ----------------------------------------------------------------------
+
+test_that("can group transiently using `.by`", {
+  df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 2, 1, 2, 3))
+
+  out <- summarise(df, x = mean(x, na.rm = TRUE), .by = g) %>%
+    arrange(g) %>%
+    collect()
+
+  expect_identical(out$g, c(1, 2))
+  expect_identical(out$x, c(3, 2))
+  expect_equal(group_vars(out), character())
+})
+
+test_that("can't use `.by` with `.groups`", {
+  df <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    summarise(df, .by = x, .groups = "drop")
+  })
+})
+
+test_that("catches `.by` with grouped-df", {
+  df <- lazy_frame(x = 1)
+  gdf <- group_by(df, x)
+
+  expect_snapshot(error = TRUE, {
+    summarise(gdf, .by = x)
+  })
+})
+
 # sql-render --------------------------------------------------------------
 
 test_that("quoting for rendering summarized grouped table", {
@@ -157,7 +194,6 @@ test_that("can handle rename", {
     out,
     lazy_select_query(
       x = out$x,
-      last_op = "summarise",
       select = list(ax = sym("ax"), mean_by = quo(mean(by, na.rm = TRUE))),
       group_by = syms("ax"),
       select_operation = "summarise",

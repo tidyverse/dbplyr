@@ -53,6 +53,14 @@ test_that("unique index fails if values are duplicated", {
   lapply(mfs, function(.) expect_error(compute(., unique_indexes = "y")))
 })
 
+test_that("index fails if columns are missing", {
+  mf <- memdb_frame(x = 1)
+  expect_snapshot({
+    (expect_error(compute(mf, indexes = list(c("y", "x", "z"), "a"))))
+    (expect_error(compute(mf, unique_indexes = list(c("y", "x", "z"), "a"))))
+  })
+})
+
 test_that("compute creates correct column names", {
   out <- memdb_frame(x = 1) %>%
     group_by(x) %>%
@@ -70,7 +78,7 @@ test_that("compute keeps window and groups", {
     summarise(n = n(), .groups = "drop_last") %>%
     compute()
 
-  expect_equal(op_sort(out), list(quo(x)), ignore_formula_env = TRUE)
+  expect_equal(op_sort(out), list(expr(x)))
   expect_equal(op_grps(out), "x")
 })
 
@@ -86,13 +94,20 @@ test_that("compute can handle named name", {
 
 test_that("compute can handle schema", {
   df <- memdb_frame(x = 1:10)
-  on.exit(DBI::dbRemoveTable(remote_con(df), "db1"))
+  withr::defer(DBI::dbRemoveTable(remote_con(df), "db1"))
 
   expect_equal(
     df %>%
       compute(name = in_schema("main", "db1"), temporary = FALSE) %>%
       collect(),
     tibble(x = 1:10)
+  )
+
+  # errors because name already exists
+  expect_snapshot(
+    df %>% compute(name = in_schema("main", "db1"), temporary = FALSE),
+    transform = snap_transform_dbi,
+    error = TRUE
   )
 })
 
@@ -102,6 +117,12 @@ test_that("collect() handles DBI error", {
     (expect_error(mf %>% mutate(a = sql("invalid sql")) %>% collect())),
     transform = snap_transform_dbi
   )
+})
+
+test_that("compute(temporary = FALSE) without a name is deprecated", {
+  df <- memdb_frame(x = 1:10)
+
+  expect_snapshot_warning(df %>% compute(temporary = FALSE))
 })
 
 # ops ---------------------------------------------------------------------

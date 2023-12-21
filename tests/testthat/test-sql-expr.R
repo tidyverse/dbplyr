@@ -1,3 +1,8 @@
+test_that("NULL becomes SQL NULL", {
+  con <- simulate_dbi()
+  expect_equal(sql_expr(NULL), sql("NULL"))
+})
+
 test_that("atomic vectors are escaped", {
   con <- simulate_dbi()
 

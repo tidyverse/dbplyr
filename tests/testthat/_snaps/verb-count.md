@@ -35,7 +35,7 @@
       db %>% add_count(g, sort = TRUE)
     Output
       <SQL>
-      SELECT *, COUNT(*) OVER (PARTITION BY `g`) AS `n`
+      SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
       FROM `df`
       ORDER BY `n` DESC
 
@@ -45,7 +45,7 @@
       db %>% group_by(g) %>% add_count()
     Output
       <SQL>
-      SELECT *, COUNT(*) OVER (PARTITION BY `g`) AS `n`
+      SELECT `df`.*, COUNT(*) OVER (PARTITION BY `g`) AS `n`
       FROM `df`
 
 # .drop is not supported
@@ -54,5 +54,5 @@
       lazy_frame(g = 1) %>% add_count(.drop = TRUE)
     Condition
       Error in `add_count()`:
-      ! `.drop` argument not supported for lazy tables.
+      ! Argument `.drop` isn't supported on database backends.
 

@@ -1,3 +1,12 @@
+# duplicates throw an error
+
+    Code
+      sql_translator(round = function(x) x, round = function(y) y)
+    Condition
+      Error in `sql_translator()`:
+      ! Duplicate names in `sql_translator()`
+      * round
+
 # output of print method for sql_variant is correct
 
     Code
@@ -31,4 +40,12 @@
     Condition
       Error in `sin()`:
       ! supplied argument name 'a' does not match 'x'
+
+# runif is translated
+
+    Code
+      test_translate_sql(runif(2))
+    Condition
+      Error in `sql_runif()`:
+      ! Only `n = n()` is supported.
 

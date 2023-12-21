@@ -4,7 +4,7 @@
 \alias{tbl_sql}
 \title{Create an SQL tbl (abstract)}
 \usage{
-tbl_sql(subclass, src, from, ..., vars = NULL)
+tbl_sql(subclass, src, from, ..., vars = NULL, check_from = TRUE)
 }
 \arguments{
 \item{subclass}{name of subclass}
@@ -15,6 +15,8 @@ tbl_sql(subclass, src, from, ..., vars = NULL)
 to avoid retrieving them from the database.
 Mainly useful for better performance when creating
 multiple \code{tbl} objects.}
+
+\item{check_from}{Check if \code{from} is likely misspecified SQL or a table in a schema.}
 }
 \description{
 Generally, you should no longer need to provide a custom \code{tbl()}

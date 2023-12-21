@@ -10,7 +10,7 @@
 
 \method{compute}{tbl_sql}(
   x,
-  name = unique_table_name(),
+  name = NULL,
   temporary = TRUE,
   unique_indexes = list(),
   indexes = list(),
@@ -28,7 +28,8 @@
 
 \item{name}{Table name in remote database.}
 
-\item{temporary}{Should the table be temporary (\code{TRUE}, the default\verb{) or persistent (}FALSE`)?}
+\item{temporary}{Should the table be temporary (\code{TRUE}, the default) or
+persistent (\code{FALSE})?}
 
 \item{unique_indexes}{a list of character vectors. Each element of the list
 will create a new unique index over the specified column(s). Duplicate rows

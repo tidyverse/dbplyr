@@ -37,6 +37,15 @@ test_that("across() translates functions", {
   )
 })
 
+test_that("across() translates functions in namespace #1231", {
+  lf <- lazy_frame(a = 1,  b = 2)
+
+  expect_equal(
+    capture_across(lf, across(a:b, dplyr::dense_rank)),
+    exprs(a = dense_rank(a), b = dense_rank(b))
+  )
+})
+
 test_that("across() captures anonymous functions", {
   lf <- lazy_frame(a = 1)
 
@@ -243,7 +252,7 @@ test_that("across() uses environment from the current quosure (dplyr#5460)", {
 
   expect_equal(
     partial_eval_dots(lf, if_all(all_of(y), ~ .x < 2)),
-    list(quo(x < 2)),
+    list(quo((x < 2))),
     ignore_attr = "names"
   )
 })
@@ -373,6 +382,13 @@ test_that("across() throws error if unpack = TRUE", {
   )
 })
 
+test_that("where() isn't suppored", {
+  lf <- lazy_frame(x = 1)
+  expect_snapshot(error = TRUE, {
+    capture_across(lf, across(where(is.integer), as.character))
+  })
+})
+
 
 # if_all ------------------------------------------------------------------
 
@@ -417,7 +433,7 @@ test_that("if_all() gives informative errors", {
   })
 })
 
-test_that("if_all collapses multiple expresions", {
+test_that("if_all collapses multiple expressions", {
   lf <- lazy_frame(a = 1,  b = 2)
   expect_equal(
     capture_if_all(lf, if_all(everything(), is.na)),
@@ -432,6 +448,15 @@ test_that("if_all/any works in filter()", {
   expect_snapshot(lf %>% filter(if_any(a:b, ~ . > 0)))
 })
 
+test_that("if_all/any is wrapped in parentheses #1153", {
+  lf <- lazy_frame(a = 1,  b = 2, c = 3)
+
+  expect_equal(
+    lf %>% filter(if_any(c(a, b)) & c == 3) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((`a` OR `b`) AND `c` = 3.0)")
+  )
+})
+
 test_that("if_all/any works in mutate()", {
   lf <- lazy_frame(a = 1,  b = 2)
 
@@ -439,7 +464,7 @@ test_that("if_all/any works in mutate()", {
   expect_snapshot(lf %>% mutate(c = if_any(a:b, ~ . > 0)))
 })
 
-test_that("if_all/any uses every colum as default", {
+test_that("if_all/any uses every column as default", {
   lf <- lazy_frame(a = 1, b = 2)
 
   expect_snapshot(lf %>% filter(if_all(.fns = ~ . > 0)))
@@ -472,11 +497,11 @@ test_that("if_any() and if_all() expansions deal with single inputs", {
   # Single inputs
   expect_equal(
     filter(d, if_any(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
   expect_equal(
     filter(d, if_all(x, ~ FALSE)) %>% remote_query(),
-    sql("SELECT *\nFROM `df`\nWHERE (FALSE)")
+    sql("SELECT `df`.*\nFROM `df`\nWHERE ((FALSE))")
   )
 })
 
@@ -490,12 +515,11 @@ test_that("if_all() cannot rename variables", {
 })
 
 test_that("if_all() can handle empty selection", {
-  skip("tidyselect issue #221")
   lf <- lazy_frame(x = 1, y = 2)
 
   expect_equal(
-    lf %>% mutate(if_all(character(), c)) %>% show_query(),
-    expr(lf)
+    capture_if_all(lf, if_all(character(), c)),
+    TRUE
   )
 })
 
@@ -578,3 +602,67 @@ test_that("if_all() translates dots", {
 
   expect_equal(fun(), expr(mean(a, na.rm = TRUE)))
 })
+
+
+# pick --------------------------------------------------------------------
+
+# pick() + arrange()
+
+test_that("can `arrange()` with `pick()` selection", {
+  df <- lazy_frame(x = c(2, 2, 1), y = c(3, 1, 3))
+
+  expect_identical(
+    arrange(df, pick(x, y)) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
+  )
+
+  expect_identical(
+    arrange(df, pick(x), y) %>% remote_query(),
+    sql("SELECT `df`.*\nFROM `df`\nORDER BY `x`, `y`")
+  )
+})
+
+test_that("`pick()` errors in `arrange()` are useful", {
+  df <- lazy_frame(x = 1)
+
+  expect_snapshot(error = TRUE, {
+    arrange(df, pick(y))
+  })
+})
+
+test_that("doesn't allow renaming", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick(y = x))
+  })
+})
+
+test_that("requires at least one input", {
+  expect_snapshot(error = TRUE, {
+    arrange(lazy_frame(x = 1), pick())
+  })
+})
+
+# pick() + filter()
+
+test_that("`filter()` with `pick()` that uses invalid tidy-selection errors", {
+  df <- lazy_frame(x = c(1, 2, NA, 3), y = c(2, NA, 5, 3))
+
+  expect_snapshot(error = TRUE, {
+    filter(df, pick(x, a))
+  })
+})
+
+# pick() + group_by()
+
+test_that("`pick()` can be used inside `group_by()` wrappers", {
+  df <- lazy_frame(a = 1:3, b = 2:4, c = 3:5)
+
+  tidyselect_group_by <- function(data, groups) {
+    group_by(data, pick({{ groups }}))
+  }
+  expect_identical(
+    tidyselect_group_by(df, c(a, c)),
+    group_by(df, a, c)
+  )
+})
+

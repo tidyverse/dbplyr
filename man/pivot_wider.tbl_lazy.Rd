@@ -2,11 +2,14 @@
 % Please edit documentation in R/verb-pivot-wider.R
 \name{pivot_wider.tbl_lazy}
 \alias{pivot_wider.tbl_lazy}
+\alias{dbplyr_pivot_wider_spec}
 \title{Pivot data from long to wide}
 \usage{
-pivot_wider.tbl_lazy(
+\method{pivot_wider}{tbl_lazy}(
   data,
+  ...,
   id_cols = NULL,
+  id_expand = FALSE,
   names_from = name,
   names_prefix = "",
   names_sep = "_",
@@ -18,14 +21,30 @@ pivot_wider.tbl_lazy(
   values_from = value,
   values_fill = NULL,
   values_fn = ~max(.x, na.rm = TRUE),
+  unused_fn = NULL
+)
+
+dbplyr_pivot_wider_spec(
+  data,
+  spec,
+  ...,
+  names_repair = "check_unique",
+  id_cols = NULL,
+  id_expand = FALSE,
+  values_fill = NULL,
+  values_fn = ~max(.x, na.rm = TRUE),
   unused_fn = NULL,
-  ...
+  error_call = current_env()
 )
 }
 \arguments{
 \item{data}{A lazy data frame backed by a database query.}
 
+\item{...}{Unused; included for compatibility with generic.}
+
 \item{id_cols}{A set of columns that uniquely identifies each observation.}
+
+\item{id_expand}{Unused; included for compatibility with the generic.}
 
 \item{names_from, values_from}{A pair of
 arguments describing which column (or columns) to get the name of the
@@ -88,7 +107,21 @@ all unspecified columns will be considered \code{id_cols}.
 This is similar to grouping by the \code{id_cols} then summarizing the
 unused columns using \code{unused_fn}.}
 
-\item{...}{Unused; included for compatibility with generic.}
+\item{spec}{A specification data frame. This is useful for more complex
+pivots because it gives you greater control on how metadata stored in the
+columns become column names in the result.
+
+Must be a data frame containing character \code{.name} and \code{.value} columns.
+Additional columns in \code{spec} should be named to match columns in the
+long format of the dataset and contain values corresponding to columns
+pivoted from the wide format.
+The special \code{.seq} variable is used to disambiguate rows internally;
+it is automatically removed after pivoting.}
+
+\item{error_call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 \code{pivot_wider()} "widens" data, increasing the number of columns and
@@ -98,6 +131,14 @@ Learn more in \code{vignette("pivot", "tidyr")}.
 
 Note that \code{pivot_wider()} is not and cannot be lazy because we need to look
 at the data to figure out what the new column names will be.
+If you have a long running query you have two options:
+\itemize{
+\item (temporarily) store the result of the query via \code{compute()}.
+\item Create a spec before and use \code{dbplyr_pivot_wider_spec()} - dbplyr's version
+of \code{tidyr::pivot_wider_spec()}. Note that this function is only a temporary
+solution until \code{pivot_wider_spec()} becomes a generic. It will then be
+removed soon afterwards.
+}
 }
 \details{
 The big difference to \code{pivot_wider()} for local data frames is that

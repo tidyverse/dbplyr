@@ -2,7 +2,7 @@
 #'
 #' This creates an interesting database using data from the Lahman baseball
 #' data source, provided by Sean Lahman at
-#' \url{https://www.seanlahman.com/baseball-archive/statistics/}, and
+#' \url{http://seanlahman.com/download-baseball-database/}, and
 #' made easily available in R through the \pkg{Lahman} package by
 #' Michael Friendly, Dennis Murphy and Martin Monkman. See the documentation
 #' for that package for documentation of the individual tables.
