@@ -3,9 +3,6 @@
 * Allow additional arguments to be passed from `compute()` all the way to 
   `sql_query_save()`-method (@rsund).
 
-* Passing `...` to `across()` is now deprecated because the evaluation timing of
-  `...` is ambiguous. Now instead of (e.g.) `across(a:b, mean, na.rm = TRUE)`
-  you should write `across(a:b, ~ mean(.x, na.rm = TRUE))`.
 * The class of remote sources now includes all S4 class names, not just
   the first (#918).
 
