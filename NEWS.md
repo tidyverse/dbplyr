@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `db_explain()` now works for Oracle (@thomashulst, #1353).
+
 * Database errors now show the generated SQL, which hopefully will make it
   faster to track down problems (#1401).
 
