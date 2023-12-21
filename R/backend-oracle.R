@@ -147,8 +147,8 @@ sql_query_explain.Oracle <- function(con, sql, ...) {
 
   # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
   c(
-    glue_sql2(con, "EXPLAIN PLAN FOR {sql};\n"),
-    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());")
+    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
+    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
@@ -186,16 +186,10 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
 #' @export
 db_explain.Oracle <- function(con, sql, ...) {
   sql <- sql_query_explain(con, sql, ...)
-  call <- current_call()
-  tryCatch(
-    {
-      DBI::dbExecute(con, sql[1]) # EXPLAIN PLAN
-      expl <- DBI::dbGetQuery(con, sql[2]) # DBMS_XPLAN.DISPLAY
-    },
-    error = function(cnd) {
-      cli_abort("Can't explain query.", parent = cnd)
-    }
-  )
+
+  msg <- "Can't explain query."
+  db_execute(con, sql[[1]], msg) # EXPLAIN PLAN
+  expl <- db_get_query(con, sql[[2]], msg) # DBMS_XPLAN.DISPLAY
 
   out <- utils::capture.output(print(expl))
   paste(out, collapse = "\n")
