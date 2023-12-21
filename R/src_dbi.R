@@ -123,17 +123,18 @@ src_dbi <- function(con, auto_disconnect = FALSE) {
     disco <- db_disconnector(con, quiet = is_true(auto_disconnect)) # nocov
   }
 
-  con_classes <- extends(class(con))[
-    grepl("(?<!DBI)Connection$", extends(class(con)), perl = TRUE)]
-  subclass <- paste0("src_", con_classes)
-
   structure(
     list(
       con = con,
       disco = disco
     ),
-    class = c(subclass, "src_dbi", "src_sql", "src")
+    class = connection_s3_class(con)
   )
+}
+
+connection_s3_class <- function(con) {
+  subclass <- setdiff(is(con), extends("DBIConnection"))
+  c(paste0("src_", subclass), "src_dbi", "src_sql", "src")
 }
 
 methods::setOldClass(c("src_dbi", "src_sql", "src"))
