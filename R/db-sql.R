@@ -1150,7 +1150,13 @@ sql_subquery.DBIConnection <- function(con,
 # Helpers -------------------------------------------------------------------
 
 db_execute <- function(con, sql, msg, call = caller_env(), env = caller_env()) {
-  dbi_wrap(dbExecute(con, sql), sql, msg, call = call, env = env)
+  dbi_wrap(
+    dbExecute(con, sql, immediate = TRUE),
+    sql = sql,
+    msg = msg,
+    call = call,
+    env = env
+  )
   invisible()
 }
 
