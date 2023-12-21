@@ -26,10 +26,12 @@ db_compute(
   table,
   sql,
   ...,
+  overwrite = FALSE,
   temporary = TRUE,
   unique_indexes = list(),
   indexes = list(),
-  analyze = TRUE
+  analyze = TRUE,
+  in_transaction = TRUE
 )
 
 db_collect(con, sql, n = -1, warn_incomplete = TRUE, ...)

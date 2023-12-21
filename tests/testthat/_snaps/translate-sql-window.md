@@ -1,7 +1,7 @@
 # frame is checked
 
     Code
-      translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
+      test_translate_sql(sum(x, na.rm = TRUE), vars_frame = c(1, 0))
     Condition
       Warning:
       Windowed expression `SUM(`x`)` does not have explicit order.
@@ -12,11 +12,49 @@
 # win_rank(c()) gives an informative error
 
     Code
-      translate_sql(row_number(c(x)))
+      test_translate_sql(row_number(c(x)))
     Condition
-      Error in `prepare_win_rank_over()`:
+      Error in `row_number()`:
       ! Can't use `c()` in `ROW_NUMBER()`
       i Did you mean to use `tibble(x)` instead?
+
+# row_number() with and without group_by() and arrange()
+
+    Code
+      mf %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER () AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y`) AS `rown`
+      FROM `df`
+
+---
+
+    Code
+      mf %>% group_by(y) %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (PARTITION BY `y` ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
+
+---
+
+    Code
+      mf %>% arrange(y) %>% mutate(rown = row_number())
+    Output
+      <SQL>
+      SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY `y`) AS `rown`
+      FROM `df`
+      ORDER BY `y`
 
 # window_frame()
 

@@ -312,7 +312,7 @@ test_that("output is styled", {
     filter(z == 1) %>%
     left_join(lf, by = "x")
 
-  expect_snapshot(show_query(out, cte = TRUE))
+  expect_snapshot(show_query(out, sql_options = sql_options(cte = TRUE)))
 })
 
 # sql_build -------------------------------------------------------------

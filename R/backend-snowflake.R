@@ -38,14 +38,37 @@ sql_translation.Snowflake <- function(con) {
       str_locate = function(string, pattern) {
         sql_expr(POSITION(!!pattern, !!string))
       },
-      # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
-      # str_detect does not.  Left- and right-pad `pattern` with .* to get
-      # str_detect-like behavior
       str_detect = function(string, pattern, negate = FALSE) {
-        if (isTRUE(negate)) {
-          sql_expr(!(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*")))
+        con <- sql_current_con()
+
+        # Snowflake needs backslashes escaped, so we must increase the level of escaping
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
+        if (negate) {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 0L, con = con)
         } else {
-          sql_expr(((!!string)) %REGEXP% (".*" || (!!pattern) || ".*"))
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 0L, con = con)
+        }
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        con <- sql_current_con()
+
+        # Snowflake needs backslashes escaped, so we must increase the level of escaping
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
+        if (negate) {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) != 1L, con = con)
+        } else {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern) == 1L, con = con)
+        }
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        con <- sql_current_con()
+
+        # Snowflake needs backslashes escaped, so we must increase the level of escaping
+        pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
+        if (negate) {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) != LENGTH(!!string) + 1L, con = con)
+        } else {
+          translate_sql(REGEXP_INSTR(!!string, !!pattern, 1L, 1L, 1L) == LENGTH(!!string) + 1L, con = con)
         }
       },
       # On Snowflake, REGEXP_REPLACE is used like this:
@@ -156,33 +179,55 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT("year", !!x))
       },
       seconds = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} second'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} second'")
       },
       minutes = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} minute'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} minute'")
       },
       hours = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} hour'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} hour'")
       },
       days = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} day'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} day'")
       },
       weeks = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} week'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} week'")
       },
       months = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} month'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} month'")
       },
       years = function(x) {
-        glue_sql2(sql_current_con(), "INTERVAL '{x} year'")
+        glue_sql2(sql_current_con(), "INTERVAL '{.val x} year'")
       },
       # https://docs.snowflake.com/en/sql-reference/functions/date_trunc.html
       floor_date = function(x, unit = "seconds") {
-        unit <- arg_match(unit,
-          c("second", "minute", "hour", "day", "week", "month", "quarter", "year",
-            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years")
+        unit <- arg_match(
+          unit,
+          c(
+            "second", "minute", "hour", "day", "week", "month", "quarter", "year",
+            "seconds", "minutes", "hours", "days", "weeks", "months", "quarters", "years"
+          )
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
+      },
+      # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
+      # https://docs.snowflake.com/en/sql-reference/functions/least
+      # https://docs.snowflake.com/en/sql-reference/functions/greatest
+      pmin = function(..., na.rm = FALSE) {
+        dots <- list(...)
+        if (identical(na.rm, TRUE)) {
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = "<=")
+        } else {
+          glue_sql2(sql_current_con(), "LEAST({.val dots*})")
+        }
+      },
+      pmax = function(..., na.rm = FALSE) {
+        dots <- list(...)
+        if (identical(na.rm, TRUE)) {
+          snowflake_pmin_pmax_sql_expression(dots = dots, comparison = ">=")
+        } else {
+          glue_sql2(sql_current_con(), "GREATEST({.val dots*})")
+        }
       }
     ),
     sql_translator(
@@ -209,7 +254,8 @@ sql_translation.Snowflake <- function(con) {
           partition = win_current_group(),
           order = win_current_order()
         )
-      }
+      },
+      row_number = win_rank("ROW_NUMBER", empty_order = TRUE)
     )
   )
 }
@@ -230,16 +276,21 @@ snowflake_grepl <- function(pattern,
                             perl = FALSE,
                             fixed = FALSE,
                             useBytes = FALSE) {
-  # https://docs.snowflake.com/en/sql-reference/functions/regexp.html
-  check_unsupported_arg(ignore.case, FALSE, backend = "Snowflake")
+  con <- sql_current_con()
+
   check_unsupported_arg(perl, FALSE, backend = "Snowflake")
   check_unsupported_arg(fixed, FALSE, backend = "Snowflake")
   check_unsupported_arg(useBytes, FALSE, backend = "Snowflake")
-  # REGEXP on Snowflaake "implicitly anchors a pattern at both ends", which
-  # grepl does not.  Left- and right-pad `pattern` with .* to get grepl-like
-  # behavior
-  sql_expr(((!!x)) %REGEXP% (".*" || !!paste0('(', pattern, ')') || ".*"))
+
+  # https://docs.snowflake.com/en/sql-reference/functions/regexp_instr.html
+  # REGEXP_INSTR optional parameters: position, occurrance, option, regex_parameters
+  regexp_parameters <- "c"
+  if(ignore.case) { regexp_parameters <- "i" }
+  # Snowflake needs backslashes escaped, so we must increase the level of escaping
+  pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
+  translate_sql(REGEXP_INSTR(!!x, !!pattern, 1L, 1L, 0L, !!regexp_parameters) != 0L, con = con)
 }
+
 snowflake_round <- function(x, digits = 0L) {
   digits <- as.integer(digits)
   sql_expr(round(((!!x)) %::% FLOAT, !!digits))
@@ -257,4 +308,16 @@ snowflake_paste <- function(default_sep) {
   }
 }
 
-utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim"))
+snowflake_pmin_pmax_sql_expression <- function(dots, comparison){
+  dot_combined <- dots[[1]]
+  for (i in 2:length(dots)){
+    dot_combined <- snowflake_pmin_pmax_builder(dots[i], dot_combined, comparison)
+  }
+  dot_combined
+}
+
+snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
+  glue_sql2(sql_current_con(), glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"))
+}
+
+utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim", "LENGTH"))

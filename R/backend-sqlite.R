@@ -39,7 +39,7 @@ db_connection_describe.SQLiteConnection <- function(con, ...) {
 
 #' @export
 sql_query_explain.SQLiteConnection <- function(con, sql, ...) {
-  glue_sql2(con, "EXPLAIN QUERY PLAN {.sql sql}")
+  glue_sql2(con, "EXPLAIN QUERY PLAN {sql}")
 }
 
 #' @export
@@ -125,17 +125,6 @@ sql_escape_logical.SQLiteConnection <- function(con, x){
 }
 
 #' @export
-sql_query_wrap.SQLiteConnection <- function(con, from, name = NULL, ..., lvl = 0) {
-  sql_query_wrap_helper(
-    con = con,
-    from = from,
-    name = name,
-    lvl = lvl,
-    as = TRUE
-  )
-}
-
-#' @export
 sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
   # https://sqlite.org/lang_expr.html#isisnot
   glue_sql2(con, "{x} IS {y}")
@@ -143,7 +132,7 @@ sql_expr_matches.SQLiteConnection <- function(con, x, y, ...) {
 
 #' @export
 values_prepare.SQLiteConnection <- function(con, df) {
-  needs_escape <- purrr::map_lgl(df, ~ is(.x, "Date") || inherits(.x, "POSIXct"))
+  needs_escape <- purrr::map_lgl(df, ~ methods::is(.x, "Date") || inherits(.x, "POSIXct"))
   purrr::modify_if(df, needs_escape, ~ escape(.x, con = con, parens = FALSE, collapse = NULL))
 }
 
@@ -152,4 +141,9 @@ supports_window_clause.SQLiteConnection <- function(con) {
   TRUE
 }
 
-globalVariables(c("datetime", "NUMERIC", "REAL"))
+#' @export
+db_supports_table_alias_with_as.SQLiteConnection <- function(con) {
+  TRUE
+}
+
+utils::globalVariables(c("datetime", "NUMERIC", "REAL"))

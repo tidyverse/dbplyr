@@ -124,6 +124,14 @@ sql_translator <- function(...,
   funs <- c(list2(...), .funs)
   if (length(funs) == 0) return(.parent)
 
+  if (anyDuplicated(names(funs))) {
+    bullets <- unique(names(funs)[duplicated(names(funs))])
+    cli_abort(c(
+      "Duplicate names in {.fun sql_translator}",
+      set_names(bullets, "*")
+    ))
+  }
+
   list2env(funs, copy_env(.parent))
 }
 
@@ -136,7 +144,7 @@ copy_env <- function(from, to = NULL, parent = parent.env(from)) {
 #' @export
 sql_infix <- function(f, pad = TRUE) {
   # Unquoting involving infix operators easily create abstract syntax trees
-  # without parantheses where they are needed for printing and translation.
+  # without parentheses where they are needed for printing and translation.
   # For example `expr(!!expr(2 - 1) * x))`
   #
   # See https://adv-r.hadley.nz/quasiquotation.html#non-standard-ast
@@ -166,12 +174,12 @@ sql_infix <- function(f, pad = TRUE) {
 
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
-  if (is_call(xq, infix_calls, n = 2)) {
-    return(build_sql("(", x, ")"))
-  }
+  is_infix <- is_call(xq, infix_calls, n = 2)
+  is_unary_minus <- escape_unary_minus && is_call(xq, "-", n = 1)
 
-  if (escape_unary_minus && is_call(xq, "-", n = 1)) {
-    return(build_sql("(", x, ")"))
+  if (is_infix || is_unary_minus) {
+    enpared <- glue_sql2(sql_current_con(), "({x})")
+    return(enpared)
   }
 
   x
@@ -193,7 +201,7 @@ sql_prefix <- function(f, n = NULL) {
     if (any(names2(args) != "")) {
       cli::cli_warn("Named arguments ignored for SQL {f}")
     }
-    build_sql(sql(f), args)
+    glue_sql2(sql_current_con(), "{f}({.val args*})")
   }
 }
 
@@ -204,7 +212,7 @@ sql_aggregate <- function(f, f_r = f) {
 
   function(x, na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(x))
+    glue_sql2(sql_current_con(), "{f}({.val x})")
   }
 }
 
@@ -214,7 +222,7 @@ sql_aggregate_2 <- function(f) {
   check_string(f)
 
   function(x, y) {
-    build_sql(sql(f), list(x, y))
+    glue_sql2(sql_current_con(), "{f}({.val x}, {.val y})")
   }
 }
 
@@ -225,7 +233,8 @@ sql_aggregate_n <- function(f, f_r = f) {
 
   function(..., na.rm = FALSE) {
     check_na_rm(na.rm)
-    build_sql(sql(f), list(...))
+    dots <- list(...)
+    glue_sql2(sql_current_con(), "{f}({.val dots*})")
   }
 }
 
@@ -369,4 +378,4 @@ sql_runif <- function(rand_expr, n = n(), min = 0, max = 1) {
   sql_expr(!!rand_expr)
 }
 
-globalVariables(c("%as%", "cast", "ln", "try_cast"))
+utils::globalVariables(c("%as%", "cast", "ln", "try_cast"))

@@ -22,7 +22,7 @@ win_over(
   con = sql_current_con()
 )
 
-win_rank(f)
+win_rank(f, empty_order = FALSE)
 
 win_aggregate(f)
 
@@ -43,13 +43,15 @@ win_rank_tdata(f)
 \arguments{
 \item{expr}{The window expression}
 
+\item{partition}{Variables to partition over}
+
 \item{order}{Variables to order by}
 
 \item{frame}{A numeric vector of length two defining the frame.}
 
 \item{f}{The name of an sql function as a string}
 
-\item{parition}{Variables to partition over}
+\item{empty_order}{A logical value indicating whether to order by NULL if \code{order} is not specified}
 }
 \description{
 \code{win_over()} makes it easy to generate the window function specification.

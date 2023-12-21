@@ -1,3 +1,11 @@
+# reframe is not supported
+
+    Code
+      lazy_frame(x = 1) %>% reframe()
+    Condition
+      Error in `reframe()`:
+      ! `reframe()` is not supported on database backends.
+
 # can't refer to freshly created variables
 
     Code

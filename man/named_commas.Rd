@@ -4,10 +4,7 @@
 \alias{named_commas}
 \title{Provides comma-separated string out of the parameters}
 \usage{
-named_commas(...)
-}
-\arguments{
-\item{...}{Arguments to be constructed into the string}
+named_commas(x)
 }
 \description{
 Provides comma-separated string out of the parameters

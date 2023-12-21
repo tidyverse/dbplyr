@@ -25,3 +25,18 @@
       SELECT *
       FROM `df`
 
+# names() inform that they aren't meant to be used
+
+    Code
+      names(lazy_frame(x = 1))
+    Message
+      ! The `names()` method of <tbl_lazy> is for internal use only.
+      i Did you mean `colnames()`?
+    Output
+      [1] "lazy_query" "src"       
+
+# $ aborts when not used with src or lazy_query
+
+    The `$` method of <tbl_lazy> is for internal use only.
+    i Use `dplyr::pull()` to get the values in a column.
+

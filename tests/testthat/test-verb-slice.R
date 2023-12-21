@@ -28,6 +28,17 @@ test_that("slice_max orders in opposite order", {
   expect_snapshot(error = TRUE, db %>% slice_max(id, n = 1, na_rm = FALSE))
 })
 
+test_that("slice_* can use data masking pronouns", {
+  lf <- lazy_frame(x = c(1, 1, 2), id = c(1, 2, 3))
+  x <- -1L
+
+  expect_snapshot({
+    lf %>% slice_max(x)
+    lf %>% slice_max(.data$x)
+    lf %>% slice_max(.data$x * .env$x)
+  })
+})
+
 test_that("slice_sample errors when expected", {
   db <- memdb_frame(x = c(1, 1, 2), id = c(1, 2, 3))
 
@@ -83,5 +94,28 @@ test_that("slice_sample() works with `by`", {
   expect_identical(
     slice_sample(df, n = 2, by = g) %>% pull(g) %>% sort(),
     c(1, 2, 2)
+  )
+})
+
+test_that("slice_min/max can order by multiple columns", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot({
+    lf %>% slice_min(tibble(x))
+    lf %>% slice_min(tibble::tibble(x, y))
+    lf %>% slice_min(data.frame(y, x))
+  })
+  expect_snapshot({
+    lf %>% slice_max(tibble(x))
+    lf %>% slice_max(tibble::tibble(x, y))
+    lf %>% slice_max(data.frame(y, x))
+  })
+})
+
+test_that("slice_min/max informs if order_by uses c()", {
+  lf <- lazy_frame(x = 1, y = 1)
+
+  expect_snapshot_error(
+    lf %>% slice_min(c(x, y))
   )
 })

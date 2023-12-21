@@ -65,7 +65,7 @@ sql_query_select.Teradata <- function(con,
       lvl       = lvl + 1
     )
 
-    alias <- ident(unique_subquery_name())
+    alias <- unique_subquery_name()
     from <- sql_query_wrap(con, unlimited_query, name = alias)
     select_outer <- sql_star(con, alias)
     out <- sql_select_clauses(con,
@@ -111,9 +111,7 @@ sql_translation.Teradata <- function(con) {
                       },
       as.double     = sql_cast("NUMERIC"),
       as.character  = sql_cast("VARCHAR(MAX)"),
-      as.Date       = function(x) {
-                        glue_sql2(sql_current_con(), "DATE {.val x}")
-                      },
+      as.Date       = teradata_as_date,
       log10         = sql_prefix("LOG"),
       log           = sql_log(),
       cot           = sql_cot(),
@@ -134,7 +132,11 @@ sql_translation.Teradata <- function(con) {
                       },
       paste         = sql_paste_infix(" ", "||", function(x) sql_expr(!!x)),
       paste0        = sql_paste_infix("", "||", function(x) sql_expr(!!x)),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", empty_order = TRUE),
+
+      # lubridate ---------------------------------------------------------------
+      # https://en.wikibooks.org/wiki/SQL_Dialects_Reference/Functions_and_expressions/Date_and_time_functions
+      as_date       = teradata_as_date,
       week          = function(x){
                         sql_expr(WEEKNUMBER_OF_YEAR(!!x, 'iso'))
                       },
@@ -144,7 +146,7 @@ sql_translation.Teradata <- function(con) {
     ),
     sql_translator(.parent = base_odbc_agg,
       var           = sql_aggregate("VAR_SAMP", "var"),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", empty_order = TRUE),
       weighted.mean = function(x, w, na.rm = T) {
                         # nocov start
                         win_over(
@@ -158,7 +160,7 @@ sql_translation.Teradata <- function(con) {
     ),
     sql_translator(.parent = base_odbc_win,
       var           = win_recycled("VAR_SAMP"),
-      row_number    = win_rank_tdata("ROW_NUMBER"),
+      row_number    = win_rank("ROW_NUMBER", empty_order = TRUE),
       lead          = function(x, n = 1L, default = NA, order_by = NULL) {
                         win_over(
                           sql_expr(LEAD(!!x, !!n, !!default)),
@@ -195,8 +197,18 @@ sql_translation.Teradata <- function(con) {
 
                       }
     )
+  )
+}
 
-  )}
+teradata_as_date <- function(x) {
+  xq <- enquo(x)
+  x_expr <- quo_get_expr(xq)
+  if (is.character(x_expr) && !is.sql(x_expr)) {
+    glue_sql2(sql_current_con(), "DATE {.val x}")
+  } else {
+    sql_cast("DATE")(x)
+  }
+}
 
 #' @export
 sql_table_analyze.Teradata <- function(con, table, ...) {
@@ -209,13 +221,19 @@ utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SU
 #' @export
 #' @rdname win_over
 win_rank_tdata <- function(f) {
+  lifecycle::deprecate_soft(
+    "2.4.0",
+    what = "win_rank_tdata()",
+    with = "win_rank()"
+  )
+
   force(f)
   function(order_by = NULL) {
     order_by <- order_by %||% win_current_group()
-    if (is_empty(order_by)) order_by <- build_sql("(SELECT NULL)")
+    if (is_empty(order_by)) order_by <- sql("(SELECT NULL)")
 
     win_over(
-      build_sql(dplyr::sql(f), list()),
+      sql(glue("{f}()")),
       partition = win_current_group(),
       order = order_by,
       frame = win_current_frame()

@@ -110,6 +110,8 @@ test_that("group_by mutate is not optimised away", {
 # sql_build ---------------------------------------------------------------
 
 test_that("ungroup drops PARTITION BY", {
+  suppressWarnings(check_na_rm(FALSE))
+
   out <- lazy_frame(x = 1) %>%
     group_by(x) %>%
     ungroup() %>%

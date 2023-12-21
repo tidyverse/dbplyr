@@ -97,12 +97,29 @@ sql_translation.PqConnection <- function(con) {
       str_locate  = function(string, pattern) {
         sql_expr(strpos(!!string, !!pattern))
       },
+      # https://www.postgresql.org/docs/9.1/functions-string.html
       str_detect = function(string, pattern, negate = FALSE) {
-        if (isTRUE(negate)) {
-          sql_expr(!(!!string ~ !!pattern))
-        } else {
-          sql_expr(!!string ~ !!pattern)
-        }
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("detect"),
+          f_regex = function(string, pattern, negate = FALSE) {
+            if (isTRUE(negate)) {
+              sql_expr(!(!!string ~ !!pattern))
+            } else {
+              sql_expr(!!string ~ !!pattern)
+            }
+          }
+        )
+      },
+      str_ends = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("end")
+        )
       },
       # https://www.postgresql.org/docs/current/functions-matching.html
       str_like = function(string, pattern, ignore_case = TRUE) {
@@ -126,6 +143,14 @@ sql_translation.PqConnection <- function(con) {
       },
       str_remove_all = function(string, pattern){
         sql_expr(regexp_replace(!!string, !!pattern, '', 'g'))
+      },
+      str_starts = function(string, pattern, negate = FALSE) {
+        sql_str_pattern_switch(
+          string = string,
+          pattern = {{ pattern }},
+          negate = negate,
+          f_fixed = sql_str_detect_fixed_position("start")
+        )
       },
 
       # lubridate functions
@@ -319,10 +344,11 @@ sql_query_upsert.PqConnection <- function(con,
   parts <- rows_prep(con, table, from, by, lvl = 0)
 
   insert_cols <- c(by, update_cols)
+  select_cols <- ident(insert_cols)
   insert_cols <- escape(ident(insert_cols), collapse = ", ", parens = TRUE, con = con)
 
   update_values <- set_names(
-    sql_table_prefix(con, update_cols, ident("excluded")),
+    sql_table_prefix(con, update_cols, "excluded"),
     update_cols
   )
   update_cols <- sql_escape_ident(con, update_cols)
@@ -330,7 +356,7 @@ sql_query_upsert.PqConnection <- function(con,
   by_sql <- escape(ident(by), parens = TRUE, collapse = ", ", con = con)
   clauses <- list(
     sql_clause_insert(con, insert_cols, table),
-    sql_clause_select(con, sql("*")),
+    sql_clause_select(con, select_cols),
     sql_clause_from(parts$from),
     # `WHERE true` is required for SQLite
     sql("WHERE true"),
@@ -369,4 +395,27 @@ supports_window_clause.PostgreSQL <- function(con) {
   TRUE
 }
 
-globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))
+#' @export
+db_supports_table_alias_with_as.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+db_supports_table_alias_with_as.PostgreSQL <- function(con) {
+  TRUE
+}
+
+#' @export
+db_col_types.PqConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  res <- DBI::dbSendQuery(con, glue_sql2(con, "SELECT * FROM {.tbl table} LIMIT 0"))
+  on.exit(DBI::dbClearResult(res))
+  DBI::dbFetch(res, n = 0)
+  col_info_df <- DBI::dbColumnInfo(res)
+  set_names(col_info_df[[".typname"]], col_info_df[["name"]])
+}
+
+#' @export
+db_col_types.PostgreSQL <- db_col_types.PqConnection
+
+utils::globalVariables(c("strpos", "%::%", "%FROM%", "%ILIKE%", "DATE", "EXTRACT", "TO_CHAR", "string_agg", "%~*%", "%~%", "MONTH", "DOY", "DATE_TRUNC", "INTERVAL", "FLOOR", "WEEK"))

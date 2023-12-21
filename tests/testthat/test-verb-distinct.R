@@ -21,7 +21,7 @@ test_that("distinct for single column equivalent to local unique (#1937)", {
     expect_equal_tbls(unique(df["y"]))
 })
 
-test_that("distinct doesn't duplicate colum names if grouped (#354)", {
+test_that("distinct doesn't duplicate column names if grouped (#354)", {
   df <- lazy_frame(a = 1)
   expect_equal(df %>% group_by(a) %>% distinct() %>% op_vars(), "a")
 })
@@ -115,9 +115,7 @@ test_that("distinct() produces optimized SQL", {
   expect_true(out$lazy_query$distinct)
   expect_equal(out$lazy_query$select$name, "y")
   expect_equal(out$lazy_query$select$expr, syms("y"))
-  # TODO probably `where` should be in the same query but this requires an
-  # optimized `mutate()` resp. `add_select`
-  # expect_equal(out$lazy_query$where, syms("y"))
+  expect_equal(out$lazy_query$where, list(quo(x == 1L)), ignore_formula_env = TRUE)
 
   # Note: currently this needs `distinct()` or `distinct(x, y)` because
   # `summarise()` + `select()` is not inlined.
@@ -195,6 +193,11 @@ test_that("distinct respects window_order when .keep_all is TRUE", {
       window_order(desc(y)) %>%
       distinct(x, .keep_all = TRUE)
   )
+})
+
+test_that("distinct uses dummy window order when .keep_all is TRUE and no order is used", {
+  lf <- lazy_frame(x = 1, y = 2)
+  expect_snapshot(lf %>% distinct(x, .keep_all = TRUE))
 })
 
 # sql_build ---------------------------------------------------------------

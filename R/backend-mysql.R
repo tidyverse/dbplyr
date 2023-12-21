@@ -24,7 +24,11 @@ NULL
 
 #' @export
 #' @rdname backend-mysql
-simulate_mysql <- function() simulate_dbi("MariaDBConnection")
+simulate_mysql <- function() simulate_dbi("MySQLConnection")
+
+#' @export
+#' @rdname backend-mysql
+simulate_mariadb <- function() simulate_dbi("MariaDBConnection")
 
 #' @export
 dbplyr_edition.MariaDBConnection <- function(con) {
@@ -49,6 +53,17 @@ db_connection_describe.MariaDBConnection <- function(con, ...) {
 db_connection_describe.MySQL <- db_connection_describe.MariaDBConnection
 #' @export
 db_connection_describe.MySQLConnection <- db_connection_describe.MariaDBConnection
+
+#' @export
+db_col_types.MariaDBConnection <- function(con, table, call) {
+  table <- as_table_ident(table, error_call = call)
+  col_info_df <- DBI::dbGetQuery(con, glue_sql2(con, "SHOW COLUMNS FROM {.tbl table};"))
+  set_names(col_info_df[["Type"]], col_info_df[["Field"]])
+}
+#' @export
+db_col_types.MySQL <- db_col_types.MariaDBConnection
+#' @export
+db_col_types.MySQLConnection <- db_col_types.MariaDBConnection
 
 #' @export
 sql_translation.MariaDBConnection <- function(con) {
@@ -118,9 +133,24 @@ sql_translation.MariaDBConnection <- function(con) {
 }
 
 #' @export
-sql_translation.MySQL <- sql_translation.MariaDBConnection
+sql_translation.MySQL <- function(con) {
+  maria <- unclass(sql_translation.MariaDBConnection())
+  sql_variant(
+    sql_translator(.parent = maria$scalar,
+      # MySQL doesn't support casting to INTEGER or BIGINT.
+      as.integer = function(x) {
+        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
+      },
+      as.integer64 = function(x) {
+        sql_expr(TRUNCATE(CAST(!!x %AS% DOUBLE), 0L))
+      },
+    ),
+    maria$aggregate,
+    maria$window
+  )
+}
 #' @export
-sql_translation.MySQLConnection <- sql_translation.MariaDBConnection
+sql_translation.MySQLConnection <- sql_translation.MySQL
 
 #' @export
 sql_table_analyze.MariaDBConnection <- function(con, table, ...) {
@@ -181,6 +211,10 @@ sql_query_update_from.MariaDBConnection <- function(con,
                                                     update_values,
                                                     ...,
                                                     returning_cols = NULL) {
+  if (!is_empty(returning_cols)) {
+    check_unsupported_arg(returning_cols, backend = "MariaDB")
+  }
+
   # https://stackoverflow.com/a/19346375/946850
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols <- sql_table_prefix(con, names(update_values), table)
@@ -198,6 +232,23 @@ sql_query_update_from.MariaDBConnection <- function(con,
 sql_query_update_from.MySQLConnection <- sql_query_update_from.MariaDBConnection
 #' @export
 sql_query_update_from.MySQL <- sql_query_update_from.MariaDBConnection
+
+
+#' @export
+sql_query_upsert.MariaDBConnection <- function(con,
+                                               table,
+                                               from,
+                                               by,
+                                               update_cols,
+                                               ...,
+                                               returning_cols = NULL,
+                                               method = NULL) {
+  cli_abort("{.fun rows_upsert} is not supported for MariaDB.")
+}
+#' @export
+sql_query_upsert.MySQLConnection <- sql_query_upsert.MariaDBConnection
+#' @export
+sql_query_upsert.MySQL <- sql_query_upsert.MariaDBConnection
 
 #' @export
 sql_escape_datetime.MariaDBConnection <- function(con, x) {
@@ -221,4 +272,4 @@ supports_window_clause.MySQLConnection <- supports_window_clause.MariaDBConnecti
 #' @export
 supports_window_clause.MySQL <- supports_window_clause.MariaDBConnection
 
-globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%"))
+utils::globalVariables(c("%separator%", "group_concat", "IF", "REGEXP_INSTR", "RAND", "%LIKE BINARY%", "TRUNCATE", "DOUBLE"))

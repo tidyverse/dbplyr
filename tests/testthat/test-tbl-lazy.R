@@ -40,3 +40,14 @@ test_that("base source of tbl_lazy is always 'df'", {
   out <- lazy_frame(x = 1, y = 5) %>% sql_build()
   expect_equal(out, base_query(ident("df")))
 })
+
+test_that("names() inform that they aren't meant to be used", {
+  expect_snapshot(names(lazy_frame(x = 1)))
+})
+
+test_that("$ aborts when not used with src or lazy_query", {
+  lf <- lazy_frame(x = 1)
+  expect_no_error(lf$src)
+  expect_no_error(lf$lazy_query)
+  expect_snapshot_error(lf$x)
+})

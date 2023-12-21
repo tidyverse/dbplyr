@@ -21,14 +21,13 @@ test_that("two filters equivalent to one", {
   expect_equal(lf1 %>% remote_query(), lf2 %>% remote_query())
   expect_snapshot(lf1 %>% remote_query())
 
-  unique_subquery_name_reset()
   df1 <- mf %>% filter(mean(x, na.rm = TRUE) > 3) %>% filter(y < 3)
-  unique_subquery_name_reset()
   df2 <- mf %>% filter(mean(x, na.rm = TRUE) > 3, y < 3)
   compare_tbl(df1, df2)
 
+  unique_column_name_reset()
   lf1 <- lf %>% filter(mean(x, na.rm = TRUE) > 3) %>% filter(y < 3)
-  unique_subquery_name_reset()
+  unique_column_name_reset()
   lf2 <- lf %>% filter(mean(x, na.rm = TRUE) > 3, y < 3)
   expect_equal(lf1 %>% remote_query(), lf2 %>% remote_query())
   expect_snapshot(lf1 %>% remote_query())
@@ -152,6 +151,7 @@ test_that("filter isn't inlined after mutate with window function #1135", {
 # .by -------------------------------------------------------------------------
 
 test_that("can group transiently using `.by`", {
+  suppressWarnings(check_na_rm(FALSE))
   df <- memdb_frame(g = c(1, 1, 2, 1, 2), x = c(5, 10, 1, 2, 3))
 
   out <- filter(df, x > mean(x), .by = g) %>%
@@ -380,7 +380,7 @@ test_that("generates correct lazy_select_query", {
     lazy_select_query(
       x = out$x,
       select = syms(set_names(colnames(lf))),
-      where = list(expr(q01 > 1))
+      where = list(expr(col01 > 1))
     ),
     ignore_formula_env = TRUE
   )
@@ -390,7 +390,7 @@ test_that("generates correct lazy_select_query", {
     lazy_select_query(
       x = lf$lazy_query,
       select_operation = "mutate",
-      select = list(x = sym("x"), y = sym("y"), q01 = quo(mean(x, na.rm = TRUE)))
+      select = list(x = sym("x"), y = sym("y"), col01 = quo(mean(x, na.rm = TRUE)))
     ),
     ignore_formula_env = TRUE
   )

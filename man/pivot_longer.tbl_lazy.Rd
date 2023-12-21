@@ -60,7 +60,7 @@ in the \code{value_to} column.}
 \description{
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and
 decreasing the number of columns. The inverse transformation is
-`tidyr::pivot_wider()]
+\code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}}.
 
 Learn more in \code{vignette("pivot", "tidyr")}.
 
@@ -80,7 +80,7 @@ The SQL translation basically works as follows:
 \enumerate{
 \item split the specification by its key columns i.e. by variables crammed
 into the column names.
-\item for each part in the splitted specification \code{transmute()} \code{data} into the
+\item for each part in the split specification \code{transmute()} \code{data} into the
 following columns
 }
 \itemize{

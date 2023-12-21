@@ -84,8 +84,8 @@ window_frame <- function(.data, from = -Inf, to = Inf) {
     )
   }
 
-  check_number_whole_inf(from)
-  check_number_whole_inf(to)
+  check_number_whole(from, allow_infinite = TRUE)
+  check_number_whole(to, allow_infinite = TRUE)
 
   .data$lazy_query$frame <- list(range = c(from, to))
   .data
@@ -99,26 +99,12 @@ check_frame <- function(frame, call = caller_env()) {
   check_frame_range(frame$range)
 }
 
-check_number_whole_inf <- function(x,
-                                   allow_null = FALSE,
-                                   arg = caller_arg(x),
-                                   call = caller_env()) {
-  .rlang_types_check_number(
-    x,
-    allow_decimal = FALSE,
-    allow_infinite = TRUE,
-    allow_null = allow_null,
-    arg = arg,
-    call = call
-  )
-}
-
 check_frame_range <- function(range, call = caller_env()) {
   if (is.null(range)) {
     return()
   }
 
   vctrs::vec_assert(range, size = 2L, arg = "frame", call = call)
-  check_number_whole_inf(range[1], arg = "frame", call = call)
-  check_number_whole_inf(range[2], arg = "frame", call = call)
+  check_number_whole(range[1], allow_infinite = TRUE, arg = "frame", call = call)
+  check_number_whole(range[2], allow_infinite = TRUE, arg = "frame", call = call)
 }

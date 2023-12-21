@@ -6,7 +6,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      FETCH FIRST 6 ROWS ONLY
+      WHERE (ROWNUM <= 6)
 
 # `sql_query_upsert()` is correct
 
@@ -20,9 +20,9 @@
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
       ) `...y`
-        ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
+        ON (`...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`)
       WHEN MATCHED THEN
-        UPDATE SET `c` = `excluded`.`c`, `d` = `excluded`.`d`
+        UPDATE SET `c` = `...y`.`c`, `d` = `...y`.`d`
       WHEN NOT MATCHED THEN
         INSERT (`a`, `b`, `c`, `d`)
         VALUES (`...y`.`a`, `...y`.`b`, `...y`.`c`, `...y`.`d`)
@@ -41,8 +41,8 @@
     Code
       sql_query_explain(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo;
-      SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));
+      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo
+      <SQL> SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())
 
 ---
 
@@ -51,8 +51,8 @@
     Output
       <SQL>
       SELECT `df_LHS`.`x` AS `x`
-      FROM `df` AS `df_LHS`
-      LEFT JOIN `df` AS `df_RHS`
+      FROM `df` `df_LHS`
+      LEFT JOIN `df` `df_RHS`
         ON (decode(`df_LHS`.`x`, `df_RHS`.`x`, 0, 1) = 0)
 
 ---
@@ -80,10 +80,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY DBMS_RANDOM.VALUE()) AS `col01`
         FROM `df`
       ) `q01`
-      WHERE (`q01` <= 1)
+      WHERE (`col01` <= 1)
 
 # copy_inline uses UNION ALL
 

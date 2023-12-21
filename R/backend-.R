@@ -8,8 +8,10 @@
 #' @include escape.R
 #' @include sql.R
 #' @include utils.R
-#' @include compat-obj-type.R
-#' @include compat-types-check.R
+#' @include import-standalone-obj-type.R
+#' @include import-standalone-types-check.R
+#' @include utils-check.R
+#' @include db-sql.R
 NULL
 
 #' @export
@@ -67,7 +69,7 @@ base_scalar <- sql_translator(
       glue_sql2(sql_current_con(), "{x}.{.col i}")
     } else if (is.numeric(i)) {
       i <- as.integer(i)
-      glue_sql2(sql_current_con(), "{x}[{i}]")
+      glue_sql2(sql_current_con(), "{x}[{.val i}]")
     } else {
       cli_abort("Can only index with strings and numbers")
     }
@@ -138,7 +140,9 @@ base_scalar <- sql_translator(
     }
   },
   log10   = sql_prefix("LOG10", 1),
-  round   = sql_prefix("ROUND", 2),
+  round = function(x, digits = 0L) {
+    sql_expr(ROUND(!!x, !!as.integer(digits)))
+  },
   sign    = sql_prefix("SIGN", 1),
   sin     = sql_prefix("SIN", 1),
   sqrt    = sql_prefix("SQRT", 1),
@@ -149,10 +153,6 @@ base_scalar <- sql_translator(
   sinh     = function(x) sql_expr((!!sql_exp(1, x) - !!sql_exp(-1, x)) / 2L),
   tanh     = function(x) sql_expr((!!sql_exp(2, x) - 1L) / (!!sql_exp(2, x) + 1L)),
   coth     = function(x) sql_expr((!!sql_exp(2, x) + 1L) / (!!sql_exp(2, x) - 1L)),
-
-  round = function(x, digits = 0L) {
-    sql_expr(ROUND(!!x, !!as.integer(digits)))
-  },
 
   `if` = function(cond, if_true, if_false = NULL) {
     sql_if(enquo(cond), enquo(if_true), enquo(if_false))
@@ -247,10 +247,10 @@ base_scalar <- sql_translator(
   nzchar = function(x, keepNA = FALSE) {
     if (keepNA) {
       exp <- expr(!!x != "")
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     } else {
       exp <- expr((is.na(!!x) | !!x != ""))
-      translate_sql(!!exp)
+      translate_sql(!!exp, con = sql_current_con())
     }
   },
   tolower = sql_prefix("LOWER", 1),
@@ -283,8 +283,28 @@ base_scalar <- sql_translator(
 
   str_conv = sql_not_supported("str_conv"),
   str_count = sql_not_supported("str_count"),
-  str_detect = sql_not_supported("str_detect"),
+
+  fixed = function(pattern, ignore_case = FALSE) {
+    check_unsupported_arg(ignore_case, allowed = FALSE)
+    pattern
+  },
+  str_detect = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("detect")
+    )
+  },
   str_dup = sql_not_supported("str_dup"),
+  str_ends = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("end")
+    )
+  },
   str_extract = sql_not_supported("str_extract"),
   str_extract_all = sql_not_supported("str_extract_all"),
   str_flatten = sql_not_supported("str_flatten"),
@@ -306,6 +326,14 @@ base_scalar <- sql_translator(
   str_split = sql_not_supported("str_split"),
   str_split_fixed = sql_not_supported("str_split_fixed"),
   str_squish = sql_not_supported("str_squish"),
+  str_starts = function(string, pattern, negate = FALSE) {
+    sql_str_pattern_switch(
+      string = string,
+      pattern = {{ pattern }},
+      negate = negate,
+      f_fixed = sql_str_detect_fixed_instr("start")
+    )
+  },
   str_subset = sql_not_supported("str_subset"),
   str_trunc = sql_not_supported("str_trunc"),
   str_view = sql_not_supported("str_view"),
@@ -418,7 +446,7 @@ base_win <- sql_translator(
 
   lead = function(x, n = 1L, default = NA, order_by = NULL) {
     win_over(
-      sql_expr(LEAD(!!x, !!n, !!default)),
+      sql_expr(LEAD(!!x, !!as.integer(n), !!default)),
       win_current_group(),
       order_by %||% win_current_order(),
       win_current_frame()

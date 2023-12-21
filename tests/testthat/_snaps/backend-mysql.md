@@ -39,10 +39,10 @@
       <SQL>
       SELECT `x`
       FROM (
-        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `q01`
+        SELECT `df`.*, ROW_NUMBER() OVER (ORDER BY RAND()) AS `col01`
         FROM `df`
-      ) `q01`
-      WHERE (`q01` <= 1)
+      ) AS `q01`
+      WHERE (`col01` <= 1)
 
 ---
 
@@ -57,14 +57,14 @@
         UNION ALL
       
         VALUES (1, 'a'), (2, 'b')
-      ) `values_table`
+      ) AS `values_table`
 
 ---
 
     Code
       copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
     Output
-      <SQL> SELECT CAST(`x` AS INTEGER) AS `x`, CAST(`y` AS CHAR) AS `y`
+      <SQL> SELECT TRUNCATE(CAST(`x` AS DOUBLE), 0) AS `x`, CAST(`y` AS CHAR) AS `y`
       FROM (
         SELECT NULL AS `x`, NULL AS `y`
         WHERE (0 = 1)
@@ -72,23 +72,26 @@
         UNION ALL
       
         VALUES ROW(1, 'a'), ROW(2, 'b')
-      ) `values_table`
+      ) AS `values_table`
 
 # `sql_query_update_from()` is correct
 
     Code
       sql_query_update_from(con = con, table = ident("df_x"), from = sql_render(df_y,
         con, lvl = 1), by = c("a", "b"), update_values = sql(c = "COALESCE(`df_x`.`c`, `...y`.`c`)",
-        d = "`...y`.`d`"), returning_cols = c("a", b2 = "b"))
+        d = "`...y`.`d`"))
     Output
       <SQL> UPDATE `df_x`
       INNER JOIN (
         SELECT `a`, `b`, `c` + 1.0 AS `c`, `d`
         FROM `df_y`
-      ) `...y`
+      ) AS `...y`
         ON `...y`.`a` = `df_x`.`a` AND `...y`.`b` = `df_x`.`b`
       SET `df_x`.`c` = COALESCE(`df_x`.`c`, `...y`.`c`), `df_x`.`d` = `...y`.`d`
-      RETURNING `df_x`.`a`, `df_x`.`b` AS `b2`
+
+---
+
+    Argument `returning_cols` isn't supported in MariaDB translation.
 
 # can explain
 

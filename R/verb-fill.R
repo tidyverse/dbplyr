@@ -70,18 +70,6 @@ fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "do
   )
 }
 
-swap_order_direction <- function(x) {
-  if (is_quosure(x)) {
-    x <- quo_get_expr(x)
-  }
-
-  if (is_call(x, "desc", n = 1)) {
-    call_args(x)[[1]]
-  } else {
-    expr(desc(!!x))
-  }
-}
-
 dbplyr_fill0 <- function(.con, .data, cols_to_fill, order_by_cols, .direction) {
   UseMethod("dbplyr_fill0")
 }
@@ -148,7 +136,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
   #
   # strategy:
   # for each column to fill:
-  # 1. generate a helper column `....dbplyr_partion_x`. It creates one partition
+  # 1. generate a helper column `....dbplyr_partition_x`. It creates one partition
   #    per non-NA value and all following NA (in the order of `order_by_cols`),
   #    i.e. each partition has exactly one non-NA value and any number of NA.
   # 2. use the non-NA value in each partition (`max()` is just the simplest
@@ -163,7 +151,7 @@ dbplyr_fill0.SQLiteConnection <- function(.con,
       vars_group = op_grps(.data),
     )
   ) %>%
-    set_names(paste0("..dbplyr_partion_", seq_along(cols_to_fill)))
+    set_names(paste0("..dbplyr_partition_", seq_along(cols_to_fill)))
 
   dp <- .data %>%
     mutate(!!!partition_sql)

@@ -8,7 +8,7 @@
       FROM (
         SELECT DISTINCT `df`.*
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # can use window function after summarise and pure projection #1104
 
@@ -21,7 +21,7 @@
         SELECT `g`
         FROM `df`
         GROUP BY `g`
-      ) `q01`
+      ) AS `q01`
 
 # can refer to fresly created values
 
@@ -48,7 +48,7 @@
       FROM (
         SELECT `x` / 2.0 AS `x`, `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # across() does not select grouping variables
 
@@ -77,9 +77,9 @@
       FROM (
         SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
-# across() uses original column rather than overriden one
+# across() uses original column rather than overridden one
 
     Code
       lf %>% mutate(x = -x, across(everything(), ~ .x / x), y = y + x)
@@ -91,8 +91,8 @@
         FROM (
           SELECT -`x` AS `x`, `y`, `z`
           FROM `df`
-        ) `q01`
-      ) `q01`
+        ) AS `q01`
+      ) AS `q01`
 
 # new columns take precedence over global variables
 
@@ -103,7 +103,7 @@
       FROM (
         SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # mutate() produces nice error messages
 
@@ -182,7 +182,7 @@
       FROM (
         SELECT 2.0 AS `x`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 
 # var = NULL when var is in final output
 
@@ -201,5 +201,5 @@
       FROM (
         SELECT `df`.*, 2.0 AS `y`
         FROM `df`
-      ) `q01`
+      ) AS `q01`
 

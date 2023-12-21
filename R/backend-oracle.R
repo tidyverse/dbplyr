@@ -48,6 +48,11 @@ sql_query_select.Oracle <- function(con,
                                     subquery = FALSE,
                                     lvl = 0) {
 
+  if (!is.null(limit)) {
+    limit <- as.integer(limit)
+    where = c(paste0("ROWNUM <= ", limit), where)
+  }
+
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),
@@ -56,11 +61,6 @@ sql_query_select.Oracle <- function(con,
     having    = sql_clause_having(having),
     window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
-    # Requires Oracle 12c, released in 2013
-    limit =   if (!is.null(limit)) {
-      limit <- as.integer(limit)
-      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
-    },
     lvl = lvl
   )
 }
@@ -83,17 +83,17 @@ sql_query_upsert.Oracle <- function(con,
   # https://oracle-base.com/articles/9i/merge-statement
   parts <- rows_prep(con, table, from, by, lvl = 0)
   update_cols_esc <- sql(sql_escape_ident(con, update_cols))
-  update_values <- sql_table_prefix(con, update_cols, ident("excluded"))
+  update_values <- sql_table_prefix(con, update_cols, ident("...y"))
   update_clause <- sql(paste0(update_cols_esc, " = ", update_values))
 
   insert_cols <- c(by, update_cols)
   insert_cols_esc <- escape(ident(insert_cols), parens = FALSE, con = con)
-  insert_values <- sql_table_prefix(con, insert_cols, ident("...y"))
+  insert_values <- sql_table_prefix(con, insert_cols, "...y")
 
   clauses <- list(
     sql_clause("MERGE INTO", table),
     sql_clause("USING", parts$from),
-    sql_clause_on(parts$where, lvl = 1),
+    sql_clause_on(parts$where, lvl = 1, parens = TRUE),
     sql("WHEN MATCHED THEN"),
     sql_clause("UPDATE SET", update_clause, lvl = 1),
     sql("WHEN NOT MATCHED THEN"),
@@ -115,7 +115,7 @@ sql_translation.Oracle <- function(con) {
       # https://stackoverflow.com/questions/1171196
       as.character  = sql_cast("VARCHAR2(255)"),
       # https://oracle-base.com/articles/misc/oracle-dates-timestamps-and-intervals
-      as.Date = function(x) glue_sql2(sql_current_con(), "DATE {x}"),
+      as.Date = function(x) glue_sql2(sql_current_con(), "DATE {.val x}"),
       # bit64::as.integer64 can translate to BIGINT for some
       # vendors, which is equivalent to NUMBER(19) in Oracle
       # https://docs.oracle.com/cd/B19306_01/gateways.102/b14270/apa.htm
@@ -144,10 +144,11 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  glue_sql2(
-    con,
-    "EXPLAIN PLAN FOR {.sql sql};\n",
-    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
+
+  # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
+  c(
+    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
+    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
@@ -160,7 +161,7 @@ sql_table_analyze.Oracle <- function(con, table, ...) {
 #' @export
 sql_query_save.Oracle <- function(con, sql, name, temporary = TRUE, ...) {
   type <- if (temporary)  "GLOBAL TEMPORARY " else ""
-  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{.sql sql}")
+  glue_sql2(con, "CREATE {type}TABLE {.tbl name} AS\n{sql}")
 }
 
 #' @export
@@ -182,6 +183,22 @@ sql_expr_matches.Oracle <- function(con, x, y, ...) {
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
 }
 
+#' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  sql <- sql_query_explain(con, sql, ...)
+
+  msg <- "Can't explain query."
+  db_execute(con, sql[[1]], msg) # EXPLAIN PLAN
+  expl <- db_get_query(con, sql[[2]], msg) # DBMS_XPLAN.DISPLAY
+
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
+}
+
+#' @export
+db_supports_table_alias_with_as.Oracle <- function(con) {
+  FALSE
+}
 
 # roacle package ----------------------------------------------------------
 
@@ -215,4 +232,10 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
 
-globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
+#' @export
+db_explain.OraConnection <- db_explain.Oracle
+
+#' @export
+db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
+
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))

@@ -53,7 +53,7 @@ sql_clause_select <- function(con,
     con,
     "SELECT",
     if (distinct) " DISTINCT",
-    if (!is.null(top)) " TOP {top}"
+    if (!is.null(top)) " TOP {.val top}"
   )
 
   sql_clause(clause, select)
@@ -125,8 +125,8 @@ sql_clause_insert <- function(con, cols, into = NULL, lvl = 0) {
   }
 }
 
-sql_clause_on <- function(on, lvl = 0) {
-  sql_clause("ON", on, sep = " AND", lvl = lvl)
+sql_clause_on <- function(on, lvl = 0, parens = FALSE) {
+  sql_clause("ON", on, sep = " AND", parens = parens, lvl = lvl)
 }
 
 sql_clause_where_exists <- function(table, where, not) {
@@ -137,6 +137,12 @@ sql_clause_where_exists <- function(table, where, not) {
     sql_clause_where(where, lvl = 1),
     sql(")")
   )
+}
+
+#' @export
+print.sql_clause <- function(x, ...) {
+  out <- sql_format_clause(x, lvl = 0, con = simulate_dbi())
+  cat("<sql clause>", out)
 }
 
 # helpers -----------------------------------------------------------------

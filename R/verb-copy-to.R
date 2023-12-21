@@ -62,7 +62,7 @@ copy_to.src_sql <- function(dest,
     cli_abort("{.var df} must be a local dataframe or a remote tbl_sql")
   }
 
-  name <- as.sql(name, con = dest$con)
+  name <- as_table_ident(name)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
     out <- compute(df,
@@ -165,13 +165,18 @@ lazy_values_query <- function(df, types) {
 }
 
 #' @export
-sql_build.lazy_values_query <- function(op, con, ..., use_star = TRUE) {
+sql_build.lazy_values_query <- function(op, con, ..., sql_options = NULL) {
   class(op) <- c("values_query", "query")
   op
 }
 
 #' @export
-sql_render.values_query <- function(query, con = query$src$con, ..., subquery = FALSE, lvl = 0, cte = FALSE) {
+sql_render.values_query <- function(query,
+                                    con = query$src$con,
+                                    ...,
+                                    sql_options = NULL,
+                                    subquery = FALSE,
+                                    lvl = 0) {
   sql_values_subquery(con, query$x, types = query$col_types, lvl = lvl)
 }
 
@@ -434,4 +439,4 @@ sql_cast_dispatch.integer64 <- function(x) {
   expr(as.integer64)
 }
 
-globalVariables(c("as.integer64"))
+utils::globalVariables(c("as.integer64"))

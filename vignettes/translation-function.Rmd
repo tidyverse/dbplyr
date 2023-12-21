@@ -7,28 +7,33 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r}
+#| label = "setup",
+#| include = FALSE
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
 There are two parts to dbplyr SQL translation: translating dplyr verbs, and translating expressions within those verbs. This vignette describes how individual expressions (function calls) are translated; `vignette("translation-verb")` describes how entire verbs are translated.
 
-```{r, message = FALSE}
+```{r}
+#| message = FALSE
 library(dbplyr)
 library(dplyr)
+
+con <- simulate_dbi()
 ```
 
 `dbplyr::translate_sql()` powers translation of individual function calls, and I'll use it extensively in this vignette to show what's happening. You shouldn't need to use it ordinary code as dbplyr takes care of the translation automatically.
 
 ```{r}
-translate_sql((x + y) / 2)
+translate_sql((x + y) / 2, con = con)
 ```
 
 `translate_sql()` takes an optional `con` parameter. If not supplied, this causes dplyr to generate (approximately) SQL-92 compliant SQL. If supplied, dplyr uses `sql_translation()` to look up a custom environment which makes it possible for different databases to generate slightly different SQL: see `vignette("new-backend")` for more details.  You can use the various simulate helpers to see the translations used by different backends:
 
 ```{r}
-translate_sql(x ^ 2L)
+translate_sql(x ^ 2L, con = con)
 translate_sql(x ^ 2L, con = simulate_sqlite())
 translate_sql(x ^ 2L, con = simulate_access())
 ```
@@ -45,24 +50,24 @@ The following examples work through some of the basic differences between R and 
 
     ```{r}
     # In SQLite variable names are escaped by double quotes:
-    translate_sql(x)
+    translate_sql(x, con = con)
     # And strings are escaped by single quotes
-    translate_sql("x")
+    translate_sql("x", con = con)
     ```
     
 *   And some functions have different argument orders:
     
     ```{r}
-    translate_sql(substr(x, 5, 10))
-    translate_sql(log(x, 10))
+    translate_sql(substr(x, 5, 10), con = con)
+    translate_sql(log(x, 10), con = con)
     ```
 
 *   R and SQL have different defaults for integers and reals. 
     In R, 1 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a real
     
     ```{r}
-    translate_sql(1)
-    translate_sql(1L)
+    translate_sql(1, con = con)
+    translate_sql(1L, con = con)
     ```
 
 ## Known functions
@@ -102,14 +107,14 @@ dbplyr no longer translates `%/%` because there's no robust cross-database trans
 All database provide translation for the basic aggregations: `mean()`, `sum()`, `min()`, `max()`, `sd()`, `var()`. Databases automatically drop NULLs (their equivalent of missing values) whereas in R you have to ask nicely. The aggregation functions warn you about this important difference:
 
 ```{r}
-translate_sql(mean(x))
-translate_sql(mean(x, na.rm = TRUE))
+translate_sql(mean(x), con = con)
+translate_sql(mean(x, na.rm = TRUE), con = con)
 ```
 
 Note that, by default, `translate()` assumes that the call is inside a `mutate()` or `filter()` and generates a window translation. If you want to see the equivalent `summarise()`/aggregation translation, use `window = FALSE`:
 
 ```{r}
-translate_sql(mean(x, na.rm = TRUE), window = FALSE)
+translate_sql(mean(x, na.rm = TRUE), window = FALSE, con = con)
 ```
 
 ### Conditional evaluation
@@ -117,8 +122,8 @@ translate_sql(mean(x, na.rm = TRUE), window = FALSE)
 `if` and `switch()` are translate to `CASE WHEN`:
 
 ```{r}
-translate_sql(if (x > 5) "big" else "small")
-translate_sql(switch(x, a = 1L, b = 2L, 3L))
+translate_sql(if (x > 5) "big" else "small", con = con)
+translate_sql(switch(x, a = 1L, b = 2L, 3L), con = con)
 ```
   
 ### String manipulation
@@ -137,13 +142,13 @@ Any function that dplyr doesn't know how to convert is left as is. This means th
 Any function that dbplyr doesn't know about will be left as is:
 
 ```{r}
-translate_sql(foofify(x, y))
+translate_sql(foofify(x, y), con = con)
 ```
 
 Because SQL functions are general case insensitive, I recommend using upper case when you're using SQL functions in R code. That makes it easier to spot that you're doing something unusual:
 
 ```{r}
-translate_sql(FOOFIFY(x, y))
+translate_sql(FOOFIFY(x, y), con = con)
 ```
 
 ### Infix functions
@@ -151,13 +156,13 @@ translate_sql(FOOFIFY(x, y))
 As well as prefix functions (where the name of the function comes before the arguments), dbplyr also translates infix functions. That allows you to use expressions like `LIKE` which does a limited form of pattern matching:
 
 ```{r}
-translate_sql(x %LIKE% "%foo%")
+translate_sql(x %LIKE% "%foo%", con = con)
 ```
 
 Or use `||` for string concatenation (although most backends will translate `paste()` and `paste0()` for you):
 
 ```{r}
-translate_sql(x %||% y)
+translate_sql(x %||% y, con = con)
 ```
 
 ### Special forms
@@ -165,8 +170,8 @@ translate_sql(x %||% y)
 SQL functions tend to have a greater variety of syntax than R. That means there are a number of expressions that can't be translated directly from R code. To insert these in your own queries, you can use literal SQL inside `sql()`:
 
 ```{r}
-translate_sql(sql("x!"))
-translate_sql(x == sql("ANY VALUES(1, 2, 3)"))
+translate_sql(sql("x!"), con = con)
+translate_sql(x == sql("ANY VALUES(1, 2, 3)"), con = con)
 ```
 
 This gives you a lot of freedom to generate the SQL you need: 
@@ -187,9 +192,10 @@ mf %>%
 
 If needed, you can also force dbplyr to error if it doesn't know how to translate a function with the `dplyr.strict_sql` option:
 
-```{r, error = TRUE}
+```{r}
+#| error = TRUE
 options(dplyr.strict_sql = TRUE)
-translate_sql(glob(x, y))
+translate_sql(glob(x, y), con = con)
 ```
 
 ## Window functions
@@ -224,7 +230,18 @@ Things get a little trickier with window functions, because SQL's window functio
   following"). The complete set of options is comprehensive, but fairly 
   confusing, and is summarised visually below.
 
-    ```{r echo = FALSE, out.width = "100%"}
+    ```{r}
+    #| echo: false
+    #| out-width: 100%
+    #| fig-alt: >
+    #|   A visual summary of the frame clause using the real line labelled
+    #|   with negative infinity, -3, -2, -1, 0, 1, 2, 3, infinity. The most
+    #|   important clauses are rolling, cumulative, and recycling. 
+    #|   Rolling, e.g. between 1 preceding and 1, following, run from 
+    #|   -1 to -1. Cumulative, between unbounded preceding and 
+    #|   current row, runs from negative infinity to 0. Recycled, 
+    #|   between unbound preceeding and unbound following, runs from 
+    #|   negative infinity to positive infinity.
     knitr::include_graphics("windows.png", dpi = 300)
     ```
 
@@ -243,17 +260,17 @@ Things get a little trickier with window functions, because SQL's window functio
 To see how individual window functions are translated to SQL, we can again use `translate_sql()`:
 
 ```{r}
-translate_sql(mean(G))
-translate_sql(rank(G))
-translate_sql(ntile(G, 2))
-translate_sql(lag(G))
+translate_sql(mean(G), con = con)
+translate_sql(rank(G), con = con)
+translate_sql(ntile(G, 2), con = con)
+translate_sql(lag(G), con = con)
 ```
 
 If the tbl has been grouped or arranged previously in the pipeline, then dplyr will use that information to set the "partition by" and "order by" clauses. For interactive exploration, you can achieve the same effect by setting the `vars_group` and `vars_order` arguments to `translate_sql()`
 
 ```{r}
-translate_sql(cummean(G), vars_order = "year")
-translate_sql(rank(), vars_group = "ID")
+translate_sql(cummean(G), vars_order = "year", con = con)
+translate_sql(rank(), vars_group = "ID", con = con)
 ```
 
 There are some challenges when translating window functions between R and SQL, because dplyr tries to keep the window functions as similar as possible to both the existing R analogues and to the SQL functions. This means that there are three ways to control the order clause depending on which window function you're using:
@@ -271,7 +288,8 @@ There are some challenges when translating window functions between R and SQL, b
 
 The three options are illustrated in the snippet below:
 
-```{r, eval = FALSE}
+```{r}
+#| eval = FALSE
 mutate(players,
   min_rank(yearID),
   order_by(yearID, cumsum(G)),

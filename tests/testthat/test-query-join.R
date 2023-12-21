@@ -58,7 +58,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
         table = c(1L, 1L, 2L)
       ),
       table_vars = list(left = c("x", "a"), right = c("x", "b")),
-      use_star = TRUE
+      use_star = TRUE,
+      qualify_all_columns = FALSE
     ),
     sql("`left`.*", b = "`b`")
   )
@@ -77,7 +78,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
       ),
       x_as = ident("left"),
       y_as = ident("right"),
-      use_star = TRUE
+      use_star = TRUE,
+      qualify_all_columns = FALSE
     ),
     sql(
       x = "COALESCE(`left`.`x`, `right`.`x`)",
@@ -101,7 +103,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
       ),
       x_as = ident("left"),
       y_as = ident("right"),
-      use_star = TRUE
+      use_star = TRUE,
+      qualify_all_columns = FALSE
     ),
     sql(
       a = "COALESCE(`left`.`a`, `right`.`a`)",
