@@ -1,3 +1,14 @@
+# string functions translate correctly
+
+    Code
+      test_translate_sql(str_replace(col, "pattern", "replacement"))
+    Output
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement', 1, 1)
+    Code
+      test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+    Output
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement')
+
 # queries translate correctly
 
     Code
@@ -41,8 +52,8 @@
     Code
       sql_query_explain(con, sql("SELECT * FROM foo"))
     Output
-      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo;
-      SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));
+      <SQL> EXPLAIN PLAN FOR SELECT * FROM foo
+      <SQL> SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())
 
 ---
 

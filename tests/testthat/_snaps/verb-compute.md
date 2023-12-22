@@ -20,10 +20,13 @@
     Code
       df %>% compute(name = in_schema("main", "db1"), temporary = FALSE)
     Condition
-      Error in `db_save_query.DBIConnection()`:
+      Error in `db_compute()`:
+      ! Can't copy query to table `main`.`db1`.
+      Caused by error in `db_save_query.DBIConnection()`:
       ! Can't save query to table `main`.`db1`.
+      i Using SQL: CREATE TABLE `main`.`db1` AS SELECT * FROM `dbplyr_{tmp}`
       Caused by error:
-      ! table `db1` already exists
+      ! dummy DBI error
 
 # collect() handles DBI error
 

@@ -360,7 +360,7 @@ select_wider_id_cols <- function(data,
     return(names(sim_data))
   }
 
-  try_fetch(
+  withCallingHandlers(
     id_cols <- tidyselect::eval_select(
       enquo(id_cols),
       sim_data,

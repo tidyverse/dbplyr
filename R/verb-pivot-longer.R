@@ -3,7 +3,7 @@
 #' @description
 #' `pivot_longer()` "lengthens" data, increasing the number of rows and
 #' decreasing the number of columns. The inverse transformation is
-#' `tidyr::pivot_wider()]
+#' [tidyr::pivot_wider()].
 #'
 #' Learn more in `vignette("pivot", "tidyr")`.
 #'

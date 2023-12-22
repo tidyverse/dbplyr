@@ -1,4 +1,5 @@
 test_that("2nd edition uses sql methods", {
+  reset_warning_verbosity("Test-edition")
   local_methods(
     db_analyze.Test = function(con, ...) abort("db_method")
   )
@@ -21,6 +22,7 @@ test_that("sql_query_rows() works", {
 })
 
 test_that("handles DBI error", {
+  unique_subquery_name_reset()
   con <- local_sqlite_connection()
 
   expect_snapshot({
