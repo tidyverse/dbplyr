@@ -74,7 +74,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>Allow additional arguments to be passed from <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute()</a></code> all the way to <code><a href="../reference/db-sql.html">sql_query_save()</a></code>-method (<a href="https://github.com/rsund" class="external-link">@rsund</a>).</p></li>
+<ul><li><p>Oracle: Added support for <code>str_replace()</code> and <code>str_replace_all()</code> via <code>REGEXP_REPLACE()</code> (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1402" class="external-link">#1402</a>).</p></li>
+<li><p>Allow additional arguments to be passed from <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute()</a></code> all the way to <code><a href="../reference/db-sql.html">sql_query_save()</a></code>-method (<a href="https://github.com/rsund" class="external-link">@rsund</a>).</p></li>
 <li><p>The class of remote sources now includes all S4 class names, not just the first (<a href="https://github.com/tidyverse/dbplyr/issues/918" class="external-link">#918</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_explain()</a></code> now works for Oracle (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1353" class="external-link">#1353</a>).</p></li>
 <li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
