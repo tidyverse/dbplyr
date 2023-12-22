@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
-* Oracle (@thomashulst, #1402)
-  * Added support for `str_replace()` and `str_replace_all()` via `REGEXP_REPLACE()`
+* Oracle: Added support for `str_replace()` and `str_replace_all()` via
+  `REGEXP_REPLACE()` (@thomashulst, #1402).
 
 * Allow additional arguments to be passed from `compute()` all the way to 
   `sql_query_save()`-method (@rsund).
