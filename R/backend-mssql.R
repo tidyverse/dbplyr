@@ -589,4 +589,40 @@ mssql_bit_int_bit <- function(f) {
   dplyr::if_else(x, "1", "0", "NULL")
 }
 
+#' @export
+`db_sql_render.Microsoft SQL Server` <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
+  # Post-process WHERE to cast logicals from BIT to BOOLEAN
+  sql$lazy_query <- purrr::modify_tree(
+    sql$lazy_query,
+    is_node = function(x) inherits(x, "lazy_query"),
+    post = mssql_update_where_clause
+  )
+
+  NextMethod()
+}
+
+mssql_update_where_clause <- function(qry) {
+  if (!has_name(qry, "where")) {
+    return(qry)
+  }
+
+  qry$where <- lapply(
+    qry$where, 
+    function(x) set_expr(x, bit_to_boolean(get_expr(x)))
+  )
+  qry
+}
+
+bit_to_boolean <- function(x_expr) {
+  if (is_atomic(x_expr) || is_symbol(x_expr)) {
+    expr(cast(!!x_expr %AS% BIT) == 1L)
+  } else if (is_call(x_expr, c("|", "&", "||", "&&", "!", "("))) {
+    idx <- seq2(2, length(x_expr))
+    x_expr[idx] <- lapply(x_expr[idx], bit_to_boolean)
+    x_expr
+  } else {
+    x_expr
+  }
+}
+
 utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%"))

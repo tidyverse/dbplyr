@@ -322,6 +322,20 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("atoms and symbols are cast to bit in `filter`", {
+  mf <- lazy_frame(x = TRUE, con = simulate_mssql())
+
+  # as simple symbol and atom
+  expect_snapshot(mf %>% filter(x))
+  expect_snapshot(mf %>% filter(TRUE))
+
+  # when involved in a (perhaps nested) logical expression
+  expect_snapshot(mf %>% filter((!x) | FALSE))
+
+  # in a subquery
+  expect_snapshot(mf %>% filter(x) %>% inner_join(mf, by = "x"))
+})
+
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
   expect_snapshot(mf %>% mutate(rown = row_number()))
