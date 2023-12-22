@@ -20,8 +20,8 @@ test_that("paste and paste0 translate correctly", {
 test_that("string functions translate correctly", {
   lf <- lazy_frame(x = "yy", con = simulate_oracle())
 
-  expect_snapshot(lf |> mutate(x = str_replace(x,"y","z")))
-  expect_snapshot(lf |> mutate(x = str_replace_all(x,"y","z")))
+  expect_snapshot(lf %>% mutate(x = str_replace(x,"y","z")))
+  expect_snapshot(lf %>% mutate(x = str_replace_all(x,"y","z")))
 })
 
 test_that("queries translate correctly", {
