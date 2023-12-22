@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `db_sql_render()` correctly passes on `...` when re-calling with 
+  `sql_options` set (#1394).
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 
