@@ -14,7 +14,7 @@
 # $ doesn't evaluate second argument
 
     Code
-      filter(lazy_frame(x = 1, y = 1), x == y$id)
+      lazy_frame(x = 1, y = 1) %>% filter(x == y$id)
     Output
       <SQL>
       SELECT `df`.*
@@ -24,7 +24,7 @@
 ---
 
     Code
-      filter(lazy_frame(x = 1), x == y$id)
+      lazy_frame(x = 1) %>% filter(x == y$id)
     Condition
       Error in `filter()`:
       i In argument: `x == y$id`
