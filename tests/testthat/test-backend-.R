@@ -80,8 +80,8 @@ test_that("can translate subsetting", {
 test_that("$ doesn't evaluate second argument", {
   y <- list(id = 1)
 
-  expect_snapshot(lazy_frame(x = 1, y = 1) |> filter(x == y$id))  
-  expect_snapshot(lazy_frame(x = 1) |> filter(x == y$id), error = TRUE)
+  expect_snapshot(lazy_frame(x = 1, y = 1) %>% filter(x == y$id))
+  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
 })
 
 
