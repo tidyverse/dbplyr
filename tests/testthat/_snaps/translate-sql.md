@@ -18,20 +18,32 @@
     Condition
       Error:
       ! There is no package called NOSUCHPACKAGE
-
----
-
     Code
       test_translate_sql(dbplyr::NOSUCHFUNCTION())
     Condition
       Error:
       ! "NOSUCHFUNCTION" is not an exported object from dbplyr
+    Code
+      test_translate_sql(base::abbreviate(x))
+    Condition
+      Error in `base::abbreviate()`:
+      ! No known translation
 
 ---
 
     Code
-      test_translate_sql(base::abbreviate(x))
+      lz %>% mutate(x = NOSUCHPACKAGE::foo())
     Condition
       Error:
-      ! No known translation for `base::abbreviate()`
+      ! There is no package called NOSUCHPACKAGE
+    Code
+      lz %>% mutate(x = dbplyr::NOSUCHFUNCTION())
+    Condition
+      Error:
+      ! "NOSUCHFUNCTION" is not an exported object from dbplyr
+    Code
+      lz %>% mutate(x = base::abbreviate(x))
+    Condition
+      Error in `base::abbreviate()`:
+      ! No known translation
 

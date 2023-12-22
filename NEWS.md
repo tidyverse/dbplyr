@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Namespaced dplyr calls now error if the function doesn't exist, or 
+  a translation is not available (#1426).
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 
