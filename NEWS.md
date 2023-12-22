@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Oracle (@thomashulst, #1402)
+  * Added support for `str_replace()` and `str_replace_all()` via `REGEXP_REPLACE()`
+
 * Functions qualified with the base namespace are now also translated, e.g.
   `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
 

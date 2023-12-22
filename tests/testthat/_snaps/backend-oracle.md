@@ -1,3 +1,21 @@
+# string functions translate correctly
+
+    Code
+      mutate(lf, x = str_replace(x, "y", "z"))
+    Output
+      <SQL>
+      SELECT REGEXP_REPLACE(`x`, 'y', 'z', 1, 1) AS `x`
+      FROM `df`
+
+---
+
+    Code
+      mutate(lf, x = str_replace_all(x, "y", "z"))
+    Output
+      <SQL>
+      SELECT REGEXP_REPLACE(`x`, 'y', 'z') AS `x`
+      FROM `df`
+
 # queries translate correctly
 
     Code
