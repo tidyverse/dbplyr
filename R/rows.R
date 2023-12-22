@@ -759,25 +759,15 @@ rows_auto_copy <- function(x, y, copy, call = caller_env()) {
 }
 
 rows_get_or_execute <- function(x, sql, returning_cols, call = caller_env()) {
+  error <- "Can't modify database table {.val {remote_name(x)}}."
   con <- remote_con(x)
-  withCallingHandlers(
-    {
-      if (is_empty(returning_cols)) {
-        DBI::dbExecute(con, sql, immediate = TRUE)
-      } else {
-        returned_rows <- DBI::dbGetQuery(con, sql, immediate = TRUE)
-        x <- set_returned_rows(x, returned_rows)
-      }
-    },
-    error = function(cnd) {
-      cli_abort(
-        "Can't modify database table {.val {remote_name(x)}}.",
-        parent = cnd,
-        call = call
-      )
-    }
-  )
 
+  if (is_empty(returning_cols)) {
+    db_execute(con, sql, error, call = call)
+  } else {
+    returned_rows <- db_get_query(con, sql, error, call = call)
+    x <- set_returned_rows(x, returned_rows)
+  }
 
   invisible(x)
 }

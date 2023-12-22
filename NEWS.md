@@ -3,6 +3,24 @@
 * Oracle (@thomashulst, #1402)
   * Added support for `str_replace()` and `str_replace_all()` via `REGEXP_REPLACE()`
 
+* Allow additional arguments to be passed from `compute()` all the way to 
+  `sql_query_save()`-method (@rsund).
+
+* The class of remote sources now includes all S4 class names, not just
+  the first (#918).
+
+* `db_explain()` now works for Oracle (@thomashulst, #1353).
+
+* Database errors now show the generated SQL, which hopefully will make it
+  faster to track down problems (#1401).
+
+* Snowflake (@nathanhaigh, #1406)
+  * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
+  * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports
+    regular expressions.
+  * Refactored `grepl()` to use `REGEXP_INSTR()` so now supports
+    case-insensitive matching through `grepl(..., ignore.case = TRUE)`
+
 * Functions qualified with the base namespace are now also translated, e.g.
   `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
 
