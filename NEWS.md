@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `-1 + x` is now translated correctly (#1420).
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 
