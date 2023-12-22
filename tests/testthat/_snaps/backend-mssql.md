@@ -15,6 +15,14 @@
       i Use a combination of `distinct()` and `mutate()` for the same result:
         `mutate(<col> = median(x, na.rm = TRUE)) %>% distinct(<col>)`
 
+# custom window functions translated correctly
+
+    Code
+      test_translate_sql(n_distinct(x), vars_group = "x")
+    Condition
+      Error in `n_distinct()`:
+      ! No translation available in `mutate()`/`filter()` for SQL server.
+
 # custom lubridate functions translated correctly
 
     Code

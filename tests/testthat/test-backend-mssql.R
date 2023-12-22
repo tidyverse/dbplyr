@@ -101,6 +101,11 @@ test_that("custom window functions translated correctly", {
     test_translate_sql(any(x, na.rm = TRUE)),
     sql("CAST(MAX(CAST(`x` AS INT)) OVER () AS BIT)")
   )
+
+  expect_snapshot(
+    test_translate_sql(n_distinct(x), vars_group = "x"),
+    error = TRUE
+  )
 })
 
 test_that("custom lubridate functions translated correctly", {

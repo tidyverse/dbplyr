@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
+  or `filter()` (#1366).
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 
