@@ -18,10 +18,12 @@ test_that("paste and paste0 translate correctly", {
 
 
 test_that("string functions translate correctly", {
-  lf <- lazy_frame(x = "yy", con = simulate_oracle())
+  local_con(simulate_oracle())
 
-  expect_snapshot(lf %>% mutate(x = str_replace(x,"y","z")))
-  expect_snapshot(lf %>% mutate(x = str_replace_all(x,"y","z")))
+  expect_snapshot({
+    test_translate_sql(str_replace(col, "pattern", "replacement"))
+    test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+  })
 })
 
 test_that("queries translate correctly", {

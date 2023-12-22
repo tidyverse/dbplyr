@@ -1,20 +1,13 @@
 # string functions translate correctly
 
     Code
-      lf %>% mutate(x = str_replace(x, "y", "z"))
+      test_translate_sql(str_replace(col, "pattern", "replacement"))
     Output
-      <SQL>
-      SELECT REGEXP_REPLACE(`x`, 'y', 'z', 1, 1) AS `x`
-      FROM `df`
-
----
-
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement', 1, 1)
     Code
-      lf %>% mutate(x = str_replace_all(x, "y", "z"))
+      test_translate_sql(str_replace_all(col, "pattern", "replacement"))
     Output
-      <SQL>
-      SELECT REGEXP_REPLACE(`x`, 'y', 'z') AS `x`
-      FROM `df`
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement')
 
 # queries translate correctly
 
