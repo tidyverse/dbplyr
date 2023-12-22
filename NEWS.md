@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* Clearer error if you attempt to embed a list inside of a generated 
+  query (#1368).
+  
+* `x$name` never attempts to evaluate `name` (#1368).
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 

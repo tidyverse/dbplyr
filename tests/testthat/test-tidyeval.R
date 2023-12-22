@@ -21,6 +21,22 @@ test_that("existing non-variables get inlined", {
   expect_equal(capture_dot(lf, x + n), expr(x + 10))
 })
 
+test_that("unless they're reactive objects, data.frames, or lists", {
+  lf <- lazy_frame(a = 1)
+
+  input <- structure(list(), class = "reactivevalues")
+  x <- structure(function() "y", class = "reactive")
+  l <- list()
+  df <- data.frame(x = 1)
+
+  expect_snapshot({
+    lf %>% filter(a == input$x)
+    lf %>% filter(a == x())
+    lf %>% filter(a == df$foo)
+    lf %>% filter(a == l$foo)
+  }, error = TRUE)
+})
+
 test_that("using environment of inlined quosures", {
   lf <- lazy_frame(x = 1:10, y = 1:10)
 

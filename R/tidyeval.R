@@ -153,7 +153,16 @@ partial_eval_sym <- function(sym, data, env) {
   if (name %in% vars) {
     sym
   } else if (env_has(env, name, inherit = TRUE)) {
-    eval_bare(sym, env)
+    val <- eval_bare(sym, env)
+    if (inherits(val, "data.frame")) {
+      error_embed("a data.frame", paste0(name, "$x"))
+    } else if (inherits(val, "reactivevalues")) {
+      error_embed("shiny inputs", paste0(name, "$x"))
+    } else if (is_bare_list(val)) {
+      error_embed("a list", name)
+    } else {
+      val
+    }
   } else {
     cli::cli_abort(
       "Object {.var {name}} not found.",
@@ -221,6 +230,10 @@ partial_eval_call <- function(call, data, env) {
       eval_bare(call[[2]], env)
     } else if (name == "remote") {
       call[[2]]
+    } else if (name == "$") {
+      # Only the 1st argument is evaluated
+      call[[2]] <- partial_eval(call[[2]], data = data, env = env)
+      call
     } else {
       call[-1] <- lapply(call[-1], partial_eval, data = data, env = env)
       call

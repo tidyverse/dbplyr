@@ -108,15 +108,6 @@ test_that("factors are translated", {
 
 # Helpful errors --------------------------------------------------------
 
-test_that("shiny objects give useful errors", {
-  lf <- lazy_frame(a = 1)
-  input <- structure(list(), class = "reactivevalues")
-  x <- structure(function() "y", class = "reactive")
-
-  expect_snapshot(error = TRUE, lf %>% filter(a == input$x) %>% show_query())
-  expect_snapshot(error = TRUE, lf %>% filter(a == x()) %>% show_query())
-})
-
 test_that("con must not be NULL", {
   expect_snapshot(error = TRUE, escape("a"))
   expect_snapshot(error = TRUE, sql_vector("a"))

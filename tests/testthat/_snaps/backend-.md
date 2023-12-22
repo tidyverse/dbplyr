@@ -11,6 +11,27 @@
       Error in `a[[TRUE]]`:
       ! Can only index with strings and numbers
 
+# $ doesn't evaluate second argument
+
+    Code
+      filter(lazy_frame(x = 1, y = 1), x == y$id)
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE (`x` = `y`.`id`)
+
+---
+
+    Code
+      filter(lazy_frame(x = 1), x == y$id)
+    Condition
+      Error in `filter()`:
+      i In argument: `x == y$id`
+      Caused by error:
+      ! Cannot translate a list to SQL.
+      i Do you want to force evaluation in R with (e.g.) `!!y` or `local(y)`?
+
 # can translate case insensitive like
 
     Code
