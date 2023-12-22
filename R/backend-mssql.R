@@ -591,7 +591,7 @@ mssql_bit_int_bit <- function(f) {
 
 #' @export
 `db_sql_render.Microsoft SQL Server` <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
-
+  # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
     is_node = function(x) inherits(x, "lazy_query"),
@@ -606,23 +606,19 @@ mssql_update_where_clause <- function(qry) {
     return(qry)
   }
 
-  # Post-process where statement to ensure we cast BIT to BOOLEAN
-  transform_expr <- function(x) {
-    set_expr(x, bit_to_boolean(get_expr(x)))
-  }
-
-  qry$where <- lapply(qry$where, transform_expr)
+  qry$where <- lapply(
+    qry$where, 
+    function(x) set_expr(x, bit_to_boolean(get_expr(x)))
+  )
   qry
 }
 
 bit_to_boolean <- function(x_expr) {
-  needs_logicals <- c("|", "&", "||", "&&", "!", "(")
-
   if (is_atomic(x_expr) || is_symbol(x_expr)) {
     expr(cast(!!x_expr %AS% BIT) == 1L)
-  } else if (is_call(x_expr, needs_logicals)) {
-    args <- as.list(x_expr[2:length(x_expr)])
-    x_expr[2:length(x_expr)] <- lapply(args, bit_to_boolean)
+  } else if (is_call(x_expr, c("|", "&", "||", "&&", "!", "("))) {
+    idx <- seq2(2, length(x_expr))
+    x_expr[idx] <- lapply(x_expr[idx], bit_to_boolean)
     x_expr
   } else {
     x_expr
