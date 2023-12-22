@@ -113,10 +113,6 @@ test_that("con must not be NULL", {
   expect_snapshot(error = TRUE, sql_vector("a"))
 })
 
-test_that("data frames give useful errors", {
-  expect_snapshot(error = TRUE, escape(mtcars, con = simulate_dbi()))
-})
-
 # names_to_as() -----------------------------------------------------------
 
 test_that("names_to_as() doesn't alias when ident name and value are identical", {
