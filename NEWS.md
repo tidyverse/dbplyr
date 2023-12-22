@@ -1,5 +1,11 @@
 # dbplyr (development version)
 
+* Oracle: Added support for `str_replace()` and `str_replace_all()` via
+  `REGEXP_REPLACE()` (@thomashulst, #1402).
+
+* Allow additional arguments to be passed from `compute()` all the way to 
+  `sql_query_save()`-method (@rsund).
+
 * The class of remote sources now includes all S4 class names, not just
   the first (#918).
 
