@@ -1,3 +1,14 @@
+# string functions translate correctly
+
+    Code
+      test_translate_sql(str_replace(col, "pattern", "replacement"))
+    Output
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement', 1, 1)
+    Code
+      test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+    Output
+      <SQL> REGEXP_REPLACE(`col`, 'pattern', 'replacement')
+
 # queries translate correctly
 
     Code

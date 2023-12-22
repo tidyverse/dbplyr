@@ -16,6 +16,16 @@ test_that("paste and paste0 translate correctly", {
   expect_equal(test_translate_sql(str_c(x, y)), sql("`x` || `y`"))
 })
 
+
+test_that("string functions translate correctly", {
+  local_con(simulate_oracle())
+
+  expect_snapshot({
+    test_translate_sql(str_replace(col, "pattern", "replacement"))
+    test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+  })
+})
+
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
   expect_snapshot(mf %>% head())
