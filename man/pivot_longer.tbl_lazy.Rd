@@ -60,7 +60,7 @@ in the \code{value_to} column.}
 \description{
 \code{pivot_longer()} "lengthens" data, increasing the number of rows and
 decreasing the number of columns. The inverse transformation is
-`tidyr::pivot_wider()]
+\code{\link[tidyr:pivot_wider]{tidyr::pivot_wider()}}.
 
 Learn more in \code{vignette("pivot", "tidyr")}.
 

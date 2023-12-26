@@ -182,7 +182,7 @@ with_indexed_errors <- function(expr,
                                 ...,
                                 .error_call = caller_env(),
                                 .frame = caller_env()) {
-  try_fetch(
+  withCallingHandlers(
     expr,
     purrr_error_indexed = function(cnd) {
       message <- message(cnd)
