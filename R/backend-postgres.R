@@ -239,11 +239,23 @@ sql_translation.PqConnection <- function(con) {
       # clock ---------------------------------------------------------------
       add_days = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + !!n%*INTERVAL%'1 day'))
+        glue_sql2(sql_current_con(), "({.col x} + {.val n}*INTERVAL'1 day')")
       },
       add_years = function(x, n, ...) {
         check_dots_empty()
-        sql_expr((!!x + !!n%*INTERVAL%'1 year'))
+        glue_sql2(sql_current_con(), "({.col x} + {.val n}*INTERVAL'1 year')")
+      },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        sql_expr(make_date(!!year, !!month, !!day))
+      },
+      get_year = function(x) {
+        sql_expr(date_part('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(date_part('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(date_part('day', !!x))
       },
 
       difftime = function(time1, time2, tz, units = "days") {

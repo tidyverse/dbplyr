@@ -90,9 +90,14 @@ test_that("custom lubridate functions translated correctly", {
 
 test_that("custom clock functions translated correctly", {
   local_con(simulate_postgres())
-  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + 1.0 *INTERVAL '1 year')"))
-  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + 1.0 *INTERVAL '1 day')"))
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + 1.0*INTERVAL'1 year')"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + 1.0*INTERVAL'1 day')"))
   expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("MAKE_DATE(2020.0, 1.0, 1.0)"))
+  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("MAKE_DATE(`year_column`, 1, 1)"))
+  expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
+  expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
+  expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
 })
 
 test_that("difftime is translated correctly", {
