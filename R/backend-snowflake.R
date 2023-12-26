@@ -219,6 +219,19 @@ sql_translation.Snowflake <- function(con) {
         check_dots_empty()
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        # https://docs.snowflake.com/en/sql-reference/functions/date_from_parts
+        sql_expr(DATE_FROM_PARTS(!!year, !!month, !!day))
+      },
+      get_year = function(x) {
+        sql_expr(DATE_PART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATE_PART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATE_PART('day', !!x))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
 
