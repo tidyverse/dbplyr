@@ -71,6 +71,18 @@ sql_translation.RedshiftConnection <- function(con) {
         check_dots_empty()
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')")
+      },
+      get_year = function(x) {
+        sql_expr(DATE_PART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATE_PART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATE_PART('day', !!x))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
 
