@@ -360,6 +360,18 @@ simulate_mssql <- function(version = "15.0") {
         check_dots_empty()
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        sql_expr(DATEFROMPARTS(!!year, !!month, !!day))
+      },
+      get_year = function(x) {
+        sql_expr(DATEPART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATEPART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATEPART('day', !!x))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
 
@@ -630,7 +642,7 @@ mssql_update_where_clause <- function(qry) {
   }
 
   qry$where <- lapply(
-    qry$where, 
+    qry$where,
     function(x) set_expr(x, bit_to_boolean(get_expr(x)))
   )
   qry
