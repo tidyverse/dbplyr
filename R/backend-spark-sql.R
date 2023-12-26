@@ -46,6 +46,18 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
          check_dots_empty()
          sql_expr(add_months(!!!x, !!n*12))
        },
+       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+         sql_expr(make_date(!!year, !!month, !!day))
+       },
+       get_year = function(x) {
+         sql_expr(date_part('YEAR', !!x))
+       },
+       get_month = function(x) {
+         sql_expr(date_part('MONTH', !!x))
+       },
+       get_day = function(x) {
+         sql_expr(date_part('DAY', !!x))
+       },
 
        difftime = function(time1, time2, tz, units = "days") {
 
