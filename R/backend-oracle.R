@@ -145,7 +145,31 @@ sql_translation.Oracle <- function(con) {
 
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
-      now = function() sql_expr(CURRENT_TIMESTAMP)
+      now = function() sql_expr(CURRENT_TIMESTAMP),
+
+      # clock ------------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + NUMTODSINTERVAL(!!n, 'day')))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + NUMTODSINTERVAL(!!n * 365.25, 'day')))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr(CEIL(CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+      }
+
     ),
     base_odbc_agg,
     base_odbc_win

@@ -2,6 +2,13 @@
 
 * `-1 + x` is now translated correctly (#1420).
 
+* SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
+  or `filter()` (#1366).
+
+* Add translations for clock functions `add_years()`, `add_days()`, 
+  `date_build()`, `get_year()`, `get_month()`, `get_day()`, 
+  and `base::difftime()` on SQL server, Redshift, Snowflake, and Postgres.
+
 * SQL server: `filter()` does a better job of converting logical vectors 
   from bit to boolean (@ejneer, #1288). 
 
