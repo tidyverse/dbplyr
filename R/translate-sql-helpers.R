@@ -175,10 +175,11 @@ sql_infix <- function(f, pad = TRUE) {
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
   is_infix <- is_call(xq, infix_calls, n = 2)
-  is_unary_minus <- escape_unary_minus && is_call(xq, "-", n = 1)
+  is_unary_minus <- escape_unary_minus && 
+    is_call(xq, "-", n = 1) && !is_atomic(x, n = 1)
 
   if (is_infix || is_unary_minus) {
-    enpared <- glue_sql2(sql_current_con(), "({x})")
+    enpared <- glue_sql2(sql_current_con(), "({.val x})")
     return(enpared)
   }
 
