@@ -129,6 +129,27 @@ test_that("custom lubridate functions translated correctly", {
   expect_error(test_translate_sql(quarter(x, fiscal_start = 5)))
 })
 
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_mssql())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATEFROMPARTS(2020.0, 1.0, 1.0)"))
+  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATEFROMPARTS(`year_column`, 1, 1)"))
+  expect_equal(test_translate_sql(get_year(date_column)), sql("DATEPART('year', `date_column`)"))
+  expect_equal(test_translate_sql(get_month(date_column)), sql("DATEPART('month', `date_column`)"))
+  expect_equal(test_translate_sql(get_day(date_column)), sql("DATEPART('day', `date_column`)"))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_mssql())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+})
+
 test_that("last_value_sql() translated correctly", {
   con <- simulate_mssql()
   expect_equal(
