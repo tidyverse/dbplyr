@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `-1 + x` is now translated correctly (#1420).
+
 * SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
   or `filter()` (#1366).
 
