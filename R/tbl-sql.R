@@ -14,7 +14,7 @@
 #'   multiple `tbl` objects.
 #' @param check_from Check if `from` is likely misspecified SQL or a table in a schema.
 tbl_sql <- function(subclass, src, from, ..., vars = NULL, check_from = TRUE) {
-  check_dots_used()
+  # Can't use check_dots_used(), #1429
   check_character(vars, allow_null = TRUE)
 
   from <- as_from(from)

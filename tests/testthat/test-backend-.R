@@ -39,6 +39,7 @@ test_that("unary plus works for non-numeric expressions", {
 test_that("unary minus flips sign of number", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(-10L), sql("-10"))
+  expect_equal(test_translate_sql(-10L + x), sql("-10 + `x`"))
   expect_equal(test_translate_sql(x == -10), sql('`x` = -10.0'))
   expect_equal(test_translate_sql(x %in% c(-1L, 0L)), sql('`x` IN (-1, 0)'))
 })

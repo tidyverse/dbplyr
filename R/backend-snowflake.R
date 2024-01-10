@@ -210,6 +210,41 @@ sql_translation.Snowflake <- function(con) {
         )
         sql_expr(DATE_TRUNC(!!unit, !!x))
       },
+      # clock ---------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(DAY, !!n, !!x))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(YEAR, !!n, !!x))
+      },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        # https://docs.snowflake.com/en/sql-reference/functions/date_from_parts
+        sql_expr(DATE_FROM_PARTS(!!year, !!month, !!day))
+      },
+      get_year = function(x) {
+        sql_expr(DATE_PART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATE_PART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATE_PART('day', !!x))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr(DATEDIFF(day, !!time1, !!time2))
+      },
       # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
       # https://docs.snowflake.com/en/sql-reference/functions/greatest
