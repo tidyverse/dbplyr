@@ -60,20 +60,20 @@ sql_join_suffix.DBIConnection <- function(con, suffix, ...) {
 db_sql_render <- function(con, sql, ..., cte = FALSE, sql_options = NULL) {
   check_bool(cte)
   if (cte) {
-  lifecycle::deprecate_soft(
+    lifecycle::deprecate_soft(
       when = "2.4.0",
       what = "db_sql_render(cte)",
       with = I("db_sql_render(sql_options = sql_options(cte = TRUE))")
     )
     sql_options <- sql_options %||% sql_options(cte = TRUE)
-    out <- db_sql_render(con, sql, sql_options = sql_options)
+    out <- db_sql_render(con, sql, ..., sql_options = sql_options)
     return(out)
   }
 
   if (is.null(sql_options)) {
     sql_options <- sql_options()
 
-    out <- db_sql_render(con, sql, sql_options = sql_options)
+    out <- db_sql_render(con, sql, ..., sql_options = sql_options)
     return(out)
   }
 

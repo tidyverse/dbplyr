@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `db_sql_render()` correctly passes on `...` when re-calling with 
+  `sql_options` set (#1394).
+
 * `-1 + x` is now translated correctly (#1420).
 
 * SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
