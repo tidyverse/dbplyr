@@ -66,7 +66,7 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
     data <- lazy_frame(!!!rep_named(data, list(logical())))
   }
 
-  if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
+  if (is_sql_literal(call)) {
     call
   } else if (is_symbol(call)) {
     partial_eval_sym(call, data, env)
@@ -87,6 +87,10 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
   } else {
     cli_abort("Unknown input type: {typeof(call)}")
   }
+}
+
+is_sql_literal <- function(x) {
+  is_atomic(x) || is_null(x) || blob::is_blob(x)
 }
 
 capture_dot <- function(.data, x) {
@@ -154,14 +158,18 @@ partial_eval_sym <- function(sym, data, env) {
     sym
   } else if (env_has(env, name, inherit = TRUE)) {
     val <- eval_bare(sym, env)
+
+    # Handle common failure modes
     if (inherits(val, "data.frame")) {
       error_embed("a data.frame", paste0(name, "$x"))
     } else if (inherits(val, "reactivevalues")) {
       error_embed("shiny inputs", paste0(name, "$x"))
-    } else if (is_bare_list(val)) {
-      error_embed("a list", name)
+    }
+
+    if (is_sql_literal(val)) {
+      unname(val)
     } else {
-      val
+      error_embed(obj_type_friendly(val), name)
     }
   } else {
     cli::cli_abort(

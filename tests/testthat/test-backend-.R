@@ -84,6 +84,10 @@ test_that("$ doesn't evaluate second argument", {
   expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
 })
 
+test_that("useful error if $ used with inlined value", {
+  y <- 1
+  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
+})
 
 # window ------------------------------------------------------------------
 

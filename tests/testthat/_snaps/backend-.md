@@ -32,6 +32,14 @@
       ! Cannot translate a list to SQL.
       i Do you want to force evaluation in R with (e.g.) `!!y` or `local(y)`?
 
+# useful error if $ used with inlined value
+
+    Code
+      lazy_frame(x = 1) %>% filter(x == y$id)
+    Condition
+      Error in `1$id`:
+      ! `$` can only subset database columns, not inlined values.
+
 # can translate case insensitive like
 
     Code

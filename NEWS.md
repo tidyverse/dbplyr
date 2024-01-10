@@ -1,6 +1,6 @@
 # dbplyr (development version)
 
-* Clearer error if you attempt to embed a list inside of a generated 
+* Clearer error if you attempt to embed non-atomic vectors inside of a generated 
   query (#1368).
   
 * `x$name` never attempts to evaluate `name` (#1368).

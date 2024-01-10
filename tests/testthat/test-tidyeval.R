@@ -14,14 +14,14 @@ test_that("simple expressions left as is", {
   expect_equal(capture_dot(lf, FALSE), FALSE)
 })
 
-test_that("existing non-variables get inlined", {
+test_that("existing atomic non-variables get inlined", {
   lf <- lazy_frame(x = 1:10, y = 1:10)
 
   n <- 10
   expect_equal(capture_dot(lf, x + n), expr(x + 10))
 })
 
-test_that("unless they're reactive objects, data.frames, or lists", {
+test_that("other objects get informative error", {
   lf <- lazy_frame(a = 1)
 
   input <- structure(list(), class = "reactivevalues")
@@ -30,11 +30,19 @@ test_that("unless they're reactive objects, data.frames, or lists", {
   df <- data.frame(x = 1)
 
   expect_snapshot({
-    lf %>% filter(a == input$x)
-    lf %>% filter(a == x())
-    lf %>% filter(a == df$foo)
-    lf %>% filter(a == l$foo)
+    capture_dot(lf, input)
+    capture_dot(lf, x())
+    capture_dot(lf, df)
+    capture_dot(lf, l)
+    capture_dot(lf, mean)
   }, error = TRUE)
+})
+
+test_that("names are stripped", {
+  lf <- lazy_frame(x = "a")
+  y <- c(x = "a", "b")
+
+  expect_equal(partial_eval(quote(x %in% y), lf), expr(x %in% !!c("a", "b")))
 })
 
 test_that("using environment of inlined quosures", {
