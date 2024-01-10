@@ -350,6 +350,41 @@ simulate_mssql <- function(version = "15.0") {
           sql_expr(DATEPART(QUARTER, !!x))
         }
       },
+
+      # clock ---------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(DAY, !!n, !!x))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(YEAR, !!n, !!x))
+      },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        sql_expr(DATEFROMPARTS(!!year, !!month, !!day))
+      },
+      get_year = function(x) {
+        sql_expr(DATEPART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATEPART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATEPART('day', !!x))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr(DATEDIFF(day, !!time1, !!time2))
+      }
     )
 
   if (mssql_version(con) >= "11.0") { # MSSQL 2012
@@ -434,7 +469,13 @@ simulate_mssql <- function(version = "15.0") {
       },
       all = mssql_bit_int_bit(win_aggregate("MIN")),
       any = mssql_bit_int_bit(win_aggregate("MAX")),
-      row_number = win_rank("ROW_NUMBER", empty_order = TRUE)
+      row_number = win_rank("ROW_NUMBER", empty_order = TRUE),
+
+      n_distinct = function(x) {
+        cli_abort(
+          "No translation available in `mutate()`/`filter()` for SQL server."
+        )
+      }
     )
 
   )}
@@ -607,7 +648,7 @@ mssql_update_where_clause <- function(qry) {
   }
 
   qry$where <- lapply(
-    qry$where, 
+    qry$where,
     function(x) set_expr(x, bit_to_boolean(get_expr(x)))
   )
   qry
