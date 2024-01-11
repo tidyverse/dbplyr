@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The databricks backend now supports creating non-temporary tables too (#1418).
+
 * Namespaced dplyr calls now error if the function doesn't exist, or 
   a translation is not available (#1426).
 
