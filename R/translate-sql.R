@@ -185,7 +185,7 @@ sql_data_mask <- function(expr,
     if (env_has(special_calls2, name) || env_has(special_calls, name)) {
       env_get(special_calls2, name, inherit = TRUE)
     } else {
-      cli_abort("No known translation for {.fun {pkg}::{name}}")
+      cli_abort("No known translation", call = call2(call2("::", sym(pkg), sym(name))))
     }
   }
 
