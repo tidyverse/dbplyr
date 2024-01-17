@@ -230,7 +230,7 @@ partial_eval_call <- function(call, data, env) {
       eval_bare(call[[2]], env)
     } else if (is_call(call, "remote")) {
       call[[2]]
-    } else if (name == "$") {
+    } else if (is_call(call, "$")) {
       # Only the 1st argument is evaluated
       call[[2]] <- partial_eval(call[[2]], data = data, env = env)
       call
