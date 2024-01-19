@@ -21,7 +21,7 @@ Depends:
 Imports: 
     blob (>= 1.2.0),
     cli (>= 3.6.1),
-    DBI (>= 1.1.3),
+    DBI (>= 1.2.1),
     dplyr (>= 1.1.2),
     glue (>= 1.6.2),
     lifecycle (>= 1.0.3),
