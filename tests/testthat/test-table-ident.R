@@ -106,6 +106,11 @@ test_that("as_table_ident works", {
     new_table_ident(catalog = "catalog", schema = "schema", table = "table")
   )
 
+  expect_equal(
+    as_table_ident(DBI::Id("catalog", "schema", "table")),
+    new_table_ident(catalog = "catalog", schema = "schema", table = "table")
+  )
+
   table <- new_table_ident(table = "table")
   expect_equal(
     as_table_ident(table),

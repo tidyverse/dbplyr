@@ -119,22 +119,8 @@ as_table_ident.dbplyr_catalog <- function(x, ..., error_call = caller_env()) {
 
 #' @export
 as_table_ident.Id <- function(x, ..., error_call = caller_env()) {
-  id <- x@name
-  nms <- names(id)
-  known_names <- c("catalog", "schema", "table")
-  unknown_names <- setdiff(nms, known_names)
-  if (!is_empty(unknown_names)) {
-    cli_abort(c(
-      "{.arg table} is an <Id> with unknown names {.val {unknown_names}}.",
-      i = "Only {.val {known_names}} are supported."
-    ), call = error_call)
-  }
-
-  new_table_ident(
-    table = if ("table" %in% nms) id[["table"]] else NA_character_,
-    schema = if ("schema" %in% nms) id[["schema"]] else NA_character_,
-    catalog = if ("catalog" %in% nms) id[["catalog"]] else NA_character_
-  )
+  id <- rev(unname(x@name))
+  new_table_ident(table = id[1], schema = id[2], catalog = id[3])
 }
 
 as_table_ident_or_sql <- function(x, ..., error_call = caller_env()) {
