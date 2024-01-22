@@ -1,5 +1,44 @@
 # dbplyr (development version)
 
+* Namespaced dplyr calls now error if the function doesn't exist, or 
+  a translation is not available (#1426).
+
+* `db_sql_render()` correctly passes on `...` when re-calling with 
+  `sql_options` set (#1394).
+
+* `-1 + x` is now translated correctly (#1420).
+
+* SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
+  or `filter()` (#1366).
+
+* Add translations for clock functions `add_years()`, `add_days()`, 
+  `date_build()`, `get_year()`, `get_month()`, `get_day()`, 
+  and `base::difftime()` on SQL server, Redshift, Snowflake, and Postgres.
+
+* SQL server: `filter()` does a better job of converting logical vectors 
+  from bit to boolean (@ejneer, #1288). 
+
+* Oracle: Added support for `str_replace()` and `str_replace_all()` via
+  `REGEXP_REPLACE()` (@thomashulst, #1402).
+
+* Allow additional arguments to be passed from `compute()` all the way to 
+  `sql_query_save()`-method (@rsund).
+
+* The class of remote sources now includes all S4 class names, not just
+  the first (#918).
+
+* `db_explain()` now works for Oracle (@thomashulst, #1353).
+
+* Database errors now show the generated SQL, which hopefully will make it
+  faster to track down problems (#1401).
+
+* Snowflake (@nathanhaigh, #1406)
+  * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
+  * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports
+    regular expressions.
+  * Refactored `grepl()` to use `REGEXP_INSTR()` so now supports
+    case-insensitive matching through `grepl(..., ignore.case = TRUE)`
+
 * Functions qualified with the base namespace are now also translated, e.g.
   `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
 

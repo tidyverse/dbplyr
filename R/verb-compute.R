@@ -25,7 +25,7 @@ collapse.tbl_sql <- function(x, ...) {
 
 #' @rdname collapse.tbl_sql
 #' @param name Table name in remote database.
-#' @param temporary Should the table be temporary (`TRUE`, the default`) or
+#' @param temporary Should the table be temporary (`TRUE`, the default) or
 #'   persistent (`FALSE`)?
 #' @inheritParams copy_to.src_sql
 #' @inheritParams collect.tbl_sql
@@ -128,8 +128,8 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE
   }
 
   sql <- db_sql_render(x$src$con, x, cte = cte)
-  out <- withCallingHandlers(
-    db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete, ...),
+  withCallingHandlers(
+    out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete, ...),
     error = function(cnd) {
       cli_abort("Failed to collect lazy table.", parent = cnd)
     }

@@ -71,25 +71,23 @@ db_copy_to.DBIConnection <- function(con,
   temporary <- new$temporary
   call <- current_env()
 
-  with_transaction(con, in_transaction, {
-    withCallingHandlers(
-      {
-        table <- dplyr::db_write_table(con, table,
-          types = types,
-          values = values,
-          temporary = temporary,
-          overwrite = overwrite,
-          ...
-        )
-        create_indexes(con, table, unique_indexes, unique = TRUE)
-        create_indexes(con, table, indexes)
-        if (analyze) dbplyr_analyze(con, table)
-      },
-      error = function(cnd) {
-        cli_abort("Can't copy to table {.field {format(table, con = con)}}.", parent = cnd, call = call)
-      }
-    )
-  })
+  with_transaction(
+    con,
+    in_transaction,
+    "Can't copy data to table {.field {format(table, con = con)}}.",
+    {
+      table <- dplyr::db_write_table(con, table,
+        types = types,
+        values = values,
+        temporary = temporary,
+        overwrite = overwrite,
+        ...
+      )
+      create_indexes(con, table, unique_indexes, unique = TRUE)
+      create_indexes(con, table, indexes)
+      if (analyze) dbplyr_analyze(con, table)
+    }
+  )
 
   table
 }
@@ -131,18 +129,24 @@ db_compute.DBIConnection <- function(con,
   table <- new$table
   temporary <- new$temporary
 
-  with_transaction(con, in_transaction, {
-    table <- dbplyr_save_query(
-      con,
-      sql,
-      table,
-      temporary = temporary,
-      overwrite = overwrite
-    )
-    create_indexes(con, table, unique_indexes, unique = TRUE)
-    create_indexes(con, table, indexes)
-    if (analyze) dbplyr_analyze(con, table)
-  })
+  with_transaction(
+    con,
+    in_transaction,
+    "Can't copy query to table {.field {format(table, con = con)}}.",
+    {
+      table <- dbplyr_save_query(
+        con,
+        sql,
+        table,
+        ...,
+        temporary = temporary,
+        overwrite = overwrite
+      )
+      create_indexes(con, table, unique_indexes, unique = TRUE)
+      create_indexes(con, table, indexes)
+      if (analyze) dbplyr_analyze(con, table)
+    }
+  )
 
   table
 }
@@ -156,14 +160,12 @@ db_collect <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
 #' @export
 db_collect.DBIConnection <- function(con, sql, n = -1, warn_incomplete = TRUE, ...) {
   res <- dbSendQuery(con, sql)
-  tryCatch({
-    out <- dbFetch(res, n = n)
-    if (warn_incomplete) {
-      res_warn_incomplete(res, "n = Inf")
-    }
-  }, finally = {
-    dbClearResult(res)
-  })
+  on.exit(dbClearResult(res), add = TRUE)
+
+  out <- dbFetch(res, n = n)
+  if (warn_incomplete) {
+    res_warn_incomplete(res, "n = Inf")
+  }
 
   out
 }
@@ -217,14 +219,23 @@ create_indexes <- function(con, table, indexes = NULL, unique = FALSE, ...) {
   }
 }
 
-# Don't use `tryCatch()` because it messes with the callstack
-with_transaction <- function(con, in_transaction, code) {
+with_transaction <- function(con,
+                             in_transaction,
+                             msg,
+                             code,
+                             call = caller_env(),
+                             env = caller_env()) {
   if (in_transaction) {
     dbBegin(con)
     on.exit(dbRollback(con))
   }
 
-  code
+  withCallingHandlers(
+    code,
+    error = function(cnd) {
+      cli_abort(msg, parent = cnd, call = call, .envir = env)
+    }
+  )
 
   if (in_transaction) {
     on.exit()

@@ -20,12 +20,12 @@ named_commas <- function(x) {
 
 commas <- function(...) paste0(..., collapse = ", ")
 
-unique_table_name <- function() {
-  # Needs to use option to unique names across reloads while testing
-  i <- getOption("dbplyr_table_name", 0) + 1
-  options(dbplyr_table_name = i)
-  sprintf("dbplyr_%03i", i)
+unique_table_name <- function(prefix = "") {
+  vals <- c(letters, LETTERS, 0:9)
+  name <- paste0(sample(vals, 10, replace = TRUE), collapse = "")
+  paste0(prefix, "dbplyr_", name)
 }
+
 unique_subquery_name <- function() {
   # Needs to use option so can reset at the start of each query
   i <- getOption("dbplyr_subquery_name", 0) + 1

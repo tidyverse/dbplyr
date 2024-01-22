@@ -14,9 +14,19 @@ test_that("namespace calls are translated", {
   expect_equal(test_translate_sql(dplyr::n(), window = FALSE), sql("COUNT(*)"))
   expect_equal(test_translate_sql(base::ceiling(x)), sql("CEIL(`x`)"))
 
-  expect_snapshot(error = TRUE, test_translate_sql(NOSUCHPACKAGE::foo()))
-  expect_snapshot(error = TRUE, test_translate_sql(dbplyr::NOSUCHFUNCTION()))
-  expect_snapshot(error = TRUE, test_translate_sql(base::abbreviate(x)))
+  expect_snapshot(error = TRUE, {
+    test_translate_sql(NOSUCHPACKAGE::foo())
+    test_translate_sql(dbplyr::NOSUCHFUNCTION())
+    test_translate_sql(base::abbreviate(x))
+  })
+
+  lz <- lazy_frame(x = 1)
+  # Also test full pipeline to ensure that they make it through partial_eval
+  expect_snapshot(error = TRUE, {
+    lz %>% mutate(x = NOSUCHPACKAGE::foo())
+    lz %>% mutate(x = dbplyr::NOSUCHFUNCTION())
+    lz %>% mutate(x = base::abbreviate(x))
+  })
 })
 
 test_that("Wrong number of arguments raises error", {

@@ -2,8 +2,8 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_snowflake())
   expect_equal(test_translate_sql(log10(x)), sql("LOG(10.0, `x`)"))
   expect_equal(test_translate_sql(round(x, digits = 1.1)), sql("ROUND((`x`) :: FLOAT, 1)"))
-  expect_equal(test_translate_sql(grepl("exp", x)), sql("(`x`) REGEXP ('.*' || '(exp)' || '.*')"))
-  expect_snapshot((expect_error(test_translate_sql(grepl("exp", x, ignore.case = TRUE)))))
+  expect_equal(test_translate_sql(grepl("exp", x)), sql("REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'c') != 0"))
+  expect_equal(test_translate_sql(grepl("exp", x, ignore.case = TRUE)), sql("REGEXP_INSTR(`x`, 'exp', 1, 1, 0, 'i') != 0"))
 })
 
 test_that("pasting translated correctly", {
@@ -25,8 +25,8 @@ test_that("custom stringr functions translated correctly", {
   local_con(simulate_snowflake())
 
   expect_equal(test_translate_sql(str_locate(x, y)), sql("POSITION(`y`, `x`)"))
-  expect_equal(test_translate_sql(str_detect(x, y)), sql("(`x`) REGEXP ('.*' || `y` || '.*')"))
-  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("!((`x`) REGEXP ('.*' || `y` || '.*'))"))
+  expect_equal(test_translate_sql(str_detect(x, y)), sql("REGEXP_INSTR(`x`, `y`) != 0"))
+  expect_equal(test_translate_sql(str_detect(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`) = 0"))
   expect_equal(test_translate_sql(str_replace(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace(x, "\\d", z)), sql("REGEXP_REPLACE(`x`, '\\\\d', `z`, 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
@@ -34,6 +34,10 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(test_translate_sql(str_remove(x, y)), sql("REGEXP_REPLACE(`x`, `y`, '', 1.0, 1.0)"))
   expect_equal(test_translate_sql(str_remove_all(x, y)), sql("REGEXP_REPLACE(`x`, `y`)"))
   expect_equal(test_translate_sql(str_trim(x)), sql("TRIM(`x`)"))
+  expect_equal(test_translate_sql(str_starts(x, y)), sql("REGEXP_INSTR(`x`, `y`) = 1"))
+  expect_equal(test_translate_sql(str_starts(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`) != 1"))
+  expect_equal(test_translate_sql(str_ends(x, y)), sql("REGEXP_INSTR(`x`, `y`, 1, 1, 1) = (LENGTH(`x`) + 1)"))
+  expect_equal(test_translate_sql(str_ends(x, y, negate = TRUE)), sql("REGEXP_INSTR(`x`, `y`, 1, 1, 1) != (LENGTH(`x`) + 1)"))
 })
 
 test_that("aggregates are translated correctly", {
@@ -96,6 +100,27 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_equal(test_translate_sql(floor_date(x, "month")), sql("DATE_TRUNC('month', `x`)"))
   expect_equal(test_translate_sql(floor_date(x, "week")), sql("DATE_TRUNC('week', `x`)"))
+})
+
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_snowflake())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATE_FROM_PARTS(2020.0, 1.0, 1.0)"))
+  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATE_FROM_PARTS(`year_column`, 1, 1)"))
+  expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
+  expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
+  expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_snowflake())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
 })
 
 test_that("min() and max()", {

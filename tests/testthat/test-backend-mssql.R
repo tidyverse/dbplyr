@@ -101,6 +101,11 @@ test_that("custom window functions translated correctly", {
     test_translate_sql(any(x, na.rm = TRUE)),
     sql("CAST(MAX(CAST(`x` AS INT)) OVER () AS BIT)")
   )
+
+  expect_snapshot(
+    test_translate_sql(n_distinct(x), vars_group = "x"),
+    error = TRUE
+  )
 })
 
 test_that("custom lubridate functions translated correctly", {
@@ -122,6 +127,27 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
   expect_equal(test_translate_sql(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
   expect_error(test_translate_sql(quarter(x, fiscal_start = 5)))
+})
+
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_mssql())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATEFROMPARTS(2020.0, 1.0, 1.0)"))
+  expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATEFROMPARTS(`year_column`, 1, 1)"))
+  expect_equal(test_translate_sql(get_year(date_column)), sql("DATEPART('year', `date_column`)"))
+  expect_equal(test_translate_sql(get_month(date_column)), sql("DATEPART('month', `date_column`)"))
+  expect_equal(test_translate_sql(get_day(date_column)), sql("DATEPART('day', `date_column`)"))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_mssql())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
 })
 
 test_that("last_value_sql() translated correctly", {
@@ -322,6 +348,20 @@ test_that("`sql_query_upsert()` is correct", {
   )
 })
 
+test_that("atoms and symbols are cast to bit in `filter`", {
+  mf <- lazy_frame(x = TRUE, con = simulate_mssql())
+
+  # as simple symbol and atom
+  expect_snapshot(mf %>% filter(x))
+  expect_snapshot(mf %>% filter(TRUE))
+
+  # when involved in a (perhaps nested) logical expression
+  expect_snapshot(mf %>% filter((!x) | FALSE))
+
+  # in a subquery
+  expect_snapshot(mf %>% filter(x) %>% inner_join(mf, by = "x"))
+})
+
 test_that("row_number() with and without group_by() and arrange(): unordered defaults to Ordering by NULL (per empty_order)", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
   expect_snapshot(mf %>% mutate(rown = row_number()))
@@ -331,18 +371,20 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
 
 # Live database -----------------------------------------------------------
 
-test_that("can copy_to() and compute() with temporary tables (#272)", {
+test_that("can copy_to() and compute() with temporary tables (#438)", {
   con <- src_test("mssql")
   df <- tibble(x = 1:3)
-  expect_message(
-    db <- copy_to(con, df, name = "temp", temporary = TRUE),
-    "Created a temporary table",
+
+  # converts to name automatically with message
+  expect_snapshot(
+    db <- copy_to(con, df, name = unique_table_name(), temporary = TRUE),
+    transform = snap_transform_dbi
   )
   expect_equal(db %>% pull(), 1:3)
 
-  expect_message(
+  expect_snapshot(
     db2 <- db %>% mutate(y = x + 1) %>% compute(),
-    "Created a temporary table"
+    transform = snap_transform_dbi
   )
   expect_equal(db2 %>% pull(), 2:4)
 })
@@ -362,12 +404,12 @@ test_that("add prefix to temporary table", {
 
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
   expect_equal(db %>% mutate(z = x == y) %>% pull(), c(FALSE, TRUE, FALSE))
   expect_equal(db %>% filter(x == y) %>% pull(), 2)
 
   df <- tibble(x = c(TRUE, FALSE, FALSE), y = c(TRUE, FALSE, TRUE))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
   expect_equal(db %>% filter(x == 1) %>% pull(), TRUE)
   expect_equal(db %>% mutate(z = TRUE) %>% pull(), c(1, 1, 1))
 
@@ -381,7 +423,7 @@ test_that("bit conversion works for important cases", {
 
 test_that("as.integer and as.integer64 translations if parsing failures", {
   df <- data.frame(x = c("1.3", "2x"))
-  db <- copy_to(src_test("mssql"), df, name = unique_table_name())
+  db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))
 
   out <- db %>%
     mutate(

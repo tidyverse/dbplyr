@@ -133,9 +133,43 @@ sql_translation.Oracle <- function(con) {
       paste0 = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
       str_c = sql_paste_infix("", "||", function(x) sql_expr(cast(!!x %as% text))),
 
+      # https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/REGEXP_REPLACE.html
+      # 4th argument is starting position (default: 1 => first char of string)
+      # 5th argument is occurrence (default: 0 => match all occurrences)
+      str_replace = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement, 1L, 1L))
+      },
+      str_replace_all = function(string, pattern, replacement){
+        sql_expr(regexp_replace(!!string, !!pattern, !!replacement))
+      },
+
       # lubridate --------------------------------------------------------------
       today = function() sql_expr(TRUNC(CURRENT_TIMESTAMP)),
-      now = function() sql_expr(CURRENT_TIMESTAMP)
+      now = function() sql_expr(CURRENT_TIMESTAMP),
+
+      # clock ------------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + NUMTODSINTERVAL(!!n, 'day')))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr((!!x + NUMTODSINTERVAL(!!n * 365.25, 'day')))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr(CEIL(CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+      }
+
     ),
     base_odbc_agg,
     base_odbc_win
@@ -144,10 +178,11 @@ sql_translation.Oracle <- function(con) {
 
 #' @export
 sql_query_explain.Oracle <- function(con, sql, ...) {
-  glue_sql2(
-    con,
-    "EXPLAIN PLAN FOR {sql};\n",
-    "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY()));",
+
+  # https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html
+  c(
+    glue_sql2(con, "EXPLAIN PLAN FOR {sql}"),
+    glue_sql2(con, "SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY())")
   )
 }
 
@@ -180,6 +215,18 @@ setdiff.tbl_Oracle <- function(x, y, copy = FALSE, ...) {
 sql_expr_matches.Oracle <- function(con, x, y, ...) {
   # https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions040.htm
   glue_sql2(con, "decode({x}, {y}, 0, 1) = 0")
+}
+
+#' @export
+db_explain.Oracle <- function(con, sql, ...) {
+  sql <- sql_query_explain(con, sql, ...)
+
+  msg <- "Can't explain query."
+  db_execute(con, sql[[1]], msg) # EXPLAIN PLAN
+  expl <- db_get_query(con, sql[[2]], msg) # DBMS_XPLAN.DISPLAY
+
+  out <- utils::capture.output(print(expl))
+  paste(out, collapse = "\n")
 }
 
 #' @export
@@ -218,6 +265,9 @@ setdiff.OraConnection <- setdiff.tbl_Oracle
 
 #' @export
 sql_expr_matches.OraConnection <- sql_expr_matches.Oracle
+
+#' @export
+db_explain.OraConnection <- db_explain.Oracle
 
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle

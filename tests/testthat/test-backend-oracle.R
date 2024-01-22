@@ -16,6 +16,16 @@ test_that("paste and paste0 translate correctly", {
   expect_equal(test_translate_sql(str_c(x, y)), sql("`x` || `y`"))
 })
 
+
+test_that("string functions translate correctly", {
+  local_con(simulate_oracle())
+
+  expect_snapshot({
+    test_translate_sql(str_replace(col, "pattern", "replacement"))
+    test_translate_sql(str_replace_all(col, "pattern", "replacement"))
+  })
+})
+
 test_that("queries translate correctly", {
   mf <- lazy_frame(x = 1, con = simulate_oracle())
   expect_snapshot(mf %>% head())
@@ -71,4 +81,20 @@ test_that("copy_inline uses UNION ALL", {
     copy_inline(con, y %>% slice(0), types = types) %>% remote_query()
     copy_inline(con, y, types = types) %>% remote_query()
   })
+})
+
+test_that("custom clock functions translated correctly", {
+  local_con(simulate_oracle())
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))"))
+  expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0, 'day'))"))
+  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+})
+
+test_that("difftime is translated correctly", {
+  local_con(simulate_oracle())
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+
+  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
+  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
 })

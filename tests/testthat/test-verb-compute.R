@@ -104,10 +104,11 @@ test_that("compute can handle schema", {
   )
 
   # errors because name already exists
-  expect_snapshot(error = TRUE, {
-    df %>%
-      compute(name = in_schema("main", "db1"), temporary = FALSE)
-  })
+  expect_snapshot(
+    df %>% compute(name = in_schema("main", "db1"), temporary = FALSE),
+    transform = snap_transform_dbi,
+    error = TRUE
+  )
 })
 
 test_that("collect() handles DBI error", {

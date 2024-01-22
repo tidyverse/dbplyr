@@ -110,14 +110,17 @@ test_that("SQLite warns if set op attempted when tbl has LIMIT", {
 test_that("other backends can combine with a limit", {
   df <- tibble(x = 1:2)
 
-  # sqlite only allows limit at top level
-  tbls_full <- test_load(df, ignore = "sqlite")
-  tbls_head <- lapply(test_load(df, ignore = "sqlite"), head, n = 1)
+  ignore <- c(
+    "sqlite", # only allows limit at top level
+    "mssql"   # unusual execution order gives unintuitive result
+  )
+  tbls_full <- test_load(df, ignore = ignore)
+  tbls_head <- lapply(test_load(df, ignore = ignore), head, n = 1)
 
   tbls_full %>%
     purrr::map2(tbls_head, union) %>%
-    expect_equal_tbls()
+    expect_equal_tbls(head(df, 1))
   tbls_full %>%
     purrr::map2(tbls_head, union_all) %>%
-    expect_equal_tbls()
+    expect_equal_tbls(head(df, 1))
 })

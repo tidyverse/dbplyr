@@ -60,6 +60,41 @@ sql_translation.RedshiftConnection <- function(con) {
       str_replace = sql_not_supported("str_replace"),
       str_replace_all = function(string, pattern, replacement) {
         sql_expr(REGEXP_REPLACE(!!string, !!pattern, !!replacement))
+      },
+
+      # clock ---------------------------------------------------------------
+      add_days = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(DAY, !!n, !!x))
+      },
+      add_years = function(x, n, ...) {
+        check_dots_empty()
+        sql_expr(DATEADD(YEAR, !!n, !!x))
+      },
+      date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')")
+      },
+      get_year = function(x) {
+        sql_expr(DATE_PART('year', !!x))
+      },
+      get_month = function(x) {
+        sql_expr(DATE_PART('month', !!x))
+      },
+      get_day = function(x) {
+        sql_expr(DATE_PART('day', !!x))
+      },
+
+      difftime = function(time1, time2, tz, units = "days") {
+
+        if (!missing(tz)) {
+          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
+        }
+
+        if (units[1] != "days") {
+          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
+        }
+
+        sql_expr(DATEDIFF(day, !!time1, !!time2))
       }
     ),
     sql_translator(.parent = postgres$aggregate,
