@@ -27,7 +27,6 @@ Imports:
     lifecycle (>= 1.0.3),
     magrittr,
     methods,
-    odbc (>= 1.4.1),
     pillar (>= 1.9.0),
     purrr (>= 1.0.1),
     R6 (>= 2.2.2),
@@ -44,6 +43,7 @@ Suggests:
     knitr,
     Lahman,
     nycflights13,
+    odbc (>= 1.4.2),
     RMariaDB (>= 1.2.2),
     rmarkdown,
     RPostgres (>= 1.4.5),
@@ -159,5 +159,3 @@ Collate:
     'verb-uncount.R'
     'verb-window.R'
     'zzz.R'
-Remotes:  
-    r-dbi/odbc@11d48a3
