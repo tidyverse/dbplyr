@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `rows_patch()` no longer throws an error when more than one column needs to be
+  patched (@gorcha, #1443).
+
 * Namespaced dplyr calls now error if the function doesn't exist, or 
   a translation is not available (#1426).
 

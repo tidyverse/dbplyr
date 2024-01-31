@@ -361,6 +361,31 @@
           ON (`df_x`.`x` = `df_y`.`x`)
       ) AS `q01`
 
+# `rows_patch()` works with multiple columns to update
+
+    Code
+      rows_patch(lazy_frame(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33), .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, z = 42:43, .name = "df_y"), by = "x", unmatched = "ignore",
+      in_place = FALSE)
+    Output
+      <SQL>
+      SELECT `df_x`.*
+      FROM `df_x`
+      WHERE NOT EXISTS (
+        SELECT 1 FROM `df_y`
+        WHERE (`df_x`.`x` = `df_y`.`x`)
+      )
+      
+      UNION ALL
+      
+      SELECT `x`, COALESCE(`y`, `y...y`) AS `y`, COALESCE(`z`, `z...y`) AS `z`
+      FROM (
+        SELECT `df_x`.*, `df_y`.`y` AS `y...y`, `df_y`.`z` AS `z...y`
+        FROM `df_x`
+        INNER JOIN `df_y`
+          ON (`df_x`.`x` = `df_y`.`x`)
+      ) AS `q01`
+
 # `rows_patch()` works with `in_place = TRUE`
 
     Code
