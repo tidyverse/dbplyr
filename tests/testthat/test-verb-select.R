@@ -284,6 +284,14 @@ test_that("where() isn't suppored", {
   })
 })
 
+test_that("computed columns are not inlined away", {
+  lf <- lazy_frame(x = 1, y = 2)
+
+  expect_snapshot({
+    lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+  })
+})
+
 # sql_render --------------------------------------------------------------
 
 test_that("multiple selects are collapsed", {

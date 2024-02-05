@@ -114,7 +114,7 @@ add_select <- function(lazy_query, vars) {
   }
 
   is_select <- is_lazy_select_query(lazy_query)
-  select_can_be_inlined <- is_bijective_projection(vars, vars_data) || !is_true(lazy_query$distinct)
+  select_can_be_inlined <- select_can_be_inlined(lazy_query, vars)
   if (is_select && select_can_be_inlined) {
     idx <- vctrs::vec_match(vars, vars_data)
 
@@ -128,6 +128,28 @@ add_select <- function(lazy_query, vars) {
     x = lazy_query,
     select_operation = "select",
     select = syms(vars)
+  )
+}
+
+select_can_be_inlined <- function(lazy_query, vars) {
+  vars_data <- op_vars(lazy_query)
+
+  bijective_or_not_distinct <- is_bijective_projection(vars, vars_data) ||
+      !is_true(lazy_query$distinct)
+
+  computed_columns <- purrr::pmap(
+    lazy_query$select,
+    function(name, expr, ...) if (is_quosure(expr)) name
+  ) %>%
+    purrr::compact()
+
+  order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
+
+  all(
+    # computed columns used for ordering (if any) must also be
+    # selected to inline the query
+    intersect(computed_columns, order_vars) %in% vars,
+    bijective_or_not_distinct
   )
 }
 

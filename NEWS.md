@@ -38,6 +38,9 @@
 * The databricks backend now supports creating non-temporary tables too (#1418).
 
 * `x$name` never attempts to evaluate `name` (#1368).
+* Refined the `select()` inlining criteria to keep computed columns used to
+  `arrange()` subqueries that are eliminated by a subsequent select (@ejneer,
+  #1437).
 
 * `rows_patch(in_place = FALSE)` now works when more than one column should be
   patched (@gorcha, #1443).

@@ -181,6 +181,22 @@
       Error in `select()`:
       ! This tidyselect interface doesn't support predicates.
 
+# computed columns are not inlined away
+
+    Code
+      lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+    Condition
+      Warning:
+      ORDER BY is ignored in subqueries without LIMIT
+      i Do you need to move arrange() later in the pipeline or use window_order() instead?
+    Output
+      <SQL>
+      SELECT `x`
+      FROM (
+        SELECT `df`.*, 1.0 AS `z`
+        FROM `df`
+      ) AS `q01`
+
 # multiple selects are collapsed
 
     Code
