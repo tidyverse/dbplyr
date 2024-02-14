@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* The databricks backend now supports creating non-temporary tables too (#1418).
+
 * Clearer error if you attempt to embed non-atomic vectors inside of a generated 
   query (#1368).
   
