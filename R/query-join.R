@@ -249,7 +249,10 @@ sql_rf_join_vars <- function(con,
                              use_star,
                              qualify_all_columns) {
   type <- arg_match0(type, c("right", "full"))
-  table_names <- table_name(c(x_as, y_as))
+
+  check_table_name(x_as)
+  check_table_name(y_as)
+  table_names <- c(x_as, y_as)
 
   if (type == "full") {
     duplicated_vars <- intersect(tolower(vars$all_x), tolower(vars$all_y))
