@@ -39,6 +39,7 @@ test_that("unary plus works for non-numeric expressions", {
 test_that("unary minus flips sign of number", {
   local_con(simulate_dbi())
   expect_equal(test_translate_sql(-10L), sql("-10"))
+  expect_equal(test_translate_sql(-10L + x), sql("-10 + `x`"))
   expect_equal(test_translate_sql(x == -10), sql('`x` = -10.0'))
   expect_equal(test_translate_sql(x %in% c(-1L, 0L)), sql('`x` IN (-1, 0)'))
 })
@@ -77,6 +78,17 @@ test_that("can translate subsetting", {
   })
 })
 
+test_that("$ doesn't evaluate second argument", {
+  y <- list(id = 1)
+
+  expect_snapshot(lazy_frame(x = 1, y = 1) %>% filter(x == y$id))
+  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
+})
+
+test_that("useful error if $ used with inlined value", {
+  y <- 1
+  expect_snapshot(lazy_frame(x = 1) %>% filter(x == y$id), error = TRUE)
+})
 
 # window ------------------------------------------------------------------
 

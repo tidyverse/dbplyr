@@ -66,7 +66,7 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
     data <- lazy_frame(!!!rep_named(data, list(logical())))
   }
 
-  if (is_atomic(call) || is_null(call) || blob::is_blob(call)) {
+  if (is_sql_literal(call)) {
     call
   } else if (is_symbol(call)) {
     partial_eval_sym(call, data, env)
@@ -87,6 +87,10 @@ partial_eval <- function(call, data, env = caller_env(), vars = NULL, error_call
   } else {
     cli_abort("Unknown input type: {typeof(call)}")
   }
+}
+
+is_sql_literal <- function(x) {
+  is_atomic(x) || is_null(x) || blob::is_blob(x)
 }
 
 capture_dot <- function(.data, x) {
@@ -153,18 +157,26 @@ partial_eval_sym <- function(sym, data, env) {
   if (name %in% vars) {
     sym
   } else if (env_has(env, name, inherit = TRUE)) {
-    eval_bare(sym, env)
+    val <- eval_bare(sym, env)
+
+    # Handle common failure modes
+    if (inherits(val, "data.frame")) {
+      error_embed("a data.frame", paste0(name, "$x"))
+    } else if (inherits(val, "reactivevalues")) {
+      error_embed("shiny inputs", paste0(name, "$x"))
+    }
+
+    if (is_sql_literal(val)) {
+      unname(val)
+    } else {
+      error_embed(obj_type_friendly(val), name)
+    }
   } else {
     cli::cli_abort(
       "Object {.var {name}} not found.",
       call = NULL
     )
   }
-}
-
-is_namespaced_dplyr_call <- function(call) {
-  packages <- c("base", "dplyr", "stringr", "lubridate")
-  is_symbol(call[[1]], "::") && is_symbol(call[[2]], packages)
 }
 
 is_mask_pronoun <- function(call) {
@@ -190,11 +202,9 @@ partial_eval_call <- function(call, data, env) {
     call[[1]] <- fun <- sym(fun_name)
   }
 
-  # So are compound calls, EXCEPT dplyr::foo()
-  if (is.call(fun)) {
-    if (is_namespaced_dplyr_call(fun)) {
-      call[[1]] <- fun[[3]]
-    } else if (is_mask_pronoun(fun)) {
+  # Compound calls, apart from `::` aren't translatable
+  if (is_call(fun) && !is_call(fun, "::")) {
+    if (is_mask_pronoun(fun)) {
       stop("Use local() or remote() to force evaluation of functions", call. = FALSE)
     } else {
       return(eval_bare(call, env))
@@ -216,11 +226,14 @@ partial_eval_call <- function(call, data, env) {
   } else {
     # Process call arguments recursively, unless user has manually called
     # remote/local
-    name <- as_string(call[[1]])
-    if (name == "local") {
+    if (is_call(call, "local")) {
       eval_bare(call[[2]], env)
-    } else if (name == "remote") {
+    } else if (is_call(call, "remote")) {
       call[[2]]
+    } else if (is_call(call, "$")) {
+      # Only the 1st argument is evaluated
+      call[[2]] <- partial_eval(call[[2]], data = data, env = env)
+      call
     } else {
       call[-1] <- lapply(call[-1], partial_eval, data = data, env = env)
       call
