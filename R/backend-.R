@@ -61,7 +61,13 @@ base_scalar <- sql_translator(
     }
   },
 
-  `$`   = sql_infix(".", pad = FALSE),
+  `$`   = function(x, name) {
+    if (!is.sql(x)) {
+      cli_abort("{.code $} can only subset database columns, not inlined values.")
+    }
+    glue_sql2(sql_current_con(), "{x}.{.col name}")
+  },
+
   `[[`   = function(x, i) {
     # `x` can be a table, column or even an expression (e.g. for json)
     i <- enexpr(i)
