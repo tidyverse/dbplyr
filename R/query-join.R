@@ -184,7 +184,6 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
   }
   table_names <- table_name(names(table_vars))
 
-  # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
   out <- rep_named(vars$name, list())
 
   for (i in seq_along(table_names)) {
@@ -334,18 +333,19 @@ sql_table_prefix <- function(con, var, table = NULL) {
   if (!is_bare_character(var)) {
     cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
   }
-  var <- sql_escape_ident(con, var)
-  sql_table_name_prefix(con, table, var)
+  sql_qualify_var(con, table, var)
 }
 
 sql_star <- function(con, table = NULL) {
-  sql_table_name_prefix(con, table, sql("*"))
+  sql_qualify_var(con, table, SQL("*"))
 }
 
-sql_table_name_prefix <- function(con, table, var) {
+sql_qualify_var <- function(con, table, var) {
+  var <- sql_escape_ident(con, var)
+
   if (!is.null(table)) {
     table <- table_name_table(table, con)
-    table <- as_table_name(table, con)
+    table <- as_table_names(table, con)
 
     sql(paste0(table, ".", var))
   } else {
