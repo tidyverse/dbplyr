@@ -32,6 +32,7 @@
 #'     n_squirrels,
 #'     n_squirrels2,
 #'   )
+#' @exportS3Method tidyr::fill
 fill.tbl_lazy <- function(.data, ..., .direction = c("down", "up", "updown", "downup")) {
   cols_to_fill <- tidyselect::eval_select(expr(c(...)), .data)
   cols_to_fill <- syms(names(cols_to_fill))

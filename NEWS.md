@@ -2,6 +2,14 @@
 
 * The databricks backend now supports creating non-temporary tables too (#1418).
 
+* Clearer error if you attempt to embed non-atomic vectors inside of a generated 
+  query (#1368).
+  
+* `x$name` never attempts to evaluate `name` (#1368).
+
+* `rows_patch(in_place = FALSE)` now works when more than one column should be
+  patched (@gorcha, #1443).
+
 * Namespaced dplyr calls now error if the function doesn't exist, or 
   a translation is not available (#1426).
 

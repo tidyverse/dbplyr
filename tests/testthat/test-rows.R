@@ -612,6 +612,32 @@ test_that("`rows_patch()` works with `in_place = FALSE`", {
   expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, NA)))
 })
 
+test_that("`rows_patch()` works with multiple columns to update", {
+  expect_snapshot(
+    rows_patch(
+      lazy_frame(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33), .name = "df_x"),
+      lazy_frame(x = 2:3, y = 22:23, z = 42:43, .name = "df_y"),
+      by = "x",
+      unmatched = "ignore",
+      in_place = FALSE
+    )
+  )
+
+  df <- memdb_frame(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33))
+  expect_equal(
+    rows_patch(
+      df, memdb_frame(x = 2:3, y = 22:23, z = 42:43),
+      by = "x",
+      unmatched = "ignore",
+      in_place = FALSE
+    ) %>%
+      collect(),
+    tibble(x = 1:3, y = c(11, 12, 23), z = c(31, 42, 33))
+  )
+
+  expect_equal(df %>% collect(), tibble(x = 1:3, y = c(11, 12, NA), z = c(31, NA, 33)))
+})
+
 test_that("`rows_patch()` works with `in_place = FALSE` and `returning`", {
   expect_equal(
     rows_patch(

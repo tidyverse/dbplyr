@@ -57,8 +57,8 @@ Config/testthat/edition: 3
 Config/testthat/parallel: TRUE 
 Encoding: UTF-8
 Language: en-gb
-Roxygen: {library(tidyr); list(markdown = TRUE)}
-RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
 Collate: 
     'db-sql.R'
     'utils-check.R'
@@ -101,6 +101,7 @@ Collate:
     'dbplyr.R'
     'explain.R'
     'ident.R'
+    'import-standalone-s3-register.R'
     'join-by-compat.R'
     'join-cols-compat.R'
     'lazy-join-query.R'
