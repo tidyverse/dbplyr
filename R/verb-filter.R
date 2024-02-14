@@ -13,8 +13,8 @@
 #' db <- memdb_frame(x = c(2, NA, 5, NA, 10), y = 1:5)
 #' db %>% filter(x < 5) %>% show_query()
 #' db %>% filter(is.na(x)) %>% show_query()
-# registered onLoad
 #' @importFrom dplyr filter
+# Registered onLoad
 filter.tbl_lazy <- function(.data, ..., .by = NULL, .preserve = FALSE) {
   check_unsupported_arg(.preserve, FALSE)
   check_filter(...)

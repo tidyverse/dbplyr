@@ -106,6 +106,7 @@
 #'     names_from = key,
 #'     values_from = value
 #'   )
+#' @exportS3Method tidyr::pivot_wider
 pivot_wider.tbl_lazy <- function(data,
                                  ...,
                                  id_cols = NULL,
