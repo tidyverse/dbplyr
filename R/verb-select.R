@@ -134,9 +134,6 @@ add_select <- function(lazy_query, vars) {
 select_can_be_inlined <- function(lazy_query, vars) {
   vars_data <- op_vars(lazy_query)
 
-  bijective_or_not_distinct <- is_bijective_projection(vars, vars_data) ||
-      !is_true(lazy_query$distinct)
-
   computed_columns <- purrr::pmap(
     lazy_query$select,
     function(name, expr, ...) if (is_quosure(expr)) name
@@ -145,12 +142,10 @@ select_can_be_inlined <- function(lazy_query, vars) {
 
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
 
-  all(
-    # computed columns used for ordering (if any) must also be
-    # selected to inline the query
-    intersect(computed_columns, order_vars) %in% vars,
-    bijective_or_not_distinct
-  )
+  # computed columns used for ordering (if any) must also be
+  # selected to inline the query
+  all(intersect(computed_columns, order_vars) %in% vars) &&
+      (is_bijective_projection(vars, vars_data) || !is_true(lazy_query$distinct))
 }
 
 is_bijective_projection <- function(vars, names_prev) {
