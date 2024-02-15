@@ -24,6 +24,7 @@
 #'
 #' # Only combinations that already appear in the data ---------------
 #' fruits %>% tidyr::expand(nesting(type, size))
+#' @exportS3Method tidyr::expand
 expand.tbl_lazy <- function(data, ..., .name_repair = "check_unique") {
   dots <- purrr::discard(quos(...), quo_is_null)
 
@@ -106,6 +107,7 @@ extract_expand_dot_vars <- function(dot, call) {
 #'
 #' # You can also choose to fill in missing values
 #' df %>% tidyr::complete(group, nesting(item_id, item_name), fill = list(value1 = 0))
+#' @exportS3Method tidyr::complete
 complete.tbl_lazy <- function(data, ..., fill = list()) {
   full <- tidyr::expand(data, ...)
 
@@ -127,6 +129,7 @@ complete.tbl_lazy <- function(data, ..., fill = list()) {
 #' @examplesIf rlang::is_installed("tidyr", version = "1.0.0")
 #' df <- memdb_frame(x = c(1, 2, NA), y = c("a", NA, "b"))
 #' df %>% tidyr::replace_na(list(x = 0, y = "unknown"))
+#' @exportS3Method tidyr::replace_na
 replace_na.tbl_lazy <- function(data, replace = list(), ...) {
   check_list(replace)
   check_named(replace)

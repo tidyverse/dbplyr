@@ -126,12 +126,12 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
                                    analyze = TRUE,
                                    in_transaction = FALSE) {
 
-  if (!temporary) {
-    cli::cli_abort("Spark SQL only support temporary tables")
+  if (temporary) {
+    sql <- sql_values_subquery(con, values, types = types, lvl = 1)
+    db_compute(con, table, sql, overwrite = overwrite)
+  } else {
+    NextMethod()
   }
-
-  sql <- sql_values_subquery(con, values, types = types, lvl = 1)
-  db_compute(con, table, sql, overwrite = overwrite)
 }
 
 #' @export

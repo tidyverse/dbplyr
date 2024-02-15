@@ -332,7 +332,11 @@ rows_patch.tbl_lazy <- function(x,
     )
 
     patch_columns_y <- paste0(new_columns, "...y")
-    patch_quos <- lapply(new_columns, function(.x) quo(coalesce(!!sym(.x), !!sym(patch_columns_y)))) %>%
+    patch_quos <-
+      lapply(
+        seq_along(new_columns),
+        function(.x) quo(coalesce(!!sym(new_columns[.x]), !!sym(patch_columns_y[.x])))
+      ) %>%
       rlang::set_names(new_columns)
     if (is_empty(new_columns)) {
       patched <- to_patch
