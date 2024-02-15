@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
+  it now only includes the table name in the index name, not the schema name.
+
 * Namespaced dplyr calls now error if the function doesn't exist, or 
   a translation is not available (#1426).
 
