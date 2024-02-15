@@ -48,11 +48,6 @@ sql_query_select.Oracle <- function(con,
                                     subquery = FALSE,
                                     lvl = 0) {
 
-  if (!is.null(limit)) {
-    limit <- as.integer(limit)
-    where = c(paste0("ROWNUM <= ", limit), where)
-  }
-
   sql_select_clauses(con,
     select    = sql_clause_select(con, select, distinct),
     from      = sql_clause_from(from),
@@ -61,6 +56,11 @@ sql_query_select.Oracle <- function(con,
     having    = sql_clause_having(having),
     window    = sql_clause_window(window),
     order_by  = sql_clause_order_by(order_by, subquery, limit),
+    # Requires Oracle 12c, released in 2013
+    limit =   if (!is.null(limit)) {
+      limit <- format(as.integer(limit))
+      glue_sql2(con, "FETCH FIRST {limit} ROWS ONLY")
+    },
     lvl = lvl
   )
 }
