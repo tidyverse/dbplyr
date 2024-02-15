@@ -17,7 +17,7 @@ tbl_lazy <- function(df, con = NULL, ..., name = "df") {
   con <- con %||% sql_current_con() %||% simulate_dbi()
   subclass <- class(con)[[1]]
 
-  name <- as_table_name(name, con)
+  name <- as_table_path(name, con)
 
   dplyr::make_tbl(
     purrr::compact(c(subclass, "lazy")),

@@ -65,7 +65,7 @@ db_copy_to.DBIConnection <- function(con,
                                      indexes = NULL,
                                      analyze = TRUE,
                                      in_transaction = TRUE) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -124,7 +124,7 @@ db_compute.DBIConnection <- function(con,
                                      indexes = list(),
                                      analyze = TRUE,
                                      in_transaction = FALSE) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -180,7 +180,7 @@ db_write_table.DBIConnection <- function(con,
                                          temporary = TRUE,
                                          ...,
                                          overwrite = FALSE) {
-  check_table_name(table)
+  check_table_path(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)

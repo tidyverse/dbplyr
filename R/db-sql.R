@@ -173,10 +173,10 @@ sql_table_index.DBIConnection <- function(con,
                                           unique = FALSE,
                                           ...,
                                           call = caller_env()) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
 
   if (is.null(name)) {
-    table_name <- table_name_table(table, con)
+    table_name <- table_name(table, con)
     name <- name %||% paste0(c(table_name, columns), collapse = "_")
   }
   glue_sql2(
@@ -225,7 +225,7 @@ sql_query_save <- function(con, sql, name, temporary = TRUE, ...) {
 }
 #' @export
 sql_query_save.DBIConnection <- function(con, sql, name, temporary = TRUE, ...) {
-  name <- as_table_name(name, con)
+  name <- as_table_path(name, con)
 
   glue_sql2(
     con,
@@ -257,10 +257,10 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
     # some backends, e.g. Postgres, require an alias for a subquery
     name <- name %||% unique_subquery_name()
     glue_sql2(con, "{from}", as_sql, "{.tbl name}")
-  } else { # must be a table_name
+  } else { # must be a table_path
     if (!is.null(name)) {
-      table <- table_name_table(name, con)
-      names(from) <- as_table_name(table, con)
+      table <- table_name(name, con)
+      names(from) <- as_table_path(table, con)
     }
     from
   }
@@ -792,7 +792,7 @@ sql_query_insert.DBIConnection <- function(con,
                                            conflict = c("error", "ignore"),
                                            returning_cols = NULL,
                                            method = NULL) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   from <- as_table_source(from, con)
 
   method <- method %||% "where_not_exists"
@@ -856,7 +856,7 @@ sql_query_append.DBIConnection <- function(con,
                                            insert_cols,
                                            ...,
                                            returning_cols = NULL) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   from <- as_table_source(from, con)
 
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
@@ -901,7 +901,7 @@ sql_query_update_from.DBIConnection <- function(con,
                                                 update_values,
                                                 ...,
                                                 returning_cols = NULL) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   from <- as_table_source(from, con)
 
   # https://stackoverflow.com/questions/2334712/how-do-i-update-from-a-select-in-sql-server
@@ -951,7 +951,7 @@ sql_query_upsert.DBIConnection <- function(con,
                                            ...,
                                            returning_cols = NULL,
                                            method = NULL) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   from <- as_table_source(from, con)
 
   method <- method %||% "cte_update"
@@ -1016,7 +1016,7 @@ sql_query_delete.DBIConnection <- function(con,
                                            by,
                                            ...,
                                            returning_cols = NULL) {
-  table <- as_table_name(table, con)
+  table <- as_table_path(table, con)
   from <- as_table_source(from, con)
   parts <- rows_prep(con, table, from, by, lvl = 1)
 
@@ -1121,7 +1121,7 @@ db_save_query.DBIConnection <- function(con,
                                         temporary = TRUE,
                                         ...,
                                         overwrite = FALSE) {
-  name <- as_table_name(name, con)
+  name <- as_table_path(name, con)
   sql <- sql_query_save(con, sql, name, temporary = temporary, ...)
 
   if (overwrite) {

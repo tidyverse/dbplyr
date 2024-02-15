@@ -747,8 +747,8 @@ make_join_aliases <- function(con, x_as, y_as, sql_on, call) {
   }
 
   list(
-    x = if (!is.null(x_as)) as_table_name(x_as, con),
-    y = if (!is.null(y_as)) as_table_name(y_as, con)
+    x = if (!is.null(x_as)) as_table_path(x_as, con),
+    y = if (!is.null(y_as)) as_table_path(y_as, con)
   )
 }
 
@@ -760,7 +760,7 @@ make_table_names <- function(as, lq) {
   } else if (!is.null(name)) {
     tibble(name = name, from = "name")
   } else {
-    tibble(name = table_name(""), from = "")
+    tibble(name = table_path(""), from = "")
   }
 }
 

@@ -76,8 +76,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
         all_x = c("x", "a"),
         all_y = c("x", "a", "b")
       ),
-      x_as = table_name("left"),
-      y_as = table_name("right"),
+      x_as = table_path("left"),
+      y_as = table_path("right"),
       use_star = TRUE,
       qualify_all_columns = FALSE
     ),
@@ -101,8 +101,8 @@ test_that("sql_multi_join_vars generates expected SQL", {
         all_x = c("a", "b"),
         all_y = c("a", "B")
       ),
-      x_as = table_name("left"),
-      y_as = table_name("right"),
+      x_as = table_path("left"),
+      y_as = table_path("right"),
       use_star = TRUE,
       qualify_all_columns = FALSE
     ),

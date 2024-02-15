@@ -5,17 +5,17 @@
     Output
       <SQL JOINS>
       X:
-        <table_name> `lf1`
+        <table_path> `lf1`
       Type: left
       By:
         x-x
       Y:
-        <table_name> `lf2`
+        <table_path> `lf2`
       Type: left
       By:
         x-x
       Y:
-        <table_name> `lf3`
+        <table_path> `lf3`
 
 # generated sql doesn't change unexpectedly
 

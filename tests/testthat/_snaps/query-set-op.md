@@ -5,21 +5,21 @@
     Output
         <SQL SELECT>
         From:
-          <table_name> `lf1`
+          <table_path> `lf1`
         Select:   `lf1`.*, NULL
       
         UNION
       
         <SQL SELECT>
         From:
-          <table_name> `lf2`
+          <table_path> `lf2`
         Select:   `x`, NULL, `z`
       
         UNION ALL
       
         <SQL SELECT>
         From:
-          <table_name> `lf3`
+          <table_path> `lf3`
         Select:   `x`, NULL, `z`
 
 # generated sql doesn't change unexpectedly

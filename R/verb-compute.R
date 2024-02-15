@@ -51,7 +51,7 @@ compute.tbl_sql <- function(x,
     name <- unique_table_name()
   }
 
-  name <- as_table_name(name, x$src$con)
+  name <- as_table_path(name, x$src$con)
   vars <- op_vars(x)
 
   compute_check_indexes(x, indexes)

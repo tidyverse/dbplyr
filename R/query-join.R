@@ -127,7 +127,7 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
   }
 
   # TODO reuse query
-  name <- as_table_name(unique_subquery_name(), con)
+  name <- as_table_path(unique_subquery_name(), con)
   wrapped_query <- set_names(list(qry), name)
 
   query_list$queries <- c(query_list_new$queries, wrapped_query)
@@ -182,11 +182,11 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
     duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
     duplicated_vars <- unique(duplicated_vars)
   }
-  table_names <- table_name(names(table_vars))
+  table_paths <- table_path(names(table_vars))
 
   out <- rep_named(vars$name, list())
 
-  for (i in seq_along(table_names)) {
+  for (i in seq_along(table_paths)) {
     all_vars_i <- table_vars[[i]]
     vars_idx_i <- which(vars$table == i)
     used_vars_i <- vars$var[vars_idx_i]
@@ -194,12 +194,12 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
 
     if (use_star && join_can_use_star(all_vars_i, used_vars_i, out_vars_i, vars_idx_i)) {
       id <- vars_idx_i[[1]]
-      out[[id]] <- sql_star(con, table_names[i])
+      out[[id]] <- sql_star(con, table_paths[i])
       names(out)[id] <- ""
     } else {
       out[vars_idx_i] <- purrr::map2(
         used_vars_i, i,
-        ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
+        ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
       )
 
     }
@@ -250,8 +250,8 @@ sql_rf_join_vars <- function(con,
                              qualify_all_columns) {
   type <- arg_match0(type, c("right", "full"))
 
-  check_table_name(x_as)
-  check_table_name(y_as)
+  check_table_path(x_as)
+  check_table_path(y_as)
   table_names <- c(x_as, y_as)
 
   if (type == "full") {
@@ -347,8 +347,8 @@ sql_qualify_var <- function(con, table, var) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
-    table <- table_name_table(table, con)
-    table <- as_table_names(table, con)
+    table <- table_name(table, con)
+    table <- as_table_paths(table, con)
 
     sql(paste0(table, ".", var))
   } else {

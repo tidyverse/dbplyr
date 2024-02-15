@@ -83,13 +83,13 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 }
 
 add_temporary_prefix <- function(con, table, temporary = TRUE) {
-  check_table_name(table)
+  check_table_path(table)
 
   if (!temporary) {
     return(table)
   }
 
-  pieces <- table_name_components(table, con)
+  pieces <- table_path_components(table, con)
   table_name <- pieces[length(pieces)]
 
   if (substr(table_name, 1, 1) != "#") {
@@ -99,7 +99,7 @@ add_temporary_prefix <- function(con, table, temporary = TRUE) {
       class = c("dbplyr_message_temp_table", "dbplyr_message")
     )
     pieces[[length(pieces)]] <- new_name
-    table <- make_table_name(pieces, con)
+    table <- make_table_path(pieces, con)
   }
 
   table

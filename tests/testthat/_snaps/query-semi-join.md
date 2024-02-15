@@ -11,9 +11,9 @@
       Where:
         "`df_RHS`.`z` = 2.0"
       X:
-        <table_name> `df`
+        <table_path> `df`
       Y:
-        <table_name> `df`
+        <table_path> `df`
 
 # generated sql doesn't change unexpectedly
 

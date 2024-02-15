@@ -68,14 +68,14 @@
     Code
       sql_query_wrap(con, ident("table"))
     Output
-      <table_name> `table`
+      <table_path> `table`
 
 ---
 
     Code
       sql_query_wrap(con, in_schema("schema", "tbl"))
     Output
-      <table_name> `schema`.`tbl`
+      <table_path> `schema`.`tbl`
 
 ---
 

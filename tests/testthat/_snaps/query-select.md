@@ -5,7 +5,7 @@
     Output
       <SQL SELECT>
       From:
-        <table_name> `df`
+        <table_path> `df`
       Select:   `df`.*
       Where:    `x` > 1
       Order by: `x`

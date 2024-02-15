@@ -144,7 +144,7 @@ cte_render <- function(query_list, con) {
   ctes <- purrr::imap(
     query_list[-n],
     function(query, name) {
-      name <- table_name(name)
+      name <- table_path(name)
       glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
     }
   )
@@ -169,7 +169,7 @@ querylist_reuse_query <- function(qry, query_list, con) {
   if (!is.na(id)) {
     query_list$name <- names(query_list$queries)[[id]]
   } else {
-    name <- as_table_name(unique_subquery_name(), con)
+    name <- as_table_path(unique_subquery_name(), con)
     wrapped_query <- set_names(list(qry), name)
     query_list$queries <- c(query_list$queries, wrapped_query)
     query_list$name <- name

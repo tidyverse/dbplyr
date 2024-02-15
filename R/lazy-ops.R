@@ -45,7 +45,7 @@ base_query <- function(from) {
 
 #' @export
 print.lazy_base_remote_query <- function(x, ...) {
-  if (is_table_name(x$x)) {
+  if (is_table_path(x$x)) {
     cat_line("From: ", format(x$x))
   } else {
     cat_line("From: <derived table>")
