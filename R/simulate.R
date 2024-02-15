@@ -32,7 +32,7 @@ sql_escape_ident.DBIConnection <- function(con, x) {
 }
 #' @export
 sql_escape_ident.TestConnection <- function(con, x) {
-  if (is(x, "SQL")) {
+  if (methods::is(x, "SQL")) {
     x
   } else {
     sql_quote(x, "`")
