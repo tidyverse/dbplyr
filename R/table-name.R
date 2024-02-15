@@ -15,6 +15,7 @@
 
 table_name <- function(x) {
   check_character(x)
+  x <- unname(x)
   structure(x, class = c("dbplyr_table_name", "character"))
 }
 
@@ -45,13 +46,19 @@ print.dbplyr_table_name <- function(x, ...) {
 }
 
 make_table_name <- function(x, con, collapse = TRUE) {
-  needs_quote <- !vapply(x, function(x) inherits(x, "AsIs"), logical(1))
+  needs_quote <- !vapply(x, name_is_escaped, logical(1))
+
+  x <- vapply(x, unclass, character(1))
   x[needs_quote] <- sql_escape_ident(con, x[needs_quote])
   if (collapse) {
     x <- paste0(x, collapse = ".")
   }
 
   table_name(x)
+}
+
+name_is_escaped <- function(x) {
+  inherits(x, "AsIs") || is.sql(x) || inherits(x, "ident_q")
 }
 
 as_table_names <- function(x, con) {
@@ -151,15 +158,15 @@ as_table_name <- function(x,
   } else if (methods::is(x, "Id")) {
     make_table_name(x@name, con)
   } else if (inherits(x, "dbplyr_catalog")) {
-    make_table_name(c(unclass(x$catalog), unclass(x$schema), unclass(x$table)), con)
+    make_table_name(list(x$catalog, x$schema, x$table), con)
   } else if (inherits(x, "dbplyr_schema")) {
-    make_table_name(c(unclass(x$schema), unclass(x$table)), con)
+    make_table_name(list(x$schema, x$table), con)
   } else if (inherits(x, "AsIs")) {
     check_string(unclass(x), allow_empty = FALSE, arg = error_arg, call = error_call)
     table_name(unclass(x))
   } else if (is.character(x)) {
     check_string(x, allow_empty = FALSE, arg = error_arg, call = error_call)
-    make_table_name(unname(x), con, collapse = FALSE)
+    make_table_name(x, con, collapse = FALSE)
   } else {
     cli::cli_abort(
       "{.arg {error_arg}} uses unknown specification for table name",

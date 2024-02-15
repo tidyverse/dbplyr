@@ -57,11 +57,21 @@ test_that("can coerce all user facing inputs", {
   id <- in_catalog("foo", "bar", "baz")
   expect_true(is_table_id(id))
   expect_equal(as_table_name(id, con), table_name("`foo`.`bar`.`baz`"))
+
+  id <- in_catalog("foo", sql("bar"), ident_q("baz"))
+  expect_true(is_table_id(id))
+  expect_equal(as_table_name(id, con), table_name("`foo`.bar.baz"))
 })
 
 test_that("strips names", {
   con <- simulate_dbi()
   expect_equal(as_table_name(c(x = "x"), con), table_name("`x`"))
+
+  id <- in_schema(c(x = "a"), "b")
+  expect_equal(as_table_name(id, con), table_name("`a`.`b`"))
+
+  id <- in_catalog("a", "b", c(x = "c"))
+  expect_equal(as_table_name(id, con), table_name("`a`.`b`.`c`"))
 })
 
 test_that("as_table_name validates its inputs", {
