@@ -125,11 +125,11 @@ test_that("alias truncates long table names at database limit", {
 
   # joins correctly work
   self_join2 <- left_join(mf1, mf1, by = c("x", "y"))
-#
-#   expect_equal(
-#     self_join2 %>% collect(),
-#     tibble(x = 1:3, y = "a")
-#   )
+
+  expect_equal(
+    self_join2 %>% collect(),
+    tibble(x = 1:3, y = "a")
+  )
 
   expect_snapshot(
     self_join2 %>% remote_query()
@@ -155,10 +155,10 @@ test_that("alias truncates long table names at database limit", {
   self_join3 <- left_join(mf1, mf1, by = c("x", "y")) %>%
     inner_join(mf2, by = "x")
 
-  # expect_equal(
-  #   self_join3 %>% collect(),
-  #   tibble(x = 2:3, y.x = "a", y.y = "b")
-  # )
+  expect_equal(
+    self_join3 %>% collect(),
+    tibble(x = 2:3, y.x = "a", y.y = "b")
+  )
   expect_snapshot(
     self_join3 %>% remote_query()
   )
