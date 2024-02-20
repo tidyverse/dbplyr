@@ -22,6 +22,8 @@
   
   * If you accidentally pass a named vector to any of the database identifer
     functions, those names will be automatically stripped (#1404).
+    
+  * `tbl_sql(check_from)` is now deprecated.
 
 * When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
   it now only includes the table name in the index name, not the schema name.

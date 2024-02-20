@@ -12,10 +12,19 @@
 #'   to avoid retrieving them from the database.
 #'   Mainly useful for better performance when creating
 #'   multiple `tbl` objects.
-#' @param check_from Check if `from` is likely misspecified SQL or a table in a schema.
-tbl_sql <- function(subclass, src, from, ..., vars = NULL, check_from = TRUE) {
+#' @param check_from `r lifecycle::badge("deprecated")`
+tbl_sql <- function(subclass,
+                    src,
+                    from,
+                    ...,
+                    vars = NULL,
+                    check_from = deprecated()) {
   # Can't use check_dots_used(), #1429
   check_character(vars, allow_null = TRUE)
+
+  if (lifecycle::is_present(check_from)) {
+    lifecycle::deprecate_warn("2.5.0", "tbl_sql(check_from)")
+  }
 
   from <- as_table_source(from, con = src$con)
   vars <- vars %||% dbplyr_query_fields(src$con, from)
