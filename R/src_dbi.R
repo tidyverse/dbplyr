@@ -15,9 +15,12 @@
 #' the data into R.
 #'
 #' @param src A `DBIConnection` object produced by `DBI::dbConnect()`.
-#' @param from Either a string (giving a table name),
-#'   a fully qualified table name created by [in_schema()]
-#'   or a literal [sql()] string.
+#' @param from Either a table identifier or a literal [sql()] string.
+#'
+#'   Use a string to identify a table in the current schema/catalog. We
+#'   recommend using `I()` to identify a table outside the default catalog or
+#'   schema, e.g. `I("schema.table")` or `I("catalog.schema.table")`. You can
+#'   also use [in_schema()]/[in_catalog()] or [DBI::Id()].
 #' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples
@@ -33,8 +36,8 @@
 #' # To retrieve a single table from a source, use `tbl()`
 #' con %>% tbl("mtcars")
 #'
-#' # Use `in_schema()` for fully qualified table names
-#' con %>% tbl(in_schema("temp", "mtcars")) %>% head(1)
+#' # Use `I()` for qualified table names
+#' con %>% tbl(I("temp.mtcars")) %>% head(1)
 #'
 #' # You can also use pass raw SQL if you want a more sophisticated query
 #' con %>% tbl(sql("SELECT * FROM mtcars WHERE cyl = 8"))

@@ -688,8 +688,9 @@ sql_query_union.DBIConnection <- function(con, x, unions, ..., lvl = 0) {
 #' These functions generate the SQL used in `rows_*(in_place = TRUE)`.
 #'
 #' @param con Database connection.
-#' @param table Table to update. Must be a table identifier, e.g. single string
-#'   or created via `in_schema()`.
+#' @param table Table to update. Must be a table identifier.
+#'   Use a string to refer to tables in the current schema/catalog or
+#'   `I()` to refer to tables in other schemas/catalogs.
 #' @param from Table or query that contains the new data. Either a table
 #'   identifier or SQL.
 #' @inheritParams dplyr::rows_upsert
