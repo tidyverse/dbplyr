@@ -16,8 +16,8 @@ that won't get quoted.}
 }
 \description{
 \code{in_schema()} and \code{in_catalog()} can be used to refer to tables outside of
-the current catalog/schema. We now recommend using \code{I()} instead, as it's
-tpyically much less typing.
+the current catalog/schema. However, we now recommend using \code{I()} as it's
+typically less typing.
 }
 \examples{
 # Previously:

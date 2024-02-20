@@ -12,9 +12,10 @@
 
 \item{from}{Either a table identifier or a literal \code{\link[=sql]{sql()}} string.
 
-There are many ways to refer to a table outside the default catalog or
-schema, but we currently recommend using \code{I()}, e.g. \code{I("schema.table")}
-or \code{I("catalog.schema.table")}.}
+Use a string to identify a table in the current schema/catalog. We
+recommend using \code{I()} to identify a table outside the default catalog or
+schema, e.g. \code{I("schema.table")} or \code{I("catalog.schema.table")}. You can
+also use \code{\link[=in_schema]{in_schema()}}/\code{\link[=in_catalog]{in_catalog()}} or \code{\link[DBI:Id]{DBI::Id()}}.}
 
 \item{...}{Passed on to \code{\link[=tbl_sql]{tbl_sql()}}}
 }

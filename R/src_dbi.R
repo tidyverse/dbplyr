@@ -17,9 +17,10 @@
 #' @param src A `DBIConnection` object produced by `DBI::dbConnect()`.
 #' @param from Either a table identifier or a literal [sql()] string.
 #'
-#'   There are many ways to refer to a table outside the default catalog or
-#'   schema, but we currently recommend using `I()`, e.g. `I("schema.table")`
-#'   or `I("catalog.schema.table")`.
+#'   Use a string to identify a table in the current schema/catalog. We
+#'   recommend using `I()` to identify a table outside the default catalog or
+#'   schema, e.g. `I("schema.table")` or `I("catalog.schema.table")`. You can
+#'   also use [in_schema()]/[in_catalog()] or [DBI::Id()].
 #' @param ... Passed on to [tbl_sql()]
 #' @export
 #' @examples

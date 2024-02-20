@@ -1,16 +1,18 @@
 #' Flag a character vector as SQL identifiers
 #'
 #' @description
-#' `ident()` takes unquoted strings and flags them as database identifiers
-#' (e.g. table or column names). `ident_q()` assumes its input has already
-#' been quoted, and ensures it does not get quoted again.
+#' `ident()` takes strings and turns them as database identifiers (e.g. table
+#' or column names) quoting them using the identifer rules for your database.
+#' `ident_q()` does the same, but assumes the names have already been
+#' quoted, preventing them from being quoted again.
 #'
 #' These are generally for internal use only; if you need to supply an
-#' table name that is already quoted, use `I()`.
+#' table name that is qualified with schema or catalog, or has already been
+#' quoted for some other reason, use `I()`.
 #'
-#' @param ... A character vector, or name-value pairs
+#' @param ... A character vector, or name-value pairs.
+#' @param x An object.
 #' @keywords internal
-#' @param x An object
 #' @export
 #' @examples
 #' # SQL92 quotes strings with '

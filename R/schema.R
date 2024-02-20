@@ -2,8 +2,8 @@
 #'
 #' @description
 #' `in_schema()` and `in_catalog()` can be used to refer to tables outside of
-#' the current catalog/schema. We now recommend using `I()` instead, as it's
-#' tpyically much less typing.
+#' the current catalog/schema. However, we now recommend using `I()` as it's
+#' typically less typing.
 #'
 #' @param catalog,schema,table Names of catalog, schema, and table.
 #'   These will be automatically quoted; use [sql()] to pass a raw name
