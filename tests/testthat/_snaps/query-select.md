@@ -5,8 +5,7 @@
     Output
       <SQL SELECT>
       From:
-        <dbplyr_table_ident[1]>
-        [1] `df`
+        <table_path> `df`
       Select:   `df`.*
       Where:    `x` > 1
       Order by: `x`

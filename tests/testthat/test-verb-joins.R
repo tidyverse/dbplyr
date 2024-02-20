@@ -84,16 +84,17 @@ test_that("join works with in_schema", {
     left_join(df1, df3, by = "x") %>% remote_query()
   )
 
-  # use auto name for `ident_q`
-  # suppress info about <ident_q> only meant as a workaround
-  withr::local_options(rlib_message_verbosity = "quiet")
-  df4 <- tbl(con, ident_q("`foo`.`df`"))
-  df5 <- tbl(con, ident_q("`foo2`.`df`"))
+  # use auto name for escaped table names
+  df4 <- tbl(con, I("foo.df"))
+  df5 <- tbl(con, I("foo2.df"))
   expect_snapshot(
     left_join(df4, df5, by = "x") %>% remote_query()
   )
   out <- left_join(df4, df5, by = "x")
-  expect_equal(out$lazy_query$table_names, tibble(name = c("", ""), from = ""))
+  expect_equal(out$lazy_query$table_names, tibble(
+    name = table_path(c("foo.df", "foo2.df")),
+    from = c("name", "name")
+  ))
 })
 
 test_that("alias truncates long table names at database limit", {
@@ -101,11 +102,11 @@ test_that("alias truncates long table names at database limit", {
   # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
   con <- src_test("postgres")
 
-  nm1 <- paste0("a", paste0(0:61 %% 10, collapse = ""))
-  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), nm1)
+  nm1 <- table_path(paste0("a", paste0(0:61 %% 10, collapse = "")))
+  mf1 <- local_db_table(con, tibble(x = 1:3, y = "a"), unclass(nm1))
 
-  nm2 <- paste0("b", paste0(0:61 %% 10, collapse = ""))
-  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), nm2)
+  nm2 <- table_path(paste0("b", paste0(0:61 %% 10, collapse = "")))
+  mf2 <- local_db_table(con, tibble(x = 2:3, y = "b"), unclass(nm2))
 
   # 2 tables
   # aliased names are as expected
@@ -113,10 +114,10 @@ test_that("alias truncates long table names at database limit", {
     tibble::tibble(
       name = c(nm1, nm1),
       from = "name"
-    )
+    ),
+    con
   )
-
-  expect_equal(max(nchar(self_join2_names)), 63)
+  expect_equal(max(nchar(self_join2_names)), 65)
   expect_equal(
     length(self_join2_names),
     length(unique(self_join2_names))
@@ -140,10 +141,11 @@ test_that("alias truncates long table names at database limit", {
     tibble::tibble(
       name = c(nm1, nm1, nm2),
       from = "name"
-    )
+    ),
+    con
   )
 
-  expect_equal(max(nchar(self_join3_names)), 63)
+  expect_equal(max(nchar(self_join3_names)), 65)
   expect_equal(
     length(self_join3_names),
     length(unique(self_join3_names))
@@ -288,57 +290,57 @@ test_that("join uses correct table alias", {
   y <- lazy_frame(a = 1, y = 1, .name = "y")
 
   # self joins
-  table_names <- sql_build(left_join(x, x, by = "a"))$table_names
-  expect_equal(table_names, c("x_LHS", "x_RHS"))
+  table_paths <- sql_build(left_join(x, x, by = "a"))$table_names
+  expect_equal(table_paths, table_path(c("`x_LHS`", "`x_RHS`")))
 
-  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "x"))
+  table_paths <- sql_build(left_join(x, x, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_paths, table_path(c("`my_x`", "`x`")))
 
-  table_names <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  table_paths <- sql_build(left_join(x, x, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_paths, table_path(c("`x`", "`my_y`")))
 
-  table_names <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  table_paths <- sql_build(left_join(x, x, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_paths, table_path(c("`my_x`", "`my_y`")))
 
   # x-y joins
-  table_names <- sql_build(left_join(x, y, by = "a"))$table_names
-  expect_equal(table_names, c("x", "y"))
+  table_paths <- sql_build(left_join(x, y, by = "a"))$table_names
+  expect_equal(table_paths, table_path(c("`x`", "`y`")))
 
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
-  expect_equal(table_names, c("my_x", "y"))
+  table_paths <- sql_build(left_join(x, y, by = "a", x_as = "my_x"))$table_names
+  expect_equal(table_paths, table_path(c("`my_x`", "`y`")))
 
-  table_names <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("x", "my_y"))
+  table_paths <- sql_build(left_join(x, y, by = "a", y_as = "my_y"))$table_names
+  expect_equal(table_paths, table_path(c("`x`", "`my_y`")))
 
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
-  expect_equal(table_names, c("my_x", "my_y"))
+  table_paths <- sql_build(left_join(x, y, by = "a", x_as = "my_x", y_as = "my_y"))$table_names
+  expect_equal(table_paths, table_path(c("`my_x`", "`my_y`")))
 
   # x_as same name as `y`
-  table_names <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
-  expect_equal(table_names, c("y", "y...2"))
+  table_paths <- sql_build(left_join(x, y, by = "a", x_as = "y"))$table_names
+  expect_equal(table_paths, table_path(c("`y`", "`y...2`")))
 
-  table_names <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
-  expect_equal(table_names, c("LHS...1", "LHS"))
+  table_paths <- sql_build(left_join(x %>% filter(x == 1), x, by = "x", y_as = "LHS"))$table_names
+  expect_equal(table_paths, table_path(c("`LHS...1`", "`LHS`")))
 
   # sql_on -> use alias or LHS/RHS
-  table_names <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
-  expect_equal(table_names, c("LHS", "RHS"))
+  table_paths <- sql_build(left_join(x, y, sql_on = sql("LHS.a = RHS.a")))$table_names
+  expect_equal(table_paths, table_path(c("`LHS`", "`RHS`")))
 
-  table_names <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
-  expect_equal(table_names, c("my_x", "RHS"))
+  table_paths <- sql_build(left_join(x, y, x_as = "my_x", sql_on = sql("my_x.a = RHS.a")))$table_names
+  expect_equal(table_paths, table_path(c("`my_x`", "`RHS`")))
 
   # triple join
   z <- lazy_frame(a = 1, z = 1, .name = "z")
   out <- left_join(x, y, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x", "y", "z"))
+  expect_equal(out$table_names, table_path(c("`x`", "`y`", "`z`")))
 
   # triple join where names need to be repaired
   out <- left_join(x, x, by = "a") %>%
     left_join(z, by = "a") %>%
     sql_build()
-  expect_equal(out$table_names, c("x...1", "x...2", "z"))
+  expect_equal(out$table_names, table_path(c("`x...1`", "`x...2`", "`z`")))
 })
 
 test_that("select() before join is inlined", {
@@ -623,7 +625,10 @@ test_that("multiple joins create a single query", {
     inner_join(lf3, by = "x")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(name = c("df1", "df2", "df3"), from = "name"))
+  expect_equal(lq$table_names, tibble(
+    name = table_path(c("`df1`", "`df2`", "`df3`")),
+    from = "name"
+  ))
   expect_equal(lq$vars$name, c("x", "a", "b.x", "b.y"))
   expect_equal(lq$vars$table, c(1L, 1L, 2L, 3L))
   expect_equal(lq$vars$var, c("x", "a", "b", "b"))
@@ -722,7 +727,10 @@ test_that("multi joins work with x_as", {
     inner_join(lf3, by = "x", y_as = "lf3")
   lq <- out$lazy_query
   expect_s3_class(lq, "lazy_multi_join_query")
-  expect_equal(lq$table_names, tibble(name = c("lf1", "lf2", "lf3"), from = "as"))
+  expect_equal(
+    lq$table_names,
+    tibble(name = table_path(c("`lf1`", "`lf2`", "`lf3`")), from = "as")
+  )
 
   # `x_as` provided twice with the same name -> one query
   out2 <- left_join(lf, lf2, by = "x", x_as = "lf1", y_as = "lf2") %>%

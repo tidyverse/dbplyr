@@ -62,7 +62,7 @@ copy_to.src_sql <- function(dest,
     cli_abort("{.var df} must be a local dataframe or a remote tbl_sql")
   }
 
-  name <- as_table_ident(name)
+  name <- as_table_path(name, dest$con)
 
   if (inherits(df, "tbl_sql") && same_src(df$src, dest)) {
     out <- compute(df,
@@ -181,8 +181,8 @@ sql_render.values_query <- function(query,
 }
 
 #' @export
-flatten_query.values_query <- function(qry, query_list) {
-  querylist_reuse_query(qry, query_list)
+flatten_query.values_query <- function(qry, query_list, con) {
+  querylist_reuse_query(qry, query_list, con)
 }
 
 #' @export

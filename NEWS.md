@@ -4,6 +4,28 @@
   Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
   from #1292 (#1436).
 
+* Specification of table names with schema/catalogs has been overhauled to
+  make it simpler. This includes the following features and fixes:
+
+  * The simplest way to refer to a qualified table is now to wrap it in 
+    `I()`, e.g. `I("schema_name.table_name")`.
+    
+  * Use of `sql()` and `ident_q()` inside `in_catalog()` and `in_schema()`
+    is once again supported (#1388).
+    
+  * It's ok to use `ident_q()` once again (#1413) and you should no longer
+    see unsuppressable warnings about using `in_schema()` (#1408).
+    
+  * The names of the arguments to `Id()` no longer matter, only their order 
+    (#1416). Additionally, thanks to changes to the DBI package, you no 
+    longer need to name each argument.
+  
+  * If you accidentally pass a named vector to any of the database identifer
+    functions, those names will be automatically stripped (#1404).
+
+* When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
+  it now only includes the table name in the index name, not the schema name.
+
 * The databricks backend now supports creating non-temporary tables too (#1418).
 
 * Clearer error if you attempt to embed non-atomic vectors inside of a generated 

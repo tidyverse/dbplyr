@@ -83,10 +83,10 @@ test_that("compute keeps window and groups", {
 })
 
 test_that("compute can handle named name", {
-  name <- set_names(unique_subquery_name(), unique_subquery_name())
+  con <- simulate_dbi()
   expect_equal(
     memdb_frame(x = 1:10) %>%
-      compute() %>%
+      compute(name = c(x = unique_table_name())) %>%
       collect(),
     tibble(x = 1:10)
   )

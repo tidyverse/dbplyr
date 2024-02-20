@@ -389,6 +389,19 @@ test_that("can copy_to() and compute() with temporary tables (#438)", {
   expect_equal(db2 %>% pull(), 2:4)
 })
 
+test_that("add prefix to temporary table", {
+  con <- simulate_mssql()
+  expect_snapshot(
+    out <- db_table_temporary(con, table_path("foo.bar"), temporary = TRUE)
+  )
+  expect_equal(out, list(table = table_path("`foo`.`#bar`"), temporary = FALSE))
+
+  expect_silent(
+    out <- db_table_temporary(con, table_path("foo.#bar"), temporary = TRUE)
+  )
+  expect_equal(out, list(table = table_path("foo.#bar"), temporary = FALSE))
+})
+
 test_that("bit conversion works for important cases", {
   df <- tibble(x = 1:3, y = 3:1)
   db <- copy_to(src_test("mssql"), df, name = unique_table_name("#"))

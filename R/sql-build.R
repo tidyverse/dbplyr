@@ -119,7 +119,7 @@ sql_render.lazy_query <- function(query,
   qry <- sql_optimise(qry, con = con, subquery = subquery)
 
   if (sql_options$cte) {
-    query_list <- flatten_query(qry, list(queries = list(), name = NULL))
+    query_list <- flatten_query(qry, list(queries = list(), name = NULL), con = con)
     queries <- query_list$queries
 
     rendered_queries <- purrr::map2(
@@ -144,6 +144,7 @@ cte_render <- function(query_list, con) {
   ctes <- purrr::imap(
     query_list[-n],
     function(query, name) {
+      name <- table_path(name)
       glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
     }
   )
@@ -158,17 +159,17 @@ get_subquery_name <- function(x, query_list) {
   base_query(query_list$name)
 }
 
-flatten_query <- function(qry, query_list) {
+flatten_query <- function(qry, query_list, con) {
   UseMethod("flatten_query")
 }
 
-querylist_reuse_query <- function(qry, query_list) {
+querylist_reuse_query <- function(qry, query_list, con) {
   id <- vctrs::vec_match(list(unclass(qry)), purrr::map(query_list$queries, unclass))
 
   if (!is.na(id)) {
     query_list$name <- names(query_list$queries)[[id]]
   } else {
-    name <- unique_subquery_name()
+    name <- as_table_path(unique_subquery_name(), con)
     wrapped_query <- set_names(list(qry), name)
     query_list$queries <- c(query_list$queries, wrapped_query)
     query_list$name <- name
@@ -177,16 +178,16 @@ querylist_reuse_query <- function(qry, query_list) {
   query_list
 }
 
-flatten_query_2_tables <- function(qry, query_list) {
+flatten_query_2_tables <- function(qry, query_list, con) {
   x <- qry$x
-  query_list_x <- flatten_query(x, query_list)
+  query_list_x <- flatten_query(x, query_list, con)
   qry$x <- get_subquery_name(x, query_list_x)
 
   y <- qry$y
-  query_list_y <- flatten_query(y, query_list_x)
+  query_list_y <- flatten_query(y, query_list_x, con)
   qry$y <- get_subquery_name(y, query_list_y)
 
-  querylist_reuse_query(qry, query_list_y)
+  querylist_reuse_query(qry, query_list_y, con)
 }
 
 

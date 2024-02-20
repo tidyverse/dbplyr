@@ -17,11 +17,7 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL, check_from = TRUE) {
   # Can't use check_dots_used(), #1429
   check_character(vars, allow_null = TRUE)
 
-  from <- as_from(from)
-  if (check_from) {
-    check_from_for_query_or_schema(from)
-  }
-
+  from <- as_table_source(from, con = src$con)
   vars <- vars %||% dbplyr_query_fields(src$con, from)
 
   dplyr::make_tbl(
@@ -29,33 +25,6 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL, check_from = TRUE) {
     src = src,
     lazy_query = lazy_query_remote(from, vars)
   )
-}
-
-check_from_for_query_or_schema <- function(from) {
-  if (!is_table_ident(from)) {
-    return()
-  }
-
-  table <- vctrs::field(from, "table")
-  schema <- vctrs::field(from, "schema")
-
-  if (grepl(" from ", tolower(table), fixed = TRUE)) {
-    cli::cli_inform(c(
-      "It looks like you tried to incorrectly use an SQL query as source.",
-      i = "If you want to select from a query wrap it in {.fn sql}.",
-      i = "If your table actually contains {.val FROM} in the name use {.arg check_from = FALSE} to silence this message."
-    ))
-    return()
-  }
-
-  if (grepl(".", table, fixed = TRUE) && is.na(schema)) {
-    cli::cli_inform(c(
-      "It looks like you tried to incorrectly use a table in a schema as source.",
-      i = "If you want to specify a schema use {.fn in_schema} or {.fn in_catalog}.",
-      i = "If your table actually contains {.val .} in the name use {.arg check_from = FALSE} to silence this message."
-    ))
-    return()
-  }
 }
 
 #' @importFrom dplyr same_src
