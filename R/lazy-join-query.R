@@ -188,7 +188,7 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
 }
 
 generate_join_table_names <- function(table_names, con) {
-  names <- table_name(table_names$name, con)
+  names <- table_path_name(table_names$name, con)
   table_name_length_max <- max(nchar(names))
 
   if (length(table_names$name) != 2) {

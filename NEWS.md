@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* dbplyr now exports some tools to work with the internal `table_path` class
+  which is useful for certain backends that need to work with this 
+  data structure (#1300).
+
 * Oracle once again translates `head()` to `FETCH FIRST`. This does require
   Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
   from #1292 (#1436).
