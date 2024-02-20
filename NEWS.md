@@ -1,7 +1,7 @@
 # dbplyr (development version)
 
 * Oracle once again translates `head()` to `FETCH FIRST`. This does require
-  Oracle 12c, but it actually works, compared to the approach using `ROWNUM`
+  Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
   from #1292 (#1436).
 
 * The databricks backend now supports creating non-temporary tables too (#1418).
