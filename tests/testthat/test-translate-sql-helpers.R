@@ -66,11 +66,15 @@ test_that("unary minus works with expressions", {
   expect_equal(test_translate_sql(--x), sql("--`x`"))
 })
 
-test_that("pad = FALSE works", {
+test_that("sql_infix generates expected output (#1345)", {
   local_con(simulate_dbi())
-  subset <- sql_infix(".", pad = FALSE)
+  x <- ident_q("x")
+  y <- ident_q("y")
 
-  expect_equal(subset(ident("df"), ident("x")), sql("`df`.`x`"))
+  expect_equal(sql_infix("-", pad = FALSE)(x, y), sql("x-y"))
+  expect_equal(sql_infix("-", pad = FALSE)(NULL, y), sql("-y"))
+  expect_equal(sql_infix("-")(x, y), sql("x - y"))
+  expect_equal(sql_infix("-")(NULL, y), sql("- y"))
 })
 
 test_that("sql_prefix checks arguments", {
