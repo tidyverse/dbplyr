@@ -1,18 +1,25 @@
-#' Refer to a table in a schema or a database catalog
+#' Refer to a table in another schema/catalog
 #'
-#' `in_schema()` can be used in [tbl()] to indicate a table in a specific
-#' schema.
-#' `in_catalog()` additionally allows specifying the database catalog.
+#' @description
+#' `in_schema()` and `in_catalog()` can be used to refer to tables outside of
+#' the current catalog/schema. We now recommend using `I()` instead, as it's
+#' tpyically much less typing.
 #'
 #' @param catalog,schema,table Names of catalog, schema, and table.
 #'   These will be automatically quoted; use [sql()] to pass a raw name
 #'   that won't get quoted.
 #' @export
+#' @keywords internal
 #' @examples
+#' # Previously:
 #' in_schema("my_schema", "my_table")
 #' in_catalog("my_catalog", "my_schema", "my_table")
-#' # eliminate quotes
 #' in_schema(sql("my_schema"), sql("my_table"))
+#'
+#' # Now
+#' I("my_schema.my_table")
+#' I("my_catalog.my_schema.my_table")
+#' I("my_schema.my_table")
 #'
 #' # Example using schemas with SQLite
 #' con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -23,10 +30,10 @@
 #'
 #' library(dplyr, warn.conflicts = FALSE)
 #' copy_to(con, iris, "df", temporary = FALSE)
-#' copy_to(con, mtcars, in_schema("aux", "df"), temporary = FALSE)
+#' copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 #'
 #' con %>% tbl("df")
-#' con %>% tbl(in_schema("aux", "df"))
+#' con %>% tbl(I("aux.df"))
 in_schema <- function(schema, table) {
   structure(
     list(

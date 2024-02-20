@@ -48,8 +48,9 @@ sql_query_delete(con, table, from, by, ..., returning_cols = NULL)
 \arguments{
 \item{con}{Database connection.}
 
-\item{table}{Table to update. Must be a table identifier, e.g. single string
-or created via \code{in_schema()}.}
+\item{table}{Table to update. Must be a table identifier.
+Use a string to refer to tables in the current schema/catalog or
+\code{I()} to refer to tables in other schemas/catalogs.}
 
 \item{from}{Table or query that contains the new data. Either a table
 identifier or SQL.}

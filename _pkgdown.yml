@@ -71,7 +71,6 @@ reference:
 
 - title: Database connection
   contents:
-  - in_schema
   - memdb_frame
   - remote_name
 
@@ -79,7 +78,6 @@ reference:
   contents:
   - build_sql
   - escape
-  - ident
   - partial_eval
   - sql
   - sql_expr

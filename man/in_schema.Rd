@@ -3,7 +3,7 @@
 \name{in_schema}
 \alias{in_schema}
 \alias{in_catalog}
-\title{Refer to a table in a schema or a database catalog}
+\title{Refer to a table in another schema/catalog}
 \usage{
 in_schema(schema, table)
 
@@ -15,15 +15,20 @@ These will be automatically quoted; use \code{\link[=sql]{sql()}} to pass a raw 
 that won't get quoted.}
 }
 \description{
-\code{in_schema()} can be used in \code{\link[=tbl]{tbl()}} to indicate a table in a specific
-schema.
-\code{in_catalog()} additionally allows specifying the database catalog.
+\code{in_schema()} and \code{in_catalog()} can be used to refer to tables outside of
+the current catalog/schema. We now recommend using \code{I()} instead, as it's
+tpyically much less typing.
 }
 \examples{
+# Previously:
 in_schema("my_schema", "my_table")
 in_catalog("my_catalog", "my_schema", "my_table")
-# eliminate quotes
 in_schema(sql("my_schema"), sql("my_table"))
+
+# Now
+I("my_schema.my_table")
+I("my_catalog.my_schema.my_table")
+I("my_schema.my_table")
 
 # Example using schemas with SQLite
 con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -34,8 +39,9 @@ DBI::dbExecute(con, paste0("ATTACH '", tmp, "' AS aux"))
 
 library(dplyr, warn.conflicts = FALSE)
 copy_to(con, iris, "df", temporary = FALSE)
-copy_to(con, mtcars, in_schema("aux", "df"), temporary = FALSE)
+copy_to(con, mtcars, I("aux.df"), temporary = FALSE)
 
 con \%>\% tbl("df")
-con \%>\% tbl(in_schema("aux", "df"))
+con \%>\% tbl(I("aux.df"))
 }
+\keyword{internal}
