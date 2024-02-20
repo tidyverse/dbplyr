@@ -11,6 +11,11 @@
 #' * Custom subquery generation (no `AS`)
 #' * `setdiff()` uses `MINUS` instead of `EXCEPT`
 #'
+#' Note that versions of Oracle prior to 23c have limited supported for
+#' `TRUE` and `FALSE` and you may need to use `1` and `0` instead.
+#' See <https://oracle-base.com/articles/23c/boolean-data-type-23c> for
+#' more details.
+#'
 #' Use `simulate_oracle()` with `lazy_frame()` to see simulated SQL without
 #' converting to live access database.
 #'

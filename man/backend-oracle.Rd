@@ -18,6 +18,11 @@ are:
 \item \code{setdiff()} uses \code{MINUS} instead of \code{EXCEPT}
 }
 
+Note that versions of Oracle prior to 23c have limited supported for
+\code{TRUE} and \code{FALSE} and you may need to use \code{1} and \code{0} instead.
+See \url{https://oracle-base.com/articles/23c/boolean-data-type-23c} for
+more details.
+
 Use \code{simulate_oracle()} with \code{lazy_frame()} to see simulated SQL without
 converting to live access database.
 }
