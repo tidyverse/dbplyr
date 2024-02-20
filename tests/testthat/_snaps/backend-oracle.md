@@ -17,7 +17,7 @@
       <SQL>
       SELECT `df`.*
       FROM `df`
-      WHERE (ROWNUM <= 6)
+      FETCH FIRST 6 ROWS ONLY
 
 # `sql_query_upsert()` is correct
 
