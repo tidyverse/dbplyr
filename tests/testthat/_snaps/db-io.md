@@ -35,7 +35,7 @@
     Output
       <error/rlang_error>
       Error in `db_save_query()`:
-      ! Can't save query to table tmp.
+      ! Can't save query to table `tmp`.
       i Using SQL: CREATE TEMPORARY TABLE `tmp` AS `SELECT 2 FROM tmp`
       Caused by error:
       ! dummy DBI error

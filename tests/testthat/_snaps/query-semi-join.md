@@ -11,11 +11,9 @@
       Where:
         "`df_RHS`.`z` = 2.0"
       X:
-        <dbplyr_table_ident[1]>
-        [1] `df`
+        <table_path> `df`
       Y:
-        <dbplyr_table_ident[1]>
-        [1] `df`
+        <table_path> `df`
 
 # generated sql doesn't change unexpectedly
 

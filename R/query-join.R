@@ -115,19 +115,19 @@ sql_render.multi_join_query <- function(query,
 flatten_query.join_query <- flatten_query_2_tables
 
 #' @export
-flatten_query.multi_join_query <- function(qry, query_list) {
+flatten_query.multi_join_query <- function(qry, query_list, con) {
   x <- qry$x
-  query_list_new <- flatten_query(x, query_list)
+  query_list_new <- flatten_query(x, query_list, con)
   qry$x <- get_subquery_name(x, query_list_new)
 
   for (i in vctrs::vec_seq_along(qry$joins)) {
     y <- qry$joins$table[[i]]
-    query_list_new <- flatten_query(y, query_list_new)
+    query_list_new <- flatten_query(y, query_list_new, con)
     qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
   }
 
   # TODO reuse query
-  name <- unique_subquery_name()
+  name <- as_table_path(unique_subquery_name(), con)
   wrapped_query <- set_names(list(qry), name)
 
   query_list$queries <- c(query_list_new$queries, wrapped_query)
@@ -182,12 +182,11 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
     duplicated_vars <- all_vars[vctrs::vec_duplicate_detect(all_vars)]
     duplicated_vars <- unique(duplicated_vars)
   }
-  table_names <- names(table_vars)
+  table_paths <- table_path(names(table_vars))
 
-  # FIXME vectorise `sql_table_prefix()` (need to update `ident()` and friends for this...)
   out <- rep_named(vars$name, list())
 
-  for (i in seq_along(table_names)) {
+  for (i in seq_along(table_paths)) {
     all_vars_i <- table_vars[[i]]
     vars_idx_i <- which(vars$table == i)
     used_vars_i <- vars$var[vars_idx_i]
@@ -195,12 +194,12 @@ sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_col
 
     if (use_star && join_can_use_star(all_vars_i, used_vars_i, out_vars_i, vars_idx_i)) {
       id <- vars_idx_i[[1]]
-      out[[id]] <- sql_star(con, table_names[i])
+      out[[id]] <- sql_star(con, table_paths[i])
       names(out)[id] <- ""
     } else {
       out[vars_idx_i] <- purrr::map2(
         used_vars_i, i,
-        ~ sql_multi_join_var(con, .x, .y, table_names, duplicated_vars)
+        ~ sql_multi_join_var(con, .x, .y, table_paths, duplicated_vars)
       )
 
     }
@@ -250,7 +249,10 @@ sql_rf_join_vars <- function(con,
                              use_star,
                              qualify_all_columns) {
   type <- arg_match0(type, c("right", "full"))
-  table_names <- c(unclass(x_as), unclass(y_as))
+
+  check_table_path(x_as)
+  check_table_path(y_as)
+  table_names <- c(x_as, y_as)
 
   if (type == "full") {
     duplicated_vars <- intersect(tolower(vars$all_x), tolower(vars$all_y))
@@ -334,22 +336,20 @@ sql_table_prefix <- function(con, var, table = NULL) {
   if (!is_bare_character(var)) {
     cli_abort("{.arg var} must be a bare character.", .internal = TRUE)
   }
-  var <- sql_escape_ident(con, var)
-
-  if (!is.null(table)) {
-    table <- as_table_ident(table)
-    table <- escape(table, collapse = NULL, con = con)
-    sql(paste0(table, ".", var))
-  } else {
-    var
-  }
+  sql_qualify_var(con, table, var)
 }
 
 sql_star <- function(con, table = NULL) {
-  var <- sql("*")
+  sql_qualify_var(con, table, SQL("*"))
+}
+
+sql_qualify_var <- function(con, table, var) {
+  var <- sql_escape_ident(con, var)
+
   if (!is.null(table)) {
-    table <- as_table_ident(table)
-    table <- escape(table, collapse = NULL, con = con)
+    table <- table_name(table, con)
+    table <- as_table_paths(table, con)
+
     sql(paste0(table, ".", var))
   } else {
     var

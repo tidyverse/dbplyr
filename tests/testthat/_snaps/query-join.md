@@ -5,20 +5,17 @@
     Output
       <SQL JOINS>
       X:
-        <dbplyr_table_ident[1]>
-        [1] `lf1`
+        <table_path> `lf1`
       Type: left
       By:
         x-x
       Y:
-        <dbplyr_table_ident[1]>
-        [1] `lf2`
+        <table_path> `lf2`
       Type: left
       By:
         x-x
       Y:
-        <dbplyr_table_ident[1]>
-        [1] `lf3`
+        <table_path> `lf3`
 
 # generated sql doesn't change unexpectedly
 

@@ -153,7 +153,9 @@ op_vars.lazy_semi_join_query <- function(op) {
 
 #' @export
 sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
-  table_names_out <- generate_join_table_names(op$table_names)
+
+  table_names_out <- generate_join_table_names(op$table_names, con)
+
   tables <- set_names(c(list(op$x), op$joins$table), table_names_out)
   table_vars <- purrr::map(tables, op_vars)
   select_sql <- sql_multi_join_vars(
@@ -185,21 +187,21 @@ sql_build.lazy_multi_join_query <- function(op, con, ..., sql_options = NULL) {
   )
 }
 
-generate_join_table_names <- function(table_names) {
-  table_name_length_max <- max(nchar(table_names$name))
+generate_join_table_names <- function(table_names, con) {
+  names <- table_name(table_names$name, con)
+  table_name_length_max <- max(nchar(names))
 
   if (length(table_names$name) != 2) {
-    table_names_repaired <- vctrs::vec_as_names(table_names$name, repair = "unique", quiet = TRUE)
+    table_names_repaired <- vctrs::vec_as_names(names, repair = "unique", quiet = TRUE)
     may_repair_name <- table_names$from != "as"
-    table_names$name[may_repair_name] <- table_names_repaired[may_repair_name]
-    table_names_prepared <- table_names$name
+    names[may_repair_name] <- table_names_repaired[may_repair_name]
   } else{
-    table_names_prepared <- join_two_table_alias(table_names$name, table_names$from)
+    names <- join_two_table_alias(names, table_names$from)
   }
 
   # avoid database aliases exceeding the database-specific maximum length
-  abbreviate(
-    table_names_prepared,
+  abbr_names <- abbreviate(
+    names,
     # arbitrarily floor at identifier limit for Postgres backend to avoid unnecessarily truncating reasonable lengths
     # Source: https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
     # "By default, NAMEDATALEN is 64 so the maximum identifier length is 63 bytes."
@@ -213,11 +215,13 @@ generate_join_table_names <- function(table_names) {
     # since we opt to add qualifiers (...1, _{R/L}HS, etc.) to end of table name
     method = "both.sides"
   )
+
+  as_table_paths(abbr_names, con)
 }
 
 #' @export
 sql_build.lazy_rf_join_query <- function(op, con, ..., sql_options = NULL) {
-  table_names_out <- generate_join_table_names(op$table_names)
+  table_names_out <- generate_join_table_names(op$table_names, con)
 
   vars_classic <- as.list(op$vars)
   vars_classic$all_x <- op_vars(op$x)
@@ -260,7 +264,7 @@ sql_build.lazy_semi_join_query <- function(op, con, ..., sql_options = NULL) {
   }
 
   y_vars <- op_vars(op$y)
-  replacements <- purrr::map(y_vars, ~ call2("$", sym(op$by$y_as), sym(.x)))
+  replacements <- purrr::map(y_vars, ~ call2("$", call2("sql", op$by$y_as), sym(.x)))
   where <- purrr::map(
     op$where,
     ~ replace_sym(.x, y_vars, replacements)

@@ -42,7 +42,7 @@ db_copy_to <-  function(con,
                         indexes = NULL,
                         analyze = TRUE,
                         in_transaction = TRUE) {
-  as_table_ident(table)
+  check_table_id(table)
   check_bool(overwrite)
   check_character(types, allow_null = TRUE)
   check_named(types)
@@ -65,10 +65,11 @@ db_copy_to.DBIConnection <- function(con,
                                      indexes = NULL,
                                      analyze = TRUE,
                                      in_transaction = TRUE) {
-  table <- as_table_ident(table)
+  table <- as_table_path(table, con)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
+  call <- current_env()
 
   with_transaction(
     con,
@@ -103,7 +104,7 @@ db_compute <- function(con,
                        indexes = list(),
                        analyze = TRUE,
                        in_transaction = TRUE) {
-  as_table_ident(table)
+  check_table_id(table)
   check_scalar_sql(sql)
   check_bool(overwrite)
   check_bool(temporary)
@@ -123,7 +124,7 @@ db_compute.DBIConnection <- function(con,
                                      indexes = list(),
                                      analyze = TRUE,
                                      in_transaction = FALSE) {
-  table <- as_table_ident(table)
+  table <- as_table_path(table, con)
   new <- db_table_temporary(con, table, temporary)
   table <- new$table
   temporary <- new$temporary
@@ -179,7 +180,7 @@ db_write_table.DBIConnection <- function(con,
                                          temporary = TRUE,
                                          ...,
                                          overwrite = FALSE) {
-  table <- as_table_ident(table)
+  check_table_path(table)
   check_character(types, allow_null = TRUE)
   check_named(types)
   check_bool(temporary)
@@ -188,7 +189,7 @@ db_write_table.DBIConnection <- function(con,
   withCallingHandlers(
     dbWriteTable(
       con,
-      name = table_ident_to_id(table),
+      name = SQL(table),
       value = values,
       field.types = types,
       temporary = temporary,
