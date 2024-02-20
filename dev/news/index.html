@@ -74,7 +74,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li>
+<ul><li><p>Oracle once again translates <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code> to <code>FETCH FIRST</code>. This does require Oracle 12c or newer, but it actually works, compared to the approach using <code>ROWNUM</code> from <a href="https://github.com/tidyverse/dbplyr/issues/1292" class="external-link">#1292</a> (<a href="https://github.com/tidyverse/dbplyr/issues/1436" class="external-link">#1436</a>).</p></li>
+<li>
 <p>Specification of table names with schema/catalogs has been overhauled to make it simpler. This includes the following features and fixes:</p>
 <ul><li><p>The simplest way to refer to a qualified table is now to wrap it in <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code>, e.g. <code>I("schema_name.table_name")</code>.</p></li>
 <li><p>Use of <code><a href="../reference/sql.html">sql()</a></code> and <code><a href="../reference/ident_q.html">ident_q()</a></code> inside <code><a href="../reference/in_schema.html">in_catalog()</a></code> and <code><a href="../reference/in_schema.html">in_schema()</a></code> is once again supported (<a href="https://github.com/tidyverse/dbplyr/issues/1388" class="external-link">#1388</a>).</p></li>
