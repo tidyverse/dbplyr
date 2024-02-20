@@ -54,6 +54,13 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   expect_equal(as.character(tbl_vars(df)), c("a", "b", "c"))
 })
 
+test_that("useful error if missing I()", {
+  expect_snapshot(
+    tbl(src_memdb(), "foo.bar"),
+    error = TRUE
+  )
+})
+
 # n_groups ----------------------------------------------------------------
 
 test_that("check basic group size implementation", {

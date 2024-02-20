@@ -17,13 +17,29 @@ tbl_sql <- function(subclass, src, from, ..., vars = NULL, check_from = TRUE) {
   # Can't use check_dots_used(), #1429
   check_character(vars, allow_null = TRUE)
 
-  from <- as_table_source(from, con = src$con)
-  vars <- vars %||% dbplyr_query_fields(src$con, from)
+  is_suspicious <- is_bare_string(from) && grepl(".", from, fixed = TRUE)
+  source <- as_table_source(from, con = src$con)
+
+  withCallingHandlers(
+    vars <- vars %||% dbplyr_query_fields(src$con, source),
+    error = function(err) {
+      if (!is_suspicious) return()
+
+      cli::cli_abort(
+        c(
+          "Failed to find table {source}.",
+          i = "Did you mean {.code from = I({.str {from}})}?"
+        ),
+        parent = err
+      )
+    }
+  )
+
 
   dplyr::make_tbl(
     c(subclass, "sql", "lazy"),
     src = src,
-    lazy_query = lazy_query_remote(from, vars)
+    lazy_query = lazy_query_remote(source, vars)
   )
 }
 
