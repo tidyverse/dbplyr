@@ -121,7 +121,9 @@ amounts of data.</p></dd>
 
 
 <dt>name</dt>
-<dd><p>name for new remote table.</p></dd>
+<dd><p>Name of new remote table. Use a string to create the table
+in the current catalog/schema. Use <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code> if you want to create it
+in a specific catalog/schema, e.g. <code>I("schema.table")</code>.</p></dd>
 
 
 <dt>overwrite</dt>
