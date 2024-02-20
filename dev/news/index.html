@@ -74,7 +74,16 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p>The databricks backend now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
+<ul><li>
+<p>Specification of table names with schema/catalogs has been overhauled to make it simpler. This includes the following features and fixes:</p>
+<ul><li><p>The simplest way to refer to a qualified table is now to wrap it in <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code>, e.g. <code>I("schema_name.table_name")</code>.</p></li>
+<li><p>Use of <code><a href="../reference/sql.html">sql()</a></code> and <code><a href="../reference/ident_q.html">ident_q()</a></code> inside <code><a href="../reference/in_schema.html">in_catalog()</a></code> and <code><a href="../reference/in_schema.html">in_schema()</a></code> is once again supported (<a href="https://github.com/tidyverse/dbplyr/issues/1388" class="external-link">#1388</a>).</p></li>
+<li><p>It’s ok to use <code><a href="../reference/ident_q.html">ident_q()</a></code> once again (<a href="https://github.com/tidyverse/dbplyr/issues/1413" class="external-link">#1413</a>) and you should no longer see unsuppressable warnings about using <code><a href="../reference/in_schema.html">in_schema()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1408" class="external-link">#1408</a>).</p></li>
+<li><p>The names of the arguments to <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">Id()</a></code> no longer matter, only their order (<a href="https://github.com/tidyverse/dbplyr/issues/1416" class="external-link">#1416</a>). Additionally, thanks to changes to the DBI package, you no longer need to name each argument.</p></li>
+<li><p>If you accidentally pass a named vector to any of the database identifer functions, those names will be automatically stripped (<a href="https://github.com/tidyverse/dbplyr/issues/1404" class="external-link">#1404</a>).</p></li>
+</ul></li>
+<li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
+<li><p>The databricks backend now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
 <li><p>Clearer error if you attempt to embed non-atomic vectors inside of a generated query (<a href="https://github.com/tidyverse/dbplyr/issues/1368" class="external-link">#1368</a>).</p></li>
 <li><p><code>x$name</code> never attempts to evaluate <code>name</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1368" class="external-link">#1368</a>).</p></li>
 <li><p><code>rows_patch(in_place = FALSE)</code> now works when more than one column should be patched (<a href="https://github.com/gorcha" class="external-link">@gorcha</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1443" class="external-link">#1443</a>).</p></li>
