@@ -83,6 +83,7 @@
 <li><p>It’s ok to use <code><a href="../reference/ident_q.html">ident_q()</a></code> once again (<a href="https://github.com/tidyverse/dbplyr/issues/1413" class="external-link">#1413</a>) and you should no longer see unsuppressable warnings about using <code><a href="../reference/in_schema.html">in_schema()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1408" class="external-link">#1408</a>).</p></li>
 <li><p>The names of the arguments to <code><a href="https://dbi.r-dbi.org/reference/Id.html" class="external-link">Id()</a></code> no longer matter, only their order (<a href="https://github.com/tidyverse/dbplyr/issues/1416" class="external-link">#1416</a>). Additionally, thanks to changes to the DBI package, you no longer need to name each argument.</p></li>
 <li><p>If you accidentally pass a named vector to any of the database identifer functions, those names will be automatically stripped (<a href="https://github.com/tidyverse/dbplyr/issues/1404" class="external-link">#1404</a>).</p></li>
+<li><p><code>tbl_sql(check_from)</code> is now deprecated.</p></li>
 </ul></li>
 <li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
 <li><p>The databricks backend now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
