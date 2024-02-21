@@ -50,8 +50,15 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   DBI::dbExecute(con, "CREATE TABLE 'aux.t1' (a, b, c)")
 
   expect_equal(as.character(tbl_vars(tbl(con, in_schema("aux", "t1")))), c("x", "y", "z"))
-  df <- tbl(con, ident("aux.t1"), check_from = FALSE)
+  df <- tbl(con, ident("aux.t1"))
   expect_equal(as.character(tbl_vars(df)), c("a", "b", "c"))
+})
+
+test_that("check_from is deprecated", {
+  con <- local_sqlite_connection()
+  DBI::dbExecute(con, "CREATE TABLE x (y)")
+
+  expect_snapshot(tbl(con, "x", check_from = FALSE))
 })
 
 # n_groups ----------------------------------------------------------------
