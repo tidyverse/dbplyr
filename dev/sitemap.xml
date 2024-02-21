@@ -175,6 +175,9 @@
     <loc>https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.html</loc>
   </url>
   <url>
+    <loc>https://dbplyr.tidyverse.org/dev/reference/is_table_path.html</loc>
+  </url>
+  <url>
     <loc>https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.html</loc>
   </url>
   <url>
