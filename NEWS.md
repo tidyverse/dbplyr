@@ -4,6 +4,9 @@
   which is useful for certain backends that need to work with this 
   data structure (#1300).
 
+* You can once again use `NULL` on the LHS of an infix operator in order
+  to generate SQL with unusual syntax (#1345).
+
 * Oracle once again translates `head()` to `FETCH FIRST`. This does require
   Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
   from #1292 (#1436).
@@ -26,6 +29,8 @@
   
   * If you accidentally pass a named vector to any of the database identifer
     functions, those names will be automatically stripped (#1404).
+    
+  * `tbl_sql(check_from)` is now deprecated.
 
 * When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
   it now only includes the table name in the index name, not the schema name.

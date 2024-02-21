@@ -4,7 +4,7 @@
 \alias{tbl_sql}
 \title{Create an SQL tbl (abstract)}
 \usage{
-tbl_sql(subclass, src, from, ..., vars = NULL, check_from = TRUE)
+tbl_sql(subclass, src, from, ..., vars = NULL, check_from = deprecated())
 }
 \arguments{
 \item{subclass}{name of subclass}
@@ -16,7 +16,7 @@ to avoid retrieving them from the database.
 Mainly useful for better performance when creating
 multiple \code{tbl} objects.}
 
-\item{check_from}{Check if \code{from} is likely misspecified SQL or a table in a schema.}
+\item{check_from}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 }
 \description{
 Generally, you should no longer need to provide a custom \code{tbl()}

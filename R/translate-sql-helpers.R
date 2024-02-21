@@ -153,29 +153,34 @@ sql_infix <- function(f, pad = TRUE) {
   # This is fixed with `escape_infix_expr()`
   # see https://github.com/tidyverse/dbplyr/issues/634
   check_string(f)
+  check_bool(pad)
   f <- sql(f)
 
-  if (pad) {
-    function(x, y) {
-      x <- escape_infix_expr(enexpr(x), x)
-      y <- escape_infix_expr(enexpr(y), y)
+  function(x, y) {
+    x <- escape_infix_expr(enexpr(x), x)
+    y <- escape_infix_expr(enexpr(y), y)
 
-      glue_sql2(sql_current_con(), "{.val x} {f} {.val y}")
+    if (is.null(x)) {
+      if (pad) {
+        sql <- "{f} {.val y}"
+      } else {
+        sql <- "{f}{.val y}"
+      }
+    } else {
+      if (pad) {
+        sql <- "{.val x} {f} {.val y}"
+      } else {
+        sql <- "{.val x}{f}{.val y}"
+      }
     }
-  } else {
-    function(x, y) {
-      x <- escape_infix_expr(enexpr(x), x)
-      y <- escape_infix_expr(enexpr(y), y)
-
-      glue_sql2(sql_current_con(), "{.val x}{f}{.val y}")
-    }
+    glue_sql2(sql_current_con(), sql)
   }
 }
 
 escape_infix_expr <- function(xq, x, escape_unary_minus = FALSE) {
   infix_calls <- c("+", "-", "*", "/", "%%", "^")
   is_infix <- is_call(xq, infix_calls, n = 2)
-  is_unary_minus <- escape_unary_minus && 
+  is_unary_minus <- escape_unary_minus &&
     is_call(xq, "-", n = 1) && !is_atomic(x, n = 1)
 
   if (is_infix || is_unary_minus) {
