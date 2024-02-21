@@ -94,7 +94,7 @@ sql_translation.RedshiftConnection <- function(con) {
           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        sql_expr(DATEDIFF(day, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
       }
     ),
     sql_translator(.parent = postgres$aggregate,
@@ -179,4 +179,4 @@ supports_window_clause.Redshift <- function(con) {
 #' @export
 supports_window_clause.RedshiftConnection <- supports_window_clause.Redshift
 
-utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float", "text"))
+utils::globalVariables(c("REGEXP_REPLACE", "LAG", "LEAD", "LISTAGG", "float", "text", "DATE_PART"))
