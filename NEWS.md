@@ -1,5 +1,9 @@
 # dbplyr (development version)
 
+* dbplyr now exports some tools to work with the internal `table_path` class
+  which is useful for certain backends that need to work with this 
+  data structure (#1300).
+
 * You can once again use `NULL` on the LHS of an infix operator in order
   to generate SQL with unusual syntax (#1345).
 

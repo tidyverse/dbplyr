@@ -23,6 +23,34 @@ table_path <- function(x) {
 # So you can do SQL(table_path("foo"))
 setOldClass(c("dbplyr_table_path", "character"))
 
+
+#' Table paths
+#'
+#' @description
+#' dbplyr standardises all the ways of referring to a table (i.e. a single
+#' string, a string wrapped in `I()`, a [DBI::Id()] and the results of
+#' [in_schema()] and [in_catalog()]) into a table "path" of the form
+#' `table`, `schema.table`, or `catalog.schema.path`. A table path is
+#' always suitable for inlining into a query, so user input is quoted unless
+#' it is wrapped in `I()`.
+#'
+#' This is primarily for internal usage, but you may need to work with it if
+#' you're implementing a backend, and you need to compute with the table path,
+#' not just pass it on unchanged to some other dbplyr function.
+#'
+#' * `is_table_path()` returns `TRUE` if the object is a `table_path`.
+#' * `as_table_path()` coerces known table identifiers to a `table_path`.
+#' * `check_table_path()` throws an error if the object is not a `table_path`.
+#' * `table_path_name()` returns the last component of the table path (i.e.
+#'   the name of the table).
+#' * `table_path_components()` returns a list containing the components of each
+#'    table path.
+#'
+#' A `table_path` object can technically be a vector of table paths, but
+#' you will never see this in table paths constructed from user inputs.
+#'
+#' @keywords internal
+#' @export
 is_table_path <- function(x) {
   inherits(x, "dbplyr_table_path")
 }
@@ -36,6 +64,7 @@ print.dbplyr_table_path <- function(x, ...) {
 `[.dbplyr_table_path` <- function(x, ...) {
   table_path(NextMethod())
 }
+
 #' @export
 `[[.dbplyr_table_path` <- function(x, ...) {
   table_path(NextMethod())
@@ -66,35 +95,44 @@ as_table_paths <- function(x, con) {
   make_table_path(x, con, collapse = FALSE)
 }
 
-# Extract just the table name from a full identifier
-table_name <- function(x, con) {
-  x <- as_table_path(x, con)
+#' @export
+#' @rdname is_table_path
+table_path_name <- function(x, con) {
+  path <- as_table_path(x, con)
+  components <- table_path_components(path, con)
 
-  vapply(x, FUN.VALUE = character(1), function(x) {
-    if (x == "") return("")
-
-    out <- table_path_components(x, con)
-    out[[length(out)]]
+  vapply(components, FUN.VALUE = character(1), function(x) {
+    if (length(x) == 0) "" else x[[length(x)]]
   })
 }
+
+#' @export
+#' @rdname is_table_path
 table_path_components <- function(x, con) {
+  UseMethod("table_path_components", con)
+}
+
+#' @export
+table_path_components.DBIConnection <- function(x, con) {
   quote_char <- substr(sql_escape_ident(con, ""), 1, 1)
 
-  scan(
-    text = x,
-    what = character(),
-    quote = quote_char,
-    quiet = TRUE,
-    na.strings = character(),
-    sep = "."
-  )
+  lapply(x, function(x) {
+    scan(
+      text = x,
+      what = character(),
+      quote = quote_char,
+      quiet = TRUE,
+      na.strings = character(),
+      sep = "."
+    )
+  })
 }
 
 #' @export
 escape.dbplyr_table_path <- function(x, parens = FALSE, collapse = ", ", con = NULL) {
   # names are always already escaped
   alias <- names2(x)
-  table_path <- as_table_path(table_name(x, con), con)
+  table_path <- as_table_path(table_path_name(x, con), con)
   has_alias <- alias == "" | alias == table_path
 
   if (db_supports_table_alias_with_as(con)) {
@@ -116,14 +154,15 @@ check_table_id <- function(x, arg = caller_arg(x), call = caller_env()) {
 }
 
 is_table_id <- function(x) {
-  is_table_path(x) ||
-    is.ident(x) ||
+  is.ident(x) ||
     methods::is(x, "Id") ||
     is_catalog(x) ||
     is_schema(x) ||
-    is.character(x)
+    ((is.character(x) || is_table_path(x)) && length(x) == 1)
 }
 
+#' @export
+#' @rdname is_table_path
 check_table_path <- function(x,
                              error_arg = caller_arg(x),
                              error_call = caller_env()) {
@@ -136,6 +175,8 @@ check_table_path <- function(x,
   }
 }
 
+#' @export
+#' @rdname is_table_path
 as_table_path <- function(x,
                           con,
                           error_arg = caller_arg(x),

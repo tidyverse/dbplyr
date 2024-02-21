@@ -347,7 +347,7 @@ sql_qualify_var <- function(con, table, var) {
   var <- sql_escape_ident(con, var)
 
   if (!is.null(table)) {
-    table <- table_name(table, con)
+    table <- table_path_name(table, con)
     table <- as_table_paths(table, con)
 
     sql(paste0(table, ".", var))

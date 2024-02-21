@@ -63,6 +63,10 @@ test_that("can coerce all user facing inputs", {
   expect_equal(as_table_path(id, con), table_path("`foo`.bar.baz"))
 })
 
+test_that("vectorised table_path is not a table_id", {
+  expect_false(is_table_id(table_path(c("x", "y"))))
+})
+
 test_that("strips names", {
   con <- simulate_dbi()
   expect_equal(as_table_path(c(x = "x"), con), table_path("`x`"))
@@ -87,4 +91,24 @@ test_that("as_table_path validates its inputs", {
 test_that("as_table_path warns when using sql", {
   con <- simulate_dbi()
   expect_snapshot(as_table_path(sql("x"), con))
+})
+
+# components --------------------------------------------------------------
+
+test_that("can parse components from path", {
+  con <- simulate_dbi()
+
+  expect_equal(
+    table_path_components(table_path(c("x.y", "`x.y`.z", "`x.y`.`y.z`")), con),
+    list(c("x", "y"), c("x.y", "z"), c("x.y", "y.z"))
+  )
+})
+
+test_that("can extract names from path", {
+  con <- simulate_dbi()
+
+  expect_equal(
+    table_path_name(table_path(c("x.y", "`x.y`.z", "x.`y.z`")), con),
+    c("y", "z", "y.z")
+  )
 })

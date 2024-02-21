@@ -40,7 +40,7 @@ remote_name <- function(x, null_if_local = TRUE) {
     if (is.null(con)) {
       table
     } else {
-      table_name(table, con)
+      table_path_name(table, con)
     }
   }
 }
