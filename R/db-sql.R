@@ -176,7 +176,7 @@ sql_table_index.DBIConnection <- function(con,
   table <- as_table_path(table, con)
 
   if (is.null(name)) {
-    table_name <- table_name(table, con)
+    table_name <- table_path_name(table, con)
     name <- name %||% paste0(c(table_name, columns), collapse = "_")
   }
   glue_sql2(
@@ -259,7 +259,7 @@ sql_query_wrap.DBIConnection <- function(con, from, name = NULL, ..., lvl = 0) {
     glue_sql2(con, "{from}", as_sql, "{.tbl name}")
   } else { # must be a table_path
     if (!is.null(name)) {
-      table <- table_name(name, con)
+      table <- table_path_name(name, con)
       names(from) <- as_table_path(table, con)
     }
     from

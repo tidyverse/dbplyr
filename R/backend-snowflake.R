@@ -224,13 +224,13 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(DATE_FROM_PARTS(!!year, !!month, !!day))
       },
       get_year = function(x) {
-        sql_expr(DATE_PART('year', !!x))
+        sql_expr(DATE_PART(YEAR, !!x))
       },
       get_month = function(x) {
-        sql_expr(DATE_PART('month', !!x))
+        sql_expr(DATE_PART(MONTH, !!x))
       },
       get_day = function(x) {
-        sql_expr(DATE_PART('day', !!x))
+        sql_expr(DATE_PART(DAY, !!x))
       },
 
       difftime = function(time1, time2, tz, units = "days") {
@@ -243,7 +243,7 @@ sql_translation.Snowflake <- function(con) {
           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        sql_expr(DATEDIFF(day, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
       },
       # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
@@ -355,4 +355,4 @@ snowflake_pmin_pmax_builder <- function(dot_1, dot_2, comparison){
   glue_sql2(sql_current_con(), glue("COALESCE(IFF({dot_2} {comparison} {dot_1}, {dot_2}, {dot_1}), {dot_2}, {dot_1})"))
 }
 
-utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim", "LENGTH"))
+utils::globalVariables(c("%REGEXP%", "DAYNAME", "DECODE", "FLOAT", "MONTHNAME", "POSITION", "trim", "LENGTH", "DATE_FROM_PARTS", "DATE_PART"))

@@ -109,15 +109,15 @@ test_that("custom clock functions translated correctly", {
   expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
   expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATE_FROM_PARTS(2020.0, 1.0, 1.0)"))
   expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATE_FROM_PARTS(`year_column`, 1, 1)"))
-  expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
-  expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
-  expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
+  expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART(YEAR, `date_column`)"))
+  expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART(MONTH, `date_column`)"))
+  expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART(DAY, `date_column`)"))
 })
 
 test_that("difftime is translated correctly", {
   local_con(simulate_snowflake())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(day, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(day, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
 
   expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
   expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
