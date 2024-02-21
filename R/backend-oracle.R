@@ -277,4 +277,4 @@ db_explain.OraConnection <- db_explain.Oracle
 #' @export
 db_supports_table_alias_with_as.OraConnection <- db_supports_table_alias_with_as.Oracle
 
-utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE"))
+utils::globalVariables(c("DATE", "CURRENT_TIMESTAMP", "TRUNC", "dbms_random.VALUE", "DATEDIFF", "CEIL", "NUMTODSINTERVAL"))
