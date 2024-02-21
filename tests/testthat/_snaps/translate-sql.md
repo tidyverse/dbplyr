@@ -27,7 +27,7 @@
       test_translate_sql(base::abbreviate(x))
     Condition
       Error in `base::abbreviate()`:
-      ! No known translation
+      ! No known SQL translation
 
 ---
 
@@ -45,5 +45,5 @@
       lz %>% mutate(x = base::abbreviate(x))
     Condition
       Error in `base::abbreviate()`:
-      ! No known translation
+      ! No known SQL translation
 
