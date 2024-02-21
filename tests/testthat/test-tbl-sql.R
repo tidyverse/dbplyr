@@ -54,6 +54,13 @@ test_that("can distinguish 'schema.table' from 'schema'.'table'", {
   expect_equal(as.character(tbl_vars(df)), c("a", "b", "c"))
 })
 
+test_that("useful error if missing I()", {
+  expect_snapshot(
+    tbl(src_memdb(), "foo.bar"),
+    error = TRUE
+  )
+})
+
 test_that("check_from is deprecated", {
   con <- local_sqlite_connection()
   DBI::dbExecute(con, "CREATE TABLE x (y)")
