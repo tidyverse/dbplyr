@@ -95,20 +95,12 @@ test_that("as_table_path warns when using sql", {
 
 # components --------------------------------------------------------------
 
-test_that("can extract components from path", {
+test_that("can parse components from path", {
   con <- simulate_dbi()
 
   expect_equal(
-    table_path_components(table_path("x.y"), con),
-    list(c("x", "y"))
-  )
-  expect_equal(
-    table_path_components(table_path("`x.y`.z"), con),
-    list(c("x.y", "z"))
-  )
-  expect_equal(
-    table_path_components(table_path("`x.y`.`y.z`"), con),
-    list(c("x.y", "y.z"))
+    table_path_components(table_path(c("x.y", "`x.y`.z", "`x.y`.`y.z`")), con),
+    list(c("x", "y"), c("x.y", "z"), c("x.y", "y.z"))
   )
 })
 
