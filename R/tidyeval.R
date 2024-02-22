@@ -166,10 +166,11 @@ partial_eval_sym <- function(sym, data, env) {
       error_embed("shiny inputs", paste0(name, "$x"))
     }
 
+
     if (is_sql_literal(val)) {
       unname(val)
     } else {
-      error_embed(obj_type_friendly(val), name)
+      val
     }
   } else {
     cli::cli_abort(

@@ -26,15 +26,12 @@ test_that("other objects get informative error", {
 
   input <- structure(list(), class = "reactivevalues")
   x <- structure(function() "y", class = "reactive")
-  l <- list()
   df <- data.frame(x = 1)
 
   expect_snapshot({
     capture_dot(lf, input)
     capture_dot(lf, x())
     capture_dot(lf, df)
-    capture_dot(lf, l)
-    capture_dot(lf, mean)
   }, error = TRUE)
 })
 

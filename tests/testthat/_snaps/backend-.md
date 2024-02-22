@@ -26,11 +26,8 @@
     Code
       lazy_frame(x = 1) %>% filter(x == y$id)
     Condition
-      Error in `filter()`:
-      i In argument: `x == y$id`
-      Caused by error:
-      ! Cannot translate a list to SQL.
-      i Do you want to force evaluation in R with (e.g.) `!!y` or `local(y)`?
+      Error in `<list: id = 1>$id`:
+      ! `$` can only subset database columns, not inlined values.
 
 # useful error if $ used with inlined value
 
