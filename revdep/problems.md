@@ -72,7 +72,7 @@ Run `revdepcheck::cloud_details(, "Andromeda")` for more info
     
     Quitting from lines 175-184 [unnamed-chunk-17] (UsingAndromeda.Rmd)
     Error: processing vignette 'UsingAndromeda.Rmd' failed with diagnostics:
-    No known translation
+    No known SQL translation
     --- failed re-building ‘UsingAndromeda.Rmd’
     
     SUMMARY: processing the following file failed:
@@ -82,60 +82,31 @@ Run `revdepcheck::cloud_details(, "Andromeda")` for more info
     Execution halted
     ```
 
-# arrow
+## Newly fixed
 
-<details>
-
-* Version: 14.0.0.2
-* GitHub: https://github.com/apache/arrow
-* Source code: https://github.com/cran/arrow
-* Date/Publication: 2023-12-02 01:30:03 UTC
-* Number of recursive dependencies: 79
-
-Run `revdepcheck::cloud_details(, "arrow")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking examples ... ERROR
+*   checking re-building of vignette outputs ... WARNING
     ```
-    Running examples in ‘arrow-Ex.R’ failed
-    The error most likely occurred in:
+    Error(s) in re-building vignettes:
+      ...
+    --- re-building ‘UsingAndromeda.Rmd’ using rmarkdown
     
-    > ### Name: to_duckdb
-    > ### Title: Create a (virtual) DuckDB table from an Arrow object
-    > ### Aliases: to_duckdb
-    > 
-    > ### ** Examples
-    > 
-    > ## Don't show: 
+    tlmgr: Remote database (revision 70006 of the texlive-scripts package)
+    seems to be older than the local installation (rev 70039 of
+    texlive-scripts); please use a different mirror and/or wait a day or two.
+    
+    Warning in system2("tlmgr", args, ...) :
+      running command ''tlmgr' search --file --global '/bookmark.sty'' had status 1
     ...
-     12.       └─dbplyr:::partial_eval_quo(dot, .data, error_call, dot_name, was_named[[i]])
-     13.         ├─base::withCallingHandlers(...)
-     14.         └─dbplyr::partial_eval(get_expr(x), data, get_env(x), error_call = error_call)
-     15.           └─dbplyr:::partial_eval_sym(call, data, env)
-     16.             └─dbplyr:::error_embed(obj_type_friendly(val), name)
-     17.               └─cli::cli_abort(...)
-     18.                 └─rlang::abort(...)
+    
+    Error: processing vignette 'UsingAndromeda.Rmd' failed with diagnostics:
+    LaTeX failed to compile /tmp/workdir/Andromeda/old/Andromeda.Rcheck/vign_test/Andromeda/vignettes/UsingAndromeda.tex. See https://yihui.org/tinytex/r/#debugging for debugging tips. See UsingAndromeda.log for more info.
+    --- failed re-building ‘UsingAndromeda.Rmd’
+    
+    SUMMARY: processing the following file failed:
+      ‘UsingAndromeda.Rmd’
+    
+    Error: Vignette re-building failed.
     Execution halted
-    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
-    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
-    ```
-
-## In both
-
-*   checking installed package size ... NOTE
-    ```
-      installed size is 147.3Mb
-      sub-directories of 1Mb or more:
-        R       8.0Mb
-        libs  138.6Mb
-    ```
-
-*   checking Rd cross-references ... NOTE
-    ```
-    Package unavailable to check Rd xrefs: ‘readr’
     ```
 
 # bcdata
@@ -174,7 +145,7 @@ Run `revdepcheck::cloud_details(, "bcdata")` for more info
        18.                           └─cli::cli_abort(...)
        19.                             └─rlang::abort(...)
       
-      [ FAIL 2 | WARN 0 | SKIP 105 | PASS 69 ]
+      [ FAIL 1 | WARN 0 | SKIP 105 | PASS 77 ]
       Error: Test failures
       Execution halted
     ```
@@ -208,16 +179,16 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
       > # * https://r-pkgs.org/tests.html
       > # * https://testthat.r-lib.org/reference/test_package.html#special-files
     ...
+      In addition: Warning messages:
       1: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       2: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       3: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
-      4: Connection is garbage-collected, use dbDisconnect() to avoid this. 
-      5: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
+      4: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
+      5: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       6: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       7: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
+      8: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
       Execution halted
-      Warning message:
-      Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
     ```
 
 *   checking re-building of vignette outputs ... ERROR
@@ -233,7 +204,7 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
     --- finished re-building ‘a01_getting-started.Rmd’
     
     ...
-    ℹ Do you want to force evaluation in R with (e.g.) `!!con` or `local(con)`?
+    No known SQL translation
     --- failed re-building ‘a06_using_cdm_attributes.Rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
@@ -346,12 +317,12 @@ Run `revdepcheck::cloud_details(, "CohortSurvival")` for more info
     
     Quitting from lines 47-53 [unnamed-chunk-5] (a01_Single_event_of_interest.Rmd)
     Error: processing vignette 'a01_Single_event_of_interest.Rmd' failed with diagnostics:
-    No known translation
+    No known SQL translation
     --- failed re-building ‘a01_Single_event_of_interest.Rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
     ...
-    No known translation
+    No known SQL translation
     --- failed re-building ‘a02_Competing_risk_survival.Rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
@@ -392,14 +363,14 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
       > # Learn more about the roles of various files in:
       > # * https://r-pkgs.org/tests.html
     ...
-       32. │                     │ └─methods::initialize(value, ...)
-       33. │                     └─RSQLite:::result_create(conn@ptr, statement)
-       34. └─base::.handleSimpleError(...)
-       35.   └─dbplyr (local) h(simpleError(msg, call))
-       36.     └─cli::cli_abort(msg, parent = cnd, call = call, .envir = env)
-       37.       └─rlang::abort(...)
+       33. │                     │ └─methods::initialize(value, ...)
+       34. │                     └─RSQLite:::result_create(conn@ptr, statement)
+       35. └─base::.handleSimpleError(...)
+       36.   └─dbplyr (local) h(simpleError(msg, call))
+       37.     └─cli::cli_abort(msg, parent = cnd, call = call, .envir = env)
+       38.       └─rlang::abort(...)
       
-      [ FAIL 4 | WARN 0 | SKIP 6 | PASS 310 ]
+      [ FAIL 4 | WARN 1 | SKIP 6 | PASS 310 ]
       Error: Test failures
       Execution halted
     ```
@@ -452,11 +423,11 @@ Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
     
     Quitting from lines 116-122 [unnamed-chunk-6] (a01_introCreateCohort.Rmd)
     Error: processing vignette 'a01_introCreateCohort.Rmd' failed with diagnostics:
-    ℹ In argument: `prev_start = dplyr::coalesce(...)`
-    Caused by error:
-    ! Cannot translate a <duckdb_connection> object to SQL.
-    ℹ Do you want to force evaluation in R with (e.g.) `!!con` or `local(con)`?
+    No known SQL translation
     --- failed re-building ‘a01_introCreateCohort.Rmd’
+    
+    Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
+    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
     ...
     Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
@@ -518,7 +489,7 @@ Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info
     
     Quitting from lines 73-81 [unnamed-chunk-6] (a01_Introduction_to_IncidencePrevalence.Rmd)
     Error: processing vignette 'a01_Introduction_to_IncidencePrevalence.Rmd' failed with diagnostics:
-    No known translation
+    No known SQL translation
     --- failed re-building ‘a01_Introduction_to_IncidencePrevalence.Rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
@@ -540,10 +511,10 @@ Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info
 
 <details>
 
-* Version: 0.6.0
+* Version: 0.6.1
 * GitHub: NA
 * Source code: https://github.com/cran/PatientProfiles
-* Date/Publication: 2024-02-08 17:40:06 UTC
+* Date/Publication: 2024-02-21 23:30:07 UTC
 * Number of recursive dependencies: 174
 
 Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
@@ -572,7 +543,7 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
        30.   └─cli::cli_abort(...)
        31.     └─rlang::abort(...)
       
-      [ FAIL 64 | WARN 0 | SKIP 0 | PASS 222 ]
+      [ FAIL 65 | WARN 0 | SKIP 1 | PASS 201 ]
       Error: Test failures
       Execution halted
     ```
@@ -585,12 +556,12 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
     
     Quitting from lines 71-81 [unnamed-chunk-4] (addCohortIntersections.Rmd)
     Error: processing vignette 'addCohortIntersections.Rmd' failed with diagnostics:
-    No known translation
+    No known SQL translation
     --- failed re-building ‘addCohortIntersections.Rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
     ...
-    No known translation
+    No known SQL translation
     --- failed re-building ‘addPatientCharacteristics.rmd’
     
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
@@ -659,7 +630,7 @@ Run `revdepcheck::cloud_details(, "pool")` for more info
        3.   └─pool:::tbl.Pool(dest, name)
        4.     └─dbplyr::tbl_sql("Pool", dbplyr::src_dbi(src), from, ..., vars = vars)
        5.       └─dbplyr:::as_table_source(from, con = src$con)
-       6.         └─dbplyr:::as_table_path(x, con = con, error_arg = error_arg, error_call = error_call)
+       6.         └─dbplyr::as_table_path(x, con = con, error_arg = error_arg, error_call = error_call)
        7.           └─dbplyr:::make_table_path(list(x$schema, x$table), con)
        8.             └─dbplyr:::sql_escape_ident(con, x[needs_quote])
       
@@ -729,7 +700,7 @@ Run `revdepcheck::cloud_details(, "SCDB")` for more info
       Caused by error:
       ! Table `SCDB_log_patch` exists in database, and both overwrite and append are FALSE
       
-      [ FAIL 4 | WARN 0 | SKIP 0 | PASS 294 ]
+      [ FAIL 4 | WARN 1 | SKIP 0 | PASS 294 ]
       Error: Test failures
       Execution halted
     ```
