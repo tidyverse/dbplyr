@@ -21,20 +21,6 @@ test_that("existing atomic non-variables get inlined", {
   expect_equal(capture_dot(lf, x + n), expr(x + 10))
 })
 
-test_that("other objects get informative error", {
-  lf <- lazy_frame(a = 1)
-
-  input <- structure(list(), class = "reactivevalues")
-  x <- structure(function() "y", class = "reactive")
-  df <- data.frame(x = 1)
-
-  expect_snapshot({
-    capture_dot(lf, input)
-    capture_dot(lf, x())
-    capture_dot(lf, df)
-  }, error = TRUE)
-})
-
 test_that("names are stripped", {
   lf <- lazy_frame(x = "a")
   y <- c(x = "a", "b")

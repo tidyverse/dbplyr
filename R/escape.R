@@ -137,6 +137,21 @@ escape.list <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
   sql_vector(pieces, parens, collapse, con = con)
 }
 
+#' @export
+escape.data.frame <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+  error_embed("a data.frame", "df$x")
+}
+
+#' @export
+escape.reactivevalues <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+  error_embed("shiny inputs", "input$x")
+}
+
+#' @export
+escape.default <- function(x, parens = TRUE, collapse = ", ", con = NULL) {
+  error_embed(obj_type_friendly(x), "x")
+}
+
 # Also used in default_ops() for reactives
 error_embed <- function(type, expr) {
   cli_abort(c(

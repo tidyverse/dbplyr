@@ -82,74 +82,6 @@ Run `revdepcheck::cloud_details(, "Andromeda")` for more info
     Execution halted
     ```
 
-## Newly fixed
-
-*   checking re-building of vignette outputs ... WARNING
-    ```
-    Error(s) in re-building vignettes:
-      ...
-    --- re-building ‘UsingAndromeda.Rmd’ using rmarkdown
-    
-    tlmgr: Remote database (revision 70006 of the texlive-scripts package)
-    seems to be older than the local installation (rev 70039 of
-    texlive-scripts); please use a different mirror and/or wait a day or two.
-    
-    Warning in system2("tlmgr", args, ...) :
-      running command ''tlmgr' search --file --global '/bookmark.sty'' had status 1
-    ...
-    
-    Error: processing vignette 'UsingAndromeda.Rmd' failed with diagnostics:
-    LaTeX failed to compile /tmp/workdir/Andromeda/old/Andromeda.Rcheck/vign_test/Andromeda/vignettes/UsingAndromeda.tex. See https://yihui.org/tinytex/r/#debugging for debugging tips. See UsingAndromeda.log for more info.
-    --- failed re-building ‘UsingAndromeda.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘UsingAndromeda.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
-
-# bcdata
-
-<details>
-
-* Version: 0.4.1
-* GitHub: https://github.com/bcgov/bcdata
-* Source code: https://github.com/cran/bcdata
-* Date/Publication: 2023-03-18 14:50:02 UTC
-* Number of recursive dependencies: 121
-
-Run `revdepcheck::cloud_details(, "bcdata")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Complete output:
-      > # Copyright 2019 Province of British Columbia
-      > #
-      > # Licensed under the Apache License, Version 2.0 (the "License");
-      > # you may not use this file except in compliance with the License.
-      > # You may obtain a copy of the License at
-      > #
-      > # http://www.apache.org/licenses/LICENSE-2.0
-    ...
-       14.                   └─base::lapply(call[-1], partial_eval, data = data, env = env)
-       15.                     └─dbplyr (local) FUN(X[[i]], ...)
-       16.                       └─dbplyr:::partial_eval_sym(call, data, env)
-       17.                         └─dbplyr:::error_embed("a data.frame", paste0(name, "$x"))
-       18.                           └─cli::cli_abort(...)
-       19.                             └─rlang::abort(...)
-      
-      [ FAIL 1 | WARN 0 | SKIP 105 | PASS 77 ]
-      Error: Test failures
-      Execution halted
-    ```
-
 # CDMConnector
 
 <details>
@@ -179,16 +111,16 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
       > # * https://r-pkgs.org/tests.html
       > # * https://testthat.r-lib.org/reference/test_package.html#special-files
     ...
-      In addition: Warning messages:
       1: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       2: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       3: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
-      4: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
-      5: Connection is garbage-collected, use dbDisconnect() to avoid this. 
+      4: Connection is garbage-collected, use dbDisconnect() to avoid this. 
+      5: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
       6: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       7: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
-      8: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
       Execution halted
+      Warning message:
+      Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
     ```
 
 *   checking re-building of vignette outputs ... ERROR
@@ -445,10 +377,10 @@ Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
 
 <details>
 
-* Version: 0.7.0
+* Version: 0.7.1
 * GitHub: NA
 * Source code: https://github.com/cran/IncidencePrevalence
-* Date/Publication: 2024-02-15 22:50:02 UTC
+* Date/Publication: 2024-02-22 23:00:11 UTC
 * Number of recursive dependencies: 133
 
 Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info

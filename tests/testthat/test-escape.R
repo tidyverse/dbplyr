@@ -113,6 +113,21 @@ test_that("con must not be NULL", {
   expect_snapshot(error = TRUE, sql_vector("a"))
 })
 
+test_that("other objects get informative error", {
+  lf <- lazy_frame(x = 1)
+
+  input <- structure(list(), class = "reactivevalues")
+  x <- structure(function() "y", class = "reactive")
+  df <- data.frame(x = 1)
+
+  expect_snapshot({
+    lf %>% filter(x == input)
+    lf %>% filter(x == x())
+    lf %>% filter(x == df)
+    lf %>% filter(x == mean)
+  }, error = TRUE)
+})
+
 # names_to_as() -----------------------------------------------------------
 
 test_that("names_to_as() doesn't alias when ident name and value are identical", {
