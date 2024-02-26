@@ -1,7 +1,7 @@
 #' SQL escaping/quoting generics
 #'
 #' These generics translate individual values into SQL. The core
-#' generics are [DBI::dbQuoteIdentifier()] and[DBI::dbQuoteString]
+#' generics are [DBI::dbQuoteIdentifier()] and [DBI::dbQuoteString]
 #' for quoting identifiers and strings, but dbplyr needs additional
 #' tools for inserting logical, date, date-time, and raw values into
 #' queries.

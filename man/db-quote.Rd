@@ -17,7 +17,7 @@ sql_escape_raw(con, x)
 }
 \description{
 These generics translate individual values into SQL. The core
-generics are \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} and\link[DBI:dbQuoteString]{DBI::dbQuoteString}
+generics are \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} and \link[DBI:dbQuoteString]{DBI::dbQuoteString}
 for quoting identifiers and strings, but dbplyr needs additional
 tools for inserting logical, date, date-time, and raw values into
 queries.
