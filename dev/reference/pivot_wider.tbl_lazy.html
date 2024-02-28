@@ -272,11 +272,11 @@ Mind that you also do not get a warning if an observation is not uniquely
 identified.</p>
 <p>The translation to SQL code basically works as follows:</p><ol><li><p>Get unique keys in <code>names_from</code> column.</p></li>
 <li><p>For each key value generate an expression of the form:</p>
-<p></p><div class="sourceCode sql"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>value_fn(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> (`names <span class="kw">from</span> column` <span class="op">==</span> `key value`)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">THEN</span> (`value column`)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">END</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> `output column`</span></code></pre><p></p></div></li>
+<p></p><div class="sourceCode sql"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>value_fn(</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="cf">CASE</span> <span class="cf">WHEN</span> (`names <span class="kw">from</span> column` <span class="op">==</span> `key value`)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="cf">THEN</span> (`value column`)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>  <span class="cf">END</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>) <span class="kw">AS</span> `output column`</span></code></pre><p></p></div></li>
 <li><p>Group data by id columns.</p></li>
 <li><p>Summarise the grouped data with the expressions from step 2.</p></li>
 </ol></div>

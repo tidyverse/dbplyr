@@ -88,7 +88,6 @@
 </ul></li>
 <li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
 <li><p>The databricks backend now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
-<li><p>Clearer error if you attempt to embed non-atomic vectors inside of a generated query (<a href="https://github.com/tidyverse/dbplyr/issues/1368" class="external-link">#1368</a>).</p></li>
 <li><p><code>x$name</code> never attempts to evaluate <code>name</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1368" class="external-link">#1368</a>).</p></li>
 <li><p><code>rows_patch(in_place = FALSE)</code> now works when more than one column should be patched (<a href="https://github.com/gorcha" class="external-link">@gorcha</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1443" class="external-link">#1443</a>).</p></li>
 <li><p>Namespaced dplyr calls now error if the function doesn’t exist, or a translation is not available (<a href="https://github.com/tidyverse/dbplyr/issues/1426" class="external-link">#1426</a>).</p></li>

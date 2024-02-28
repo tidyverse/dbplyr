@@ -191,10 +191,10 @@ conflict with keys in <code>x</code>.</p></li>
 
 
 <p>The default for most databases.</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>INSERT INTO x_name</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>SELECT <span class="sc">*</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>FROM y</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>WHERE NOT EXISTS <span class="sc">&lt;</span>match on by columns<span class="sc">&gt;</span></span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>INSERT INTO x_name</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>SELECT <span class="sc">*</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>FROM y</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>WHERE NOT EXISTS <span class="sc">&lt;</span>match on by columns<span class="sc">&gt;</span></span></code></pre><p></p></div>
 </div>
 
 <div class="section">
@@ -212,13 +212,13 @@ index on the columns specified in <code>by</code>.</p>
 
 
 <p>The upsert method according to the SQL standard. It uses the <code>MERGE</code> statement</p>
-<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MERGE INTO x_name</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>USING y</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  ON <span class="sc">&lt;</span>match on by columns<span class="sc">&gt;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>WHEN MATCHED THEN</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  UPDATE SET ...</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>WHEN NOT MATCHED THEN</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  INSERT ...</span></code></pre><p></p></div>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>MERGE INTO x_name</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>USING y</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  ON <span class="sc">&lt;</span>match on by columns<span class="sc">&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>WHEN MATCHED THEN</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  UPDATE SET ...</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>WHEN NOT MATCHED THEN</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  INSERT ...</span></code></pre><p></p></div>
 </div>
 
 <div class="section">
