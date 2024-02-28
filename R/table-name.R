@@ -113,7 +113,7 @@ table_path_components <- function(x, con) {
 }
 
 #' @export
-table_path_components.DBIConnection <- function(x, con) {
+table_path_components.default <- function(x, con) {
   quote_char <- substr(sql_escape_ident(con, ""), 1, 1)
 
   lapply(x, function(x) {

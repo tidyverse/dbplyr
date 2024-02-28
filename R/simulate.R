@@ -27,7 +27,7 @@ sql_escape_ident <- function(con, x) {
   UseMethod("sql_escape_ident")
 }
 #' @export
-sql_escape_ident.DBIConnection <- function(con, x) {
+sql_escape_ident.default <- function(con, x) {
   dbQuoteIdentifier(con, x)
 }
 #' @export
@@ -43,7 +43,7 @@ sql_escape_string <- function(con, x) {
   UseMethod("sql_escape_string")
 }
 #' @export
-sql_escape_string.DBIConnection <- function(con, x) {
+sql_escape_string.default <- function(con, x) {
   dbQuoteString(con, x)
 }
 #' @export
