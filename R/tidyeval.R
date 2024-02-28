@@ -157,20 +157,13 @@ partial_eval_sym <- function(sym, data, env) {
   if (name %in% vars) {
     sym
   } else if (env_has(env, name, inherit = TRUE)) {
+    # Inline the value so that the translation function can choose what to do
+
     val <- eval_bare(sym, env)
-
-    # Handle common failure modes
-    if (inherits(val, "data.frame")) {
-      error_embed("a data.frame", paste0(name, "$x"))
-    } else if (inherits(val, "reactivevalues")) {
-      error_embed("shiny inputs", paste0(name, "$x"))
+    if (is_atomic(val)) {
+      val <- unname(val)
     }
-
-    if (is_sql_literal(val)) {
-      unname(val)
-    } else {
-      error_embed(obj_type_friendly(val), name)
-    }
+    val
   } else {
     cli::cli_abort(
       "Object {.var {name}} not found.",
