@@ -134,11 +134,8 @@ add_select <- function(lazy_query, vars) {
 select_can_be_inlined <- function(lazy_query, vars) {
   vars_data <- op_vars(lazy_query)
 
-  computed_columns <- purrr::pmap(
-    lazy_query$select,
-    function(name, expr, ...) if (is_quosure(expr)) name
-  ) %>%
-    purrr::compact()
+  computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
+  computed_columns <- lazy_query$select$name[computed_flag]
 
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
 
