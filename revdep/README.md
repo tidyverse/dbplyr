@@ -16,7 +16,7 @@
 |SQLDataFrame       |?       |      |        |     |
 |synaptome.db       |?       |      |        |     |
 
-## New problems (10)
+## New problems (9)
 
 |package             |version |error  |warning |note |
 |:-------------------|:-------|:------|:-------|:----|
@@ -28,6 +28,5 @@
 |[DrugUtilisation](problems.md#drugutilisation)|0.5.0   |__+2__ |        |     |
 |[IncidencePrevalence](problems.md#incidenceprevalence)|0.7.1   |__+2__ |        |     |
 |[PatientProfiles](problems.md#patientprofiles)|0.6.1   |__+2__ |        |     |
-|[pool](problems.md#pool)|1.0.3   |__+2__ |        |     |
 |[SCDB](problems.md#scdb)|0.3     |__+3__ |        |     |
 

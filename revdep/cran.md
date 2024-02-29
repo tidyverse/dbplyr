@@ -1,8 +1,8 @@
 ## revdepcheck results
 
-We checked 110 reverse dependencies (99 from CRAN + 11 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
+We checked 111 reverse dependencies (100 from CRAN + 11 from Bioconductor), comparing R CMD check results across CRAN and dev versions of this package.
 
- * We saw 10 new problems
+ * We saw 9 new problems
  * We failed to check 0 packages
 
 Issues with CRAN packages are summarised below.
@@ -40,10 +40,6 @@ Issues with CRAN packages are summarised below.
 * PatientProfiles
   checking tests ... ERROR
   checking re-building of vignette outputs ... ERROR
-
-* pool
-  checking examples ... ERROR
-  checking tests ... ERROR
 
 * SCDB
   checking examples ... ERROR
