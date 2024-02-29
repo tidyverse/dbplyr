@@ -263,6 +263,18 @@ sql_escape_datetime.MySQLConnection <- sql_escape_datetime.MariaDBConnection
 #' @export
 sql_escape_datetime.MySQL <- sql_escape_datetime.MariaDBConnection
 
+
+# dbQuoteIdentifier() for RMySQL lacks handling of SQL objects
+#' @export
+sql_escape_ident.MySQLConnection <- function(con, x) {
+  if (methods::is(x, "SQL")) {
+    x
+  } else {
+    DBI::dbQuoteIdentifier(con, x)
+  }
+}
+
+
 #' @export
 supports_window_clause.MariaDBConnection <- function(con) {
   TRUE
