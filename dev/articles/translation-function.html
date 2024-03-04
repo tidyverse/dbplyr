@@ -379,14 +379,14 @@ literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_4YI6TLRmGb`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_KRq0yNU5tk`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_4YI6TLRmGb`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_KRq0yNU5tk`</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="error-for-unknown-translations">Error for unknown translations<a class="anchor" aria-label="anchor" href="#error-for-unknown-translations"></a>
