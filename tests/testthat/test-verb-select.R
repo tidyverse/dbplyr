@@ -35,6 +35,31 @@ test_that("select after distinct produces subquery", {
   expect_true(lq$x$distinct)
 })
 
+test_that("select after arrange produces subquery, if needed", {
+  lf <- lazy_frame(x = 1)
+
+  # shouldn't inline
+  out <- lf %>% mutate(z = 2) %>% arrange(x, z) %>% select(x)
+  # should inline
+  out2 <- lf %>% mutate(z = 2) %>% arrange(x, z) %>% select(x, z)
+
+  inner_query <- out$lazy_query$x
+  expect_s3_class(inner_query, "lazy_select_query")
+  expect_equal(inner_query$order_by, list(quo(x), quo(z)), ignore_formula_env = TRUE)
+  expect_equal(
+    op_vars(inner_query),
+    c("x", "z")
+  )
+  expect_equal(op_vars(out$lazy_query), "x")
+
+  # order vars in a subquery are dropped
+  expect_equal(
+    inner_query[setdiff(names(inner_query), "order_vars")],
+    out2$lazy_query[setdiff(names(out2$lazy_query), "order_vars")]
+  )
+})
+
+
 test_that("rename/relocate after distinct is inlined #1141", {
   lf <- lazy_frame(x = 1, y = 1:2)
   expect_snapshot({
@@ -282,6 +307,33 @@ test_that("where() isn't suppored", {
   expect_snapshot(error = TRUE, {
     lf %>% select(where(is.integer))
   })
+})
+
+test_that("arranged computed columns are not inlined away", {
+  lf <- lazy_frame(x = 1)
+
+  # shouldn't inline
+  out <- lf %>% mutate(z = 2) %>% arrange(x, z) %>% select(x)
+  # should inline
+  out2 <- lf %>% mutate(z = 2) %>% arrange(x, z) %>% select(x, z)
+
+  inner_query <- out$lazy_query$x
+  expect_snapshot({
+      lf %>% mutate(z = 1) %>% arrange(x, z) %>% select(x)
+  })
+  expect_s3_class(inner_query, "lazy_select_query")
+  expect_equal(
+    inner_query$order_by,
+    list(quo(x), quo(z)),
+    ignore_formula_env = TRUE
+  )
+  expect_equal(op_vars(inner_query), c("x", "z"))
+  expect_equal(op_vars(out$lazy_query), "x")
+  expect_equal(
+      # order vars in a subquery are dropped
+      inner_query[setdiff(names(inner_query), "order_vars")],
+      out2$lazy_query[setdiff(names(out2$lazy_query), "order_vars")]
+  )
 })
 
 # sql_render --------------------------------------------------------------
