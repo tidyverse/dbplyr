@@ -132,22 +132,19 @@ add_select <- function(lazy_query, vars) {
 }
 
 select_can_be_inlined <- function(lazy_query, vars) {
-  vars_data <- op_vars(lazy_query)
-
+  # all computed columns used for ordering (if any) must be present
   computed_flag <- purrr::map_lgl(lazy_query$select$expr, is_quosure)
   computed_columns <- lazy_query$select$name[computed_flag]
 
   order_vars <- purrr::map_chr(lazy_query$order_by, as_label)
+  ordered_present <- all(intersect(computed_columns, order_vars) %in% vars)
 
-  # computed columns used for ordering (if any) must also be
-  # selected to inline the query
-  all(intersect(computed_columns, order_vars) %in% vars) &&
-      (is_bijective_projection(vars, vars_data) || !is_true(lazy_query$distinct))
-}
+  # if the projection is distinct, it must be bijective
+  is_distinct <- is_true(lazy_query$distinct)
+  is_bijective_projection <- identical(sort(unname(vars)), op_vars(lazy_query))
+  distinct_is_bijective <- !is_distinct || is_bijective_projection
 
-is_bijective_projection <- function(vars, names_prev) {
-  vars <- unname(vars)
-  identical(sort(vars), names_prev)
+  ordered_present && distinct_is_bijective
 }
 
 rename_groups <- function(lazy_query, vars) {
