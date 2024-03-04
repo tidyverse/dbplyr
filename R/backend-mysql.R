@@ -267,7 +267,9 @@ sql_escape_datetime.MySQL <- sql_escape_datetime.MariaDBConnection
 # dbQuoteIdentifier() for RMySQL lacks handling of SQL objects
 #' @export
 sql_escape_ident.MySQLConnection <- function(con, x) {
-  if (methods::is(x, "SQL")) {
+  if (!isS4(con)) { # for simulate_mysql()
+    NextMethod()
+  } else if (methods::is(x, "SQL")) {
     x
   } else {
     DBI::dbQuoteIdentifier(con, x)
