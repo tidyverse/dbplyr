@@ -200,6 +200,24 @@
           (`df_RHS`.`b` = 2)
       )
 
+# filtered aggregates with subsequent select are not inlined away in semi_join (#1474)
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `df`.*
+      FROM `df`
+      WHERE EXISTS (
+        SELECT 1 FROM (
+        SELECT `x`
+        FROM `df`
+        GROUP BY `x`
+        HAVING (COUNT(*) = 1.0)
+      ) AS `RHS`
+        WHERE (`df`.`x` = `RHS`.`x`)
+      )
+
 # multiple joins create a single query
 
     Code

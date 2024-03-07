@@ -123,6 +123,9 @@ is_lazy_select_query_simple <- function(x,
   if (!is_empty(x$limit)) {
     return(FALSE)
   }
+  if (!is_empty(x$having)) {
+    return(FALSE)
+  }
 
   TRUE
 }
