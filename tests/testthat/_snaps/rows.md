@@ -46,7 +46,7 @@
       (df %>% rows_insert(df, by = "x", conflict = "ignore", returning = c(y)))
     Condition
       Error in `rows_insert()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `y` doesn't exist.
 
 # `rows_insert()` errors for `conflict = 'error'` and `in_place = FALSE`
