@@ -1,3 +1,12 @@
+# errors about add argument 
+
+    Code
+      gf <- mf %>% group_by(x) %>% group_by(y, add = TRUE)
+    Condition
+      Error:
+      ! The `add` argument of `group_by()` was deprecated in dplyr 1.0.0 and is now defunct.
+      i Please use the `.add` argument instead.
+
 # errors for .drop = FALSE
 
     Code

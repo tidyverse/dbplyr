@@ -73,3 +73,10 @@ test_that("fails with multi-classes", {
   x <- structure(list(), class = c('a', 'b'))
   expect_error(partial_eval(x, lf), "Unknown input type", fixed = TRUE)
 })
+
+test_that("old arguments are defunct", {
+  expect_snapshot(error = TRUE, {
+    partial_eval(quote(x), vars = c("x", "y"))
+    partial_eval(quote(x), data = c("x", "y"))
+  })
+})

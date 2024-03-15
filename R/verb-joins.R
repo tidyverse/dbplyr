@@ -584,7 +584,7 @@ join_prepare_by <- function(by,
                             user_env = caller_env(3)) {
   if (identical(by, character()) && is.null(sql_on)) {
     if (type != "cross") {
-      lifecycle::deprecate_soft(
+      lifecycle::deprecate_warn(
         when = "1.1.0",
         what = I("Using `by = character()` to perform a cross join"),
         with = "cross_join()",

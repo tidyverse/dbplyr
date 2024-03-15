@@ -12,13 +12,11 @@
 #' @param con the connection object
 #' @param ... fields used by object
 src_sql <- function(subclass, con, ...) {
-  lifecycle::deprecate_warn(
+  lifecycle::deprecate_stop(
     when = "1.4.0",
     what = "src_sql()",
     always = TRUE
   )
-  subclass <- paste0("src_", subclass)
-  structure(list(con = con, ...), class = c(subclass, "src_sql", "src"))
 }
 
 

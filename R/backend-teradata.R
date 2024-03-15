@@ -221,7 +221,7 @@ utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SU
 #' @export
 #' @rdname win_over
 win_rank_tdata <- function(f) {
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     "2.4.0",
     what = "win_rank_tdata()",
     with = "win_rank()"
