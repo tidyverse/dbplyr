@@ -32,7 +32,7 @@
       capture_across(lf, across(c, mean))
     Condition
       Error in `across()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `c` doesn't exist.
 
 # across() defaults to everything()
@@ -268,7 +268,7 @@
       Error in `arrange()`:
       i In argument: `pick(y)`
       Caused by error in `pick()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `y` doesn't exist.
 
 # doesn't allow renaming
@@ -299,6 +299,6 @@
       Error in `filter()`:
       i In argument: `pick(x, a)`
       Caused by error in `pick()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `a` doesn't exist.
 

@@ -33,7 +33,7 @@
       Error in `group_by()`:
       i In argument: `across(non_existent)`
       Caused by error in `across()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
 
 # ungroup() produces nice error messages
@@ -42,6 +42,6 @@
       lazy_frame(x = 1) %>% ungroup(non_existent)
     Condition
       Error in `ungroup()`:
-      ! Can't subset columns that don't exist.
+      ! Can't select columns that don't exist.
       x Column `non_existent` doesn't exist.
 
