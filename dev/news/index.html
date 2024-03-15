@@ -74,12 +74,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="dbplyr-development-version">dbplyr (development version)<a class="anchor" aria-label="anchor" href="#dbplyr-development-version"></a></h2>
-<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> will no longer inline away an aggregate filter (i.e. <code>HAVING</code> clause) that was followed by a <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1474" class="external-link">#1474</a>)</p></li>
-<li><p>Refined the <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> inlining criteria to keep computed columns used to <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> subqueries that are eliminated by a subsequent select (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1437" class="external-link">#1437</a>).</p></li>
-<li><p>dbplyr now exports some tools to work with the internal <code>table_path</code> class which is useful for certain backends that need to work with this data structure (<a href="https://github.com/tidyverse/dbplyr/issues/1300" class="external-link">#1300</a>).</p></li>
-<li><p>You can once again use <code>NULL</code> on the LHS of an infix operator in order to generate SQL with unusual syntax (<a href="https://github.com/tidyverse/dbplyr/issues/1345" class="external-link">#1345</a>).</p></li>
-<li><p>Oracle once again translates <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code> to <code>FETCH FIRST</code>. This does require Oracle 12c or newer, but it actually works, compared to the approach using <code>ROWNUM</code> from <a href="https://github.com/tidyverse/dbplyr/issues/1292" class="external-link">#1292</a> (<a href="https://github.com/tidyverse/dbplyr/issues/1436" class="external-link">#1436</a>).</p></li>
-<li>
+<div class="section level3">
+<h3 id="improved-tools-for-qualified-table-names-development-version">Improved tools for qualified table names<a class="anchor" aria-label="anchor" href="#improved-tools-for-qualified-table-names-development-version"></a></h3>
+<ul><li>
 <p>Specification of table names with schema/catalogs has been overhauled to make it simpler. This includes the following features and fixes:</p>
 <ul><li><p>The simplest way to refer to a qualified table is now to wrap it in <code><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I()</a></code>, e.g. <code>I("schema_name.table_name")</code>.</p></li>
 <li><p>Use of <code><a href="../reference/sql.html">sql()</a></code> and <code><a href="../reference/ident_q.html">ident_q()</a></code> inside <code><a href="../reference/in_schema.html">in_catalog()</a></code> and <code><a href="../reference/in_schema.html">in_schema()</a></code> is once again supported (<a href="https://github.com/tidyverse/dbplyr/issues/1388" class="external-link">#1388</a>).</p></li>
@@ -88,43 +85,56 @@
 <li><p>If you accidentally pass a named vector to any of the database identifer functions, those names will be automatically stripped (<a href="https://github.com/tidyverse/dbplyr/issues/1404" class="external-link">#1404</a>).</p></li>
 <li><p><code>tbl_sql(check_from)</code> is now deprecated.</p></li>
 </ul></li>
-<li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
-<li><p>The databricks backend now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
+<li><p>dbplyr now exports some tools to work with the internal <code>table_path</code> class which is useful for certain backends that need to work with this data structure (<a href="https://github.com/tidyverse/dbplyr/issues/1300" class="external-link">#1300</a>).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="improved-sql-development-version">Improved SQL<a class="anchor" aria-label="anchor" href="#improved-sql-development-version"></a></h3>
+<ul><li><p>New translations for clock functions <code>add_years()</code>, <code>add_days()</code>, <code>date_build()</code>, <code>get_year()</code>, <code>get_month()</code>, <code>get_day()</code>, and <code><a href="https://rdrr.io/r/base/difftime.html" class="external-link">base::difftime()</a></code> on SQL server, Redshift, Snowflake, and Postgres.</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> will keep computed columns used to <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code> subqueries that are eliminated by a subsequent select (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1437" class="external-link">#1437</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">semi_join()</a></code> will no longer inline away an aggregate filter (i.e. <code>HAVING</code> clause) that was followed by a <code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select()</a></code> (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1474" class="external-link">#1474</a>)</p></li>
+<li>
+<p>Improved function translations:</p>
+<ul><li><p>Functions qualified with the base namespace are now also translated, e.g. <code>base::paste0(x, "_1")</code> is now translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1022" class="external-link">#1022</a>).</p></li>
+<li><p><code>-1 + x</code> now generates a translation instead erroring (<a href="https://github.com/tidyverse/dbplyr/issues/1420" class="external-link">#1420</a>).</p></li>
 <li><p><code>x$name</code> never attempts to evaluate <code>name</code> (<a href="https://github.com/tidyverse/dbplyr/issues/1368" class="external-link">#1368</a>).</p></li>
-<li><p><code>rows_patch(in_place = FALSE)</code> now works when more than one column should be patched (<a href="https://github.com/gorcha" class="external-link">@gorcha</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1443" class="external-link">#1443</a>).</p></li>
-<li><p>Namespaced dplyr calls now error if the function doesn’t exist, or a translation is not available (<a href="https://github.com/tidyverse/dbplyr/issues/1426" class="external-link">#1426</a>).</p></li>
-<li><p><code><a href="../reference/db-misc.html">db_sql_render()</a></code> correctly passes on <code>...</code> when re-calling with <code>sql_options</code> set (<a href="https://github.com/tidyverse/dbplyr/issues/1394" class="external-link">#1394</a>).</p></li>
-<li><p><code>-1 + x</code> is now translated correctly (<a href="https://github.com/tidyverse/dbplyr/issues/1420" class="external-link">#1420</a>).</p></li>
-<li><p>SQL server: clear error if you attempt to use <code><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct()</a></code> in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1366" class="external-link">#1366</a>).</p></li>
-<li><p>Add translations for clock functions <code>add_years()</code>, <code>add_days()</code>, <code>date_build()</code>, <code>get_year()</code>, <code>get_month()</code>, <code>get_day()</code>, and <code><a href="https://rdrr.io/r/base/difftime.html" class="external-link">base::difftime()</a></code> on SQL server, Redshift, Snowflake, and Postgres.</p></li>
-<li><p>SQL server: <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> does a better job of converting logical vectors from bit to boolean (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1288" class="external-link">#1288</a>).</p></li>
-<li><p>Oracle: Added support for <code>str_replace()</code> and <code>str_replace_all()</code> via <code>REGEXP_REPLACE()</code> (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1402" class="external-link">#1402</a>).</p></li>
-<li><p>Allow additional arguments to be passed from <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute()</a></code> all the way to <code><a href="../reference/db-sql.html">sql_query_save()</a></code>-method (<a href="https://github.com/rsund" class="external-link">@rsund</a>).</p></li>
-<li><p>The class of remote sources now includes all S4 class names, not just the first (<a href="https://github.com/tidyverse/dbplyr/issues/918" class="external-link">#918</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_explain()</a></code> now works for Oracle (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1353" class="external-link">#1353</a>).</p></li>
-<li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
+<li><p>You can once again use <code>NULL</code> on the LHS of an infix operator in order to generate SQL with unusual syntax (<a href="https://github.com/tidyverse/dbplyr/issues/1345" class="external-link">#1345</a>).</p></li>
+<li><p>Namespaced calls now error if the function doesn’t exist, or a translation is not available (<a href="https://github.com/tidyverse/dbplyr/issues/1426" class="external-link">#1426</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lead()</a></code> translation coerces <code>n</code> to an integer.</p></li>
+</ul></li>
+<li><p>Databricks: now supports creating non-temporary tables too (<a href="https://github.com/tidyverse/dbplyr/issues/1418" class="external-link">#1418</a>).</p></li>
+<li>
+<p>Oracle:</p>
+<ul><li><p><code><a href="https://dplyr.tidyverse.org/reference/backend_dbplyr.html" class="external-link">db_explain()</a></code> now works (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1353" class="external-link">#1353</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date()</a></code> works when applied to a string (<a href="https://github.com/tidyverse/dbplyr/issues/1389" class="external-link">#1389</a>).</p></li>
+<li><p><code><a href="https://rdrr.io/r/utils/head.html" class="external-link">head()</a></code> is once again translated to <code>FETCH FIRST</code>. This does require Oracle 12c or newer, but it actually works, compared to the approach using <code>ROWNUM</code> from <a href="https://github.com/tidyverse/dbplyr/issues/1292" class="external-link">#1292</a> (<a href="https://github.com/tidyverse/dbplyr/issues/1436" class="external-link">#1436</a>).</p></li>
+<li><p>Added support for <code>str_replace()</code> and <code>str_replace_all()</code> via <code>REGEXP_REPLACE()</code> (<a href="https://github.com/thomashulst" class="external-link">@thomashulst</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1402" class="external-link">#1402</a>).</p></li>
+</ul></li>
 <li>
 <p>Snowflake (<a href="https://github.com/nathanhaigh" class="external-link">@nathanhaigh</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1406" class="external-link">#1406</a>)</p>
-<ul><li>Added support for <code>str_starts()</code> and <code>str_ends()</code> via <code>REGEXP_INSTR()</code>
-</li>
-<li>Refactored <code>str_detect()</code> to use <code>REGEXP_INSTR()</code> so now supports regular expressions.</li>
-<li>Refactored <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl()</a></code> to use <code>REGEXP_INSTR()</code> so now supports case-insensitive matching through <code>grepl(..., ignore.case = TRUE)</code>
-</li>
-</ul></li>
-<li><p>Functions qualified with the base namespace are now also translated, e.g. <code>base::paste0(x, "_1")</code> is now translated (<a href="https://github.com/mgirlich" class="external-link">@mgirlich</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1022" class="external-link">#1022</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lead()</a></code> translation coerces <code>n</code> to an integer.</p></li>
-<li><p><code><a href="../reference/sql_variant.html">sql_translator()</a></code> now checks for duplicated definitions (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1374" class="external-link">#1374</a>).</p></li>
-<li><p><code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/tidyverse/dbplyr/issues/1148" class="external-link">#1148</a>).</p></li>
-<li>
-<p>MySQL/MariaDB:</p>
-<ul><li>Fix translation of <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> for MySQL (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</li>
-<li>New <code><a href="../reference/backend-mysql.html">simulate_mariadb()</a></code> (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</li>
+<ul><li><p>Added support for <code>str_starts()</code> and <code>str_ends()</code> via <code>REGEXP_INSTR()</code></p></li>
+<li><p>Refactored <code>str_detect()</code> to use <code>REGEXP_INSTR()</code> so now supports regular expressions.</p></li>
+<li><p>Refactored <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl()</a></code> to use <code>REGEXP_INSTR()</code> so now supports case-insensitive matching through <code>grepl(..., ignore.case = TRUE)</code></p></li>
 </ul></li>
 <li>
-<p>Oracle</p>
-<ul><li>Fix translation of <code><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date()</a></code> applied to a string (<a href="https://github.com/tidyverse/dbplyr/issues/1389" class="external-link">#1389</a>).</li>
+<p>SQL server:</p>
+<ul><li><p>Now products a clear error if you attempt to use <code><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct()</a></code> in <code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> or <code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> (<a href="https://github.com/tidyverse/dbplyr/issues/1366" class="external-link">#1366</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code> does a better job of converting logical vectors from bit to boolean (<a href="https://github.com/ejneer" class="external-link">@ejneer</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1288" class="external-link">#1288</a>).</p></li>
 </ul></li>
+<li><p>MySQL: <code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code> gets correct translation (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</p></li>
 </ul></div>
+<div class="section level3">
+<h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
+<ul><li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
+<li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
+<li><p>The class of remote sources now includes all S4 class names, not just the first (<a href="https://github.com/tidyverse/dbplyr/issues/918" class="external-link">#918</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute()</a></code> passes additional arguments all the way to <code><a href="../reference/db-sql.html">sql_query_save()</a></code>-methods (<a href="https://github.com/rsund" class="external-link">@rsund</a>).</p></li>
+<li><p><code><a href="../reference/db-misc.html">db_sql_render()</a></code> correctly passes on <code>...</code> when re-calling with <code>sql_options</code> set (<a href="https://github.com/tidyverse/dbplyr/issues/1394" class="external-link">#1394</a>).</p></li>
+<li><p><code><a href="https://dplyr.tidyverse.org/reference/reframe.html" class="external-link">reframe()</a></code> now gives an informative error that it isn’t supported (<a href="https://github.com/tidyverse/dbplyr/issues/1148" class="external-link">#1148</a>).</p></li>
+<li><p><code>rows_patch(in_place = FALSE)</code> now works when more than one column should be patched (<a href="https://github.com/gorcha" class="external-link">@gorcha</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1443" class="external-link">#1443</a>).</p></li>
+<li><p>New <code><a href="../reference/backend-mysql.html">simulate_mariadb()</a></code> (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1375" class="external-link">#1375</a>).</p></li>
+<li><p><code><a href="../reference/sql_variant.html">sql_translator()</a></code> now checks for duplicated definitions (<a href="https://github.com/krlmlr" class="external-link">@krlmlr</a>, <a href="https://github.com/tidyverse/dbplyr/issues/1374" class="external-link">#1374</a>).</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.4.0" id="dbplyr-240">dbplyr 2.4.0<a class="anchor" aria-label="anchor" href="#dbplyr-240"></a></h2><p class="text-muted">CRAN release: 2023-10-26</p>
 <div class="section level3">
