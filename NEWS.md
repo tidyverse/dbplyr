@@ -1,22 +1,6 @@
 # dbplyr (development version)
 
-* `semi_join()` will no longer inline away an aggregate filter (i.e. `HAVING`
-  clause) that was followed by a `select()` (@ejneer, #1474)
-
-* Refined the `select()` inlining criteria to keep computed columns used to
-  `arrange()` subqueries that are eliminated by a subsequent select (@ejneer,
-  #1437).
-
-* dbplyr now exports some tools to work with the internal `table_path` class
-  which is useful for certain backends that need to work with this 
-  data structure (#1300).
-
-* You can once again use `NULL` on the LHS of an infix operator in order
-  to generate SQL with unusual syntax (#1345).
-
-* Oracle once again translates `head()` to `FETCH FIRST`. This does require
-  Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
-  from #1292 (#1436).
+## Improved tools for qualified table names
 
 * Specification of table names with schema/catalogs has been overhauled to
   make it simpler. This includes the following features and fixes:
@@ -39,70 +23,99 @@
     
   * `tbl_sql(check_from)` is now deprecated.
 
-* When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
-  it now only includes the table name in the index name, not the schema name.
+* dbplyr now exports some tools to work with the internal `table_path` class
+  which is useful for certain backends that need to work with this 
+  data structure (#1300).
 
-* The databricks backend now supports creating non-temporary tables too (#1418).
+## Improved SQL
 
-* `x$name` never attempts to evaluate `name` (#1368).
-
-* `rows_patch(in_place = FALSE)` now works when more than one column should be
-  patched (@gorcha, #1443).
-
-* Namespaced dplyr calls now error if the function doesn't exist, or 
-  a translation is not available (#1426).
-
-* `db_sql_render()` correctly passes on `...` when re-calling with 
-  `sql_options` set (#1394).
-
-* `-1 + x` is now translated correctly (#1420).
-
-* SQL server: clear error if you attempt to use `n_distinct()` in `mutate()`
-  or `filter()` (#1366).
-
-* Add translations for clock functions `add_years()`, `add_days()`, 
+* New translations for clock functions `add_years()`, `add_days()`, 
   `date_build()`, `get_year()`, `get_month()`, `get_day()`, 
   and `base::difftime()` on SQL server, Redshift, Snowflake, and Postgres.
 
-* SQL server: `filter()` does a better job of converting logical vectors 
-  from bit to boolean (@ejneer, #1288). 
+* `select()` will keep computed columns used to `arrange()` subqueries that are
+  eliminated by a subsequent select (@ejneer, #1437).
 
-* Oracle: Added support for `str_replace()` and `str_replace_all()` via
-  `REGEXP_REPLACE()` (@thomashulst, #1402).
+* `semi_join()` will no longer inline away an aggregate filter (i.e. `HAVING`
+  clause) that was followed by a `select()` (@ejneer, #1474)
 
-* Allow additional arguments to be passed from `compute()` all the way to 
-  `sql_query_save()`-method (@rsund).
+* Improved function translations:
 
-* The class of remote sources now includes all S4 class names, not just
-  the first (#918).
+  * Functions qualified with the base namespace are now also translated, e.g.
+    `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
 
-* `db_explain()` now works for Oracle (@thomashulst, #1353).
+  * `-1 + x` now generates a translation instead erroring (#1420).
+
+  * `x$name` never attempts to evaluate `name` (#1368).
+
+  * You can once again use `NULL` on the LHS of an infix operator in order
+    to generate SQL with unusual syntax (#1345).
+    
+  * Namespaced calls now error if the function doesn't exist, or a translation 
+    is not available (#1426).
+
+  * `lead()` translation coerces `n` to an integer.
+
+* Databricks: now supports creating non-temporary tables too (#1418).
+
+* Oracle:
+    
+  * `db_explain()` now works (@thomashulst, #1353).
+
+  * `as.Date()` works when applied to a string (#1389).
+
+  * `head()` is once again translated to `FETCH FIRST`. This does require Oracle 
+    12c or newer, but it actually works, compared to the approach using 
+    `ROWNUM` from #1292 (#1436).
+    
+  * Added support for `str_replace()` and `str_replace_all()` via
+    `REGEXP_REPLACE()` (@thomashulst, #1402).
+
+* Snowflake (@nathanhaigh, #1406)
+
+  * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
+
+  * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports
+    regular expressions.
+
+  * Refactored `grepl()` to use `REGEXP_INSTR()` so now supports
+    case-insensitive matching through `grepl(..., ignore.case = TRUE)`
+
+* SQL server: 
+
+  * Now products a clear error if you attempt to use `n_distinct()` in 
+    `mutate()` or `filter()` (#1366).
+
+  * `filter()` does a better job of converting logical vectors 
+    from bit to boolean (@ejneer, #1288). 
+
+* MySQL: `as.integer()` gets correct translation (@krlmlr, #1375).
+
+## Minor improvements and bug fixes
 
 * Database errors now show the generated SQL, which hopefully will make it
   faster to track down problems (#1401).
 
-* Snowflake (@nathanhaigh, #1406)
-  * Added support for `str_starts()` and `str_ends()` via `REGEXP_INSTR()`
-  * Refactored `str_detect()` to use `REGEXP_INSTR()` so now supports
-    regular expressions.
-  * Refactored `grepl()` to use `REGEXP_INSTR()` so now supports
-    case-insensitive matching through `grepl(..., ignore.case = TRUE)`
+* When dbplyr creates an index on a table in a schema (e.g. `schema.table`), 
+  it now only includes the table name in the index name, not the schema name.
 
-* Functions qualified with the base namespace are now also translated, e.g.
-  `base::paste0(x, "_1")` is now translated (@mgirlich, #1022).
+* The class of remote sources now includes all S4 class names, not just
+  the first (#918).
 
-* `lead()` translation coerces `n` to an integer.
+* `compute()` passes additional arguments all the way to 
+  `sql_query_save()`-methods (@rsund).
 
-* `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
+* `db_sql_render()` correctly passes on `...` when re-calling with 
+  `sql_options` set (#1394).
 
 * `reframe()` now gives an informative error that it isn't supported (#1148).
 
-* MySQL/MariaDB:
-  * Fix translation of `as.integer()` for MySQL (@krlmlr, #1375).
-  * New `simulate_mariadb()` (@krlmlr, #1375).
+* `rows_patch(in_place = FALSE)` now works when more than one column should be
+  patched (@gorcha, #1443).
 
-* Oracle
-  * Fix translation of `as.Date()` applied to a string (#1389).
+* New `simulate_mariadb()` (@krlmlr, #1375).
+
+* `sql_translator()` now checks for duplicated definitions (@krlmlr, #1374).
 
 # dbplyr 2.4.0
 
