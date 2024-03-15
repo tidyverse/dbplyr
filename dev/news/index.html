@@ -124,7 +124,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="minor-improvements-and-bug-fixes-development-version">Minor improvements and bug fixes<a class="anchor" aria-label="anchor" href="#minor-improvements-and-bug-fixes-development-version"></a></h3>
-<ul><li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
+<ul><li><p>Deprecation status of functions deprecated in previous versions (at least 2 years old) have been advanced. In particular, <code><a href="../reference/src_sql.html">src_sql()</a></code> is now defunct, as is the use of <code><a href="../reference/partial_eval.html">partial_eval()</a></code> with character <code>data</code>.</p></li>
+<li><p>Database errors now show the generated SQL, which hopefully will make it faster to track down problems (<a href="https://github.com/tidyverse/dbplyr/issues/1401" class="external-link">#1401</a>).</p></li>
 <li><p>When dbplyr creates an index on a table in a schema (e.g. <code>schema.table</code>), it now only includes the table name in the index name, not the schema name.</p></li>
 <li><p>The class of remote sources now includes all S4 class names, not just the first (<a href="https://github.com/tidyverse/dbplyr/issues/918" class="external-link">#918</a>).</p></li>
 <li><p><code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">compute()</a></code> passes additional arguments all the way to <code><a href="../reference/db-sql.html">sql_query_save()</a></code>-methods (<a href="https://github.com/rsund" class="external-link">@rsund</a>).</p></li>
