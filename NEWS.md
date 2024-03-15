@@ -1,22 +1,5 @@
 # dbplyr (development version)
 
-* `semi_join()` will no longer inline away an aggregate filter (i.e. `HAVING`
-  clause) that was followed by a `select()` (@ejneer, #1474)
-
-* Refined the `select()` inlining criteria to keep computed columns used to
-  `arrange()` subqueries that are eliminated by a subsequent select (@ejneer,
-  #1437).
-
-* dbplyr now exports some tools to work with the internal `table_path` class
-  which is useful for certain backends that need to work with this 
-  data structure (#1300).
-
-* You can once again use `NULL` on the LHS of an infix operator in order
-  to generate SQL with unusual syntax (#1345).
-
-* Oracle once again translates `head()` to `FETCH FIRST`. This does require
-  Oracle 12c or newer, but it actually works, compared to the approach using `ROWNUM`
-  from #1292 (#1436).
 ## Improved tools for qualified table names
 
 * Specification of table names with schema/catalogs has been overhauled to
@@ -109,6 +92,10 @@
 * MySQL: `as.integer()` gets correct translation (@krlmlr, #1375).
 
 ## Minor improvements and bug fixes
+
+* Deprecation status of functions deprecated in previous versions (at least
+  2 years old) have been advanced. In particular, `src_sql()` is now defunct,
+  as is the use of `partial_eval()` with character `data`.
 
 * Database errors now show the generated SQL, which hopefully will make it
   faster to track down problems (#1401).
