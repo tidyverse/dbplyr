@@ -616,6 +616,23 @@ test_that("filter() before semi join is not when y has other operations", {
   expect_null(lq$where)
 })
 
+test_that("filtered aggregates with subsequent select are not inlined away in semi_join (#1474)", {
+  lf <- lazy_frame(x = 1, y = 2, z = 3)
+  lf2 <- lazy_frame(x = 1, a = 2, b = 3)
+
+  out <- semi_join(
+    lf,
+    lf2 %>%
+      dplyr::summarize(n = n(), .by = "x") %>%
+      filter(n == 1) %>%
+      select(x)
+  )
+  lq <- out$lazy_query
+
+  expect_equal(lq$y$having, list(quo(n() == 1)), ignore_formula_env = TRUE)
+  expect_snapshot(out)
+})
+
 test_that("multiple joins create a single query", {
   lf <- lazy_frame(x = 1, a = 1, .name = "df1")
   lf2 <- lazy_frame(x = 1, b = 2, .name = "df2")
