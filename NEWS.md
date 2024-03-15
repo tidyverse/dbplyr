@@ -1,9 +1,5 @@
 # dbplyr (development version)
 
-* Deprecation status of functions deprecated in previous versions (at least
-  2 years old) have been advanced. In particular, `src_sql()` is now defunct,
-  as is the use of `partial_eval()` with character `data`.
-
 * `semi_join()` will no longer inline away an aggregate filter (i.e. `HAVING`
   clause) that was followed by a `select()` (@ejneer, #1474)
 
