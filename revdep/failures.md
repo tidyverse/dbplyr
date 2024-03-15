@@ -110,7 +110,7 @@ Run `revdepcheck::cloud_details(, "CompoundDb")` for more info
 * Version: NA
 * GitHub: NA
 * Source code: https://github.com/cran/CuratedAtlasQueryR
-* Number of recursive dependencies: 197
+* Number of recursive dependencies: 196
 
 Run `revdepcheck::cloud_details(, "CuratedAtlasQueryR")` for more info
 
@@ -215,7 +215,7 @@ Run `revdepcheck::cloud_details(, "grasp2db")` for more info
 * Version: NA
 * GitHub: NA
 * Source code: https://github.com/cran/msPurity
-* Number of recursive dependencies: 185
+* Number of recursive dependencies: 183
 
 Run `revdepcheck::cloud_details(, "msPurity")` for more info
 
@@ -320,7 +320,7 @@ Run `revdepcheck::cloud_details(, "Organism.dplyr")` for more info
 * Version: NA
 * GitHub: NA
 * Source code: https://github.com/cran/SQLDataFrame
-* Number of recursive dependencies: 95
+* Number of recursive dependencies: 93
 
 Run `revdepcheck::cloud_details(, "SQLDataFrame")` for more info
 
@@ -355,7 +355,7 @@ Run `revdepcheck::cloud_details(, "SQLDataFrame")` for more info
 * Version: NA
 * GitHub: NA
 * Source code: https://github.com/cran/synaptome.db
-* Number of recursive dependencies: 151
+* Number of recursive dependencies: 149
 
 Run `revdepcheck::cloud_details(, "synaptome.db")` for more info
 

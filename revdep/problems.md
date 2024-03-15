@@ -82,6 +82,33 @@ Run `revdepcheck::cloud_details(, "Andromeda")` for more info
     Execution halted
     ```
 
+## Newly fixed
+
+*   checking re-building of vignette outputs ... WARNING
+    ```
+    Error(s) in re-building vignettes:
+      ...
+    --- re-building ‘UsingAndromeda.Rmd’ using rmarkdown
+    A new version of TeX Live has been released. If you need to install or update any LaTeX packages, you have to upgrade TinyTeX with tinytex::reinstall_tinytex(repository = "illinois").
+    
+    tlmgr: Local TeX Live (2023) is older than remote repository (2024).
+    Cross release updates are only supported with
+      update-tlmgr-latest(.sh/.exe) --update
+    See https://tug.org/texlive/upgrade.html for details.
+    Warning in system2("tlmgr", args, ...) :
+    ...
+    
+    Error: processing vignette 'UsingAndromeda.Rmd' failed with diagnostics:
+    LaTeX failed to compile /tmp/workdir/Andromeda/old/Andromeda.Rcheck/vign_test/Andromeda/vignettes/UsingAndromeda.tex. See https://yihui.org/tinytex/r/#debugging for debugging tips. See UsingAndromeda.log for more info.
+    --- failed re-building ‘UsingAndromeda.Rmd’
+    
+    SUMMARY: processing the following file failed:
+      ‘UsingAndromeda.Rmd’
+    
+    Error: Vignette re-building failed.
+    Execution halted
+    ```
+
 # CDMConnector
 
 <details>
@@ -111,6 +138,7 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
       > # * https://r-pkgs.org/tests.html
       > # * https://testthat.r-lib.org/reference/test_package.html#special-files
     ...
+      In addition: Warning messages:
       1: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       2: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       3: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
@@ -118,9 +146,8 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
       5: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
       6: Connection is garbage-collected, use dbDisconnect() to avoid this. 
       7: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
+      8: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
       Execution halted
-      Warning message:
-      Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this. 
     ```
 
 *   checking re-building of vignette outputs ... ERROR
@@ -156,50 +183,6 @@ Run `revdepcheck::cloud_details(, "CDMConnector")` for more info
       'arrow', 'CirceR', 'Capr'
     ```
 
-# childesr
-
-<details>
-
-* Version: 0.2.3
-* GitHub: https://github.com/langcog/childesr
-* Source code: https://github.com/cran/childesr
-* Date/Publication: 2022-01-27 00:00:02 UTC
-* Number of recursive dependencies: 48
-
-Run `revdepcheck::cloud_details(, "childesr")` for more info
-
-</details>
-
-## Newly broken
-
-*   checking re-building of vignette outputs ... ERROR
-    ```
-    Error(s) in re-building vignettes:
-      ...
-    --- re-building ‘access_childes_db.Rmd’ using rmarkdown
-    
-    Quitting from lines 101-103 [unnamed-chunk-8] (access_childes_db.Rmd)
-    Error: processing vignette 'access_childes_db.Rmd' failed with diagnostics:
-    Failed to collect lazy table.
-    Caused by error in `dbSendQuery()`:
-    ! could not run statement: Unknown column 'participant.*' in 'field list'
-    --- failed re-building ‘access_childes_db.Rmd’
-    
-    SUMMARY: processing the following file failed:
-      ‘access_childes_db.Rmd’
-    
-    Error: Vignette re-building failed.
-    Execution halted
-    ```
-
-## In both
-
-*   checking dependencies in R code ... NOTE
-    ```
-    Namespace in Imports field not imported from: ‘dbplyr’
-      All declared Imports should be used.
-    ```
-
 # CohortSurvival
 
 <details>
@@ -208,7 +191,7 @@ Run `revdepcheck::cloud_details(, "childesr")` for more info
 * GitHub: NA
 * Source code: https://github.com/cran/CohortSurvival
 * Date/Publication: 2024-02-08 09:50:02 UTC
-* Number of recursive dependencies: 140
+* Number of recursive dependencies: 114
 
 Run `revdepcheck::cloud_details(, "CohortSurvival")` for more info
 
@@ -311,11 +294,11 @@ Run `revdepcheck::cloud_details(, "diseasystore")` for more info
 
 <details>
 
-* Version: 0.5.0
+* Version: 0.5.2
 * GitHub: NA
 * Source code: https://github.com/cran/DrugUtilisation
-* Date/Publication: 2024-02-10 18:10:02 UTC
-* Number of recursive dependencies: 163
+* Date/Publication: 2024-03-06 01:00:29 UTC
+* Number of recursive dependencies: 144
 
 Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
 
@@ -338,12 +321,12 @@ Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
     ...
       Backtrace:
           ▆
-       1. ├─testthat::expect_true(inherits(x, "omop_result")) at test-summariseTreatment.R:11:3
+       1. ├─testthat::expect_true(inherits(x, "summarised_result")) at test-summariseTreatment.R:11:3
        2. │ └─testthat::quasi_label(enquo(object), label, arg = "object")
        3. │   └─rlang::eval_bare(expr, quo_get_env(quo))
-       4. └─base::inherits(x, "omop_result")
+       4. └─base::inherits(x, "summarised_result")
       
-      [ FAIL 13 | WARN 9 | SKIP 19 | PASS 115 ]
+      [ FAIL 8 | WARN 36 | SKIP 19 | PASS 139 ]
       Error: Test failures
       Execution halted
     ```
@@ -361,13 +344,13 @@ Run `revdepcheck::cloud_details(, "DrugUtilisation")` for more info
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
     Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
     ...
-    Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
+    --- finished re-building ‘routePatternDose.Rmd’
+    
     Warning: Connection is garbage-collected, use dbDisconnect() to avoid this.
     Warning: Database is garbage-collected, use dbDisconnect(con, shutdown=TRUE) or duckdb::duckdb_shutdown(drv) to avoid this.
     SUMMARY: processing the following files failed:
       ‘a01_introCreateCohort.Rmd’ ‘a03_addIndications-example.Rmd’
-      ‘a04_addDrugInfo.Rmd’ ‘a06_treatmentSummary.Rmd’
-      ‘routePatternDose.Rmd’
+      ‘a06_treatmentSummary.Rmd’
     
     Error: Vignette re-building failed.
     Execution halted
@@ -443,42 +426,17 @@ Run `revdepcheck::cloud_details(, "IncidencePrevalence")` for more info
 
 <details>
 
-* Version: 0.6.1
+* Version: 0.6.2
 * GitHub: NA
 * Source code: https://github.com/cran/PatientProfiles
-* Date/Publication: 2024-02-21 23:30:07 UTC
-* Number of recursive dependencies: 174
+* Date/Publication: 2024-03-05 18:50:03 UTC
+* Number of recursive dependencies: 156
 
 Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
 
 </details>
 
 ## Newly broken
-
-*   checking tests ... ERROR
-    ```
-      Running ‘spelling.R’
-      Running ‘testthat.R’
-    Running the tests in ‘tests/testthat.R’ failed.
-    Complete output:
-      > # This file is part of the standard setup for testthat.
-      > # It is recommended that you do not modify it.
-      > #
-      > # Where should you do additional test configuration?
-      > # Learn more about the roles of various files in:
-      > # * https://r-pkgs.org/tests.html
-    ...
-       26. │                       └─dbplyr (local) FUN(X[[i]], ...)
-       27. │                         ├─dbplyr::escape(eval_tidy(x, mask), con = con)
-       28. │                         └─rlang::eval_tidy(x, mask)
-       29. └─CDMConnector::datediff
-       30.   └─cli::cli_abort(...)
-       31.     └─rlang::abort(...)
-      
-      [ FAIL 65 | WARN 0 | SKIP 1 | PASS 201 ]
-      Error: Test failures
-      Execution halted
-    ```
 
 *   checking re-building of vignette outputs ... ERROR
     ```
@@ -503,6 +461,33 @@ Run `revdepcheck::cloud_details(, "PatientProfiles")` for more info
     
     Error: Vignette re-building failed.
     Execution halted
+    ```
+
+## In both
+
+*   checking tests ... ERROR
+    ```
+      Running ‘spelling.R’
+      Running ‘testthat.R’
+    Running the tests in ‘tests/testthat.R’ failed.
+    Complete output:
+      > # This file is part of the standard setup for testthat.
+      > # It is recommended that you do not modify it.
+      > #
+      > # Where should you do additional test configuration?
+      > # Learn more about the roles of various files in:
+      > # * https://r-pkgs.org/tests.html
+    ...
+       26. │                       └─dbplyr (local) FUN(X[[i]], ...)
+       27. │                         ├─dbplyr::escape(eval_tidy(x, mask), con = con)
+       28. │                         └─rlang::eval_tidy(x, mask)
+       29. └─CDMConnector::datediff
+       30.   └─cli::cli_abort(...)
+       31.     └─rlang::abort(...)
+      
+      [ FAIL 65 | WARN 21 | SKIP 1 | PASS 200 ]
+      Error: Test failures
+      Execution halted
     ```
 
 # SCDB

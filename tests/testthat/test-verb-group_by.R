@@ -7,13 +7,12 @@ test_that("group_by with .add = TRUE adds groups", {
   expect_equal(group_vars(gf2), c("x", "y"))
 })
 
-test_that("warns about add argument ", {
+test_that("errors about add argument ", {
   mf <- memdb_frame(x = 1:3, y = 1:3)
-  expect_warning(
+  expect_snapshot(
     gf <- mf %>% group_by(x) %>% group_by(y, add = TRUE),
-    "deprecated"
+    error = TRUE
   )
-  expect_equal(group_vars(gf), c("x", "y"))
 })
 
 test_that("errors for .drop = FALSE", {

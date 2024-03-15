@@ -823,9 +823,9 @@ sql_query_append <- function(con,
                              ...,
                              returning_cols = NULL) {
   if (is_tbl_lazy(from)) {
-    lifecycle::deprecate_soft(
+    lifecycle::deprecate_warn(
       when = "2.3.2",
-      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')",
+      what = "sql_query_append(from = 'must be a table identifier or an SQL query, not a lazy table.')"
     )
 
     insert_cols <- colnames(from)

@@ -4,7 +4,7 @@
 \alias{group_by.tbl_lazy}
 \title{Group by one or more variables}
 \usage{
-\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, add = NULL, .drop = TRUE)
+\method{group_by}{tbl_lazy}(.data, ..., .add = FALSE, add = deprecated(), .drop = TRUE)
 }
 \arguments{
 \item{.data}{A lazy data frame backed by a database query.}

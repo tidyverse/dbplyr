@@ -93,6 +93,10 @@
 
 ## Minor improvements and bug fixes
 
+* Deprecation status of functions deprecated in previous versions (at least
+  2 years old) have been advanced. In particular, `src_sql()` is now defunct,
+  as is the use of `partial_eval()` with character `data`.
+
 * Database errors now show the generated SQL, which hopefully will make it
   faster to track down problems (#1401).
 

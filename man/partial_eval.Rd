@@ -4,7 +4,7 @@
 \alias{partial_eval}
 \title{Partially evaluate an expression.}
 \usage{
-partial_eval(call, data, env = caller_env(), vars = NULL, error_call)
+partial_eval(call, data, env = caller_env(), vars = deprecated(), error_call)
 }
 \arguments{
 \item{call}{an unevaluated expression, as produced by \code{\link[=quote]{quote()}}}
