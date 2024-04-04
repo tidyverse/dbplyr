@@ -282,12 +282,11 @@ base_scalar <- sql_translator(
   str_sub = sql_str_sub("SUBSTR"),
   str_like = function(string, pattern, ignore_case = TRUE) {
     if (isTRUE(ignore_case)) {
-      bullets <- c(
+      cli_abort(c(
         "Backend does not support case insensitve {.fn str_like}.",
         i = "Set ignore_case = FALSE for case sensitive match.",
         i = "Note, using `tolower()` to cast string and pattern to lower case would also achieve a case insenitive match."
-      )
-      abort(bullets)
+      ))
     } else {
       sql_expr(!!string %LIKE% !!pattern)
     }
