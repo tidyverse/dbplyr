@@ -42,7 +42,7 @@
 # can translate case insensitive like
 
     Code
-      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
       Error in `str_like()`:
       ! Backend only supports case insensitve `str_like()`.
