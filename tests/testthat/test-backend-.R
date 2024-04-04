@@ -103,9 +103,9 @@ test_that("lead and lag translate n to integers", {
 
 test_that("can translate case insensitive like", {
   local_con(simulate_dbi())
-  test_translate_sql(str_like(x, "abc"))
+  test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
   expect_snapshot(
-    test_translate_sql(str_like(x, "abc", ignore_case = FALSE)),
+    test_translate_sql(str_like(x, "abc", ignore_case = TRUE)),
     error = TRUE
   )
 })

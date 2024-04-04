@@ -45,7 +45,9 @@
       test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
       Error in `str_like()`:
-      ! Backend only supports case insensitve `str_like()`.
+      ! Backend does not support case insensitve {.fn str_like}.
+      i Set ignore_case = FALSE for case sensitive match.
+      i Note, using `tolower()` to cast string and pattern to lower case would also achieve a case insenitive match.
 
 # default raw escapes translated correctly
 
