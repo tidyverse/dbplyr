@@ -32,8 +32,10 @@
     Condition
       Warning:
       The `check_from` argument of `tbl_sql()` is deprecated as of dbplyr 2.5.0.
+      i The deprecated feature was likely used in the dbplyr package.
+        Please report the issue at <https://github.com/tidyverse/dbplyr/issues>.
     Output
       # Source:   table<`x`> [0 x 1]
-      # Database: sqlite 3.41.2 [:memory:]
+      # Database: sqlite 3.45.2 [:memory:]
       # i 1 variable: y <lgl>
 
