@@ -96,6 +96,8 @@ reference:
 
 news:
   releases:
+  - text: "Version 2.5.0"
+    href: https://www.tidyverse.org/blog/2024/04/dbplyr-2-5-0/
   - text: "Version 2.4.0"
     href: https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/
   - text: "Version 2.3.0"
