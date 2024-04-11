@@ -100,7 +100,7 @@ sql_translation.Snowflake <- function(con) {
       str_squish = function(string) {
         sql_expr(regexp_replace(trim(!!string), "\\\\s+", " "))
       },
-      # date functions (e.g., functions covered by lubridate or ?base::weekdays)
+      # date functions (e.g., from lubridate or ?base::weekdays)
       # https://docs.snowflake.com/en/sql-reference/functions-date-time.html
       day = function(x) {
         sql_expr(EXTRACT(DAY %FROM% !!x))
