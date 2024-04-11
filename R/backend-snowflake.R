@@ -100,9 +100,7 @@ sql_translation.Snowflake <- function(con) {
       str_squish = function(string) {
         sql_expr(regexp_replace(trim(!!string), "\\\\s+", " "))
       },
-
-
-      # lubridate functions
+      # date functions (e.g., functions covered by lubridate or ?base::weekdays)
       # https://docs.snowflake.com/en/sql-reference/functions-date-time.html
       day = function(x) {
         sql_expr(EXTRACT(DAY %FROM% !!x))
@@ -188,12 +186,14 @@ sql_translation.Snowflake <- function(con) {
         glue_sql2(sql_current_con(), "INTERVAL '{.val x} hour'")
       },
       days = function(x) {
+        # lubridate::days() (base::days() does not exist)
         glue_sql2(sql_current_con(), "INTERVAL '{.val x} day'")
       },
       weeks = function(x) {
         glue_sql2(sql_current_con(), "INTERVAL '{.val x} week'")
       },
       months = function(x) {
+        # base::months() (or applicable methods from lubridate, e.g., months.numeric)
         glue_sql2(sql_current_con(), "INTERVAL '{.val x} month'")
       },
       years = function(x) {
