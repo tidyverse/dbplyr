@@ -110,7 +110,7 @@ test_that("can group transiently using `.by`", {
 test_that("across doesn't select columns from `.by` #1493", {
   lf <- lazy_frame(g = 1, x = 1)
 
-  out <- lf |>
+  out <- lf %>%
     summarise(
       across(everything(), ~ sum(..x, na.rm = TRUE)),
       .by = g
