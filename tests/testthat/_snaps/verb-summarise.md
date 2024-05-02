@@ -102,6 +102,16 @@
       FROM `df`
       GROUP BY `g`
 
+# across doesn't select columns from `.by` #1493
+
+    Code
+      out
+    Output
+      <SQL>
+      SELECT `g`, SUM(`..x`) AS `x`
+      FROM `df`
+      GROUP BY `g`
+
 # can't use `.by` with `.groups`
 
     Code

@@ -35,7 +35,6 @@
 #'   show_query()
 summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
   check_groups(.groups)
-  dots <- summarise_eval_dots(.data, ...)
 
   by <- compute_by(
     {{ .by }},
@@ -49,6 +48,8 @@ summarise.tbl_lazy <- function(.data, ..., .by = NULL, .groups = NULL) {
     .data$lazy_query$group_vars <- by$names
     .groups <- "drop"
   }
+
+  dots <- summarise_eval_dots(.data, ...)
   .data$lazy_query <- add_summarise(
     .data, dots,
     .groups = .groups,
