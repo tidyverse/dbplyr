@@ -215,7 +215,6 @@ sql_translation.PqConnection <- function(con) {
       hours = function(x) {
         postgres_period(x, "hours")
       },
-
       days = function(x) {
         # lubridate::days() (base::days() does not exist)
         postgres_period(x, "days")
