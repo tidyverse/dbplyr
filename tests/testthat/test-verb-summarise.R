@@ -107,6 +107,19 @@ test_that("can group transiently using `.by`", {
   expect_equal(group_vars(out), character())
 })
 
+test_that("across doesn't select columns from `.by` #1493", {
+  lf <- lazy_frame(g = 1, x = 1)
+
+  out <- lf |>
+    summarise(
+      across(everything(), ~ sum(..x, na.rm = TRUE)),
+      .by = g
+    )
+
+  expect_snapshot(out)
+  expect_equal(sql_build(out)$select[1], "`g`")
+})
+
 test_that("can't use `.by` with `.groups`", {
   df <- lazy_frame(x = 1)
 

@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* `across(everything())` doesn't select grouping columns created via `.by` in
+  `summarise()` (@mgirlich, #1493).
+
 # dbplyr 2.5.0
 
 ## Improved tools for qualified table names
