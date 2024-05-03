@@ -1,6 +1,9 @@
 # dbplyr (development version)
 * The translation of `stringr::str_like()` now defaults to use case-sensitive LIKE when argument `ignore_case` is set as FALSE instead of when this argument is set as TRUE.(@edward-burn, #1488)
 
+* `across(everything())` doesn't select grouping columns created via `.by` in
+  `summarise()` (@mgirlich, #1493).
+
 # dbplyr 2.5.0
 
 ## Improved tools for qualified table names
