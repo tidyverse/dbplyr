@@ -32,5 +32,4 @@
     Condition
       Warning:
       The `check_from` argument of `tbl_sql()` is deprecated as of dbplyr 2.5.0.
-    
 
