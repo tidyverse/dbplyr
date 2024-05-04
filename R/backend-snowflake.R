@@ -232,6 +232,18 @@ sql_translation.Snowflake <- function(con) {
       get_day = function(x) {
         sql_expr(DATE_PART(DAY, !!x))
       },
+      date_count_between = function(start, end, precision, ..., n = 1L){
+
+        check_dots_empty()
+        if (precision != "day") {
+          cli::cli_abort('The only supported value for {.arg precision} on SQL backends is "day"')
+        }
+        if (n != 1) {
+          cli::cli_abort('The only supported value for {.arg n} on SQL backends is "1"')
+        }
+
+        sql_expr(DATEDIFF(DAY, !!start, !!end))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
 
