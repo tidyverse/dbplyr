@@ -2,6 +2,7 @@
 
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+*  New translations of clock function `date_count_between()` for SQL server, Redshift, Snowflake, Postgres, and Spark (@edward-burn, #1495).
 
 # dbplyr 2.5.0
 
