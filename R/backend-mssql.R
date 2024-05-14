@@ -416,7 +416,7 @@ simulate_mssql <- function(version = "15.0") {
   sql_variant(
     mssql_scalar,
     sql_translator(.parent = base_odbc_agg,
-      n          = function() sql("BIG_COUNT(*)"),
+      n          = function() sql("COUNT_BIG(*)"),
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),
