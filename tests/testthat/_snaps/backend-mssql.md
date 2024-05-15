@@ -453,6 +453,24 @@
       FROM `df`
       ORDER BY `y`
 
+# count_big
+
+    Code
+      dplyr::count(mf)
+    Output
+      <SQL>
+      SELECT COUNT_BIG(*) AS `n`
+      FROM `df`
+
+---
+
+    Code
+      dplyr::tally(mf)
+    Output
+      <SQL>
+      SELECT COUNT_BIG(*) AS `n`
+      FROM `df`
+
 # can copy_to() and compute() with temporary tables (#438)
 
     Code

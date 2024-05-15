@@ -2,6 +2,8 @@
 
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+*  Use `COUNT_BIG` instead of `COUNT` for SQL server so that `tally()` and
+  `count()` work regardless of size of the data (@edward-burn, #1498).
 
 # dbplyr 2.5.0
 
