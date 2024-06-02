@@ -2,6 +2,8 @@
 
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+  
+* `mutate()` now supports the argument `.keep = "transmute"`.
 
 # dbplyr 2.5.0
 
