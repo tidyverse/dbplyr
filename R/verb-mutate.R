@@ -24,7 +24,7 @@
 mutate.tbl_lazy <- function(.data,
                             ...,
                             .by = NULL,
-                            .keep = c("all", "used", "unused", "none"),
+                            .keep = c("all", "used", "unused", "none", "transmute"),
                             .before = NULL,
                             .after = NULL) {
   keep <- arg_match(.keep)
@@ -53,6 +53,7 @@ mutate.tbl_lazy <- function(.data,
 
   out <- mutate_relocate(
     out = out,
+    keep = keep,
     before = {{ .before }},
     after = {{ .after }},
     names_original = names_original
@@ -238,11 +239,11 @@ get_mutate_dot_cols <- function(quosures, all_vars) {
   )
 }
 
-mutate_relocate <- function(out, before, after, names_original) {
+mutate_relocate <- function(out, keep, before, after, names_original) {
   before <- enquo(before)
   after <- enquo(after)
 
-  if (quo_is_null(before) && quo_is_null(after)) {
+  if (keep == "transmute" || (quo_is_null(before) && quo_is_null(after))) {
     return(out)
   }
 
@@ -264,6 +265,9 @@ mutate_keep <- function(out, keep, used, names_new, names_groups) {
 
   if (keep == "all") {
     names_out <- names
+  } else if (keep == "transmute") {
+    names_groups <- setdiff(names_groups, names_new)
+    names_out <- c(names_groups, names_new)
   } else {
     names_keep <- switch(
       keep,
