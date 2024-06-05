@@ -1,6 +1,6 @@
 test_that("custom clock functions translated correctly", {
   local_con(simulate_spark_sql())
-  expect_equal(test_translate_sql(add_years(x, 1)), sql("ADD_MONTHS('`x`', 1.0 * 12.0)"))
+  expect_equal(test_translate_sql(add_years(x, 1)), sql("ADD_MONTHS(`x`, 1.0 * 12.0)"))
   expect_equal(test_translate_sql(add_days(x, 1)), sql("DATE_ADD(`x`, 1.0)"))
   expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
   expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("MAKE_DATE(2020.0, 1.0, 1.0)"))
