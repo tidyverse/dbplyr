@@ -229,7 +229,7 @@ regular tibble:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights_db</span> </span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   table&lt;`flights`&gt; [?? x 19]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1      517            515         2      830</span></span>
@@ -262,7 +262,7 @@ with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">year</span><span class="op">:</span><span class="va">day</span>, <span class="va">dep_delay</span>, <span class="va">arr_delay</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 5]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_delay arr_delay</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1         2        11</span></span>
@@ -271,11 +271,12 @@ with:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">1</span>       -<span style="color: #BB0000;">18</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">6</span>       -<span style="color: #BB0000;">25</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">2</span>013     1     1        -<span style="color: #BB0000;">4</span>        12</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">dep_delay</span> <span class="op">&gt;</span> <span class="fl">240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 19]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 [:memory:]</span></span></span>
 <span><span class="co">#&gt;    year month   day dep_time sched_dep_time dep_delay arr_time</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>013     1     1      848           <span style="text-decoration: underline;">1</span>835       853     <span style="text-decoration: underline;">1</span>001</span></span>
@@ -288,8 +289,9 @@ with:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   time_hour &lt;dbl&gt;</span></span></span>
-<span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   time_hour &lt;dbl&gt;</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">dest</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>delay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">dep_delay</span><span class="op">)</span><span class="op">)</span></span>
@@ -297,7 +299,7 @@ with:</p>
 <span><span class="co">#&gt; Use `na.rm = TRUE` to silence this warning</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 2]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.46.0 [:memory:]</span></span></span>
 <span><span class="co">#&gt;   dest  delay</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ABQ   13.7 </span></span>
@@ -329,7 +331,7 @@ collects together everything you want to do and then sends it to the
 database in one step.</p></li>
 </ul>
 <p>For example, take the following code:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span> <span class="op">&lt;-</span> <span class="va">flights_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">tailnum</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
@@ -343,10 +345,10 @@ It’s not until you ask for the data (e.g. by printing
 <code>tailnum_delay</code>) that dplyr generates the SQL and requests
 the results from the database. Even then it tries to do as little work
 as possible and only pulls down a few rows.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:     SQL [?? x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database:   sqlite 3.46.0 [:memory:]</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Ordered by: desc(delay)</span></span></span>
 <span><span class="co">#&gt;   tailnum delay     n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
@@ -359,7 +361,7 @@ as possible and only pulls down a few rows.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ more rows</span></span></span></code></pre></div>
 <p>Behind the scenes, dplyr is translating your R code into SQL. You can
 see the SQL it’s generating with <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> `tailnum`, AVG(`arr_delay`)<span style="color: #0000BB;"> AS </span>`delay`, COUNT(*)<span style="color: #0000BB;"> AS </span>`n`</span></span>
@@ -375,7 +377,7 @@ translation in <code><a href="../articles/translation-verb.html">vignette("trans
 you need from the database. Once you’ve figured it out, use
 <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> to pull all the data down into a local
 tibble:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tailnum_delay</span> <span class="op">&lt;-</span> <span class="va">tailnum_delay_db</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">tailnum_delay</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,201 × 3</span></span></span>
@@ -398,10 +400,11 @@ always <code>NA</code>.</p></li>
 <li><p>Because you can’t find the last few rows without executing the
 whole query, you can’t use <code><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail()</a></code>.</p></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] NA</span></span>
-<span></span>
+<span><span class="co">#&gt; [1] NA</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">tailnum_delay_db</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tail()`:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `tail()` is not supported on database backends.</span></span></code></pre></div>
