@@ -35,6 +35,12 @@ redshift_round <- function(x, digits = 0L) {
 }
 
 #' @export
+sql_expr_matches.RedshiftConnection <- sql_expr_matches.DBIConnection
+
+#' @export
+sql_expr_matches.Redshift <- sql_expr_matches.RedshiftConnection
+
+#' @export
 sql_translation.RedshiftConnection <- function(con) {
   postgres <- sql_translation.PostgreSQL(con)
 
