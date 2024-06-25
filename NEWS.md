@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Redshift driver has a custom `sql_expr_matches` method, what makes
+join operation statements correct when `na_matches="na"` argument is set (#1521).
+
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
   
