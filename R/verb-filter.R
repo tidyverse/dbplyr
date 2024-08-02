@@ -73,7 +73,7 @@ add_filter <- function(.data, dots) {
     }
   } else {
     # Do partial evaluation, then extract out window functions
-    where <- translate_window_where_all(dots, ls(dbplyr_sql_translation(con)$window))
+    where <- translate_window_where_all(dots, ls_all(dbplyr_sql_translation(con)$window))
 
     # Add extracted window expressions as columns
     mutated <- mutate(.data, !!!where$comp)
