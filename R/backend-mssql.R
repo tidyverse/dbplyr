@@ -383,7 +383,7 @@ simulate_mssql <- function(version = "15.0") {
           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       }
     )
 
