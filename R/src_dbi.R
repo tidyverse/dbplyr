@@ -3,7 +3,7 @@
 #' All data manipulation on SQL tbls are lazy: they will not actually
 #' run the query or retrieve the data unless you ask for it: they all return
 #' a new `tbl_dbi` object. Use [compute()] to run the query and save the
-#' results in a temporary in the database, or use [collect()] to retrieve the
+#' results in a temporary table in the database, or use [collect()] to retrieve the
 #' results to R. You can see the query with [show_query()].
 #'
 #' @details
