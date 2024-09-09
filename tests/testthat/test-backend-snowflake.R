@@ -116,8 +116,8 @@ test_that("custom clock functions translated correctly", {
 
 test_that("difftime is translated correctly", {
   local_con(simulate_snowflake())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `start_date`, `end_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
 
   expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
   expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))

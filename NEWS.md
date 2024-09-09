@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Translations of `difftime()` for Postgres, SQL server, Redshift, and Snowflake
+  previously returned the wrong sign and are now correct (@edward-burn, #1532). 
+  
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
   

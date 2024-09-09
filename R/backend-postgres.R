@@ -268,7 +268,7 @@ sql_translation.PqConnection <- function(con) {
           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        sql_expr((CAST(!!time2 %AS% DATE) - CAST(!!time1 %AS% DATE)))
+        sql_expr((CAST(!!time1 %AS% DATE) - CAST(!!time2 %AS% DATE)))
       },
     ),
     sql_translator(.parent = base_agg,

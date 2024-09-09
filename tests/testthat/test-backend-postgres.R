@@ -102,8 +102,8 @@ test_that("custom clock functions translated correctly", {
 
 test_that("difftime is translated correctly", {
   local_con(simulate_postgres())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("(CAST(`start_date` AS DATE) - CAST(`end_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("(CAST(`start_date` AS DATE) - CAST(`end_date` AS DATE))"))
 
   expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
   expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))

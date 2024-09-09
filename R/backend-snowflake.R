@@ -243,7 +243,7 @@ sql_translation.Snowflake <- function(con) {
           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
         }
 
-        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       },
       # LEAST / GREATEST on Snowflake will not respect na.rm = TRUE by default (similar to Oracle/Access)
       # https://docs.snowflake.com/en/sql-reference/functions/least
