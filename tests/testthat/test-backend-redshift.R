@@ -68,6 +68,10 @@ test_that("custom clock functions translated correctly", {
   expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
   expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
   expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
+  expect_equal(test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
+               sql("DATEDIFF(DAY, `date_column_1`, `date_column_2`)"))
+  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "year")))
+  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5)))
 })
 
 test_that("difftime is translated correctly", {
