@@ -1,282 +1,96 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/CONTRIBUTING.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/SUPPORT.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/backend-2.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/dbplyr.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/new-backend.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/reprex.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/translation-function.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/articles/translation-verb.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/arrange.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-access.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-hana.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-hive.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-impala.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-mssql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-mysql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-odbc.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-oracle.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-postgres.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-redshift.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/backend-teradata.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/build_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/complete.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/copy_inline.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/db-io.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/db-misc.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/db-quote.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/db-sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr-package.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/distinct.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/do.tbl_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/escape.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/expand.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/fill.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/head.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/ident.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/ident_q.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/in_schema.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/is_table_path.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/lahman.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/lazy_ops.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/memdb_frame.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/mutate.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/named_commas.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/nycflights13.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/partial_eval.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/pivot_longer.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/pivot_wider.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/pull.tbl_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/remote_name.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/replace_na.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/rows-db.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_build.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_expr.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_quote.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/sql_variant.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/src_dbi.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/src_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/tbl_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/testing.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/translate_sql.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/win_over.html</loc>
-  </url>
-  <url>
-    <loc>https://dbplyr.tidyverse.org/dev/reference/window_order.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://dbplyr.tidyverse.org/dev/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/CONTRIBUTING.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/LICENSE-text.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/LICENSE.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/SUPPORT.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/backend-2.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/dbplyr.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/index.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/new-backend.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/reprex.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/translation-function.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/articles/translation-verb.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/authors.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/index.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/news/index.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/arrange.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-access.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hana.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-hive.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-impala.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-mssql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-mysql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-odbc.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-oracle.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-postgres.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-redshift.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-snowflake.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-spark-sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-sqlite.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/backend-teradata.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/build_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/collapse.tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/complete.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/copy_inline.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/copy_to.src_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/count.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/db-io.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/db-misc.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/db-quote.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/db-sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr-package.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr-slice.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/dbplyr_uncount.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/distinct.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/do.tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/escape.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/expand.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/fill.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/filter.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/get_returned_rows.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/group_by.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/head.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/ident.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/ident_q.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/in_schema.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/index.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/intersect.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/is_table_path.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/join.tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/lahman.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/lazy_ops.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/memdb_frame.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/mutate.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/named_commas.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/nycflights13.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/partial_eval.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/pivot_longer.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/pivot_wider.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/pull.tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/reexports.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/remote_name.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/replace_na.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/rows-db.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/select.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/simulate_dbi.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_build.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_expr.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_options.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_query_insert.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_quote.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/sql_variant.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/src_dbi.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/src_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/summarise.tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl.src_dbi.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl_lazy.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/tbl_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/testing.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/translate_sql.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/win_over.html</loc></url>
+<url><loc>https://dbplyr.tidyverse.org/dev/reference/window_order.html</loc></url>
 </urlset>
+
