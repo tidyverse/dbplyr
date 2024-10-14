@@ -109,7 +109,7 @@ sql_translation.Teradata <- function(con) {
                         digits <- vctrs::vec_cast(digits, integer())
                         sql_expr(CAST(!!x %as% DECIMAL(12L, !!digits)))
                       },
-      as.double     = sql_cast("NUMERIC"),
+      as.double     = sql_cast("FLOAT"),
       as.character  = sql_cast("VARCHAR(MAX)"),
       as.Date       = teradata_as_date,
       log10         = sql_prefix("LOG"),
