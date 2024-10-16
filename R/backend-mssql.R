@@ -376,7 +376,7 @@ simulate_mssql <- function(version = "15.0") {
 
         check_dots_empty()
         if (precision != "day") {
-          cli::cli_abort('The only supported value for {.arg precision} on SQL backends is "day"')
+          cli_abort("{.arg precision} must be {.val day} on SQL backends.")
         }
         if (n != 1) {
           cli::cli_abort('The only supported value for {.arg n} on SQL backends is "1"')
