@@ -87,10 +87,10 @@ sql_translation.RedshiftConnection <- function(con) {
 
         check_dots_empty()
         if (precision != "day") {
-          cli::cli_abort('The only supported value for {.arg precision} on SQL backends is "day"')
+          cli_abort("{.arg precision} must be {.val day} on SQL backends.")
         }
         if (n != 1) {
-          cli::cli_abort('The only supported value for {.arg n} on SQL backends is "1"')
+          cli_abort("{.arg n} must be {.val 1} on SQL backends.")
         }
 
         sql_expr(DATEDIFF(DAY, !!start, !!end))
