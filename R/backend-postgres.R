@@ -248,6 +248,18 @@ sql_translation.PqConnection <- function(con) {
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
         sql_expr(make_date(!!year, !!month, !!day))
       },
+      date_count_between = function(start, end, precision, ..., n = 1L){
+
+        check_dots_empty()
+        if (precision != "day") {
+          cli_abort("{.arg precision} must be {.val day} on SQL backends.")
+        }
+        if (n != 1) {
+          cli_abort("{.arg n} must be {.val 1} on SQL backends.")
+        }
+
+        sql_expr(!!end - !!start)
+      },
       get_year = function(x) {
         sql_expr(date_part('year', !!x))
       },
