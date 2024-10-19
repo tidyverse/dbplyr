@@ -72,7 +72,7 @@ sql_translation.RedshiftConnection <- function(con) {
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
-        glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')")
+        glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' || CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT), 'YYYY-MM-DD')")
       },
       get_year = function(x) {
         sql_expr(DATE_PART('year', !!x))
