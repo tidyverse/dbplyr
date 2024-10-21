@@ -5,6 +5,8 @@
   
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+  
+* `mutate()` now supports the argument `.keep = "transmute"`.
 
 *  New translations of clock function `date_count_between()` for SQL server, Redshift, Snowflake, Postgres, and Spark (@edward-burn, #1495).
 
