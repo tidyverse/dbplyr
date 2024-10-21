@@ -48,13 +48,13 @@
       (expect_error(test_translate_sql(case_when(x == 1L ~ "yes", .ptype = character())))
       )
     Output
-      <error/rlang_error>
+      <error/unsupported_arg_error>
       Error in `case_when()`:
       ! Argument `.ptype` isn't supported on database backends.
     Code
       (expect_error(test_translate_sql(case_when(x == 1L ~ "yes", .size = 1))))
     Output
-      <error/rlang_error>
+      <error/unsupported_arg_error>
       Error in `case_when()`:
       ! Argument `.size` isn't supported on database backends.
 
@@ -122,7 +122,7 @@
     Code
       (expect_error(test_translate_sql(case_match(x, 1 ~ 1, .ptype = integer()))))
     Output
-      <error/rlang_error>
+      <error/unsupported_arg_error>
       Error in `case_match()`:
       ! Argument `.ptype` isn't supported on database backends.
 
