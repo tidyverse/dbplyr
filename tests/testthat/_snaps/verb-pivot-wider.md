@@ -169,7 +169,7 @@
     Code
       (expect_error(tidyr::pivot_wider(df, id_expand = TRUE)))
     Output
-      <error/rlang_error>
+      <error/unsupported_arg_error>
       Error in `tidyr::pivot_wider()`:
       ! `id_expand = TRUE` isn't supported on database backends.
       i It must be FALSE instead.
