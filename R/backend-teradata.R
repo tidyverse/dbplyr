@@ -112,6 +112,7 @@ sql_translation.Teradata <- function(con) {
       as.double     = sql_cast("FLOAT"),
       as.character  = function(x, nchar = 255L) {
         check_number_whole(nchar, min = 0, max = 64000)
+        nchar <- vctrs::vec_cast(nchar, integer())
         sql_expr(CAST(!!x %as% VARCHAR(!!nchar)))
       },
       as.Date       = teradata_as_date,
