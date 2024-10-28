@@ -2,6 +2,7 @@
 
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+* `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
 
 # dbplyr 2.5.0
 
