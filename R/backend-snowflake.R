@@ -117,6 +117,7 @@ sql_translation.Snowflake <- function(con) {
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
         check_bool(label)
         check_bool(abbr)
+        check_number_whole(week_start, allow_null = TRUE)
         if (!label) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
           offset <- as.integer(7 - week_start)
