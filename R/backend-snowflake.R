@@ -27,6 +27,7 @@ sql_translation.Snowflake <- function(con) {
       paste = snowflake_paste(" "),
       paste0 = snowflake_paste(""),
       str_c = function(..., sep = "", collapse = NULL) {
+        check_string(sep)
         if (!is.null(collapse)) {
           cli_abort(c(
             "{.arg collapse} not supported in DB translation of {.fn str_c}.",
@@ -40,6 +41,7 @@ sql_translation.Snowflake <- function(con) {
       },
       str_detect = function(string, pattern, negate = FALSE) {
         con <- sql_current_con()
+        check_bool(negate)
 
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
@@ -51,6 +53,7 @@ sql_translation.Snowflake <- function(con) {
       },
       str_starts = function(string, pattern, negate = FALSE) {
         con <- sql_current_con()
+        check_bool(negate)
 
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
@@ -62,6 +65,7 @@ sql_translation.Snowflake <- function(con) {
       },
       str_ends = function(string, pattern, negate = FALSE) {
         con <- sql_current_con()
+        check_bool(negate)
 
         # Snowflake needs backslashes escaped, so we must increase the level of escaping
         pattern <- gsub("\\", "\\\\", pattern, fixed = TRUE)
@@ -111,6 +115,8 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(EXTRACT(DAY %FROM% !!x))
       },
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        check_bool(label)
+        check_bool(abbr)
         if (!label) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
           offset <- as.integer(7 - week_start)
@@ -140,6 +146,8 @@ sql_translation.Snowflake <- function(con) {
       },
       isoweek = function(x) sql_expr(EXTRACT("weekiso", !!x)),
       month = function(x, label = FALSE, abbr = TRUE) {
+        check_bool(label)
+        check_bool(abbr)
         if (!label) {
           sql_expr(EXTRACT("month", !!x))
         } else {
@@ -167,6 +175,7 @@ sql_translation.Snowflake <- function(con) {
         }
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        check_bool(with_year)
         check_unsupported_arg(fiscal_start, 1)
 
         if (with_year) {
@@ -220,6 +229,8 @@ sql_translation.Snowflake <- function(con) {
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        check_dots_empty()
+        check_unsupported_arg(invalid, allowed = NULL)
         # https://docs.snowflake.com/en/sql-reference/functions/date_from_parts
         sql_expr(DATE_FROM_PARTS(!!year, !!month, !!day))
       },
@@ -235,25 +246,15 @@ sql_translation.Snowflake <- function(con) {
       date_count_between = function(start, end, precision, ..., n = 1L){
 
         check_dots_empty()
-        if (precision != "day") {
-          cli_abort("{.arg precision} must be {.val day} on SQL backends.")
-        }
-        if (n != 1) {
-          cli_abort("{.arg n} must be {.val 1} on SQL backends.")
-        }
+        check_unsupported_arg(precision, allowed = "day")
+        check_unsupported_arg(n, allowed = 1L)
 
         sql_expr(DATEDIFF(DAY, !!start, !!end))
       },
 
       difftime = function(time1, time2, tz, units = "days") {
-
-        if (!missing(tz)) {
-          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-        }
-
-        if (units[1] != "days") {
-          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-        }
+        check_unsupported_arg(tz)
+        check_unsupported_arg(units, allowed = "days")
 
         sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       },
