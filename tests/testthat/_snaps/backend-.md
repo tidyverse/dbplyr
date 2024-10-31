@@ -53,9 +53,9 @@
       test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
       Error in `str_like()`:
-      ! Backend does not support case insensitve `str_like()`.
-      i Set ignore_case = FALSE for case sensitive match.
-      i Or use `tolower()` on both arguments to achieve a case insensitive match.
+      ! Backend does not support case insensitive `str_like()`.
+      i Set `ignore_case = FALSE` for case sensitive match.
+      i Use `tolower()` on both arguments to achieve a case insensitive match.
 
 # default raw escapes translated correctly
 
