@@ -87,7 +87,10 @@ test_that("custom clock functions translated correctly", {
   local_con(simulate_oracle())
   expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0 * 365.25, 'day'))"))
   expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + NUMTODSINTERVAL(1.0, 'day'))"))
-  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_error(
+    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    class = "rlib_error_dots_nonempty"
+  )
 })
 
 test_that("difftime is translated correctly", {
@@ -95,6 +98,12 @@ test_that("difftime is translated correctly", {
   expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
   expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("CEIL(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
 
-  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+  )
 })

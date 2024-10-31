@@ -34,8 +34,14 @@ test_that("custom scalar translated correctly", {
     sql("IIF(`x`, 'true', 'false')")
   )
 
-  expect_error(test_translate_sql(bitwShiftL(x, 2L)), sql("not available"))
-  expect_error(test_translate_sql(bitwShiftR(x, 2L)), sql("not available"))
+  expect_error(
+    test_translate_sql(bitwShiftL(x, 2L)),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(bitwShiftR(x, 2L)),
+    class = "dbplyr_error_unsupported_fn"
+  )
 })
 
 test_that("contents of [ have bool context", {
@@ -57,8 +63,14 @@ test_that("custom aggregators translated correctly", {
   expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),  sql("STDEV(`x`)"))
   expect_equal(test_translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR(`x`)"))
 
-  expect_error(test_translate_sql(cor(x), window = FALSE), "not available")
-  expect_error(test_translate_sql(cov(x), window = FALSE), "not available")
+  expect_error(
+    test_translate_sql(cor(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(cov(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
 
   expect_equal(test_translate_sql(str_flatten(x), window = FALSE), sql("STRING_AGG(`x`, '')"))
   expect_snapshot(error = TRUE, {
@@ -126,14 +138,17 @@ test_that("custom lubridate functions translated correctly", {
 
   expect_equal(test_translate_sql(quarter(x)), sql("DATEPART(QUARTER, `x`)"))
   expect_equal(test_translate_sql(quarter(x, with_year = TRUE)), sql("(DATENAME(YEAR, `x`) + '.' + DATENAME(QUARTER, `x`))"))
-  expect_error(test_translate_sql(quarter(x, fiscal_start = 5)))
+  expect_snapshot(error = TRUE, test_translate_sql(quarter(x, fiscal_start = 5)))
 })
 
 test_that("custom clock functions translated correctly", {
   local_con(simulate_mssql())
   expect_equal(test_translate_sql(add_years(x, 1)), sql("DATEADD(YEAR, 1.0, `x`)"))
   expect_equal(test_translate_sql(add_days(x, 1)), sql("DATEADD(DAY, 1.0, `x`)"))
-  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_error(
+    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    class = "rlib_error_dots_nonempty"
+  )
   expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("DATEFROMPARTS(2020.0, 1.0, 1.0)"))
   expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("DATEFROMPARTS(`year_column`, 1, 1)"))
   expect_equal(test_translate_sql(get_year(date_column)), sql("DATEPART(YEAR, `date_column`)"))
@@ -141,8 +156,14 @@ test_that("custom clock functions translated correctly", {
   expect_equal(test_translate_sql(get_day(date_column)), sql("DATEPART(DAY, `date_column`)"))
   expect_equal(test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
                sql("DATEDIFF(DAY, `date_column_1`, `date_column_2`)"))
-  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "year")))
-  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5)))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+  )
 })
 
 test_that("difftime is translated correctly", {
@@ -150,8 +171,14 @@ test_that("difftime is translated correctly", {
   expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
   expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
 
-  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+  )
 })
 
 test_that("last_value_sql() translated correctly", {
