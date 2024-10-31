@@ -89,7 +89,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT('year', `x`) || '.' || EXTRACT('quarter', `x`))"))
   expect_error(
     test_translate_sql(quarter(x, fiscal_start = 2)),
-    class = "unsupported_arg_error"
+    class = "dbplyr_error_unsupported_arg"
   )
   expect_equal(test_translate_sql(isoyear(x)), sql("EXTRACT('year', `x`)"))
 

@@ -55,7 +55,7 @@
       (expect_error(rows_insert(lf, lf, by = "x", conflict = "error", in_place = FALSE))
       )
     Output
-      <error/unsupported_arg_error>
+      <error/dbplyr_error_unsupported_arg>
       Error in `rows_insert()`:
       ! `conflict = "error"` isn't supported on database backends.
       i It must be "ignore" instead.
