@@ -47,13 +47,15 @@
       Error in `x$id`:
       ! $ operator is invalid for atomic vectors
 
-# can translate case insensitive like
+# can only translate case sensitive str_like
 
     Code
-      test_translate_sql(str_like(x, "abc", ignore_case = FALSE))
+      test_translate_sql(str_like(x, "abc", ignore_case = TRUE))
     Condition
       Error in `str_like()`:
-      ! Backend only supports case insensitve `str_like()`.
+      ! Backend does not support case insensitive `str_like()`.
+      i Set `ignore_case = FALSE` for case sensitive match.
+      i Use `tolower()` on both arguments to achieve a case insensitive match.
 
 # default raw escapes translated correctly
 
