@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
+
 * Translations for `as.double()` and `as.character()` with Teradata previously
   raised errors and are now correct (@rplsmn, #1545).
 
@@ -8,7 +10,6 @@
   
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
-* `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
 
 *  New translations of clock function `date_count_between()` for SQL server, Redshift, Snowflake, Postgres, and Spark (@edward-burn, #1495).
 
