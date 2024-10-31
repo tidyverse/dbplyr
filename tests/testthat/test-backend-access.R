@@ -34,7 +34,7 @@ test_that("custom scalar translated correctly", {
   # paste()
   expect_equal(test_translate_sql(paste(x, y, sep = "+")), sql("`x` & '+' & `y`"))
   expect_equal(test_translate_sql(paste0(x, y)), sql("`x` & `y`"))
-  expect_error(test_translate_sql(paste(x, collapse = "-")),"`collapse` not supported")
+  expect_snapshot(error = TRUE, test_translate_sql(paste(x, collapse = "-")))
   # Logic
   expect_equal(test_translate_sql(ifelse(x, "true", "false")), sql("IIF(`x`, 'true', 'false')"))
 })
@@ -45,9 +45,18 @@ test_that("custom aggregators translated correctly", {
   expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE),  sql("STDEV(`x`)"))
   expect_equal(test_translate_sql(var(x, na.rm = TRUE), window = FALSE), sql("VAR(`x`)"))
 
-  expect_error(test_translate_sql(cor(x), window = FALSE), "not available")
-  expect_error(test_translate_sql(cov(x), window = FALSE), "not available")
-  expect_error(test_translate_sql(n_distinct(x), window = FALSE), "not available")
+  expect_error(
+    test_translate_sql(cor(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(cov(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
+  expect_error(
+    test_translate_sql(n_distinct(x), window = FALSE),
+    class = "dbplyr_error_unsupported_fn"
+  )
 })
 
 test_that("custom escaping works as expected", {

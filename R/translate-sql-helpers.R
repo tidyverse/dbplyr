@@ -273,7 +273,10 @@ sql_not_supported <- function(f) {
   check_string(f)
 
   function(...) {
-    cli_abort("{.fun {f}} is not available in this SQL variant.")
+    cli_abort(
+      "{.fun {f}} is not available in this SQL variant.",
+      class = "dbplyr_error_unsupported_fn"
+    )
   }
 }
 

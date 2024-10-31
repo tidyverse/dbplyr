@@ -1,3 +1,11 @@
+# basic arithmetic is correct
+
+    Code
+      test_translate_sql(100L %/% 3L)
+    Condition
+      Error in `100L %/% 3L`:
+      ! `%/%()` is not available in this SQL variant.
+
 # can translate subsetting
 
     Code

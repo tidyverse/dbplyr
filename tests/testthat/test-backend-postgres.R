@@ -52,7 +52,10 @@ test_that("pasting translated correctly", {
   expect_equal(test_translate_sql(paste(x, y), window = FALSE),  sql("CONCAT_WS(' ', `x`, `y`)"))
   expect_equal(test_translate_sql(paste0(x, y), window = FALSE), sql("CONCAT_WS('', `x`, `y`)"))
 
-  expect_error(test_translate_sql(paste0(x, collapse = ""), window = FALSE), "`collapse` not supported")
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(paste0(x, collapse = ""), window = FALSE)
+  )
 })
 
 test_that("postgres mimics two argument log", {
@@ -73,7 +76,7 @@ test_that("custom lubridate functions translated correctly", {
   expect_equal(test_translate_sql(isoweek(x)), sql("EXTRACT(WEEK FROM `x`)"))
   expect_equal(test_translate_sql(quarter(x)), sql("EXTRACT(QUARTER FROM `x`)"))
   expect_equal(test_translate_sql(quarter(x, with_year = TRUE)), sql("(EXTRACT(YEAR FROM `x`) || '.' || EXTRACT(QUARTER FROM `x`))"))
-  expect_error(test_translate_sql(quarter(x, fiscal_start = 2)))
+  expect_snapshot(error = TRUE, test_translate_sql(quarter(x, fiscal_start = 2)))
   expect_equal(test_translate_sql(isoyear(x)), sql("EXTRACT(YEAR FROM `x`)"))
 
   expect_equal(test_translate_sql(seconds(x)), sql("CAST('`x` seconds' AS INTERVAL)"))
@@ -92,30 +95,53 @@ test_that("custom clock functions translated correctly", {
   local_con(simulate_postgres())
   expect_equal(test_translate_sql(add_years(x, 1)), sql("(`x` + 1.0*INTERVAL'1 year')"))
   expect_equal(test_translate_sql(add_days(x, 1)), sql("(`x` + 1.0*INTERVAL'1 day')"))
-  expect_error(test_translate_sql(add_days(x, 1, "dots", "must", "be empty")))
+  expect_error(
+    test_translate_sql(add_days(x, 1, "dots", "must", "be empty")),
+    class = "rlib_error_dots_nonempty"
+  )
   expect_equal(test_translate_sql(date_build(2020, 1, 1)), sql("MAKE_DATE(2020.0, 1.0, 1.0)"))
   expect_equal(test_translate_sql(date_build(year_column, 1L, 1L)), sql("MAKE_DATE(`year_column`, 1, 1)"))
   expect_equal(test_translate_sql(get_year(date_column)), sql("DATE_PART('year', `date_column`)"))
   expect_equal(test_translate_sql(get_month(date_column)), sql("DATE_PART('month', `date_column`)"))
   expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART('day', `date_column`)"))
+  expect_equal(test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
+               sql("`date_column_2` - `date_column_1`"))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+  )
 })
 
 test_that("difftime is translated correctly", {
   local_con(simulate_postgres())
-  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
-  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("(CAST(`end_date` AS DATE) - CAST(`start_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("(CAST(`start_date` AS DATE) - CAST(`end_date` AS DATE))"))
+  expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("(CAST(`start_date` AS DATE) - CAST(`end_date` AS DATE))"))
 
-  expect_error(test_translate_sql(difftime(start_date, end_date, units = "auto")))
-  expect_error(test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")))
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+  )
 })
 
 test_that("custom window functions translated correctly", {
   local_con(simulate_postgres())
 
-  expect_snapshot({
-    (expect_error(test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)))
-    (expect_error(test_translate_sql(median(x, na.rm = TRUE), window = TRUE)))
-  })
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)
+  )
+  expect_snapshot(
+    error = TRUE,
+    test_translate_sql(median(x, na.rm = TRUE), window = TRUE)
+  )
 })
 
 test_that("custom SQL translation", {
@@ -198,7 +224,7 @@ test_that("can overwrite temp tables", {
   src <- src_test("postgres")
   copy_to(src, mtcars, "mtcars", overwrite = TRUE)
   withr::defer(DBI::dbRemoveTable(src, "mtcars"))
-  expect_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE), NA)
+  expect_no_error(copy_to(src, mtcars, "mtcars", overwrite = TRUE))
 })
 
 test_that("copy_inline works", {
@@ -237,7 +263,7 @@ test_that("can insert with returning", {
     )
   }, transform = snap_transform_dbi)
 
-  expect_error(
+  expect_no_error(
     rows_insert(
       x, y,
       by = c("a", "b"),
@@ -245,8 +271,7 @@ test_that("can insert with returning", {
       conflict = "ignore",
       returning = everything(),
       method = "where_not_exists"
-    ),
-    NA
+    )
   )
 
   x <- local_db_table(con, df_x, "df_x2", overwrite = TRUE)
@@ -368,15 +393,14 @@ test_that("can upsert with returning", {
   }, transform = snap_transform_dbi)
 
   # DBI method does not need a unique index
-  expect_error(
+  expect_no_error(
     rows_upsert(
       x, y,
       by = c("a", "b"),
       in_place = TRUE,
       returning = everything(),
       method = "cte_update"
-    ),
-    NA
+    )
   )
 
   x <- local_db_table(con, df_x, "df_x2")

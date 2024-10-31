@@ -10,6 +10,10 @@ test_that("aggregation functions warn once if na.rm = FALSE", {
   expect_warning(sql_mean("x"), NA)
 })
 
+test_that("warns informatively with unsupported function", {
+  expect_snapshot(error = TRUE, sql_not_supported("cor")())
+})
+
 test_that("missing window functions create a warning", {
   local_con(simulate_dbi())
   sim_scalar <- sql_translator()

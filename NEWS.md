@@ -1,8 +1,21 @@
 # dbplyr (development version)
 * The translation of `stringr::str_like()` now defaults to use case-sensitive LIKE when argument `ignore_case` is set as FALSE instead of when this argument is set as TRUE.(@edward-burn, #1488)
 
+* `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
+
+* Translations for `as.double()` and `as.character()` with Teradata previously
+  raised errors and are now correct (@rplsmn, #1545).
+
+* Translations of `difftime()` for Postgres, SQL server, Redshift, and Snowflake
+  previously returned the wrong sign and are now correct (@edward-burn, #1532). 
+  
 * `across(everything())` doesn't select grouping columns created via `.by` in
   `summarise()` (@mgirlich, #1493).
+
+*  New translations of clock function `date_count_between()` for SQL server, Redshift, Snowflake, Postgres, and Spark (@edward-burn, #1495).
+
+* Spark SQL backend now supports persisting tables with
+  `compute(x, name = I("x.y.z"), temporary = FALSE)` (@zacdav-db, #1502).
 
 # dbplyr 2.5.0
 
