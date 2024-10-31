@@ -1,5 +1,10 @@
 # dbplyr (development version)
 
+* Tightened argument checks for Snowflake SQL translations. These changes should 
+  result in more informative errors in cases where code already failed; if you
+  see errors with code that used to work correctly, please report them to
+  the package authors (@simonpcouch, #1554).
+
 * `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
 
 * Translations for `as.double()` and `as.character()` with Teradata previously
