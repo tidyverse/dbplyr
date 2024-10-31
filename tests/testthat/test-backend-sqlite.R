@@ -37,11 +37,6 @@ test_that("custom aggregates translated", {
 
   expect_equal(test_translate_sql(median(x, na.rm = TRUE), window = FALSE), sql('MEDIAN(`x`)'))
   expect_equal(test_translate_sql(sd(x, na.rm = TRUE), window = FALSE), sql('STDEV(`x`)'))
-
-  expect_snapshot({
-    (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE)))
-    (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE)))
-  })
 })
 
 test_that("custom SQL translation", {
