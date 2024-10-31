@@ -15,7 +15,7 @@ test_that("basic arithmetic is correct", {
   expect_equal(test_translate_sql(5 ^ 2), sql("POWER(5.0, 2.0)"))
   expect_equal(test_translate_sql(100L %% 3L), sql("100 % 3"))
 
-  expect_error(test_translate_sql(100L %/% 3L), "not available")
+  expect_snapshot(error = TRUE, test_translate_sql(100L %/% 3L))
 })
 
 test_that("small numbers aren't converted to 0", {
