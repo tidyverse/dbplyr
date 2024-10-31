@@ -1,5 +1,7 @@
 # dbplyr (development version)
-* The translation of `stringr::str_like()` now defaults to use case-sensitive LIKE when argument `ignore_case` is set as FALSE instead of when this argument is set as TRUE.(@edward-burn, #1488)
+
+* Corrected translation of `stringr::str_like()` to use case-sensitive 
+  `LIKE` when argument `ignore_case` is set as `FALSE` (@edward-burn, #1488).
 
 * `clock::add_years()` translates to correct SQL on Spark (@ablack3, #1510).
 
