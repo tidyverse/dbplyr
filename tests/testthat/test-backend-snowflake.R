@@ -120,8 +120,14 @@ test_that("custom clock functions translated correctly", {
   expect_equal(test_translate_sql(get_day(date_column)), sql("DATE_PART(DAY, `date_column`)"))
   expect_equal(test_translate_sql(date_count_between(date_column_1, date_column_2, "day")),
                sql("DATEDIFF(DAY, `date_column_1`, `date_column_2`)"))
-  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "year")))
-  expect_error(test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5)))
+  expect_error(
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "year")),
+    class = "dbplyr_error_unsupported_arg"
+  )
+  expect_error(
+    test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5)),
+    class = "dbplyr_error_unsupported_arg"
+  )
 })
 
 test_that("difftime is translated correctly", {
@@ -129,13 +135,13 @@ test_that("difftime is translated correctly", {
   expect_equal(test_translate_sql(difftime(start_date, end_date, units = "days")), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
   expect_equal(test_translate_sql(difftime(start_date, end_date)), sql("DATEDIFF(DAY, `end_date`, `start_date`)"))
 
-  expect_snapshot(
-    error = TRUE,
-    test_translate_sql(difftime(start_date, end_date, units = "auto"))
+  expect_error(
+    test_translate_sql(difftime(start_date, end_date, units = "auto")),
+    class = "dbplyr_error_unsupported_arg"
   )
-  expect_snapshot(
-    error = TRUE,
-    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+  expect_error(
+    test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days")),
+    class = "dbplyr_error_unsupported_arg"
   )
 })
 
