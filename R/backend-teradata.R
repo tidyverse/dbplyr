@@ -153,6 +153,7 @@ sql_translation.Teradata <- function(con) {
       row_number    = win_rank("ROW_NUMBER", empty_order = TRUE),
       weighted.mean = function(x, w, na.rm = T) {
                         # nocov start
+                        check_unsupported_arg(na.rm, allowed = TRUE)
                         win_over(
                           sql_expr(SUM((!!x * !!w))/SUM(!!w)),
                           win_current_group(),
@@ -191,6 +192,7 @@ sql_translation.Teradata <- function(con) {
                       },
       weighted.mean = function(x, w, na.rm = T) {
                         # nocov start
+                        check_unsupported_arg(na.rm, allowed = TRUE)
                         win_over(
                           sql_expr(SUM((!!x * !!w))/SUM(!!w)),
                           win_current_group(),
