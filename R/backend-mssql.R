@@ -294,7 +294,8 @@ simulate_mssql <- function(version = "15.0") {
       is.na         = mssql_is_null,
 
       runif = function(n = n(), min = 0, max = 1) {
-        sql_runif(RAND(), n = {{ n }}, min = min, max = max)
+        # https://stackoverflow.com/a/9039661
+        sql_runif(RAND(CHECKSUM(NEWID())), n = {{ n }}, min = min, max = max)
       },
 
       # string functions ------------------------------------------------
@@ -671,4 +672,4 @@ bit_to_boolean <- function(x_expr) {
   }
 }
 
-utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATEADD", "DATEFROMPARTS", "DATEDIFF", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%"))
+utils::globalVariables(c("BIT", "CAST", "%AS%", "%is%", "convert", "DATE", "DATEADD", "DATEFROMPARTS", "DATEDIFF", "DATENAME", "DATEPART", "IIF", "NOT", "SUBSTRING", "LTRIM", "RTRIM", "CHARINDEX", "SYSDATETIME", "SECOND", "MINUTE", "HOUR", "DAY", "DAYOFWEEK", "DAYOFYEAR", "MONTH", "QUARTER", "YEAR", "BIGINT", "INT", "%AND%", "%BETWEEN%", "CHECKSUM", "NEWID"))
