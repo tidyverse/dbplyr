@@ -634,8 +634,6 @@ mssql_bit_int_bit <- function(f) {
 
 #' @export
 `db_sql_render.Microsoft SQL Server` <- function(con, sql, ..., cte = FALSE, use_star = TRUE) {
-  check_unsupported_arg(cte, allowed = FALSE)
-  check_unsupported_arg(use_star, allowed = TRUE)
   # Post-process WHERE to cast logicals from BIT to BOOLEAN
   sql$lazy_query <- purrr::modify_tree(
     sql$lazy_query,
