@@ -107,11 +107,14 @@ simulate_mssql <- function(version = "15.0") {
                                                     conflict = c("error", "ignore"),
                                                     returning_cols = NULL,
                                                     method = NULL) {
+  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
+  conflict <- rows_check_conflict(conflict)
+
+  check_character(returning_cols, allow_null = TRUE)
+
   check_string(method, allow_null = TRUE)
   method <- method %||% "where_not_exists"
   arg_match(method, "where_not_exists", error_arg = "method")
-  # https://stackoverflow.com/questions/25969/insert-into-values-select-from
-  conflict <- rows_check_conflict(conflict)
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
