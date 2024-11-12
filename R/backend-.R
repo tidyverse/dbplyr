@@ -252,6 +252,7 @@ base_scalar <- sql_translator(
   # base R
   nchar = sql_prefix("LENGTH", 1),
   nzchar = function(x, keepNA = FALSE) {
+    check_bool(keepNA)
     if (keepNA) {
       exp <- expr(!!x != "")
       translate_sql(!!exp, con = sql_current_con())
@@ -281,6 +282,7 @@ base_scalar <- sql_translator(
   str_c = sql_paste(""),
   str_sub = sql_str_sub("SUBSTR"),
   str_like = function(string, pattern, ignore_case = TRUE) {
+    check_bool(ignore_case)
     if (isTRUE(ignore_case)) {
       sql_expr(!!string %LIKE% !!pattern)
     } else {

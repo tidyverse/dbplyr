@@ -47,6 +47,7 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
          sql_expr(add_months(!!x, !!n*12))
        },
        date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+         check_unsupported_arg(invalid, allow_null = TRUE)
          sql_expr(make_date(!!year, !!month, !!day))
        },
        get_year = function(x) {
@@ -59,27 +60,16 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
          sql_expr(date_part('DAY', !!x))
        },
        date_count_between = function(start, end, precision, ..., n = 1L){
-
          check_dots_empty()
-         if (precision != "day") {
-           cli_abort("{.arg precision} must be {.val day} on SQL backends.")
-         }
-         if (n != 1) {
-           cli_abort("{.arg n} must be {.val 1} on SQL backends.")
-         }
+         check_unsupported_arg(precision, allowed = "day")
+         check_unsupported_arg(n, allowed = 1L)
 
          sql_expr(datediff(!!end, !!start))
        },
 
        difftime = function(time1, time2, tz, units = "days") {
-
-         if (!missing(tz)) {
-           cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-         }
-
-         if (units[1] != "days") {
-           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-         }
+         check_unsupported_arg(tz)
+         check_unsupported_arg(units, allowed = "days")
 
          sql_expr(datediff(!!time2, !!time1))
        }
@@ -153,7 +143,8 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
                                    indexes = list(),
                                    analyze = TRUE,
                                    in_transaction = FALSE) {
-
+  check_bool(overwrite)
+  check_bool(temporary)
   sql <- glue_sql2(
     con,
     "CREATE ", if (overwrite) "OR REPLACE ",

@@ -57,6 +57,7 @@ postgres_grepl <- function(pattern,
   check_unsupported_arg(perl, FALSE, backend = "PostgreSQL")
   check_unsupported_arg(fixed, FALSE, backend = "PostgreSQL")
   check_unsupported_arg(useBytes, FALSE, backend = "PostgreSQL")
+  check_bool(ignore.case)
 
   if (ignore.case) {
     sql_expr(((!!x)) %~*% ((!!pattern)))
@@ -123,6 +124,7 @@ sql_translation.PqConnection <- function(con) {
       },
       # https://www.postgresql.org/docs/current/functions-matching.html
       str_like = function(string, pattern, ignore_case = TRUE) {
+        check_bool(ignore_case)
         if (isTRUE(ignore_case)) {
           sql_expr(!!string %ILIKE% !!pattern)
         } else {
@@ -162,6 +164,9 @@ sql_translation.PqConnection <- function(con) {
         sql_expr(EXTRACT(DAY %FROM% !!x))
       },
       wday = function(x, label = FALSE, abbr = TRUE, week_start = NULL) {
+        check_bool(label)
+        check_bool(abbr)
+        check_number_whole(week_start, allow_null = TRUE)
         if (!label) {
           week_start <- week_start %||% getOption("lubridate.week.start", 7)
           offset <- as.integer(7 - week_start)
@@ -182,6 +187,8 @@ sql_translation.PqConnection <- function(con) {
         sql_expr(EXTRACT(WEEK %FROM% !!x))
       },
       month = function(x, label = FALSE, abbr = TRUE) {
+        check_bool(label)
+        check_bool(abbr)
         if (!label) {
           sql_expr(EXTRACT(MONTH %FROM% !!x))
         } else {
@@ -193,6 +200,7 @@ sql_translation.PqConnection <- function(con) {
         }
       },
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        check_bool(with_year)
         check_unsupported_arg(fiscal_start, 1, backend = "PostgreSQL")
 
         if (with_year) {
@@ -246,17 +254,14 @@ sql_translation.PqConnection <- function(con) {
         glue_sql2(sql_current_con(), "({.col x} + {.val n}*INTERVAL'1 year')")
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        check_unsupported_arg(invalid, allow_null = TRUE)
         sql_expr(make_date(!!year, !!month, !!day))
       },
       date_count_between = function(start, end, precision, ..., n = 1L){
 
         check_dots_empty()
-        if (precision != "day") {
-          cli_abort("{.arg precision} must be {.val day} on SQL backends.")
-        }
-        if (n != 1) {
-          cli_abort("{.arg n} must be {.val 1} on SQL backends.")
-        }
+        check_unsupported_arg(precision, allowed = "day")
+        check_unsupported_arg(n, allowed = 1L)
 
         sql_expr(!!end - !!start)
       },
@@ -272,13 +277,8 @@ sql_translation.PqConnection <- function(con) {
 
       difftime = function(time1, time2, tz, units = "days") {
 
-        if (!missing(tz)) {
-          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-        }
-
-        if (units[1] != "days") {
-          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-        }
+        check_unsupported_arg(tz)
+        check_unsupported_arg(units, allowed = "days")
 
         sql_expr((CAST(!!time1 %AS% DATE) - CAST(!!time2 %AS% DATE)))
       },
@@ -344,6 +344,7 @@ sql_query_insert.PqConnection <- function(con,
                                           ...,
                                           returning_cols = NULL,
                                           method = NULL) {
+  check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("on_conflict", "where_not_exists"), error_arg = "method")
   if (method == "where_not_exists") {
@@ -379,6 +380,7 @@ sql_query_upsert.PqConnection <- function(con,
                                           ...,
                                           returning_cols = NULL,
                                           method = NULL) {
+  check_string(method, allow_null = TRUE)
   method <- method %||% "on_conflict"
   arg_match(method, c("cte_update", "on_conflict"), error_arg = "method")
 
