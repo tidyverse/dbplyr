@@ -62,3 +62,21 @@
       LEFT JOIN `lf1`
         ON (`LHS`.`x` = `lf1`.`x`)
 
+---
+
+    Code
+      lf1 %>% union_all(lf2) %>% show_query(sql_options = sql_options(cte = TRUE))
+    Output
+      <SQL>
+      WITH `q01` AS (
+        SELECT NULL AS `x`, `lf2`.*
+        FROM `lf2`
+      )
+      SELECT *
+      FROM `lf1`
+      
+      UNION ALL
+      
+      SELECT *
+      FROM `q01`
+
