@@ -148,7 +148,7 @@ warn_drop_order_by <- function() {
 flatten_query.select_query <- function(qry, query_list, con) {
   from <- qry$from
   query_list <- flatten_query(from, query_list, con)
+  qry$from <- get_subquery_name(from, query_list, con)
 
-  qry$from <- get_subquery_name(from, query_list)
   querylist_reuse_query(qry, query_list, con)
 }

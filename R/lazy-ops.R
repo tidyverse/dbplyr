@@ -69,7 +69,7 @@ sql_build.lazy_base_remote_query <- function(op, con, ...) {
 
 #' @export
 sql_build.lazy_base_local_query <- function(op, con, ...) {
-  base_query(op$name)
+  base_query(as_table_path(op$name, con))
 }
 
 #' @export
