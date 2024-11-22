@@ -120,7 +120,7 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
   query_list_new <- flatten_query(x, query_list, con)
   qry$x <- get_subquery_name(x, query_list_new)
 
-  for (i in vctrs::vec_seq_along(qry$joins)) {
+  for (i in vctrs::vec_seq_along(qry$joins$table)) {
     y <- qry$joins$table[[i]]
     query_list_new <- flatten_query(y, query_list_new, con)
     qry$joins$table[[i]] <- get_subquery_name(y, query_list_new)
