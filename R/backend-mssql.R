@@ -22,7 +22,7 @@
 #'
 #' * The `BOOLEAN` type is the result of logical comparisons (e.g. `x > y`)
 #'   and can be used `WHERE` but not to create new columns in `SELECT`.
-#'   <https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
+#'   <https://learn.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
 #'
 #' * The `BIT` type is a special type of numeric column used to store
 #'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
