@@ -21,7 +21,7 @@ yourself beforehand; for example replace \code{arrange(x, desc(y))} by
 Fill in missing values with previous or next value
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 squirrels <- tibble::tribble(
   ~group,    ~name,     ~role,     ~n_squirrels, ~ n_squirrels2,
   1,      "Sam",    "Observer",   NA,                 1,

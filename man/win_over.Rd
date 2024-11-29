@@ -58,7 +58,7 @@ win_rank_tdata(f)
 \code{win_absent()}, \code{win_rank()}, \code{win_aggregate()}, and \code{win_cumulative()}
 provide helpers for constructing common types of window functions.
 \code{win_current_group()} and \code{win_current_order()} allow you to access
-the grouping and order context set up by \code{\link[=group_by]{group_by()}} and \code{\link[=arrange]{arrange()}}.
+the grouping and order context set up by \code{\link[dplyr:group_by]{dplyr::group_by()}} and \code{\link[dplyr:arrange]{dplyr::arrange()}}.
 }
 \examples{
 con <- simulate_dbi()

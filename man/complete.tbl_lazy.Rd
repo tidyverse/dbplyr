@@ -16,7 +16,7 @@ more details.}
 use instead of NA for missing combinations.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
@@ -25,7 +25,7 @@ Turns implicit missing values into explicit missing values. This is a method
 for the \code{\link[tidyr:complete]{tidyr::complete()}} generic.
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 df <- memdb_frame(
   group = c(1:2, 1),
   item_id = c(1:2, 2),

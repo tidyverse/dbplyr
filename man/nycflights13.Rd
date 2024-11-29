@@ -19,7 +19,7 @@ copy_nycflights13(con, ...)
 \arguments{
 \item{path}{location of SQLite database file}
 
-\item{dbname, ...}{Arguments passed on to \code{\link[=src_postgres]{src_postgres()}}}
+\item{dbname, ...}{Arguments passed on to \code{\link[dplyr:src_dbi]{dplyr::src_postgres()}}}
 }
 \description{
 These functions cache the data from the \code{nycflights13} database in

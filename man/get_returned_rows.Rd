@@ -21,13 +21,13 @@ For \code{has_returned_rows()}, a scalar logical.
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 
 \code{get_returned_rows()} extracts the \code{RETURNING} rows produced by
-\code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}},
-or \code{\link[=rows_delete]{rows_delete()}} if these are called with the \code{returning} argument.
+\code{\link[dplyr:rows]{dplyr::rows_insert()}}, \code{\link[dplyr:rows]{dplyr::rows_append()}}, \code{\link[dplyr:rows]{dplyr::rows_update()}}, \code{\link[dplyr:rows]{dplyr::rows_upsert()}},
+or \code{\link[dplyr:rows]{dplyr::rows_delete()}} if these are called with the \code{returning} argument.
 An error is raised if this information is not available.
 
 \code{has_returned_rows()} checks if \code{x} has stored RETURNING rows produced by
-\code{\link[=rows_insert]{rows_insert()}}, \code{\link[=rows_append]{rows_append()}}, \code{\link[=rows_update]{rows_update()}}, \code{\link[=rows_upsert]{rows_upsert()}},
-or \code{\link[=rows_delete]{rows_delete()}}.
+\code{\link[dplyr:rows]{dplyr::rows_insert()}}, \code{\link[dplyr:rows]{dplyr::rows_append()}}, \code{\link[dplyr:rows]{dplyr::rows_update()}}, \code{\link[dplyr:rows]{dplyr::rows_upsert()}},
+or \code{\link[dplyr:rows]{dplyr::rows_delete()}}.
 }
 \examples{
 library(dplyr)

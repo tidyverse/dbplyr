@@ -93,7 +93,7 @@ following columns
 }
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 # See vignette("pivot") for examples and explanation
 
 # Simplest case where column names are character data

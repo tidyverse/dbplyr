@@ -78,7 +78,7 @@ naming scheme of the form: \verb{value1_name1, value2_name1, value1_name2, value
 }}
 
 \item{names_expand}{Should the values in the \code{names_from} columns be expanded
-by \code{\link[=expand]{expand()}} before pivoting? This results in more columns, the output
+by \code{\link[tidyr:expand]{tidyr::expand()}} before pivoting? This results in more columns, the output
 will contain column names corresponding to a complete expansion of all
 possible values in \code{names_from}. Additionally, the column names will be
 sorted, identical to what \code{names_sort} would produce.}
@@ -164,7 +164,7 @@ The translation to SQL code basically works as follows:
 }
 }
 \examples{
-\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("tidyr", version = "1.0.0")) withAutoprint(\{ # examplesIf}
 memdb_frame(
   id = 1,
   key = c("x", "y"),

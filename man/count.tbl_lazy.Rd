@@ -38,7 +38,7 @@ it will use \code{nn}. If there's a column called \code{n} and \code{nn}, it'll 
 \item{.drop}{Not supported for lazy tables.}
 }
 \description{
-These are methods for the dplyr \code{\link[=count]{count()}} and \code{\link[=tally]{tally()}} generics. They
+These are methods for the dplyr \code{\link[dplyr:count]{dplyr::count()}} and \code{\link[dplyr:count]{dplyr::tally()}} generics. They
 wrap up \code{\link[=group_by.tbl_lazy]{group_by.tbl_lazy()}}, \code{\link[=summarise.tbl_lazy]{summarise.tbl_lazy()}} and, optionally,
 \code{\link[=arrange.tbl_lazy]{arrange.tbl_lazy()}}.
 }

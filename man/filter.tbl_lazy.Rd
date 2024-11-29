@@ -22,12 +22,12 @@ details and examples, see \link[dplyr:dplyr_by]{?dplyr_by}.}
 \item{.preserve}{Not supported by this method.}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is a method for the dplyr \code{\link[=filter]{filter()}} generic. It generates the
+This is a method for the dplyr \code{\link[dplyr:filter]{dplyr::filter()}} generic. It generates the
 \code{WHERE} clause of the SQL query.
 }
 \examples{

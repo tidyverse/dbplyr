@@ -1,6 +1,6 @@
 #' Count observations by group
 #'
-#' These are methods for the dplyr [count()] and [tally()] generics. They
+#' These are methods for the dplyr [dplyr::count()] and [tally()] generics. They
 #' wrap up [group_by.tbl_lazy()], [summarise.tbl_lazy()] and, optionally,
 #' [arrange.tbl_lazy()].
 #'

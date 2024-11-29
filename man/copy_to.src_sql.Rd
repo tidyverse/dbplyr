@@ -59,12 +59,12 @@ database doesn't support transactions, or you're wrapping in a transaction
 higher up (and your database doesn't support nested transactions.)}
 }
 \value{
-Another \code{tbl_lazy}. Use \code{\link[=show_query]{show_query()}} to see the generated
+Another \code{tbl_lazy}. Use \code{\link[dplyr:explain]{dplyr::show_query()}} to see the generated
 query, and use \code{\link[=collect.tbl_sql]{collect()}} to execute the query
 and return data to R.
 }
 \description{
-This is an implementation of the dplyr \code{\link[=copy_to]{copy_to()}} generic and it mostly
+This is an implementation of the dplyr \code{\link[dplyr:copy_to]{dplyr::copy_to()}} generic and it mostly
 a wrapper around \code{\link[DBI:dbWriteTable]{DBI::dbWriteTable()}}.
 
 It is useful for copying small amounts of data to a database for examples,
