@@ -22,7 +22,7 @@
 #'
 #' * The `BOOLEAN` type is the result of logical comparisons (e.g. `x > y`)
 #'   and can be used `WHERE` but not to create new columns in `SELECT`.
-#'   <https://docs.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
+#'   <https://learn.microsoft.com/en-us/sql/t-sql/language-elements/comparison-operators-transact-sql>
 #'
 #' * The `BIT` type is a special type of numeric column used to store
 #'   `TRUE` and `FALSE` values, but can't be used in `WHERE` clauses.
@@ -107,10 +107,14 @@ simulate_mssql <- function(version = "15.0") {
                                                     conflict = c("error", "ignore"),
                                                     returning_cols = NULL,
                                                     method = NULL) {
-  method <- method %||% "where_not_exists"
-  arg_match(method, "where_not_exists", error_arg = "method")
   # https://stackoverflow.com/questions/25969/insert-into-values-select-from
   conflict <- rows_check_conflict(conflict)
+
+  check_character(returning_cols, allow_null = TRUE)
+
+  check_string(method, allow_null = TRUE)
+  method <- method %||% "where_not_exists"
+  arg_match(method, "where_not_exists", error_arg = "method")
 
   parts <- rows_insert_prep(con, table, from, insert_cols, by, lvl = 0)
 
@@ -177,6 +181,7 @@ simulate_mssql <- function(version = "15.0") {
                                                     ...,
                                                     returning_cols = NULL,
                                                     method = NULL) {
+  check_string(method, allow_null = TRUE)
   method <- method %||% "merge"
   arg_match(method, "merge", error_arg = "method")
 
@@ -333,6 +338,7 @@ simulate_mssql <- function(version = "15.0") {
       second = function(x) sql_expr(DATEPART(SECOND, !!x)),
 
       month = function(x, label = FALSE, abbr = TRUE) {
+        check_bool(label)
         if (!label) {
           sql_expr(DATEPART(MONTH, !!x))
         } else {
@@ -342,6 +348,7 @@ simulate_mssql <- function(version = "15.0") {
       },
 
       quarter = function(x, with_year = FALSE, fiscal_start = 1) {
+        check_bool(with_year)
         check_unsupported_arg(fiscal_start, 1, backend = "SQL Server")
 
         if (with_year) {
@@ -361,6 +368,7 @@ simulate_mssql <- function(version = "15.0") {
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        check_unsupported_arg(invalid, allow_null = TRUE)
         sql_expr(DATEFROMPARTS(!!year, !!month, !!day))
       },
       get_year = function(x) {
@@ -372,18 +380,19 @@ simulate_mssql <- function(version = "15.0") {
       get_day = function(x) {
         sql_expr(DATEPART(DAY, !!x))
       },
+      date_count_between = function(start, end, precision, ..., n = 1L){
+        check_dots_empty()
+        check_unsupported_arg(precision, allowed = "day")
+        check_unsupported_arg(n, allowed = 1L)
+
+        sql_expr(DATEDIFF(DAY, !!start, !!end))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
+        check_unsupported_arg(tz)
+        check_unsupported_arg(units, allowed = "days")
 
-        if (!missing(tz)) {
-          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-        }
-
-        if (units[1] != "days") {
-          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-        }
-
-        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       }
     )
 
@@ -534,7 +543,7 @@ mssql_version <- function(con) {
 
 #' @export
 `sql_returning_cols.Microsoft SQL Server` <- function(con, cols, table, ...) {
-  stopifnot(table %in% c("DELETED", "INSERTED"))
+  arg_match(table, values = c("DELETED", "INSERTED"))
   returning_cols <- sql_named_cols(con, cols, table = table)
 
   sql_clause("OUTPUT", returning_cols)

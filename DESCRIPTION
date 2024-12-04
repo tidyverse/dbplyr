@@ -48,7 +48,7 @@ Suggests:
     rmarkdown,
     RPostgres (>= 1.4.5),
     RPostgreSQL,
-    RSQLite (>= 2.3.1),
+    RSQLite (>= 2.3.8),
     testthat (>= 3.1.10)
 VignetteBuilder: 
     knitr
@@ -58,7 +58,7 @@ Config/testthat/parallel: TRUE
 Encoding: UTF-8
 Language: en-gb
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Collate: 
     'db-sql.R'
     'utils-check.R'

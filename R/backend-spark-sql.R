@@ -44,9 +44,10 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
        },
        add_years = function(x, n, ...) {
          check_dots_empty()
-         sql_expr(add_months(!!!x, !!n*12))
+         sql_expr(add_months(!!x, !!n*12))
        },
        date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+         check_unsupported_arg(invalid, allow_null = TRUE)
          sql_expr(make_date(!!year, !!month, !!day))
        },
        get_year = function(x) {
@@ -58,16 +59,17 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
        get_day = function(x) {
          sql_expr(date_part('DAY', !!x))
        },
+       date_count_between = function(start, end, precision, ..., n = 1L){
+         check_dots_empty()
+         check_unsupported_arg(precision, allowed = "day")
+         check_unsupported_arg(n, allowed = 1L)
+
+         sql_expr(datediff(!!end, !!start))
+       },
 
        difftime = function(time1, time2, tz, units = "days") {
-
-         if (!missing(tz)) {
-           cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-         }
-
-         if (units[1] != "days") {
-           cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-         }
+         check_unsupported_arg(tz)
+         check_unsupported_arg(units, allowed = "days")
 
          sql_expr(datediff(!!time2, !!time1))
        }
@@ -126,12 +128,8 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
                                    analyze = TRUE,
                                    in_transaction = FALSE) {
 
-  if (temporary) {
-    sql <- sql_values_subquery(con, values, types = types, lvl = 1)
-    db_compute(con, table, sql, overwrite = overwrite)
-  } else {
-    NextMethod()
-  }
+  sql <- sql_values_subquery(con, values, types = types, lvl = 1)
+  db_compute(con, table, sql, overwrite = overwrite, temporary = temporary)
 }
 
 #' @export
@@ -145,15 +143,13 @@ simulate_spark_sql <- function() simulate_dbi("Spark SQL")
                                    indexes = list(),
                                    analyze = TRUE,
                                    in_transaction = FALSE) {
-
-  if (!temporary) {
-    cli::cli_abort("Spark SQL only support temporary tables")
-  }
-
+  check_bool(overwrite)
+  check_bool(temporary)
   sql <- glue_sql2(
     con,
     "CREATE ", if (overwrite) "OR REPLACE ",
-    "TEMPORARY VIEW {.tbl {table}} AS \n",
+    if (temporary) "TEMPORARY VIEW" else "TABLE",
+    " {.tbl {table}} AS \n",
     "{.from {sql}}"
   )
   DBI::dbExecute(con, sql)

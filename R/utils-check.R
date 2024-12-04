@@ -144,7 +144,7 @@ check_unsupported_arg <- function(x,
 
     msg <- c(msg, i = allow_msg)
   }
-  cli_abort(msg, call = call)
+  cli_abort(msg, call = call, class = "dbplyr_error_unsupported_arg")
 }
 
 stop_unsupported_function <- function(f, ..., with = NULL, call = caller_env()) {

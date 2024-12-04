@@ -1,18 +1,71 @@
+# pasting translated correctly
+
+    Code
+      test_translate_sql(paste0(x, collapse = ""), window = FALSE)
+    Condition
+      Error in `check_collapse()`:
+      ! `collapse` not supported in DB translation of `paste()`.
+      i Please use `str_flatten()` instead.
+
+# custom lubridate functions translated correctly
+
+    Code
+      test_translate_sql(quarter(x, fiscal_start = 2))
+    Condition
+      Error in `quarter()`:
+      ! `fiscal_start = 2` isn't supported in PostgreSQL translation.
+      i It must be 1 instead.
+
+# custom clock functions translated correctly
+
+    Code
+      test_translate_sql(date_count_between(date_column_1, date_column_2, "year"))
+    Condition
+      Error in `date_count_between()`:
+      ! `precision = "year"` isn't supported on database backends.
+      i It must be "day" instead.
+
+---
+
+    Code
+      test_translate_sql(date_count_between(date_column_1, date_column_2, "day", n = 5))
+    Condition
+      Error in `date_count_between()`:
+      ! `n = 5` isn't supported on database backends.
+      i It must be 1 instead.
+
+# difftime is translated correctly
+
+    Code
+      test_translate_sql(difftime(start_date, end_date, units = "auto"))
+    Condition
+      Error in `difftime()`:
+      ! `units = "auto"` isn't supported on database backends.
+      i It must be "days" instead.
+
+---
+
+    Code
+      test_translate_sql(difftime(start_date, end_date, tz = "UTC", units = "days"))
+    Condition
+      Error in `difftime()`:
+      ! Argument `tz` isn't supported on database backends.
+
 # custom window functions translated correctly
 
     Code
-      (expect_error(test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE))
-      )
-    Output
-      <error/rlang_error>
+      test_translate_sql(quantile(x, 0.3, na.rm = TRUE), window = TRUE)
+    Condition
       Error in `quantile()`:
       ! Translation of `quantile()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:
         `df %>% left_join(summarise(<col> = quantile(x, 0.3, na.rm = TRUE)))`.
+
+---
+
     Code
-      (expect_error(test_translate_sql(median(x, na.rm = TRUE), window = TRUE)))
-    Output
-      <error/rlang_error>
+      test_translate_sql(median(x, na.rm = TRUE), window = TRUE)
+    Condition
       Error in `median()`:
       ! Translation of `median()` in `mutate()` is not supported for PostgreSQL.
       i Use a combination of `summarise()` and `left_join()` instead:

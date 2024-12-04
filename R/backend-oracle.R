@@ -13,7 +13,7 @@
 #'
 #' Note that versions of Oracle prior to 23c have limited supported for
 #' `TRUE` and `FALSE` and you may need to use `1` and `0` instead.
-#' See <https://oracle-base.com/articles/23c/boolean-data-type-23c> for
+#' See <https://oracle-base.com/articles/23/boolean-data-type-23> for
 #' more details.
 #'
 #' Use `simulate_oracle()` with `lazy_frame()` to see simulated SQL without

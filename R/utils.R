@@ -83,6 +83,7 @@ res_warn_incomplete <- function(res, hint = "n = -1") {
 }
 
 add_temporary_prefix <- function(con, table, temporary = TRUE) {
+  check_bool(temporary)
   check_table_path(table)
 
   if (!temporary) {

@@ -94,6 +94,7 @@ sql_table_analyze.Hive <- function(con, table, ...) {
 
 #' @export
 sql_query_set_op.Hive <- function(con, x, y, method, ..., all = FALSE, lvl = 0) {
+  check_bool(all)
   # parentheses are not allowed
   method <- paste0(method, if (all) " ALL")
   glue_sql2(

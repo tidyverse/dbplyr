@@ -72,6 +72,7 @@ sql_translation.RedshiftConnection <- function(con) {
         sql_expr(DATEADD(YEAR, !!n, !!x))
       },
       date_build = function(year, month = 1L, day = 1L, ..., invalid = NULL) {
+        check_unsupported_arg(invalid, allow_null = TRUE)
         glue_sql2(sql_current_con(), "TO_DATE(CAST({.val year} AS TEXT) || '-' CAST({.val month} AS TEXT) || '-' || CAST({.val day} AS TEXT)), 'YYYY-MM-DD')")
       },
       get_year = function(x) {
@@ -83,18 +84,19 @@ sql_translation.RedshiftConnection <- function(con) {
       get_day = function(x) {
         sql_expr(DATE_PART('day', !!x))
       },
+      date_count_between = function(start, end, precision, ..., n = 1L){
+        check_dots_empty()
+        check_unsupported_arg(precision, allowed = "day")
+        check_unsupported_arg(n, allowed = 1L)
+
+        sql_expr(DATEDIFF(DAY, !!start, !!end))
+      },
 
       difftime = function(time1, time2, tz, units = "days") {
+        check_unsupported_arg(tz)
+        check_unsupported_arg(units, allowed = "days")
 
-        if (!missing(tz)) {
-          cli::cli_abort("The {.arg tz} argument is not supported for SQL backends.")
-        }
-
-        if (units[1] != "days") {
-          cli::cli_abort('The only supported value for {.arg units} on SQL backends is "days"')
-        }
-
-        sql_expr(DATEDIFF(DAY, !!time1, !!time2))
+        sql_expr(DATEDIFF(DAY, !!time2, !!time1))
       }
     ),
     sql_translator(.parent = postgres$aggregate,

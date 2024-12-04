@@ -1,20 +1,3 @@
-# custom aggregates translated
-
-    Code
-      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = FALSE))
-      )
-    Output
-      <error/rlang_error>
-      Error in `quantile()`:
-      ! `quantile()` is not available in this SQL variant.
-    Code
-      (expect_error(test_translate_sql(quantile(x, 0.5, na.rm = TRUE), window = TRUE))
-      )
-    Output
-      <error/rlang_error>
-      Error in `quantile()`:
-      ! `quantile()` is not available in this SQL variant.
-
 # custom SQL translation
 
     Code
@@ -53,5 +36,5 @@
       
       <PLAN>
         id parent notused                                        detail
-      1  2      0       0 SEARCH test USING COVERING INDEX test_x (x>?)
+      1  2      0      35 SEARCH test USING COVERING INDEX test_x (x>?)
 

@@ -1,3 +1,12 @@
+# pasting translated correctly
+
+    Code
+      test_translate_sql(paste0(x, collapse = ""))
+    Condition
+      Error in `check_collapse()`:
+      ! `collapse` not supported in DB translation of `paste()`.
+      i Please use `str_flatten()` instead.
+
 # pmin() and pmax() respect na.rm
 
     Code
