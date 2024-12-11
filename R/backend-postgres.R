@@ -224,12 +224,14 @@ sql_translation.PqConnection <- function(con) {
         postgres_period(x, "hours")
       },
       days = function(x) {
+        # lubridate::days() (base::days() does not exist)
         postgres_period(x, "days")
       },
       weeks = function(x) {
         postgres_period(x, "weeks")
       },
       months = function(x) {
+        # base::months() (or applicable methods from lubridate, e.g., months.numeric)
         postgres_period(x, "months")
       },
       years = function(x) {
