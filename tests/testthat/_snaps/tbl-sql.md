@@ -3,7 +3,7 @@
     Code
       mf2
     Output
-      # Source:   SQL [3 x 2]
+      # Source:   SQL [?? x 2]
       # Database: sqlite ?.?.? [:memory:]
             x     y
         <int> <int>
