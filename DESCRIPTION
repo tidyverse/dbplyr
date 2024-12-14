@@ -27,7 +27,7 @@ Imports:
     lifecycle (>= 1.0.3),
     magrittr,
     methods,
-    pillar (>= 1.9.0),
+    pillar (>= 1.9.0.1038),
     purrr (>= 1.0.1),
     R6 (>= 2.2.2),
     rlang (>= 1.1.1),
@@ -52,6 +52,8 @@ Suggests:
     testthat (>= 3.1.10)
 VignetteBuilder: 
     knitr
+Remotes: 
+    r-lib/pillar
 Config/Needs/website: tidyverse/tidytemplate
 Config/testthat/edition: 3
 Config/testthat/parallel: TRUE 
