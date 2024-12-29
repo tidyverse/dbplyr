@@ -25,7 +25,7 @@ test_that("custom date escaping works as expected", {
   expect_equal(escape(as.Date("2020-01-01"), con = con), sql("'2020-01-01'"))
   expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
 
-  expect_equal(escape(as.POSIXct("2020-01-01", tz = "UTC"), con = con), sql("'2020-01-01'"))
+  expect_equal(escape(as.POSIXct("2020-01-01", tz = "UTC"), con = con), sql("'2020-01-01 00:00:00'"))
   expect_equal(escape(as.POSIXct(NA, tz = "UTC"), con = con), sql("NULL"))
 })
 
