@@ -255,8 +255,7 @@ all_calls <- function(x) {
   if (is_quosure(x)) return(all_calls(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
-  fname <- as.character(x[[1]])
-  unique(c(fname, unlist(lapply(x[-1], all_calls), use.names = FALSE)))
+  setdiff(all.names(x, unique = TRUE), all_names(x))
 }
 
 all_names <- function(x) {
@@ -264,7 +263,7 @@ all_names <- function(x) {
   if (is_quosure(x)) return(all_names(quo_get_expr(x)))
   if (!is.call(x)) return(NULL)
 
-  unique(unlist(lapply(x[-1], all_names), use.names = FALSE))
+  all.vars(x)
 }
 
 # character vector -> environment
