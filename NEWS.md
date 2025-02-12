@@ -1,5 +1,8 @@
 # dbplyr (development version)
 
+* Fixed overwrite flag in `copy_to` to work when source is in the same remote DB
+  as destination (@liudvikasakelis, #1535)
+
 * Tightened argument checks for SQL translations. These changes should 
   result in more informative errors in cases where code already failed, possibly
   silently; if you see errors with code that used to run correctly, please report 
