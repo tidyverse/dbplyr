@@ -12,6 +12,7 @@
   x,
   name = NULL,
   temporary = TRUE,
+  overwrite = FALSE,
   unique_indexes = list(),
   indexes = list(),
   analyze = TRUE,
@@ -30,6 +31,10 @@
 
 \item{temporary}{Should the table be temporary (\code{TRUE}, the default) or
 persistent (\code{FALSE})?}
+
+\item{overwrite}{If \code{TRUE}, will overwrite an existing table with
+name \code{name}. If \code{FALSE}, will throw an error if \code{name} already
+exists.}
 
 \item{unique_indexes}{a list of character vectors. Each element of the list
 will create a new unique index over the specified column(s). Duplicate rows
