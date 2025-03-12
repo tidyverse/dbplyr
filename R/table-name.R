@@ -21,7 +21,7 @@ table_path <- function(x) {
 }
 
 # So you can do SQL(table_path("foo"))
-setOldClass(c("dbplyr_table_path", "character"))
+methods::setOldClass(c("dbplyr_table_path", "character"))
 
 
 #' Table paths
