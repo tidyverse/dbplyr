@@ -175,7 +175,7 @@ flatten_query.multi_join_query <- function(qry, query_list, con) {
 #'
 #' # Full and right join are handled via `sql_rf_join_vars`
 sql_multi_join_vars <- function(con, vars, table_vars, use_star, qualify_all_columns) {
-  all_vars <- tolower(unlist(table_vars))
+  all_vars <- tolower(unlist(table_vars, use.names = FALSE))
   if (qualify_all_columns) {
     duplicated_vars <- unique(all_vars)
   } else {
