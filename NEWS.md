@@ -41,7 +41,7 @@
     (#1416). Additionally, thanks to changes to the DBI package, you no 
     longer need to name each argument.
   
-  * If you accidentally pass a named vector to any of the database identifer
+  * If you accidentally pass a named vector to any of the database identifier
     functions, those names will be automatically stripped (#1404).
     
   * `tbl_sql(check_from)` is now deprecated.
@@ -199,7 +199,7 @@
   * The `na_matches` argument of `semi_join()` and `anti_join()` works again
     (@mgirlich, #1211).
     
-  * A `semi/anti_join()` on fitlered `y` is inlined when possible (@mgirlich, #884).
+  * A `semi/anti_join()` on filtered `y` is inlined when possible (@mgirlich, #884).
 
   * Joins now work again for Pool and Oracle connections (@mgirlich, #1177, #1181).
 

@@ -332,7 +332,7 @@ snowflake_grepl <- function(pattern,
   check_unsupported_arg(useBytes, FALSE, backend = "Snowflake")
 
   # https://docs.snowflake.com/en/sql-reference/functions/regexp_instr.html
-  # REGEXP_INSTR optional parameters: position, occurrance, option, regex_parameters
+  # REGEXP_INSTR optional parameters: position, occurrence, option, regex_parameters
   regexp_parameters <- "c"
   if(ignore.case) { regexp_parameters <- "i" }
   # Snowflake needs backslashes escaped, so we must increase the level of escaping
