@@ -8,8 +8,8 @@
     Output
       [1] "# Source:   SQL [3 x 1]"
     Code
-      # Number of rows still can't be shown
-      x <- memdb_frame(a = 1:11) %>% filter(a > 0)
+      # Number of rows still can't be shown if above 20
+      x <- memdb_frame(a = 1:21) %>% filter(a > 0)
       setup <- pillar::tbl_format_setup(x)
       tbl_format_header(x, setup)[[1]]
     Output
