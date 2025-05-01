@@ -144,7 +144,7 @@ cte_render <- function(query_list, con) {
   ctes <- purrr::imap(
     query_list[-n],
     function(query, name) {
-      name <- table_path(name)
+      name <- as_table_path(name, con)
       glue_sql2(con, "{.name name} {.kw 'AS'} (\n{query}\n)")
     }
   )
@@ -153,10 +153,10 @@ cte_render <- function(query_list, con) {
   glue_sql2(con, "{.kw 'WITH'} ", cte_query, "\n", query_list[[n]])
 }
 
-get_subquery_name <- function(x, query_list) {
+get_subquery_name <- function(x, query_list, con) {
   if (inherits(x, "base_query")) return(x)
 
-  base_query(query_list$name)
+  base_query(as_table_path(query_list$name, con))
 }
 
 flatten_query <- function(qry, query_list, con) {
@@ -169,7 +169,7 @@ querylist_reuse_query <- function(qry, query_list, con) {
   if (!is.na(id)) {
     query_list$name <- names(query_list$queries)[[id]]
   } else {
-    name <- as_table_path(unique_subquery_name(), con)
+    name <- unique_subquery_name()
     wrapped_query <- set_names(list(qry), name)
     query_list$queries <- c(query_list$queries, wrapped_query)
     query_list$name <- name
@@ -181,11 +181,11 @@ querylist_reuse_query <- function(qry, query_list, con) {
 flatten_query_2_tables <- function(qry, query_list, con) {
   x <- qry$x
   query_list_x <- flatten_query(x, query_list, con)
-  qry$x <- get_subquery_name(x, query_list_x)
+  qry$x <- get_subquery_name(x, query_list_x, con)
 
   y <- qry$y
   query_list_y <- flatten_query(y, query_list_x, con)
-  qry$y <- get_subquery_name(y, query_list_y)
+  qry$y <- get_subquery_name(y, query_list_y, con)
 
   querylist_reuse_query(qry, query_list_y, con)
 }
