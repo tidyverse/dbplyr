@@ -284,6 +284,7 @@ sql_translation.Snowflake <- function(con) {
         } else {
           eval(bquote(`$`(x, .(substitute(name)))))
         }
+      }
     ),
     sql_translator(
       .parent = base_agg,
