@@ -335,7 +335,7 @@ test_that("casts `y` column for local df", {
 
   out <- tibble(
     id = bit64::as.integer64(1:2),
-    val = bit64::as.integer64(10L, 20L),
+    val = bit64::as.integer64(c(10L, 20L)),
     arr = structure(c("{1,2}", "{1,2,3}"), class = "pq__int4")
   )
   expect_equal(
