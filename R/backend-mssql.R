@@ -291,10 +291,6 @@ simulate_mssql <- function(version = "15.0") {
       ceil          = sql_prefix("CEILING"),
       ceiling       = sql_prefix("CEILING"),
 
-      # https://dba.stackexchange.com/questions/187090
-      pmin          = sql_not_supported("pmin"),
-      pmax          = sql_not_supported("pmax"),
-
       is.null       = mssql_is_null,
       is.na         = mssql_is_null,
 

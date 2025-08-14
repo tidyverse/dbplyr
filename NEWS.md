@@ -1,5 +1,7 @@
 # dbplyr (development version)
 
+* Add support for `pmin()` and `pmax()` on SQL Server (@edward-burn, #1602). 
+
 * Fix for failing snapshot tests (@edward-burn, #1567). 
 
 * Tightened argument checks for SQL translations. These changes should 
