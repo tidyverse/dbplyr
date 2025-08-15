@@ -425,6 +425,9 @@ simulate_mssql <- function(version = "15.0") {
   sql_variant(
     mssql_scalar,
     sql_translator(.parent = base_odbc_agg,
+     # Use COUNT_BIG to ensure result is always returned regardless of table size
+     # COUNT errors if more than 2,147,483,647 rows are present due to an integer overflow
+     # https://learn.microsoft.com/en-us/sql/t-sql/functions/count-transact-sql?view=sql-server-ver17
       n           = function() sql("COUNT_BIG(*)"),
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
