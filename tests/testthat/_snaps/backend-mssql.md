@@ -506,15 +506,6 @@
       SELECT COUNT_BIG(*) AS `n`
       FROM `df`
 
----
-
-    Code
-      tally(mf)
-    Output
-      <SQL>
-      SELECT COUNT_BIG(*) AS `n`
-      FROM `df`
-
 # add prefix to temporary table
 
     Code

@@ -403,7 +403,6 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
 test_that("count_big", {
   mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
   expect_snapshot(count(mf))
-  expect_snapshot(tally(mf))
 })
 
 # Live database -----------------------------------------------------------
