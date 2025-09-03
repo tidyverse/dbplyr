@@ -3,7 +3,7 @@
 details of overall translation technology. Key differences for this backend
 are:
 Temporary tables get # prefix and use LOCAL TEMPORARY COLUMN.
-No table analysis performed in copy_to().
+No table analysis performed in dplyr::copy_to().
 paste() uses ||
 Note that you can't create new boolean columns from logical expressions;
 you need to wrap with explicit ifelse: ifelse(x &amp;gt; y, TRUE, FALSE).
@@ -14,7 +14,7 @@ converting to live access database."><meta property="og:description" content="Se
 details of overall translation technology. Key differences for this backend
 are:
 Temporary tables get # prefix and use LOCAL TEMPORARY COLUMN.
-No table analysis performed in copy_to().
+No table analysis performed in dplyr::copy_to().
 paste() uses ||
 Note that you can't create new boolean columns from logical expressions;
 you need to wrap with explicit ifelse: ifelse(x &amp;gt; y, TRUE, FALSE).
@@ -83,7 +83,7 @@ converting to live access database."><meta property="og:image" content="https://
     <p>See <code><a href="../articles/translation-function.html">vignette("translation-function")</a></code> and <code><a href="../articles/translation-verb.html">vignette("translation-verb")</a></code> for
 details of overall translation technology. Key differences for this backend
 are:</p><ul><li><p>Temporary tables get <code>#</code> prefix and use <code>LOCAL TEMPORARY COLUMN</code>.</p></li>
-<li><p>No table analysis performed in <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code>.</p></li>
+<li><p>No table analysis performed in <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">dplyr::copy_to()</a></code>.</p></li>
 <li><p><code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> uses <code>||</code></p></li>
 <li><p>Note that you can't create new boolean columns from logical expressions;
 you need to wrap with explicit <code>ifelse</code>: <code>ifelse(x &gt; y, TRUE, FALSE)</code>.</p></li>

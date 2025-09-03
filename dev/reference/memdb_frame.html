@@ -80,13 +80,13 @@ data frame in R, it creates a table in <code>src_memdb()</code>.</p>
 <dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>&lt;<code><a href="https://rlang.r-lib.org/reference/dyn-dots.html" class="external-link">dynamic-dots</a></code>&gt;
 A set of name-value pairs. These arguments are
-processed with <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code> and support unquote via <code>!!</code> and
-unquote-splice via <code>!!!</code>. Use <code>:=</code> to create columns that start with a dot.</p>
+processed with <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html" class="external-link">rlang::quos()</a></code> and support unquote via <code><a href="https://rlang.r-lib.org/reference/injection-operator.html" class="external-link">rlang::!!</a></code> and
+unquote-splice via <code><a href="https://rlang.r-lib.org/reference/splice-operator.html" class="external-link">rlang::!!!</a></code>. Use <code>:=</code> to create columns that start with a dot.</p>
 <p>Arguments are evaluated sequentially.
-You can refer to previously created elements directly or using the <a href="https://rlang.r-lib.org/reference/dot-data.html" class="external-link">.data</a>
+You can refer to previously created elements directly or using the <a href="https://rlang.r-lib.org/reference/dot-data.html" class="external-link">rlang::.data</a>
 pronoun.
-To refer explicitly to objects in the calling environment, use <code>!!</code> or
-.env, e.g. <code>!!.data</code> or <code>.env$.data</code> for the special case of an object
+To refer explicitly to objects in the calling environment, use <code><a href="https://rlang.r-lib.org/reference/injection-operator.html" class="external-link">rlang::!!</a></code> or
+<a href="https://rlang.r-lib.org/reference/dot-data.html" class="external-link">rlang::.env</a>, e.g. <code>!!.data</code> or <code>.env$.data</code> for the special case of an object
 named <code>.data</code>.</p></dd>
 
 

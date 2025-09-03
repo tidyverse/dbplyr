@@ -14,7 +14,7 @@ db_supports_table_alias_with_as(con) does the backend support using AS when usin
 Tables:
 sql_table_analyze(con, table) generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
-planner. It called from copy_to() when analyze = TRUE.
+planner. It called from dplyr::copy_to() when analyze = TRUE.
 sql_table_index() generates SQL for adding an index to table.
 
 
@@ -64,7 +64,7 @@ db_supports_table_alias_with_as(con) does the backend support using AS when usin
 Tables:
 sql_table_analyze(con, table) generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
-planner. It called from copy_to() when analyze = TRUE.
+planner. It called from dplyr::copy_to() when analyze = TRUE.
 sql_table_index() generates SQL for adding an index to table.
 
 
@@ -169,7 +169,7 @@ a translation for <code>runif(n())</code>.</p></li>
 <li><p><code>db_supports_table_alias_with_as(con)</code> does the backend support using <code>AS</code> when using a table alias?</p></li>
 </ul><p>Tables:</p><ul><li><p><code>sql_table_analyze(con, table)</code> generates SQL that "analyzes" the table,
 ensuring that the database has up-to-date statistics for use in the query
-planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
+planner. It called from <code><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">dplyr::copy_to()</a></code> when <code>analyze = TRUE</code>.</p></li>
 <li><p><code>sql_table_index()</code> generates SQL for adding an index to table.</p></li>
 </ul><p>Query manipulation:</p><ul><li><p><code>sql_query_explain(con, sql)</code> generates SQL that "explains" a query,
 i.e. generates a query plan describing what indexes etc that the
