@@ -222,7 +222,7 @@ sql_table_analyze.Teradata <- function(con, table, ...) {
   glue_sql2(con, "COLLECT STATISTICS {.tbl table}")
 }
 
-utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "SUM"))
+utils::globalVariables(c("ATAN2", "SUBSTR", "DECIMAL", "WEEKNUMBER_OF_YEAR", "VARCHAR", "SUM"))
 
 #' @export
 #' @rdname win_over
