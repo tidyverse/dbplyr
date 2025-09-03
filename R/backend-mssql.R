@@ -421,6 +421,8 @@ simulate_mssql <- function(version = "15.0") {
   sql_variant(
     mssql_scalar,
     sql_translator(.parent = base_odbc_agg,
+     # https://learn.microsoft.com/en-us/sql/t-sql/functions/count-big-transact-sql?view=sql-server-ver17
+      n           = function() sql("COUNT_BIG(*)"),
       sd            = sql_aggregate("STDEV", "sd"),
       var           = sql_aggregate("VAR", "var"),
       str_flatten = function(x, collapse = "") sql_expr(string_agg(!!x, !!collapse)),

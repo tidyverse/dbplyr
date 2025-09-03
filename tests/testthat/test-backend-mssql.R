@@ -400,6 +400,11 @@ test_that("row_number() with and without group_by() and arrange(): unordered def
   expect_snapshot(mf %>% arrange(y) %>% mutate(rown = row_number()))
 })
 
+test_that("count_big", {
+  mf <- lazy_frame(x = c(1:5), y = c(rep("A", 5)), con = simulate_mssql())
+  expect_snapshot(count(mf))
+})
+
 # Live database -----------------------------------------------------------
 
 test_that("can copy_to() and compute() with temporary tables (#438)", {
