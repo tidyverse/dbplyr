@@ -175,7 +175,7 @@ the data into R.</p>
 <span class="r-in"><span><span class="co"># creating the database.</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"Lahman"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">batting</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">Lahman</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/Lahman/man/Batting.html" class="external-link">Batting</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">batting</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="fu">Lahman</span><span class="fu">::</span><span class="va"><a href="http://cdalzell.github.io/Lahman/reference/Batting.html" class="external-link">Batting</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">batting</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Basic data manipulation verbs work in the same way as with a tibble</span></span></span>
