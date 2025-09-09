@@ -1,4 +1,4 @@
-# dbplyr (development version)
+# dbplyr 2.5.1
 
 * Improved translations:
   * SQL Server, Redshift, Snowflake, and Postgres now correctly translate
