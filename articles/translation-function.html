@@ -5,96 +5,79 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="dbplyr">
 <title>Function translation • dbplyr</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
-<link href="../deps/Source_Code_Pro-0.4.9/font.css" rel="stylesheet">
-<!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Function translation">
-<meta property="og:description" content="dbplyr">
-<meta property="og:image" content="https://dbplyr.tidyverse.org/logo.png">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Function translation">
+<script defer data-domain="dbplyr.tidyverse.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
     <a href="#container" class="visually-hidden-focusable">Skip to content</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-none"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-none" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">dbplyr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.5.1</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../articles/dbplyr.html">Get started</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/dbplyr.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a>
-    <a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a>
-    <a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a>
-    <a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a>
-    <a class="dropdown-item" href="../articles/translation-function.html">Function translation</a>
-    <a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/backend-2.html">dbplyr 2.0.0 backend API</a></li>
+    <li><a class="dropdown-item" href="../articles/new-backend.html">Adding a new DBI backend</a></li>
+    <li><a class="dropdown-item" href="../articles/reprex.html">Reprexes for dbplyr</a></li>
+    <li><a class="dropdown-item" href="../articles/sql.html">Writing SQL with dbplyr</a></li>
+    <li><a class="dropdown-item" href="../articles/translation-function.html">Function translation</a></li>
+    <li><a class="dropdown-item" href="../articles/translation-verb.html">Verb translation</a></li>
+  </ul>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-news">News</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-news">
-    <h6 class="dropdown-header" data-toc-skip>Releases</h6>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2024/04/dbplyr-2-5-0/">Version 2.5.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/">Version 1.3.0</a>
-    <a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/">Version 1.2.0</a>
-    <a class="external-link dropdown-item" href="https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/">Version 1.1.0</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" href="../news/index.html">Changelog</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+<li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2024/04/dbplyr-2-5-0/">Version 2.5.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/10/dbplyr-2-4-0/">Version 2.4.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2023/01/dbplyr-2-3-0/">Version 2.3.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2022/06/dbplyr-2-2-0/">Version 2.2.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2021/02/dplyr-backends/">Version 2.1.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/blog/2020/11/dbplyr-2-0-0/">Version 2.0.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/04/dbplyr-1-4-0/">Version 1.4.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2019/01/dbplyr-1-3-0/">Version 1.3.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://www.tidyverse.org/articles/2018/01/dbplyr-1-2/">Version 1.2.0</a></li>
+    <li><a class="external-link dropdown-item" href="https://blog.rstudio.com/2017/06/27/dbplyr-1-1-0/">Version 1.1.0</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul>
 </li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/tidyverse/dbplyr/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/tidyverse/dbplyr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article" id="container">
 
@@ -106,7 +89,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Function translation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/HEAD/vignettes/translation-function.Rmd" class="external-link"><code>vignettes/translation-function.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidyverse/dbplyr/blob/main/vignettes/translation-function.Rmd" class="external-link"><code>vignettes/translation-function.Rmd</code></a></small>
       <div class="d-none name"><code>translation-function.Rmd</code></div>
     </div>
 
@@ -130,8 +113,8 @@ takes care of the translation automatically.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; (`x` + `y`) / 2.0</span></span></code></pre></div>
 <p><code><a href="../reference/translate_sql.html">translate_sql()</a></code> takes an optional <code>con</code>
-parameter. If not supplied, this causes dplyr to generate
-(approximately) SQL-92 compliant SQL. If supplied, dplyr uses
+parameter. If not supplied, this causes dbplyr to generate
+(approximately) SQL-92 compliant SQL. If supplied, dbplyr uses
 <code><a href="../reference/db-sql.html">sql_translation()</a></code> to look up a custom environment which
 makes it possible for different databases to generate slightly different
 SQL: see <code><a href="../articles/new-backend.html">vignette("new-backend")</a></code> for more details. You can
@@ -145,10 +128,10 @@ different backends:</p>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">^</span> <span class="fl">2L</span>, con <span class="op">=</span> <span class="fu"><a href="../reference/backend-access.html">simulate_access</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; `x` ^ 2</span></span></code></pre></div>
 <p>Perfect translation is not possible because databases don’t have all
-the functions that R does. The goal of dplyr is to provide a semantic
+the functions that R does. The goal of dbplyr is to provide a semantic
 rather than a literal translation: what you mean, rather than precisely
 what is done. In fact, even for functions that exist both in databases
-and R, you shouldn’t expect results to be identical; database
+and in R, you shouldn’t expect results to be identical; database
 programmers have different priorities than R core programmers. For
 example, in R in order to get a higher level of numerical accuracy,
 <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code> loops through the data twice. R’s
@@ -185,7 +168,7 @@ between R and SQL.</p>
 <li>
 <p>R and SQL have different defaults for integers and reals. In R, 1
 is a real, and 1L is an integer. In SQL, 1 is an integer, and 1.0 is a
-real</p>
+real.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fl">1</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; 1.0</span></span>
@@ -244,8 +227,8 @@ taking the sign of the divisor.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   -<span style="color: #BB0000;">10</span>     3      2</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">10</span>    -<span style="color: #BB0000;">3</span>     -<span style="color: #BB0000;">1</span></span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="va">y</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [4 x 3]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [?? x 3]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.50.4 [:memory:]</span></span></span>
 <span><span class="co">#&gt;       x     y `x%%y`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>    10     3      1</span></span>
@@ -270,7 +253,7 @@ robust cross-database translation available.</p>
 <div class="section level3">
 <h3 id="aggregation">Aggregation<a class="anchor" aria-label="anchor" href="#aggregation"></a>
 </h3>
-<p>All database provide translation for the basic aggregations:
+<p>All databases provide translation for the basic aggregations:
 <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min()</a></code>,
 <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd()</a></code>, <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var()</a></code>. Databases
 automatically drop NULLs (their equivalent of missing values) whereas in
@@ -296,7 +279,7 @@ a window translation. If you want to see the equivalent
 <div class="section level3">
 <h3 id="conditional-evaluation">Conditional evaluation<a class="anchor" aria-label="anchor" href="#conditional-evaluation"></a>
 </h3>
-<p><code>if</code> and <code><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch()</a></code> are translate to
+<p><code>if</code> and <code><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch()</a></code> are translated to
 <code>CASE WHEN</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">5</span><span class="op">)</span> <span class="st">"big"</span> <span class="kw">else</span> <span class="st">"small"</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
@@ -324,8 +307,8 @@ a window translation. If you want to see the equivalent
 <div class="section level2">
 <h2 id="unknown-functions">Unknown functions<a class="anchor" aria-label="anchor" href="#unknown-functions"></a>
 </h2>
-<p>Any function that dplyr doesn’t know how to convert is left as is.
-This means that database functions that are not covered by dplyr can
+<p>Any function that dbplyr doesn’t know how to convert is left as is.
+This means that database functions that are not covered by dbplyr can
 often be used directly via <code><a href="../reference/translate_sql.html">translate_sql()</a></code>.</p>
 <div class="section level3">
 <h3 id="prefix-functions">Prefix functions<a class="anchor" aria-label="anchor" href="#prefix-functions"></a>
@@ -334,9 +317,9 @@ often be used directly via <code><a href="../reference/translate_sql.html">trans
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">foofify</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; foofify(`x`, `y`)</span></span></code></pre></div>
-<p>Because SQL functions are general case insensitive, I recommend using
-upper case when you’re using SQL functions in R code. That makes it
-easier to spot that you’re doing something unusual:</p>
+<p>Because SQL functions are generally case insensitive, I recommend
+using upper case when you’re using SQL functions in R code. That makes
+it easier to spot that you’re doing something unusual:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">FOOFIFY</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; FOOFIFY(`x`, `y`)</span></span></code></pre></div>
@@ -346,7 +329,7 @@ easier to spot that you’re doing something unusual:</p>
 </h3>
 <p>As well as prefix functions (where the name of the function comes
 before the arguments), dbplyr also translates infix functions. That
-allows you to use expressions like <code>LIKE</code> which does a
+allows you to use expressions like <code>LIKE</code>, which does a
 limited form of pattern matching:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%LIKE%</span> <span class="st">"%foo%"</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
@@ -355,7 +338,7 @@ limited form of pattern matching:</p>
 backends will translate <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste()</a></code> and <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code>
 for you):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op">%||%</span> <span class="va">y</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="va">x</span> <span class="op"><a href="https://rdrr.io/r/base/Control.html" class="external-link">%||%</a></span> <span class="va">y</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; `x` || `y`</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -379,21 +362,21 @@ literal SQL inside <code><a href="../reference/sql.html">sql()</a></code>:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> x!<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_QiIy06Mesc`</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_uR8HfdVHIy`</span></span>
 <span></span>
 <span><span class="va">mf</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span>factorial <span class="op">=</span> <span class="fu"><a href="../reference/sql.html">sql</a></span><span class="op">(</span><span class="st">"CAST(x AS FLOAT)"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">show_query</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt;</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB;">SELECT</span> CAST(x AS FLOAT)<span style="color: #0000BB;"> AS </span>`factorial`</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_QiIy06Mesc`</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #0000BB;">FROM</span> `dbplyr_uR8HfdVHIy`</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="error-for-unknown-translations">Error for unknown translations<a class="anchor" aria-label="anchor" href="#error-for-unknown-translations"></a>
 </h3>
-<p>If needed, you can also force dbplyr to error if it doesn’t know how
-to translate a function with the <code>dplyr.strict_sql</code>
-option:</p>
+<p>If needed, you can also use the <code>dplyr.strict_sql</code> option
+to force dbplyr to error if it doesn’t know how to translate a
+function:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>dplyr.strict_sql <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu">glob</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
@@ -439,18 +422,18 @@ preceding rows (in SQL, “unbounded preceding”), 0 means the current row
 (“current row”), and Inf means all following rows (“unbounded
 following”). The complete set of options is comprehensive, but fairly
 confusing, and is summarised visually below.</p>
-<p><img src="windows.png" alt="A visual summary of the frame clause using the real line labelled with negative infinity, -3, -2, -1, 0, 1, 2, 3, infinity. The most important clauses are rolling, cumulative, and recycling. Rolling, e.g. between 1 preceding and 1, following, run from -1 to -1. Cumulative, between unbounded preceding and current row, runs from negative infinity to 0. Recycled, between unbound preceeding and unbound following, runs from negative infinity to positive infinity." width="100%"></p>
-<p>Of the many possible specifications, there are only three that
-commonly used. They select between aggregation variants:</p>
+<p><img src="windows.png" alt="A visual summary of the frame clause using the real line labelled with negative infinity, -3, -2, -1, 0, 1, 2, 3, infinity. The most important clauses are rolling, cumulative, and recycling.  Rolling, e.g. between 1 preceding and 1, following, run from  -1 to -1. Cumulative, between unbounded preceding and  current row, runs from negative infinity to 0. Recycled,  between unbound preceeding and unbound following, runs from  negative infinity to positive infinity." width="100%"></p>
+<p>Of the many possible specifications, only three are commonly used.
+They select between aggregation variants:</p>
 <ul>
 <li><p>Recycled:
-<code>BETWEEN UNBOUND PRECEEDING AND UNBOUND FOLLOWING</code></p></li>
+<code>BETWEEN UNBOUND PRECEDING AND UNBOUND FOLLOWING</code></p></li>
 <li><p>Cumulative:
-<code>BETWEEN UNBOUND PRECEEDING AND CURRENT ROW</code></p></li>
+<code>BETWEEN UNBOUND PRECEDING AND CURRENT ROW</code></p></li>
 <li><p>Rolling:
-<code>BETWEEN 2 PRECEEDING AND 2 FOLLOWING</code></p></li>
+<code>BETWEEN 2 PRECEDING AND 2 FOLLOWING</code></p></li>
 </ul>
-<p>dplyr generates the frame clause based on whether your using a
+<p>dbplyr generates the frame clause based on whether you’re using a
 recycled aggregate or a cumulative aggregate.</p>
 </li>
 </ul>
@@ -471,14 +454,14 @@ again use <code><a href="../reference/translate_sql.html">translate_sql()</a></c
 then dplyr will use that information to set the “partition by” and
 “order by” clauses. For interactive exploration, you can achieve the
 same effect by setting the <code>vars_group</code> and
-<code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code></p>
+<code>vars_order</code> arguments to <code><a href="../reference/translate_sql.html">translate_sql()</a></code>:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/cumall.html" class="external-link">cummean</a></span><span class="op">(</span><span class="va">G</span><span class="op">)</span>, vars_order <span class="op">=</span> <span class="st">"year"</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; AVG(`G`) OVER (ORDER BY `year` ROWS UNBOUNDED PRECEDING)</span></span>
 <span><span class="fu"><a href="../reference/translate_sql.html">translate_sql</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="op">)</span>, vars_group <span class="op">=</span> <span class="st">"ID"</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; RANK() OVER (PARTITION BY `ID`)</span></span></code></pre></div>
 <p>There are some challenges when translating window functions between R
-and SQL, because dplyr tries to keep the window functions as similar as
+and SQL, because dbplyr tries to keep the window functions as similar as
 possible to both the existing R analogues and to the SQL functions. This
 means that there are three ways to control the order clause depending on
 which window function you’re using:</p>
@@ -506,7 +489,7 @@ it to override the default ordering.</p></li>
 setting the default ordering with <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange()</a></code>. This will be
 added in a future release.</p>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -515,13 +498,11 @@ added in a future release.</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by <a href="https://hadley.nz" class="external-link">Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by <a href="https://hadley.nz" class="external-link">Hadley Wickham</a>, Maximilian Girlich, Edgar Ruiz, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
   </div></footer>
