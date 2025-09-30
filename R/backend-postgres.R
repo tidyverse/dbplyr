@@ -445,6 +445,16 @@ supports_window_clause.PostgreSQL <- function(con) {
 }
 
 #' @export
+supports_distinct_on.PqConnection <- function(con) {
+  TRUE
+}
+
+#' @export
+supports_distinct_on.PostgreSQL <- function(con) {
+  TRUE
+}
+
+#' @export
 db_supports_table_alias_with_as.PqConnection <- function(con) {
   TRUE
 }

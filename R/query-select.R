@@ -17,7 +17,7 @@ select_query <- function(from,
   check_character(window)
   check_character(order_by)
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
-  check_bool(distinct)
+  stopifnot(is.logical(distinct) || is.character(distinct))
   check_string(from_alias, allow_null = TRUE)
 
   structure(
@@ -39,10 +39,12 @@ select_query <- function(from,
 
 #' @export
 print.select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
+  cat_line("<SQL SELECT", if (!isFALSE(x$distinct)) " DISTINCT",
+           if (!is.logical(x$distinct)) " ON", ">")
   cat_line("From:")
   cat_line(indent_print(x$from))
 
+  if (!is.logical(x$distinct)) cat_line("Dist On:  ", named_commas(x$distinct))
   if (length(x$select))   cat_line("Select:   ", named_commas(x$select))
   if (length(x$where))    cat_line("Where:    ", named_commas(x$where))
   if (length(x$group_by)) cat_line("Group by: ", named_commas(x$group_by))
@@ -93,7 +95,11 @@ select_query_clauses <- function(x, subquery = FALSE) {
     group_by = length(x$group_by) > 0,
     having   = length(x$having) > 0,
     select   = !identical(unname(x$select), sql("*")),
-    distinct = x$distinct,
+    distinct = if (is.logical(x$distinct)) {
+                 x$distinct
+               } else {
+                 !identical(unname(x$distinct), sql("*"))
+               },
     window   = length(x$window) > 0,
     order_by = (!subquery || !is.null(x$limit)) && length(x$order_by) > 0,
     limit    = !is.null(x$limit)

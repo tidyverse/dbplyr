@@ -19,7 +19,10 @@ lazy_select_query <- function(x,
   # stopifnot(is.character(group_by))
   stopifnot(is_lazy_sql_part(order_by))
   check_number_whole(limit, allow_infinite = TRUE, allow_null = TRUE)
-  check_bool(distinct)
+  # distinct = FALSE     -> no distinct
+  # distinct = TRUE      -> distinct over all columns
+  # distinct = columns   -> DISTINCT ON (...)
+  stopifnot(is.logical(distinct) || is_lazy_sql_part(distinct))
 
   select <- select %||% syms(set_names(op_vars(x)))
   select_operation <- arg_match0(select_operation, c("select", "mutate", "summarise"))
@@ -39,7 +42,11 @@ lazy_select_query <- function(x,
       frame = frame
     )
   } else {
+
     select <- new_lazy_select(select)
+    if (!is.logical(distinct)) {
+      distinct <- new_lazy_select(distinct)
+    }
   }
 
   lazy_query(
@@ -166,8 +173,26 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
 
   alias <- remote_name(op$x, null_if_local = FALSE) %||% unique_subquery_name()
   from <- sql_build(op$x, con, sql_options = sql_options)
+
+  selects <- op$select
+
+  if (!isTRUE(op$distinct) && !isFALSE(op$distinct)) {
+    distinct <- get_select_sql(
+      select = op$distinct,
+      select_operation = op$select_operation,
+      in_vars = op_vars(op$x),
+      table_alias = alias,
+      con = con,
+      use_star = sql_options$use_star
+    )$select_sql
+
+    selects <- anti_join(selects, op$distinct, by = "expr")
+  } else {
+    distinct <- op$distinct
+  }
+
   select_sql_list <- get_select_sql(
-    select = op$select,
+    select = selects,
     select_operation = op$select_operation,
     in_vars = op_vars(op$x),
     table_alias = alias,
@@ -175,6 +200,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     use_star = sql_options$use_star
   )
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
+
 
   select_query(
     from = from,
@@ -184,7 +210,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     having = translate_sql_(op$having, con = con, window = FALSE),
     window = select_sql_list$window_sql,
     order_by = translate_sql_(op$order_by, con = con),
-    distinct = op$distinct,
+    distinct = distinct,
     limit = op$limit,
     from_alias = alias
   )
