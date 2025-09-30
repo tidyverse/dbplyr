@@ -42,7 +42,6 @@ lazy_select_query <- function(x,
       frame = frame
     )
   } else {
-
     select <- new_lazy_select(select)
     if (!is.logical(distinct)) {
       distinct <- new_lazy_select(distinct)
@@ -176,7 +175,7 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
 
   selects <- op$select
 
-  if (!isTRUE(op$distinct) && !isFALSE(op$distinct)) {
+  if (!is.logical(op$distinct)) {
     distinct <- get_select_sql(
       select = op$distinct,
       select_operation = op$select_operation,
@@ -200,7 +199,6 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
     use_star = sql_options$use_star
   )
   where_sql <- translate_sql_(op$where, con = con, context = list(clause = "WHERE"))
-
 
   select_query(
     from = from,
