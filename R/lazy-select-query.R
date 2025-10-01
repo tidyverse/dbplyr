@@ -185,9 +185,6 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
       con = con,
       use_star = sql_options$use_star
     )$select_sql
-
-    # if some renaming is going on we want to keep that deliberately
-    selects <- anti_join(selects, op$distinct, by = "name")
   } else {
     distinct <- op$distinct
   }
