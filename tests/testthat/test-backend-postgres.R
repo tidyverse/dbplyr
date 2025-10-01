@@ -437,10 +437,12 @@ test_that("correctly escapes dates", {
   expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))
 })
 
+# we test that again because postgres uses the DISTINCT ON feature
 test_that("distinct can compute variables when .keep_all is TRUE", {
   con <- src_test("postgres")
 
-  out <- memdb_frame(x = c(2, 1), y = c(1, 2), con = con) %>%
+  out <-
+    local_db_table(con, data.frame(x = c(2, 1), y = c(1, 2)), "df_x") %>%
     distinct(z = x + y, .keep_all = TRUE) %>%
     collect()
 
@@ -451,16 +453,15 @@ test_that("distinct can compute variables when .keep_all is TRUE", {
 test_that("distinct respects window_order when .keep_all is TRUE", {
   con <- src_test("postgres")
 
-  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4, con = con)
+  mf <- local_db_table(con, data.frame(x = c(1, 1, 2, 2), y = 1:4), "mf")
   out <- mf %>%
     window_order(desc(y)) %>%
     distinct(x, .keep_all = TRUE)
 
   expect_equal(out %>% collect(), tibble(x = 1:2, y = c(2, 4)))
 
-  lf <- lazy_frame(x = c(1, 1, 2, 2), y = 1:4, con = con)
   expect_snapshot(
-    lf %>%
+    mf %>%
       window_order(desc(y)) %>%
       distinct(x, .keep_all = TRUE)
   )
