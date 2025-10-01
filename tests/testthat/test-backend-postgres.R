@@ -436,3 +436,32 @@ test_that("correctly escapes dates", {
   dd <- as.Date("2022-03-04")
   expect_equal(escape(dd, con = con), sql("'2022-03-04'::date"))
 })
+
+test_that("distinct can compute variables when .keep_all is TRUE", {
+  con <- src_test("postgres")
+
+  out <- memdb_frame(x = c(2, 1), y = c(1, 2), con = con) %>%
+    distinct(z = x + y, .keep_all = TRUE) %>%
+    collect()
+
+  expect_named(out, c("x", "y", "z"))
+  expect_equal(out$z, 3)
+})
+
+test_that("distinct respects window_order when .keep_all is TRUE", {
+  con <- src_test("postgres")
+
+  mf <- memdb_frame(x = c(1, 1, 2, 2), y = 1:4, con = con)
+  out <- mf %>%
+    window_order(desc(y)) %>%
+    distinct(x, .keep_all = TRUE)
+
+  expect_equal(out %>% collect(), tibble(x = 1:2, y = c(2, 4)))
+
+  lf <- lazy_frame(x = c(1, 1, 2, 2), y = 1:4, con = con)
+  expect_snapshot(
+    lf %>%
+      window_order(desc(y)) %>%
+      distinct(x, .keep_all = TRUE)
+  )
+})
