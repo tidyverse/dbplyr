@@ -17,9 +17,10 @@
 distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
   grps <- syms(op_grps(.data))
   empty_dots <- dots_n(...) == 0
-  use_distinct_on <- .keep_all && !(empty_dots && is_empty(grps))
+  can_use_distinct <-
+    !.keep_all || (empty_dots && is_empty(grps)) || supports_distinct_on(.data$src$con)
 
-  if (!use_distinct_on) {
+  if (can_use_distinct) {
     if (empty_dots) {
       dots <- quos(!!!syms(colnames(.data)))
     } else {
@@ -27,39 +28,32 @@ distinct.tbl_lazy <- function(.data, ..., .keep_all = FALSE) {
       dots <- quos(!!!dots)
     }
     prep <- distinct_prepare_compat(.data, dots, group_vars = group_vars(.data))
-    out <- dplyr::select(prep$data, prep$keep)
 
-    out$lazy_query <- add_distinct(out, distinct = TRUE)
-  } else {
-    if (supports_distinct_on(.data$src$con)) {
-      loc <- tidyselect::eval_select(expr(c(...)), .data)
-      loc <- ensure_group_vars(loc, .data, notify = TRUE)
-      new_vars <- set_names(colnames(.data)[loc], names(loc))
-
-      prep <- distinct_prepare_compat(.data, vars = quos(),
-                                      group_vars = group_vars(.data))
+    if (!.keep_all) {
       out <- dplyr::select(prep$data, prep$keep)
-
-      out$lazy_query <- add_distinct(out, distinct = new_vars)
+      out$lazy_query <- add_distinct(out, distinct = TRUE)
     } else {
-      needs_dummy_order <- is.null(op_sort(.data))
-
-      if (needs_dummy_order) {
-        dummy_order_vars <- colnames(.data)[[1]]
-        .data <- .data %>% window_order(!!sym(dummy_order_vars))
-      }
-
-      .data <- .data %>%
-        group_by(..., .add = TRUE) %>%
-        filter(row_number() == 1L) %>%
-        group_by(!!!grps)
-
-      if (needs_dummy_order) {
-        .data <- .data %>% window_order()
-      }
-
-      return(.data)
+      out <- prep$data
+      out$lazy_query <- add_distinct(out, distinct = set_names(names(quos_auto_name(dots))))
     }
+  } else {
+    needs_dummy_order <- is.null(op_sort(.data))
+
+    if (needs_dummy_order) {
+      dummy_order_vars <- colnames(.data)[[1]]
+      .data <- .data %>% window_order(!!sym(dummy_order_vars))
+    }
+
+    .data <- .data %>%
+      group_by(..., .add = TRUE) %>%
+      filter(row_number() == 1L) %>%
+      group_by(!!!grps)
+
+    if (needs_dummy_order) {
+      .data <- .data %>% window_order()
+    }
+
+    return(.data)
   }
   out
 }
@@ -197,6 +191,11 @@ add_distinct <- function(.data, distinct) {
     return(out)
   }
 
-  lazy_query$distinct <- distinct
+  if (!is.logical(distinct)) {
+    lazy_query$distinct <- new_lazy_select(distinct)
+  } else {
+    lazy_query$distinct <- distinct
+  }
+
   lazy_query
 }
