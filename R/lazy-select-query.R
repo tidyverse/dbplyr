@@ -143,7 +143,8 @@ is_select_identity <- function(select, vars_prev) {
 
 #' @export
 print.lazy_select_query <- function(x, ...) {
-  cat_line("<SQL SELECT", if (x$distinct) " DISTINCT", ">")
+  cat_line("<SQL SELECT", if (!isFALSE(x$distinct)) " DISTINCT",
+           if (!is.logical(x$distinct)) " ON", ">")
   cat_line("From:")
   cat_line(indent_print(sql_build(x$x, simulate_dbi())))
 
@@ -185,7 +186,8 @@ sql_build.lazy_select_query <- function(op, con, ..., sql_options = NULL) {
       use_star = sql_options$use_star
     )$select_sql
 
-    selects <- anti_join(selects, op$distinct, by = "expr")
+    # if some renaming is going on we want to keep that deliberately
+    selects <- anti_join(selects, op$distinct, by = "name")
   } else {
     distinct <- op$distinct
   }
