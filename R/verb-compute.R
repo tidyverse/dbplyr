@@ -17,7 +17,7 @@ collapse.tbl_sql <- function(x, ...) {
   sql <- db_sql_render(x$src$con, x)
 
   tbl_src_dbi(x$src, sql, colnames(x)) %>%
-    group_by(!!! syms(op_grps(x))) %>%
+    group_by(!!!syms(op_grps(x))) %>%
     arrange.tbl_lazy(!!!op_sort(x))
 }
 
@@ -31,14 +31,16 @@ collapse.tbl_sql <- function(x, ...) {
 #' @inheritParams collect.tbl_sql
 #' @export
 #' @importFrom dplyr compute
-compute.tbl_sql <- function(x,
-                            name = NULL,
-                            temporary = TRUE,
-                            unique_indexes = list(),
-                            indexes = list(),
-                            analyze = TRUE,
-                            ...,
-                            cte = FALSE) {
+compute.tbl_sql <- function(
+  x,
+  name = NULL,
+  temporary = TRUE,
+  unique_indexes = list(),
+  indexes = list(),
+  analyze = TRUE,
+  ...,
+  cte = FALSE
+) {
   check_bool(temporary)
 
   if (is.null(name)) {
@@ -57,10 +59,13 @@ compute.tbl_sql <- function(x,
   compute_check_indexes(x, indexes)
   compute_check_indexes(x, unique_indexes)
 
-  x_aliased <- select(x, !!! syms(vars)) # avoids problems with SQLite quoting (#1754)
+  x_aliased <- select(x, !!!syms(vars)) # avoids problems with SQLite quoting (#1754)
   sql <- db_sql_render(x$src$con, x_aliased$lazy_query, cte = cte)
 
-  name <- db_compute(x$src$con, name, sql,
+  name <- db_compute(
+    x$src$con,
+    name,
+    sql,
     temporary = temporary,
     unique_indexes = unique_indexes,
     indexes = indexes,
@@ -73,11 +78,13 @@ compute.tbl_sql <- function(x,
     window_order(!!!op_sort(x))
 }
 
-compute_check_indexes <- function(x,
-                                  indexes,
-                                  ...,
-                                  arg = caller_arg(indexes),
-                                  error_call = caller_env()) {
+compute_check_indexes <- function(
+  x,
+  indexes,
+  ...,
+  arg = caller_arg(indexes),
+  error_call = caller_env()
+) {
   if (is.null(indexes)) {
     return()
   }
@@ -118,7 +125,13 @@ compute_check_indexes <- function(x,
 #'   Use common table expressions in the generated SQL?
 #' @importFrom dplyr collect
 #' @export
-collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE) {
+collect.tbl_sql <- function(
+  x,
+  ...,
+  n = Inf,
+  warn_incomplete = TRUE,
+  cte = FALSE
+) {
   if (identical(n, Inf)) {
     n <- -1
   } else {
@@ -129,7 +142,13 @@ collect.tbl_sql <- function(x, ..., n = Inf, warn_incomplete = TRUE, cte = FALSE
 
   sql <- db_sql_render(x$src$con, x, cte = cte)
   withCallingHandlers(
-    out <- db_collect(x$src$con, sql, n = n, warn_incomplete = warn_incomplete, ...),
+    out <- db_collect(
+      x$src$con,
+      sql,
+      n = n,
+      warn_incomplete = warn_incomplete,
+      ...
+    ),
     error = function(cnd) {
       cli_abort("Failed to collect lazy table.", parent = cnd)
     }

@@ -102,8 +102,8 @@ test_that("across() does not select grouping variables", {
   df <- lazy_frame(g = 1, x = 1)
 
   # SELECT `g`, 0.0 AS `x`
-  expect_snapshot(df %>% group_by(g) %>% mutate(across(.fns = ~ 0)))
-  expect_snapshot(df %>% group_by(g) %>% transmute(across(.fns = ~ 0)))
+  expect_snapshot(df %>% group_by(g) %>% mutate(across(.fns = ~0)))
+  expect_snapshot(df %>% group_by(g) %>% transmute(across(.fns = ~0)))
 })
 
 test_that("transmute() keeps grouping variables", {
@@ -151,7 +151,9 @@ test_that("across() uses original column rather than overridden one", {
     lf %>%
       mutate(across(everything(), ~ .x / x)) %>%
       remote_query(),
-    sql("SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`")
+    sql(
+      "SELECT `x` / `x` AS `x`, `y` / `x` AS `y`, `z` / `x` AS `z`\nFROM `df`"
+    )
   )
   expect_snapshot(
     lf %>%
@@ -355,9 +357,18 @@ test_that(".keep and .before/.after interact correctly", {
   df <- lazy_frame(x = 1, y = 1, z = 1, a = 1, b = 2, c = 3) %>%
     group_by(a, b)
 
-  expect_equal(mutate(df, d = 1, x = 2, .keep = "none") %>% op_vars(), c("x", "a", "b", "d"))
-  expect_equal(mutate(df, d = 1, x = 2, .keep = "none", .before = "a") %>% op_vars(), c("x", "d", "a", "b"))
-  expect_equal(mutate(df, d = 1, x = 2, .keep = "none", .after = "a") %>% op_vars(), c("x", "a", "d", "b"))
+  expect_equal(
+    mutate(df, d = 1, x = 2, .keep = "none") %>% op_vars(),
+    c("x", "a", "b", "d")
+  )
+  expect_equal(
+    mutate(df, d = 1, x = 2, .keep = "none", .before = "a") %>% op_vars(),
+    c("x", "d", "a", "b")
+  )
+  expect_equal(
+    mutate(df, d = 1, x = 2, .keep = "none", .after = "a") %>% op_vars(),
+    c("x", "a", "d", "b")
+  )
 })
 
 test_that("dropping column with `NULL` then readding it retains original location", {
@@ -378,7 +389,10 @@ test_that("dropping column with `NULL` then readding it retains original locatio
   )
 
   # It isn't treated as a "new" column
-  expect_equal(mutate(df, y = NULL, y = 3, .keep = "all", .before = x) %>% op_vars(), c("x", "y", "z", "a"))
+  expect_equal(
+    mutate(df, y = NULL, y = 3, .keep = "all", .before = x) %>% op_vars(),
+    c("x", "y", "z", "a")
+  )
 })
 
 test_that(".keep= always retains grouping variables (#5582)", {
@@ -444,7 +458,9 @@ test_that("mutate() uses star", {
 
   # does not use * if `use_star = FALSE`
   expect_equal(
-    lf %>% mutate(z = 1L) %>% remote_query(sql_options = sql_options(use_star = FALSE)),
+    lf %>%
+      mutate(z = 1L) %>%
+      remote_query(sql_options = sql_options(use_star = FALSE)),
     sql("SELECT `x`, `y`, 1 AS `z`\nFROM `df`")
   )
 })
@@ -468,7 +484,7 @@ test_that("mutate can drop variables with NULL", {
 })
 
 test_that("var = NULL works when var is in original data", {
-  lf <- lazy_frame(x = 1) %>% mutate(x = 2, z = x*2, x = NULL)
+  lf <- lazy_frame(x = 1) %>% mutate(x = 2, z = x * 2, x = NULL)
   expect_equal(sql_build(lf)$select, sql(z = "`x` * 2.0"))
   expect_equal(op_vars(lf), "z")
   expect_snapshot(remote_query(lf))
@@ -482,7 +498,7 @@ test_that("var = NULL when var is in final output", {
 })
 
 test_that("temp var with nested arguments", {
-  lf <- lazy_frame(x = 1) %>% mutate(y = 2, z = y*2, y = NULL)
+  lf <- lazy_frame(x = 1) %>% mutate(y = 2, z = y * 2, y = NULL)
   expect_equal(sql_build(lf)$select, sql(x = "`x`", z = "`y` * 2.0"))
   expect_equal(op_vars(lf), c("x", "z"))
   expect_snapshot(remote_query(lf))

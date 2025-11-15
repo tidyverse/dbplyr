@@ -37,124 +37,128 @@ dbplyr_edition.ACCESS <- function(con) {
 # sql_ generics --------------------------------------------
 
 #' @export
-sql_query_select.ACCESS <- function(con,
-                                    select,
-                                    from,
-                                    where = NULL,
-                                    group_by = NULL,
-                                    having = NULL,
-                                    window = NULL,
-                                    order_by = NULL,
-                                    limit = NULL,
-                                    distinct = FALSE,
-                                    ...,
-                                    subquery = FALSE,
-                                    lvl = 0) {
-
-  sql_select_clauses(con,
-    select    = sql_clause_select(con, select, distinct, top = limit),
-    from      = sql_clause_from(from),
-    where     = sql_clause_where(where),
-    group_by  = sql_clause_group_by(group_by),
-    having    = sql_clause_having(having),
-    window    = sql_clause_window(window),
-    order_by  = sql_clause_order_by(order_by, subquery, limit),
-    lvl       = lvl
+sql_query_select.ACCESS <- function(
+  con,
+  select,
+  from,
+  where = NULL,
+  group_by = NULL,
+  having = NULL,
+  window = NULL,
+  order_by = NULL,
+  limit = NULL,
+  distinct = FALSE,
+  ...,
+  subquery = FALSE,
+  lvl = 0
+) {
+  sql_select_clauses(
+    con,
+    select = sql_clause_select(con, select, distinct, top = limit),
+    from = sql_clause_from(from),
+    where = sql_clause_where(where),
+    group_by = sql_clause_group_by(group_by),
+    having = sql_clause_having(having),
+    window = sql_clause_window(window),
+    order_by = sql_clause_order_by(order_by, subquery, limit),
+    lvl = lvl
   )
 }
 
 #' @export
 sql_translation.ACCESS <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_scalar,
+    sql_translator(
+      .parent = base_scalar,
       # Much of this translation comes from: https://www.techonthenet.com/access/functions/
 
       # Conversion
-      as.numeric    = sql_prefix("CDBL"),
-      as.double     = sql_prefix("CDBL"),
+      as.numeric = sql_prefix("CDBL"),
+      as.double = sql_prefix("CDBL"),
       # as.integer() always rounds down. CInt does not, but Int does
-      as.integer    = sql_prefix("INT"),
-      as.logical    = sql_prefix("CBOOL"),
-      as.character  = sql_prefix("CSTR"),
-      as.Date       = sql_prefix("CDATE"),
+      as.integer = sql_prefix("INT"),
+      as.logical = sql_prefix("CBOOL"),
+      as.character = sql_prefix("CSTR"),
+      as.Date = sql_prefix("CDATE"),
 
       # Math
-      exp           = sql_prefix("EXP"),
-      log           = sql_prefix("LOG"),
-      log10         = function(x) {
-       sql_expr(log(!!x) / log(10L))
+      exp = sql_prefix("EXP"),
+      log = sql_prefix("LOG"),
+      log10 = function(x) {
+        sql_expr(log(!!x) / log(10L))
       },
-      sqrt          = sql_prefix("SQR"),
-      sign          = sql_prefix("SGN"),
-      floor         = sql_prefix("INT"),
+      sqrt = sql_prefix("SQR"),
+      sign = sql_prefix("SGN"),
+      floor = sql_prefix("INT"),
       # Nearly add 1, then drop off the decimal. This results in the equivalent to ceiling()
-      ceiling       = function(x) {
-       sql_expr(int(!!x + .9999999999))
+      ceiling = function(x) {
+        sql_expr(int(!!x + .9999999999))
       },
-      ceil          = function(x) {
-       sql_expr(int(!!x + .9999999999))
+      ceil = function(x) {
+        sql_expr(int(!!x + .9999999999))
       },
       # There is no POWER function in Access. It uses ^ instead
-      `^`           = function(x, y) {
-       sql_expr((!!x) ^ (!!y))
+      `^` = function(x, y) {
+        sql_expr((!!x)^(!!y))
       },
 
       # Strings
-      nchar         = sql_prefix("LEN"),
-      tolower       = sql_prefix("LCASE"),
-      toupper       = sql_prefix("UCASE"),
+      nchar = sql_prefix("LEN"),
+      tolower = sql_prefix("LCASE"),
+      toupper = sql_prefix("UCASE"),
       # Pull `left` chars from the left, then `right` chars from the right to replicate substr
-      substr        = function(x, start, stop){
-       right  <- stop - start + 1
-       left   <- stop
-       sql_expr(right(left(!!x, !!left), !!right))
+      substr = function(x, start, stop) {
+        right <- stop - start + 1
+        left <- stop
+        sql_expr(right(left(!!x, !!left), !!right))
       },
-      trimws        = sql_prefix("TRIM"),
+      trimws = sql_prefix("TRIM"),
       # No support for CONCAT in Access
-      paste         = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
-      paste0        = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
+      paste = sql_paste_infix(" ", "&", function(x) sql_expr(CStr(!!x))),
+      paste0 = sql_paste_infix("", "&", function(x) sql_expr(CStr(!!x))),
 
       # Logic
       # Access always returns -1 for True and 0 for False
-      is.null       = sql_prefix("ISNULL"),
-      is.na         = sql_prefix("ISNULL"),
+      is.null = sql_prefix("ISNULL"),
+      is.na = sql_prefix("ISNULL"),
       # IIF() is like ifelse()
-      ifelse        = function(test, yes, no){
-       sql_expr(iif(!!test, !!yes, !!no))
+      ifelse = function(test, yes, no) {
+        sql_expr(iif(!!test, !!yes, !!no))
       },
       # Access uses <> for inequality
       `!=` = sql_infix("<>"),
-      
+
       # Coalesce doesn't exist in Access.
       # NZ() only works while in Access, not with the Access driver
       # IIF(ISNULL()) is the best way to construct this
-      coalesce      = function(x, y) {
-       sql_expr(iif(isnull(!!x), !!y, !!x))
+      coalesce = function(x, y) {
+        sql_expr(iif(isnull(!!x), !!y, !!x))
       },
 
       # pmin/pmax for 2 columns
-      pmin          = function(x, y) {
-       sql_expr(iif(!!x <= !!y, !!x, !!y))
+      pmin = function(x, y) {
+        sql_expr(iif(!!x <= !!y, !!x, !!y))
       },
 
-      pmax          = function(x, y) {
-       sql_expr(iif(!!x <= !!y, !!y, !!x))
+      pmax = function(x, y) {
+        sql_expr(iif(!!x <= !!y, !!y, !!x))
       },
 
       # Dates
-      Sys.Date      = sql_prefix("DATE")
+      Sys.Date = sql_prefix("DATE")
     ),
 
-    sql_translator(.parent = base_agg,
-      sd         = sql_aggregate("STDEV"),
-      var        = sql_aggregate("VAR"),
-      cor        = sql_not_supported("cor"),
-      cov        = sql_not_supported("cov"),
+    sql_translator(
+      .parent = base_agg,
+      sd = sql_aggregate("STDEV"),
+      var = sql_aggregate("VAR"),
+      cor = sql_not_supported("cor"),
+      cov = sql_not_supported("cov"),
 
       # Count(Distinct *) does not work in Access
       # This would work but we don't know the table name when translating:
       # SELECT Count(*) FROM (SELECT DISTINCT * FROM table_name) AS T
-      n_distinct    = sql_not_supported("n_distinct"),
+      n_distinct = sql_not_supported("n_distinct"),
     ),
 
     # Window functions not supported in Access
@@ -181,7 +185,7 @@ sql_escape_logical.ACCESS <- function(con, x) {
 }
 
 #' @export
-sql_escape_date.ACCESS <-  function(con, x) {
+sql_escape_date.ACCESS <- function(con, x) {
   # Access delimits dates using octothorpes, and uses YYYY-MM-DD
   y <- format(x, "#%Y-%m-%d#")
   y[is.na(x)] <- "NULL"
@@ -189,7 +193,7 @@ sql_escape_date.ACCESS <-  function(con, x) {
 }
 
 #' @export
-sql_escape_datetime.ACCESS <-  function(con, x) {
+sql_escape_datetime.ACCESS <- function(con, x) {
   # Access delimits datetimes using octothorpes, and uses YYYY-MM-DD HH:MM:SS
   # Timezones are not supported in Access
   y <- format(x, "#%Y-%m-%d %H:%M:%S#")

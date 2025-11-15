@@ -4,14 +4,23 @@ test_that("custom scalar translated correctly", {
   local_con(simulate_mysql())
   expect_equal(test_translate_sql(as.logical(1L)), sql("IF(1, TRUE, FALSE)"))
 
-  expect_equal(test_translate_sql(str_locate("abc", "b")), sql("REGEXP_INSTR('abc', 'b')"))
-  expect_equal(test_translate_sql(str_replace_all("abc", "b", "d")), sql("REGEXP_REPLACE('abc', 'b', 'd')"))
+  expect_equal(
+    test_translate_sql(str_locate("abc", "b")),
+    sql("REGEXP_INSTR('abc', 'b')")
+  )
+  expect_equal(
+    test_translate_sql(str_replace_all("abc", "b", "d")),
+    sql("REGEXP_REPLACE('abc', 'b', 'd')")
+  )
 })
 
 test_that("custom aggregators translated correctly", {
   local_con(simulate_mysql())
 
-  expect_equal(test_translate_sql(str_flatten(y, ","), window = FALSE),  sql("GROUP_CONCAT(`y` SEPARATOR ',')"))
+  expect_equal(
+    test_translate_sql(str_flatten(y, ","), window = FALSE),
+    sql("GROUP_CONCAT(`y` SEPARATOR ',')")
+  )
 })
 
 test_that("use CHAR type for as.character", {
@@ -25,7 +34,10 @@ test_that("custom date escaping works as expected", {
   expect_equal(escape(as.Date("2020-01-01"), con = con), sql("'2020-01-01'"))
   expect_equal(escape(as.Date(NA), con = con), sql("NULL"))
 
-  expect_equal(escape(as.POSIXct("2020-01-01", tz = "UTC"), con = con), sql("'2020-01-01 00:00:00'"))
+  expect_equal(
+    escape(as.POSIXct("2020-01-01", tz = "UTC"), con = con),
+    sql("'2020-01-01 00:00:00'")
+  )
   expect_equal(escape(as.POSIXct(NA, tz = "UTC"), con = con), sql("NULL"))
 })
 
@@ -36,9 +48,18 @@ test_that("custom stringr functions translated correctly", {
   expect_equal(test_translate_sql(str_c(x, y)), sql("CONCAT_WS('', `x`, `y`)"))
   expect_equal(test_translate_sql(str_detect(x, y)), sql("`x` REGEXP `y`"))
   expect_equal(test_translate_sql(str_like(x, y)), sql("`x` LIKE `y`"))
-  expect_equal(test_translate_sql(str_like(x, y, FALSE)), sql("`x` LIKE BINARY `y`"))
-  expect_equal(test_translate_sql(str_locate(x, y)), sql("REGEXP_INSTR(`x`, `y`)"))
-  expect_equal(test_translate_sql(str_replace_all(x, y, z)), sql("REGEXP_REPLACE(`x`, `y`, `z`)"))
+  expect_equal(
+    test_translate_sql(str_like(x, y, FALSE)),
+    sql("`x` LIKE BINARY `y`")
+  )
+  expect_equal(
+    test_translate_sql(str_locate(x, y)),
+    sql("REGEXP_INSTR(`x`, `y`)")
+  )
+  expect_equal(
+    test_translate_sql(str_replace_all(x, y, z)),
+    sql("REGEXP_REPLACE(`x`, `y`, `z`)")
+  )
 })
 
 # verbs -------------------------------------------------------------------
@@ -55,16 +76,23 @@ test_that("generates custom sql", {
 
   expect_snapshot(slice_sample(lf, n = 1))
 
-  expect_snapshot(copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(
+    copy_inline(con_maria, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+  )
 
   con_mysql <- simulate_mysql()
-  expect_snapshot(copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query())
+  expect_snapshot(
+    copy_inline(con_mysql, tibble(x = 1:2, y = letters[1:2])) %>% remote_query()
+  )
 })
 
 test_that("`sql_query_update_from()` is correct", {
   con <- simulate_mysql()
   df_y <- lazy_frame(
-    a = 2:3, b = c(12L, 13L), c = -(2:3), d = c("y", "z"),
+    a = 2:3,
+    b = c(12L, 13L),
+    c = -(2:3),
+    d = c("y", "z"),
     con = con,
     .name = "df_y"
   ) %>%
@@ -134,7 +162,8 @@ test_that("can update", {
   # https://jira.mariadb.org/browse/MDEV-5092
   expect_equal(
     rows_update(
-      x, y,
+      x,
+      y,
       by = c("a", "b"),
       unmatched = "ignore",
       in_place = TRUE

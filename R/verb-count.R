@@ -30,7 +30,14 @@ count.tbl_lazy <- function(x, ..., wt = NULL, sort = FALSE, name = NULL) {
 #' @rdname count.tbl_lazy
 #' @importFrom dplyr add_count
 #' @export
-add_count.tbl_lazy <- function (x, ..., wt = NULL, sort = FALSE, name = NULL, .drop = NULL) {
+add_count.tbl_lazy <- function(
+  x,
+  ...,
+  wt = NULL,
+  sort = FALSE,
+  name = NULL,
+  .drop = NULL
+) {
   check_unsupported_arg(.drop)
 
   if (!missing(...)) {
@@ -64,7 +71,7 @@ tally.tbl_lazy <- function(x, wt = NULL, sort = FALSE, name = NULL) {
   }
 }
 
-n_name <- function (x) {
+n_name <- function(x) {
   name <- "n"
   while (name %in% x) {
     name <- paste0("n", name)
@@ -72,7 +79,12 @@ n_name <- function (x) {
   name
 }
 
-check_count_name <- function(name, vars, arg = caller_arg(name), call = caller_env()) {
+check_count_name <- function(
+  name,
+  vars,
+  arg = caller_arg(name),
+  call = caller_env()
+) {
   if (is.null(name)) {
     name <- n_name(vars)
     if (name != "n") {

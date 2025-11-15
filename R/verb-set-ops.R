@@ -56,7 +56,9 @@ add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
     tmp <- list(lazy_query = x_lq$x)
     class(tmp) <- "tbl_lazy"
     x_lq$x <- fill_vars(tmp, vars)$lazy_query
-    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) fill_vars(table, vars))
+    x_lq$unions$table <- purrr::map(x_lq$unions$table, function(table) {
+      fill_vars(table, vars)
+    })
     y <- fill_vars(y, vars)
 
     x_lq$unions$table <- c(x_lq$unions$table, list(y))
@@ -79,7 +81,15 @@ add_union <- function(x, y, all, copy = FALSE, ..., call = caller_env()) {
   )
 }
 
-add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller_env()) {
+add_set_op <- function(
+  x,
+  y,
+  type,
+  copy = FALSE,
+  ...,
+  all = FALSE,
+  call = caller_env()
+) {
   y <- auto_copy(x, y, copy)
   check_set_op_sqlite(x, y, call = call)
 
@@ -89,7 +99,8 @@ add_set_op <- function(x, y, type, copy = FALSE, ..., all = FALSE, call = caller
   y <- fill_vars(y, vars)
 
   lazy_set_op_query(
-    x$lazy_query, y$lazy_query,
+    x$lazy_query,
+    y$lazy_query,
     type = type,
     all = all,
     call = call
