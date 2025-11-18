@@ -15,41 +15,13 @@ This skill guides you through adding SQL translations to dbplyr. SQL translation
 
 ### 1. Research SQL (CRITICAL - ALWAYS FIRST)
 
-Before implementing any SQL translation, you MUST research the SQL syntax and behavior:
+Before implementing any SQL translation, you MUST research the SQL syntax and behavior using the **sql-research** skill. See that skill for the complete research workflow.
 
-**Search for documentation:**
-- Use WebSearch to find official documentation for "{dialect} {function/command}"
-- Search for syntax, behavior, edge cases, and version-specific differences
-- Prioritize official database documentation
-
-**Document your findings:**
-- Create `research/{dialect}-{function}.md` following this structure:
-
-```markdown
-# {Dialect} - {Function/Command}
-
-## Summary
-[1-2 sentence summary focused on R-to-SQL translation]
-
-## Syntax
-[Minimal syntax examples from official sources]
-
-## Key behaviors
-[Only behaviors that matter for dbplyr translation]
-
-## Limitations
-[Only restrictions that affect dbplyr usage]
-
-## Sources
-- [Source name](URL)
-- [Source name](URL)
-```
-
-**Important:**
-- Keep documentation minimal and focused on dbplyr use cases
-- ALL citations with URLs are REQUIRED
-- NO comparisons with other databases
-- Cross-reference multiple sources for unclear behavior
+**Quick summary:**
+- Search official documentation for "{dialect} {function}"
+- Document findings in `research/{dialect}-{function}.md`
+- Include all source URLs
+- Only proceed to implementation after completing research
 
 ### 2. Identify the backend file
 

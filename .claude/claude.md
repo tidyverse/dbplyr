@@ -1,48 +1,6 @@
 ## SQL
 
-### Research workflow
-
-CRITICAL: SQL correctness is paramount in dbplyr. Before implementing SQL for any backend, you MUST follow this research workflow:
-
-1. **Search**: Use WebSearch to find official documentation for "{dialect} {command}"
-   - Prioritize official database documentation and reputable sources
-   - Search for both syntax and behavior, including edge cases
-   - Look for version-specific differences if relevant
-
-2. **Document**: Create `research/{dialect}-{command}.md` with:
-   - Minimal, focused summary relevant to translating R code to SQL
-   - Syntax examples from official sources
-   - Important notes about behavior, limitations, or gotchas for dbplyr's use case
-   - ALL citations with URLs (REQUIRED - no exceptions)
-   - NO comparisons with other databases
-   - Keep it as concise as possible
-
-3. **Verify**: Cross-reference multiple sources when:
-   - Documentation seems incomplete or unclear
-   - Behavior differs across database versions
-   - Edge cases aren't well documented
-
-4. **Implement**: Only after completing research and documentation
-
-Example research file structure:
-```markdown
-# {Dialect} - {Command}
-
-## Summary
-[1-2 sentence summary focused on R-to-SQL translation]
-
-## Syntax
-[Minimal syntax examples from official sources]
-
-## Key behaviors
-[Only the behaviors that matter for dbplyr translation]
-
-## Limitations
-[Only restrictions that affect dbplyr usage]
-
-## Sources
-- [Source name](URL)
-```
+CRITICAL: SQL correctness is paramount in dbplyr. Before implementing SQL for any backend, you MUST use the **sql-research** skill to research syntax and behavior. Only implement after completing research and documentation.
 
 ## R package development
 
